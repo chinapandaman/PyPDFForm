@@ -51,7 +51,10 @@ class PyPDFForm(object):
         pdfrw.PdfWriter().write(result_stream, generated_pdf)
         result_stream.seek(0)
 
-        return result_stream.read()
+        result = result_stream.read()
+        result_stream.close()
+
+        return result
 
     def _fill_pdf(self, template_stream):
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
@@ -77,7 +80,11 @@ class PyPDFForm(object):
         pdfrw.PdfWriter().write(result_stream, template_pdf)
         result_stream.seek(0)
 
-        return result_stream.read()
+        result = result_stream.read()
+
+        result_stream.close()
+
+        return result
 
     def draw_image(self, page_number, image_stream, x, y, width, height, rotation=0):
         buff = BytesIO()
@@ -111,6 +118,11 @@ class PyPDFForm(object):
         output_file.write(result_stream, input_file)
         result_stream.seek(0)
         self.stream = result_stream.read()
+
+        buff.close()
+        image_buff.close()
+        canv_buff.close()
+        result_stream.close()
 
         return self
 
