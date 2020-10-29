@@ -10,17 +10,17 @@ from reportlab.pdfgen import canvas as canv
 
 
 class PyPDFForm(object):
-    _ANNOT_KEY = "/Annots"
-    _ANNOT_FIELD_KEY = "/T"
-    _ANNOT_RECT_KEY = "/Rect"
-    _SUBTYPE_KEY = "/Subtype"
-    _WIDGET_SUBTYPE_KEY = "/Widget"
-
-    _CANVAS_FONT = "Helvetica"
-    _GLOBAL_FONT_SIZE = 12
-    _MAX_TXT_LENGTH = 100
-
     def __init__(self):
+        self._ANNOT_KEY = "/Annots"
+        self._ANNOT_FIELD_KEY = "/T"
+        self._ANNOT_RECT_KEY = "/Rect"
+        self._SUBTYPE_KEY = "/Subtype"
+        self._WIDGET_SUBTYPE_KEY = "/Widget"
+
+        self._CANVAS_FONT = "Helvetica"
+        self._GLOBAL_FONT_SIZE = 12
+        self._MAX_TXT_LENGTH = 100
+
         self._uuid = uuid.uuid4().hex
         self._data_dict = {}
 
@@ -229,10 +229,15 @@ class PyPDFForm(object):
         return self
 
     def fill(
-        self, template_stream, data, simple_mode=True, font="Helvetica", font_size=12
+        self,
+        template_stream,
+        data,
+        simple_mode=True,
+        font_size=12,
+        text_wrap_length=100,
     ):
-        self._CANVAS_FONT = font
         self._GLOBAL_FONT_SIZE = font_size
+        self._MAX_TXT_LENGTH = text_wrap_length
 
         self._data_dict = data
         self._bool_to_checkboxes()
