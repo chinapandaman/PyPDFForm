@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import uuid
+from io import BytesIO
 from tempfile import NamedTemporaryFile
 
 import pdfrw
+from PIL import Image
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas as canv
 
 
 class PyPDFForm(object):
@@ -12,6 +16,9 @@ class PyPDFForm(object):
     _ANNOT_RECT_KEY = "/Rect"
     _SUBTYPE_KEY = "/Subtype"
     _WIDGET_SUBTYPE_KEY = "/Widget"
+
+    _LAYER_SIZE_X = 800.27
+    _LAYER_SIZE_Y = 841.89
 
     def __init__(self):
         self._uuid = uuid.uuid4().hex
@@ -70,6 +77,41 @@ class PyPDFForm(object):
             pdfrw.PdfWriter().write(output_file, template_pdf)
             output_file.seek(0)
             return output_file.read()
+
+    def draw_image(self, page_number, image_stream, x, y, width, height, rotation=0):
+        buff = BytesIO()
+        buff.write(image_stream)
+        buff.seek(0)
+
+        image = Image.open(buff)
+
+        image_buff = BytesIO()
+        image.rotate(rotation, expand=True).save(image_buff, format="JPEG")
+        image_buff.seek(0)
+
+        canv_buff = BytesIO()
+
+        c = canv.Canvas(canv_buff, pagesize=(self._LAYER_SIZE_X, self._LAYER_SIZE_Y))
+
+        c.drawImage(ImageReader(image_buff), x, y, width=width, height=height)
+        c.save()
+        canv_buff.seek(0)
+
+        output_file = pdfrw.PdfFileWriter()
+
+        input_file = pdfrw.PdfReader(fdata=self.stream)
+
+        for i in range(len(input_file.pages)):
+            if i == page_number - 1:
+                merger = pdfrw.PageMerge(input_file.pages[i])
+                merger.add(pdfrw.PdfReader(fdata=canv_buff.read()).pages[0]).render()
+
+        with NamedTemporaryFile(suffix=".pdf") as f:
+            output_file.write(f, input_file)
+            f.seek(0)
+            self.stream = f.read()
+
+            return self
 
     def fill(self, template_stream, data):
         self._data_dict = data
