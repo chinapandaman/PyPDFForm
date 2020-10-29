@@ -2,7 +2,6 @@
 
 import uuid
 from io import BytesIO
-from tempfile import NamedTemporaryFile
 
 import pdfrw
 from PIL import Image
@@ -48,10 +47,11 @@ class PyPDFForm(object):
                             )
                         )
 
-        with NamedTemporaryFile(suffix=".pdf") as final_file:
-            pdfrw.PdfWriter().write(final_file, generated_pdf)
-            final_file.seek(0)
-            return final_file.read()
+        result_stream = BytesIO()
+        pdfrw.PdfWriter().write(result_stream, generated_pdf)
+        result_stream.seek(0)
+
+        return result_stream.read()
 
     def _fill_pdf(self, template_stream):
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
@@ -73,10 +73,11 @@ class PyPDFForm(object):
                                 )
                             )
 
-        with NamedTemporaryFile(suffix=".pdf") as output_file:
-            pdfrw.PdfWriter().write(output_file, template_pdf)
-            output_file.seek(0)
-            return output_file.read()
+        result_stream = BytesIO()
+        pdfrw.PdfWriter().write(result_stream, template_pdf)
+        result_stream.seek(0)
+
+        return result_stream.read()
 
     def draw_image(self, page_number, image_stream, x, y, width, height, rotation=0):
         buff = BytesIO()
@@ -106,12 +107,12 @@ class PyPDFForm(object):
                 merger = pdfrw.PageMerge(input_file.pages[i])
                 merger.add(pdfrw.PdfReader(fdata=canv_buff.read()).pages[0]).render()
 
-        with NamedTemporaryFile(suffix=".pdf") as f:
-            output_file.write(f, input_file)
-            f.seek(0)
-            self.stream = f.read()
+        result_stream = BytesIO()
+        output_file.write(result_stream, input_file)
+        result_stream.seek(0)
+        self.stream = result_stream.read()
 
-            return self
+        return self
 
     def fill(self, template_stream, data):
         self._data_dict = data
