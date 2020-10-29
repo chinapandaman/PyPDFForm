@@ -1,3 +1,5 @@
 black
 isort
 pdfrw
+pillow
+reportlab
