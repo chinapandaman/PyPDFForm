@@ -3,7 +3,7 @@
 import os
 import shutil
 import uuid
-from tempfile import TemporaryFile
+from tempfile import NamedTemporaryFile
 
 import pdfrw
 from PIL import Image
@@ -37,8 +37,8 @@ class PyPDFForm(object):
             if isinstance(v, bool):
                 self._data_dict[k] = pdfrw.PdfName.Yes if v else pdfrw.PdfName.Off
 
-    def _assign_uuid(self, output_file, final_file):
-        generated_pdf = pdfrw.PdfReader(output_file.name)
+    def _assign_uuid(self, output_stream):
+        generated_pdf = pdfrw.PdfReader(fdata=output_stream)
 
         for i in range(len(generated_pdf.pages)):
             annots = generated_pdf.pages[i][self._ANNOT_KEY]
@@ -54,10 +54,13 @@ class PyPDFForm(object):
                             )
                         )
 
-        pdfrw.PdfWriter().write(final_file.name, generated_pdf)
+        with NamedTemporaryFile("w+b", suffix=".pdf") as final_file:
+            pdfrw.PdfWriter().write(final_file, generated_pdf)
+            final_file.seek(0)
+            return final_file.read()
 
-    def _fill_pdf(self, template_file, output_file):
-        template_pdf = pdfrw.PdfReader(template_file.name)
+    def _fill_pdf(self, template_stream):
+        template_pdf = pdfrw.PdfReader(fdata=template_stream)
 
         for i in range(len(template_pdf.pages)):
             annots = template_pdf.pages[i][self._ANNOT_KEY]
@@ -76,7 +79,10 @@ class PyPDFForm(object):
                                 )
                             )
 
-        pdfrw.PdfWriter().write(output_file.name, template_pdf)
+        with NamedTemporaryFile("w+b", suffix=".pdf") as output_file:
+            pdfrw.PdfWriter().write(output_file, template_pdf)
+            output_file.seek(0)
+            return output_file.read()
 
     def fill(
         self, template_stream, data, canvas=False,
@@ -84,13 +90,7 @@ class PyPDFForm(object):
         self._data_dict = data
         self._bool_to_checkboxes()
 
-        with TemporaryFile("w+b", suffix=".pdf") as template_file:
-            template_file.write(template_stream)
+        output_stream = self._fill_pdf(template_stream)
+        self.stream = self._assign_uuid(output_stream)
 
-            with TemporaryFile("w+b", suffix=".pdf") as output_file:
-                self._fill_pdf(template_file, output_file)
-
-                with TemporaryFile("w+b", suffix=".pdf") as final_file:
-                    self._assign_uuid(output_file, final_file)
-                    final_file.seek(0)
-                    self.stream = final_file.read()
+        return self
