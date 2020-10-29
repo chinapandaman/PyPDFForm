@@ -21,10 +21,29 @@ class PyPDFForm(object):
         self._GLOBAL_FONT_SIZE = 12
         self._MAX_TXT_LENGTH = 100
 
-        self._uuid = uuid.uuid4().hex
         self._data_dict = {}
 
         self.stream = ""
+
+    def __add__(self, other):
+        if not self.stream:
+            return other
+
+        writer = pdfrw.PdfWriter()
+
+        writer.addpages(pdfrw.PdfReader(fdata=self.stream).pages)
+        writer.addpages(pdfrw.PdfReader(fdata=other.stream).pages)
+
+        result_stream = BytesIO()
+        writer.write(result_stream)
+        result_stream.seek(0)
+
+        new_obj = self.__class__()
+        new_obj.stream = result_stream.read()
+
+        result_stream.close()
+
+        return new_obj
 
     def _bool_to_checkboxes(self):
         for k, v in self._data_dict.items():
@@ -32,6 +51,8 @@ class PyPDFForm(object):
                 self._data_dict[k] = pdfrw.PdfName.Yes if v else pdfrw.PdfName.Off
 
     def _assign_uuid(self, output_stream):
+        _uuid = uuid.uuid4().hex
+
         generated_pdf = pdfrw.PdfReader(fdata=output_stream)
 
         for i in range(len(generated_pdf.pages)):
@@ -42,7 +63,7 @@ class PyPDFForm(object):
                         annotation.update(
                             pdfrw.PdfDict(
                                 T="{}_{}".format(
-                                    annotation[self._ANNOT_FIELD_KEY][1:-1], self._uuid,
+                                    annotation[self._ANNOT_FIELD_KEY][1:-1], _uuid,
                                 ),
                                 Ff=pdfrw.PdfObject(1),
                             )
