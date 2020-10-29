@@ -16,8 +16,9 @@ class PyPDFForm(object):
     _SUBTYPE_KEY = "/Subtype"
     _WIDGET_SUBTYPE_KEY = "/Widget"
 
-    _LAYER_SIZE_X = 800.27
-    _LAYER_SIZE_Y = 841.89
+    _CANVAS_FONT = "Helvetica"
+    _GLOBAL_FONT_SIZE = 12
+    _MAX_TXT_LENGTH = 100
 
     def __init__(self):
         self._uuid = uuid.uuid4().hex
@@ -86,7 +87,104 @@ class PyPDFForm(object):
 
         return result
 
+    def _fill_pdf_canvas(self, template_stream):
+        template_pdf = pdfrw.PdfReader(fdata=template_stream)
+        layers = []
+
+        for i in range(len(template_pdf.pages)):
+            layer = BytesIO()
+            layers.append(layer)
+
+            c = canv.Canvas(
+                layer,
+                pagesize=(
+                    float(template_pdf.pages[i].MediaBox[2]),
+                    float(template_pdf.pages[i].MediaBox[3]),
+                ),
+            )
+            c.setFont(self._CANVAS_FONT, self._GLOBAL_FONT_SIZE)
+
+            annotations = template_pdf.pages[i][self._ANNOT_KEY]
+            if annotations:
+                for j in reversed(range(len(annotations))):
+                    annotation = annotations[j]
+
+                    if (
+                        annotation[self._SUBTYPE_KEY] == self._WIDGET_SUBTYPE_KEY
+                        and annotation[self._ANNOT_FIELD_KEY]
+                    ):
+                        key = annotation[self._ANNOT_FIELD_KEY][1:-1]
+                        if key in self._data_dict.keys():
+                            if self._data_dict[key] in [
+                                pdfrw.PdfName.Yes,
+                                pdfrw.PdfName.Off,
+                            ]:
+                                annotation.update(
+                                    pdfrw.PdfDict(
+                                        AS=self._data_dict[key], Ff=pdfrw.PdfObject(1)
+                                    )
+                                )
+                            else:
+                                coordinates = annotation[self._ANNOT_RECT_KEY]
+                                annotations.pop(j)
+                                if len(self._data_dict[key]) < self._MAX_TXT_LENGTH:
+                                    c.drawString(
+                                        float(coordinates[0]),
+                                        (float(coordinates[1]) + float(coordinates[3]))
+                                        / 2
+                                        - 2,
+                                        self._data_dict[key],
+                                    )
+                                else:
+                                    txt_obj = c.beginText(0, 0)
+
+                                    start = 0
+                                    end = self._MAX_TXT_LENGTH
+
+                                    while end < len(self._data_dict[key]):
+                                        txt_obj.textLine(
+                                            (self._data_dict[key][start:end])
+                                        )
+                                        start += self._MAX_TXT_LENGTH
+                                        end += self._MAX_TXT_LENGTH
+                                    txt_obj.textLine(self._data_dict[key][start:])
+                                    c.saveState()
+                                    c.translate(
+                                        float(coordinates[0]),
+                                        (float(coordinates[1]) + float(coordinates[3]))
+                                        / 2
+                                        - 2,
+                                    )
+                                    c.drawText(txt_obj)
+                                    c.restoreState()
+                        else:
+                            annotations.pop(j)
+
+            c.save()
+            layer.seek(0)
+
+        for i in range(len(template_pdf.pages)):
+            layer_pdf = pdfrw.PdfReader(layers[i])
+            input_page = template_pdf.pages[i]
+            merger = pdfrw.PageMerge(input_page)
+
+            if len(layer_pdf.pages) > 0:
+                merger.add(layer_pdf.pages[0]).render()
+
+            layers[i].close()
+
+        result_stream = BytesIO()
+        pdfrw.PdfWriter().write(result_stream, template_pdf)
+        result_stream.seek(0)
+
+        result = result_stream.read()
+        result_stream.close()
+
+        return result
+
     def draw_image(self, page_number, image_stream, x, y, width, height, rotation=0):
+        input_file = pdfrw.PdfReader(fdata=self.stream)
+
         buff = BytesIO()
         buff.write(image_stream)
         buff.seek(0)
@@ -99,15 +197,19 @@ class PyPDFForm(object):
 
         canv_buff = BytesIO()
 
-        c = canv.Canvas(canv_buff, pagesize=(self._LAYER_SIZE_X, self._LAYER_SIZE_Y))
+        c = canv.Canvas(
+            canv_buff,
+            pagesize=(
+                float(input_file.pages[page_number - 1].MediaBox[2]),
+                float(input_file.pages[page_number - 1].MediaBox[3]),
+            ),
+        )
 
         c.drawImage(ImageReader(image_buff), x, y, width=width, height=height)
         c.save()
         canv_buff.seek(0)
 
         output_file = pdfrw.PdfFileWriter()
-
-        input_file = pdfrw.PdfReader(fdata=self.stream)
 
         for i in range(len(input_file.pages)):
             if i == page_number - 1:
@@ -126,11 +228,19 @@ class PyPDFForm(object):
 
         return self
 
-    def fill(self, template_stream, data):
+    def fill(
+        self, template_stream, data, simple_mode=True, font="Helvetica", font_size=12
+    ):
+        self._CANVAS_FONT = font
+        self._GLOBAL_FONT_SIZE = font_size
+
         self._data_dict = data
         self._bool_to_checkboxes()
 
-        output_stream = self._fill_pdf(template_stream)
-        self.stream = self._assign_uuid(output_stream)
+        if simple_mode:
+            output_stream = self._fill_pdf(template_stream)
+            self.stream = self._assign_uuid(output_stream)
+        else:
+            self.stream = self._fill_pdf_canvas(template_stream)
 
         return self
