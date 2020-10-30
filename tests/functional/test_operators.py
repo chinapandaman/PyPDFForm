@@ -36,9 +36,8 @@ def test_addition_operator_3_times(
 
         for i in range(3):
             obj = (
-                PyPDFForm()
+                PyPDFForm(template_stream)
                 .fill(
-                    template_stream,
                     {
                         "test": "{}_test_1".format(i),
                         "check": True,
@@ -47,7 +46,6 @@ def test_addition_operator_3_times(
                         "test_3": "{}_test_3".format(i),
                         "check_3": True,
                     },
-                    simple_mode=True,
                 )
                 .draw_image(i + 1, image_stream, 100, 100, 400, 225, 0)
             )
@@ -67,9 +65,8 @@ def test_addition_assignment_operator_3_times(
 
         for i in range(3):
             obj = (
-                PyPDFForm()
+                PyPDFForm(template_stream)
                 .fill(
-                    template_stream,
                     {
                         "test": "{}_test_1".format(i),
                         "check": True,
@@ -78,7 +75,6 @@ def test_addition_assignment_operator_3_times(
                         "test_3": "{}_test_3".format(i),
                         "check_3": True,
                     },
-                    simple_mode=True,
                 )
                 .draw_image(i + 1, image_stream, 100, 100, 400, 225, 0)
             )
