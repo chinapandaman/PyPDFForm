@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from PyPDFForm.pdf import PyPDFForm
+from PyPDFForm.wrapper import PyPDFForm

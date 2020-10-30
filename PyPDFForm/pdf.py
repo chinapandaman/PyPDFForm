@@ -9,7 +9,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
 
-class PyPDFForm(object):
+class _PyPDFForm(object):
     def __init__(self):
         self._ANNOT_KEY = "/Annots"
         self._ANNOT_FIELD_KEY = "/T"
@@ -44,9 +44,6 @@ class PyPDFForm(object):
         result_stream.close()
 
         return new_obj
-
-    def __iadd__(self, other):
-        return self.__add__(other)
 
     def _bool_to_checkboxes(self):
         for k, v in self._data_dict.items():
