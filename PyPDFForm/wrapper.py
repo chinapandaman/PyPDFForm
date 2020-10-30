@@ -32,7 +32,7 @@ class PyPDFForm(object):
 
         return self
 
-    def draw_image(self, page_number, image, x, y, width, height, rotation=0):
+    def draw_image(self, image, page_number, x, y, width, height, rotation=0):
         obj = _PyPDFForm()
         obj.stream = self.stream
 

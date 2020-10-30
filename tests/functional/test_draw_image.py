@@ -44,7 +44,7 @@ def test_draw_image_on_one_page(
                     "check_3": True,
                 },
             )
-            .draw_image(2, image_stream, 100, 100, 400, 225, 0)
+            .draw_image(image_stream, 2, 100, 100, 400, 225, 0)
         )
 
         expected = f.read()

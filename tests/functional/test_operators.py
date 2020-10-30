@@ -47,7 +47,7 @@ def test_addition_operator_3_times(
                         "check_3": True,
                     },
                 )
-                .draw_image(i + 1, image_stream, 100, 100, 400, 225, 0)
+                .draw_image(image_stream, i + 1, 100, 100, 400, 225, 0)
             )
 
             result = result + obj
@@ -76,7 +76,7 @@ def test_addition_assignment_operator_3_times(
                         "check_3": True,
                     },
                 )
-                .draw_image(i + 1, image_stream, 100, 100, 400, 225, 0)
+                .draw_image(image_stream, i + 1, 100, 100, 400, 225, 0)
             )
 
             result += obj
