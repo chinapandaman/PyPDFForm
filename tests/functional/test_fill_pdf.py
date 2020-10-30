@@ -24,8 +24,7 @@ def comparing_size():
 
 def test_fill_simple_mode(template_stream, pdf_samples, comparing_size):
     with open(os.path.join(pdf_samples, "sample_filled_simple_mode.pdf"), "rb+") as f:
-        obj = PyPDFForm().fill(
-            template_stream,
+        obj = PyPDFForm(template_stream).fill(
             {
                 "test": "test_1",
                 "check": True,
@@ -44,8 +43,7 @@ def test_fill_simple_mode(template_stream, pdf_samples, comparing_size):
 
 def test_fill_font_20(template_stream, pdf_samples, comparing_size):
     with open(os.path.join(pdf_samples, "sample_filled_font_20.pdf"), "rb+") as f:
-        obj = PyPDFForm().fill(
-            template_stream,
+        obj = PyPDFForm(template_stream, simple_mode=False).fill(
             {
                 "test": "test_1",
                 "check": True,
@@ -54,7 +52,6 @@ def test_fill_font_20(template_stream, pdf_samples, comparing_size):
                 "test_3": "test_3",
                 "check_3": True,
             },
-            simple_mode=False,
             font_size=20,
         )
 
@@ -66,8 +63,7 @@ def test_fill_font_20(template_stream, pdf_samples, comparing_size):
 
 def test_fill_text_wrap_2(template_stream, pdf_samples, comparing_size):
     with open(os.path.join(pdf_samples, "sample_filled_text_wrap_2.pdf"), "rb+") as f:
-        obj = PyPDFForm().fill(
-            template_stream,
+        obj = PyPDFForm(template_stream, simple_mode=False).fill(
             {
                 "test": "test_1",
                 "check": True,
@@ -76,7 +72,6 @@ def test_fill_text_wrap_2(template_stream, pdf_samples, comparing_size):
                 "test_3": "test_3",
                 "check_3": True,
             },
-            simple_mode=False,
             text_wrap_length=2,
         )
 
