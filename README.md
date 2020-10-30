@@ -2,7 +2,7 @@
 
 PyPDFForm is a pure-python library for PDF form processing. 
 It allows filling a PDF form by creating a python dictionary that matches its annotation names 
-for elements such as text fields and checkboxes. It also supports other drawing image and mering multiple 
+for elements such as text fields and checkboxes. It also supports other drawing image and merging multiple 
 PDFs together.
 
 ## Installing
@@ -13,23 +13,22 @@ Install using  [pip](https://pip.pypa.io/en/stable/quickstart/):
 pip install -i https://test.pypi.org/simple/ PyPDFForm
 `````
 
-## A Simple Example
+## Quick Example
 
 You can find a sample PDF form from [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). Download it and try:
 
 ````python
 import os
+
 from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
-    os.path.expanduser("~"),
-    "sample_template.pdf"
-) # Change this to where you downloaded the sample PDF form
+    os.path.expanduser("~"), "sample_template.pdf"
+)  # Change this to where you downloaded the sample PDF form
 
 PATH_TO_FILLED_PDF_FORM = os.path.join(
-    os.path.expanduser("~"),
-    "output.pdf"
-) # Change this to where you wish to put your filled PDF form
+    os.path.expanduser("~"), "output.pdf"
+)  # Change this to where you wish to put your filled PDF form
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     filled_pdf = PyPDFForm(template.read(), simple_mode=False).fill(
@@ -48,8 +47,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         output.write(filled_pdf.stream)
 ````
 
-After running the above code snippet you should be able to find `output.pdf` 
-and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_filled_font_20.pdf)
+After running the above code snippet you can find `output.pdf` at the location you specified 
+and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_filled_font_20.pdf).
 
 ## Documentation
 
