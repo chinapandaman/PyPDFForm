@@ -48,5 +48,4 @@ def test_draw_image_on_one_page(template_stream, image_stream, pdf_samples, comp
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
         assert obj.stream[:comparing_size] == expected[:comparing_size]
