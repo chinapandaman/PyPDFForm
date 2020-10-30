@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="PyPDFForm",
-    version="0.0.3",
+    version="0.0.4",
     author="Jinge Li",
     description="python library for PDF forms",
     long_description=long_description,
