@@ -25,7 +25,7 @@ def image_stream(pdf_samples):
 
 @pytest.fixture
 def comparing_size():
-    return 32767
+    return 4095
 
 
 def test_addition_operator_3_times(
