@@ -6,8 +6,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="PyPDFForm-chinapandaman",
-    version="0.0.2",
+    name="PyPDFForm",
+    version="0.0.3",
     author="Jinge Li",
     description="python library for PDF forms",
     long_description=long_description,
