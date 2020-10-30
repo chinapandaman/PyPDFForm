@@ -45,6 +45,9 @@ class PyPDFForm(object):
 
         return new_obj
 
+    def __iadd__(self, other):
+        return self.__add__(other)
+
     def _bool_to_checkboxes(self):
         for k, v in self._data_dict.items():
             if isinstance(v, bool):
