@@ -7,17 +7,17 @@ drawing image and merging multiple PDFs together.
 
 ## Installing
 
-Install using  [pip](https://pip.pypa.io/en/stable/quickstart/):
+Install using [pip](https://pip.pypa.io/en/stable/quickstart/):
 
-`````commandline
-pip install -U PyPDFForm
-`````
+```commandline
+pip install PyPDFForm
+```
 
 ## Quick Example
 
-You can find a sample PDF form from [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). Download it and try:
+A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). Download it and try:
 
-````python
+```python
 import os
 
 from PyPDFForm import PyPDFForm
@@ -45,7 +45,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
         output.write(filled_pdf.stream)
-````
+```
 
 After running the above code snippet you can find `output.pdf` at the location you specified 
 and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_filled_font_20.pdf).
@@ -53,3 +53,26 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/m
 ## Documentation
 
 (WIP)
+
+## Tests
+
+PyPDFForm utilizes [pytest](https://docs.pytest.org/en/stable/) for unit and 
+functional tests. Tests can be run by first installing dependencies using 
+[pip](https://pip.pypa.io/en/stable/quickstart/):
+
+```commandline
+pip install -r requirements.txt
+```
+
+In order to run tests, source root needs to be added to PYTHONPATH by running 
+the following command at project root:
+
+```shell script
+export PYTHONPATH=$PYTHONPATH:$(pwd)/PyPDFForm
+```
+
+From there run tests using:
+
+```commandline
+pytest
+```
