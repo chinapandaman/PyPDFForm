@@ -46,7 +46,7 @@ class PyPDFForm(object):
         obj.stream = self.stream
 
         self.stream = obj.draw_image(
-            page_number, image, x, y, width, height, rotation
+            image, page_number, x, y, width, height, rotation
         ).stream
 
         return self

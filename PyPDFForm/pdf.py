@@ -205,8 +205,8 @@ class _PyPDFForm(object):
 
     def draw_image(
         self,
-        page_number: int,
         image_stream: bytes,
+        page_number: int,
         x: float,
         y: float,
         width: float,
