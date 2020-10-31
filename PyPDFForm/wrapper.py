@@ -4,11 +4,11 @@ from PyPDFForm.pdf import _PyPDFForm
 
 
 class PyPDFForm(object):
-    def __init__(self, template="", simple_mode=True):
+    def __init__(self, template: bytes = b"", simple_mode: bool = True) -> None:
         self.stream = template
         self.simple_mode = simple_mode
 
-    def __add__(self, other):
+    def __add__(self, other: "PyPDFForm") -> "PyPDFForm":
         self_obj = _PyPDFForm()
         self_obj.stream = self.stream
 
@@ -22,8 +22,8 @@ class PyPDFForm(object):
         return new_obj
 
     def fill(
-        self, data, font_size=12, text_wrap_length=100,
-    ):
+        self, data: dict, font_size: float = 12, text_wrap_length: int = 100,
+    ) -> "PyPDFForm":
         self.stream = (
             _PyPDFForm()
             .fill(self.stream, data, self.simple_mode, font_size, text_wrap_length)
@@ -32,7 +32,16 @@ class PyPDFForm(object):
 
         return self
 
-    def draw_image(self, image, page_number, x, y, width, height, rotation=0):
+    def draw_image(
+        self,
+        image: bytes,
+        page_number: int,
+        x: float,
+        y: float,
+        width: float,
+        height: float,
+        rotation: float = 0,
+    ) -> "PyPDFForm":
         obj = _PyPDFForm()
         obj.stream = self.stream
 
