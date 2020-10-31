@@ -10,7 +10,7 @@ with open("requirements-deploy.txt", "r") as requirements:
 
 setuptools.setup(
     name="PyPDFForm",
-    version="0.0.5",
+    version="0.0.6",
     author="Jinge Li",
     description="python library for PDF forms",
     long_description=long_description,

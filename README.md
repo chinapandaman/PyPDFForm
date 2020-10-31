@@ -10,7 +10,7 @@ drawing image and merging multiple PDFs together.
 Install using  [pip](https://pip.pypa.io/en/stable/quickstart/):
 
 `````commandline
-pip install -i https://test.pypi.org/simple/ PyPDFForm
+pip install -U PyPDFForm
 `````
 
 ## Quick Example
