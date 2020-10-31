@@ -5,6 +5,9 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("requirements-deploy.txt", "r") as requirements:
+    dependencies = [each.replace("\n", "") for each in requirements.readlines() if each]
+
 setuptools.setup(
     name="PyPDFForm",
     version="0.0.4",
@@ -20,4 +23,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
+    install_requires=dependencies,
 )
