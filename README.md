@@ -64,10 +64,11 @@ functional tests. Tests can be run by first installing dependencies using
 pip install -r requirements.txt
 ```
 
-In order to run tests, source root needs to be added to PYTHONPATH:
+In order to run tests, source root needs to be added to PYTHONPATH by running 
+the following command at project root:
 
 ```shell script
-export PYTHONPATH=$PYTHONPATH:$(pwd)/chocolatepy
+export PYTHONPATH=$PYTHONPATH:$(pwd)/PyPDFForm
 ```
 
 From there run tests using:
