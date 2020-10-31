@@ -5,8 +5,14 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-with open("requirements-deploy.txt", "r") as requirements:
-    dependencies = [each.replace("\n", "") for each in requirements.readlines() if each]
+dev_dependencies = ["black", "isort", "pytest"]
+
+with open("requirements.txt", "r") as requirements:
+    dependencies = [
+        each.replace("\n", "")
+        for each in requirements.readlines()
+        if each.replace("\n", "") not in dev_dependencies
+    ]
 
 setuptools.setup(
     name="PyPDFForm",
