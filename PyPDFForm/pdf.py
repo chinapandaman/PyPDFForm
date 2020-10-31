@@ -10,7 +10,7 @@ from reportlab.pdfgen import canvas as canv
 
 
 class _PyPDFForm(object):
-    def __init__(self):
+    def __init__(self) -> None:
         self._ANNOT_KEY = "/Annots"
         self._ANNOT_FIELD_KEY = "/T"
         self._ANNOT_RECT_KEY = "/Rect"
@@ -23,9 +23,9 @@ class _PyPDFForm(object):
 
         self._data_dict = {}
 
-        self.stream = ""
+        self.stream = b""
 
-    def __add__(self, other):
+    def __add__(self, other: "_PyPDFForm") -> "_PyPDFForm":
         if not self.stream:
             return other
 
@@ -45,12 +45,12 @@ class _PyPDFForm(object):
 
         return new_obj
 
-    def _bool_to_checkboxes(self):
+    def _bool_to_checkboxes(self) -> None:
         for k, v in self._data_dict.items():
             if isinstance(v, bool):
                 self._data_dict[k] = pdfrw.PdfName.Yes if v else pdfrw.PdfName.Off
 
-    def _assign_uuid(self, output_stream):
+    def _assign_uuid(self, output_stream: bytes) -> bytes:
         _uuid = uuid.uuid4().hex
 
         generated_pdf = pdfrw.PdfReader(fdata=output_stream)
@@ -78,7 +78,7 @@ class _PyPDFForm(object):
 
         return result
 
-    def _fill_pdf(self, template_stream):
+    def _fill_pdf(self, template_stream: bytes) -> bytes:
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
 
         for i in range(len(template_pdf.pages)):
@@ -108,7 +108,7 @@ class _PyPDFForm(object):
 
         return result
 
-    def _fill_pdf_canvas(self, template_stream):
+    def _fill_pdf_canvas(self, template_stream: bytes) -> bytes:
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
         layers = []
 
@@ -203,7 +203,16 @@ class _PyPDFForm(object):
 
         return result
 
-    def draw_image(self, page_number, image_stream, x, y, width, height, rotation=0):
+    def draw_image(
+        self,
+        image_stream: bytes,
+        page_number: int,
+        x: float,
+        y: float,
+        width: float,
+        height: float,
+        rotation: float = 0,
+    ) -> "_PyPDFForm":
         input_file = pdfrw.PdfReader(fdata=self.stream)
 
         buff = BytesIO()
@@ -251,12 +260,12 @@ class _PyPDFForm(object):
 
     def fill(
         self,
-        template_stream,
-        data,
-        simple_mode=True,
-        font_size=12,
-        text_wrap_length=100,
-    ):
+        template_stream: bytes,
+        data: dict,
+        simple_mode: bool = True,
+        font_size: float = 12,
+        text_wrap_length: int = 100,
+    ) -> "_PyPDFForm":
         self._GLOBAL_FONT_SIZE = font_size
         self._MAX_TXT_LENGTH = text_wrap_length
 
