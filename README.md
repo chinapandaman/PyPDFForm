@@ -15,7 +15,7 @@ pip install PyPDFForm
 
 ## Quick Example
 
-You can find a sample PDF form from [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). Download it and try:
+A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). Download it and try:
 
 ```python
 import os
@@ -57,7 +57,8 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/m
 ## Tests
 
 PyPDFForm utilizes [pytest](https://docs.pytest.org/en/stable/) for unit and 
-functional tests. Tests can be run by first installing dependencies using pip:
+functional tests. Tests can be run by first installing dependencies using 
+[pip](https://pip.pypa.io/en/stable/quickstart/):
 
 ```commandline
 pip install -r requirements.txt
