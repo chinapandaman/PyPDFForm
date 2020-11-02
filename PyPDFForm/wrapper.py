@@ -41,11 +41,11 @@ class PyPDFForm(object):
         self,
         image: bytes,
         page_number: int,
-        x: float,
-        y: float,
-        width: float,
-        height: float,
-        rotation: float = 0,
+        x: Union[float, int],
+        y: Union[float, int],
+        width: Union[float, int],
+        height: Union[float, int],
+        rotation: Union[float, int] = 0,
     ) -> "PyPDFForm":
         obj = _PyPDFForm()
         obj.stream = self.stream
