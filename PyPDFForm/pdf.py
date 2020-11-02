@@ -253,7 +253,7 @@ class _PyPDFForm(object):
         image = Image.open(buff)
 
         image_buff = BytesIO()
-        image.rotate(rotation, expand=True).save(image_buff, format="JPEG")
+        image.rotate(rotation, expand=True).save(image_buff, format=image.format)
         image_buff.seek(0)
 
         canv_buff = BytesIO()
