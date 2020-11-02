@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from typing import Union
+
 from PyPDFForm.pdf import _PyPDFForm
 
 
@@ -22,7 +24,10 @@ class PyPDFForm(object):
         return new_obj
 
     def fill(
-        self, data: dict, font_size: int = 12, text_wrap_length: int = 100,
+        self,
+        data: dict,
+        font_size: Union[float, int] = 12,
+        text_wrap_length: int = 100,
     ) -> "PyPDFForm":
         self.stream = (
             _PyPDFForm()
