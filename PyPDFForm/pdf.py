@@ -7,8 +7,12 @@ from typing import Union
 import pdfrw
 from PIL import Image
 from PyPDFForm.exceptions import (InvalidFontSizeError, InvalidFormDataError,
-                                  InvalidModeError, InvalidTemplateError,
-                                  InvalidWrapLengthError)
+                                  InvalidImageCoordinateError,
+                                  InvalidImageDimensionError,
+                                  InvalidImageError,
+                                  InvalidImageRotationAngleError,
+                                  InvalidModeError, InvalidPageNumberError,
+                                  InvalidTemplateError, InvalidWrapLengthError)
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
@@ -59,9 +63,11 @@ class _PyPDFForm(object):
 
     @staticmethod
     def _validate_fill_inputs(
-        data: dict, simple_mode: bool, font_size: float, text_wrap_length: int
-    ):
-
+        data: dict,
+        simple_mode: bool,
+        font_size: Union[float, int],
+        text_wrap_length: int,
+    ) -> None:
         if not isinstance(data, dict):
             raise InvalidFormDataError
 
@@ -73,6 +79,33 @@ class _PyPDFForm(object):
 
         if not isinstance(text_wrap_length, int):
             raise InvalidWrapLengthError
+
+    @staticmethod
+    def _validate_draw_image_inputs(
+        page_number: int,
+        x: Union[float, int],
+        y: Union[float, int],
+        width: Union[float, int],
+        height: Union[float, int],
+        rotation: Union[float, int],
+    ) -> None:
+        if not isinstance(page_number, int):
+            raise InvalidPageNumberError
+
+        if not (isinstance(x, float) or isinstance(x, int)):
+            raise InvalidImageCoordinateError
+
+        if not (isinstance(y, float) or isinstance(y, int)):
+            raise InvalidImageCoordinateError
+
+        if not (isinstance(width, float) or isinstance(width, int)):
+            raise InvalidImageDimensionError
+
+        if not (isinstance(height, float) or isinstance(height, int)):
+            raise InvalidImageDimensionError
+
+        if not (isinstance(rotation, float) or isinstance(rotation, int)):
+            raise InvalidImageRotationAngleError
 
     def _bool_to_checkboxes(self) -> None:
         for k, v in self._data_dict.items():
@@ -243,6 +276,7 @@ class _PyPDFForm(object):
         rotation: float,
     ) -> "_PyPDFForm":
         self._validate_template(self.stream)
+        self._validate_draw_image_inputs(page_number, x, y, width, height, rotation)
 
         input_file = pdfrw.PdfReader(fdata=self.stream)
 
@@ -250,7 +284,10 @@ class _PyPDFForm(object):
         buff.write(image_stream)
         buff.seek(0)
 
-        image = Image.open(buff)
+        try:
+            image = Image.open(buff)
+        except Exception:
+            raise InvalidImageError
 
         image_buff = BytesIO()
         image.rotate(rotation, expand=True).save(image_buff, format=image.format)
