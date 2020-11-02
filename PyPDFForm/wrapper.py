@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from typing import Union
+
 from PyPDFForm.pdf import _PyPDFForm
 
 
@@ -22,7 +24,10 @@ class PyPDFForm(object):
         return new_obj
 
     def fill(
-        self, data: dict, font_size: float = 12, text_wrap_length: int = 100,
+        self,
+        data: dict,
+        font_size: Union[float, int] = 12,
+        text_wrap_length: int = 100,
     ) -> "PyPDFForm":
         self.stream = (
             _PyPDFForm()
@@ -36,11 +41,11 @@ class PyPDFForm(object):
         self,
         image: bytes,
         page_number: int,
-        x: float,
-        y: float,
-        width: float,
-        height: float,
-        rotation: float = 0,
+        x: Union[float, int],
+        y: Union[float, int],
+        width: Union[float, int],
+        height: Union[float, int],
+        rotation: Union[float, int] = 0,
     ) -> "PyPDFForm":
         obj = _PyPDFForm()
         obj.stream = self.stream

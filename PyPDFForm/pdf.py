@@ -2,9 +2,17 @@
 
 import uuid
 from io import BytesIO
+from typing import Union
 
 import pdfrw
 from PIL import Image
+from PyPDFForm.exceptions import (InvalidFontSizeError, InvalidFormDataError,
+                                  InvalidImageCoordinateError,
+                                  InvalidImageDimensionError,
+                                  InvalidImageError,
+                                  InvalidImageRotationAngleError,
+                                  InvalidModeError, InvalidPageNumberError,
+                                  InvalidTemplateError, InvalidWrapLengthError)
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
@@ -29,6 +37,9 @@ class _PyPDFForm(object):
         if not self.stream:
             return other
 
+        self._validate_template(self.stream)
+        self._validate_template(other.stream)
+
         writer = pdfrw.PdfWriter()
 
         writer.addpages(pdfrw.PdfReader(fdata=self.stream).pages)
@@ -44,6 +55,57 @@ class _PyPDFForm(object):
         result_stream.close()
 
         return new_obj
+
+    @staticmethod
+    def _validate_template(template_stream: bytes) -> None:
+        if b"%PDF" not in template_stream:
+            raise InvalidTemplateError
+
+    @staticmethod
+    def _validate_fill_inputs(
+        data: dict,
+        simple_mode: bool,
+        font_size: Union[float, int],
+        text_wrap_length: int,
+    ) -> None:
+        if not isinstance(data, dict):
+            raise InvalidFormDataError
+
+        if not isinstance(simple_mode, bool):
+            raise InvalidModeError
+
+        if not (isinstance(font_size, float) or isinstance(font_size, int)):
+            raise InvalidFontSizeError
+
+        if not isinstance(text_wrap_length, int):
+            raise InvalidWrapLengthError
+
+    @staticmethod
+    def _validate_draw_image_inputs(
+        page_number: int,
+        x: Union[float, int],
+        y: Union[float, int],
+        width: Union[float, int],
+        height: Union[float, int],
+        rotation: Union[float, int],
+    ) -> None:
+        if not isinstance(page_number, int):
+            raise InvalidPageNumberError
+
+        if not (isinstance(x, float) or isinstance(x, int)):
+            raise InvalidImageCoordinateError
+
+        if not (isinstance(y, float) or isinstance(y, int)):
+            raise InvalidImageCoordinateError
+
+        if not (isinstance(width, float) or isinstance(width, int)):
+            raise InvalidImageDimensionError
+
+        if not (isinstance(height, float) or isinstance(height, int)):
+            raise InvalidImageDimensionError
+
+        if not (isinstance(rotation, float) or isinstance(rotation, int)):
+            raise InvalidImageRotationAngleError
 
     def _bool_to_checkboxes(self) -> None:
         for k, v in self._data_dict.items():
@@ -207,22 +269,28 @@ class _PyPDFForm(object):
         self,
         image_stream: bytes,
         page_number: int,
-        x: float,
-        y: float,
-        width: float,
-        height: float,
-        rotation: float = 0,
+        x: Union[float, int],
+        y: Union[float, int],
+        width: Union[float, int],
+        height: Union[float, int],
+        rotation: Union[float, int],
     ) -> "_PyPDFForm":
+        self._validate_template(self.stream)
+        self._validate_draw_image_inputs(page_number, x, y, width, height, rotation)
+
         input_file = pdfrw.PdfReader(fdata=self.stream)
 
         buff = BytesIO()
         buff.write(image_stream)
         buff.seek(0)
 
-        image = Image.open(buff)
+        try:
+            image = Image.open(buff)
+        except Exception:
+            raise InvalidImageError
 
         image_buff = BytesIO()
-        image.rotate(rotation, expand=True).save(image_buff, format="JPEG")
+        image.rotate(rotation, expand=True).save(image_buff, format=image.format)
         image_buff.seek(0)
 
         canv_buff = BytesIO()
@@ -262,10 +330,13 @@ class _PyPDFForm(object):
         self,
         template_stream: bytes,
         data: dict,
-        simple_mode: bool = True,
-        font_size: float = 12,
-        text_wrap_length: int = 100,
+        simple_mode: bool,
+        font_size: Union[float, int],
+        text_wrap_length: int,
     ) -> "_PyPDFForm":
+        self._validate_template(template_stream)
+        self._validate_fill_inputs(data, simple_mode, font_size, text_wrap_length)
+
         self._GLOBAL_FONT_SIZE = font_size
         self._MAX_TXT_LENGTH = text_wrap_length
 
