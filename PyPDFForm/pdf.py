@@ -2,10 +2,13 @@
 
 import uuid
 from io import BytesIO
+from typing import Union
 
 import pdfrw
 from PIL import Image
-from PyPDFForm.exceptions import InvalidTemplateError
+from PyPDFForm.exceptions import (InvalidFontSizeError, InvalidFormDataError,
+                                  InvalidModeError, InvalidTemplateError,
+                                  InvalidWrapLengthError)
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
@@ -50,9 +53,26 @@ class _PyPDFForm(object):
         return new_obj
 
     @staticmethod
-    def _validate_template(template_stream):
+    def _validate_template(template_stream: bytes) -> None:
         if b"%PDF" not in template_stream:
             raise InvalidTemplateError
+
+    @staticmethod
+    def _validate_fill_inputs(
+        data: dict, simple_mode: bool, font_size: float, text_wrap_length: int
+    ):
+
+        if not isinstance(data, dict):
+            raise InvalidFormDataError
+
+        if not isinstance(simple_mode, bool):
+            raise InvalidModeError
+
+        if not (isinstance(font_size, float) or isinstance(font_size, int)):
+            raise InvalidFontSizeError
+
+        if not isinstance(text_wrap_length, int):
+            raise InvalidWrapLengthError
 
     def _bool_to_checkboxes(self) -> None:
         for k, v in self._data_dict.items():
@@ -220,7 +240,7 @@ class _PyPDFForm(object):
         y: float,
         width: float,
         height: float,
-        rotation: float = 0,
+        rotation: float,
     ) -> "_PyPDFForm":
         self._validate_template(self.stream)
 
@@ -273,11 +293,12 @@ class _PyPDFForm(object):
         self,
         template_stream: bytes,
         data: dict,
-        simple_mode: bool = True,
-        font_size: float = 12,
-        text_wrap_length: int = 100,
+        simple_mode: bool,
+        font_size: Union[float, int],
+        text_wrap_length: int,
     ) -> "_PyPDFForm":
         self._validate_template(template_stream)
+        self._validate_fill_inputs(data, simple_mode, font_size, text_wrap_length)
 
         self._GLOBAL_FONT_SIZE = font_size
         self._MAX_TXT_LENGTH = text_wrap_length
