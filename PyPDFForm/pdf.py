@@ -269,11 +269,11 @@ class _PyPDFForm(object):
         self,
         image_stream: bytes,
         page_number: int,
-        x: float,
-        y: float,
-        width: float,
-        height: float,
-        rotation: float,
+        x: Union[float, int],
+        y: Union[float, int],
+        width: Union[float, int],
+        height: Union[float, int],
+        rotation: Union[float, int],
     ) -> "_PyPDFForm":
         self._validate_template(self.stream)
         self._validate_draw_image_inputs(page_number, x, y, width, height, rotation)
