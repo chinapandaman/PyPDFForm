@@ -5,6 +5,7 @@ from io import BytesIO
 
 import pdfrw
 from PIL import Image
+from PyPDFForm.exceptions import InvalidTemplateError
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
@@ -29,6 +30,9 @@ class _PyPDFForm(object):
         if not self.stream:
             return other
 
+        self._validate_template(self.stream)
+        self._validate_template(other.stream)
+
         writer = pdfrw.PdfWriter()
 
         writer.addpages(pdfrw.PdfReader(fdata=self.stream).pages)
@@ -44,6 +48,11 @@ class _PyPDFForm(object):
         result_stream.close()
 
         return new_obj
+
+    @staticmethod
+    def _validate_template(template_stream):
+        if b"%PDF" not in template_stream:
+            raise InvalidTemplateError
 
     def _bool_to_checkboxes(self) -> None:
         for k, v in self._data_dict.items():
@@ -213,6 +222,8 @@ class _PyPDFForm(object):
         height: float,
         rotation: float = 0,
     ) -> "_PyPDFForm":
+        self._validate_template(self.stream)
+
         input_file = pdfrw.PdfReader(fdata=self.stream)
 
         buff = BytesIO()
@@ -266,6 +277,8 @@ class _PyPDFForm(object):
         font_size: float = 12,
         text_wrap_length: int = 100,
     ) -> "_PyPDFForm":
+        self._validate_template(template_stream)
+
         self._GLOBAL_FONT_SIZE = font_size
         self._MAX_TXT_LENGTH = text_wrap_length
 
