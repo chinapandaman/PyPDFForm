@@ -2,7 +2,7 @@
 
 from typing import Union
 
-from PyPDFForm.pdf import _PyPDFForm
+from .pdf import _PyPDFForm
 
 
 class PyPDFForm(object):
@@ -27,11 +27,21 @@ class PyPDFForm(object):
         self,
         data: dict,
         font_size: Union[float, int] = 12,
+        text_x_offset: Union[float, int] = 0,
+        text_y_offset: Union[float, int] = 0,
         text_wrap_length: int = 100,
     ) -> "PyPDFForm":
         self.stream = (
             _PyPDFForm()
-            .fill(self.stream, data, self.simple_mode, font_size, text_wrap_length)
+            .fill(
+                self.stream,
+                data,
+                self.simple_mode,
+                font_size,
+                text_x_offset,
+                text_y_offset,
+                text_wrap_length,
+            )
             .stream
         )
 
