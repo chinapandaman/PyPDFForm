@@ -20,12 +20,6 @@ def template_stream(pdf_samples):
         return f.read()
 
 
-@pytest.fixture
-def image_stream(pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_image.jpg"), "rb+") as f:
-        return f.read()
-
-
 def test_bool_to_checkboxes():
     _data = {
         "test": "test_1",
@@ -132,3 +126,15 @@ def test_fill_pdf_canvas(template_stream):
                     assert annotation["/AS"] == (
                         pdfrw.PdfName.Yes if expected else pdfrw.PdfName.Off
                     )
+
+
+def test_merging(template_stream):
+    obj_one = _PyPDFForm()
+    obj_two = _PyPDFForm()
+
+    obj_one.stream = template_stream
+    obj_two.stream = template_stream
+
+    result = pdfrw.PdfReader(fdata=(obj_one + obj_two).stream)
+
+    assert len(result.pages) == len(pdfrw.PdfReader(fdata=template_stream).pages) * 2
