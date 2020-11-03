@@ -3,8 +3,8 @@
 import os
 
 import pytest
-from PyPDFForm import (InvalidFormDataError, InvalidModeError,
-                       InvalidTemplateError, PyPDFForm)
+from PyPDFForm import (InvalidFontSizeError, InvalidFormDataError,
+                       InvalidModeError, InvalidTemplateError, PyPDFForm)
 
 
 @pytest.fixture
@@ -45,4 +45,12 @@ def test_invalid_mode_error(template_stream):
         PyPDFForm(template_stream, simple_mode=1).fill({})
         assert False
     except InvalidModeError:
+        assert True
+
+
+def test_invalid_font_size_error(template_stream):
+    try:
+        PyPDFForm(template_stream, simple_mode=False).fill({}, font_size="12")
+        assert False
+    except InvalidFontSizeError:
         assert True
