@@ -75,3 +75,25 @@ def test_assign_uuid(template_stream):
         assert len(each) == len(uuid.uuid4().hex)
 
     assert len(_uuid.keys()) == 1
+
+
+def test_bool_to_checkboxes():
+    _data = {
+        "test": "test_1",
+        "check": True,
+        "test_2": "test_2",
+        "check_2": False,
+        "test_3": "test_3",
+        "check_3": True,
+    }
+
+    obj = _PyPDFForm()
+    obj._data_dict = _data
+    obj._bool_to_checkboxes()
+
+    for k, v in obj._data_dict.items():
+        if isinstance(_data[k], bool):
+            if _data[k]:
+                assert v == pdfrw.PdfName.Yes
+            else:
+                assert v == pdfrw.PdfName.Off
