@@ -6,13 +6,18 @@ from typing import Union
 
 import pdfrw
 from PIL import Image
-from PyPDFForm.exceptions import (InvalidFontSizeError, InvalidFormDataError,
-                                  InvalidImageCoordinateError,
-                                  InvalidImageDimensionError,
-                                  InvalidImageError,
-                                  InvalidImageRotationAngleError,
-                                  InvalidModeError, InvalidPageNumberError,
-                                  InvalidTemplateError, InvalidWrapLengthError)
+from PyPDFForm.exceptions import (
+    InvalidFontSizeError,
+    InvalidFormDataError,
+    InvalidImageCoordinateError,
+    InvalidImageDimensionError,
+    InvalidImageError,
+    InvalidImageRotationAngleError,
+    InvalidModeError,
+    InvalidPageNumberError,
+    InvalidTemplateError,
+    InvalidWrapLengthError,
+)
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
@@ -170,7 +175,12 @@ class _PyPDFForm(object):
 
         return result
 
-    def _fill_pdf_canvas(self, template_stream: bytes) -> bytes:
+    def _fill_pdf_canvas(
+        self,
+        template_stream: bytes,
+        text_x_offset: Union[float, int],
+        text_y_offset: Union[float, int],
+    ) -> bytes:
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
         layers = []
 
@@ -212,10 +222,11 @@ class _PyPDFForm(object):
                                 annotations.pop(j)
                                 if len(self._data_dict[key]) < self._MAX_TXT_LENGTH:
                                     c.drawString(
-                                        float(coordinates[0]),
+                                        float(coordinates[0]) + text_x_offset,
                                         (float(coordinates[1]) + float(coordinates[3]))
                                         / 2
-                                        - 2,
+                                        - 2
+                                        + text_y_offset,
                                         self._data_dict[key],
                                     )
                                 else:
@@ -332,6 +343,8 @@ class _PyPDFForm(object):
         data: dict,
         simple_mode: bool,
         font_size: Union[float, int],
+        text_x_offset: Union[float, int],
+        text_y_offset: Union[float, int],
         text_wrap_length: int,
     ) -> "_PyPDFForm":
         self._validate_template(template_stream)
@@ -347,6 +360,8 @@ class _PyPDFForm(object):
             output_stream = self._fill_pdf(template_stream)
             self.stream = self._assign_uuid(output_stream)
         else:
-            self.stream = self._fill_pdf_canvas(template_stream)
+            self.stream = self._fill_pdf_canvas(
+                template_stream, text_x_offset, text_y_offset
+            )
 
         return self
