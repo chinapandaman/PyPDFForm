@@ -65,3 +65,9 @@ class InvalidImageRotationAngleError(BasePyPDFFormException):
     """Raised when rotation angle input is not a float or int"""
 
     pass
+
+
+class InvalidTextOffsetError(BasePyPDFFormException):
+    """Raised when x or y text offset input is not a float or int"""
+
+    pass

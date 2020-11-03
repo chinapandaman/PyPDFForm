@@ -7,7 +7,8 @@ from PyPDFForm import (
     InvalidFontSizeError, InvalidFormDataError, InvalidImageCoordinateError,
     InvalidImageDimensionError, InvalidImageError,
     InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError,
-    InvalidTemplateError, InvalidWrapLengthError, PyPDFForm)
+    InvalidTemplateError, InvalidTextOffsetError, InvalidWrapLengthError,
+    PyPDFForm)
 
 
 @pytest.fixture
@@ -116,4 +117,22 @@ def test_invalid_image_rotation_angle_error(template_stream, image_stream):
         PyPDFForm(template_stream).draw_image(image_stream, 1, 100, 100, 400, 225, "90")
         assert False
     except InvalidImageRotationAngleError:
+        assert True
+
+
+def test_invalid_text_offset_error(template_stream):
+    try:
+        PyPDFForm(template_stream, simple_mode=False).fill(
+            {}, text_x_offset="100", text_y_offset=100
+        )
+        assert False
+    except InvalidTextOffsetError:
+        assert True
+
+    try:
+        PyPDFForm(template_stream, simple_mode=False).fill(
+            {}, text_x_offset=100, text_y_offset="100"
+        )
+        assert False
+    except InvalidTextOffsetError:
         assert True

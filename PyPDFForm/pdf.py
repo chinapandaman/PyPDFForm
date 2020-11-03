@@ -7,17 +7,10 @@ from typing import Union
 import pdfrw
 from PIL import Image
 from PyPDFForm.exceptions import (
-    InvalidFontSizeError,
-    InvalidFormDataError,
-    InvalidImageCoordinateError,
-    InvalidImageDimensionError,
-    InvalidImageError,
-    InvalidImageRotationAngleError,
-    InvalidModeError,
-    InvalidPageNumberError,
-    InvalidTemplateError,
-    InvalidWrapLengthError,
-)
+    InvalidFontSizeError, InvalidFormDataError, InvalidImageCoordinateError,
+    InvalidImageDimensionError, InvalidImageError,
+    InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError,
+    InvalidTemplateError, InvalidTextOffsetError, InvalidWrapLengthError)
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
@@ -71,6 +64,8 @@ class _PyPDFForm(object):
         data: dict,
         simple_mode: bool,
         font_size: Union[float, int],
+        text_x_offset: Union[float, int],
+        text_y_offset: Union[float, int],
         text_wrap_length: int,
     ) -> None:
         if not isinstance(data, dict):
@@ -84,6 +79,12 @@ class _PyPDFForm(object):
 
         if not isinstance(text_wrap_length, int):
             raise InvalidWrapLengthError
+
+        if not (isinstance(text_x_offset, float) or isinstance(text_x_offset, int)):
+            raise InvalidTextOffsetError
+
+        if not (isinstance(text_y_offset, float) or isinstance(text_y_offset, int)):
+            raise InvalidTextOffsetError
 
     @staticmethod
     def _validate_draw_image_inputs(
@@ -348,7 +349,9 @@ class _PyPDFForm(object):
         text_wrap_length: int,
     ) -> "_PyPDFForm":
         self._validate_template(template_stream)
-        self._validate_fill_inputs(data, simple_mode, font_size, text_wrap_length)
+        self._validate_fill_inputs(
+            data, simple_mode, font_size, text_x_offset, text_y_offset, text_wrap_length
+        )
 
         self._GLOBAL_FONT_SIZE = font_size
         self._MAX_TXT_LENGTH = text_wrap_length
