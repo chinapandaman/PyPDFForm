@@ -4,8 +4,8 @@ import os
 
 import pytest
 from PyPDFForm import (InvalidFontSizeError, InvalidFormDataError,
-                       InvalidModeError, InvalidTemplateError,
-                       InvalidWrapLengthError, PyPDFForm)
+                       InvalidImageError, InvalidModeError,
+                       InvalidTemplateError, InvalidWrapLengthError, PyPDFForm)
 
 
 @pytest.fixture
@@ -62,4 +62,12 @@ def test_invalid_wrap_length_error(template_stream):
         PyPDFForm(template_stream, simple_mode=False).fill({}, text_wrap_length="100")
         assert False
     except InvalidWrapLengthError:
+        assert True
+
+
+def test_invalid_image_error(template_stream):
+    try:
+        PyPDFForm(template_stream).draw_image(b"BAD_IMAGE", 1, 100, 100, 400, 225)
+        assert False
+    except InvalidImageError:
         assert True
