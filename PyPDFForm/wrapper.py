@@ -2,7 +2,7 @@
 
 from typing import Union
 
-from PyPDFForm.pdf import _PyPDFForm
+from .pdf import _PyPDFForm
 
 
 class PyPDFForm(object):

@@ -6,13 +6,15 @@ from typing import Union
 
 import pdfrw
 from PIL import Image
-from PyPDFForm.exceptions import (
-    InvalidFontSizeError, InvalidFormDataError, InvalidImageCoordinateError,
-    InvalidImageDimensionError, InvalidImageError,
-    InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError,
-    InvalidTemplateError, InvalidTextOffsetError, InvalidWrapLengthError)
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
+
+from .exceptions import (InvalidFontSizeError, InvalidFormDataError,
+                         InvalidImageCoordinateError,
+                         InvalidImageDimensionError, InvalidImageError,
+                         InvalidImageRotationAngleError, InvalidModeError,
+                         InvalidPageNumberError, InvalidTemplateError,
+                         InvalidTextOffsetError, InvalidWrapLengthError)
 
 
 class _PyPDFForm(object):
