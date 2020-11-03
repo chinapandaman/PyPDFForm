@@ -107,7 +107,7 @@ def test_fill_pdf_canvas(template_stream):
     obj = _PyPDFForm()
     obj._data_dict = deepcopy(_data)
     obj._bool_to_checkboxes()
-    result_pdf = pdfrw.PdfReader(fdata=obj._fill_pdf_canvas(template_stream))
+    result_pdf = pdfrw.PdfReader(fdata=obj._fill_pdf_canvas(template_stream, 0, 0))
 
     for i in range(len(result_pdf.pages)):
         annotations = result_pdf.pages[i][obj._ANNOT_KEY]
