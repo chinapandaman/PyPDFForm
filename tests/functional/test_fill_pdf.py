@@ -79,3 +79,24 @@ def test_fill_text_wrap_2(template_stream, pdf_samples, comparing_size):
 
         assert len(obj.stream) == len(expected)
         assert obj.stream[:comparing_size] == expected[:comparing_size]
+
+
+def test_fill_offset_100(template_stream, pdf_samples, comparing_size):
+    with open(os.path.join(pdf_samples, "sample_filled_offset_100.pdf"), "rb+") as f:
+        obj = PyPDFForm(template_stream, simple_mode=False).fill(
+            {
+                "test": "test_1",
+                "check": True,
+                "test_2": "test_2",
+                "check_2": False,
+                "test_3": "test_3",
+                "check_3": True,
+            },
+            text_x_offset=100,
+            text_y_offset=-100,
+        )
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream[:comparing_size] == expected[:comparing_size]
