@@ -3,7 +3,7 @@
 import os
 
 import pytest
-from PyPDFForm import InvalidTemplateError, PyPDFForm
+from PyPDFForm import InvalidFormDataError, InvalidTemplateError, PyPDFForm
 
 
 @pytest.fixture
@@ -28,4 +28,12 @@ def test_invalid_template_error():
         PyPDFForm(b"BAD_TEMPLATE").fill({})
         assert False
     except InvalidTemplateError:
+        assert True
+
+
+def test_invalid_form_data_error(template_stream):
+    try:
+        PyPDFForm(template_stream).fill("NOT_A_DICT")
+        assert False
+    except InvalidFormDataError:
         assert True
