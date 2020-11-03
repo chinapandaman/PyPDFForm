@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import uuid
 
 import pdfrw
 import pytest
@@ -51,3 +52,26 @@ def test_simple_mode_fill_pdf_method(template_stream):
                         assert annotation["/AS"] == pdfrw.PdfObject(expected)
                     else:
                         assert annotation["/V"][1:-1] == expected
+
+
+def test_assign_uuid(template_stream):
+    obj = _PyPDFForm()
+    result_pdf = pdfrw.PdfReader(fdata=obj._assign_uuid(template_stream))
+
+    _uuid = {}
+
+    for i in range(len(result_pdf.pages)):
+        annotations = result_pdf.pages[i][obj._ANNOT_KEY]
+        if annotations:
+            for annotation in annotations:
+                if (
+                    annotation[obj._SUBTYPE_KEY] == obj._WIDGET_SUBTYPE_KEY
+                    and annotation[obj._ANNOT_FIELD_KEY]
+                ):
+                    key = annotation[obj._ANNOT_FIELD_KEY][1:-1]
+                    _uuid[key.split("_")[-1]] = True
+
+    for each in _uuid.keys():
+        assert len(each) == len(uuid.uuid4().hex)
+
+    assert len(_uuid.keys()) == 1
