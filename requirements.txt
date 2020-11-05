@@ -2,5 +2,6 @@ black
 isort
 pdfrw
 pillow
+pre-commit
 pytest
 reportlab
