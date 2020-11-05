@@ -6,6 +6,7 @@ from copy import deepcopy
 
 import pdfrw
 import pytest
+
 from PyPDFForm.pdf import _PyPDFForm
 
 
@@ -73,7 +74,9 @@ def test_simple_mode_fill_pdf_method(template_stream):
 
 def test_assign_uuid(template_stream):
     obj = _PyPDFForm()
-    result_pdf = pdfrw.PdfReader(fdata=obj._assign_uuid(template_stream))
+    result_pdf = pdfrw.PdfReader(
+        fdata=obj._assign_uuid(template_stream, editable=False)
+    )
 
     _uuid = {}
 
