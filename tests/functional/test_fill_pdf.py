@@ -3,6 +3,7 @@
 import os
 
 import pytest
+
 from PyPDFForm import PyPDFForm
 
 
@@ -94,6 +95,26 @@ def test_fill_offset_100(template_stream, pdf_samples, comparing_size):
             },
             text_x_offset=100,
             text_y_offset=-100,
+        )
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream[:comparing_size] == expected[:comparing_size]
+
+
+def test_fill_editable(template_stream, pdf_samples, comparing_size):
+    with open(os.path.join(pdf_samples, "sample_filled_editable.pdf"), "rb+") as f:
+        obj = PyPDFForm(template_stream, simple_mode=True).fill(
+            {
+                "test": "test_1",
+                "check": True,
+                "test_2": "test_2",
+                "check_2": False,
+                "test_3": "test_3",
+                "check_3": True,
+            },
+            editable=True,
         )
 
         expected = f.read()

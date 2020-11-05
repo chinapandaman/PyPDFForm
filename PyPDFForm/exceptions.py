@@ -71,3 +71,9 @@ class InvalidTextOffsetError(BasePyPDFFormException):
     """Raised when x or y text offset input is not a float or int"""
 
     pass
+
+
+class InvalidEditableParameterError(BasePyPDFFormException):
+    """Raised when editable input is not a boolean"""
+
+    pass

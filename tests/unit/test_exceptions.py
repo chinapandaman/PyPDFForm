@@ -3,12 +3,14 @@
 import os
 
 import pytest
-from PyPDFForm import (
-    InvalidFontSizeError, InvalidFormDataError, InvalidImageCoordinateError,
-    InvalidImageDimensionError, InvalidImageError,
-    InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError,
-    InvalidTemplateError, InvalidTextOffsetError, InvalidWrapLengthError,
-    PyPDFForm)
+
+from PyPDFForm import (InvalidEditableParameterError, InvalidFontSizeError,
+                       InvalidFormDataError, InvalidImageCoordinateError,
+                       InvalidImageDimensionError, InvalidImageError,
+                       InvalidImageRotationAngleError, InvalidModeError,
+                       InvalidPageNumberError, InvalidTemplateError,
+                       InvalidTextOffsetError, InvalidWrapLengthError,
+                       PyPDFForm)
 
 
 @pytest.fixture
@@ -135,4 +137,12 @@ def test_invalid_text_offset_error(template_stream):
         )
         assert False
     except InvalidTextOffsetError:
+        assert True
+
+
+def test_invalid_editable_parameter_error(template_stream):
+    try:
+        PyPDFForm(template_stream, simple_mode=True).fill({}, editable=1)
+        assert False
+    except InvalidEditableParameterError:
         assert True

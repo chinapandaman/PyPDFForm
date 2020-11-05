@@ -24,9 +24,11 @@ class PyPDFForm(object):
 
         return new_obj
 
-    def _simple_fill(self, data: dict) -> "PyPDFForm":
+    def _simple_fill(self, data: dict, editable: bool = False) -> "PyPDFForm":
         self.stream = (
-            _PyPDFForm().fill(self.stream, data, self.simple_mode, 12, 0, 0, 100).stream
+            _PyPDFForm()
+            .fill(self.stream, data, self.simple_mode, 12, 0, 0, 100, editable)
+            .stream
         )
 
         return self
@@ -49,6 +51,7 @@ class PyPDFForm(object):
                 text_x_offset,
                 text_y_offset,
                 text_wrap_length,
+                False,
             )
             .stream
         )
