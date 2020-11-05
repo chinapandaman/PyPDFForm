@@ -5,7 +5,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-dev_dependencies = ["black", "isort", "pre-commit", "pytest"]
+dev_dependencies = ["black", "isort", "pytest"]
 
 with open("requirements.txt", "r") as requirements:
     dependencies = [
