@@ -9,6 +9,7 @@ class PyPDFForm(object):
     def __init__(self, template: bytes = b"", simple_mode: bool = True) -> None:
         self.stream = template
         self.simple_mode = simple_mode
+        self.fill = self._simple_fill if simple_mode else self._fill
 
     def __add__(self, other: "PyPDFForm") -> "PyPDFForm":
         self_obj = _PyPDFForm()
@@ -23,7 +24,14 @@ class PyPDFForm(object):
 
         return new_obj
 
-    def fill(
+    def _simple_fill(self, data: dict) -> "PyPDFForm":
+        self.stream = (
+            _PyPDFForm().fill(self.stream, data, self.simple_mode, 12, 0, 0, 100).stream
+        )
+
+        return self
+
+    def _fill(
         self,
         data: dict,
         font_size: Union[float, int] = 12,
