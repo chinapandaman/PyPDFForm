@@ -88,6 +88,7 @@ def test_assign_uuid(template_stream):
                     annotation[obj._SUBTYPE_KEY] == obj._WIDGET_SUBTYPE_KEY
                     and annotation[obj._ANNOT_FIELD_KEY]
                 ):
+                    assert annotation["/Ff"] == pdfrw.PdfObject(1)
                     key = annotation[obj._ANNOT_FIELD_KEY][1:-1]
                     _uuid[key.split("_")[-1]] = True
 
@@ -141,3 +142,18 @@ def test_merging(template_stream):
     result = pdfrw.PdfReader(fdata=(obj_one + obj_two).stream)
 
     assert len(result.pages) == len(pdfrw.PdfReader(fdata=template_stream).pages) * 2
+
+
+def test_editable(template_stream):
+    obj = _PyPDFForm()
+    result_pdf = pdfrw.PdfReader(fdata=obj._assign_uuid(template_stream, editable=True))
+
+    for i in range(len(result_pdf.pages)):
+        annotations = result_pdf.pages[i][obj._ANNOT_KEY]
+        if annotations:
+            for annotation in annotations:
+                if (
+                    annotation[obj._SUBTYPE_KEY] == obj._WIDGET_SUBTYPE_KEY
+                    and annotation[obj._ANNOT_FIELD_KEY]
+                ):
+                    assert annotation["/Ff"] is None
