@@ -9,8 +9,8 @@ from PIL import Image
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
-from .exceptions import (InvalidFontSizeError, InvalidFormDataError,
-                         InvalidImageCoordinateError,
+from .exceptions import (InvalidEditableParameterError, InvalidFontSizeError,
+                         InvalidFormDataError, InvalidImageCoordinateError,
                          InvalidImageDimensionError, InvalidImageError,
                          InvalidImageRotationAngleError, InvalidModeError,
                          InvalidPageNumberError, InvalidTemplateError,
@@ -69,6 +69,7 @@ class _PyPDFForm(object):
         text_x_offset: Union[float, int],
         text_y_offset: Union[float, int],
         text_wrap_length: int,
+        editable: bool,
     ) -> None:
         if not isinstance(data, dict):
             raise InvalidFormDataError
@@ -87,6 +88,9 @@ class _PyPDFForm(object):
 
         if not (isinstance(text_y_offset, float) or isinstance(text_y_offset, int)):
             raise InvalidTextOffsetError
+
+        if not (isinstance(editable, bool)):
+            raise InvalidEditableParameterError
 
     @staticmethod
     def _validate_draw_image_inputs(
@@ -120,7 +124,7 @@ class _PyPDFForm(object):
             if isinstance(v, bool):
                 self._data_dict[k] = pdfrw.PdfName.Yes if v else pdfrw.PdfName.Off
 
-    def _assign_uuid(self, output_stream: bytes) -> bytes:
+    def _assign_uuid(self, output_stream: bytes, editable: bool) -> bytes:
         _uuid = uuid.uuid4().hex
 
         generated_pdf = pdfrw.PdfReader(fdata=output_stream)
@@ -130,14 +134,21 @@ class _PyPDFForm(object):
             if annotations:
                 for annotation in annotations:
                     if self._ANNOT_FIELD_KEY in annotation.keys():
-                        annotation.update(
-                            pdfrw.PdfDict(
+                        if editable:
+                            update_obj = pdfrw.PdfDict(
+                                T="{}_{}".format(
+                                    annotation[self._ANNOT_FIELD_KEY][1:-1], _uuid,
+                                ),
+                            )
+                        else:
+                            update_obj = pdfrw.PdfDict(
                                 T="{}_{}".format(
                                     annotation[self._ANNOT_FIELD_KEY][1:-1], _uuid,
                                 ),
                                 Ff=pdfrw.PdfObject(1),
                             )
-                        )
+
+                        annotation.update(update_obj)
 
         result_stream = BytesIO()
         pdfrw.PdfWriter().write(result_stream, generated_pdf)
@@ -349,10 +360,17 @@ class _PyPDFForm(object):
         text_x_offset: Union[float, int],
         text_y_offset: Union[float, int],
         text_wrap_length: int,
+        editable: bool,
     ) -> "_PyPDFForm":
         self._validate_template(template_stream)
         self._validate_fill_inputs(
-            data, simple_mode, font_size, text_x_offset, text_y_offset, text_wrap_length
+            data,
+            simple_mode,
+            font_size,
+            text_x_offset,
+            text_y_offset,
+            text_wrap_length,
+            editable,
         )
 
         self._GLOBAL_FONT_SIZE = font_size
@@ -363,7 +381,7 @@ class _PyPDFForm(object):
 
         if simple_mode:
             output_stream = self._fill_pdf(template_stream)
-            self.stream = self._assign_uuid(output_stream)
+            self.stream = self._assign_uuid(output_stream, editable)
         else:
             self.stream = self._fill_pdf_canvas(
                 template_stream, text_x_offset, text_y_offset
