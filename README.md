@@ -1,8 +1,9 @@
 # PyPDFForm
 
 PyPDFForm is a pure-python library for PDF form processing. 
-It allows filling a PDF form by creating a python dictionary that matches its annotation names 
-for elements such as text fields and checkboxes. It also supports other functionalities such as 
+It allows filling a PDF form programatically by creating 
+a python dictionary with keys matching its annotation names 
+for elements like text fields and checkboxes. It also supports other functionalities such as 
 drawing image and merging multiple PDFs together.
 
 ## Installing
@@ -23,7 +24,7 @@ import os
 from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
-    os.path.expanduser("~"), "sample_template.pdf"
+    os.path.expanduser("~/Downloads"), "sample_template.pdf"
 )  # Change this to where you downloaded the sample PDF form
 
 PATH_TO_FILLED_PDF_FORM = os.path.join(
