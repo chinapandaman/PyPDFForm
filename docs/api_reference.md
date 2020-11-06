@@ -20,7 +20,7 @@ by python IO's `.read()` method.
 details like font size. However turning simple mode on also allows leaving PDF editable 
 after filling.
 
-## **fill**(*data, font_size=12, text_x_offset=0, text_y_offset, text_wrap_length=100, editable=False*)
+## **fill**(*data, font_size=12, text_x_offset=0, text_y_offset=0, text_wrap_length=100, editable=False*)
 
 The fill method takes a python dictionary object `data` and fill the PDF form 
 template with it. The key of the object should match the annotation names of the PDF form. 
