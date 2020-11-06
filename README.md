@@ -53,7 +53,7 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/m
 
 ## Documentation
 
-(WIP)
+* API Reference: https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md
 
 ## Tests
 
