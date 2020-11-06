@@ -5,7 +5,7 @@ of PyPDFForm.
 
 ## PyPDFForm Object
 
-### <span style="font-weight:normal">*class* PyPDFForm.**PyPDFForm**(*template=b"", simple_mode=True*)</span>
+### *class* PyPDFForm.**PyPDFForm**(*template=b"", simple_mode=True*)
 
 The PyPDFForm object implements a PDF form and acts as 
 the central object. It can be constructed with or without a 
