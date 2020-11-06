@@ -49,12 +49,12 @@ wrapping to a new line for texts printed on the PDF form.
 * **editable** - only available if `simple_mode` is `True`, enabling this will allow the filled PDF to be still 
 editable.
 
-### simple_mode = *True*
+### **simple_mode** = *True*
 
 A boolean value which indicates whether the PDF form can be filled with more detailed specifications 
 like font size.
 
-### stream = *b""*
+### **stream** = *b""*
 
 A byte object which holds the stream with the current state of the PDF form. This can be used by 
 python IO to `.write` to another destination.
