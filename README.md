@@ -1,7 +1,7 @@
 # PyPDFForm
 
 PyPDFForm is a pure-python library for PDF form processing. 
-It allows filling a PDF form programatically by creating 
+It allows filling a PDF form programmatically by creating 
 a python dictionary with keys matching its annotation names 
 for elements like text fields and checkboxes. It also supports other functionalities such as 
 drawing image and merging multiple PDFs together.
@@ -10,7 +10,7 @@ drawing image and merging multiple PDFs together.
 
 Install using [pip](https://pip.pypa.io/en/stable/quickstart/):
 
-```commandline
+```shell script
 pip install PyPDFForm
 ```
 
@@ -61,8 +61,15 @@ PyPDFForm utilizes [pytest](https://docs.pytest.org/en/stable/) for unit and
 functional tests. Tests can be run by first installing dependencies using 
 [pip](https://pip.pypa.io/en/stable/quickstart/):
 
-```commandline
+```shell script
 pip install -r requirements.txt
+```
+
+Alternatively, there is a bash script which will setup a python virtual environment 
+and install all needed dependencies if you are running Linux:
+
+```shell script
+./scripts/build.sh
 ```
 
 In order to run tests, source root needs to be added to PYTHONPATH by running 
@@ -74,6 +81,12 @@ export PYTHONPATH=$PYTHONPATH:$(pwd)/PyPDFForm
 
 From there run tests using:
 
-```commandline
-pytest
+```shell script
+pytest -v
+```
+
+Or you can use this bash script to do the above two steps if you are running Linux:
+
+```shell script
+./scripts/test.sh
 ```
