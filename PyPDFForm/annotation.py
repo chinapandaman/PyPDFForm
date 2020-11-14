@@ -11,6 +11,14 @@ class Annotation(object):
     ) -> None:
         """Constructs all attributes for the Annotation object."""
 
-        self.name = annot_name
-        self.type = annot_type
+        self._name = annot_name
+        self._type = annot_type
         self.value = annot_value
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def type(self):
+        return self._type

@@ -430,7 +430,7 @@ class _PyPDFForm(object):
 
         return self
 
-    def _update_annotations(self):
+    def _update_annotations(self) -> None:
         """Updates annotations' values given data dict."""
 
         for each in self.annotations:
