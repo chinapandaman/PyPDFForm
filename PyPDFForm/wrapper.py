@@ -6,12 +6,18 @@ from .pdf import _PyPDFForm
 
 
 class PyPDFForm(object):
+    """A class to represent a PDF form."""
+
     def __init__(self, template: bytes = b"", simple_mode: bool = True) -> None:
+        """Constructs all attributes for the PyPDFForm object."""
+
         self.stream = template
         self.simple_mode = simple_mode
         self.fill = self._simple_fill if simple_mode else self._fill
 
     def __add__(self, other: "PyPDFForm") -> "PyPDFForm":
+        """Overloaded addition operator to perform merging PDFs."""
+
         self_obj = _PyPDFForm()
         self_obj.stream = self.stream
 
@@ -25,6 +31,8 @@ class PyPDFForm(object):
         return new_obj
 
     def _simple_fill(self, data: dict, editable: bool = False) -> "PyPDFForm":
+        """Fill a PDF form in simple mode."""
+
         self.stream = (
             _PyPDFForm()
             .fill(self.stream, data, self.simple_mode, 12, 0, 0, 100, editable)
@@ -41,6 +49,8 @@ class PyPDFForm(object):
         text_y_offset: Union[float, int] = 0,
         text_wrap_length: int = 100,
     ) -> "PyPDFForm":
+        """Fill a PDF form with customized parameters."""
+
         self.stream = (
             _PyPDFForm()
             .fill(
@@ -68,6 +78,8 @@ class PyPDFForm(object):
         height: Union[float, int],
         rotation: Union[float, int] = 0,
     ) -> "PyPDFForm":
+        """Draw an image on a PDF form."""
+
         obj = _PyPDFForm()
         obj.stream = self.stream
 

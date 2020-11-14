@@ -18,7 +18,11 @@ from .exceptions import (InvalidEditableParameterError, InvalidFontSizeError,
 
 
 class _PyPDFForm(object):
+    """Core components of PyPDFForm."""
+
     def __init__(self) -> None:
+        """Constructs all attributes for the core object."""
+
         self._ANNOT_KEY = "/Annots"
         self._ANNOT_FIELD_KEY = "/T"
         self._ANNOT_RECT_KEY = "/Rect"
@@ -34,6 +38,8 @@ class _PyPDFForm(object):
         self.stream = b""
 
     def __add__(self, other: "_PyPDFForm") -> "_PyPDFForm":
+        """Overloaded addition operator to perform merging PDFs."""
+
         if not self.stream:
             return other
 
@@ -58,6 +64,8 @@ class _PyPDFForm(object):
 
     @staticmethod
     def _validate_template(template_stream: bytes) -> None:
+        """Validate if a template stream is indeed a PDF stream."""
+
         if b"%PDF" not in template_stream:
             raise InvalidTemplateError
 
@@ -71,6 +79,8 @@ class _PyPDFForm(object):
         text_wrap_length: int,
         editable: bool,
     ) -> None:
+        """Validate input parameters for the fill method."""
+
         if not isinstance(data, dict):
             raise InvalidFormDataError
 
@@ -101,6 +111,8 @@ class _PyPDFForm(object):
         height: Union[float, int],
         rotation: Union[float, int],
     ) -> None:
+        """Validate input parameters for the draw image method."""
+
         if not isinstance(page_number, int):
             raise InvalidPageNumberError
 
@@ -120,11 +132,15 @@ class _PyPDFForm(object):
             raise InvalidImageRotationAngleError
 
     def _bool_to_checkboxes(self) -> None:
+        """Converts all boolean values in input data dictionary into PDF checkbox objects."""
+
         for k, v in self._data_dict.items():
             if isinstance(v, bool):
                 self._data_dict[k] = pdfrw.PdfName.Yes if v else pdfrw.PdfName.Off
 
     def _assign_uuid(self, output_stream: bytes, editable: bool) -> bytes:
+        """Append UUIDs to all annotations of the PDF form."""
+
         _uuid = uuid.uuid4().hex
 
         generated_pdf = pdfrw.PdfReader(fdata=output_stream)
@@ -160,6 +176,8 @@ class _PyPDFForm(object):
         return result
 
     def _fill_pdf(self, template_stream: bytes) -> bytes:
+        """Fill a PDF form in simple mode."""
+
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
 
         for i in range(len(template_pdf.pages)):
@@ -195,6 +213,8 @@ class _PyPDFForm(object):
         text_x_offset: Union[float, int],
         text_y_offset: Union[float, int],
     ) -> bytes:
+        """Fill a PDF form by drawing on a reportlab canvas."""
+
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
         layers = []
 
@@ -300,6 +320,8 @@ class _PyPDFForm(object):
         height: Union[float, int],
         rotation: Union[float, int],
     ) -> "_PyPDFForm":
+        """Draw an image on a PDF form."""
+
         self._validate_template(self.stream)
         self._validate_draw_image_inputs(page_number, x, y, width, height, rotation)
 
@@ -362,6 +384,8 @@ class _PyPDFForm(object):
         text_wrap_length: int,
         editable: bool,
     ) -> "_PyPDFForm":
+        """General wrapper for filling a PDF form."""
+
         self._validate_template(template_stream)
         self._validate_fill_inputs(
             data,
