@@ -290,10 +290,11 @@ class _PyPDFForm(object):
                                     txt_obj.textLine(self._data_dict[key][start:])
                                     c.saveState()
                                     c.translate(
-                                        float(coordinates[0]),
+                                        float(coordinates[0]) + text_x_offset,
                                         (float(coordinates[1]) + float(coordinates[3]))
                                         / 2
-                                        - 2,
+                                        - 2
+                                        + text_y_offset,
                                     )
                                     c.drawText(txt_obj)
                                     c.restoreState()
