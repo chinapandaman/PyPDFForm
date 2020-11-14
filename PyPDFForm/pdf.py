@@ -439,13 +439,15 @@ class _PyPDFForm(object):
     def build_annotations(self, pdf_stream: bytes) -> "_PyPDFForm":
         """Builds an annotation list."""
 
+        if not pdf_stream:
+            return self
+
+        self._validate_template(pdf_stream)
+
         annot_type_mapping = {
             "/Btn": "checkbox",
             "/Tx": "text",
         }
-
-        if not pdf_stream:
-            return self
 
         _pdf = pdfrw.PdfReader(fdata=pdf_stream)
 
