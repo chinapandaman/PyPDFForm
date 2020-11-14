@@ -35,8 +35,10 @@ class _PyPDFForm(object):
         self._GLOBAL_FONT_SIZE = 12
         self._MAX_TXT_LENGTH = 100
 
+        self._uuid = uuid.uuid4().hex
+
         self._data_dict = {}
-        self.annotations = []
+        self.annotations = {}
 
         self.stream = b""
 
@@ -153,7 +155,7 @@ class _PyPDFForm(object):
     def _assign_uuid(self, output_stream: bytes, editable: bool) -> bytes:
         """Append UUIDs to all annotations of the PDF form."""
 
-        _uuid = uuid.uuid4().hex
+        _uuid = self._uuid
 
         generated_pdf = pdfrw.PdfReader(fdata=output_stream)
 
@@ -436,17 +438,17 @@ class _PyPDFForm(object):
     ) -> None:
         """Updates annotations' values given data dict."""
 
-        for each in self.annotations:
-            each.value = self._data_dict[each.name]
+        for k, v in self.annotations.items():
+            v.value = self._data_dict[k]
 
-            if not each.font_size:
-                each.font_size = self._GLOBAL_FONT_SIZE
-            if not each.text_x_offset:
-                each.text_x_offset = text_x_offset
-            if not each.text_y_offset:
-                each.text_y_offset = text_y_offset
-            if not each.text_wrap_length:
-                each.text_wrap_length = self._MAX_TXT_LENGTH
+            if not v.font_size:
+                v.font_size = self._GLOBAL_FONT_SIZE
+            if not v.text_x_offset:
+                v.text_x_offset = text_x_offset
+            if not v.text_y_offset:
+                v.text_y_offset = text_y_offset
+            if not v.text_wrap_length:
+                v.text_wrap_length = self._MAX_TXT_LENGTH
 
     def build_annotations(self, pdf_stream: bytes) -> "_PyPDFForm":
         """Builds an annotation list."""
@@ -473,13 +475,11 @@ class _PyPDFForm(object):
                     ):
                         key = annotation[self._ANNOT_FIELD_KEY][1:-1]
 
-                        self.annotations.append(
-                            Annotation(
-                                annot_name=key,
-                                annot_type=annot_type_mapping.get(
-                                    str(annotation[self._ANNOT_TYPE_KEY])
-                                ),
-                            )
+                        self.annotations[key] = Annotation(
+                            annot_name=key,
+                            annot_type=annot_type_mapping.get(
+                                str(annotation[self._ANNOT_TYPE_KEY])
+                            ),
                         )
 
         return self
