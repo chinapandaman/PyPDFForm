@@ -16,13 +16,13 @@ class Annotation(object):
         self.value = annot_value
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Name of the annotation."""
 
         return self._name
 
     @property
-    def type(self):
+    def type(self) -> str:
         """Type of the annotation."""
 
         return self._type
