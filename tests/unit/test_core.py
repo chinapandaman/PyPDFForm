@@ -6,7 +6,6 @@ from copy import deepcopy
 
 import pdfrw
 import pytest
-
 from PyPDFForm.pdf import _PyPDFForm
 
 
@@ -157,3 +156,47 @@ def test_editable(template_stream):
                     and annotation[obj._ANNOT_FIELD_KEY]
                 ):
                     assert annotation["/Ff"] is None
+
+
+def test_build_annotation(template_stream):
+    _data = {
+        "test": False,
+        "check": False,
+        "test_2": False,
+        "check_2": False,
+        "test_3": False,
+        "check_3": False,
+    }
+
+    obj = _PyPDFForm().build_annotations(template_stream)
+
+    for each in obj.annotations:
+        _data[each.name] = True
+
+    for k in _data.keys():
+        assert _data[k]
+
+
+def test_update_annotation(template_stream):
+    _data = {
+        "test": "test_1",
+        "check": True,
+        "test_2": "test_2",
+        "check_2": False,
+        "test_3": "test_3",
+        "check_3": True,
+    }
+
+    obj = _PyPDFForm().fill(
+        template_stream,
+        _data,
+        simple_mode=False,
+        font_size=20,
+        text_x_offset=0,
+        text_y_offset=0,
+        text_wrap_length=100,
+        editable=False,
+    )
+
+    for each in obj.annotations:
+        assert _data[each.name] == each.value
