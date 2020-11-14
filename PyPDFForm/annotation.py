@@ -17,8 +17,12 @@ class Annotation(object):
 
     @property
     def name(self):
+        """Name of the annotation."""
+
         return self._name
 
     @property
     def type(self):
+        """Type of the annotation."""
+
         return self._type
