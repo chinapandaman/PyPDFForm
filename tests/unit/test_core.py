@@ -200,3 +200,7 @@ def test_update_annotation(template_stream):
 
     for each in obj.annotations:
         assert _data[each.name] == each.value
+        assert each.font_size == 20
+        assert each.text_x_offset == 0
+        assert each.text_y_offset == 0
+        assert each.text_wrap_length == 100

@@ -426,15 +426,26 @@ class _PyPDFForm(object):
         self._checkboxes_to_bool()
 
         if not simple_mode:
-            self._update_annotations()
+            self._update_annotations(text_x_offset, text_y_offset)
 
         return self
 
-    def _update_annotations(self) -> None:
+    def _update_annotations(
+        self, text_x_offset: Union[float, int], text_y_offset: Union[float, int]
+    ) -> None:
         """Updates annotations' values given data dict."""
 
         for each in self.annotations:
             each.value = self._data_dict[each.name]
+
+            if not each.font_size:
+                each.font_size = self._GLOBAL_FONT_SIZE
+            if not each.text_x_offset:
+                each.text_x_offset = text_x_offset
+            if not each.text_y_offset:
+                each.text_y_offset = text_y_offset
+            if not each.text_wrap_length:
+                each.text_wrap_length = self._MAX_TXT_LENGTH
 
     def build_annotations(self, pdf_stream: bytes) -> "_PyPDFForm":
         """Builds an annotation list."""

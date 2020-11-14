@@ -15,6 +15,11 @@ class Annotation(object):
         self._type = annot_type
         self.value = annot_value
 
+        self.font_size = None
+        self.text_x_offset = None
+        self.text_y_offset = None
+        self.text_wrap_length = None
+
     @property
     def name(self) -> str:
         """Name of the annotation."""
