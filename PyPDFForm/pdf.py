@@ -441,14 +441,15 @@ class _PyPDFForm(object):
         for k, v in self.annotations.items():
             v.value = self._data_dict[k]
 
-            if not v.font_size:
-                v.font_size = self._GLOBAL_FONT_SIZE
-            if not v.text_x_offset:
-                v.text_x_offset = text_x_offset
-            if not v.text_y_offset:
-                v.text_y_offset = text_y_offset
-            if not v.text_wrap_length:
-                v.text_wrap_length = self._MAX_TXT_LENGTH
+            if v.type == "text":
+                if not v.font_size:
+                    v.font_size = self._GLOBAL_FONT_SIZE
+                if not v.text_x_offset:
+                    v.text_x_offset = text_x_offset
+                if not v.text_y_offset:
+                    v.text_y_offset = text_y_offset
+                if not v.text_wrap_length:
+                    v.text_wrap_length = self._MAX_TXT_LENGTH
 
     def build_annotations(self, pdf_stream: bytes) -> "_PyPDFForm":
         """Builds an annotation list."""

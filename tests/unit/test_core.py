@@ -204,7 +204,9 @@ def test_update_annotation(template_stream):
 
     for k, v in obj.annotations.items():
         assert _data[k] == v.value
-        assert v.font_size == 20
-        assert v.text_x_offset == 0
-        assert v.text_y_offset == 0
-        assert v.text_wrap_length == 100
+
+        if v.type == "text":
+            assert v.font_size == 20
+            assert v.text_x_offset == 0
+            assert v.text_y_offset == 0
+            assert v.text_wrap_length == 100
