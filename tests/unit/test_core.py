@@ -107,7 +107,7 @@ def test_fill_pdf_canvas(template_stream):
         "check_3": True,
     }
 
-    obj = _PyPDFForm()
+    obj = _PyPDFForm().build_annotations(template_stream)
     obj._data_dict = deepcopy(_data)
     obj._bool_to_checkboxes()
     result_pdf = pdfrw.PdfReader(fdata=obj._fill_pdf_canvas(template_stream, 0, 0))

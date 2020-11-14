@@ -266,9 +266,25 @@ class _PyPDFForm(object):
                                     )
                                 )
                             else:
+                                max_text_length = self._MAX_TXT_LENGTH
+
+                                _annotation = self.annotations[key]
+
+                                if _annotation.type == "text":
+                                    if _annotation.font_size:
+                                        c.setFont(
+                                            self._CANVAS_FONT, _annotation.font_size
+                                        )
+                                    if _annotation.text_x_offset:
+                                        text_x_offset = _annotation.text_x_offset
+                                    if _annotation.text_y_offset:
+                                        text_y_offset = _annotation.text_y_offset
+                                    if _annotation.text_wrap_length:
+                                        max_text_length = _annotation.text_wrap_length
+
                                 coordinates = annotation[self._ANNOT_RECT_KEY]
                                 annotations.pop(j)
-                                if len(self._data_dict[key]) < self._MAX_TXT_LENGTH:
+                                if len(self._data_dict[key]) < max_text_length:
                                     c.drawString(
                                         float(coordinates[0]) + text_x_offset,
                                         (float(coordinates[1]) + float(coordinates[3]))
@@ -281,14 +297,14 @@ class _PyPDFForm(object):
                                     txt_obj = c.beginText(0, 0)
 
                                     start = 0
-                                    end = self._MAX_TXT_LENGTH
+                                    end = max_text_length
 
                                     while end < len(self._data_dict[key]):
                                         txt_obj.textLine(
                                             (self._data_dict[key][start:end])
                                         )
-                                        start += self._MAX_TXT_LENGTH
-                                        end += self._MAX_TXT_LENGTH
+                                        start += max_text_length
+                                        end += max_text_length
                                     txt_obj.textLine(self._data_dict[key][start:])
                                     c.saveState()
                                     c.translate(
