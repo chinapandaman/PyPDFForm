@@ -9,6 +9,7 @@ from PIL import Image
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
+from .annotation import Annotation
 from .exceptions import (InvalidEditableParameterError, InvalidFontSizeError,
                          InvalidFormDataError, InvalidImageCoordinateError,
                          InvalidImageDimensionError, InvalidImageError,
@@ -28,12 +29,14 @@ class _PyPDFForm(object):
         self._ANNOT_RECT_KEY = "/Rect"
         self._SUBTYPE_KEY = "/Subtype"
         self._WIDGET_SUBTYPE_KEY = "/Widget"
+        self._ANNOT_TYPE_KEY = "/FT"
 
         self._CANVAS_FONT = "Helvetica"
         self._GLOBAL_FONT_SIZE = 12
         self._MAX_TXT_LENGTH = 100
 
         self._data_dict = {}
+        self.annotations = []
 
         self.stream = b""
 
@@ -137,6 +140,15 @@ class _PyPDFForm(object):
         for k, v in self._data_dict.items():
             if isinstance(v, bool):
                 self._data_dict[k] = pdfrw.PdfName.Yes if v else pdfrw.PdfName.Off
+
+    def _checkboxes_to_bool(self) -> None:
+        """Converts all PDF checkbox objects back to boolean values."""
+
+        checkbox_mapping = {pdfrw.PdfName.Yes: True, pdfrw.PdfName.Off: False}
+
+        for k, v in self._data_dict.items():
+            if v in checkbox_mapping.keys():
+                self._data_dict[k] = checkbox_mapping[v]
 
     def _assign_uuid(self, output_stream: bytes, editable: bool) -> bytes:
         """Append UUIDs to all annotations of the PDF form."""
@@ -410,5 +422,50 @@ class _PyPDFForm(object):
             self.stream = self._fill_pdf_canvas(
                 template_stream, text_x_offset, text_y_offset
             )
+
+        self._checkboxes_to_bool()
+
+        if not simple_mode:
+            self._update_annotations()
+
+        return self
+
+    def _update_annotations(self) -> None:
+        """Updates annotations' values given data dict."""
+
+        for each in self.annotations:
+            each.value = self._data_dict[each.name]
+
+    def build_annotations(self, pdf_stream: bytes) -> "_PyPDFForm":
+        """Builds an annotation list."""
+
+        annot_type_mapping = {
+            "/Btn": "checkbox",
+            "/Tx": "text",
+        }
+
+        if not pdf_stream:
+            return self
+
+        _pdf = pdfrw.PdfReader(fdata=pdf_stream)
+
+        for i in range(len(_pdf.pages)):
+            annotations = _pdf.pages[i][self._ANNOT_KEY]
+            if annotations:
+                for annotation in annotations:
+                    if (
+                        annotation[self._SUBTYPE_KEY] == self._WIDGET_SUBTYPE_KEY
+                        and annotation[self._ANNOT_FIELD_KEY]
+                    ):
+                        key = annotation[self._ANNOT_FIELD_KEY][1:-1]
+
+                        self.annotations.append(
+                            Annotation(
+                                annot_name=key,
+                                annot_type=annot_type_mapping.get(
+                                    str(annotation[self._ANNOT_TYPE_KEY])
+                                ),
+                            )
+                        )
 
         return self
