@@ -267,6 +267,8 @@ class _PyPDFForm(object):
                                 )
                             else:
                                 max_text_length = self._MAX_TXT_LENGTH
+                                x_offset = text_x_offset
+                                y_offset = text_y_offset
 
                                 _annotation = self.annotations[key]
 
@@ -276,9 +278,9 @@ class _PyPDFForm(object):
                                             self._CANVAS_FONT, _annotation.font_size
                                         )
                                     if _annotation.text_x_offset:
-                                        text_x_offset = _annotation.text_x_offset
+                                        x_offset = _annotation.text_x_offset
                                     if _annotation.text_y_offset:
-                                        text_y_offset = _annotation.text_y_offset
+                                        y_offset = _annotation.text_y_offset
                                     if _annotation.text_wrap_length:
                                         max_text_length = _annotation.text_wrap_length
 
@@ -286,11 +288,11 @@ class _PyPDFForm(object):
                                 annotations.pop(j)
                                 if len(self._data_dict[key]) < max_text_length:
                                     c.drawString(
-                                        float(coordinates[0]) + text_x_offset,
+                                        float(coordinates[0]) + x_offset,
                                         (float(coordinates[1]) + float(coordinates[3]))
                                         / 2
                                         - 2
-                                        + text_y_offset,
+                                        + y_offset,
                                         self._data_dict[key],
                                     )
                                 else:
@@ -308,11 +310,11 @@ class _PyPDFForm(object):
                                     txt_obj.textLine(self._data_dict[key][start:])
                                     c.saveState()
                                     c.translate(
-                                        float(coordinates[0]) + text_x_offset,
+                                        float(coordinates[0]) + x_offset,
                                         (float(coordinates[1]) + float(coordinates[3]))
                                         / 2
                                         - 2
-                                        + text_y_offset,
+                                        + y_offset,
                                     )
                                     c.drawText(txt_obj)
                                     c.restoreState()
