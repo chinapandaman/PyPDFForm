@@ -439,7 +439,7 @@ class _PyPDFForm(object):
         """Updates annotations' values given data dict."""
 
         for k, v in self.annotations.items():
-            v.value = self._data_dict[k]
+            v.value = self._data_dict.get(k)
 
             if v.type == "text":
                 if not v.font_size:
