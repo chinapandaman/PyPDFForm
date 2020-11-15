@@ -155,3 +155,52 @@ def test_fill_editable(template_stream, pdf_samples, comparing_size):
 
         assert len(obj.stream) == len(expected)
         assert obj.stream[:comparing_size] == expected[:comparing_size]
+
+
+def test_fill_with_customized_annotations(template_stream, pdf_samples, comparing_size):
+    with open(
+        os.path.join(pdf_samples, "sample_filled_customized_annotations.pdf"), "rb+"
+    ) as f:
+        data_dict = {
+            "test": "test_1",
+            "check": True,
+            "test_2": "test_2",
+            "check_2": False,
+            "test_3": "test_3",
+            "check_3": True,
+        }
+
+        obj = PyPDFForm(template_stream, simple_mode=False)
+
+        obj.annotations["test"].font_size = 20
+        obj.annotations["test_2"].text_x_offset = 50
+        obj.annotations["test_2"].text_y_offset = -50
+        obj.annotations["test_2"].text_wrap_length = 1
+        obj.annotations["test_3"].text_wrap_length = 2
+
+        obj.fill(data_dict)
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream[:comparing_size] == expected[:comparing_size]
+
+        for k, v in obj.annotations.items():
+            assert k in data_dict
+            assert v.name in data_dict
+            assert v.value == data_dict[k]
+
+        assert obj.annotations["test"].font_size == 20
+        assert obj.annotations["test"].text_x_offset == 0
+        assert obj.annotations["test"].text_y_offset == 0
+        assert obj.annotations["test"].text_wrap_length == 100
+
+        assert obj.annotations["test_2"].font_size == 12
+        assert obj.annotations["test_2"].text_x_offset == 50
+        assert obj.annotations["test_2"].text_y_offset == -50
+        assert obj.annotations["test_2"].text_wrap_length == 1
+
+        assert obj.annotations["test_3"].font_size == 12
+        assert obj.annotations["test_3"].text_x_offset == 0
+        assert obj.annotations["test_3"].text_y_offset == 0
+        assert obj.annotations["test_3"].text_wrap_length == 2
