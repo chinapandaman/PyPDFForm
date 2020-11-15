@@ -107,7 +107,7 @@ def test_fill_pdf_canvas(template_stream):
         "check_3": True,
     }
 
-    obj = _PyPDFForm()
+    obj = _PyPDFForm().build_annotations(template_stream)
     obj._data_dict = deepcopy(_data)
     obj._bool_to_checkboxes()
     result_pdf = pdfrw.PdfReader(fdata=obj._fill_pdf_canvas(template_stream, 0, 0))
@@ -170,8 +170,8 @@ def test_build_annotation(template_stream):
 
     obj = _PyPDFForm().build_annotations(template_stream)
 
-    for each in obj.annotations:
-        _data[each.name] = True
+    for each in obj.annotations.keys():
+        _data[each] = True
 
     for k in _data.keys():
         assert _data[k]
@@ -187,16 +187,26 @@ def test_update_annotation(template_stream):
         "check_3": True,
     }
 
-    obj = _PyPDFForm().fill(
-        template_stream,
-        _data,
-        simple_mode=False,
-        font_size=20,
-        text_x_offset=0,
-        text_y_offset=0,
-        text_wrap_length=100,
-        editable=False,
+    obj = (
+        _PyPDFForm()
+        .build_annotations(template_stream)
+        .fill(
+            template_stream,
+            _data,
+            simple_mode=False,
+            font_size=20,
+            text_x_offset=0,
+            text_y_offset=0,
+            text_wrap_length=100,
+            editable=False,
+        )
     )
 
-    for each in obj.annotations:
-        assert _data[each.name] == each.value
+    for k, v in obj.annotations.items():
+        assert _data[k] == v.value
+
+        if v.type == "text":
+            assert v.font_size == 20
+            assert v.text_x_offset == 0
+            assert v.text_y_offset == 0
+            assert v.text_wrap_length == 100

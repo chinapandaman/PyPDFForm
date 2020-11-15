@@ -35,8 +35,10 @@ class _PyPDFForm(object):
         self._GLOBAL_FONT_SIZE = 12
         self._MAX_TXT_LENGTH = 100
 
+        self._uuid = uuid.uuid4().hex
+
         self._data_dict = {}
-        self.annotations = []
+        self.annotations = {}
 
         self.stream = b""
 
@@ -153,7 +155,7 @@ class _PyPDFForm(object):
     def _assign_uuid(self, output_stream: bytes, editable: bool) -> bytes:
         """Append UUIDs to all annotations of the PDF form."""
 
-        _uuid = uuid.uuid4().hex
+        _uuid = self._uuid
 
         generated_pdf = pdfrw.PdfReader(fdata=output_stream)
 
@@ -241,12 +243,12 @@ class _PyPDFForm(object):
                     float(template_pdf.pages[i].MediaBox[3]),
                 ),
             )
-            c.setFont(self._CANVAS_FONT, self._GLOBAL_FONT_SIZE)
 
             annotations = template_pdf.pages[i][self._ANNOT_KEY]
             if annotations:
                 for j in reversed(range(len(annotations))):
                     annotation = annotations[j]
+                    c.setFont(self._CANVAS_FONT, self._GLOBAL_FONT_SIZE)
 
                     if (
                         annotation[self._SUBTYPE_KEY] == self._WIDGET_SUBTYPE_KEY
@@ -264,36 +266,55 @@ class _PyPDFForm(object):
                                     )
                                 )
                             else:
+                                max_text_length = self._MAX_TXT_LENGTH
+                                x_offset = text_x_offset
+                                y_offset = text_y_offset
+
+                                _annotation = self.annotations[key]
+
+                                if _annotation.type == "text":
+                                    if _annotation.font_size:
+                                        c.setFont(
+                                            self._CANVAS_FONT, _annotation.font_size
+                                        )
+                                    if _annotation.text_x_offset:
+                                        x_offset = _annotation.text_x_offset
+                                    if _annotation.text_y_offset:
+                                        y_offset = _annotation.text_y_offset
+                                    if _annotation.text_wrap_length:
+                                        max_text_length = _annotation.text_wrap_length
+
                                 coordinates = annotation[self._ANNOT_RECT_KEY]
                                 annotations.pop(j)
-                                if len(self._data_dict[key]) < self._MAX_TXT_LENGTH:
+                                if len(self._data_dict[key]) < max_text_length:
                                     c.drawString(
-                                        float(coordinates[0]) + text_x_offset,
+                                        float(coordinates[0]) + x_offset,
                                         (float(coordinates[1]) + float(coordinates[3]))
                                         / 2
                                         - 2
-                                        + text_y_offset,
+                                        + y_offset,
                                         self._data_dict[key],
                                     )
                                 else:
                                     txt_obj = c.beginText(0, 0)
 
                                     start = 0
-                                    end = self._MAX_TXT_LENGTH
+                                    end = max_text_length
 
                                     while end < len(self._data_dict[key]):
                                         txt_obj.textLine(
                                             (self._data_dict[key][start:end])
                                         )
-                                        start += self._MAX_TXT_LENGTH
-                                        end += self._MAX_TXT_LENGTH
+                                        start += max_text_length
+                                        end += max_text_length
                                     txt_obj.textLine(self._data_dict[key][start:])
                                     c.saveState()
                                     c.translate(
-                                        float(coordinates[0]),
+                                        float(coordinates[0]) + x_offset,
                                         (float(coordinates[1]) + float(coordinates[3]))
                                         / 2
-                                        - 2,
+                                        - 2
+                                        + y_offset,
                                     )
                                     c.drawText(txt_obj)
                                     c.restoreState()
@@ -426,26 +447,40 @@ class _PyPDFForm(object):
         self._checkboxes_to_bool()
 
         if not simple_mode:
-            self._update_annotations()
+            self._update_annotations(text_x_offset, text_y_offset)
 
         return self
 
-    def _update_annotations(self) -> None:
+    def _update_annotations(
+        self, text_x_offset: Union[float, int], text_y_offset: Union[float, int]
+    ) -> None:
         """Updates annotations' values given data dict."""
 
-        for each in self.annotations:
-            each.value = self._data_dict[each.name]
+        for k, v in self.annotations.items():
+            v.value = self._data_dict.get(k)
+
+            if v.type == "text":
+                if not v.font_size:
+                    v.font_size = self._GLOBAL_FONT_SIZE
+                if not v.text_x_offset:
+                    v.text_x_offset = text_x_offset
+                if not v.text_y_offset:
+                    v.text_y_offset = text_y_offset
+                if not v.text_wrap_length:
+                    v.text_wrap_length = self._MAX_TXT_LENGTH
 
     def build_annotations(self, pdf_stream: bytes) -> "_PyPDFForm":
         """Builds an annotation list."""
+
+        if not pdf_stream:
+            return self
+
+        self._validate_template(pdf_stream)
 
         annot_type_mapping = {
             "/Btn": "checkbox",
             "/Tx": "text",
         }
-
-        if not pdf_stream:
-            return self
 
         _pdf = pdfrw.PdfReader(fdata=pdf_stream)
 
@@ -459,13 +494,11 @@ class _PyPDFForm(object):
                     ):
                         key = annotation[self._ANNOT_FIELD_KEY][1:-1]
 
-                        self.annotations.append(
-                            Annotation(
-                                annot_name=key,
-                                annot_type=annot_type_mapping.get(
-                                    str(annotation[self._ANNOT_TYPE_KEY])
-                                ),
-                            )
+                        self.annotations[key] = Annotation(
+                            annot_name=key,
+                            annot_type=annot_type_mapping.get(
+                                str(annotation[self._ANNOT_TYPE_KEY])
+                            ),
                         )
 
         return self
