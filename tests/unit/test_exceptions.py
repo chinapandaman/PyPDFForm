@@ -3,7 +3,6 @@
 import os
 
 import pytest
-
 from PyPDFForm import (InvalidEditableParameterError, InvalidFontSizeError,
                        InvalidFormDataError, InvalidImageCoordinateError,
                        InvalidImageDimensionError, InvalidImageError,
@@ -55,17 +54,34 @@ def test_invalid_mode_error(template_stream):
 
 
 def test_invalid_font_size_error(template_stream):
+    obj = PyPDFForm(template_stream, simple_mode=False)
+
     try:
-        PyPDFForm(template_stream, simple_mode=False).fill({}, font_size="12")
+        obj.fill({}, font_size="12")
+        assert False
+    except InvalidFontSizeError:
+        assert True
+
+    try:
+        obj.annotations["test"].font_size = "50"
+        obj.fill({})
         assert False
     except InvalidFontSizeError:
         assert True
 
 
 def test_invalid_wrap_length_error(template_stream):
+    obj = PyPDFForm(template_stream, simple_mode=False)
+
     try:
-        PyPDFForm(template_stream, simple_mode=False).fill({}, text_wrap_length="100")
+        obj.fill({}, text_wrap_length="100")
         assert False
+    except InvalidWrapLengthError:
+        assert True
+
+    try:
+        obj.annotations["test"].text_wrap_length = "100"
+        obj.fill({})
     except InvalidWrapLengthError:
         assert True
 
@@ -123,18 +139,30 @@ def test_invalid_image_rotation_angle_error(template_stream, image_stream):
 
 
 def test_invalid_text_offset_error(template_stream):
+    obj = PyPDFForm(template_stream, simple_mode=False)
+
     try:
-        PyPDFForm(template_stream, simple_mode=False).fill(
-            {}, text_x_offset="100", text_y_offset=100
-        )
+        obj.fill({}, text_x_offset="100", text_y_offset=100)
         assert False
     except InvalidTextOffsetError:
         assert True
 
     try:
-        PyPDFForm(template_stream, simple_mode=False).fill(
-            {}, text_x_offset=100, text_y_offset="100"
-        )
+        obj.fill({}, text_x_offset=100, text_y_offset="100")
+        assert False
+    except InvalidTextOffsetError:
+        assert True
+
+    try:
+        obj.annotations["test"].text_x_offset = "100"
+        obj.fill({})
+        assert False
+    except InvalidTextOffsetError:
+        assert True
+
+    try:
+        obj.annotations["test"].text_y_offset = "100"
+        obj.fill({})
         assert False
     except InvalidTextOffsetError:
         assert True

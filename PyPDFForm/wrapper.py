@@ -55,6 +55,10 @@ class PyPDFForm(object):
         """Fill a PDF form with customized parameters."""
 
         obj = _PyPDFForm()
+
+        for each in self.annotations.values():
+            each.validate()
+
         obj.annotations = self.annotations
         obj = obj.fill(
             self.stream,

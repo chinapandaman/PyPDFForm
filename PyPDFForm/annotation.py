@@ -2,6 +2,9 @@
 
 from typing import Union
 
+from PyPDFForm import (InvalidFontSizeError, InvalidTextOffsetError,
+                       InvalidWrapLengthError)
+
 
 class Annotation(object):
     """A class to represent an annotation of a PDF form."""
@@ -32,3 +35,25 @@ class Annotation(object):
         """Type of the annotation."""
 
         return self._type
+
+    def validate(self):
+        if self._type == "text":
+            if self.font_size and not (
+                isinstance(self.font_size, float) or isinstance(self.font_size, int)
+            ):
+                raise InvalidFontSizeError
+
+            if self.text_x_offset and not (
+                isinstance(self.text_x_offset, float)
+                or isinstance(self.text_x_offset, int)
+            ):
+                raise InvalidTextOffsetError
+
+            if self.text_y_offset and not (
+                isinstance(self.text_y_offset, float)
+                or isinstance(self.text_y_offset, int)
+            ):
+                raise InvalidTextOffsetError
+
+            if self.text_wrap_length and not isinstance(self.text_wrap_length, int):
+                raise InvalidWrapLengthError
