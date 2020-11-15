@@ -36,7 +36,7 @@ class Annotation(object):
 
         return self._type
 
-    def validate(self):
+    def validate(self) -> None:
         if self._type == "text":
             if self.font_size and not (
                 isinstance(self.font_size, float) or isinstance(self.font_size, int)
