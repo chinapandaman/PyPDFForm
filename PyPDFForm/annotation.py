@@ -37,6 +37,8 @@ class Annotation(object):
         return self._type
 
     def validate(self) -> None:
+        """Validates text annotation's attributes."""
+
         if self._type == "text":
             if self.font_size and not (
                 isinstance(self.font_size, float) or isinstance(self.font_size, int)
