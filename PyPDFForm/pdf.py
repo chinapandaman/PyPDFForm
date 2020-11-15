@@ -243,12 +243,12 @@ class _PyPDFForm(object):
                     float(template_pdf.pages[i].MediaBox[3]),
                 ),
             )
-            c.setFont(self._CANVAS_FONT, self._GLOBAL_FONT_SIZE)
 
             annotations = template_pdf.pages[i][self._ANNOT_KEY]
             if annotations:
                 for j in reversed(range(len(annotations))):
                     annotation = annotations[j]
+                    c.setFont(self._CANVAS_FONT, self._GLOBAL_FONT_SIZE)
 
                     if (
                         annotation[self._SUBTYPE_KEY] == self._WIDGET_SUBTYPE_KEY
