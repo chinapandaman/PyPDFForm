@@ -52,8 +52,8 @@ on the specified page, coordinates with specified resolutions and rotation angle
 ### **fill**(*data, font_size=12, text_x_offset=0, text_y_offset=0, text_wrap_length=100, editable=False*)
 
 The fill method takes a python dictionary object `data` and fill the PDF form 
-template with it. The key of the object should match the annotation names of the PDF form. 
-The value of the object will be printed on the corresponding annotation field if it's a `string`. 
+template with it. The key of the object should match the annotated names of elements on the PDF form. 
+The value of the object will be printed on the corresponding element if it's a `string`. 
 If the value is a `boolean` the corresponding checkboxes will be checked on the PDF form.
 
 #### Parameters:

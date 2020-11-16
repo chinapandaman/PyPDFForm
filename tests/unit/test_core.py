@@ -53,22 +53,22 @@ def test_simple_mode_fill_pdf_method(template_stream):
     result_pdf = pdfrw.PdfReader(fdata=obj._fill_pdf(template_stream))
 
     for i in range(len(result_pdf.pages)):
-        annotations = result_pdf.pages[i][obj._ANNOT_KEY]
-        if annotations:
-            for annotation in annotations:
+        elements = result_pdf.pages[i][obj._ANNOT_KEY]
+        if elements:
+            for element in elements:
                 if (
-                    annotation[obj._SUBTYPE_KEY] == obj._WIDGET_SUBTYPE_KEY
-                    and annotation[obj._ANNOT_FIELD_KEY]
+                    element[obj._SUBTYPE_KEY] == obj._WIDGET_SUBTYPE_KEY
+                    and element[obj._ANNOT_FIELD_KEY]
                 ):
-                    key = annotation[obj._ANNOT_FIELD_KEY][1:-1]
+                    key = element[obj._ANNOT_FIELD_KEY][1:-1]
 
                     expected = obj._data_dict[key]
                     if isinstance(expected, bool):
-                        assert annotation["/AS"] == (
+                        assert element["/AS"] == (
                             pdfrw.PdfName.Yes if expected else pdfrw.PdfName.Off
                         )
                     else:
-                        assert annotation["/V"][1:-1] == expected
+                        assert element["/V"][1:-1] == expected
 
 
 def test_assign_uuid(template_stream):
@@ -80,15 +80,15 @@ def test_assign_uuid(template_stream):
     _uuid = {}
 
     for i in range(len(result_pdf.pages)):
-        annotations = result_pdf.pages[i][obj._ANNOT_KEY]
-        if annotations:
-            for annotation in annotations:
+        elements = result_pdf.pages[i][obj._ANNOT_KEY]
+        if elements:
+            for element in elements:
                 if (
-                    annotation[obj._SUBTYPE_KEY] == obj._WIDGET_SUBTYPE_KEY
-                    and annotation[obj._ANNOT_FIELD_KEY]
+                    element[obj._SUBTYPE_KEY] == obj._WIDGET_SUBTYPE_KEY
+                    and element[obj._ANNOT_FIELD_KEY]
                 ):
-                    assert annotation["/Ff"] == pdfrw.PdfObject(1)
-                    key = annotation[obj._ANNOT_FIELD_KEY][1:-1]
+                    assert element["/Ff"] == pdfrw.PdfObject(1)
+                    key = element[obj._ANNOT_FIELD_KEY][1:-1]
                     _uuid[key.split("_")[-1]] = True
 
     for each in _uuid.keys():
@@ -107,26 +107,26 @@ def test_fill_pdf_canvas(template_stream):
         "check_3": True,
     }
 
-    obj = _PyPDFForm().build_annotations(template_stream)
+    obj = _PyPDFForm().build_elements(template_stream)
     obj._data_dict = deepcopy(_data)
     obj._bool_to_checkboxes()
     result_pdf = pdfrw.PdfReader(fdata=obj._fill_pdf_canvas(template_stream, 0, 0))
 
     for i in range(len(result_pdf.pages)):
-        annotations = result_pdf.pages[i][obj._ANNOT_KEY]
-        if annotations:
-            for annotation in annotations:
+        elements = result_pdf.pages[i][obj._ANNOT_KEY]
+        if elements:
+            for element in elements:
                 if (
-                    annotation[obj._SUBTYPE_KEY] == obj._WIDGET_SUBTYPE_KEY
-                    and annotation[obj._ANNOT_FIELD_KEY]
+                    element[obj._SUBTYPE_KEY] == obj._WIDGET_SUBTYPE_KEY
+                    and element[obj._ANNOT_FIELD_KEY]
                 ):
-                    key = annotation[obj._ANNOT_FIELD_KEY][1:-1]
+                    key = element[obj._ANNOT_FIELD_KEY][1:-1]
                     expected = _data[key]
 
                     if not isinstance(expected, bool):
                         assert False
 
-                    assert annotation["/AS"] == (
+                    assert element["/AS"] == (
                         pdfrw.PdfName.Yes if expected else pdfrw.PdfName.Off
                     )
 
@@ -148,17 +148,17 @@ def test_editable(template_stream):
     result_pdf = pdfrw.PdfReader(fdata=obj._assign_uuid(template_stream, editable=True))
 
     for i in range(len(result_pdf.pages)):
-        annotations = result_pdf.pages[i][obj._ANNOT_KEY]
-        if annotations:
-            for annotation in annotations:
+        elements = result_pdf.pages[i][obj._ANNOT_KEY]
+        if elements:
+            for element in elements:
                 if (
-                    annotation[obj._SUBTYPE_KEY] == obj._WIDGET_SUBTYPE_KEY
-                    and annotation[obj._ANNOT_FIELD_KEY]
+                    element[obj._SUBTYPE_KEY] == obj._WIDGET_SUBTYPE_KEY
+                    and element[obj._ANNOT_FIELD_KEY]
                 ):
-                    assert annotation["/Ff"] is None
+                    assert element["/Ff"] is None
 
 
-def test_build_annotation(template_stream):
+def test_build_elements(template_stream):
     _data = {
         "test": False,
         "check": False,
@@ -168,16 +168,16 @@ def test_build_annotation(template_stream):
         "check_3": False,
     }
 
-    obj = _PyPDFForm().build_annotations(template_stream)
+    obj = _PyPDFForm().build_elements(template_stream)
 
-    for each in obj.annotations.keys():
+    for each in obj.elements.keys():
         _data[each] = True
 
     for k in _data.keys():
         assert _data[k]
 
 
-def test_update_annotation(template_stream):
+def test_update_elements(template_stream):
     _data = {
         "test": "test_1",
         "check": True,
@@ -189,7 +189,7 @@ def test_update_annotation(template_stream):
 
     obj = (
         _PyPDFForm()
-        .build_annotations(template_stream)
+        .build_elements(template_stream)
         .fill(
             template_stream,
             _data,
@@ -202,7 +202,7 @@ def test_update_annotation(template_stream):
         )
     )
 
-    for k, v in obj.annotations.items():
+    for k, v in obj.elements.items():
         assert _data[k] == v.value
 
         if v.type == "text":

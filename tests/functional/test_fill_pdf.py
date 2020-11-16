@@ -61,7 +61,7 @@ def test_fill_font_20(template_stream, pdf_samples, comparing_size):
         assert len(obj.stream) == len(expected)
         assert obj.stream[:comparing_size] == expected[:comparing_size]
 
-        for k, v in obj.annotations.items():
+        for k, v in obj.elements.items():
             assert k in data_dict
             assert v.name in data_dict
             assert v.value == data_dict[k]
@@ -93,7 +93,7 @@ def test_fill_text_wrap_2(template_stream, pdf_samples, comparing_size):
         assert len(obj.stream) == len(expected)
         assert obj.stream[:comparing_size] == expected[:comparing_size]
 
-        for k, v in obj.annotations.items():
+        for k, v in obj.elements.items():
             assert k in data_dict
             assert v.name in data_dict
             assert v.value == data_dict[k]
@@ -125,7 +125,7 @@ def test_fill_offset_100(template_stream, pdf_samples, comparing_size):
         assert len(obj.stream) == len(expected)
         assert obj.stream[:comparing_size] == expected[:comparing_size]
 
-        for k, v in obj.annotations.items():
+        for k, v in obj.elements.items():
             assert k in data_dict
             assert v.name in data_dict
             assert v.value == data_dict[k]
@@ -157,9 +157,9 @@ def test_fill_editable(template_stream, pdf_samples, comparing_size):
         assert obj.stream[:comparing_size] == expected[:comparing_size]
 
 
-def test_fill_with_customized_annotations(template_stream, pdf_samples, comparing_size):
+def test_fill_with_customized_elements(template_stream, pdf_samples, comparing_size):
     with open(
-        os.path.join(pdf_samples, "sample_filled_customized_annotations.pdf"), "rb+"
+        os.path.join(pdf_samples, "sample_filled_customized_elements.pdf"), "rb+"
     ) as f:
         data_dict = {
             "test": "test_1",
@@ -172,11 +172,11 @@ def test_fill_with_customized_annotations(template_stream, pdf_samples, comparin
 
         obj = PyPDFForm(template_stream, simple_mode=False)
 
-        obj.annotations["test"].font_size = 20
-        obj.annotations["test_2"].text_x_offset = 50
-        obj.annotations["test_2"].text_y_offset = -50
-        obj.annotations["test_2"].text_wrap_length = 1
-        obj.annotations["test_3"].text_wrap_length = 2
+        obj.elements["test"].font_size = 20
+        obj.elements["test_2"].text_x_offset = 50
+        obj.elements["test_2"].text_y_offset = -50
+        obj.elements["test_2"].text_wrap_length = 1
+        obj.elements["test_3"].text_wrap_length = 2
 
         obj.fill(data_dict)
 
@@ -185,22 +185,22 @@ def test_fill_with_customized_annotations(template_stream, pdf_samples, comparin
         assert len(obj.stream) == len(expected)
         assert obj.stream[:comparing_size] == expected[:comparing_size]
 
-        for k, v in obj.annotations.items():
+        for k, v in obj.elements.items():
             assert k in data_dict
             assert v.name in data_dict
             assert v.value == data_dict[k]
 
-        assert obj.annotations["test"].font_size == 20
-        assert obj.annotations["test"].text_x_offset == 0
-        assert obj.annotations["test"].text_y_offset == 0
-        assert obj.annotations["test"].text_wrap_length == 100
+        assert obj.elements["test"].font_size == 20
+        assert obj.elements["test"].text_x_offset == 0
+        assert obj.elements["test"].text_y_offset == 0
+        assert obj.elements["test"].text_wrap_length == 100
 
-        assert obj.annotations["test_2"].font_size == 12
-        assert obj.annotations["test_2"].text_x_offset == 50
-        assert obj.annotations["test_2"].text_y_offset == -50
-        assert obj.annotations["test_2"].text_wrap_length == 1
+        assert obj.elements["test_2"].font_size == 12
+        assert obj.elements["test_2"].text_x_offset == 50
+        assert obj.elements["test_2"].text_y_offset == -50
+        assert obj.elements["test_2"].text_wrap_length == 1
 
-        assert obj.annotations["test_3"].font_size == 12
-        assert obj.annotations["test_3"].text_x_offset == 0
-        assert obj.annotations["test_3"].text_y_offset == 0
-        assert obj.annotations["test_3"].text_wrap_length == 2
+        assert obj.elements["test_3"].font_size == 12
+        assert obj.elements["test_3"].text_x_offset == 0
+        assert obj.elements["test_3"].text_y_offset == 0
+        assert obj.elements["test_3"].text_wrap_length == 2

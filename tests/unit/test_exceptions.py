@@ -63,7 +63,7 @@ def test_invalid_font_size_error(template_stream):
         assert True
 
     try:
-        obj.annotations["test"].font_size = "50"
+        obj.elements["test"].font_size = "50"
         obj.fill({})
         assert False
     except InvalidFontSizeError:
@@ -80,7 +80,7 @@ def test_invalid_wrap_length_error(template_stream):
         assert True
 
     try:
-        obj.annotations["test"].text_wrap_length = "100"
+        obj.elements["test"].text_wrap_length = "100"
         obj.fill({})
     except InvalidWrapLengthError:
         assert True
@@ -154,14 +154,14 @@ def test_invalid_text_offset_error(template_stream):
         assert True
 
     try:
-        obj.annotations["test"].text_x_offset = "100"
+        obj.elements["test"].text_x_offset = "100"
         obj.fill({})
         assert False
     except InvalidTextOffsetError:
         assert True
 
     try:
-        obj.annotations["test"].text_y_offset = "100"
+        obj.elements["test"].text_y_offset = "100"
         obj.fill({})
         assert False
     except InvalidTextOffsetError:

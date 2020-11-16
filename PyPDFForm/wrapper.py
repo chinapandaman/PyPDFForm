@@ -16,7 +16,7 @@ class PyPDFForm(object):
         self.fill = self._simple_fill if simple_mode else self._fill
 
         if not simple_mode:
-            self.annotations = _PyPDFForm().build_annotations(template).annotations
+            self.elements = _PyPDFForm().build_elements(template).elements
 
     def __add__(self, other: "PyPDFForm") -> "PyPDFForm":
         """Overloaded addition operator to perform merging PDFs."""
@@ -56,10 +56,10 @@ class PyPDFForm(object):
 
         obj = _PyPDFForm()
 
-        for each in self.annotations.values():
+        for each in self.elements.values():
             each.validate()
 
-        obj.annotations = self.annotations
+        obj.elements = self.elements
         obj = obj.fill(
             self.stream,
             data,
@@ -72,7 +72,7 @@ class PyPDFForm(object):
         )
 
         self.stream = obj.stream
-        self.annotations = obj.annotations
+        self.elements = obj.elements
 
         return self
 
