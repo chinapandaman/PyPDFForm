@@ -6,7 +6,7 @@ from copy import deepcopy
 
 import pdfrw
 import pytest
-from PyPDFForm.pdf import _PyPDFForm
+from PyPDFForm.core import _PyPDFForm
 
 
 @pytest.fixture
