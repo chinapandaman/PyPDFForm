@@ -6,19 +6,22 @@ from PyPDFForm import (InvalidFontSizeError, InvalidTextOffsetError,
                        InvalidWrapLengthError)
 
 
-class Annotation(object):
-    """A class to represent an annotation of a PDF form."""
+class Element(object):
+    """A class to represent an element of a PDF form."""
 
     def __init__(
-        self, annot_name: str, annot_type: str, annot_value: Union[str, bool] = None
+        self,
+        element_name: str,
+        element_type: str,
+        element_value: Union[str, bool] = None,
     ) -> None:
-        """Constructs all attributes for the Annotation object."""
+        """Constructs all attributes for the Element object."""
 
-        self._name = annot_name
-        self._type = annot_type
-        self.value = annot_value
+        self._name = element_name
+        self._type = element_type
+        self.value = element_value
 
-        if annot_type == "text":
+        if element_type == "text":
             self.font_size = None
             self.text_x_offset = None
             self.text_y_offset = None
@@ -26,18 +29,18 @@ class Annotation(object):
 
     @property
     def name(self) -> str:
-        """Name of the annotation."""
+        """Name of the element."""
 
         return self._name
 
     @property
     def type(self) -> str:
-        """Type of the annotation."""
+        """Type of the element."""
 
         return self._type
 
     def validate(self) -> None:
-        """Validates text annotation's attributes."""
+        """Validates text element's attributes."""
 
         if self._type == "text":
             if self.font_size and not (
