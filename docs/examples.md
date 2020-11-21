@@ -297,7 +297,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
 
 ## Fill with customized elements
 
-A lot of times you may want one or two elements' details like font size and 
+A lot of times you may want one or more elements' details like font size and 
 text wrap length to be different from the global setting. This can be done by manipulating 
 the `elements` attributes of the object.
 
