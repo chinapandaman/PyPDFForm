@@ -1,0 +1,39 @@
+# GitHub Action that uses Black to reformat the Python code in an incoming pull request.
+# If all Python code in the pull request is compliant with Black then this Action does nothing.
+# Otherwise, Black is run and its changes are committed back to the incoming pull request.
+# https://github.com/cclauss/autoblack
+
+name: Python Black/Isort
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.7 ]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Black
+        run: pip install black
+      - name: Run black --check .
+        run: black --check .
+      - name: If needed, commit black changes to the pull request
+        if: failure()
+        run: |
+          black .
+          git config --global user.name 'black-isort-bot'
+          git config --global user.email 'bot@domain.com'
+          git remote set-url origin https://x-access-token:${{ secrets.BLACK_ISORT_TOKEN }}@github.com/PyPDFForm.git
+          git checkout $GITHUB_HEAD_REF
+          git commit -m "fixup: Format Python code with Black"
+          git push
