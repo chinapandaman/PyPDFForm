@@ -2,7 +2,7 @@
 
 import uuid
 from io import BytesIO
-from typing import Union
+from typing import List, Union
 
 import pdfrw
 from PIL import Image
@@ -136,7 +136,7 @@ class _PyPDFForm(object):
         if not (isinstance(rotation, float) or isinstance(rotation, int)):
             raise InvalidImageRotationAngleError
 
-    def _iterate_elements(self, pdf: "pdfrw.PdfReader") -> list:
+    def _iterate_elements(self, pdf: "pdfrw.PdfReader") -> List["pdfrw.PdfDict"]:
         result = []
 
         for i in range(len(pdf.pages)):
