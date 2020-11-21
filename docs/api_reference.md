@@ -53,7 +53,7 @@ on the specified page, coordinates with specified resolutions and rotation angle
 
 A python dictionary only available when `simple_mode` is `False`. Its keys consist 
 all elements' annotated names while the values hold their corresponding `Element()` object. 
-For more about `Element()` please read from [here](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md#element-object).
+Please read more about `Element()` [here](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md#element-object).
 
 ### **fill**(*data, font_size=12, text_x_offset=0, text_y_offset=0, text_wrap_length=100, editable=False*)
 
