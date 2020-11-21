@@ -51,7 +51,9 @@ on the specified page, coordinates with specified resolutions and rotation angle
 
 ### **elements**
 
-A python dictionary only available when `simple_mode` is `False`. Its keys consist 
+A python dictionary only available when `simple_mode` is `False`. 
+This attribute is the primary way of customizing details like font size and text wrap length for individual element. 
+Its keys consist 
 all elements' annotated names while the values hold their corresponding `Element()` objects. 
 Please read more about `Element()` [here](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md#element-object).
 
