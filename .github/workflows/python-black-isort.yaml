@@ -11,18 +11,14 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [ 3.7 ]
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.7
       - name: Install Black
         run: pip install black
       - name: Install Isort
@@ -33,7 +29,7 @@ jobs:
           isort .
           git config --global user.name 'black-isort-bot'
           git config --global user.email 'bot@domain.com'
-          git remote set-url origin https://x-access-token:${{ secrets.BLACK_ISORT_TOKEN }}@github.com/chinapandaman/PyPDFForm.git
+          git remote set-url origin https://x-access-token:${{ secrets.BLACK_ISORT_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git fetch
           git checkout $GITHUB_HEAD_REF
           git commit -am "fixup: Format Python code with Black/Isort"

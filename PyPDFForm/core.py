@@ -179,17 +179,11 @@ class _PyPDFForm(object):
         for element in self._iterate_elements(generated_pdf):
             if editable:
                 update_obj = pdfrw.PdfDict(
-                    T="{}_{}".format(
-                        element[self._ANNOT_FIELD_KEY][1:-1],
-                        _uuid,
-                    ),
+                    T="{}_{}".format(element[self._ANNOT_FIELD_KEY][1:-1], _uuid,),
                 )
             else:
                 update_obj = pdfrw.PdfDict(
-                    T="{}_{}".format(
-                        element[self._ANNOT_FIELD_KEY][1:-1],
-                        _uuid,
-                    ),
+                    T="{}_{}".format(element[self._ANNOT_FIELD_KEY][1:-1], _uuid,),
                     Ff=pdfrw.PdfObject(1),
                 )
 
@@ -214,8 +208,7 @@ class _PyPDFForm(object):
             if key in self._data_dict.keys():
                 element.update(
                     pdfrw.PdfDict(
-                        V="{}".format(self._data_dict[key]),
-                        AS=self._data_dict[key],
+                        V="{}".format(self._data_dict[key]), AS=self._data_dict[key],
                     )
                 )
 
