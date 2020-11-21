@@ -210,3 +210,10 @@ def test_update_elements(template_stream):
             assert v.text_x_offset == 0
             assert v.text_y_offset == 0
             assert v.text_wrap_length == 100
+
+
+def test_iterate_elements(template_stream):
+    obj = _PyPDFForm().build_elements(template_stream)
+
+    for each in obj._iterate_elements(pdfrw.PdfReader(fdata=template_stream)):
+        assert obj.elements.get(each[obj._ANNOT_FIELD_KEY][1:-1])
