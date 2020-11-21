@@ -137,6 +137,8 @@ class _PyPDFForm(object):
             raise InvalidImageRotationAngleError
 
     def _iterate_elements(self, pdf: "pdfrw.PdfReader") -> List["pdfrw.PdfDict"]:
+        """Iterates through a PDF and returns all elements found."""
+
         result = []
 
         for i in range(len(pdf.pages)):
