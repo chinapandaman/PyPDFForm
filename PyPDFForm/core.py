@@ -2,7 +2,7 @@
 
 import uuid
 from io import BytesIO
-from typing import Union
+from typing import List, Union
 
 import pdfrw
 from PIL import Image
@@ -136,6 +136,23 @@ class _PyPDFForm(object):
         if not (isinstance(rotation, float) or isinstance(rotation, int)):
             raise InvalidImageRotationAngleError
 
+    def _iterate_elements(self, pdf: "pdfrw.PdfReader") -> List["pdfrw.PdfDict"]:
+        """Iterates through a PDF and returns all elements found."""
+
+        result = []
+
+        for i in range(len(pdf.pages)):
+            elements = pdf.pages[i][self._ANNOT_KEY]
+            if elements:
+                for element in elements:
+                    if (
+                        element[self._SUBTYPE_KEY] == self._WIDGET_SUBTYPE_KEY
+                        and element[self._ANNOT_FIELD_KEY]
+                    ):
+                        result.append(element)
+
+        return result
+
     def _bool_to_checkboxes(self) -> None:
         """Converts all boolean values in input data dictionary into PDF checkbox objects."""
 
@@ -159,26 +176,18 @@ class _PyPDFForm(object):
 
         generated_pdf = pdfrw.PdfReader(fdata=output_stream)
 
-        for i in range(len(generated_pdf.pages)):
-            elements = generated_pdf.pages[i][self._ANNOT_KEY]
-            if elements:
-                for element in elements:
-                    if self._ANNOT_FIELD_KEY in element.keys():
-                        if editable:
-                            update_obj = pdfrw.PdfDict(
-                                T="{}_{}".format(
-                                    element[self._ANNOT_FIELD_KEY][1:-1], _uuid,
-                                ),
-                            )
-                        else:
-                            update_obj = pdfrw.PdfDict(
-                                T="{}_{}".format(
-                                    element[self._ANNOT_FIELD_KEY][1:-1], _uuid,
-                                ),
-                                Ff=pdfrw.PdfObject(1),
-                            )
+        for element in self._iterate_elements(generated_pdf):
+            if editable:
+                update_obj = pdfrw.PdfDict(
+                    T="{}_{}".format(element[self._ANNOT_FIELD_KEY][1:-1], _uuid,),
+                )
+            else:
+                update_obj = pdfrw.PdfDict(
+                    T="{}_{}".format(element[self._ANNOT_FIELD_KEY][1:-1], _uuid,),
+                    Ff=pdfrw.PdfObject(1),
+                )
 
-                        element.update(update_obj)
+            element.update(update_obj)
 
         result_stream = BytesIO()
         pdfrw.PdfWriter().write(result_stream, generated_pdf)
@@ -194,22 +203,14 @@ class _PyPDFForm(object):
 
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
 
-        for i in range(len(template_pdf.pages)):
-            elements = template_pdf.pages[i][self._ANNOT_KEY]
-            if elements:
-                for element in elements:
-                    if (
-                        element[self._SUBTYPE_KEY] == self._WIDGET_SUBTYPE_KEY
-                        and element[self._ANNOT_FIELD_KEY]
-                    ):
-                        key = element[self._ANNOT_FIELD_KEY][1:-1]
-                        if key in self._data_dict.keys():
-                            element.update(
-                                pdfrw.PdfDict(
-                                    V="{}".format(self._data_dict[key]),
-                                    AS=self._data_dict[key],
-                                )
-                            )
+        for element in self._iterate_elements(template_pdf):
+            key = element[self._ANNOT_FIELD_KEY][1:-1]
+            if key in self._data_dict.keys():
+                element.update(
+                    pdfrw.PdfDict(
+                        V="{}".format(self._data_dict[key]), AS=self._data_dict[key],
+                    )
+                )
 
         result_stream = BytesIO()
         pdfrw.PdfWriter().write(result_stream, template_pdf)
@@ -482,21 +483,14 @@ class _PyPDFForm(object):
 
         _pdf = pdfrw.PdfReader(fdata=pdf_stream)
 
-        for i in range(len(_pdf.pages)):
-            elements = _pdf.pages[i][self._ANNOT_KEY]
-            if elements:
-                for element in elements:
-                    if (
-                        element[self._SUBTYPE_KEY] == self._WIDGET_SUBTYPE_KEY
-                        and element[self._ANNOT_FIELD_KEY]
-                    ):
-                        key = element[self._ANNOT_FIELD_KEY][1:-1]
+        for element in self._iterate_elements(_pdf):
+            key = element[self._ANNOT_FIELD_KEY][1:-1]
 
-                        self.elements[key] = Element(
-                            element_name=key,
-                            element_type=element_type_mapping.get(
-                                str(element[self._ANNOT_TYPE_KEY])
-                            ),
-                        )
+            self.elements[key] = Element(
+                element_name=key,
+                element_type=element_type_mapping.get(
+                    str(element[self._ANNOT_TYPE_KEY])
+                ),
+            )
 
         return self
