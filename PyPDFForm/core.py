@@ -10,20 +10,12 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
 from .element import Element
-from .exceptions import (
-    InvalidEditableParameterError,
-    InvalidFontSizeError,
-    InvalidFormDataError,
-    InvalidImageCoordinateError,
-    InvalidImageDimensionError,
-    InvalidImageError,
-    InvalidImageRotationAngleError,
-    InvalidModeError,
-    InvalidPageNumberError,
-    InvalidTemplateError,
-    InvalidTextOffsetError,
-    InvalidWrapLengthError,
-)
+from .exceptions import (InvalidEditableParameterError, InvalidFontSizeError,
+                         InvalidFormDataError, InvalidImageCoordinateError,
+                         InvalidImageDimensionError, InvalidImageError,
+                         InvalidImageRotationAngleError, InvalidModeError,
+                         InvalidPageNumberError, InvalidTemplateError,
+                         InvalidTextOffsetError, InvalidWrapLengthError)
 
 
 class _PyPDFForm(object):
