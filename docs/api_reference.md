@@ -142,7 +142,7 @@ change the vertical offset used for the text filled on this element.
 
 ### **text_wrap_length** = *None*
 
-Only available if the `element_type` is `text`. Setting this numerical attribute will 
+Only available if the `element_type` is `text`. Setting this integer attribute will 
 change the maximum text wrap length used for the text filled on this element.
 
 ### **validate**()
