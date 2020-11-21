@@ -49,6 +49,12 @@ on the specified page, coordinates with specified resolutions and rotation angle
 
 * **rotation** - degrees the image will be rotated after drawn.
 
+### **elements**
+
+A python dictionary only available when `simple_mode` is `False`. Its keys consist 
+all elements' annotated names while the values hold their corresponding `Element()` objects. 
+Please read more about `Element()` [here](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md#element-object).
+
 ### **fill**(*data, font_size=12, text_x_offset=0, text_y_offset=0, text_wrap_length=100, editable=False*)
 
 The fill method takes a python dictionary object `data` and fill the PDF form 
@@ -85,3 +91,61 @@ like font size.
 
 A byte object which holds the stream with the current state of the PDF form. This can be used by 
 python IO to `.write` to another destination.
+
+## Element Object
+
+### *class* PyPDFForm.element.**Element**(*element_name, element_type, element_value*)
+
+The Element object implements a single PDF form element. It is constructed for each element 
+of a **non-simple-mode** `PyPDFForm` object constructed with a template stream and makes up the `elements` attribute. 
+When accessed through the `elements` attribute it can be used to customize individual element's detail for filling method 
+such as font size and text wrap length.
+
+#### Parameters:
+
+* **element_name** - a string which represents the annotated name of the element.
+
+* **element_type** - a string which represents the type of the element. Currently supporting 
+`text` and `checkbox`.
+
+* **element_value** - this is the value that's used to to fill this element. It is a string 
+if the `element_type` is `text` or a boolean value in the case of `checkbox`.
+
+### **name**
+
+A string which represents the annotated name of the element. Readonly.
+
+### **type**
+
+A string which represents the type of the element. Currently supporting 
+`text` and `checkbox`. Readonly.
+
+### **value**
+
+This attribute holds the value that's used to to fill this element. It is a string 
+if the `element_type` is `text` or a boolean value in the case of `checkbox`.
+
+### **font_size** = *None*
+
+Only available if the `element_type` is `text`. Setting this numerical attribute will 
+change the font size used for the text filled on this element.
+
+### **text_x_offset** = *None*
+
+Only available if the `element_type` is `text`. Setting this numerical attribute will 
+change the horizontal offset used for the text filled on this element.
+
+### **text_y_offset** = *None*
+
+Only available if the `element_type` is `text`. Setting this numerical attribute will 
+change the vertical offset used for the text filled on this element.
+
+### **text_wrap_length** = *None*
+
+Only available if the `element_type` is `text`. Setting this integer attribute will 
+change the maximum text wrap length used for the text filled on this element.
+
+### **validate**()
+
+The validate method validates all attributes for the Element object and raises 
+appropriate exceptions based on the validation.
