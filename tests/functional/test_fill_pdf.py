@@ -53,7 +53,8 @@ def test_fill_font_20(template_stream, pdf_samples, comparing_size):
         }
 
         obj = PyPDFForm(template_stream, simple_mode=False).fill(
-            data_dict, font_size=20,
+            data_dict,
+            font_size=20,
         )
 
         expected = f.read()
@@ -85,7 +86,8 @@ def test_fill_text_wrap_2(template_stream, pdf_samples, comparing_size):
         }
 
         obj = PyPDFForm(template_stream, simple_mode=False).fill(
-            data_dict, text_wrap_length=2,
+            data_dict,
+            text_wrap_length=2,
         )
 
         expected = f.read()
@@ -117,7 +119,9 @@ def test_fill_offset_100(template_stream, pdf_samples, comparing_size):
         }
 
         obj = PyPDFForm(template_stream, simple_mode=False).fill(
-            data_dict, text_x_offset=100, text_y_offset=-100,
+            data_dict,
+            text_x_offset=100,
+            text_y_offset=-100,
         )
 
         expected = f.read()

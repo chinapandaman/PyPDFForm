@@ -2,8 +2,11 @@
 
 from typing import Union
 
-from PyPDFForm import (InvalidFontSizeError, InvalidTextOffsetError,
-                       InvalidWrapLengthError)
+from PyPDFForm import (
+    InvalidFontSizeError,
+    InvalidTextOffsetError,
+    InvalidWrapLengthError,
+)
 
 
 class Element(object):
