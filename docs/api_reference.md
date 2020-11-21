@@ -127,22 +127,22 @@ if the `element_type` is `text` or a boolean value in the case of `checkbox`.
 
 ### **font_size** = *None*
 
-Only available if the `element_type` is `text`. Changing this numerical attribute will 
+Only available if the `element_type` is `text`. Setting this numerical attribute will 
 change the font size used for the text filled on this element.
 
 ### **text_x_offset** = *None*
 
-Only available if the `element_type` is `text`. Changing this numerical attribute will 
+Only available if the `element_type` is `text`. Setting this numerical attribute will 
 change the horizontal offset used for the text filled on this element.
 
 ### **text_y_offset** = *None*
 
-Only available if the `element_type` is `text`. Changing this numerical attribute will 
+Only available if the `element_type` is `text`. Setting this numerical attribute will 
 change the vertical offset used for the text filled on this element.
 
 ### **text_wrap_length** = *None*
 
-Only available if the `element_type` is `text`. Changing this numerical attribute will 
+Only available if the `element_type` is `text`. Setting this numerical attribute will 
 change the maximum text wrap length used for the text filled on this element.
 
 ### **validate**()
