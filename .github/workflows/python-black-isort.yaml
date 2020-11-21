@@ -32,5 +32,5 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.BLACK_ISORT_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git fetch
           git checkout $GITHUB_HEAD_REF
-          git commit -am "fixup: Format Python code with Black/Isort"
+          git diff --quiet && git diff --staged --quiet || git commit -am 'linting: black/isort'
           git push
