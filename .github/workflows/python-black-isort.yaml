@@ -33,7 +33,7 @@ jobs:
           black .
           git config --global user.name 'black-isort-bot'
           git config --global user.email 'bot@domain.com'
-          git remote set-url origin https://x-access-token:${{ secrets.BLACK_ISORT_TOKEN }}@github.com/PyPDFForm.git
+          git remote set-url origin https://x-access-token:${{ secrets.BLACK_ISORT_TOKEN }}@github.com/chinapandaman/PyPDFForm.git
           git fetch
           git checkout $GITHUB_HEAD_REF
           git commit -m "fixup: Format Python code with Black"
