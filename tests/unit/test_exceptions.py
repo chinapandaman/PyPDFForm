@@ -3,6 +3,7 @@
 import os
 
 import pytest
+
 from PyPDFForm import (InvalidEditableParameterError, InvalidFontSizeError,
                        InvalidFormDataError, InvalidImageCoordinateError,
                        InvalidImageDimensionError, InvalidImageError,
