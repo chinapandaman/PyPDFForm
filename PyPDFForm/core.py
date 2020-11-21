@@ -174,26 +174,18 @@ class _PyPDFForm(object):
 
         generated_pdf = pdfrw.PdfReader(fdata=output_stream)
 
-        for i in range(len(generated_pdf.pages)):
-            elements = generated_pdf.pages[i][self._ANNOT_KEY]
-            if elements:
-                for element in elements:
-                    if self._ANNOT_FIELD_KEY in element.keys():
-                        if editable:
-                            update_obj = pdfrw.PdfDict(
-                                T="{}_{}".format(
-                                    element[self._ANNOT_FIELD_KEY][1:-1], _uuid,
-                                ),
-                            )
-                        else:
-                            update_obj = pdfrw.PdfDict(
-                                T="{}_{}".format(
-                                    element[self._ANNOT_FIELD_KEY][1:-1], _uuid,
-                                ),
-                                Ff=pdfrw.PdfObject(1),
-                            )
+        for element in self._iterate_elements(generated_pdf):
+            if editable:
+                update_obj = pdfrw.PdfDict(
+                    T="{}_{}".format(element[self._ANNOT_FIELD_KEY][1:-1], _uuid,),
+                )
+            else:
+                update_obj = pdfrw.PdfDict(
+                    T="{}_{}".format(element[self._ANNOT_FIELD_KEY][1:-1], _uuid,),
+                    Ff=pdfrw.PdfObject(1),
+                )
 
-                        element.update(update_obj)
+            element.update(update_obj)
 
         result_stream = BytesIO()
         pdfrw.PdfWriter().write(result_stream, generated_pdf)
