@@ -6,6 +6,7 @@ from copy import deepcopy
 
 import pdfrw
 import pytest
+
 from PyPDFForm.core import _PyPDFForm
 
 
