@@ -50,7 +50,7 @@ class Element(object):
                 raise InvalidFontSizeError
 
             if self.font_color and not (
-                isinstance(self.font_size, tuple) and len(self.font_color) == 3
+                isinstance(self.font_color, tuple) and len(self.font_color) == 3
             ):
                 raise InvalidFontColorError
 
