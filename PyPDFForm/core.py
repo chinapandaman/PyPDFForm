@@ -292,6 +292,12 @@ class _PyPDFForm(object):
                                 if _element.type == "text":
                                     if _element.font_size:
                                         c.setFont(self._CANVAS_FONT, _element.font_size)
+                                    if _element.font_color:
+                                        c.setFillColorRGB(
+                                            _element.font_color[0],
+                                            _element.font_color[1],
+                                            _element.font_color[2],
+                                        )
                                     if _element.text_x_offset:
                                         x_offset = _element.text_x_offset
                                     if _element.text_y_offset:
@@ -480,6 +486,8 @@ class _PyPDFForm(object):
             if v.type == "text":
                 if not v.font_size:
                     v.font_size = self._GLOBAL_FONT_SIZE
+                if not v.font_color:
+                    v.font_color = self._GLOBAL_FONT_COLOR
                 if not v.text_x_offset:
                     v.text_x_offset = text_x_offset
                 if not v.text_y_offset:
