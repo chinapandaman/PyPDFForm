@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Union
+from typing import Tuple, Union
 
 from .core import _PyPDFForm
 
@@ -38,7 +38,9 @@ class PyPDFForm(object):
 
         self.stream = (
             _PyPDFForm()
-            .fill(self.stream, data, self.simple_mode, 12, 0, 0, 100, editable)
+            .fill(
+                self.stream, data, self.simple_mode, 12, (0, 0, 0), 0, 0, 100, editable
+            )
             .stream
         )
 
@@ -48,6 +50,11 @@ class PyPDFForm(object):
         self,
         data: dict,
         font_size: Union[float, int] = 12,
+        font_color: Tuple[Union[float, int], Union[float, int], Union[float, int]] = (
+            0,
+            0,
+            0,
+        ),
         text_x_offset: Union[float, int] = 0,
         text_y_offset: Union[float, int] = 0,
         text_wrap_length: int = 100,
@@ -65,6 +72,7 @@ class PyPDFForm(object):
             data,
             self.simple_mode,
             font_size,
+            font_color,
             text_x_offset,
             text_y_offset,
             text_wrap_length,

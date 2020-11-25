@@ -2,8 +2,8 @@
 
 from typing import Union
 
-from .exceptions import (InvalidFontSizeError, InvalidTextOffsetError,
-                         InvalidWrapLengthError)
+from .exceptions import (InvalidFontColorError, InvalidFontSizeError,
+                         InvalidTextOffsetError, InvalidWrapLengthError)
 
 
 class Element(object):
@@ -23,6 +23,7 @@ class Element(object):
 
         if element_type == "text":
             self.font_size = None
+            self.font_color = None
             self.text_x_offset = None
             self.text_y_offset = None
             self.text_wrap_length = None
@@ -47,6 +48,16 @@ class Element(object):
                 isinstance(self.font_size, float) or isinstance(self.font_size, int)
             ):
                 raise InvalidFontSizeError
+
+            if self.font_color and not (
+                isinstance(self.font_color, tuple) and len(self.font_color) == 3
+            ):
+                raise InvalidFontColorError
+
+            if isinstance(self.font_size, tuple):
+                for each in self.font_color:
+                    if not (isinstance(each, float) or isinstance(each, int)):
+                        raise InvalidFontColorError
 
             if self.text_x_offset and not (
                 isinstance(self.text_x_offset, float)

@@ -70,6 +70,43 @@ def test_fill_font_20(template_stream, pdf_samples, comparing_size):
 
             if v.type == "text":
                 assert v.font_size == 20
+                assert v.font_color == (0, 0, 0)
+                assert v.text_x_offset == 0
+                assert v.text_y_offset == 0
+                assert v.text_wrap_length == 100
+
+
+def test_fill_font_color_red(template_stream, pdf_samples, comparing_size):
+    with open(
+        os.path.join(pdf_samples, "sample_filled_font_color_red.pdf"), "rb+"
+    ) as f:
+        data_dict = {
+            "test": "test_1",
+            "check": True,
+            "test_2": "test_2",
+            "check_2": False,
+            "test_3": "test_3",
+            "check_3": True,
+        }
+
+        obj = PyPDFForm(template_stream, simple_mode=False).fill(
+            data_dict,
+            font_color=(1, 0, 0),
+        )
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream[:comparing_size] == expected[:comparing_size]
+
+        for k, v in obj.elements.items():
+            assert k in data_dict
+            assert v.name in data_dict
+            assert v.value == data_dict[k]
+
+            if v.type == "text":
+                assert v.font_size == 12
+                assert v.font_color == (1, 0, 0)
                 assert v.text_x_offset == 0
                 assert v.text_y_offset == 0
                 assert v.text_wrap_length == 100
@@ -103,6 +140,7 @@ def test_fill_text_wrap_2(template_stream, pdf_samples, comparing_size):
 
             if v.type == "text":
                 assert v.font_size == 12
+                assert v.font_color == (0, 0, 0)
                 assert v.text_x_offset == 0
                 assert v.text_y_offset == 0
                 assert v.text_wrap_length == 2
@@ -137,6 +175,7 @@ def test_fill_offset_100(template_stream, pdf_samples, comparing_size):
 
             if v.type == "text":
                 assert v.font_size == 12
+                assert v.font_color == (0, 0, 0)
                 assert v.text_x_offset == 100
                 assert v.text_y_offset == -100
                 assert v.text_wrap_length == 100
@@ -209,3 +248,39 @@ def test_fill_with_customized_elements(template_stream, pdf_samples, comparing_s
         assert obj.elements["test_3"].text_x_offset == 0
         assert obj.elements["test_3"].text_y_offset == 0
         assert obj.elements["test_3"].text_wrap_length == 2
+
+
+def test_fill_with_customized_colors(template_stream, pdf_samples, comparing_size):
+    with open(
+        os.path.join(pdf_samples, "sample_filled_customized_colors.pdf"), "rb+"
+    ) as f:
+        data_dict = {
+            "test": "test_1",
+            "check": True,
+            "test_2": "test_2",
+            "check_2": False,
+            "test_3": "test_3",
+            "check_3": True,
+        }
+
+        obj = PyPDFForm(template_stream, simple_mode=False)
+
+        obj.elements["test"].font_color = (1, 0, 0)
+        obj.elements["test_2"].font_color = (0, 1, 0)
+        obj.elements["test_3"].font_color = (0, 0, 1)
+
+        obj.fill(data_dict)
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream[:comparing_size] == expected[:comparing_size]
+
+        for k, v in obj.elements.items():
+            assert k in data_dict
+            assert v.name in data_dict
+            assert v.value == data_dict[k]
+
+        assert obj.elements["test"].font_color == (1, 0, 0)
+        assert obj.elements["test_2"].font_color == (0, 1, 0)
+        assert obj.elements["test_3"].font_color == (0, 0, 1)

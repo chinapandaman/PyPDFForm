@@ -82,9 +82,10 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         output.write(filled_pdf.stream)
 ```
 
-## Set global font size on filled text
+## Set global font size and font color on filled text
 
-This example sets a global font size of 20 on the filled PDF form.
+This example sets a global font size of 20  and a global font color of red 
+on the filled PDF form.
 
 ```python
 import os
@@ -110,6 +111,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
             "check_3": True,
         },
         font_size=20,
+        font_color=(1, 0, 0),
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
@@ -318,10 +320,13 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     pdf_form = PyPDFForm(template.read(), simple_mode=False)
 
     pdf_form.elements["test"].font_size = 20
+    pdf_form.elements["test"].font_color = (1, 0, 0)
     pdf_form.elements["test_2"].text_x_offset = 50
     pdf_form.elements["test_2"].text_y_offset = -50
     pdf_form.elements["test_2"].text_wrap_length = 1
+    pdf_form.elements["test_2"].font_color = (0, 1, 0)
     pdf_form.elements["test_3"].text_wrap_length = 2
+    pdf_form.elements["test_3"].font_color = (0, 0, 1)
 
     pdf_form.fill(
         {

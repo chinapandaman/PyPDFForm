@@ -31,6 +31,12 @@ class InvalidFontSizeError(BasePyPDFFormException):
     pass
 
 
+class InvalidFontColorError(BasePyPDFFormException):
+    """Raised when font color input is not a tuple of three numerical values"""
+
+    pass
+
+
 class InvalidWrapLengthError(BasePyPDFFormException):
     """Raised when text wrap length input is not an int."""
 
