@@ -73,7 +73,7 @@ be printed and a `boolean` will check the corresponding checkboxes.
 printed on the PDF form.
 
 * **font_color** - only available if `simple_mode` is `False`, sets the global font color for texts 
-with a tuple of RGB values
+with a tuple of RGB values.
 
 * **text_x_offset** - only available if `simple_mode` is `False`, setting this value will offset all texts 
 printed on the PDF form by specified value horizontally.
