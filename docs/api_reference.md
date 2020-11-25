@@ -57,7 +57,7 @@ Its keys consist
 all elements' annotated names while the values hold their corresponding `Element()` objects. 
 Please read more about `Element()` [here](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md#element-object).
 
-### **fill**(*data, font_size=12, text_x_offset=0, text_y_offset=0, text_wrap_length=100, editable=False*)
+### **fill**(*data, font_size=12, font_color=(0,0,0), text_x_offset=0, text_y_offset=0, text_wrap_length=100, editable=False*)
 
 The fill method takes a python dictionary object `data` and fill the PDF form 
 template with it. The key of the object should match the annotated names of elements on the PDF form. 
@@ -71,6 +71,9 @@ be printed and a `boolean` will check the corresponding checkboxes.
 
 * **font_size** - only available if `simple_mode` is `False`, sets the global font size for texts 
 printed on the PDF form.
+
+* **font_color** - only available if `simple_mode` is `False`, sets the global font color for texts 
+with a tuple of RGB values
 
 * **text_x_offset** - only available if `simple_mode` is `False`, setting this value will offset all texts 
 printed on the PDF form by specified value horizontally.
@@ -131,6 +134,11 @@ if the `element_type` is `text` or a boolean value in the case of `checkbox`.
 
 Only available if the `element_type` is `text`. Setting this numerical attribute will 
 change the font size used for the text filled on this element.
+
+### **font_color** = *None*
+
+Only available if the `element_type` is `text`. Setting this tuple of RGB values will 
+change the font color used for the text filled on this element.
 
 ### **text_x_offset** = *None*
 
