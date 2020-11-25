@@ -2,7 +2,7 @@
 
 import uuid
 from io import BytesIO
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import pdfrw
 from PIL import Image
@@ -10,8 +10,9 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
 from .element import Element
-from .exceptions import (InvalidEditableParameterError, InvalidFontSizeError,
-                         InvalidFormDataError, InvalidImageCoordinateError,
+from .exceptions import (InvalidEditableParameterError, InvalidFontColorError,
+                         InvalidFontSizeError, InvalidFormDataError,
+                         InvalidImageCoordinateError,
                          InvalidImageDimensionError, InvalidImageError,
                          InvalidImageRotationAngleError, InvalidModeError,
                          InvalidPageNumberError, InvalidTemplateError,
@@ -33,6 +34,7 @@ class _PyPDFForm(object):
 
         self._CANVAS_FONT = "Helvetica"
         self._GLOBAL_FONT_SIZE = 12
+        self._GLOBAL_FONT_COLOR = (0, 0, 0)
         self._MAX_TXT_LENGTH = 100
 
         self._uuid = uuid.uuid4().hex
@@ -79,6 +81,7 @@ class _PyPDFForm(object):
         data: dict,
         simple_mode: bool,
         font_size: Union[float, int],
+        font_color: Tuple[Union[float, int], Union[float, int], Union[float, int]],
         text_x_offset: Union[float, int],
         text_y_offset: Union[float, int],
         text_wrap_length: int,
@@ -94,6 +97,13 @@ class _PyPDFForm(object):
 
         if not (isinstance(font_size, float) or isinstance(font_size, int)):
             raise InvalidFontSizeError
+
+        if len(font_color) != 3:
+            raise InvalidFontColorError
+
+        for each in font_color:
+            if not (isinstance(each, float) or isinstance(each, int)):
+                raise InvalidFontColorError
 
         if not isinstance(text_wrap_length, int):
             raise InvalidWrapLengthError
@@ -179,17 +189,11 @@ class _PyPDFForm(object):
         for element in self._iterate_elements(generated_pdf):
             if editable:
                 update_obj = pdfrw.PdfDict(
-                    T="{}_{}".format(
-                        element[self._ANNOT_FIELD_KEY][1:-1],
-                        _uuid,
-                    ),
+                    T="{}_{}".format(element[self._ANNOT_FIELD_KEY][1:-1], _uuid,),
                 )
             else:
                 update_obj = pdfrw.PdfDict(
-                    T="{}_{}".format(
-                        element[self._ANNOT_FIELD_KEY][1:-1],
-                        _uuid,
-                    ),
+                    T="{}_{}".format(element[self._ANNOT_FIELD_KEY][1:-1], _uuid,),
                     Ff=pdfrw.PdfObject(1),
                 )
 
@@ -214,8 +218,7 @@ class _PyPDFForm(object):
             if key in self._data_dict.keys():
                 element.update(
                     pdfrw.PdfDict(
-                        V="{}".format(self._data_dict[key]),
-                        AS=self._data_dict[key],
+                        V="{}".format(self._data_dict[key]), AS=self._data_dict[key],
                     )
                 )
 
@@ -257,6 +260,12 @@ class _PyPDFForm(object):
                 for j in reversed(range(len(elements))):
                     element = elements[j]
                     c.setFont(self._CANVAS_FONT, self._GLOBAL_FONT_SIZE)
+                    if self._GLOBAL_FONT_COLOR != (0, 0, 0):
+                        c.setFillColorRGB(
+                            self._GLOBAL_FONT_COLOR[0],
+                            self._GLOBAL_FONT_COLOR[1],
+                            self._GLOBAL_FONT_COLOR[2],
+                        )
 
                     if (
                         element[self._SUBTYPE_KEY] == self._WIDGET_SUBTYPE_KEY
@@ -418,6 +427,7 @@ class _PyPDFForm(object):
         data: dict,
         simple_mode: bool,
         font_size: Union[float, int],
+        font_color: Tuple[Union[float, int], Union[float, int], Union[float, int]],
         text_x_offset: Union[float, int],
         text_y_offset: Union[float, int],
         text_wrap_length: int,
@@ -430,6 +440,7 @@ class _PyPDFForm(object):
             data,
             simple_mode,
             font_size,
+            font_color,
             text_x_offset,
             text_y_offset,
             text_wrap_length,
@@ -437,6 +448,7 @@ class _PyPDFForm(object):
         )
 
         self._GLOBAL_FONT_SIZE = font_size
+        self._GLOBAL_FONT_COLOR = font_color
         self._MAX_TXT_LENGTH = text_wrap_length
 
         self._data_dict = data

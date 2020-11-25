@@ -6,7 +6,6 @@ from copy import deepcopy
 
 import pdfrw
 import pytest
-
 from PyPDFForm.core import _PyPDFForm
 
 
@@ -196,6 +195,7 @@ def test_update_elements(template_stream):
             _data,
             simple_mode=False,
             font_size=20,
+            font_color=(0, 0, 0),
             text_x_offset=0,
             text_y_offset=0,
             text_wrap_length=100,
