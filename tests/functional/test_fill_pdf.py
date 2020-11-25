@@ -3,7 +3,6 @@
 import os
 
 import pytest
-
 from PyPDFForm import PyPDFForm
 
 
@@ -54,8 +53,7 @@ def test_fill_font_20(template_stream, pdf_samples, comparing_size):
         }
 
         obj = PyPDFForm(template_stream, simple_mode=False).fill(
-            data_dict,
-            font_size=20,
+            data_dict, font_size=20,
         )
 
         expected = f.read()
@@ -70,6 +68,7 @@ def test_fill_font_20(template_stream, pdf_samples, comparing_size):
 
             if v.type == "text":
                 assert v.font_size == 20
+                assert v.font_color == (0, 0, 0)
                 assert v.text_x_offset == 0
                 assert v.text_y_offset == 0
                 assert v.text_wrap_length == 100
@@ -87,8 +86,7 @@ def test_fill_text_wrap_2(template_stream, pdf_samples, comparing_size):
         }
 
         obj = PyPDFForm(template_stream, simple_mode=False).fill(
-            data_dict,
-            text_wrap_length=2,
+            data_dict, text_wrap_length=2,
         )
 
         expected = f.read()
@@ -103,6 +101,7 @@ def test_fill_text_wrap_2(template_stream, pdf_samples, comparing_size):
 
             if v.type == "text":
                 assert v.font_size == 12
+                assert v.font_color == (0, 0, 0)
                 assert v.text_x_offset == 0
                 assert v.text_y_offset == 0
                 assert v.text_wrap_length == 2
@@ -120,9 +119,7 @@ def test_fill_offset_100(template_stream, pdf_samples, comparing_size):
         }
 
         obj = PyPDFForm(template_stream, simple_mode=False).fill(
-            data_dict,
-            text_x_offset=100,
-            text_y_offset=-100,
+            data_dict, text_x_offset=100, text_y_offset=-100,
         )
 
         expected = f.read()
@@ -137,6 +134,7 @@ def test_fill_offset_100(template_stream, pdf_samples, comparing_size):
 
             if v.type == "text":
                 assert v.font_size == 12
+                assert v.font_color == (0, 0, 0)
                 assert v.text_x_offset == 100
                 assert v.text_y_offset == -100
                 assert v.text_wrap_length == 100
