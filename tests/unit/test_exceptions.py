@@ -4,13 +4,17 @@ import os
 
 import pytest
 
-from PyPDFForm import (InvalidEditableParameterError, InvalidFontSizeError,
-                       InvalidFormDataError, InvalidImageCoordinateError,
-                       InvalidImageDimensionError, InvalidImageError,
-                       InvalidImageRotationAngleError, InvalidModeError,
-                       InvalidPageNumberError, InvalidTemplateError,
-                       InvalidTextOffsetError, InvalidWrapLengthError,
-                       PyPDFForm)
+from PyPDFForm import PyPDFForm
+from PyPDFForm.exceptions import (InvalidCoordinateError,
+                                  InvalidEditableParameterError,
+                                  InvalidFontSizeError, InvalidFormDataError,
+                                  InvalidImageDimensionError,
+                                  InvalidImageError,
+                                  InvalidImageRotationAngleError,
+                                  InvalidModeError, InvalidPageNumberError,
+                                  InvalidTemplateError, InvalidTextError,
+                                  InvalidTextOffsetError,
+                                  InvalidWrapLengthError)
 
 
 @pytest.fixture
@@ -107,13 +111,13 @@ def test_invalid_image_coordinate_error(template_stream, image_stream):
     try:
         PyPDFForm(template_stream).draw_image(image_stream, 1, "100", 100, 400, 225)
         assert False
-    except InvalidImageCoordinateError:
+    except InvalidCoordinateError:
         assert True
 
     try:
         PyPDFForm(template_stream).draw_image(image_stream, 1, 100, "100", 400, 225)
         assert False
-    except InvalidImageCoordinateError:
+    except InvalidCoordinateError:
         assert True
 
 
@@ -174,4 +178,12 @@ def test_invalid_editable_parameter_error(template_stream):
         PyPDFForm(template_stream, simple_mode=True).fill({}, editable=1)
         assert False
     except InvalidEditableParameterError:
+        assert True
+
+
+def test_invalid_text_error(template_stream):
+    try:
+        PyPDFForm(template_stream, simple_mode=True).draw_text(1, 1, 0, 0)
+        assert False
+    except InvalidTextError:
         assert True

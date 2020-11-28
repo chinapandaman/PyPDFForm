@@ -10,12 +10,12 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
 from .element import Element
-from .exceptions import (InvalidEditableParameterError, InvalidFontColorError,
-                         InvalidFontSizeError, InvalidFormDataError,
-                         InvalidImageCoordinateError,
-                         InvalidImageDimensionError, InvalidImageError,
-                         InvalidImageRotationAngleError, InvalidModeError,
-                         InvalidPageNumberError, InvalidTemplateError,
+from .exceptions import (InvalidCoordinateError, InvalidEditableParameterError,
+                         InvalidFontColorError, InvalidFontSizeError,
+                         InvalidFormDataError, InvalidImageDimensionError,
+                         InvalidImageError, InvalidImageRotationAngleError,
+                         InvalidModeError, InvalidPageNumberError,
+                         InvalidTemplateError, InvalidTextError,
                          InvalidTextOffsetError, InvalidWrapLengthError)
 
 
@@ -118,6 +118,27 @@ class _PyPDFForm(object):
             raise InvalidEditableParameterError
 
     @staticmethod
+    def _validate_draw_text_inputs(
+        text: str,
+        page_number: int,
+        x: Union[float, int],
+        y: Union[float, int],
+    ) -> None:
+        """Validate input parameters for the draw text method."""
+
+        if not isinstance(text, str):
+            raise InvalidTextError
+
+        if not isinstance(page_number, int):
+            raise InvalidPageNumberError
+
+        if not (isinstance(x, float) or isinstance(x, int)):
+            raise InvalidCoordinateError
+
+        if not (isinstance(y, float) or isinstance(y, int)):
+            raise InvalidCoordinateError
+
+    @staticmethod
     def _validate_draw_image_inputs(
         page_number: int,
         x: Union[float, int],
@@ -132,10 +153,10 @@ class _PyPDFForm(object):
             raise InvalidPageNumberError
 
         if not (isinstance(x, float) or isinstance(x, int)):
-            raise InvalidImageCoordinateError
+            raise InvalidCoordinateError
 
         if not (isinstance(y, float) or isinstance(y, int)):
-            raise InvalidImageCoordinateError
+            raise InvalidCoordinateError
 
         if not (isinstance(width, float) or isinstance(width, int)):
             raise InvalidImageDimensionError
@@ -429,6 +450,51 @@ class _PyPDFForm(object):
 
         buff.close()
         image_buff.close()
+        canv_buff.close()
+        result_stream.close()
+
+        return self
+
+    def draw_text(
+        self,
+        text: str,
+        page_number: int,
+        x: Union[float, int],
+        y: Union[float, int],
+    ) -> "_PyPDFForm":
+        """Draw a text on a PDF form."""
+
+        self._validate_template(self.stream)
+        self._validate_draw_text_inputs(text, page_number, x, y)
+
+        input_file = pdfrw.PdfReader(fdata=self.stream)
+
+        canv_buff = BytesIO()
+
+        c = canv.Canvas(
+            canv_buff,
+            pagesize=(
+                float(input_file.pages[page_number - 1].MediaBox[2]),
+                float(input_file.pages[page_number - 1].MediaBox[3]),
+            ),
+        )
+
+        c.drawString(x, y, text)
+        c.save()
+        canv_buff.seek(0)
+
+        output_file = pdfrw.PdfFileWriter()
+
+        for i in range(len(input_file.pages)):
+            if i == page_number - 1:
+                merger = pdfrw.PageMerge(input_file.pages[i])
+                merger.add(pdfrw.PdfReader(fdata=canv_buff.read()).pages[0]).render()
+
+        result_stream = BytesIO()
+        output_file.write(result_stream, input_file)
+        result_stream.seek(0)
+        self.stream = result_stream.read()
+
         canv_buff.close()
         result_stream.close()
 
