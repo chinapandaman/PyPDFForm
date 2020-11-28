@@ -84,4 +84,4 @@ def test_addition_assignment_operator_3_times(
 
         expected = f.read()
 
-        assert result.stream[:comparing_size] == expected[:comparing_size]
+        assert str(result.stream)[:comparing_size] == str(expected)[:comparing_size]
