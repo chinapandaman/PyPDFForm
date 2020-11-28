@@ -4,14 +4,13 @@ import os
 
 import pytest
 
-from PyPDFForm import (InvalidCoordinateError, InvalidEditableParameterError,
+from PyPDFForm import PyPDFForm
+from PyPDFForm.exceptions import (InvalidCoordinateError, InvalidEditableParameterError,
                        InvalidFontSizeError, InvalidFormDataError,
                        InvalidImageDimensionError, InvalidImageError,
                        InvalidImageRotationAngleError, InvalidModeError,
                        InvalidPageNumberError, InvalidTemplateError,
-                       InvalidTextOffsetError, InvalidWrapLengthError,
-                       PyPDFForm)
-from PyPDFForm.exceptions import InvalidTextError
+                       InvalidTextOffsetError, InvalidWrapLengthError,InvalidTextError)
 
 
 @pytest.fixture

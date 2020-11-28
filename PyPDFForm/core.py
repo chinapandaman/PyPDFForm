@@ -123,7 +123,7 @@ class _PyPDFForm(object):
         page_number: int,
         x: Union[float, int],
         y: Union[float, int],
-    ):
+    ) -> None:
         """Validate input parameters for the draw text method."""
 
         if not isinstance(text, str):

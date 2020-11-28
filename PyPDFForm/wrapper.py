@@ -107,7 +107,7 @@ class PyPDFForm(object):
 
     def draw_text(
         self, text: str, page_number: int, x: Union[float, int], y: Union[float, int]
-    ):
+    ) -> "PyPDFForm":
         """Draw a text on a PDF form."""
 
         obj = _PyPDFForm()
