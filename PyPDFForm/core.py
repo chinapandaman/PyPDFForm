@@ -98,9 +98,7 @@ class _PyPDFForm(object):
         if not (isinstance(font_size, float) or isinstance(font_size, int)):
             raise InvalidFontSizeError
 
-        if font_color and not (
-            isinstance(font_color, tuple) and len(font_color) == 3
-        ):
+        if font_color and not (isinstance(font_color, tuple) and len(font_color) == 3):
             raise InvalidFontColorError
 
         if isinstance(font_color, tuple):
