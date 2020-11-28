@@ -5,7 +5,7 @@ import os
 import pytest
 
 from PyPDFForm import (InvalidEditableParameterError, InvalidFontSizeError,
-                       InvalidFormDataError, InvalidImageCoordinateError,
+                       InvalidFormDataError, InvalidCoordinateError,
                        InvalidImageDimensionError, InvalidImageError,
                        InvalidImageRotationAngleError, InvalidModeError,
                        InvalidPageNumberError, InvalidTemplateError,
@@ -107,13 +107,13 @@ def test_invalid_image_coordinate_error(template_stream, image_stream):
     try:
         PyPDFForm(template_stream).draw_image(image_stream, 1, "100", 100, 400, 225)
         assert False
-    except InvalidImageCoordinateError:
+    except InvalidCoordinateError:
         assert True
 
     try:
         PyPDFForm(template_stream).draw_image(image_stream, 1, 100, "100", 400, 225)
         assert False
-    except InvalidImageCoordinateError:
+    except InvalidCoordinateError:
         assert True
 
 

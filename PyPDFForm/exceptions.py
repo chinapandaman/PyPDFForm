@@ -55,7 +55,7 @@ class InvalidPageNumberError(BasePyPDFFormException):
     pass
 
 
-class InvalidImageCoordinateError(BasePyPDFFormException):
+class InvalidCoordinateError(BasePyPDFFormException):
     """Raised when x or y coordinate input is not a float or int."""
 
     pass
@@ -81,5 +81,11 @@ class InvalidTextOffsetError(BasePyPDFFormException):
 
 class InvalidEditableParameterError(BasePyPDFFormException):
     """Raised when editable input is not a boolean."""
+
+    pass
+
+
+class InvalidTextError(BasePyPDFFormException):
+    """Raised when text input is not a string."""
 
     pass

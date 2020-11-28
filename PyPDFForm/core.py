@@ -12,11 +12,11 @@ from reportlab.pdfgen import canvas as canv
 from .element import Element
 from .exceptions import (InvalidEditableParameterError, InvalidFontColorError,
                          InvalidFontSizeError, InvalidFormDataError,
-                         InvalidImageCoordinateError,
+                         InvalidCoordinateError,
                          InvalidImageDimensionError, InvalidImageError,
                          InvalidImageRotationAngleError, InvalidModeError,
                          InvalidPageNumberError, InvalidTemplateError,
-                         InvalidTextOffsetError, InvalidWrapLengthError)
+                         InvalidTextOffsetError, InvalidWrapLengthError, InvalidTextError)
 
 
 class _PyPDFForm(object):
@@ -118,6 +118,27 @@ class _PyPDFForm(object):
             raise InvalidEditableParameterError
 
     @staticmethod
+    def _validate_draw_text_inputs(
+        text: str,
+        page_number: int,
+        x: Union[float, int],
+        y: Union[float, int],
+    ):
+        """Validate input parameters for the draw text method."""
+
+        if not isinstance(text, str):
+            raise InvalidTextError
+
+        if not isinstance(page_number, int):
+            raise InvalidPageNumberError
+
+        if not (isinstance(x, float) or isinstance(x, int)):
+            raise InvalidCoordinateError
+
+        if not (isinstance(y, float) or isinstance(y, int)):
+            raise InvalidCoordinateError
+
+    @staticmethod
     def _validate_draw_image_inputs(
         page_number: int,
         x: Union[float, int],
@@ -132,10 +153,10 @@ class _PyPDFForm(object):
             raise InvalidPageNumberError
 
         if not (isinstance(x, float) or isinstance(x, int)):
-            raise InvalidImageCoordinateError
+            raise InvalidCoordinateError
 
         if not (isinstance(y, float) or isinstance(y, int)):
-            raise InvalidImageCoordinateError
+            raise InvalidCoordinateError
 
         if not (isinstance(width, float) or isinstance(width, int)):
             raise InvalidImageDimensionError
@@ -442,6 +463,7 @@ class _PyPDFForm(object):
         """Draw a text on a PDF form."""
 
         self._validate_template(self.stream)
+        self._validate_draw_text_inputs(text, page_number, x, y)
 
         input_file = pdfrw.PdfReader(fdata=self.stream)
 
