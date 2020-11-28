@@ -54,7 +54,7 @@ class Element(object):
             ):
                 raise InvalidFontColorError
 
-            if isinstance(self.font_size, tuple):
+            if isinstance(self.font_color, tuple):
                 for each in self.font_color:
                     if not (isinstance(each, float) or isinstance(each, int)):
                         raise InvalidFontColorError

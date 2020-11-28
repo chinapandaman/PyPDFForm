@@ -7,7 +7,8 @@ import pytest
 from PyPDFForm import PyPDFForm
 from PyPDFForm.exceptions import (InvalidCoordinateError,
                                   InvalidEditableParameterError,
-                                  InvalidFontSizeError, InvalidFormDataError,
+                                  InvalidFontColorError, InvalidFontSizeError,
+                                  InvalidFormDataError,
                                   InvalidImageDimensionError,
                                   InvalidImageError,
                                   InvalidImageRotationAngleError,
@@ -72,6 +73,23 @@ def test_invalid_font_size_error(template_stream):
         obj.fill({})
         assert False
     except InvalidFontSizeError:
+        assert True
+
+
+def test_invalid_font_color_error(template_stream):
+    obj = PyPDFForm(template_stream, simple_mode=False)
+
+    try:
+        obj.fill({}, font_color=1)
+        assert False
+    except InvalidFontColorError:
+        assert True
+
+    try:
+        obj.elements["test"].font_color = ("1", 0, 0)
+        obj.fill({})
+        assert False
+    except InvalidFontColorError:
         assert True
 
 

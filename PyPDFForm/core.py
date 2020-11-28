@@ -98,12 +98,13 @@ class _PyPDFForm(object):
         if not (isinstance(font_size, float) or isinstance(font_size, int)):
             raise InvalidFontSizeError
 
-        if len(font_color) != 3:
+        if font_color and not (isinstance(font_color, tuple) and len(font_color) == 3):
             raise InvalidFontColorError
 
-        for each in font_color:
-            if not (isinstance(each, float) or isinstance(each, int)):
-                raise InvalidFontColorError
+        if isinstance(font_color, tuple):
+            for each in font_color:
+                if not (isinstance(each, float) or isinstance(each, int)):
+                    raise InvalidFontColorError
 
         if not isinstance(text_wrap_length, int):
             raise InvalidWrapLengthError
