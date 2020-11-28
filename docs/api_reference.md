@@ -49,6 +49,21 @@ on the specified page, coordinates with specified resolutions and rotation angle
 
 * **rotation** - degrees the image will be rotated after drawn.
 
+### **draw_text**(*text, page_number, x, y*)
+
+The draw text method takes a text string and draws it on the specified page 
+at the specified coordinates.
+
+#### Parameters:
+
+* **text** - a text string.
+
+* **page_number** - page number of which the text will be drawn on.
+
+* **x** - horizontal coordinate of which the text will be drawn at.
+
+* **y** - vertical coordinate of which the text will be drawn at.
+
 ### **elements**
 
 A python dictionary only available when `simple_mode` is `False`. 
