@@ -53,9 +53,7 @@ def test_draw_image_on_one_page(
         assert obj.stream[:comparing_size] == expected[:comparing_size]
 
 
-def test_draw_text_on_one_page(
-    template_stream, pdf_samples, comparing_size
-):
+def test_draw_text_on_one_page(template_stream, pdf_samples, comparing_size):
     with open(os.path.join(pdf_samples, "sample_pdf_with_drawn_text.pdf"), "rb+") as f:
         obj = (
             PyPDFForm(template_stream)

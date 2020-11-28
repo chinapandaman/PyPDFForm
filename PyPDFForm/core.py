@@ -10,13 +10,13 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as canv
 
 from .element import Element
-from .exceptions import (InvalidEditableParameterError, InvalidFontColorError,
-                         InvalidFontSizeError, InvalidFormDataError,
-                         InvalidCoordinateError,
-                         InvalidImageDimensionError, InvalidImageError,
-                         InvalidImageRotationAngleError, InvalidModeError,
-                         InvalidPageNumberError, InvalidTemplateError,
-                         InvalidTextOffsetError, InvalidWrapLengthError, InvalidTextError)
+from .exceptions import (InvalidCoordinateError, InvalidEditableParameterError,
+                         InvalidFontColorError, InvalidFontSizeError,
+                         InvalidFormDataError, InvalidImageDimensionError,
+                         InvalidImageError, InvalidImageRotationAngleError,
+                         InvalidModeError, InvalidPageNumberError,
+                         InvalidTemplateError, InvalidTextError,
+                         InvalidTextOffsetError, InvalidWrapLengthError)
 
 
 class _PyPDFForm(object):
@@ -455,11 +455,13 @@ class _PyPDFForm(object):
 
         return self
 
-    def draw_text(self,
-                  text: str,
-                  page_number: int,
-                  x: Union[float, int],
-                  y: Union[float, int],) -> "_PyPDFForm":
+    def draw_text(
+        self,
+        text: str,
+        page_number: int,
+        x: Union[float, int],
+        y: Union[float, int],
+    ) -> "_PyPDFForm":
         """Draw a text on a PDF form."""
 
         self._validate_template(self.stream)
@@ -474,7 +476,7 @@ class _PyPDFForm(object):
             pagesize=(
                 float(input_file.pages[page_number - 1].MediaBox[2]),
                 float(input_file.pages[page_number - 1].MediaBox[3]),
-            )
+            ),
         )
 
         c.drawString(x, y, text)

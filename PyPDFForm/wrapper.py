@@ -105,18 +105,14 @@ class PyPDFForm(object):
 
         return self
 
-    def draw_text(self,
-                  text: str,
-                  page_number: int,
-                  x: Union[float, int],
-                  y: Union[float, int]):
+    def draw_text(
+        self, text: str, page_number: int, x: Union[float, int], y: Union[float, int]
+    ):
         """Draw a text on a PDF form."""
 
         obj = _PyPDFForm()
         obj.stream = self.stream
 
-        self.stream = obj.draw_text(
-            text, page_number, x, y
-        ).stream
+        self.stream = obj.draw_text(text, page_number, x, y).stream
 
         return self

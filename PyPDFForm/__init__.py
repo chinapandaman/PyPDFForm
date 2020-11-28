@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from .exceptions import (InvalidEditableParameterError, InvalidFontSizeError,
-                         InvalidFormDataError, InvalidCoordinateError,
+from .exceptions import (InvalidCoordinateError, InvalidEditableParameterError,
+                         InvalidFontSizeError, InvalidFormDataError,
                          InvalidImageDimensionError, InvalidImageError,
                          InvalidImageRotationAngleError, InvalidModeError,
                          InvalidPageNumberError, InvalidTemplateError,
