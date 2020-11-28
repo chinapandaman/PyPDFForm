@@ -87,6 +87,8 @@ def test_invalid_font_color_error(template_stream):
 
     try:
         obj.elements["test"].font_color = ("1", 0, 0)
+        obj.fill({})
+        assert False
     except InvalidFontColorError:
         assert True
 
