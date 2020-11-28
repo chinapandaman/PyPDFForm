@@ -11,6 +11,7 @@ from PyPDFForm import (InvalidEditableParameterError, InvalidFontSizeError,
                        InvalidPageNumberError, InvalidTemplateError,
                        InvalidTextOffsetError, InvalidWrapLengthError,
                        PyPDFForm)
+from PyPDFForm.exceptions import InvalidTextError
 
 
 @pytest.fixture
@@ -174,4 +175,12 @@ def test_invalid_editable_parameter_error(template_stream):
         PyPDFForm(template_stream, simple_mode=True).fill({}, editable=1)
         assert False
     except InvalidEditableParameterError:
+        assert True
+
+
+def test_invalid_text_error(template_stream):
+    try:
+        PyPDFForm(template_stream, simple_mode=True).draw_text(1, 1, 0, 0)
+        assert False
+    except InvalidTextError:
         assert True
