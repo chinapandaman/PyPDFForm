@@ -2,6 +2,8 @@
 
 import pytest
 from PyPDFForm.middleware.element import Element
+from PyPDFForm.middleware.exceptions import InvalidFontSizeError, InvalidFontColorError, InvalidTextOffsetError, \
+    InvalidWrapLengthError
 
 
 @pytest.fixture
@@ -47,3 +49,62 @@ def test_constructing_checkboxes_element(checkbox_element, text_element_attribut
 
     for each in text_element_attributes:
         assert not hasattr(obj, each)
+
+
+def test_set_value(text_element, checkbox_element):
+    text_element.value = "bar"
+    assert text_element.value == "bar"
+
+    checkbox_element.value = False
+    assert checkbox_element.value is not None
+    assert not checkbox_element.value
+
+
+def test_validate_text_attributes(text_element):
+    text_element.font_size = "12.5"
+
+    try:
+        text_element.validate_text_attributes()
+        assert False
+    except InvalidFontSizeError:
+        assert True
+
+    text_element.font_size = 12.5
+
+    text_element.font_color = "red"
+
+    try:
+        text_element.validate_text_attributes()
+        assert False
+    except InvalidFontColorError:
+        assert True
+
+    text_element.font_color = (1, 0, 0)
+
+    text_element.text_x_offset = "100"
+
+    try:
+        text_element.validate_text_attributes()
+        assert False
+    except InvalidTextOffsetError:
+        assert True
+
+    text_element.text_x_offset = 100
+
+    text_element.text_y_offset = "100"
+
+    try:
+        text_element.validate_text_attributes()
+        assert False
+    except InvalidTextOffsetError:
+        assert True
+
+    text_element.text_y_offset = 100
+
+    text_element.text_wrap_length = 100.5
+
+    try:
+        text_element.validate_text_attributes()
+        assert False
+    except InvalidWrapLengthError:
+        assert True

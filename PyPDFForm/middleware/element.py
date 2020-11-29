@@ -40,7 +40,7 @@ class Element(object):
 
         return self._type
 
-    def validate(self) -> None:
+    def validate_text_attributes(self) -> None:
         """Validates text element's attributes."""
 
         if self._type == "text":
