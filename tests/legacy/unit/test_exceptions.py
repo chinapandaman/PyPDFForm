@@ -20,7 +20,7 @@ from PyPDFForm.legacy.exceptions import (InvalidCoordinateError,
 
 @pytest.fixture
 def pdf_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples")
+    return os.path.join(os.path.dirname(__file__), "../..", "..", "pdf_samples")
 
 
 @pytest.fixture
