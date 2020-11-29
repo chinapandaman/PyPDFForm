@@ -15,8 +15,18 @@ def text_element_attributes():
     ]
 
 
-def test_constructing_text_element(text_element_attributes):
-    obj = Element("foo", "text")
+@pytest.fixture
+def text_element():
+    return Element("foo", "text")
+
+
+@pytest.fixture
+def checkbox_element():
+    return Element("foo", "checkbox")
+
+
+def test_constructing_text_element(text_element, text_element_attributes):
+    obj = text_element
 
     assert obj.name == "foo"
     assert obj.type == "text"
@@ -27,8 +37,8 @@ def test_constructing_text_element(text_element_attributes):
         assert hasattr(obj, each)
 
 
-def test_constructing_checkboxes_element(text_element_attributes):
-    obj = Element("foo", "checkbox")
+def test_constructing_checkboxes_element(checkbox_element, text_element_attributes):
+    obj = checkbox_element
 
     assert obj.name == "foo"
     assert obj.type == "checkbox"
