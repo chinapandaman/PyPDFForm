@@ -7,12 +7,12 @@ from copy import deepcopy
 import pdfrw
 import pytest
 
-from PyPDFForm.core import _PyPDFForm
+from PyPDFForm.legacy.core import _PyPDFForm
 
 
 @pytest.fixture
 def pdf_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples")
+    return os.path.join(os.path.dirname(__file__), "../..", "..", "pdf_samples")
 
 
 @pytest.fixture

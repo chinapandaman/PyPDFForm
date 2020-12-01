@@ -5,22 +5,25 @@ import os
 import pytest
 
 from PyPDFForm import PyPDFForm
-from PyPDFForm.exceptions import (InvalidCoordinateError,
-                                  InvalidEditableParameterError,
-                                  InvalidFontColorError, InvalidFontSizeError,
-                                  InvalidFormDataError,
-                                  InvalidImageDimensionError,
-                                  InvalidImageError,
-                                  InvalidImageRotationAngleError,
-                                  InvalidModeError, InvalidPageNumberError,
-                                  InvalidTemplateError, InvalidTextError,
-                                  InvalidTextOffsetError,
-                                  InvalidWrapLengthError)
+from PyPDFForm.legacy.exceptions import (InvalidCoordinateError,
+                                         InvalidEditableParameterError,
+                                         InvalidFontColorError,
+                                         InvalidFontSizeError,
+                                         InvalidFormDataError,
+                                         InvalidImageDimensionError,
+                                         InvalidImageError,
+                                         InvalidImageRotationAngleError,
+                                         InvalidModeError,
+                                         InvalidPageNumberError,
+                                         InvalidTemplateError,
+                                         InvalidTextError,
+                                         InvalidTextOffsetError,
+                                         InvalidWrapLengthError)
 
 
 @pytest.fixture
 def pdf_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples")
+    return os.path.join(os.path.dirname(__file__), "../..", "..", "pdf_samples")
 
 
 @pytest.fixture
