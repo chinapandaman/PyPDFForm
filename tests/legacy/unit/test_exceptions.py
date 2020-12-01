@@ -7,13 +7,16 @@ import pytest
 from PyPDFForm import PyPDFForm
 from PyPDFForm.legacy.exceptions import (InvalidCoordinateError,
                                          InvalidEditableParameterError,
-                                         InvalidFontColorError, InvalidFontSizeError,
+                                         InvalidFontColorError,
+                                         InvalidFontSizeError,
                                          InvalidFormDataError,
                                          InvalidImageDimensionError,
                                          InvalidImageError,
                                          InvalidImageRotationAngleError,
-                                         InvalidModeError, InvalidPageNumberError,
-                                         InvalidTemplateError, InvalidTextError,
+                                         InvalidModeError,
+                                         InvalidPageNumberError,
+                                         InvalidTemplateError,
+                                         InvalidTextError,
                                          InvalidTextOffsetError,
                                          InvalidWrapLengthError)
 
