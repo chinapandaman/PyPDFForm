@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+
 from PyPDFForm.middleware.element import Element, ElementType
-from PyPDFForm.middleware.exceptions import InvalidFontSizeError, InvalidFontColorError, InvalidTextOffsetError, \
-    InvalidWrapLengthError, InvalidElementValueError, InvalidElementNameError, InvalidElementTypeError
+from PyPDFForm.middleware.exceptions import (InvalidElementNameError,
+                                             InvalidElementTypeError,
+                                             InvalidElementValueError,
+                                             InvalidFontColorError,
+                                             InvalidFontSizeError,
+                                             InvalidTextOffsetError,
+                                             InvalidWrapLengthError)
 
 
 @pytest.fixture

@@ -3,9 +3,10 @@
 from enum import Enum
 from typing import Union
 
-from .exceptions import (InvalidFontColorError, InvalidFontSizeError,
-                         InvalidTextOffsetError, InvalidWrapLengthError, InvalidElementValueError,
-                         InvalidElementNameError, InvalidElementTypeError)
+from .exceptions import (InvalidElementNameError, InvalidElementTypeError,
+                         InvalidElementValueError, InvalidFontColorError,
+                         InvalidFontSizeError, InvalidTextOffsetError,
+                         InvalidWrapLengthError)
 
 
 class ElementType(Enum):
