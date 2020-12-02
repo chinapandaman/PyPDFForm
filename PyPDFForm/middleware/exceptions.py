@@ -89,3 +89,21 @@ class InvalidTextError(BasePyPDFFormException):
     """Raised when text input is not a string."""
 
     pass
+
+
+class InvalidElementNameError(BasePyPDFFormException):
+    """Raised when an element's name is not a string."""
+
+    pass
+
+
+class InvalidElementTypeError(BasePyPDFFormException):
+    """Raised when an element's type is not an ElementType object."""
+
+    pass
+
+
+class InvalidElementValueError(BasePyPDFFormException):
+    """Raised when an element's value has the wrong type."""
+
+    pass
