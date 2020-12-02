@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-from PyPDFForm.middleware.element import Element
+from PyPDFForm.middleware.element import Element, ElementType
 from PyPDFForm.middleware.exceptions import InvalidFontSizeError, InvalidFontColorError, InvalidTextOffsetError, \
     InvalidWrapLengthError, InvalidElementValueError
 
@@ -19,19 +19,19 @@ def text_element_attributes():
 
 @pytest.fixture
 def text_element():
-    return Element("foo", "text")
+    return Element("foo", ElementType.text)
 
 
 @pytest.fixture
 def checkbox_element():
-    return Element("foo", "checkbox")
+    return Element("foo", ElementType.checkbox)
 
 
 def test_constructing_text_element(text_element, text_element_attributes):
     obj = text_element
 
     assert obj.name == "foo"
-    assert obj.type == "text"
+    assert obj.type == ElementType.text
 
     assert not obj.value
 
@@ -43,7 +43,7 @@ def test_constructing_checkboxes_element(checkbox_element, text_element_attribut
     obj = checkbox_element
 
     assert obj.name == "foo"
-    assert obj.type == "checkbox"
+    assert obj.type == ElementType.checkbox
 
     assert not obj.value
 

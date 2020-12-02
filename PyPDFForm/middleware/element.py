@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 
+from enum import Enum
 from typing import Union
 
 from .exceptions import (InvalidFontColorError, InvalidFontSizeError,
                          InvalidTextOffsetError, InvalidWrapLengthError, InvalidElementValueError)
+
+
+class ElementType(Enum):
+    text = "text"
+    checkbox = "checkbox"
 
 
 class Element(object):
@@ -12,7 +18,7 @@ class Element(object):
     def __init__(
         self,
         element_name: str,
-        element_type: str,
+        element_type: Enum,
         element_value: Union[str, bool] = None,
     ) -> None:
         """Constructs all attributes for the Element object."""
@@ -21,7 +27,7 @@ class Element(object):
         self._type = element_type
         self.value = element_value
 
-        if element_type == "text":
+        if element_type == ElementType.text:
             self.font_size = None
             self.font_color = None
             self.text_x_offset = None
@@ -35,24 +41,24 @@ class Element(object):
         return self._name
 
     @property
-    def type(self) -> str:
+    def type(self) -> Enum:
         """Type of the element."""
 
         return self._type
 
     def validate_value(self):
-        if self._type == "text":
+        if self._type == ElementType.text:
             if self.value is not None and not isinstance(self.value, str):
                 raise InvalidElementValueError
 
-        if self._type == "checkbox":
+        if self._type == ElementType.checkbox:
             if self.value is not None and not isinstance(self.value, bool):
                 raise InvalidElementValueError
 
     def validate_text_attributes(self) -> None:
         """Validates text element's attributes."""
 
-        if self._type == "text":
+        if self._type == ElementType.text:
             if self.font_size and not (
                 isinstance(self.font_size, float) or isinstance(self.font_size, int)
             ):
