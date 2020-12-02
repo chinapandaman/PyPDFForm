@@ -3,7 +3,7 @@
 import pytest
 from PyPDFForm.middleware.element import Element, ElementType
 from PyPDFForm.middleware.exceptions import InvalidFontSizeError, InvalidFontColorError, InvalidTextOffsetError, \
-    InvalidWrapLengthError, InvalidElementValueError, InvalidElementNameError
+    InvalidWrapLengthError, InvalidElementValueError, InvalidElementNameError, InvalidElementTypeError
 
 
 @pytest.fixture
@@ -130,10 +130,18 @@ def test_setting_invalid_value(text_element, checkbox_element):
 
 def test_invalid_constants(text_element):
     text_element._name = 1
-    text_element._type = "text"
 
     try:
         text_element.validate_constants()
         assert False
     except InvalidElementNameError:
+        assert True
+
+    text_element._name = "foo"
+    text_element._type = "text"
+
+    try:
+        text_element.validate_constants()
+        assert False
+    except InvalidElementTypeError:
         assert True

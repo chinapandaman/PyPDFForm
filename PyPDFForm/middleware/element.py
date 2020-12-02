@@ -5,7 +5,7 @@ from typing import Union
 
 from .exceptions import (InvalidFontColorError, InvalidFontSizeError,
                          InvalidTextOffsetError, InvalidWrapLengthError, InvalidElementValueError,
-                         InvalidElementNameError)
+                         InvalidElementNameError, InvalidElementTypeError)
 
 
 class ElementType(Enum):
@@ -54,7 +54,7 @@ class Element(object):
             raise InvalidElementNameError
 
         if not isinstance(self._type, ElementType):
-            raise InvalidElementNameError
+            raise InvalidElementTypeError
 
     def validate_value(self):
         """Validates the value of the element."""
