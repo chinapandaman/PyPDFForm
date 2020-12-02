@@ -3,7 +3,7 @@
 from typing import Union
 
 from .exceptions import (InvalidFontColorError, InvalidFontSizeError,
-                         InvalidTextOffsetError, InvalidWrapLengthError)
+                         InvalidTextOffsetError, InvalidWrapLengthError, InvalidElementValueError)
 
 
 class Element(object):
@@ -39,6 +39,15 @@ class Element(object):
         """Type of the element."""
 
         return self._type
+
+    def validate_value(self):
+        if self._type == "text":
+            if self.value is not None and not isinstance(self.value, str):
+                raise InvalidElementValueError
+
+        if self._type == "checkbox":
+            if self.value is not None and not isinstance(self.value, bool):
+                raise InvalidElementValueError
 
     def validate_text_attributes(self) -> None:
         """Validates text element's attributes."""
