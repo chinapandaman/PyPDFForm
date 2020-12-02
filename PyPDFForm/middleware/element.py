@@ -47,6 +47,8 @@ class Element(object):
         return self._type
 
     def validate_value(self):
+        """Validates the value of the element."""
+
         if self._type == ElementType.text:
             if self.value is not None and not isinstance(self.value, str):
                 raise InvalidElementValueError
