@@ -4,7 +4,8 @@ from enum import Enum
 from typing import Union
 
 from .exceptions import (InvalidFontColorError, InvalidFontSizeError,
-                         InvalidTextOffsetError, InvalidWrapLengthError, InvalidElementValueError)
+                         InvalidTextOffsetError, InvalidWrapLengthError, InvalidElementValueError,
+                         InvalidElementNameError)
 
 
 class ElementType(Enum):
@@ -18,7 +19,7 @@ class Element(object):
     def __init__(
         self,
         element_name: str,
-        element_type: Enum,
+        element_type: "ElementType",
         element_value: Union[str, bool] = None,
     ) -> None:
         """Constructs all attributes for the Element object."""
@@ -41,10 +42,19 @@ class Element(object):
         return self._name
 
     @property
-    def type(self) -> Enum:
+    def type(self) -> "ElementType":
         """Type of the element."""
 
         return self._type
+
+    def validate_constants(self):
+        """Validates unchangeable attributes of the element."""
+
+        if not isinstance(self._name, str):
+            raise InvalidElementNameError
+
+        if not isinstance(self._type, ElementType):
+            raise InvalidElementNameError
 
     def validate_value(self):
         """Validates the value of the element."""
