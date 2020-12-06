@@ -5,7 +5,8 @@ import os
 import pytest
 
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
-from PyPDFForm.middleware.template import Template
+from PyPDFForm.middleware.template import Template as TemplateMiddleware
+from PyPDFForm.core.template import Template as TemplateCore
 
 
 @pytest.fixture
@@ -33,25 +34,25 @@ def data_dict():
 
 def test_validate_template_stream(template_stream):
     try:
-        Template().validate_stream(b"")
+        TemplateMiddleware().validate_stream(b"")
         assert False
     except InvalidTemplateError:
         assert True
 
-    Template().validate_stream(template_stream)
+    TemplateMiddleware().validate_stream(template_stream)
     assert True
 
 
 def test_iterate_elements_and_get_element_key(template_stream, data_dict):
-    for each in Template().iterate_elements(template_stream):
-        data_dict[Template().get_element_key(each)] = True
+    for each in TemplateCore().iterate_elements(template_stream):
+        data_dict[TemplateCore().get_element_key(each)] = True
 
     for k in data_dict.keys():
         assert data_dict[k]
 
 
 def test_build_elements(template_stream, data_dict):
-    for k, v in Template().build_elements(template_stream).items():
+    for k, v in TemplateMiddleware().build_elements(template_stream).items():
         if k in data_dict and k == v.name:
             data_dict[k] = True
 
