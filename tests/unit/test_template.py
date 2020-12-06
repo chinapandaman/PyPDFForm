@@ -62,7 +62,9 @@ def test_get_element_type(template_stream):
     }
 
     for each in TemplateCore().iterate_elements(template_stream):
-        assert type_mapping[TemplateCore().get_element_key(each)] == TemplateCore().get_element_type(each)
+        assert type_mapping[
+            TemplateCore().get_element_key(each)
+        ] == TemplateCore().get_element_type(each)
 
 
 def test_build_elements(template_stream, data_dict):
