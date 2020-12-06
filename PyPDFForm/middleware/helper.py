@@ -33,7 +33,7 @@ class Template(object):
 
 class Elements(object):
     @staticmethod
-    def build_elements(pdf_stream: bytes) -> Dict[str: "Element"]:
+    def build_elements(pdf_stream: bytes) -> Dict[str, "Element"]:
         """Builds an element list given a PDF form stream."""
 
         element_type_mapping = {
