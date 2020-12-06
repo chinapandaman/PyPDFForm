@@ -6,9 +6,17 @@ import pdfrw
 
 from .constants import Template as TemplateConstants
 from .element import Element, ElementType
+from .exceptions.template import InvalidTemplateError
 
 
 class Template(object):
+    @staticmethod
+    def validate_stream(pdf_stream: bytes) -> None:
+        """Validate if a template stream is indeed a PDF stream."""
+
+        if b"%PDF" not in pdf_stream:
+            raise InvalidTemplateError
+
     @staticmethod
     def iterate_elements(pdf_stream: bytes) -> List["pdfrw.PdfDict"]:
         """Iterates through a PDF and returns all elements found."""

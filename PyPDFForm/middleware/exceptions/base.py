@@ -7,12 +7,6 @@ class BasePyPDFFormException(Exception):
     pass
 
 
-class InvalidTemplateError(BasePyPDFFormException):
-    """Raised when the template stream is an invalid PDF stream."""
-
-    pass
-
-
 class InvalidFormDataError(BasePyPDFFormException):
     """Raised when form data input is not a dictionary."""
 

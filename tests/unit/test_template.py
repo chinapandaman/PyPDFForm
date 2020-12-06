@@ -4,6 +4,7 @@ import os
 
 import pytest
 
+from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
 from PyPDFForm.middleware.template import Template
 
 
@@ -28,6 +29,17 @@ def data_dict():
         "test_3": False,
         "check_3": False,
     }
+
+
+def test_validate_template_stream(template_stream):
+    try:
+        Template().validate_stream(b"")
+        assert False
+    except InvalidTemplateError:
+        assert True
+
+    Template().validate_stream(template_stream)
+    assert True
 
 
 def test_iterate_elements_and_get_element_key(template_stream, data_dict):
