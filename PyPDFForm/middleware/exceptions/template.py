@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from middleware.exceptions.base import BasePyPDFFormException
+from .base import BasePyPDFFormException
 
 
 class InvalidTemplateError(BasePyPDFFormException):
