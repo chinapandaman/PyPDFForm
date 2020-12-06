@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+
 import pytest
 
 from PyPDFForm.middleware.template import Template
@@ -39,10 +40,7 @@ def test_iterate_elements_and_get_element_key(template_stream, data_dict):
 
 def test_build_elements(template_stream, data_dict):
     for k, v in Template().build_elements(template_stream).items():
-        if (
-            k in data_dict
-            and k == v.name
-        ):
+        if k in data_dict and k == v.name:
             data_dict[k] = True
 
     for k in data_dict.keys():
