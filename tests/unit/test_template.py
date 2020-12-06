@@ -2,7 +2,6 @@
 
 import os
 import pytest
-from copy import deepcopy
 
 from PyPDFForm.middleware.template import Template
 
@@ -31,24 +30,20 @@ def data_dict():
 
 
 def test_iterate_elements_and_get_element_key(template_stream, data_dict):
-    _data_dict = deepcopy(data_dict)
-
     for each in Template().iterate_elements(template_stream):
-        _data_dict[Template().get_element_key(each)] = True
+        data_dict[Template().get_element_key(each)] = True
 
-    for k in _data_dict.keys():
-        assert _data_dict[k]
+    for k in data_dict.keys():
+        assert data_dict[k]
 
 
 def test_build_elements(template_stream, data_dict):
-    _data_dict = deepcopy(data_dict)
-
     for k, v in Template().build_elements(template_stream).items():
         if (
-            k in _data_dict
+            k in data_dict
             and k == v.name
         ):
-            _data_dict[k] = True
+            data_dict[k] = True
 
-    for k in _data_dict.keys():
-        assert _data_dict[k]
+    for k in data_dict.keys():
+        assert data_dict[k]
