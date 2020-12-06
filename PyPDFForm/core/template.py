@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import List
+from typing import List, Union
 
 import pdfrw
 
@@ -9,10 +9,11 @@ from .constants import Template as TemplateCoreConstants
 
 class Template(object):
     @staticmethod
-    def iterate_elements(pdf_stream: bytes) -> List["pdfrw.PdfDict"]:
+    def iterate_elements(pdf: Union[bytes, "pdfrw.PdfReader"]) -> List["pdfrw.PdfDict"]:
         """Iterates through a PDF and returns all elements found."""
 
-        pdf = pdfrw.PdfReader(fdata=pdf_stream)
+        if isinstance(pdf, bytes):
+            pdf = pdfrw.PdfReader(fdata=pdf)
 
         result = []
 
