@@ -3,7 +3,6 @@
 from typing import Dict
 
 from ..core.template import Template as TemplateCore
-from .constants import Template as TemplateConstants
 from .element import Element, ElementType
 from .exceptions.template import InvalidTemplateError
 
@@ -32,7 +31,7 @@ class Template(object):
             results[key] = Element(
                 element_name=key,
                 element_type=element_type_mapping.get(
-                    str(element[TemplateConstants().element_type_key])
+                    TemplateCore().get_element_type(element)
                 ),
             )
 

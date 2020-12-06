@@ -4,7 +4,7 @@ from typing import List
 
 import pdfrw
 
-from ..middleware.constants import Template as TemplateConstants
+from .constants import Template as TemplateCoreConstants
 
 
 class Template(object):
@@ -17,13 +17,13 @@ class Template(object):
         result = []
 
         for i in range(len(pdf.pages)):
-            elements = pdf.pages[i][TemplateConstants().annotation_key]
+            elements = pdf.pages[i][TemplateCoreConstants().annotation_key]
             if elements:
                 for element in elements:
                     if (
-                        element[TemplateConstants().subtype_key]
-                        == TemplateConstants().widget_subtype_key
-                        and element[TemplateConstants().annotation_field_key]
+                        element[TemplateCoreConstants().subtype_key]
+                        == TemplateCoreConstants().widget_subtype_key
+                        and element[TemplateCoreConstants().annotation_field_key]
                     ):
                         result.append(element)
 
@@ -33,4 +33,9 @@ class Template(object):
     def get_element_key(element: "pdfrw.PdfDict") -> str:
         """Returns its annotated key given a PDF form element."""
 
-        return element[TemplateConstants().annotation_field_key][1:-1]
+        return element[TemplateCoreConstants().annotation_field_key][1:-1]
+
+    @staticmethod
+    def get_element_type(element: "pdfrw.PdfDict") -> str:
+
+        return str(element[TemplateCoreConstants().element_type_key])
