@@ -37,5 +37,6 @@ class Template(object):
 
     @staticmethod
     def get_element_type(element: "pdfrw.PdfDict") -> str:
+        """Returns its annotated type given a PDF form element."""
 
         return str(element[TemplateCoreConstants().element_type_key])

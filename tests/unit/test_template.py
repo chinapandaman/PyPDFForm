@@ -51,6 +51,20 @@ def test_iterate_elements_and_get_element_key(template_stream, data_dict):
         assert data_dict[k]
 
 
+def test_get_element_type(template_stream):
+    type_mapping = {
+        "test": "/Tx",
+        "check": "/Btn",
+        "test_2": "/Tx",
+        "check_2": "/Btn",
+        "test_3": "/Tx",
+        "check_3": "/Btn",
+    }
+
+    for each in TemplateCore().iterate_elements(template_stream):
+        assert type_mapping[TemplateCore().get_element_key(each)] == TemplateCore().get_element_type(each)
+
+
 def test_build_elements(template_stream, data_dict):
     for k, v in TemplateMiddleware().build_elements(template_stream).items():
         if k in data_dict and k == v.name:
