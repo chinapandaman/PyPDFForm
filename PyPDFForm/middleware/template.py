@@ -30,10 +30,13 @@ class Template(object):
 
         return result
 
-
-class Elements(object):
     @staticmethod
-    def build_elements(pdf_stream: bytes) -> Dict[str, "Element"]:
+    def get_element_key(element: "pdfrw.PdfDict") -> str:
+        """Returns its annotated key given a PDF form element."""
+
+        return element[TemplateConstants().annotation_field_key][1:-1]
+
+    def build_elements(self, pdf_stream: bytes) -> Dict[str, "Element"]:
         """Builds an element list given a PDF form stream."""
 
         element_type_mapping = {
@@ -42,8 +45,8 @@ class Elements(object):
         }
         results = {}
 
-        for element in Template().iterate_elements(pdf_stream):
-            key = element[TemplateConstants().annotation_field_key][1:-1]
+        for element in self.iterate_elements(pdf_stream):
+            key = self.get_element_key(element)
 
             results[key] = Element(
                 element_name=key,
