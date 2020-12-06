@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+
 from PyPDFForm.middleware.element import Element, ElementType
 from PyPDFForm.middleware.exceptions.element import (InvalidElementNameError,
                                                      InvalidElementTypeError,
