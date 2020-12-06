@@ -4,9 +4,9 @@ import os
 
 import pytest
 
+from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
 from PyPDFForm.middleware.template import Template as TemplateMiddleware
-from PyPDFForm.core.template import Template as TemplateCore
 
 
 @pytest.fixture

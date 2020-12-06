@@ -21,9 +21,9 @@ class Template(object):
             if elements:
                 for element in elements:
                     if (
-                            element[TemplateConstants().subtype_key]
-                            == TemplateConstants().widget_subtype_key
-                            and element[TemplateConstants().annotation_field_key]
+                        element[TemplateConstants().subtype_key]
+                        == TemplateConstants().widget_subtype_key
+                        and element[TemplateConstants().annotation_field_key]
                     ):
                         result.append(element)
 

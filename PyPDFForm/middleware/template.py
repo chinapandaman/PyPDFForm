@@ -2,10 +2,10 @@
 
 from typing import Dict
 
-from .constants import Template as TemplateConstants
 from ..core.template import Template as TemplateCore
-from .exceptions.template import InvalidTemplateError
+from .constants import Template as TemplateConstants
 from .element import Element, ElementType
+from .exceptions.template import InvalidTemplateError
 
 
 class Template(object):
