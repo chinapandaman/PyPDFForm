@@ -2,6 +2,7 @@
 
 import os
 
+import pdfrw
 import pytest
 
 from PyPDFForm.core.template import Template as TemplateCore
@@ -62,6 +63,13 @@ def test_get_element_type(template_stream):
     }
 
     for each in TemplateCore().iterate_elements(template_stream):
+        assert type_mapping[
+            TemplateCore().get_element_key(each)
+        ] == TemplateCore().get_element_type(each)
+
+    read_template_stream = pdfrw.PdfReader(fdata=template_stream)
+
+    for each in TemplateCore().iterate_elements(read_template_stream):
         assert type_mapping[
             TemplateCore().get_element_key(each)
         ] == TemplateCore().get_element_type(each)
