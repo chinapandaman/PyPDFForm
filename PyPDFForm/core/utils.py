@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import pdfrw
-from io import BytesIO
 from copy import deepcopy
+from io import BytesIO
+
+import pdfrw
 
 
 class Utils(object):

@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import os
+
 import pdfrw
 import pytest
 
+from PyPDFForm.core.constants import Template as TemplateConstants
 from PyPDFForm.core.filler import Filler
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.core.utils import Utils
-from PyPDFForm.core.constants import Template as TemplateConstants
 
 
 @pytest.fixture
@@ -45,4 +46,7 @@ def test_simple_fill(template_stream, data_dict):
                 pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
             )
         else:
-            assert element[TemplateConstants().text_field_value_key][1:-1] == data_dict[key]
+            assert (
+                element[TemplateConstants().text_field_value_key][1:-1]
+                == data_dict[key]
+            )

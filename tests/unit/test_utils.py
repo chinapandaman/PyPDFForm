@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import pytest
-import pdfrw
 from copy import deepcopy
+
+import pdfrw
+import pytest
 
 from PyPDFForm.core.utils import Utils
 

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import pdfrw
+
+from .constants import Template as TemplateConstants
 from .template import Template as TemplateCore
 from .utils import Utils
-from .constants import Template as TemplateConstants
 
 
 class Filler(object):
