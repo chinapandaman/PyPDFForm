@@ -7,7 +7,7 @@ import pytest
 from PyPDFForm.core.filler import Filler
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.core.utils import Utils
-from PyPDFForm.core.constants import Filler as FillerConstants
+from PyPDFForm.core.constants import Template as TemplateConstants
 
 
 @pytest.fixture
@@ -41,8 +41,8 @@ def test_simple_fill(template_stream, data_dict):
         key = TemplateCore().get_element_key(element)
 
         if isinstance(data_dict[key], bool):
-            assert element[FillerConstants().checkbox_field_value_key] == (
+            assert element[TemplateConstants().checkbox_field_value_key] == (
                 pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
             )
         else:
-            assert element[FillerConstants().text_field_value_key][1:-1] == data_dict[key]
+            assert element[TemplateConstants().text_field_value_key][1:-1] == data_dict[key]

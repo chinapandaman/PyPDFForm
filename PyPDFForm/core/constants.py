@@ -38,16 +38,14 @@ class Template(object):
 
         return "/FT"
 
-
-class Filler(object):
     @property
     def text_field_value_key(self) -> str:
-        """Used for extracting text field value for pdfrw parsed PDF form."""
+        """Used for extracting text field values for pdfrw parsed PDF form."""
 
         return "/V"
 
     @property
     def checkbox_field_value_key(self) -> str:
-        """Used for extracting checkbox field value for pdfrw parsed PDF form."""
+        """Used for extracting checkbox field values for pdfrw parsed PDF form."""
 
         return "/AS"

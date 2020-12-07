@@ -3,7 +3,7 @@
 import pdfrw
 from .template import Template as TemplateCore
 from .utils import Utils
-from .constants import Filler as FillerConstants
+from .constants import Template as TemplateConstants
 
 
 class Filler(object):
@@ -22,13 +22,13 @@ class Filler(object):
                     pdfrw.PdfName.Off,
                 ]:
                     update_dict = {
-                        FillerConstants().checkbox_field_value_key.replace(
+                        TemplateConstants().checkbox_field_value_key.replace(
                             "/", ""
                         ): data[key]
                     }
                 else:
                     update_dict = {
-                        FillerConstants().text_field_value_key.replace("/", ""): data[
+                        TemplateConstants().text_field_value_key.replace("/", ""): data[
                             key
                         ]
                     }
