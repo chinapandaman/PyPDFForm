@@ -37,3 +37,17 @@ class Template(object):
         """Used for extracting elements from pdfrw parsed PDF form."""
 
         return "/FT"
+
+
+class Filler(object):
+    @property
+    def text_field_value_key(self) -> str:
+        """Used for extracting text field value for pdfrw parsed PDF form."""
+
+        return "/V"
+
+    @property
+    def checkbox_field_value_key(self) -> str:
+        """Used for extracting checkbox field value for pdfrw parsed PDF form."""
+
+        return "/AS"
