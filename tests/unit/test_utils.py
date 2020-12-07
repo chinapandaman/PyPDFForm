@@ -1,22 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import os
 import pytest
 import pdfrw
 from copy import deepcopy
 
 from PyPDFForm.core.utils import Utils
-
-
-@pytest.fixture
-def pdf_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples")
-
-
-@pytest.fixture
-def template_stream(pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_template.pdf"), "rb+") as f:
-        return f.read()
 
 
 @pytest.fixture
