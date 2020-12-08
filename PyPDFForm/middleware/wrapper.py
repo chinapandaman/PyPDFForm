@@ -19,6 +19,6 @@ class PyPDFForm(object):
     def _simple_fill(self, data: dict, editable: bool = False) -> "PyPDFForm":
         """Fill a PDF form in simple mode."""
 
-        self.stream = FillerCore().simple_fill(self.stream, data)
+        self.stream = FillerCore().simple_fill(self.stream, data, editable)
 
         return self

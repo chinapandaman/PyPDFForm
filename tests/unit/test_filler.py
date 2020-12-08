@@ -36,7 +36,7 @@ def data_dict():
 
 def test_simple_fill(template_stream, data_dict):
     converted_data = Utils.bool_to_checkboxes(data_dict)
-    result_stream = Filler().simple_fill(template_stream, converted_data)
+    result_stream = Filler().simple_fill(template_stream, converted_data, False)
 
     for element in TemplateCore().iterate_elements(result_stream):
         key = TemplateCore().get_element_key(element)
@@ -50,3 +50,4 @@ def test_simple_fill(template_stream, data_dict):
                 element[TemplateConstants().text_field_value_key][1:-1]
                 == data_dict[key]
             )
+        assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)

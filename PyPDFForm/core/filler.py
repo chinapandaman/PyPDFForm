@@ -9,7 +9,7 @@ from .utils import Utils
 
 class Filler(object):
     @staticmethod
-    def simple_fill(template_stream: bytes, data: dict) -> bytes:
+    def simple_fill(template_stream: bytes, data: dict, editable: bool) -> bytes:
         """Fill a PDF form in simple mode."""
 
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
@@ -33,6 +33,11 @@ class Filler(object):
                             key
                         ]
                     }
+
+                if not editable:
+                    update_dict[
+                        TemplateConstants().field_editable_key.replace("/", "")
+                    ] = pdfrw.PdfObject(1)
 
                 element.update(pdfrw.PdfDict(**update_dict))
 
