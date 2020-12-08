@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from .template import Template as TemplateMiddleware
 from ..core.filler import Filler as FillerCore
+from .template import Template as TemplateMiddleware
 
 
 class PyPDFForm(object):
@@ -11,7 +11,7 @@ class PyPDFForm(object):
         """Constructs all attributes for the PyPDFForm object."""
 
         self.stream = template
-        self.simple_mode = simple_mode,
+        self.simple_mode = (simple_mode,)
         self.fill = self._simple_fill
 
         if not simple_mode:

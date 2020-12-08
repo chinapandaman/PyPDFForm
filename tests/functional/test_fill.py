@@ -38,7 +38,9 @@ def test_fill_simple_mode(template_stream, pdf_samples):
 
 
 def test_fill_simple_mode_editable(template_stream, pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_filled_simple_mode_editable.pdf"), "rb+") as f:
+    with open(
+        os.path.join(pdf_samples, "sample_filled_simple_mode_editable.pdf"), "rb+"
+    ) as f:
         obj = PyPDFForm(template_stream).fill(
             {
                 "test": "test_1",
@@ -47,7 +49,8 @@ def test_fill_simple_mode_editable(template_stream, pdf_samples):
                 "check_2": False,
                 "test_3": "test_3",
                 "check_3": True,
-            }, editable=True
+            },
+            editable=True,
         )
 
         expected = f.read()
