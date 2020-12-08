@@ -12,6 +12,7 @@ class PyPDFForm(object):
 
         self.stream = template
         self.simple_mode = simple_mode,
+        self.fill = self._simple_fill
 
         if not simple_mode:
             self.elements = TemplateMiddleware().build_elements(template)
