@@ -49,3 +49,9 @@ class Template(object):
         """Used for extracting checkbox field values for pdfrw parsed PDF form."""
 
         return "/AS"
+
+    @property
+    def field_editable_key(self) -> str:
+        """Used for identifying if an element is still editable for pdfrw parsed PDF form."""
+
+        return "/Ff"
