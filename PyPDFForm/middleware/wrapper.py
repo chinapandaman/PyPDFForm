@@ -18,7 +18,7 @@ class PyPDFForm(object):
             self.elements = TemplateMiddleware().build_elements(template)
 
     def _simple_fill(self, data: dict, editable: bool = False) -> "PyPDFForm":
-        """Fill a PDF form in simple mode."""
+        """Fills a PDF form in simple mode."""
 
         self.stream = FillerCore().simple_fill(self.stream, data, editable)
 
