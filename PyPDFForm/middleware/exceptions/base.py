@@ -37,12 +37,6 @@ class InvalidImageRotationAngleError(BasePyPDFFormException):
     pass
 
 
-class InvalidEditableParameterError(BasePyPDFFormException):
-    """Raised when editable input is not a boolean."""
-
-    pass
-
-
 class InvalidTextError(BasePyPDFFormException):
     """Raised when text input is not a string."""
 

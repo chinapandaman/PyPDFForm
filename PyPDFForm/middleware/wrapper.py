@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .exceptions.input import InvalidFormDataError, InvalidModeError
+from .exceptions.input import InvalidFormDataError, InvalidModeError, InvalidEditableParameterError
 from ..core.filler import Filler as FillerCore
 from .template import Template as TemplateMiddleware
 
@@ -28,6 +28,9 @@ class PyPDFForm(object):
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
+
+        if not (isinstance(editable, bool)):
+            raise InvalidEditableParameterError
 
         self.stream = FillerCore().simple_fill(self.stream, data, editable)
 

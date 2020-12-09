@@ -13,3 +13,9 @@ class InvalidFormDataError(BasePyPDFFormException):
     """Raised when form data input is not a dictionary."""
 
     pass
+
+
+class InvalidEditableParameterError(BasePyPDFFormException):
+    """Raised when editable input is not a boolean."""
+
+    pass
