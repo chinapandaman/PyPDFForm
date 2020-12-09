@@ -7,18 +7,6 @@ class BasePyPDFFormException(Exception):
     pass
 
 
-class InvalidFormDataError(BasePyPDFFormException):
-    """Raised when form data input is not a dictionary."""
-
-    pass
-
-
-class InvalidModeError(BasePyPDFFormException):
-    """Raised when simple mode input is not a boolean."""
-
-    pass
-
-
 class InvalidImageError(BasePyPDFFormException):
     """Raised when the image stream is an invalid image."""
 
@@ -45,12 +33,6 @@ class InvalidImageDimensionError(BasePyPDFFormException):
 
 class InvalidImageRotationAngleError(BasePyPDFFormException):
     """Raised when rotation angle input is not a float or int."""
-
-    pass
-
-
-class InvalidEditableParameterError(BasePyPDFFormException):
-    """Raised when editable input is not a boolean."""
 
     pass
 

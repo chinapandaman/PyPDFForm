@@ -50,7 +50,7 @@ class Element(object):
 
         return self._type
 
-    def validate_constants(self):
+    def validate_constants(self) -> None:
         """Validates unchangeable attributes of the element."""
 
         if not isinstance(self._name, str):
@@ -59,7 +59,7 @@ class Element(object):
         if not isinstance(self._type, ElementType):
             raise InvalidElementTypeError
 
-    def validate_value(self):
+    def validate_value(self) -> None:
         """Validates the value of the element."""
 
         if self._type == ElementType.text:
