@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from .exceptions.input import InvalidFormDataError, InvalidModeError, InvalidEditableParameterError
 from ..core.filler import Filler as FillerCore
+from .exceptions.input import (InvalidEditableParameterError,
+                               InvalidFormDataError, InvalidModeError)
 from .template import Template as TemplateMiddleware
 
 

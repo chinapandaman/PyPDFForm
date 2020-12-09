@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from PyPDFForm.middleware.exceptions.input import (
+    InvalidEditableParameterError, InvalidFormDataError, InvalidModeError)
 from PyPDFForm.middleware.wrapper import PyPDFForm
-from PyPDFForm.middleware.exceptions.input import InvalidModeError, InvalidFormDataError, InvalidEditableParameterError
 
 
 def test_validate_constructor_inputs():
