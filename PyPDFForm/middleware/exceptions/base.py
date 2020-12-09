@@ -7,18 +7,6 @@ class BasePyPDFFormException(Exception):
     pass
 
 
-class InvalidFormDataError(BasePyPDFFormException):
-    """Raised when form data input is not a dictionary."""
-
-    pass
-
-
-class InvalidModeError(BasePyPDFFormException):
-    """Raised when simple mode input is not a boolean."""
-
-    pass
-
-
 class InvalidImageError(BasePyPDFFormException):
     """Raised when the image stream is an invalid image."""
 
