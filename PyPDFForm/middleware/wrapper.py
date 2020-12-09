@@ -22,6 +22,11 @@ class PyPDFForm(object):
         if not simple_mode:
             self.elements = TemplateMiddleware().build_elements(template)
 
+            for each in self.elements.values():
+                each.validate_constants()
+                each.validate_value()
+                each.validate_text_attributes()
+
     def _simple_fill(self, data: dict, editable: bool = False) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
 
