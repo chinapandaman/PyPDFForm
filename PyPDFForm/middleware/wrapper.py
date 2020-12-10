@@ -13,6 +13,7 @@ class PyPDFForm(object):
     def __init__(self, template: bytes = b"", simple_mode: bool = True) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
+        TemplateMiddleware().validate_template(template)
         if not isinstance(simple_mode, bool):
             raise InvalidModeError
 

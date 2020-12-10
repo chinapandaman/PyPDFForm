@@ -33,6 +33,16 @@ def data_dict():
     }
 
 
+def test_validate_template():
+    bad_inputs = [""]
+
+    try:
+        TemplateMiddleware().validate_template(*bad_inputs)
+        assert False
+    except InvalidTemplateError:
+        assert True
+
+
 def test_validate_template_stream(template_stream):
     try:
         TemplateMiddleware().validate_stream(b"")
