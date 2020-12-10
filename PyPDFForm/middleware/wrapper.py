@@ -5,6 +5,9 @@ from ..core.utils import Utils as UtilsCore
 from .exceptions.input import (InvalidEditableParameterError,
                                InvalidFormDataError, InvalidModeError)
 from .template import Template as TemplateMiddleware
+from typing import Union
+from .image import Image as ImageMiddleware
+from ..core.watermark import Watermark as WatermarkCore
 
 
 class PyPDFForm(object):
@@ -42,6 +45,43 @@ class PyPDFForm(object):
 
         self.stream = FillerCore().simple_fill(
             self.stream, UtilsCore().bool_to_checkboxes(data), editable
+        )
+
+        return self
+
+    def draw_image(
+        self,
+        image: bytes,
+        page_number: int,
+        x: Union[float, int],
+        y: Union[float, int],
+        width: Union[float, int],
+        height: Union[float, int],
+        rotation: Union[float, int] = 0,
+    ) -> "PyPDFForm":
+        """Draw an image on a PDF form."""
+
+        if rotation:
+            image = ImageMiddleware().rotate_image(image, rotation)
+
+        watermarks = WatermarkCore().create_watermarks_and_draw(
+            self.stream,
+            page_number,
+            (
+                "image",
+                [
+                    image,
+                    x,
+                    y,
+                    width,
+                    height
+                ]
+            )
+        )
+
+        self.stream = WatermarkCore().merge_watermarks_with_pdf(
+            self.stream,
+            watermarks
         )
 
         return self

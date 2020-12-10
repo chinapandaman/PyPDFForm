@@ -38,12 +38,12 @@ class Watermark(object):
 
         image_buff.close()
 
-    def create_watermark_and_draw(
+    def create_watermarks_and_draw(
         self,
         pdf: bytes,
         page_number: int,
         action: Tuple[str, List]
-    ) -> bytes:
+    ) -> List[bytes]:
         """Creates a canvas watermark and draw something on it."""
 
         pdf_file = pdfrw.PdfReader(fdata=pdf)
@@ -63,10 +63,17 @@ class Watermark(object):
         c.save()
         buff.seek(0)
 
-        result = buff.read()
+        watermark = buff.read()
         buff.close()
 
-        return result
+        results = []
+
+        for i in range(len(pdf_file.pages)):
+            results.append(
+                watermark if i == page_number - 1 else b""
+            )
+
+        return results
 
     @staticmethod
     def merge_watermarks_with_pdf(
