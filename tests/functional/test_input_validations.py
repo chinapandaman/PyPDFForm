@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import os
+
 import pytest
+
 from PyPDFForm.middleware.exceptions.input import (
     InvalidEditableParameterError, InvalidFormDataError, InvalidModeError)
 from PyPDFForm.middleware.wrapper import PyPDFForm
