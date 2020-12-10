@@ -14,7 +14,7 @@ class Template(object):
     def validate_stream(pdf_stream: bytes) -> None:
         """Validates if a template stream is indeed a PDF stream."""
 
-        if pdf_stream and b"%PDF" not in pdf_stream:
+        if b"%PDF" not in pdf_stream:
             raise InvalidTemplateError
 
     @staticmethod
