@@ -11,7 +11,14 @@ class Watermark(object):
     """Contains methods for interacting with watermark created by canvas."""
 
     @staticmethod
-    def draw_image(*args: Union["canvas.Canvas", bytes, float, int]) -> None:
+    def draw_image(
+        *args: Union[
+            "canvas.Canvas",
+            bytes,
+            float,
+            int
+        ]
+    ) -> None:
         """Draws an image on the watermark."""
 
         c = args[0]
@@ -33,18 +40,20 @@ class Watermark(object):
 
     def create_watermark_and_draw(
         self,
-        x_dimension: Union[float, int],
-        y_dimension: Union[float, int],
+        pdf: bytes,
+        page_number: int,
         action: Tuple[str, List]
     ) -> bytes:
         """Creates a canvas watermark and draw something on it."""
 
+        pdf_file = pdfrw.PdfReader(fdata=pdf)
         buff = BytesIO()
 
         c = canvas.Canvas(
             buff,
             pagesize=(
-                x_dimension, y_dimension
+                float(pdf_file.pages[page_number - 1].MediaBox[2]),
+                float(pdf_file.pages[page_number - 1].MediaBox[3]),
             )
         )
 
@@ -65,6 +74,7 @@ class Watermark(object):
         watermarks: List[bytes],
     ):
         """Merges watermarks with PDF."""
+
         pdf_file = pdfrw.PdfReader(fdata=pdf)
 
         for i in range(len(pdf_file.pages)):
