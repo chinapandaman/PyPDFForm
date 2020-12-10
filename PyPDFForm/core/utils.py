@@ -7,6 +7,8 @@ import pdfrw
 
 
 class Utils(object):
+    """Contains utility methods for core modules."""
+
     @staticmethod
     def generate_stream(pdf: "pdfrw.PdfReader") -> bytes:
         """Generates new stream for manipulated PDF form."""

@@ -8,9 +8,11 @@ from .utils import Utils
 
 
 class Filler(object):
+    """Contains methods for filling a PDF form with dict."""
+
     @staticmethod
     def simple_fill(template_stream: bytes, data: dict, editable: bool) -> bytes:
-        """Fill a PDF form in simple mode."""
+        """Fills a PDF form in simple mode."""
 
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
 
