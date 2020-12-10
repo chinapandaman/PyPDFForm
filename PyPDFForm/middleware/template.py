@@ -8,9 +8,11 @@ from .exceptions.template import InvalidTemplateError
 
 
 class Template(object):
+    """Contains methods for interacting with template middlewares."""
+
     @staticmethod
     def validate_stream(pdf_stream: bytes) -> None:
-        """Validate if a template stream is indeed a PDF stream."""
+        """Validates if a template stream is indeed a PDF stream."""
 
         if pdf_stream and b"%PDF" not in pdf_stream:
             raise InvalidTemplateError

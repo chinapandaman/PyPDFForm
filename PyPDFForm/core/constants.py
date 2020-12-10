@@ -2,6 +2,8 @@
 
 
 class Template(object):
+    """Contains constants for pdfrw parsed PDF form."""
+
     @property
     def annotation_key(self) -> str:
         """Used for extracting elements from pdfrw parsed PDF form."""
@@ -40,13 +42,13 @@ class Template(object):
 
     @property
     def text_field_value_key(self) -> str:
-        """Used for extracting text field values for pdfrw parsed PDF form."""
+        """Used for extracting text element values for pdfrw parsed PDF form."""
 
         return "/V"
 
     @property
     def checkbox_field_value_key(self) -> str:
-        """Used for extracting checkbox field values for pdfrw parsed PDF form."""
+        """Used for extracting checkbox element values for pdfrw parsed PDF form."""
 
         return "/AS"
 

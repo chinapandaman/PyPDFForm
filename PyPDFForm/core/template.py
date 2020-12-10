@@ -8,6 +8,8 @@ from .constants import Template as TemplateCoreConstants
 
 
 class Template(object):
+    """Contains methods for interacting with a pdfrw parsed PDF form."""
+
     @staticmethod
     def iterate_elements(pdf: Union[bytes, "pdfrw.PdfReader"]) -> List["pdfrw.PdfDict"]:
         """Iterates through a PDF and returns all elements found."""
