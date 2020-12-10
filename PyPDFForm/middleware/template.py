@@ -11,10 +11,17 @@ class Template(object):
     """Contains methods for interacting with template middlewares."""
 
     @staticmethod
+    def validate_template(pdf_stream: bytes) -> None:
+        """Validates if a template stream is byte type."""
+
+        if not isinstance(pdf_stream, bytes):
+            raise InvalidTemplateError
+
+    @staticmethod
     def validate_stream(pdf_stream: bytes) -> None:
         """Validates if a template stream is indeed a PDF stream."""
 
-        if pdf_stream and b"%PDF" not in pdf_stream:
+        if b"%PDF" not in pdf_stream:
             raise InvalidTemplateError
 
     @staticmethod
