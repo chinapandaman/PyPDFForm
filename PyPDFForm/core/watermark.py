@@ -42,7 +42,7 @@ class Watermark(object):
         self,
         pdf: bytes,
         page_number: int,
-        action: Tuple[str, List]
+        action: Tuple[str, List[Union[bytes, float, int]]]
     ) -> List[bytes]:
         """Creates a canvas watermark and draw something on it."""
 
