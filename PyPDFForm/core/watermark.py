@@ -42,7 +42,7 @@ class Watermark(object):
         self,
         pdf: bytes,
         page_number: int,
-        action: Tuple[str, List[Union[bytes, float, int]]]
+        action: Tuple[str, List[List]]
     ) -> List[bytes]:
         """Creates a canvas watermark and draw something on it."""
 
@@ -58,7 +58,8 @@ class Watermark(object):
         )
 
         if action[0] == "image":
-            self.draw_image(*([c] + action[1]))
+            for each in action[1]:
+                self.draw_image(*([c] + each))
 
         c.save()
         buff.seek(0)

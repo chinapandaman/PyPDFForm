@@ -70,11 +70,13 @@ class PyPDFForm(object):
             (
                 "image",
                 [
-                    image,
-                    x,
-                    y,
-                    width,
-                    height
+                    [
+                        image,
+                        x,
+                        y,
+                        width,
+                        height
+                    ]
                 ]
             )
         )
