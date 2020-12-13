@@ -30,4 +30,8 @@ def test_draw_image_on_one_page(template_stream, image_stream, pdf_samples):
 
         expected = f.read()
 
-        assert obj.stream[:32767] == expected[:32767]
+        if os.name == "nt":
+            assert len(obj.stream) == len(expected)
+            assert obj.stream == expected
+        else:
+            assert obj.stream[:32767] == expected[:32767]
