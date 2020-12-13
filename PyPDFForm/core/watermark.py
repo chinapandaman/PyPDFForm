@@ -24,7 +24,7 @@ class Watermark(object):
                 Union[float, int]
             ]
         ]
-    ):
+    ) -> None:
         """Draws a text on the watermark."""
 
         c = args[0]

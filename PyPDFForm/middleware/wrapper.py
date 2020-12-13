@@ -73,8 +73,8 @@ class PyPDFForm(object):
         text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
         text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
         text_wrap_length: int = TextConstants().global_text_wrap_length,
-    ):
-        """Draw a text on a PDF form."""
+    ) -> "PyPDFForm":
+        """Draws a text on a PDF form."""
 
         if not isinstance(text, str):
             raise InvalidTextError
@@ -132,7 +132,7 @@ class PyPDFForm(object):
         height: Union[float, int],
         rotation: Union[float, int] = 0,
     ) -> "PyPDFForm":
-        """Draw an image on a PDF form."""
+        """Draws an image on a PDF form."""
 
         if not (isinstance(rotation, float) or isinstance(rotation, int)):
             raise InvalidImageRotationAngleError
