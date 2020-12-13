@@ -92,4 +92,23 @@ def create_watermarks_and_draw_images(template_stream, image_stream):
         ]
     )
 
-    assert watermarks[page_number - 1] != watermarks_drawn_two_images[page_number - 2]
+    assert watermarks[page_number - 1] != watermarks_drawn_two_images[page_number - 1]
+
+
+def test_merge_watermarks_with_pdf(template_stream, image_stream):
+    watermarks = WatermarkCore().create_watermarks_and_draw(
+        template_stream,
+        2,
+        "image",
+        [
+            [
+                image_stream,
+                0,
+                0,
+                400,
+                225,
+            ]
+        ]
+    )
+
+    assert template_stream != WatermarkCore().merge_watermarks_with_pdf(template_stream, watermarks)
