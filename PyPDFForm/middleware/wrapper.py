@@ -19,6 +19,8 @@ from .exceptions.input import (
 )
 from .template import Template as TemplateMiddleware
 from .constants import Text as TextConstants
+from .element import Element as ElementMiddleware
+from .element import ElementType
 
 
 class PyPDFForm(object):
@@ -85,6 +87,17 @@ class PyPDFForm(object):
 
         if not (isinstance(y, float) or isinstance(y, int)):
             raise InvalidCoordinateError
+
+        new_element = ElementMiddleware("new", ElementType.text)
+        new_element.value = text
+        new_element.font_size = font_size
+        new_element.font_color = font_color
+        new_element.text_x_offset = text_x_offset
+        new_element.text_y_offset = text_y_offset
+        new_element.text_wrap_length = text_wrap_length
+        new_element.validate_constants()
+        new_element.validate_value()
+        new_element.validate_text_attributes()
 
         watermarks = WatermarkCore().create_watermarks_and_draw(
             self.stream,
