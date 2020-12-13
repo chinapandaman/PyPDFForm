@@ -12,7 +12,19 @@ class Watermark(object):
     """Contains methods for interacting with watermark created by canvas."""
 
     @staticmethod
-    def draw_text(*args: Union["canvas.Canvas", str, float, int, Tuple[Union[float, Union]]]):
+    def draw_text(
+        *args: Union[
+            "canvas.Canvas",
+            str,
+            float,
+            int,
+            Tuple[
+                Union[float, int],
+                Union[float, int],
+                Union[float, int]
+            ]
+        ]
+    ):
         """Draws a text on the watermark."""
 
         c = args[0]
@@ -87,7 +99,21 @@ class Watermark(object):
         pdf: bytes,
         page_number: int,
         action_type: str,
-        actions: List[List[Union[bytes, float, int, str, Tuple[Union[float, Union]]]]],
+        actions: List[
+            List[
+                Union[
+                    bytes,
+                    float,
+                    int,
+                    str,
+                    Tuple[
+                        Union[float, int],
+                        Union[float, int],
+                        Union[float, int]
+                    ]
+                ]
+            ]
+        ],
     ) -> List[bytes]:
         """Creates a canvas watermark and draw some stuffs on it."""
 
