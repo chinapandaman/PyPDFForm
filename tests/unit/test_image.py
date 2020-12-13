@@ -3,6 +3,8 @@
 import os
 import pytest
 from PyPDFForm.core.image import Image as ImageCore
+from PIL import Image
+from io import BytesIO
 
 
 @pytest.fixture
@@ -17,4 +19,19 @@ def image_stream(pdf_samples):
 
 
 def test_rotate_image(image_stream):
-    assert ImageCore().rotate_image(image_stream, 180) != image_stream
+    rotated = ImageCore().rotate_image(image_stream, 180)
+
+    assert rotated != image_stream
+
+    buff = BytesIO()
+    buff.write(image_stream)
+    buff.seek(0)
+
+    rotated_buff = BytesIO()
+    rotated_buff.write(rotated)
+    rotated_buff.seek(0)
+
+    assert Image.open(buff).format == Image.open(rotated_buff).format
+
+    buff.close()
+    rotated_buff.close()
