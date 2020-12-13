@@ -44,7 +44,7 @@ class Watermark(object):
         page_number: int,
         action: Tuple[str, List[List]]
     ) -> List[bytes]:
-        """Creates a canvas watermark and draw something on it."""
+        """Creates a canvas watermark and draw some stuffs on it."""
 
         pdf_file = pdfrw.PdfReader(fdata=pdf)
         buff = BytesIO()
