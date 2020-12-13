@@ -7,6 +7,7 @@ import pytest
 from reportlab.pdfgen import canvas
 
 from PyPDFForm.core.watermark import Watermark as WatermarkCore
+from PyPDFForm.middleware.constants import Text as TextConstants
 
 
 @pytest.fixture
@@ -24,6 +25,35 @@ def template_stream(pdf_samples):
 def image_stream(pdf_samples):
     with open(os.path.join(pdf_samples, "sample_image.jpg"), "rb+") as f:
         return f.read()
+
+
+def test_draw_text():
+    buff = BytesIO()
+
+    assert not buff.read()
+    buff.seek(0)
+
+    c = canvas.Canvas(buff, pagesize=(100, 100))
+
+    WatermarkCore().draw_text(
+        c,
+        "drawn_text",
+        300,
+        225,
+        TextConstants().global_font,
+        TextConstants().global_font_size,
+        TextConstants().global_font_color,
+        TextConstants().global_text_x_offset,
+        TextConstants().global_text_y_offset,
+        TextConstants().global_text_wrap_length
+    )
+
+    c.save()
+    buff.seek(0)
+
+    assert buff.read()
+
+    buff.close()
 
 
 def test_draw_image(image_stream):
