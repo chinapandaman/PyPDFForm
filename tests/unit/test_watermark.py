@@ -14,6 +14,12 @@ def pdf_samples():
 
 
 @pytest.fixture
+def template_stream(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_template.pdf"), "rb+") as f:
+        return f.read()
+
+
+@pytest.fixture
 def image_stream(pdf_samples):
     with open(os.path.join(pdf_samples, "sample_image.jpg"), "rb+") as f:
         return f.read()
@@ -30,7 +36,7 @@ def test_draw_image(image_stream):
         )
     )
 
-    WatermarkCore().draw_image(c, image_stream, 0, 0, 400, 225)
+    WatermarkCore().draw_image(c, image_stream, 100, 100, 400, 225)
 
     c.save()
     buff.seek(0)
@@ -38,3 +44,52 @@ def test_draw_image(image_stream):
     assert buff.read()
 
     buff.close()
+
+
+def create_watermarks_and_draw_images(template_stream, image_stream):
+    page_number = 2
+
+    watermarks = WatermarkCore().create_watermarks_and_draw(
+        template_stream,
+        page_number,
+        "image",
+        [
+            [
+                image_stream,
+                0,
+                0,
+                400,
+                225,
+            ]
+        ]
+    )
+
+    for i in range(len(watermarks)):
+        if i == page_number - 1:
+            assert watermarks[i]
+        else:
+            assert not watermarks[i]
+
+    watermarks_drawn_two_images = WatermarkCore().create_watermarks_and_draw(
+        template_stream,
+        page_number,
+        "image",
+        [
+            [
+                image_stream,
+                0,
+                0,
+                400,
+                225,
+            ],
+            [
+                image_stream,
+                0,
+                225,
+                400,
+                225,
+            ]
+        ]
+    )
+
+    assert watermarks[page_number - 1] != watermarks_drawn_two_images[page_number - 2]
