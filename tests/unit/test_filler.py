@@ -13,7 +13,7 @@ from PyPDFForm.core.utils import Utils
 
 @pytest.fixture
 def pdf_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples")
+    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples", "v2")
 
 
 @pytest.fixture
