@@ -71,7 +71,7 @@ class Watermark(object):
     def merge_watermarks_with_pdf(
         pdf: bytes,
         watermarks: List[bytes],
-    ):
+    ) -> bytes:
         """Merges watermarks with PDF."""
 
         pdf_file = pdfrw.PdfReader(fdata=pdf)
