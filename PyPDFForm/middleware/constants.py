@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 
 class Text(object):
@@ -19,7 +19,9 @@ class Text(object):
         return 12
 
     @property
-    def global_font_color(self) -> Tuple[Union[float, int], Union[float, int], Union[float, int]]:
+    def global_font_color(
+        self,
+    ) -> Tuple[Union[float, int], Union[float, int], Union[float, int]]:
         """Used for setting global font color for text."""
 
         return 0, 0, 0

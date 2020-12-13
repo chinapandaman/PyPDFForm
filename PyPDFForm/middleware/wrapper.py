@@ -1,26 +1,22 @@
 # -*- coding: utf-8 -*-
 
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 from ..core.filler import Filler as FillerCore
 from ..core.image import Image as ImageCore
 from ..core.utils import Utils as UtilsCore
 from ..core.watermark import Watermark as WatermarkCore
-from .exceptions.input import (
-    InvalidCoordinateError,
-    InvalidEditableParameterError,
-    InvalidFormDataError,
-    InvalidImageDimensionError,
-    InvalidImageError,
-    InvalidImageRotationAngleError,
-    InvalidModeError,
-    InvalidPageNumberError,
-    InvalidTextError
-)
-from .template import Template as TemplateMiddleware
 from .constants import Text as TextConstants
 from .element import Element as ElementMiddleware
 from .element import ElementType
+from .exceptions.input import (InvalidCoordinateError,
+                               InvalidEditableParameterError,
+                               InvalidFormDataError,
+                               InvalidImageDimensionError, InvalidImageError,
+                               InvalidImageRotationAngleError,
+                               InvalidModeError, InvalidPageNumberError,
+                               InvalidTextError)
+from .template import Template as TemplateMiddleware
 
 
 class PyPDFForm(object):
@@ -69,7 +65,9 @@ class PyPDFForm(object):
         x: Union[float, int],
         y: Union[float, int],
         font_size: Union[float, int] = TextConstants().global_font_size,
-        font_color: Tuple[Union[float, int], Union[float, int], Union[float, int]] = TextConstants().global_font_color,
+        font_color: Tuple[
+            Union[float, int], Union[float, int], Union[float, int]
+        ] = TextConstants().global_font_color,
         text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
         text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
         text_wrap_length: int = TextConstants().global_text_wrap_length,
@@ -113,7 +111,7 @@ class PyPDFForm(object):
                     font_color,
                     text_x_offset,
                     text_y_offset,
-                    text_wrap_length
+                    text_wrap_length,
                 ]
             ],
         )

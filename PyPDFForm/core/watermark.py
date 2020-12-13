@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from io import BytesIO
-from typing import List, Union, Tuple
+from typing import List, Tuple, Union
 
 import pdfrw
 from reportlab.lib.utils import ImageReader
@@ -18,11 +18,7 @@ class Watermark(object):
             str,
             float,
             int,
-            Tuple[
-                Union[float, int],
-                Union[float, int],
-                Union[float, int]
-            ]
+            Tuple[Union[float, int], Union[float, int], Union[float, int]],
         ]
     ) -> None:
         """Draws a text on the watermark."""
@@ -40,18 +36,10 @@ class Watermark(object):
         text_wrap_length = args[9]
 
         c.setFont(font, font_size)
-        c.setFillColorRGB(
-            font_color[0],
-            font_color[1],
-            font_color[2]
-        )
+        c.setFillColorRGB(font_color[0], font_color[1], font_color[2])
 
         if len(text) < text_wrap_length:
-            c.drawString(
-                x + text_x_offset,
-                y + text_y_offset,
-                text
-            )
+            c.drawString(x + text_x_offset, y + text_y_offset, text)
         else:
             text_obj = c.beginText(0, 0)
 
@@ -59,19 +47,14 @@ class Watermark(object):
             end = text_wrap_length
 
             while end < len(text):
-                text_obj.textLine(
-                    text[start:end]
-                )
+                text_obj.textLine(text[start:end])
                 start += text_wrap_length
                 end += text_wrap_length
 
             text_obj.textLine(text[start:])
 
             c.saveState()
-            c.translate(
-                x + text_x_offset,
-                y + text_y_offset
-            )
+            c.translate(x + text_x_offset, y + text_y_offset)
             c.drawText(text_obj)
             c.restoreState()
 
@@ -106,11 +89,7 @@ class Watermark(object):
                     float,
                     int,
                     str,
-                    Tuple[
-                        Union[float, int],
-                        Union[float, int],
-                        Union[float, int]
-                    ]
+                    Tuple[Union[float, int], Union[float, int], Union[float, int]],
                 ]
             ]
         ],

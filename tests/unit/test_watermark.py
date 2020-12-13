@@ -45,7 +45,7 @@ def test_draw_text():
         TextConstants().global_font_color,
         TextConstants().global_text_x_offset,
         TextConstants().global_text_y_offset,
-        TextConstants().global_text_wrap_length
+        TextConstants().global_text_wrap_length,
     )
 
     c.save()
@@ -91,7 +91,7 @@ def test_create_watermarks_and_draw_texts(template_stream):
                 TextConstants().global_font_color,
                 TextConstants().global_text_x_offset,
                 TextConstants().global_text_y_offset,
-                TextConstants().global_text_wrap_length
+                TextConstants().global_text_wrap_length,
             ]
         ],
     )
@@ -116,7 +116,7 @@ def test_create_watermarks_and_draw_texts(template_stream):
                 TextConstants().global_font_color,
                 TextConstants().global_text_x_offset,
                 TextConstants().global_text_y_offset,
-                TextConstants().global_text_wrap_length
+                TextConstants().global_text_wrap_length,
             ],
             [
                 "drawn_text",
@@ -127,7 +127,7 @@ def test_create_watermarks_and_draw_texts(template_stream):
                 TextConstants().global_font_color,
                 TextConstants().global_text_x_offset,
                 TextConstants().global_text_y_offset,
-                TextConstants().global_text_wrap_length
+                TextConstants().global_text_wrap_length,
             ],
         ],
     )
