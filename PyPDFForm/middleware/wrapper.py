@@ -15,6 +15,7 @@ from .exceptions.input import (
     InvalidImageRotationAngleError,
     InvalidModeError,
     InvalidPageNumberError,
+    InvalidTextError
 )
 from .template import Template as TemplateMiddleware
 from .constants import Text as TextConstants
@@ -72,6 +73,18 @@ class PyPDFForm(object):
         text_wrap_length: int = TextConstants().global_text_wrap_length,
     ):
         """Draw a text on a PDF form."""
+
+        if not isinstance(text, str):
+            raise InvalidTextError
+
+        if not isinstance(page_number, int):
+            raise InvalidPageNumberError
+
+        if not (isinstance(x, float) or isinstance(x, int)):
+            raise InvalidCoordinateError
+
+        if not (isinstance(y, float) or isinstance(y, int)):
+            raise InvalidCoordinateError
 
         watermarks = WatermarkCore().create_watermarks_and_draw(
             self.stream,
