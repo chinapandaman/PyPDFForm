@@ -4,8 +4,6 @@ from io import BytesIO
 from typing import Union
 from PIL import Image as Img
 
-from .exceptions.base import InvalidImageError
-
 
 class Image(object):
     """Contains methods for interacting with images."""
@@ -18,10 +16,7 @@ class Image(object):
         buff.write(image_stream)
         buff.seek(0)
 
-        try:
-            image = Img.open(buff)
-        except Exception:
-            raise InvalidImageError
+        image = Img.open(buff)
 
         rotated_buff = BytesIO()
         image.rotate(rotation, expand=True).save(rotated_buff, format=image.format)

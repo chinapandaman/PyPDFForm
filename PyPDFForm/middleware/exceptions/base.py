@@ -7,12 +7,6 @@ class BasePyPDFFormException(Exception):
     pass
 
 
-class InvalidImageError(BasePyPDFFormException):
-    """Raised when the image stream is an invalid image."""
-
-    pass
-
-
 class InvalidPageNumberError(BasePyPDFFormException):
     """Raised when page number input is not an int."""
 

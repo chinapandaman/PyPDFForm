@@ -3,10 +3,11 @@
 from ..core.filler import Filler as FillerCore
 from ..core.utils import Utils as UtilsCore
 from .exceptions.input import (InvalidEditableParameterError,
-                               InvalidFormDataError, InvalidModeError)
+                               InvalidFormDataError, InvalidModeError, InvalidImageError)
+
 from .template import Template as TemplateMiddleware
 from typing import Union
-from .image import Image as ImageMiddleware
+from ..core.image import Image as ImageCore
 from ..core.watermark import Watermark as WatermarkCore
 
 
@@ -61,8 +62,10 @@ class PyPDFForm(object):
     ) -> "PyPDFForm":
         """Draw an image on a PDF form."""
 
-        if rotation:
-            image = ImageMiddleware().rotate_image(image, rotation)
+        try:
+            image = ImageCore().rotate_image(image, rotation)
+        except Exception:
+            raise InvalidImageError
 
         watermarks = WatermarkCore().create_watermarks_and_draw(
             self.stream,
