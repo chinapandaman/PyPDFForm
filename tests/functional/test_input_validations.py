@@ -5,9 +5,9 @@ import os
 import pytest
 
 from PyPDFForm.middleware.exceptions.input import (
-    InvalidEditableParameterError, InvalidFormDataError, InvalidModeError, InvalidImageError, InvalidPageNumberError,
-    InvalidImageRotationAngleError, InvalidImageDimensionError, InvalidCoordinateError
-)
+    InvalidCoordinateError, InvalidEditableParameterError,
+    InvalidFormDataError, InvalidImageDimensionError, InvalidImageError,
+    InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError)
 from PyPDFForm.middleware.wrapper import PyPDFForm
 
 

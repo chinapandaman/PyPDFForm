@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
+from io import BytesIO
+
 import pytest
+from reportlab.pdfgen import canvas
 
 from PyPDFForm.core.watermark import Watermark as WatermarkCore
-from reportlab.pdfgen import canvas
-from io import BytesIO
 
 
 @pytest.fixture
@@ -28,13 +29,7 @@ def image_stream(pdf_samples):
 def test_draw_image(image_stream):
     buff = BytesIO()
 
-    c = canvas.Canvas(
-        buff,
-        pagesize=(
-            100,
-            100
-        )
-    )
+    c = canvas.Canvas(buff, pagesize=(100, 100))
 
     WatermarkCore().draw_image(c, image_stream, 100, 100, 400, 225)
 
@@ -61,7 +56,7 @@ def create_watermarks_and_draw_images(template_stream, image_stream):
                 400,
                 225,
             ]
-        ]
+        ],
     )
 
     for i in range(len(watermarks)):
@@ -88,8 +83,8 @@ def create_watermarks_and_draw_images(template_stream, image_stream):
                 225,
                 400,
                 225,
-            ]
-        ]
+            ],
+        ],
     )
 
     assert watermarks[page_number - 1] != watermarks_drawn_two_images[page_number - 1]
@@ -108,7 +103,9 @@ def test_merge_watermarks_with_pdf(template_stream, image_stream):
                 400,
                 225,
             ]
-        ]
+        ],
     )
 
-    assert template_stream != WatermarkCore().merge_watermarks_with_pdf(template_stream, watermarks)
+    assert template_stream != WatermarkCore().merge_watermarks_with_pdf(
+        template_stream, watermarks
+    )

@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from ..core.filler import Filler as FillerCore
-from ..core.utils import Utils as UtilsCore
-from .exceptions.input import (InvalidEditableParameterError,
-                               InvalidFormDataError, InvalidModeError, InvalidImageError,
-                               InvalidCoordinateError, InvalidImageDimensionError, InvalidImageRotationAngleError,
-                               InvalidPageNumberError)
-
-from .template import Template as TemplateMiddleware
 from typing import Union
+
+from ..core.filler import Filler as FillerCore
 from ..core.image import Image as ImageCore
+from ..core.utils import Utils as UtilsCore
 from ..core.watermark import Watermark as WatermarkCore
+from .exceptions.input import (InvalidCoordinateError,
+                               InvalidEditableParameterError,
+                               InvalidFormDataError,
+                               InvalidImageDimensionError, InvalidImageError,
+                               InvalidImageRotationAngleError,
+                               InvalidModeError, InvalidPageNumberError)
+from .template import Template as TemplateMiddleware
 
 
 class PyPDFForm(object):
@@ -88,23 +90,9 @@ class PyPDFForm(object):
             raise InvalidImageDimensionError
 
         watermarks = WatermarkCore().create_watermarks_and_draw(
-            self.stream,
-            page_number,
-            "image",
-            [
-                [
-                    image,
-                    x,
-                    y,
-                    width,
-                    height
-                ]
-            ]
+            self.stream, page_number, "image", [[image, x, y, width, height]]
         )
 
-        self.stream = WatermarkCore().merge_watermarks_with_pdf(
-            self.stream,
-            watermarks
-        )
+        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self

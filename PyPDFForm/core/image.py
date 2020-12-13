@@ -2,6 +2,7 @@
 
 from io import BytesIO
 from typing import Union
+
 from PIL import Image as Img
 
 

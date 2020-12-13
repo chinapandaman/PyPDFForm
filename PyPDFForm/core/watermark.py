@@ -1,24 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from typing import Union, List
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
 from io import BytesIO
+from typing import List, Union
+
 import pdfrw
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
 
 
 class Watermark(object):
     """Contains methods for interacting with watermark created by canvas."""
 
     @staticmethod
-    def draw_image(
-        *args: Union[
-            "canvas.Canvas",
-            bytes,
-            float,
-            int
-        ]
-    ) -> None:
+    def draw_image(*args: Union["canvas.Canvas", bytes, float, int]) -> None:
         """Draws an image on the watermark."""
 
         c = args[0]
@@ -32,9 +26,7 @@ class Watermark(object):
         image_buff.write(image_stream)
         image_buff.seek(0)
 
-        c.drawImage(
-            ImageReader(image_buff), x, y, width=width, height=height
-        )
+        c.drawImage(ImageReader(image_buff), x, y, width=width, height=height)
 
         image_buff.close()
 
@@ -43,7 +35,7 @@ class Watermark(object):
         pdf: bytes,
         page_number: int,
         action_type: str,
-        actions: List[List[Union[bytes, float, int]]]
+        actions: List[List[Union[bytes, float, int]]],
     ) -> List[bytes]:
         """Creates a canvas watermark and draw some stuffs on it."""
 
@@ -55,7 +47,7 @@ class Watermark(object):
             pagesize=(
                 float(pdf_file.pages[page_number - 1].MediaBox[2]),
                 float(pdf_file.pages[page_number - 1].MediaBox[3]),
-            )
+            ),
         )
 
         if action_type == "image":
@@ -71,9 +63,7 @@ class Watermark(object):
         results = []
 
         for i in range(len(pdf_file.pages)):
-            results.append(
-                watermark if i == page_number - 1 else b""
-            )
+            results.append(watermark if i == page_number - 1 else b"")
 
         return results
 

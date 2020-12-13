@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
-import pytest
-from PyPDFForm.core.image import Image as ImageCore
-from PIL import Image
 from io import BytesIO
+
+import pytest
+from PIL import Image
+
+from PyPDFForm.core.image import Image as ImageCore
 
 
 @pytest.fixture
