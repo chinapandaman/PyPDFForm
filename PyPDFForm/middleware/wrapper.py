@@ -17,6 +17,7 @@ from .exceptions.input import (
     InvalidPageNumberError,
 )
 from .template import Template as TemplateMiddleware
+from .constants import Text as TextConstants
 
 
 class PyPDFForm(object):
@@ -34,8 +35,6 @@ class PyPDFForm(object):
         self.fill = self._simple_fill
 
         if not simple_mode:
-            self.global_font = "Helvetica"
-
             self.elements = TemplateMiddleware().build_elements(template)
 
             for each in self.elements.values():
@@ -66,15 +65,11 @@ class PyPDFForm(object):
         page_number: int,
         x: Union[float, int],
         y: Union[float, int],
-        font_size: Union[float, int] = 12,
-        font_color: Tuple[Union[float, int], Union[float, int], Union[float, int]] = (
-            0,
-            0,
-            0,
-        ),
-        text_x_offset: Union[float, int] = 0,
-        text_y_offset: Union[float, int] = 0,
-        text_wrap_length: int = 100,
+        font_size: Union[float, int] = TextConstants().global_font_size,
+        font_color: Tuple[Union[float, int], Union[float, int], Union[float, int]] = TextConstants().global_font_color,
+        text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
+        text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
+        text_wrap_length: int = TextConstants().global_text_wrap_length,
     ):
         """Draw a text on a PDF form."""
 
@@ -87,7 +82,7 @@ class PyPDFForm(object):
                     text,
                     x,
                     y,
-                    self.global_font,
+                    TextConstants().global_font,
                     font_size,
                     font_color,
                     text_x_offset,
