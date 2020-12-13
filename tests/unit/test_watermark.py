@@ -74,7 +74,7 @@ def test_draw_image(image_stream):
     buff.close()
 
 
-def create_watermarks_and_draw_texts(template_stream):
+def test_create_watermarks_and_draw_texts(template_stream):
     page_number = 2
 
     watermarks = WatermarkCore().create_watermarks_and_draw(
@@ -135,7 +135,7 @@ def create_watermarks_and_draw_texts(template_stream):
     assert watermarks[page_number - 1] != watermarks_drawn_two_texts[page_number - 1]
 
 
-def create_watermarks_and_draw_images(template_stream, image_stream):
+def test_create_watermarks_and_draw_images(template_stream, image_stream):
     page_number = 2
 
     watermarks = WatermarkCore().create_watermarks_and_draw(
