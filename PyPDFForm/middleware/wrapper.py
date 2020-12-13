@@ -64,6 +64,9 @@ class PyPDFForm(object):
     ) -> "PyPDFForm":
         """Draw an image on a PDF form."""
 
+        if not (isinstance(rotation, float) or isinstance(rotation, int)):
+            raise InvalidImageRotationAngleError
+
         try:
             image = ImageCore().rotate_image(image, rotation)
         except Exception:
@@ -83,9 +86,6 @@ class PyPDFForm(object):
 
         if not (isinstance(height, float) or isinstance(height, int)):
             raise InvalidImageDimensionError
-
-        if not (isinstance(rotation, float) or isinstance(rotation, int)):
-            raise InvalidImageRotationAngleError
 
         watermarks = WatermarkCore().create_watermarks_and_draw(
             self.stream,
