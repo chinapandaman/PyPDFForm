@@ -76,6 +76,8 @@ class PyPDFForm(object):
         text_y_offset: Union[float, int] = 0,
         text_wrap_length: int = 100,
     ):
+        """Draw a text on a PDF form."""
+
         watermarks = WatermarkCore().create_watermarks_and_draw(
             self.stream,
             page_number,
