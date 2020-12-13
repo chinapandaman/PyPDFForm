@@ -29,6 +29,9 @@ def image_stream(pdf_samples):
 def test_draw_image(image_stream):
     buff = BytesIO()
 
+    assert not buff.read()
+    buff.seek(0)
+
     c = canvas.Canvas(buff, pagesize=(100, 100))
 
     WatermarkCore().draw_image(c, image_stream, 100, 100, 400, 225)
