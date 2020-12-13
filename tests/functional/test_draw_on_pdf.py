@@ -29,5 +29,5 @@ def test_draw_image_on_one_page(template_stream, image_stream, pdf_samples):
         obj = PyPDFForm(template_stream).draw_image(image_stream, 2, 100, 100, 400, 300)
 
         expected = f.read()
-        
+
         assert obj.stream[:32767] == expected[:32767]
