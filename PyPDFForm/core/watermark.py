@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Union, Tuple, List
+from typing import Union, List
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from io import BytesIO
@@ -42,7 +42,8 @@ class Watermark(object):
         self,
         pdf: bytes,
         page_number: int,
-        action: Tuple[str, List[List]]
+        action_type: str,
+        actions: List[List[Union[bytes, float, int]]]
     ) -> List[bytes]:
         """Creates a canvas watermark and draw some stuffs on it."""
 
@@ -57,9 +58,9 @@ class Watermark(object):
             )
         )
 
-        if action[0] == "image":
-            for each in action[1]:
-                self.draw_image(*([c] + each))
+        if action_type == "image":
+            for each in actions:
+                self.draw_image(*([c, *each]))
 
         c.save()
         buff.seek(0)

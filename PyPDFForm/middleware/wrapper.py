@@ -67,18 +67,16 @@ class PyPDFForm(object):
         watermarks = WatermarkCore().create_watermarks_and_draw(
             self.stream,
             page_number,
-            (
-                "image",
+            "image",
+            [
                 [
-                    [
-                        image,
-                        x,
-                        y,
-                        width,
-                        height
-                    ]
+                    image,
+                    x,
+                    y,
+                    width,
+                    height
                 ]
-            )
+            ]
         )
 
         self.stream = WatermarkCore().merge_watermarks_with_pdf(
