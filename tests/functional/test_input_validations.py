@@ -5,7 +5,7 @@ import os
 import pytest
 
 from PyPDFForm.middleware.exceptions.input import (
-    InvalidEditableParameterError, InvalidFormDataError, InvalidModeError)
+    InvalidEditableParameterError, InvalidFormDataError, InvalidModeError, InvalidImageError)
 from PyPDFForm.middleware.wrapper import PyPDFForm
 
 
@@ -44,4 +44,12 @@ def test_validate_simple_fill_inputs(template_stream):
     try:
         PyPDFForm(template_stream).fill(*bad_inputs)
     except InvalidEditableParameterError:
+        assert True
+
+
+def test_validate_image_stream(template_stream):
+    try:
+        PyPDFForm(template_stream).draw_image(b"", 1, 100, 100, 400, 225)
+        assert False
+    except InvalidImageError:
         assert True
