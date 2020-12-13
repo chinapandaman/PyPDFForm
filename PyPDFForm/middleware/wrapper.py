@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from typing import Union
+from typing import Union, Tuple
 
 from ..core.filler import Filler as FillerCore
 from ..core.image import Image as ImageCore
 from ..core.utils import Utils as UtilsCore
 from ..core.watermark import Watermark as WatermarkCore
-from .exceptions.input import (InvalidCoordinateError,
-                               InvalidEditableParameterError,
-                               InvalidFormDataError,
-                               InvalidImageDimensionError, InvalidImageError,
-                               InvalidImageRotationAngleError,
-                               InvalidModeError, InvalidPageNumberError)
+from .exceptions.input import (
+    InvalidCoordinateError,
+    InvalidEditableParameterError,
+    InvalidFormDataError,
+    InvalidImageDimensionError,
+    InvalidImageError,
+    InvalidImageRotationAngleError,
+    InvalidModeError,
+    InvalidPageNumberError,
+)
 from .template import Template as TemplateMiddleware
 
 
@@ -30,6 +34,8 @@ class PyPDFForm(object):
         self.fill = self._simple_fill
 
         if not simple_mode:
+            self.global_font = "Helvetica"
+
             self.elements = TemplateMiddleware().build_elements(template)
 
             for each in self.elements.values():
@@ -51,6 +57,45 @@ class PyPDFForm(object):
         self.stream = FillerCore().simple_fill(
             self.stream, UtilsCore().bool_to_checkboxes(data), editable
         )
+
+        return self
+
+    def draw_text(
+        self,
+        text: str,
+        page_number: int,
+        x: Union[float, int],
+        y: Union[float, int],
+        font_size: Union[float, int] = 12,
+        font_color: Tuple[Union[float, int], Union[float, int], Union[float, int]] = (
+            0,
+            0,
+            0,
+        ),
+        text_x_offset: Union[float, int] = 0,
+        text_y_offset: Union[float, int] = 0,
+        text_wrap_length: int = 100,
+    ):
+        watermarks = WatermarkCore().create_watermarks_and_draw(
+            self.stream,
+            page_number,
+            "text",
+            [
+                [
+                    text,
+                    x,
+                    y,
+                    self.global_font,
+                    font_size,
+                    font_color,
+                    text_x_offset,
+                    text_y_offset,
+                    text_wrap_length
+                ]
+            ],
+        )
+
+        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
 
