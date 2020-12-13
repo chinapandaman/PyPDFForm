@@ -113,3 +113,6 @@ def test_validate_draw_image_inputs(template_stream, image_stream):
         assert True
 
     bad_inputs[5] = 225
+
+    PyPDFForm(template_stream).draw_image(*bad_inputs)
+    assert True
