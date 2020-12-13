@@ -26,7 +26,7 @@ def image_stream(pdf_samples):
 
 def test_draw_image_on_one_page(template_stream, image_stream, pdf_samples):
     with open(os.path.join(pdf_samples, "sample_pdf_with_image.pdf"), "rb+") as f:
-        obj = PyPDFForm(template_stream).draw_image(image_stream, 2, 100, 100, 400, 300)
+        obj = PyPDFForm(template_stream).draw_image(image_stream, 2, 100, 100, 400, 225)
 
         expected = f.read()
 
