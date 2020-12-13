@@ -3,7 +3,9 @@
 from ..core.filler import Filler as FillerCore
 from ..core.utils import Utils as UtilsCore
 from .exceptions.input import (InvalidEditableParameterError,
-                               InvalidFormDataError, InvalidModeError, InvalidImageError)
+                               InvalidFormDataError, InvalidModeError, InvalidImageError,
+                               InvalidCoordinateError, InvalidImageDimensionError, InvalidImageRotationAngleError,
+                               InvalidPageNumberError)
 
 from .template import Template as TemplateMiddleware
 from typing import Union
@@ -66,6 +68,24 @@ class PyPDFForm(object):
             image = ImageCore().rotate_image(image, rotation)
         except Exception:
             raise InvalidImageError
+
+        if not isinstance(page_number, int):
+            raise InvalidPageNumberError
+
+        if not (isinstance(x, float) or isinstance(x, int)):
+            raise InvalidCoordinateError
+
+        if not (isinstance(y, float) or isinstance(y, int)):
+            raise InvalidCoordinateError
+
+        if not (isinstance(width, float) or isinstance(width, int)):
+            raise InvalidImageDimensionError
+
+        if not (isinstance(height, float) or isinstance(height, int)):
+            raise InvalidImageDimensionError
+
+        if not (isinstance(rotation, float) or isinstance(rotation, int)):
+            raise InvalidImageRotationAngleError
 
         watermarks = WatermarkCore().create_watermarks_and_draw(
             self.stream,
