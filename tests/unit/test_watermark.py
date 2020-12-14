@@ -7,6 +7,9 @@ import pytest
 from reportlab.pdfgen import canvas
 
 from PyPDFForm.core.watermark import Watermark as WatermarkCore
+from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.middleware.element import Element as ElementMiddleware
+from PyPDFForm.middleware.element import ElementType
 
 
 @pytest.fixture
@@ -24,6 +27,46 @@ def template_stream(pdf_samples):
 def image_stream(pdf_samples):
     with open(os.path.join(pdf_samples, "sample_image.jpg"), "rb+") as f:
         return f.read()
+
+
+@pytest.fixture
+def text_element():
+    new_element = ElementMiddleware("new", ElementType.text)
+    new_element.value = "drawn_text"
+    new_element.font_size = TextConstants().global_font_size
+    new_element.font_color = TextConstants().global_font_color
+    new_element.text_x_offset = TextConstants().global_text_x_offset
+    new_element.text_y_offset = TextConstants().global_text_y_offset
+    new_element.text_wrap_length = TextConstants().global_text_wrap_length
+    new_element.validate_constants()
+    new_element.validate_value()
+    new_element.validate_text_attributes()
+
+    return new_element
+
+
+def test_draw_text(text_element):
+    buff = BytesIO()
+
+    assert not buff.read()
+    buff.seek(0)
+
+    c = canvas.Canvas(buff, pagesize=(100, 100))
+
+    WatermarkCore().draw_text(
+        c,
+        text_element,
+        300,
+        225,
+        TextConstants().global_font,
+    )
+
+    c.save()
+    buff.seek(0)
+
+    assert buff.read()
+
+    buff.close()
 
 
 def test_draw_image(image_stream):
@@ -44,7 +87,53 @@ def test_draw_image(image_stream):
     buff.close()
 
 
-def create_watermarks_and_draw_images(template_stream, image_stream):
+def test_create_watermarks_and_draw_texts(template_stream, text_element):
+    page_number = 2
+
+    watermarks = WatermarkCore().create_watermarks_and_draw(
+        template_stream,
+        page_number,
+        "text",
+        [
+            [
+                text_element,
+                300,
+                225,
+                TextConstants().global_font,
+            ]
+        ],
+    )
+
+    for i in range(len(watermarks)):
+        if i == page_number - 1:
+            assert watermarks[i]
+        else:
+            assert not watermarks[i]
+
+    watermarks_drawn_two_texts = WatermarkCore().create_watermarks_and_draw(
+        template_stream,
+        page_number,
+        "text",
+        [
+            [
+                text_element,
+                300,
+                225,
+                TextConstants().global_font,
+            ],
+            [
+                text_element,
+                400,
+                225,
+                TextConstants().global_font,
+            ],
+        ],
+    )
+
+    assert watermarks[page_number - 1] != watermarks_drawn_two_texts[page_number - 1]
+
+
+def test_create_watermarks_and_draw_images(template_stream, image_stream):
     page_number = 2
 
     watermarks = WatermarkCore().create_watermarks_and_draw(

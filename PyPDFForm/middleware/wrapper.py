@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from typing import Union
+from typing import Tuple, Union
 
 from ..core.filler import Filler as FillerCore
 from ..core.image import Image as ImageCore
 from ..core.utils import Utils as UtilsCore
 from ..core.watermark import Watermark as WatermarkCore
+from .constants import Text as TextConstants
+from .element import Element as ElementMiddleware
+from .element import ElementType
 from .exceptions.input import (InvalidCoordinateError,
                                InvalidEditableParameterError,
                                InvalidFormDataError,
                                InvalidImageDimensionError, InvalidImageError,
                                InvalidImageRotationAngleError,
-                               InvalidModeError, InvalidPageNumberError)
+                               InvalidModeError, InvalidPageNumberError,
+                               InvalidTextError)
 from .template import Template as TemplateMiddleware
 
 
@@ -54,6 +58,63 @@ class PyPDFForm(object):
 
         return self
 
+    def draw_text(
+        self,
+        text: str,
+        page_number: int,
+        x: Union[float, int],
+        y: Union[float, int],
+        font_size: Union[float, int] = TextConstants().global_font_size,
+        font_color: Tuple[
+            Union[float, int], Union[float, int], Union[float, int]
+        ] = TextConstants().global_font_color,
+        text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
+        text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
+        text_wrap_length: int = TextConstants().global_text_wrap_length,
+    ) -> "PyPDFForm":
+        """Draws a text on a PDF form."""
+
+        if not isinstance(text, str):
+            raise InvalidTextError
+
+        if not isinstance(page_number, int):
+            raise InvalidPageNumberError
+
+        if not (isinstance(x, float) or isinstance(x, int)):
+            raise InvalidCoordinateError
+
+        if not (isinstance(y, float) or isinstance(y, int)):
+            raise InvalidCoordinateError
+
+        new_element = ElementMiddleware("new", ElementType.text)
+        new_element.value = text
+        new_element.font_size = font_size
+        new_element.font_color = font_color
+        new_element.text_x_offset = text_x_offset
+        new_element.text_y_offset = text_y_offset
+        new_element.text_wrap_length = text_wrap_length
+        new_element.validate_constants()
+        new_element.validate_value()
+        new_element.validate_text_attributes()
+
+        watermarks = WatermarkCore().create_watermarks_and_draw(
+            self.stream,
+            page_number,
+            "text",
+            [
+                [
+                    new_element,
+                    x,
+                    y,
+                    TextConstants().global_font,
+                ]
+            ],
+        )
+
+        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
+
+        return self
+
     def draw_image(
         self,
         image: bytes,
@@ -64,7 +125,7 @@ class PyPDFForm(object):
         height: Union[float, int],
         rotation: Union[float, int] = 0,
     ) -> "PyPDFForm":
-        """Draw an image on a PDF form."""
+        """Draws an image on a PDF form."""
 
         if not (isinstance(rotation, float) or isinstance(rotation, int)):
             raise InvalidImageRotationAngleError

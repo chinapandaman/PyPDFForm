@@ -7,9 +7,56 @@ import pdfrw
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
+from ..middleware.element import Element as ElementMiddleware
+
 
 class Watermark(object):
     """Contains methods for interacting with watermark created by canvas."""
+
+    @staticmethod
+    def draw_text(
+        *args: Union[
+            "canvas.Canvas",
+            "ElementMiddleware",
+            float,
+            int,
+            str,
+        ]
+    ) -> None:
+        """Draws a text on the watermark."""
+
+        c = args[0]
+        element = args[1]
+        x = args[2]
+        y = args[3]
+        font = args[4]
+
+        c.setFont(font, element.font_size)
+        c.setFillColorRGB(
+            element.font_color[0], element.font_color[1], element.font_color[2]
+        )
+
+        if len(element.value) < element.text_wrap_length:
+            c.drawString(
+                x + element.text_x_offset, y + element.text_y_offset, element.value
+            )
+        else:
+            text_obj = c.beginText(0, 0)
+
+            start = 0
+            end = element.text_wrap_length
+
+            while end < len(element.value):
+                text_obj.textLine(element.value[start:end])
+                start += element.text_wrap_length
+                end += element.text_wrap_length
+
+            text_obj.textLine(element.value[start:])
+
+            c.saveState()
+            c.translate(x + element.text_x_offset, y + element.text_y_offset)
+            c.drawText(text_obj)
+            c.restoreState()
 
     @staticmethod
     def draw_image(*args: Union["canvas.Canvas", bytes, float, int]) -> None:
@@ -35,7 +82,17 @@ class Watermark(object):
         pdf: bytes,
         page_number: int,
         action_type: str,
-        actions: List[List[Union[bytes, float, int]]],
+        actions: List[
+            List[
+                Union[
+                    bytes,
+                    float,
+                    int,
+                    "ElementMiddleware",
+                    str,
+                ]
+            ]
+        ],
     ) -> List[bytes]:
         """Creates a canvas watermark and draw some stuffs on it."""
 
@@ -53,6 +110,9 @@ class Watermark(object):
         if action_type == "image":
             for each in actions:
                 self.draw_image(*([c, *each]))
+        elif action_type == "text":
+            for each in actions:
+                self.draw_text(*([c, *each]))
 
         c.save()
         buff.seek(0)
