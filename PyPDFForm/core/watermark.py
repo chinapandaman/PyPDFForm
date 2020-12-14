@@ -6,6 +6,7 @@ from typing import List, Union
 import pdfrw
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
+
 from ..middleware.element import Element as ElementMiddleware
 
 
@@ -31,10 +32,14 @@ class Watermark(object):
         font = args[4]
 
         c.setFont(font, element.font_size)
-        c.setFillColorRGB(element.font_color[0], element.font_color[1], element.font_color[2])
+        c.setFillColorRGB(
+            element.font_color[0], element.font_color[1], element.font_color[2]
+        )
 
         if len(element.value) < element.text_wrap_length:
-            c.drawString(x + element.text_x_offset, y + element.text_y_offset, element.value)
+            c.drawString(
+                x + element.text_x_offset, y + element.text_y_offset, element.value
+            )
         else:
             text_obj = c.beginText(0, 0)
 
