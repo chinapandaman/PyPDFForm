@@ -4,13 +4,15 @@ import os
 
 import pytest
 
+from PyPDFForm.middleware.exceptions.element import (InvalidFontColorError,
+                                                     InvalidFontSizeError,
+                                                     InvalidTextOffsetError,
+                                                     InvalidWrapLengthError)
 from PyPDFForm.middleware.exceptions.input import (
     InvalidCoordinateError, InvalidEditableParameterError,
     InvalidFormDataError, InvalidImageDimensionError, InvalidImageError,
-    InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError, InvalidTextError)
-from PyPDFForm.middleware.exceptions.element import (
-    InvalidFontSizeError, InvalidFontColorError, InvalidTextOffsetError, InvalidWrapLengthError,
-)
+    InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError,
+    InvalidTextError)
 from PyPDFForm.middleware.wrapper import PyPDFForm
 
 
