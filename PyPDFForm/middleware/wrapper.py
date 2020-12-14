@@ -103,15 +103,10 @@ class PyPDFForm(object):
             "text",
             [
                 [
-                    text,
+                    new_element,
                     x,
                     y,
                     TextConstants().global_font,
-                    font_size,
-                    font_color,
-                    text_x_offset,
-                    text_y_offset,
-                    text_wrap_length,
                 ]
             ],
         )

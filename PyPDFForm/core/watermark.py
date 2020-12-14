@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from io import BytesIO
-from typing import List, Tuple, Union
+from typing import List, Union
 
 import pdfrw
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
+from ..middleware.element import Element as ElementMiddleware
 
 
 class Watermark(object):
@@ -15,46 +16,40 @@ class Watermark(object):
     def draw_text(
         *args: Union[
             "canvas.Canvas",
-            str,
+            "ElementMiddleware",
             float,
             int,
-            Tuple[Union[float, int], Union[float, int], Union[float, int]],
+            str,
         ]
     ) -> None:
         """Draws a text on the watermark."""
 
         c = args[0]
-        text = args[1]
+        element = args[1]
         x = args[2]
         y = args[3]
-
         font = args[4]
-        font_size = args[5]
-        font_color = args[6]
-        text_x_offset = args[7]
-        text_y_offset = args[8]
-        text_wrap_length = args[9]
 
-        c.setFont(font, font_size)
-        c.setFillColorRGB(font_color[0], font_color[1], font_color[2])
+        c.setFont(font, element.font_size)
+        c.setFillColorRGB(element.font_color[0], element.font_color[1], element.font_color[2])
 
-        if len(text) < text_wrap_length:
-            c.drawString(x + text_x_offset, y + text_y_offset, text)
+        if len(element.value) < element.text_wrap_length:
+            c.drawString(x + element.text_x_offset, y + element.text_y_offset, element.value)
         else:
             text_obj = c.beginText(0, 0)
 
             start = 0
-            end = text_wrap_length
+            end = element.text_wrap_length
 
-            while end < len(text):
-                text_obj.textLine(text[start:end])
-                start += text_wrap_length
-                end += text_wrap_length
+            while end < len(element.value):
+                text_obj.textLine(element.value[start:end])
+                start += element.text_wrap_length
+                end += element.text_wrap_length
 
-            text_obj.textLine(text[start:])
+            text_obj.textLine(element.value[start:])
 
             c.saveState()
-            c.translate(x + text_x_offset, y + text_y_offset)
+            c.translate(x + element.text_x_offset, y + element.text_y_offset)
             c.drawText(text_obj)
             c.restoreState()
 
@@ -88,8 +83,8 @@ class Watermark(object):
                     bytes,
                     float,
                     int,
+                    "ElementMiddleware",
                     str,
-                    Tuple[Union[float, int], Union[float, int], Union[float, int]],
                 ]
             ]
         ],
