@@ -26,8 +26,7 @@ class Filler(object):
         for page, _elements in TemplateCore().get_elements_by_page(template_pdf).items():
             elements_to_fill[page] = []
             watermarks.append(b"")
-            for j in reversed(range(len(_elements))):
-                _element = _elements[j]
+            for _element in _elements:
                 key = TemplateCore().get_element_key(_element)
 
                 update_dict = {
