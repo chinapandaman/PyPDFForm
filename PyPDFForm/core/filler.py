@@ -24,9 +24,11 @@ class Filler(object):
             each.name: each
             for each in elements
         }
+        watermarks = []
 
         for page, elements in TemplateCore().get_elements_by_page(template_pdf).items():
             elements_to_fill[page] = []
+            watermarks.append(b"")
             for j in reversed(range(len(elements))):
                 element = elements[j]
                 key = TemplateCore().get_element_key(element)
@@ -46,19 +48,18 @@ class Filler(object):
                     )
                     elements.pop(j)
 
-        final_stream = Utils().generate_stream(template_pdf)
-
         for page, elements in elements_to_fill.items():
-            watermarks = WatermarkCore().create_watermarks_and_draw(
-                final_stream,
+            _watermarks = WatermarkCore().create_watermarks_and_draw(
+                template_stream,
                 page,
                 "text",
                 elements
             )
+            for i in range(len(_watermarks)):
+                if _watermarks[i]:
+                    watermarks[i] = _watermarks[i]
 
-            final_stream = WatermarkCore().merge_watermarks_with_pdf(final_stream, watermarks)
-
-        return final_stream
+        return WatermarkCore().merge_watermarks_with_pdf(Utils().generate_stream(template_pdf), watermarks)
 
     @staticmethod
     def simple_fill(template_stream: bytes, data: dict, editable: bool) -> bytes:
