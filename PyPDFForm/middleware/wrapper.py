@@ -93,7 +93,7 @@ class PyPDFForm(object):
             raise InvalidEditableParameterError
 
         self.stream = FillerCore().simple_fill(
-            self.stream, UtilsCore().bool_to_checkboxes(data), editable
+            self.stream, data, editable
         )
 
         return self

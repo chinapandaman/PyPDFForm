@@ -68,6 +68,7 @@ class Filler(object):
         """Fills a PDF form in simple mode."""
 
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
+        data = Utils().bool_to_checkboxes(data)
 
         for element in TemplateCore().iterate_elements(template_pdf):
             key = TemplateCore().get_element_key(element)
