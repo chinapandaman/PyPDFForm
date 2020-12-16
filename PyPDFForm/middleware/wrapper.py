@@ -65,6 +65,9 @@ class PyPDFForm(object):
 
         TemplateMiddleware().validate_stream(self.stream)
 
+        if not isinstance(data, dict):
+            raise InvalidFormDataError
+
         for k, v in data.items():
             if k in self.elements:
                 self.elements[k].value = v
