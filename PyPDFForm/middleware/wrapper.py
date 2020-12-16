@@ -47,11 +47,12 @@ class PyPDFForm(object):
             self.elements = TemplateMiddleware().build_elements(template)
 
             for each in self.elements.values():
-                each.font_size = global_font_size
-                each.font_color = global_font_color
-                each.text_x_offset = global_text_x_offset
-                each.text_y_offset = global_text_y_offset
-                each.text_wrap_length = global_text_wrap_length
+                if each.type == ElementType.text:
+                    each.font_size = global_font_size
+                    each.font_color = global_font_color
+                    each.text_x_offset = global_text_x_offset
+                    each.text_y_offset = global_text_y_offset
+                    each.text_wrap_length = global_text_wrap_length
                 each.validate_constants()
                 each.validate_value()
                 each.validate_text_attributes()
@@ -72,7 +73,7 @@ class PyPDFForm(object):
                 self.elements[k].validate_text_attributes()
 
         self.stream = FillerCore().fill(
-            self.stream, [each for each in self.elements.values()]
+            self.stream, self.elements
         )
 
         return self

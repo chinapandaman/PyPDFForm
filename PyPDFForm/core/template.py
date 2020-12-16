@@ -71,6 +71,6 @@ class Template(object):
     def get_element_coordinates(element: "pdfrw.PdfDict") -> Tuple[Union[float, int], Union[float, int]]:
         """Returns its coordinates given a PDF form element."""
 
-        return (element[TemplateCoreConstants().annotation_rectangle_key][0],
-                (element[TemplateCoreConstants().annotation_rectangle_key][1]
-                 + element[TemplateCoreConstants().annotation_rectangle_key[3]]) / 2)
+        return (float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
+                (float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+                 + float(element[TemplateCoreConstants().annotation_rectangle_key][3])) / 2)
