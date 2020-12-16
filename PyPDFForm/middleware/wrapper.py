@@ -22,7 +22,17 @@ from .template import Template as TemplateMiddleware
 class PyPDFForm(object):
     """A class to represent a PDF form."""
 
-    def __init__(self, template: bytes = b"", simple_mode: bool = True) -> None:
+    def __init__(self,
+                 template: bytes = b"",
+                 simple_mode: bool = True,
+                 global_font_size: Union[float, int] = TextConstants().global_font_size,
+                 global_font_color: Tuple[
+                     Union[float, int], Union[float, int], Union[float, int]
+                 ] = TextConstants().global_font_color,
+                 global_text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
+                 global_text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
+                 global_text_wrap_length: int = TextConstants().global_text_wrap_length,
+                 ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
         TemplateMiddleware().validate_template(template)
@@ -37,9 +47,35 @@ class PyPDFForm(object):
             self.elements = TemplateMiddleware().build_elements(template)
 
             for each in self.elements.values():
+                each.font_size = global_font_size
+                each.font_color = global_font_color
+                each.text_x_offset = global_text_x_offset
+                each.text_y_offset = global_text_y_offset
+                each.text_wrap_length = global_text_wrap_length
                 each.validate_constants()
                 each.validate_value()
                 each.validate_text_attributes()
+
+    def _fill(
+        self,
+        data: dict,
+    ) -> "PyPDFForm":
+        """Fill a PDF form with customized parameters."""
+
+        TemplateMiddleware().validate_stream(self.stream)
+
+        for k, v in data.items():
+            if k in self.elements:
+                self.elements[k].value = v
+                self.elements[k].validate_constants()
+                self.elements[k].validate_value()
+                self.elements[k].validate_text_attributes()
+
+        self.stream = FillerCore().fill(
+            self.stream, [each for each in self.elements.values()]
+        )
+
+        return self
 
     def _simple_fill(self, data: dict, editable: bool = False) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
@@ -73,6 +109,8 @@ class PyPDFForm(object):
         text_wrap_length: int = TextConstants().global_text_wrap_length,
     ) -> "PyPDFForm":
         """Draws a text on a PDF form."""
+
+        TemplateMiddleware().validate_stream(self.stream)
 
         if not isinstance(text, str):
             raise InvalidTextError
@@ -126,6 +164,8 @@ class PyPDFForm(object):
         rotation: Union[float, int] = 0,
     ) -> "PyPDFForm":
         """Draws an image on a PDF form."""
+
+        TemplateMiddleware().validate_stream(self.stream)
 
         if not (isinstance(rotation, float) or isinstance(rotation, int)):
             raise InvalidImageRotationAngleError
