@@ -126,6 +126,13 @@ def test_validate_draw_text_inputs(template_stream):
     bad_inputs = [1, "1", "300", "225", "20", [1, 0, 0], "50", "50", "4"]
 
     try:
+        obj = PyPDFForm(b"bad_stream")
+        obj.draw_text(*bad_inputs)
+        assert False
+    except InvalidTemplateError:
+        assert True
+
+    try:
         PyPDFForm(template_stream).draw_text(*bad_inputs)
         assert False
     except InvalidTextError:
@@ -202,6 +209,13 @@ def test_validate_draw_text_inputs(template_stream):
 
 def test_validate_draw_image_inputs(template_stream, image_stream):
     bad_inputs = [b"", "1", "100", "100", "400", "225", "180"]
+
+    try:
+        obj = PyPDFForm(b"bad_stream")
+        obj.draw_image(*bad_inputs)
+        assert False
+    except InvalidTemplateError:
+        assert True
 
     try:
         PyPDFForm(template_stream).draw_image(*bad_inputs)
