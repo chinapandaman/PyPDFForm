@@ -4,7 +4,6 @@ from typing import Tuple, Union
 
 from ..core.filler import Filler as FillerCore
 from ..core.image import Image as ImageCore
-from ..core.utils import Utils as UtilsCore
 from ..core.watermark import Watermark as WatermarkCore
 from .constants import Text as TextConstants
 from .element import Element as ElementMiddleware
@@ -22,7 +21,18 @@ from .template import Template as TemplateMiddleware
 class PyPDFForm(object):
     """A class to represent a PDF form."""
 
-    def __init__(self, template: bytes = b"", simple_mode: bool = True) -> None:
+    def __init__(
+        self,
+        template: bytes = b"",
+        simple_mode: bool = True,
+        global_font_size: Union[float, int] = TextConstants().global_font_size,
+        global_font_color: Tuple[
+            Union[float, int], Union[float, int], Union[float, int]
+        ] = TextConstants().global_font_color,
+        global_text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
+        global_text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
+        global_text_wrap_length: int = TextConstants().global_text_wrap_length,
+    ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
         TemplateMiddleware().validate_template(template)
@@ -31,15 +41,46 @@ class PyPDFForm(object):
 
         self.stream = template
         self.simple_mode = simple_mode
-        self.fill = self._simple_fill
+        self.fill = self._simple_fill if simple_mode else self._fill
 
         if not simple_mode:
-            self.elements = TemplateMiddleware().build_elements(template)
+            self.elements = {}
+            if template:
+                TemplateMiddleware().validate_stream(template)
+                self.elements = TemplateMiddleware().build_elements(template)
 
             for each in self.elements.values():
+                if each.type == ElementType.text:
+                    each.font_size = global_font_size
+                    each.font_color = global_font_color
+                    each.text_x_offset = global_text_x_offset
+                    each.text_y_offset = global_text_y_offset
+                    each.text_wrap_length = global_text_wrap_length
                 each.validate_constants()
                 each.validate_value()
                 each.validate_text_attributes()
+
+    def _fill(
+        self,
+        data: dict,
+    ) -> "PyPDFForm":
+        """Fill a PDF form with customized parameters."""
+
+        TemplateMiddleware().validate_stream(self.stream)
+
+        if not isinstance(data, dict):
+            raise InvalidFormDataError
+
+        for k, v in data.items():
+            if k in self.elements:
+                self.elements[k].value = v
+                self.elements[k].validate_constants()
+                self.elements[k].validate_value()
+                self.elements[k].validate_text_attributes()
+
+        self.stream = FillerCore().fill(self.stream, self.elements)
+
+        return self
 
     def _simple_fill(self, data: dict, editable: bool = False) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
@@ -52,9 +93,7 @@ class PyPDFForm(object):
         if not (isinstance(editable, bool)):
             raise InvalidEditableParameterError
 
-        self.stream = FillerCore().simple_fill(
-            self.stream, UtilsCore().bool_to_checkboxes(data), editable
-        )
+        self.stream = FillerCore().simple_fill(self.stream, data, editable)
 
         return self
 
@@ -73,6 +112,8 @@ class PyPDFForm(object):
         text_wrap_length: int = TextConstants().global_text_wrap_length,
     ) -> "PyPDFForm":
         """Draws a text on a PDF form."""
+
+        TemplateMiddleware().validate_stream(self.stream)
 
         if not isinstance(text, str):
             raise InvalidTextError
@@ -126,6 +167,8 @@ class PyPDFForm(object):
         rotation: Union[float, int] = 0,
     ) -> "PyPDFForm":
         """Draws an image on a PDF form."""
+
+        TemplateMiddleware().validate_stream(self.stream)
 
         if not (isinstance(rotation, float) or isinstance(rotation, int)):
             raise InvalidImageRotationAngleError

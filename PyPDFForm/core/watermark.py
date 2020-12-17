@@ -31,6 +31,9 @@ class Watermark(object):
         y = args[3]
         font = args[4]
 
+        if not element.value:
+            element.value = ""
+
         c.setFont(font, element.font_size)
         c.setFillColorRGB(
             element.font_color[0], element.font_color[1], element.font_color[2]

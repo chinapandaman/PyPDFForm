@@ -34,3 +34,9 @@ class Utils(object):
                 result[k] = pdfrw.PdfName.Yes if v else pdfrw.PdfName.Off
 
         return result
+
+    @staticmethod
+    def bool_to_checkbox(data: bool) -> "pdfrw.PdfName":
+        """Converts a boolean value into a PDF checkbox object."""
+
+        return pdfrw.PdfName.Yes if data else pdfrw.PdfName.Off

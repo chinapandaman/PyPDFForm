@@ -13,6 +13,7 @@ from PyPDFForm.middleware.exceptions.input import (
     InvalidFormDataError, InvalidImageDimensionError, InvalidImageError,
     InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError,
     InvalidTextError)
+from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
 from PyPDFForm.middleware.wrapper import PyPDFForm
 
 
@@ -33,14 +34,89 @@ def image_stream(pdf_samples):
         return f.read()
 
 
-def test_validate_constructor_inputs():
-    bad_inputs = [b"", "True"]
+def test_validate_constructor_inputs(template_stream):
+    bad_inputs = ["", "True", "12", ("0", "0", "0"), "0", "0", "100"]
+
+    try:
+        PyPDFForm(*bad_inputs)
+        assert False
+    except InvalidTemplateError:
+        assert True
+
+    bad_inputs[0] = b"bad_stream"
 
     try:
         PyPDFForm(*bad_inputs)
         assert False
     except InvalidModeError:
         assert True
+
+    bad_inputs[1] = False
+
+    try:
+        PyPDFForm(*bad_inputs)
+        assert False
+    except InvalidTemplateError:
+        assert True
+
+    bad_inputs[0] = template_stream
+
+    try:
+        PyPDFForm(*bad_inputs)
+        assert False
+    except InvalidFontSizeError:
+        assert True
+
+    bad_inputs[2] = 12
+
+    try:
+        PyPDFForm(*bad_inputs)
+        assert False
+    except InvalidFontColorError:
+        assert True
+
+    bad_inputs[3] = (0, 0, 0)
+
+    try:
+        PyPDFForm(*bad_inputs)
+        assert False
+    except InvalidTextOffsetError:
+        assert True
+
+    bad_inputs[4] = 0
+
+    try:
+        PyPDFForm(*bad_inputs)
+        assert False
+    except InvalidTextOffsetError:
+        assert True
+
+    bad_inputs[5] = 0
+
+    try:
+        PyPDFForm(*bad_inputs)
+        assert False
+    except InvalidWrapLengthError:
+        assert True
+
+    bad_inputs[6] = 100
+    bad_inputs[0] = b""
+    obj = PyPDFForm(*bad_inputs)
+    assert obj.elements == {}
+
+
+def test_validate_fill_inputs(template_stream):
+    bad_inputs = ["not_dict"]
+
+    try:
+        PyPDFForm(template_stream, False).fill(*bad_inputs)
+        assert False
+    except InvalidFormDataError:
+        assert True
+
+    bad_inputs[0] = {}
+    PyPDFForm(template_stream, False).fill(*bad_inputs)
+    assert True
 
 
 def test_validate_simple_fill_inputs(template_stream):
@@ -59,9 +135,20 @@ def test_validate_simple_fill_inputs(template_stream):
     except InvalidEditableParameterError:
         assert True
 
+    bad_inputs[1] = True
+    PyPDFForm(template_stream).fill(*bad_inputs)
+    assert True
+
 
 def test_validate_draw_text_inputs(template_stream):
     bad_inputs = [1, "1", "300", "225", "20", [1, 0, 0], "50", "50", "4"]
+
+    try:
+        obj = PyPDFForm(b"bad_stream")
+        obj.draw_text(*bad_inputs)
+        assert False
+    except InvalidTemplateError:
+        assert True
 
     try:
         PyPDFForm(template_stream).draw_text(*bad_inputs)
@@ -140,6 +227,13 @@ def test_validate_draw_text_inputs(template_stream):
 
 def test_validate_draw_image_inputs(template_stream, image_stream):
     bad_inputs = [b"", "1", "100", "100", "400", "225", "180"]
+
+    try:
+        obj = PyPDFForm(b"bad_stream")
+        obj.draw_image(*bad_inputs)
+        assert False
+    except InvalidTemplateError:
+        assert True
 
     try:
         PyPDFForm(template_stream).draw_image(*bad_inputs)
