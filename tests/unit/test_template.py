@@ -5,6 +5,7 @@ import os
 import pdfrw
 import pytest
 
+from PyPDFForm.core.constants import Template as TemplateCoreConstants
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
 from PyPDFForm.middleware.template import Template as TemplateMiddleware
@@ -111,3 +112,12 @@ def test_build_elements(template_stream, data_dict):
 
     for k in data_dict.keys():
         assert data_dict[k]
+
+
+def test_get_element_coordinates(template_stream):
+    for element in TemplateCore().iterate_elements(template_stream):
+        assert TemplateCore().get_element_coordinates(element) == (
+            float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
+            (float(element[TemplateCoreConstants().annotation_rectangle_key][1]) +
+             float(element[TemplateCoreConstants().annotation_rectangle_key][3])) / 2
+        )
