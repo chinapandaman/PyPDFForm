@@ -5,6 +5,7 @@ import os
 import pytest
 
 from PyPDFForm.middleware.wrapper import PyPDFForm
+from PyPDFForm.middleware.element import ElementType
 
 
 @pytest.fixture
@@ -55,3 +56,26 @@ def test_fill_simple_mode_editable(template_stream, pdf_samples, data_dict):
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_fill_non_simple_mode_font_20(template_stream, pdf_samples, data_dict):
+    with open(os.path.join(pdf_samples, "sample_filled_font_20.pdf"), "rb+") as f:
+        obj = PyPDFForm(template_stream, simple_mode=False, global_font_size=20).fill(
+            data_dict,
+        )
+
+        expected = f.read()
+
+        assert obj.stream == expected
+
+        for k, v in obj.elements.items():
+            assert k in data_dict
+            assert v.name in data_dict
+            assert v.value == data_dict[k]
+
+            if v.type == ElementType.text:
+                assert v.font_size == 20
+                assert v.font_color == (0, 0, 0)
+                assert v.text_x_offset == 0
+                assert v.text_y_offset == 0
+                assert v.text_wrap_length == 100
