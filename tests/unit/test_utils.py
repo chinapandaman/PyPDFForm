@@ -26,3 +26,8 @@ def test_bool_to_checkboxes(data_dict):
     for k, v in Utils().bool_to_checkboxes(result).items():
         if isinstance(data_dict[k], bool):
             assert v == (pdfrw.PdfName.Yes if data_dict[k] else pdfrw.PdfName.Off)
+
+
+def test_bool_to_checkbox():
+    assert Utils().bool_to_checkbox(True) == pdfrw.PdfName.Yes
+    assert Utils().bool_to_checkbox(False) == pdfrw.PdfName.Off
