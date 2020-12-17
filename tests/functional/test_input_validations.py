@@ -105,6 +105,20 @@ def test_validate_constructor_inputs(template_stream):
     assert obj.elements == {}
 
 
+def test_validate_fill_inputs(template_stream):
+    bad_inputs = ["not_dict"]
+
+    try:
+        PyPDFForm(template_stream, False).fill(*bad_inputs)
+        assert False
+    except InvalidFormDataError:
+        assert True
+
+    bad_inputs[0] = {}
+    PyPDFForm(template_stream, False).fill(*bad_inputs)
+    assert True
+
+
 def test_validate_simple_fill_inputs(template_stream):
     bad_inputs = ["not_dict", "True"]
 
@@ -120,6 +134,10 @@ def test_validate_simple_fill_inputs(template_stream):
         PyPDFForm(template_stream).fill(*bad_inputs)
     except InvalidEditableParameterError:
         assert True
+
+    bad_inputs[1] = True
+    PyPDFForm(template_stream).fill(*bad_inputs)
+    assert True
 
 
 def test_validate_draw_text_inputs(template_stream):

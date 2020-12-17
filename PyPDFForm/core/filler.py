@@ -4,6 +4,7 @@ import pdfrw
 from typing import Dict
 
 from ..middleware.element import Element as ElementMiddleware
+from ..middleware.element import ElementType
 from ..middleware.constants import Text as TextConstants
 from .constants import Template as TemplateConstants
 from .template import Template as TemplateCore
@@ -34,7 +35,7 @@ class Filler(object):
                         "/", ""
                     ): pdfrw.PdfObject(1)
                 }
-                if isinstance(elements[key].value, bool):
+                if elements[key].type == ElementType.checkbox:
                     update_dict[TemplateConstants().checkbox_field_value_key.replace(
                             "/", ""
                     )] = Utils().bool_to_checkbox(elements[key].value)
