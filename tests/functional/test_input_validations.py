@@ -8,12 +8,12 @@ from PyPDFForm.middleware.exceptions.element import (InvalidFontColorError,
                                                      InvalidFontSizeError,
                                                      InvalidTextOffsetError,
                                                      InvalidWrapLengthError)
-from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
 from PyPDFForm.middleware.exceptions.input import (
     InvalidCoordinateError, InvalidEditableParameterError,
     InvalidFormDataError, InvalidImageDimensionError, InvalidImageError,
     InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError,
     InvalidTextError)
+from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
 from PyPDFForm.middleware.wrapper import PyPDFForm
 
 

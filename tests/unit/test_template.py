@@ -65,12 +65,18 @@ def test_iterate_elements_and_get_element_key(template_stream, data_dict):
 
 def test_get_elements_by_page(template_stream):
     expected = {
-        1: {"test": False,
-            "check": False, },
-        2: {"test_2": False,
-            "check_2": False, },
-        3: {"test_3": False,
-            "check_3": False, }
+        1: {
+            "test": False,
+            "check": False,
+        },
+        2: {
+            "test_2": False,
+            "check_2": False,
+        },
+        3: {
+            "test_3": False,
+            "check_3": False,
+        },
     }
 
     for page, elements in TemplateCore().get_elements_by_page(template_stream).items():
@@ -118,6 +124,9 @@ def test_get_element_coordinates(template_stream):
     for element in TemplateCore().iterate_elements(template_stream):
         assert TemplateCore().get_element_coordinates(element) == (
             float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
-            (float(element[TemplateCoreConstants().annotation_rectangle_key][1]) +
-             float(element[TemplateCoreConstants().annotation_rectangle_key][3])) / 2
+            (
+                float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+                + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+            )
+            / 2,
         )

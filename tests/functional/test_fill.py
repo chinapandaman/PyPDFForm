@@ -4,9 +4,9 @@ import os
 
 import pytest
 
-from PyPDFForm.middleware.wrapper import PyPDFForm
-from PyPDFForm.middleware.element import ElementType
 from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.middleware.element import ElementType
+from PyPDFForm.middleware.wrapper import PyPDFForm
 
 
 @pytest.fixture
@@ -83,8 +83,12 @@ def test_fill_non_simple_mode_font_20(template_stream, pdf_samples, data_dict):
 
 
 def test_fill_non_simple_mode_font_color_red(template_stream, pdf_samples, data_dict):
-    with open(os.path.join(pdf_samples, "sample_filled_font_color_red.pdf"), "rb+") as f:
-        obj = PyPDFForm(template_stream, simple_mode=False, global_font_color=(1, 0, 0)).fill(
+    with open(
+        os.path.join(pdf_samples, "sample_filled_font_color_red.pdf"), "rb+"
+    ) as f:
+        obj = PyPDFForm(
+            template_stream, simple_mode=False, global_font_color=(1, 0, 0)
+        ).fill(
             data_dict,
         )
 
@@ -107,7 +111,12 @@ def test_fill_non_simple_mode_font_color_red(template_stream, pdf_samples, data_
 
 def test_fill_non_simple_mode_offset_100(template_stream, pdf_samples, data_dict):
     with open(os.path.join(pdf_samples, "sample_filled_offset_100.pdf"), "rb+") as f:
-        obj = PyPDFForm(template_stream, simple_mode=False, global_text_x_offset=100, global_text_y_offset=-100).fill(
+        obj = PyPDFForm(
+            template_stream,
+            simple_mode=False,
+            global_text_x_offset=100,
+            global_text_y_offset=-100,
+        ).fill(
             data_dict,
         )
 
@@ -130,7 +139,9 @@ def test_fill_non_simple_mode_offset_100(template_stream, pdf_samples, data_dict
 
 def test_fill_non_simple_mode_wrap_2(template_stream, pdf_samples, data_dict):
     with open(os.path.join(pdf_samples, "sample_filled_text_wrap_2.pdf"), "rb+") as f:
-        obj = PyPDFForm(template_stream, simple_mode=False, global_text_wrap_length=2).fill(
+        obj = PyPDFForm(
+            template_stream, simple_mode=False, global_text_wrap_length=2
+        ).fill(
             data_dict,
         )
 
@@ -151,8 +162,12 @@ def test_fill_non_simple_mode_wrap_2(template_stream, pdf_samples, data_dict):
                 assert v.text_wrap_length == 2
 
 
-def test_fill_non_simple_mode_with_customized_elements(template_stream, pdf_samples, data_dict):
-    with open(os.path.join(pdf_samples, "sample_filled_customized_elements.pdf"), "rb+") as f:
+def test_fill_non_simple_mode_with_customized_elements(
+    template_stream, pdf_samples, data_dict
+):
+    with open(
+        os.path.join(pdf_samples, "sample_filled_customized_elements.pdf"), "rb+"
+    ) as f:
         obj = PyPDFForm(template_stream, simple_mode=False)
 
         obj.elements["test"].font_size = 20
@@ -176,9 +191,16 @@ def test_fill_non_simple_mode_with_customized_elements(template_stream, pdf_samp
 
         assert obj.elements["test"].font_size == 20
         assert obj.elements["test"].font_color == (1, 0, 0)
-        assert obj.elements["test"].text_x_offset == TextConstants().global_text_x_offset
-        assert obj.elements["test"].text_y_offset == TextConstants().global_text_y_offset
-        assert obj.elements["test"].text_wrap_length == TextConstants().global_text_wrap_length
+        assert (
+            obj.elements["test"].text_x_offset == TextConstants().global_text_x_offset
+        )
+        assert (
+            obj.elements["test"].text_y_offset == TextConstants().global_text_y_offset
+        )
+        assert (
+            obj.elements["test"].text_wrap_length
+            == TextConstants().global_text_wrap_length
+        )
 
         assert obj.elements["test_2"].font_size == TextConstants().global_font_size
         assert obj.elements["test_2"].font_color == (0, 1, 0)
@@ -188,6 +210,10 @@ def test_fill_non_simple_mode_with_customized_elements(template_stream, pdf_samp
 
         assert obj.elements["test_3"].font_size == TextConstants().global_font_size
         assert obj.elements["test_3"].font_color == TextConstants().global_font_color
-        assert obj.elements["test_3"].text_x_offset == TextConstants().global_text_x_offset
-        assert obj.elements["test_3"].text_y_offset == TextConstants().global_text_y_offset
+        assert (
+            obj.elements["test_3"].text_x_offset == TextConstants().global_text_x_offset
+        )
+        assert (
+            obj.elements["test_3"].text_y_offset == TextConstants().global_text_y_offset
+        )
         assert obj.elements["test_3"].text_wrap_length == 2

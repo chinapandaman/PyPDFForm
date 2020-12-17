@@ -8,8 +8,8 @@ import pytest
 from PyPDFForm.core.constants import Template as TemplateConstants
 from PyPDFForm.core.filler import Filler
 from PyPDFForm.core.template import Template as TemplateCore
-from PyPDFForm.middleware.template import Template as TemplateMiddleware
 from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.middleware.template import Template as TemplateMiddleware
 
 
 @pytest.fixture

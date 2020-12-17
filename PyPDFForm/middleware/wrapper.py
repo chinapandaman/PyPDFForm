@@ -21,17 +21,18 @@ from .template import Template as TemplateMiddleware
 class PyPDFForm(object):
     """A class to represent a PDF form."""
 
-    def __init__(self,
-                 template: bytes = b"",
-                 simple_mode: bool = True,
-                 global_font_size: Union[float, int] = TextConstants().global_font_size,
-                 global_font_color: Tuple[
-                     Union[float, int], Union[float, int], Union[float, int]
-                 ] = TextConstants().global_font_color,
-                 global_text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
-                 global_text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
-                 global_text_wrap_length: int = TextConstants().global_text_wrap_length,
-                 ) -> None:
+    def __init__(
+        self,
+        template: bytes = b"",
+        simple_mode: bool = True,
+        global_font_size: Union[float, int] = TextConstants().global_font_size,
+        global_font_color: Tuple[
+            Union[float, int], Union[float, int], Union[float, int]
+        ] = TextConstants().global_font_color,
+        global_text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
+        global_text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
+        global_text_wrap_length: int = TextConstants().global_text_wrap_length,
+    ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
         TemplateMiddleware().validate_template(template)
@@ -77,9 +78,7 @@ class PyPDFForm(object):
                 self.elements[k].validate_value()
                 self.elements[k].validate_text_attributes()
 
-        self.stream = FillerCore().fill(
-            self.stream, self.elements
-        )
+        self.stream = FillerCore().fill(self.stream, self.elements)
 
         return self
 
@@ -94,9 +93,7 @@ class PyPDFForm(object):
         if not (isinstance(editable, bool)):
             raise InvalidEditableParameterError
 
-        self.stream = FillerCore().simple_fill(
-            self.stream, data, editable
-        )
+        self.stream = FillerCore().simple_fill(self.stream, data, editable)
 
         return self
 
