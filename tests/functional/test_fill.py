@@ -126,3 +126,26 @@ def test_fill_non_simple_mode_offset_100(template_stream, pdf_samples, data_dict
                 assert v.text_x_offset == 100
                 assert v.text_y_offset == -100
                 assert v.text_wrap_length == TextConstants().global_text_wrap_length
+
+
+def test_fill_non_simple_mode_wrap_2(template_stream, pdf_samples, data_dict):
+    with open(os.path.join(pdf_samples, "sample_filled_text_wrap_2.pdf"), "rb+") as f:
+        obj = PyPDFForm(template_stream, simple_mode=False, global_text_wrap_length=2).fill(
+            data_dict,
+        )
+
+        expected = f.read()
+
+        assert obj.stream == expected
+
+        for k, v in obj.elements.items():
+            assert k in data_dict
+            assert v.name in data_dict
+            assert v.value == data_dict[k]
+
+            if v.type == ElementType.text:
+                assert v.font_size == TextConstants().global_font_size
+                assert v.font_color == TextConstants().global_font_color
+                assert v.text_x_offset == TextConstants().global_text_x_offset
+                assert v.text_y_offset == TextConstants().global_text_y_offset
+                assert v.text_wrap_length == 2
