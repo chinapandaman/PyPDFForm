@@ -43,7 +43,10 @@ class PyPDFForm(object):
         self.fill = self._simple_fill if simple_mode else self._fill
 
         if not simple_mode:
-            self.elements = TemplateMiddleware().build_elements(template)
+            self.elements = {}
+            if template:
+                TemplateMiddleware().validate_stream(template)
+                self.elements = TemplateMiddleware().build_elements(template)
 
             for each in self.elements.values():
                 if each.type == ElementType.text:
