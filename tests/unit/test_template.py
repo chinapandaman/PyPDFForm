@@ -62,6 +62,25 @@ def test_iterate_elements_and_get_element_key(template_stream, data_dict):
         assert data_dict[k]
 
 
+def test_get_elements_by_page(template_stream):
+    expected = {
+        1: {"test": False,
+            "check": False, },
+        2: {"test_2": False,
+            "check_2": False, },
+        3: {"test_3": False,
+            "check_3": False, }
+    }
+
+    for page, elements in TemplateCore().get_elements_by_page(template_stream).items():
+        for each in elements:
+            expected[page][TemplateCore().get_element_key(each)] = True
+
+    for page, elements in expected.items():
+        for k in elements.keys():
+            assert expected[page][k]
+
+
 def test_get_element_type(template_stream):
     type_mapping = {
         "test": "/Tx",
