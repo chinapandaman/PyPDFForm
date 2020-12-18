@@ -92,11 +92,16 @@ class Template(object):
         pdf_file = pdfrw.PdfReader(fdata=pdf)
 
         for element in self.iterate_elements(pdf_file):
+            base_key = self.get_element_key(element)
+            existed_uuid = ""
+            if UUID().separator in base_key:
+                base_key, existed_uuid = base_key.split(UUID().separator)
+
             update_dict = {
                 TemplateCoreConstants().annotation_field_key.replace("/", ""): "{}{}{}".format(
-                    element[TemplateCoreConstants().annotation_field_key][1:-1],
+                    base_key,
                     UUID().separator,
-                    _uuid
+                    existed_uuid or _uuid
                 )
             }
             element.update(
