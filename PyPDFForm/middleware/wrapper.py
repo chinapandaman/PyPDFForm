@@ -5,6 +5,8 @@ from typing import Tuple, Union
 from ..core.filler import Filler as FillerCore
 from ..core.image import Image as ImageCore
 from ..core.watermark import Watermark as WatermarkCore
+from ..core.utils import Utils as UtilsCore
+from ..core.template import Template as TemplateCore
 from .constants import Text as TextConstants
 from .element import Element as ElementMiddleware
 from .element import ElementType
@@ -59,6 +61,25 @@ class PyPDFForm(object):
                 each.validate_constants()
                 each.validate_value()
                 each.validate_text_attributes()
+
+    def __add__(self, other: "PyPDFForm") -> "PyPDFForm":
+        """Overloaded addition operator to perform merging PDFs."""
+
+        if not self.stream:
+            return other
+
+        if not other.stream:
+            return self
+
+        TemplateMiddleware().validate_stream(self.stream)
+        TemplateMiddleware().validate_stream(other.stream)
+
+        pdf_one = TemplateCore().assign_uuid(self.stream)
+        pdf_two = TemplateCore().assign_uuid(other.stream)
+
+        self.stream = UtilsCore().merge_two_pdfs(pdf_one, pdf_two)
+
+        return self
 
     def _fill(
         self,

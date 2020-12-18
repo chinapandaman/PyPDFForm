@@ -57,3 +57,13 @@ class Template(object):
         """Used for identifying if an element is still editable for pdfrw parsed PDF form."""
 
         return "/Ff"
+
+
+class UUID(object):
+    """Contains constants for uuid used for PDF merging."""
+
+    @property
+    def separator(self) -> str:
+        """Used for separating uuid from annotated name."""
+
+        return "_e65c5a97ecc14cf79e4e86f5365be93b_"

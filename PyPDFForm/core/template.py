@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from typing import Dict, List, Tuple, Union
+import uuid
 
 import pdfrw
 
-from .constants import Template as TemplateCoreConstants
+from .constants import Template as TemplateCoreConstants, UUID
+from .utils import Utils
 
 
 class Template(object):
@@ -83,3 +85,22 @@ class Template(object):
             )
             / 2,
         )
+
+    def assign_uuid(self, pdf: bytes) -> bytes:
+        _uuid = uuid.uuid4().hex
+
+        pdf_file = pdfrw.PdfReader(fdata=pdf)
+
+        for element in self.iterate_elements(pdf_file):
+            update_dict = {
+                TemplateCoreConstants().annotation_field_key.replace("/", ""): "{}{}{}".format(
+                    element[TemplateCoreConstants().annotation_field_key][1:-1],
+                    UUID().separator,
+                    _uuid
+                )
+            }
+            element.update(
+                pdfrw.PdfDict(**update_dict)
+            )
+
+        return Utils().generate_stream(pdf_file)

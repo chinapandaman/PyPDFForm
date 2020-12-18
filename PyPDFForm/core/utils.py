@@ -40,3 +40,21 @@ class Utils(object):
         """Converts a boolean value into a PDF checkbox object."""
 
         return pdfrw.PdfName.Yes if data else pdfrw.PdfName.Off
+
+    @staticmethod
+    def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
+        """Merges two PDFs into one PDF."""
+
+        writer = pdfrw.PdfWriter()
+
+        writer.addpages(pdfrw.PdfReader(fdata=pdf).pages)
+        writer.addpages(pdfrw.PdfReader(fdata=other).pages)
+
+        result_stream = BytesIO()
+        writer.write(result_stream)
+        result_stream.seek(0)
+
+        result = result_stream.read()
+        result_stream.close()
+
+        return result
