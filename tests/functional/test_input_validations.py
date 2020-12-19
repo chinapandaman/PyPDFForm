@@ -105,6 +105,30 @@ def test_validate_constructor_inputs(template_stream):
     assert obj.elements == {}
 
 
+def test_validate_addition_operator_inputs(template_stream):
+    assert (PyPDFForm() + PyPDFForm(template_stream)).stream == template_stream
+    assert (PyPDFForm(template_stream) + PyPDFForm()).stream == template_stream
+
+    result = PyPDFForm(b"bad_stream")
+
+    try:
+        result += PyPDFForm(b"bad_stream")
+        assert False
+    except InvalidTemplateError:
+        assert True
+
+    result.stream = template_stream
+
+    try:
+        result += PyPDFForm(b"bad_stream")
+        assert False
+    except InvalidTemplateError:
+        assert True
+
+    result += PyPDFForm(template_stream)
+    assert True
+
+
 def test_validate_fill_inputs(template_stream):
     bad_inputs = ["not_dict"]
 

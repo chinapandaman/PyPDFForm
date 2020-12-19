@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import uuid
 from typing import Dict, List, Tuple, Union
 
 import pdfrw
 
+from .constants import Merge as MergeConstants
 from .constants import Template as TemplateCoreConstants
+from .utils import Utils
 
 
 class Template(object):
@@ -83,3 +86,27 @@ class Template(object):
             )
             / 2,
         )
+
+    def assign_uuid(self, pdf: bytes) -> bytes:
+        """Appends a separator and uuid after each element's annotated name."""
+
+        _uuid = uuid.uuid4().hex
+
+        pdf_file = pdfrw.PdfReader(fdata=pdf)
+
+        for element in self.iterate_elements(pdf_file):
+            base_key = self.get_element_key(element)
+            existed_uuid = ""
+            if MergeConstants().separator in base_key:
+                base_key, existed_uuid = base_key.split(MergeConstants().separator)
+
+            update_dict = {
+                TemplateCoreConstants().annotation_field_key.replace(
+                    "/", ""
+                ): "{}{}{}".format(
+                    base_key, MergeConstants().separator, existed_uuid or _uuid
+                )
+            }
+            element.update(pdfrw.PdfDict(**update_dict))
+
+        return Utils().generate_stream(pdf_file)

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
+import uuid
 
 import pdfrw
 import pytest
 
+from PyPDFForm.core.constants import Merge as MergeCoreConstants
 from PyPDFForm.core.constants import Template as TemplateCoreConstants
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
@@ -130,3 +132,19 @@ def test_get_element_coordinates(template_stream):
             )
             / 2,
         )
+
+
+def test_assign_uuid(template_stream, data_dict):
+    for element in TemplateCore().iterate_elements(
+        TemplateCore().assign_uuid(template_stream)
+    ):
+        key = TemplateCore().get_element_key(element)
+        assert MergeCoreConstants().separator in key
+
+        key, _uuid = key.split(MergeCoreConstants().separator)
+
+        assert len(_uuid) == len(uuid.uuid4().hex)
+        data_dict[key] = True
+
+    for k in data_dict.keys():
+        assert data_dict[k]
