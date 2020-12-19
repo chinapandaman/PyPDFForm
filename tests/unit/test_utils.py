@@ -33,6 +33,19 @@ def data_dict():
     }
 
 
+def test_generate_stream(template_stream, data_dict):
+    template = TemplateCore().get_elements_by_page(template_stream)
+    result = TemplateCore().get_elements_by_page(Utils.generate_stream(pdfrw.PdfReader(fdata=template_stream)))
+
+    page_count = len(template.keys())
+    result_page_count = len(result.keys())
+    for elements in result.values():
+        for element in elements:
+            assert TemplateCore().get_element_key(element) in data_dict
+
+    assert page_count == result_page_count
+
+
 def test_bool_to_checkboxes(data_dict):
     result = deepcopy(data_dict)
 
