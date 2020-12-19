@@ -87,6 +87,8 @@ class Template(object):
         )
 
     def assign_uuid(self, pdf: bytes) -> bytes:
+        """Appends a separator and uuid after each element's annotated name."""
+
         _uuid = uuid.uuid4().hex
 
         pdf_file = pdfrw.PdfReader(fdata=pdf)
