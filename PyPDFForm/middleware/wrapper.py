@@ -65,6 +65,9 @@ class PyPDFForm(object):
     def __add__(self, other: "PyPDFForm") -> "PyPDFForm":
         """Overloaded addition operator to perform merging PDFs."""
 
+        if not isinstance(other, PyPDFForm):
+            return self
+
         if not self.stream:
             return other
 
