@@ -4,9 +4,9 @@ from typing import Tuple, Union
 
 from ..core.filler import Filler as FillerCore
 from ..core.image import Image as ImageCore
-from ..core.watermark import Watermark as WatermarkCore
-from ..core.utils import Utils as UtilsCore
 from ..core.template import Template as TemplateCore
+from ..core.utils import Utils as UtilsCore
+from ..core.watermark import Watermark as WatermarkCore
 from .constants import Text as TextConstants
 from .element import Element as ElementMiddleware
 from .element import ElementType

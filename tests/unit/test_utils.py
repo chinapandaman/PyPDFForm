@@ -6,8 +6,8 @@ from copy import deepcopy
 import pdfrw
 import pytest
 
-from PyPDFForm.core.utils import Utils
 from PyPDFForm.core.template import Template as TemplateCore
+from PyPDFForm.core.utils import Utils
 
 
 @pytest.fixture
@@ -35,7 +35,9 @@ def data_dict():
 
 def test_generate_stream(template_stream, data_dict):
     template = TemplateCore().get_elements_by_page(template_stream)
-    result = TemplateCore().get_elements_by_page(Utils.generate_stream(pdfrw.PdfReader(fdata=template_stream)))
+    result = TemplateCore().get_elements_by_page(
+        Utils.generate_stream(pdfrw.PdfReader(fdata=template_stream))
+    )
 
     page_count = len(template.keys())
     result_page_count = len(result.keys())

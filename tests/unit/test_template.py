@@ -6,7 +6,8 @@ import uuid
 import pdfrw
 import pytest
 
-from PyPDFForm.core.constants import Template as TemplateCoreConstants, Merge as MergeCoreConstants
+from PyPDFForm.core.constants import Merge as MergeCoreConstants
+from PyPDFForm.core.constants import Template as TemplateCoreConstants
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
 from PyPDFForm.middleware.template import Template as TemplateMiddleware

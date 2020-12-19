@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from typing import Dict, List, Tuple, Union
 import uuid
+from typing import Dict, List, Tuple, Union
 
 import pdfrw
 
-from .constants import Template as TemplateCoreConstants, Merge as MergeConstants
+from .constants import Merge as MergeConstants
+from .constants import Template as TemplateCoreConstants
 from .utils import Utils
 
 
@@ -100,14 +101,12 @@ class Template(object):
                 base_key, existed_uuid = base_key.split(MergeConstants().separator)
 
             update_dict = {
-                TemplateCoreConstants().annotation_field_key.replace("/", ""): "{}{}{}".format(
-                    base_key,
-                    MergeConstants().separator,
-                    existed_uuid or _uuid
+                TemplateCoreConstants().annotation_field_key.replace(
+                    "/", ""
+                ): "{}{}{}".format(
+                    base_key, MergeConstants().separator, existed_uuid or _uuid
                 )
             }
-            element.update(
-                pdfrw.PdfDict(**update_dict)
-            )
+            element.update(pdfrw.PdfDict(**update_dict))
 
         return Utils().generate_stream(pdf_file)
