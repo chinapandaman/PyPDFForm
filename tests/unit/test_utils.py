@@ -1,11 +1,24 @@
 # -*- coding: utf-8 -*-
 
+import os
 from copy import deepcopy
 
 import pdfrw
 import pytest
 
 from PyPDFForm.core.utils import Utils
+from PyPDFForm.core.template import Template as TemplateCore
+
+
+@pytest.fixture
+def pdf_samples():
+    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples", "v2")
+
+
+@pytest.fixture
+def template_stream(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_template.pdf"), "rb+") as f:
+        return f.read()
 
 
 @pytest.fixture
@@ -31,3 +44,18 @@ def test_bool_to_checkboxes(data_dict):
 def test_bool_to_checkbox():
     assert Utils().bool_to_checkbox(True) == pdfrw.PdfName.Yes
     assert Utils().bool_to_checkbox(False) == pdfrw.PdfName.Off
+
+
+def test_merge_two_pdfs(template_stream, data_dict):
+    template = TemplateCore().get_elements_by_page(template_stream)
+    result = TemplateCore().get_elements_by_page(
+        Utils().merge_two_pdfs(template_stream, template_stream)
+    )
+
+    page_count = len(template.keys())
+    merged_page_count = len(result.keys())
+    for elements in result.values():
+        for element in elements:
+            assert TemplateCore().get_element_key(element) in data_dict
+
+    assert page_count * 2 == merged_page_count
