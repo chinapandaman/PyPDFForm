@@ -59,8 +59,8 @@ class Template(object):
         return "/Ff"
 
 
-class UUID(object):
-    """Contains constants for uuid used for PDF merging."""
+class Merge(object):
+    """Contains constants for merging PDFs."""
 
     @property
     def separator(self) -> str:

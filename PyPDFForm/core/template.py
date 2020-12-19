@@ -5,7 +5,7 @@ import uuid
 
 import pdfrw
 
-from .constants import Template as TemplateCoreConstants, UUID
+from .constants import Template as TemplateCoreConstants, Merge as MergeConstants
 from .utils import Utils
 
 
@@ -94,13 +94,13 @@ class Template(object):
         for element in self.iterate_elements(pdf_file):
             base_key = self.get_element_key(element)
             existed_uuid = ""
-            if UUID().separator in base_key:
-                base_key, existed_uuid = base_key.split(UUID().separator)
+            if MergeConstants().separator in base_key:
+                base_key, existed_uuid = base_key.split(MergeConstants().separator)
 
             update_dict = {
                 TemplateCoreConstants().annotation_field_key.replace("/", ""): "{}{}{}".format(
                     base_key,
-                    UUID().separator,
+                    MergeConstants().separator,
                     existed_uuid or _uuid
                 )
             }
