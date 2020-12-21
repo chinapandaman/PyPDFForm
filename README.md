@@ -48,7 +48,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         output.write(filled_pdf.stream)
 ```
 
-After running the above code snippet you can find `output.pdf` at the location you specified 
+After running the above code snippet you can find `output.pdf` at the location you specified, 
 and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_filled_font_20.pdf).
 
 ## Documentation
@@ -66,11 +66,11 @@ functional tests. Tests can be run by first installing dependencies using
 pip install -r requirements.txt
 ```
 
-Alternatively, there is a bash script which will setup a python virtual environment 
+Alternatively, there is a Makefile rule which will set up a python virtual environment 
 and install all needed dependencies if you are running Linux:
 
 ```shell script
-./scripts/build.sh
+make build
 ```
 
 In order to run tests, source root needs to be added to PYTHONPATH by running 
@@ -86,8 +86,8 @@ From there run tests using:
 pytest -v
 ```
 
-Or you can use this bash script to do the above two steps if you are running Linux:
+Or you can use this Makefile rule to do the above two steps if you are running Linux:
 
 ```shell script
-./scripts/test.sh
+make test
 ```
