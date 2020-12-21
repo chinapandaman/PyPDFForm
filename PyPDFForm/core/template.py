@@ -8,6 +8,7 @@ import pdfrw
 from .constants import Merge as MergeConstants
 from .constants import Template as TemplateCoreConstants
 from .utils import Utils
+from ..middleware.element import ElementType
 
 
 class Template(object):
@@ -67,10 +68,15 @@ class Template(object):
         return element[TemplateCoreConstants().annotation_field_key][1:-1]
 
     @staticmethod
-    def get_element_type(element: "pdfrw.PdfDict") -> str:
+    def get_element_type(element: "pdfrw.PdfDict") -> "ElementType":
         """Returns its annotated type given a PDF form element."""
 
-        return str(element[TemplateCoreConstants().element_type_key])
+        element_type_mapping = {
+            "/Btn": ElementType.checkbox,
+            "/Tx": ElementType.text,
+        }
+
+        return element_type_mapping.get(str(element[TemplateCoreConstants().element_type_key]))
 
     @staticmethod
     def get_element_coordinates(

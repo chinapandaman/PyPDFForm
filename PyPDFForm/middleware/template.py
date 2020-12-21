@@ -28,10 +28,6 @@ class Template(object):
     def build_elements(pdf_stream: bytes) -> Dict[str, "Element"]:
         """Builds an element dict given a PDF form stream."""
 
-        element_type_mapping = {
-            "/Btn": ElementType.checkbox,
-            "/Tx": ElementType.text,
-        }
         results = {}
 
         for element in TemplateCore().iterate_elements(pdf_stream):
@@ -39,9 +35,7 @@ class Template(object):
 
             results[key] = Element(
                 element_name=key,
-                element_type=element_type_mapping.get(
-                    TemplateCore().get_element_type(element)
-                ),
+                element_type=TemplateCore().get_element_type(element),
             )
 
         return results
