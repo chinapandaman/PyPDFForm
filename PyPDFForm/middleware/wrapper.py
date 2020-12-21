@@ -96,6 +96,12 @@ class PyPDFForm(object):
             raise InvalidFormDataError
 
         for k, v in data.items():
+            if not isinstance(k, str):
+                raise InvalidFormDataError
+            if not (isinstance(v, str) or isinstance(v, bool)):
+                raise InvalidFormDataError
+
+        for k, v in data.items():
             if k in self.elements:
                 self.elements[k].value = v
                 self.elements[k].validate_constants()
@@ -115,6 +121,12 @@ class PyPDFForm(object):
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
+
+        for k, v in data.items():
+            if not isinstance(k, str):
+                raise InvalidFormDataError
+            if not (isinstance(v, str) or isinstance(v, bool)):
+                raise InvalidFormDataError
 
         if not (isinstance(editable, bool)):
             raise InvalidEditableParameterError
