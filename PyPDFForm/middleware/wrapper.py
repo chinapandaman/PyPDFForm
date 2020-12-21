@@ -8,7 +8,8 @@ from ..core.template import Template as TemplateCore
 from ..core.utils import Utils as UtilsCore
 from ..core.watermark import Watermark as WatermarkCore
 from .constants import Text as TextConstants
-from .element import Element as ElementMiddleware, ElementType
+from .element import Element as ElementMiddleware
+from .element import ElementType
 from .exceptions.input import (InvalidCoordinateError,
                                InvalidEditableParameterError,
                                InvalidFormDataError,

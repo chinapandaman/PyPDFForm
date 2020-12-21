@@ -5,7 +5,8 @@ from typing import Dict, Union
 import pdfrw
 
 from ..middleware.constants import Text as TextConstants
-from ..middleware.element import Element as ElementMiddleware, ElementType
+from ..middleware.element import Element as ElementMiddleware
+from ..middleware.element import ElementType
 from .constants import Template as TemplateConstants
 from .template import Template as TemplateCore
 from .utils import Utils
