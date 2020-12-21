@@ -3,7 +3,7 @@
 from typing import Dict
 
 from ..core.template import Template as TemplateCore
-from .element import Element, ElementType
+from .element import Element
 from .exceptions.template import InvalidTemplateError
 
 
