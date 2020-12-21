@@ -8,8 +8,7 @@ from reportlab.pdfgen import canvas
 
 from PyPDFForm.core.watermark import Watermark as WatermarkCore
 from PyPDFForm.middleware.constants import Text as TextConstants
-from PyPDFForm.middleware.element import Element as ElementMiddleware
-from PyPDFForm.middleware.element import ElementType
+from PyPDFForm.middleware.element import Element as ElementMiddleware, ElementType
 
 
 @pytest.fixture
