@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from typing import Dict, Union
 from copy import deepcopy
 from io import BytesIO
 
@@ -24,7 +25,7 @@ class Utils(object):
         return result
 
     @staticmethod
-    def bool_to_checkboxes(data: dict) -> dict:
+    def bool_to_checkboxes(data: Dict[str, Union[str, bool]]) -> Dict[str, Union[str, "pdfrw.PdfName"]]:
         """Converts all boolean values in input data dictionary into PDF checkbox objects."""
 
         result = deepcopy(data)
