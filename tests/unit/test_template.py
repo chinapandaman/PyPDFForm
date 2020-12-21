@@ -9,9 +9,9 @@ import pytest
 from PyPDFForm.core.constants import Merge as MergeCoreConstants
 from PyPDFForm.core.constants import Template as TemplateCoreConstants
 from PyPDFForm.core.template import Template as TemplateCore
+from PyPDFForm.middleware.element import ElementType
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
 from PyPDFForm.middleware.template import Template as TemplateMiddleware
-from PyPDFForm.middleware.element import ElementType
 
 
 @pytest.fixture

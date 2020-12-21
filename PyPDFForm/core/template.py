@@ -5,10 +5,10 @@ from typing import Dict, List, Tuple, Union
 
 import pdfrw
 
+from ..middleware.element import ElementType
 from .constants import Merge as MergeConstants
 from .constants import Template as TemplateCoreConstants
 from .utils import Utils
-from ..middleware.element import ElementType
 
 
 class Template(object):
@@ -76,7 +76,9 @@ class Template(object):
             "/Tx": ElementType.text,
         }
 
-        return element_type_mapping.get(str(element[TemplateCoreConstants().element_type_key]))
+        return element_type_mapping.get(
+            str(element[TemplateCoreConstants().element_type_key])
+        )
 
     @staticmethod
     def get_element_coordinates(
