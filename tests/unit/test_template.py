@@ -9,6 +9,7 @@ import pytest
 from PyPDFForm.core.constants import Merge as MergeCoreConstants
 from PyPDFForm.core.constants import Template as TemplateCoreConstants
 from PyPDFForm.core.template import Template as TemplateCore
+from PyPDFForm.middleware.element import ElementType
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
 from PyPDFForm.middleware.template import Template as TemplateMiddleware
 
@@ -92,12 +93,12 @@ def test_get_elements_by_page(template_stream):
 
 def test_get_element_type(template_stream):
     type_mapping = {
-        "test": "/Tx",
-        "check": "/Btn",
-        "test_2": "/Tx",
-        "check_2": "/Btn",
-        "test_3": "/Tx",
-        "check_3": "/Btn",
+        "test": ElementType.text,
+        "check": ElementType.checkbox,
+        "test_2": ElementType.text,
+        "check_2": ElementType.checkbox,
+        "test_3": ElementType.text,
+        "check_3": ElementType.checkbox,
     }
 
     for each in TemplateCore().iterate_elements(template_stream):
@@ -130,7 +131,8 @@ def test_get_element_coordinates(template_stream):
                 float(element[TemplateCoreConstants().annotation_rectangle_key][1])
                 + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
             )
-            / 2,
+            / 2
+            - 2,
         )
 
 

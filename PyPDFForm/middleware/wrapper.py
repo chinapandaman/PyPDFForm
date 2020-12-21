@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Tuple, Union
+from typing import Dict, Tuple, Union
 
 from ..core.filler import Filler as FillerCore
 from ..core.image import Image as ImageCore
@@ -80,13 +80,14 @@ class PyPDFForm(object):
         pdf_one = TemplateCore().assign_uuid(self.stream)
         pdf_two = TemplateCore().assign_uuid(other.stream)
 
-        self.stream = UtilsCore().merge_two_pdfs(pdf_one, pdf_two)
+        new_obj = self.__class__()
+        new_obj.stream = UtilsCore().merge_two_pdfs(pdf_one, pdf_two)
 
-        return self
+        return new_obj
 
     def _fill(
         self,
-        data: dict,
+        data: Dict[str, Union[str, bool]],
     ) -> "PyPDFForm":
         """Fill a PDF form with customized parameters."""
 
@@ -94,6 +95,12 @@ class PyPDFForm(object):
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
+
+        for k, v in data.items():
+            if not isinstance(k, str):
+                raise InvalidFormDataError
+            if not (isinstance(v, str) or isinstance(v, bool)):
+                raise InvalidFormDataError
 
         for k, v in data.items():
             if k in self.elements:
@@ -106,13 +113,21 @@ class PyPDFForm(object):
 
         return self
 
-    def _simple_fill(self, data: dict, editable: bool = False) -> "PyPDFForm":
+    def _simple_fill(
+        self, data: Dict[str, Union[str, bool]], editable: bool = False
+    ) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
 
         TemplateMiddleware().validate_stream(self.stream)
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
+
+        for k, v in data.items():
+            if not isinstance(k, str):
+                raise InvalidFormDataError
+            if not (isinstance(v, str) or isinstance(v, bool)):
+                raise InvalidFormDataError
 
         if not (isinstance(editable, bool)):
             raise InvalidEditableParameterError
