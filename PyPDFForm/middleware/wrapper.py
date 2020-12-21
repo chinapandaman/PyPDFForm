@@ -106,7 +106,9 @@ class PyPDFForm(object):
 
         return self
 
-    def _simple_fill(self, data: Dict[str, Union[str, bool]], editable: bool = False) -> "PyPDFForm":
+    def _simple_fill(
+        self, data: Dict[str, Union[str, bool]], editable: bool = False
+    ) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
 
         TemplateMiddleware().validate_stream(self.stream)
