@@ -84,7 +84,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
 
 ## Set global font size and font color on filled text
 
-This example sets a global font size of 20  and a global font color of red 
+This example sets a global font size of 20, and a global font color of red 
 on the filled PDF form.
 
 ```python
@@ -264,7 +264,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
 
 ## Merge PDF forms
 
-This example demos how to merge PDF together using the overloaded addition operator.
+This example demos how to merge PDFs together using the overloaded addition operator.
 
 ```python
 import os
