@@ -80,9 +80,10 @@ class PyPDFForm(object):
         pdf_one = TemplateCore().assign_uuid(self.stream)
         pdf_two = TemplateCore().assign_uuid(other.stream)
 
-        self.stream = UtilsCore().merge_two_pdfs(pdf_one, pdf_two)
+        new_obj = self.__class__()
+        new_obj.stream = UtilsCore().merge_two_pdfs(pdf_one, pdf_two)
 
-        return self
+        return new_obj
 
     def _fill(
         self,
