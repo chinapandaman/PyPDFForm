@@ -130,7 +130,8 @@ def test_get_element_coordinates(template_stream):
                 float(element[TemplateCoreConstants().annotation_rectangle_key][1])
                 + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
             )
-            / 2 - 2,
+            / 2
+            - 2,
         )
 
 
