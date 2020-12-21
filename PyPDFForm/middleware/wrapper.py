@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Tuple, Union
+from typing import Dict, Tuple, Union
 
 from ..core.filler import Filler as FillerCore
 from ..core.image import Image as ImageCore
@@ -86,7 +86,7 @@ class PyPDFForm(object):
 
     def _fill(
         self,
-        data: dict,
+        data: Dict[str, Union[str, bool]],
     ) -> "PyPDFForm":
         """Fill a PDF form with customized parameters."""
 
@@ -106,7 +106,7 @@ class PyPDFForm(object):
 
         return self
 
-    def _simple_fill(self, data: dict, editable: bool = False) -> "PyPDFForm":
+    def _simple_fill(self, data: Dict[str, Union[str, bool]], editable: bool = False) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
 
         TemplateMiddleware().validate_stream(self.stream)

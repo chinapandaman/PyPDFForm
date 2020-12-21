@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Dict
+from typing import Dict, Union
 
 import pdfrw
 
@@ -66,7 +66,7 @@ class Filler(object):
         )
 
     @staticmethod
-    def simple_fill(template_stream: bytes, data: dict, editable: bool) -> bytes:
+    def simple_fill(template_stream: bytes, data: Dict[str, Union[str, bool]], editable: bool) -> bytes:
         """Fills a PDF form in simple mode."""
 
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
