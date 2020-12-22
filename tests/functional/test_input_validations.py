@@ -4,6 +4,7 @@ import os
 
 import pytest
 
+from PyPDFForm import PyPDFForm
 from PyPDFForm.middleware.exceptions.element import (InvalidFontColorError,
                                                      InvalidFontSizeError,
                                                      InvalidTextOffsetError,
@@ -14,7 +15,6 @@ from PyPDFForm.middleware.exceptions.input import (
     InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError,
     InvalidTextError)
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
-from PyPDFForm import PyPDFForm
 
 
 @pytest.fixture
