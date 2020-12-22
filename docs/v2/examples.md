@@ -10,7 +10,7 @@ The most common tool to create a PDF form is Adobe Acrobat. A tutorial can be fo
 There are other free alternatives that support the same functionalities.
 
 For the purpose of consistency, all examples will use the same PDF form which can be 
-found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). 
+found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_template.pdf). 
 It has three text fields `test`, `test_2`, `test_3` and three checkboxes 
 `check`, `check_2`, `check_3` scattered on three pages.
 
