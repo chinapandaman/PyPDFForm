@@ -5,7 +5,7 @@ of PyPDFForm.
 
 ## PyPDFForm Object
 
-### *class* PyPDFForm.**PyPDFForm**(*template=b"", simple_mode=True*)
+### *class* PyPDFForm.legacy.**PyPDFForm**(*template=b"", simple_mode=True*)
 
 The PyPDFForm object implements a PDF form and acts as 
 the central object. It can be constructed with or without a 
@@ -114,7 +114,7 @@ Python IO to `.write` to another destination.
 
 ## Element Object
 
-### *class* PyPDFForm.element.**Element**(*element_name, element_type, element_value*)
+### *class* PyPDFForm.legacy.element.**Element**(*element_name, element_type, element_value*)
 
 The Element object implements a single PDF form element. It is constructed for each element 
 of a **non-simple-mode** `PyPDFForm` object constructed with a template stream and makes up the `elements` attribute. 

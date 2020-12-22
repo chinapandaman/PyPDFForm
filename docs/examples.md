@@ -22,7 +22,7 @@ and write it to an output disk file.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm.legacy import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -55,7 +55,7 @@ This example demos filling a PDF form but leave it editable after.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm.legacy import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -90,7 +90,7 @@ on the filled PDF form.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm.legacy import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -126,7 +126,7 @@ demos globally wrapping texts with a given length.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm.legacy import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -161,7 +161,7 @@ and -100 vertically.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm.legacy import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -198,7 +198,7 @@ This example shows how.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm.legacy import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -231,7 +231,7 @@ This example demos how to draw an image on a PDF form.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm.legacy import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -269,7 +269,7 @@ This example demos how to merge PDFs together using the overloaded addition oper
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm.legacy import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -303,7 +303,7 @@ Alternatively you can use the assignment operator to achieve the same.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm.legacy import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -341,7 +341,7 @@ the `elements` attributes of the object.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm.legacy import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
