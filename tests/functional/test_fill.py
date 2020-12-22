@@ -6,7 +6,7 @@ import pytest
 
 from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.element import ElementType
-from PyPDFForm.middleware.wrapper import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 
 @pytest.fixture

@@ -14,7 +14,7 @@ from PyPDFForm.middleware.exceptions.input import (
     InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError,
     InvalidTextError)
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
-from PyPDFForm.middleware.wrapper import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 
 @pytest.fixture

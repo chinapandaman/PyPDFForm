@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm.legacy import PyPDFForm
 from PyPDFForm.legacy.exceptions import (InvalidCoordinateError,
                                          InvalidEditableParameterError,
                                          InvalidFontColorError,

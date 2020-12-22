@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from PyPDFForm.middleware.wrapper import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 
 @pytest.fixture

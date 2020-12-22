@@ -6,7 +6,7 @@ import pytest
 
 from PyPDFForm.core.constants import Merge as MergeConstants
 from PyPDFForm.core.template import Template as TemplateCore
-from PyPDFForm.middleware.wrapper import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 
 @pytest.fixture
