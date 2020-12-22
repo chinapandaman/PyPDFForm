@@ -4,9 +4,9 @@ import os
 
 import pytest
 
+from PyPDFForm import PyPDFForm
 from PyPDFForm.core.constants import Merge as MergeConstants
 from PyPDFForm.core.template import Template as TemplateCore
-from PyPDFForm import PyPDFForm
 
 
 @pytest.fixture

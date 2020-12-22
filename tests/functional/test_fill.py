@@ -4,9 +4,9 @@ import os
 
 import pytest
 
+from PyPDFForm import PyPDFForm
 from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.element import ElementType
-from PyPDFForm import PyPDFForm
 
 
 @pytest.fixture
