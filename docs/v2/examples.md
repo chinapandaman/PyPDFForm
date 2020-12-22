@@ -10,7 +10,7 @@ The most common tool to create a PDF form is Adobe Acrobat. A tutorial can be fo
 There are other free alternatives that support the same functionalities.
 
 For the purpose of consistency, all examples will use the same PDF form which can be 
-found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). 
+found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_template.pdf). 
 It has three text fields `test`, `test_2`, `test_3` and three checkboxes 
 `check`, `check_2`, `check_3` scattered on three pages.
 
@@ -22,7 +22,7 @@ and write it to an output disk file.
 ```python
 import os
 
-from PyPDFForm.legacy import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -55,7 +55,7 @@ This example demos filling a PDF form but leave it editable after.
 ```python
 import os
 
-from PyPDFForm.legacy import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -90,7 +90,7 @@ on the filled PDF form.
 ```python
 import os
 
-from PyPDFForm.legacy import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -101,7 +101,12 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 )  # Change this to where you wish to put your filled PDF form
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read(), simple_mode=False).fill(
+    filled_pdf = PyPDFForm(
+        template.read(),
+        simple_mode=False,
+        global_font_size=20,
+        global_font_color=(1, 0, 0),
+    ).fill(
         {
             "test": "test_1",
             "check": True,
@@ -110,8 +115,6 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
             "test_3": "test_3",
             "check_3": True,
         },
-        font_size=20,
-        font_color=(1, 0, 0),
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
@@ -126,7 +129,7 @@ demos globally wrapping texts with a given length.
 ```python
 import os
 
-from PyPDFForm.legacy import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -137,7 +140,11 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 )  # Change this to where you wish to put your filled PDF form
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read(), simple_mode=False).fill(
+    filled_pdf = PyPDFForm(
+        template.read(),
+        simple_mode=False,
+        global_text_wrap_length=2,
+    ).fill(
         {
             "test": "test_1",
             "check": True,
@@ -146,7 +153,6 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
             "test_3": "test_3",
             "check_3": True,
         },
-        text_wrap_length=2,
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
@@ -161,7 +167,7 @@ and -100 vertically.
 ```python
 import os
 
-from PyPDFForm.legacy import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -172,7 +178,12 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 )  # Change this to where you wish to put your filled PDF form
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read(), simple_mode=False).fill(
+    filled_pdf = PyPDFForm(
+        template.read(),
+        simple_mode=False,
+        global_text_x_offset=100,
+        global_text_y_offset=-100,
+    ).fill(
         {
             "test": "test_1",
             "check": True,
@@ -181,8 +192,6 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
             "test_3": "test_3",
             "check_3": True,
         },
-        text_x_offset=100,
-        text_y_offset=-100,
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
@@ -198,7 +207,7 @@ This example shows how.
 ```python
 import os
 
-from PyPDFForm.legacy import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -231,7 +240,7 @@ This example demos how to draw an image on a PDF form.
 ```python
 import os
 
-from PyPDFForm.legacy import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -269,7 +278,7 @@ This example demos how to merge PDFs together using the overloaded addition oper
 ```python
 import os
 
-from PyPDFForm.legacy import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -303,7 +312,7 @@ Alternatively you can use the assignment operator to achieve the same.
 ```python
 import os
 
-from PyPDFForm.legacy import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -341,7 +350,7 @@ the `elements` attributes of the object.
 ```python
 import os
 
-from PyPDFForm.legacy import PyPDFForm
+from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
