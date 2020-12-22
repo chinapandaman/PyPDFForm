@@ -16,7 +16,7 @@ pip install PyPDFForm
 
 ## Quick Example
 
-A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). Download it and try:
+A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_template.pdf). Download it and try:
 
 ```python
 import os
@@ -32,7 +32,11 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 )  # Change this to where you wish to put your filled PDF form
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read(), simple_mode=False).fill(
+    filled_pdf = PyPDFForm(
+        template.read(),
+        simple_mode=False,
+        global_font_size=20,
+    ).fill(
         {
             "test": "test_1",
             "check": True,
@@ -41,7 +45,6 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
             "test_3": "test_3",
             "check_3": True,
         },
-        font_size=20,
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
@@ -49,12 +52,14 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
 ```
 
 After running the above code snippet you can find `output.pdf` at the location you specified, 
-and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_filled_font_20.pdf).
+and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_filled_font_20.pdf).
 
 ## Documentation
 
-* API Reference: https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md
-* Examples: https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md
+* API Reference: https://github.com/chinapandaman/PyPDFForm/blob/master/docs/v2/api_reference.md
+* API Reference (legacy): https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md
+* Examples: https://github.com/chinapandaman/PyPDFForm/blob/master/docs/v2/examples.md
+* Examples (legacy): https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md
 
 ## Tests
 
