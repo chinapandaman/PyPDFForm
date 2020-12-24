@@ -148,7 +148,7 @@ A string which represents the annotated name of the element. Readonly.
 
 ### **type**
 
-A string which represents the type of the element, currently supporting 
+An enum value which represents the type of the element, currently supporting 
 `text` and `checkbox`. Readonly.
 
 ### **value**
