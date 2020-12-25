@@ -75,7 +75,7 @@ Alternatively, there is a Makefile rule which will set up a python virtual envir
 and install all needed dependencies if you are running Linux:
 
 ```shell script
-make build
+make build-all
 ```
 
 In order to run tests, source root needs to be added to PYTHONPATH by running 
@@ -94,5 +94,5 @@ pytest -v
 Or you can use this Makefile rule to do the above two steps if you are running Linux:
 
 ```shell script
-make test
+make test-all
 ```
