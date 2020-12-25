@@ -1,5 +1,5 @@
 if [[ "$VIRTUAL_ENV" == "" ]]; then
-  source "./venv/bin/activate"
+  source "./venv-linux/bin/activate"
 fi
 
 PYTHONPATH=$PYTHONPATH:$(pwd)/PyPDFForm

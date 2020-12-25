@@ -1,5 +1,5 @@
-build:
+build-all:
 	bash ./scripts/build.sh
 
-test:
+test-all:
 	bash ./scripts/test.sh
