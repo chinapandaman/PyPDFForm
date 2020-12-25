@@ -78,7 +78,7 @@ and install all needed dependencies if you are running Linux:
 make build-all
 ```
 
-In order to run tests, package source root needs to be added to PYTHONPATH by running 
+In order to run tests, source root needs to be added to PYTHONPATH by running 
 the following command at project root:
 
 ```shell script
