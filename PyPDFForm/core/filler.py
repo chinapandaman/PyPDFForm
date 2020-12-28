@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Contains helpers for filling a PDF form."""
 
 from typing import Dict, Union
 
@@ -13,7 +14,7 @@ from .utils import Utils
 from .watermark import Watermark as WatermarkCore
 
 
-class Filler(object):
+class Filler:
     """Contains methods for filling a PDF form with dict."""
 
     @staticmethod
@@ -53,9 +54,9 @@ class Filler(object):
                     )
                 _element.update(pdfrw.PdfDict(**update_dict))
 
-        for page, elements in elements_to_fill.items():
+        for page, _elements in elements_to_fill.items():
             _watermarks = WatermarkCore().create_watermarks_and_draw(
-                template_stream, page, "text", elements
+                template_stream, page, "text", _elements
             )
             for i in range(len(_watermarks)):
                 if _watermarks[i]:

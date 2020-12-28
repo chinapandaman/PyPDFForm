@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Contains helpers for watermark."""
 
 from io import BytesIO
 from typing import List, Union
@@ -11,7 +12,7 @@ from ..middleware.element import Element as ElementMiddleware
 from .utils import Utils
 
 
-class Watermark(object):
+class Watermark:
     """Contains methods for interacting with watermark created by canvas."""
 
     @staticmethod
@@ -26,26 +27,26 @@ class Watermark(object):
     ) -> None:
         """Draws a text on the watermark."""
 
-        c = args[0]
+        canv = args[0]
         element = args[1]
-        x = args[2]
-        y = args[3]
+        coordinate_x = args[2]
+        coordinate_y = args[3]
         font = args[4]
 
         if not element.value:
             element.value = ""
 
-        c.setFont(font, element.font_size)
-        c.setFillColorRGB(
+        canv.setFont(font, element.font_size)
+        canv.setFillColorRGB(
             element.font_color[0], element.font_color[1], element.font_color[2]
         )
 
         if len(element.value) < element.text_wrap_length:
-            c.drawString(
-                x + element.text_x_offset, y + element.text_y_offset, element.value
+            canv.drawString(
+                coordinate_x + element.text_x_offset, coordinate_y + element.text_y_offset, element.value
             )
         else:
-            text_obj = c.beginText(0, 0)
+            text_obj = canv.beginText(0, 0)
 
             start = 0
             end = element.text_wrap_length
@@ -57,19 +58,19 @@ class Watermark(object):
 
             text_obj.textLine(element.value[start:])
 
-            c.saveState()
-            c.translate(x + element.text_x_offset, y + element.text_y_offset)
-            c.drawText(text_obj)
-            c.restoreState()
+            canv.saveState()
+            canv.translate(coordinate_x + element.text_x_offset, coordinate_y + element.text_y_offset)
+            canv.drawText(text_obj)
+            canv.restoreState()
 
     @staticmethod
     def draw_image(*args: Union["canvas.Canvas", bytes, float, int]) -> None:
         """Draws an image on the watermark."""
 
-        c = args[0]
+        canv = args[0]
         image_stream = args[1]
-        x = args[2]
-        y = args[3]
+        coordinate_x = args[2]
+        coordinate_y = args[3]
         width = args[4]
         height = args[5]
 
@@ -77,7 +78,7 @@ class Watermark(object):
         image_buff.write(image_stream)
         image_buff.seek(0)
 
-        c.drawImage(ImageReader(image_buff), x, y, width=width, height=height)
+        canv.drawImage(ImageReader(image_buff), coordinate_x, coordinate_y, width=width, height=height)
 
         image_buff.close()
 
@@ -103,7 +104,7 @@ class Watermark(object):
         pdf_file = pdfrw.PdfReader(fdata=pdf)
         buff = BytesIO()
 
-        c = canvas.Canvas(
+        canv = canvas.Canvas(
             buff,
             pagesize=(
                 float(pdf_file.pages[page_number - 1].MediaBox[2]),
@@ -113,12 +114,12 @@ class Watermark(object):
 
         if action_type == "image":
             for each in actions:
-                self.draw_image(*([c, *each]))
+                self.draw_image(*([canv, *each]))
         elif action_type == "text":
             for each in actions:
-                self.draw_text(*([c, *each]))
+                self.draw_text(*([canv, *each]))
 
-        c.save()
+        canv.save()
         buff.seek(0)
 
         watermark = buff.read()

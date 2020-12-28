@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Contains helpers for template."""
 
 import uuid
 from typing import Dict, List, Tuple, Union
@@ -11,7 +12,7 @@ from .constants import Template as TemplateCoreConstants
 from .utils import Utils
 
 
-class Template(object):
+class Template:
     """Contains methods for interacting with a pdfrw parsed PDF form."""
 
     @staticmethod
