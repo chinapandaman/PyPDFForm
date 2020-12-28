@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+"""Contains constants for middleware layer."""
 
 from typing import Tuple, Union
 
 
-class Text(object):
+class Text:
     """Contains constants for text parameters."""
 
     @property

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Contains element middleware."""
 
 from enum import Enum
 from typing import Union
@@ -18,7 +19,7 @@ class ElementType(Enum):
     checkbox = "checkbox"
 
 
-class Element(object):
+class Element:
     """A class to represent an element of a PDF form."""
 
     def __init__(
@@ -77,7 +78,7 @@ class Element(object):
 
         if self._type == ElementType.text:
             if self.font_size and not (
-                isinstance(self.font_size, float) or isinstance(self.font_size, int)
+                isinstance(self.font_size, (float, int))
             ):
                 raise InvalidFontSizeError
 
@@ -88,18 +89,16 @@ class Element(object):
 
             if isinstance(self.font_color, tuple):
                 for each in self.font_color:
-                    if not (isinstance(each, float) or isinstance(each, int)):
+                    if not isinstance(each, (float, int)):
                         raise InvalidFontColorError
 
             if self.text_x_offset and not (
-                isinstance(self.text_x_offset, float)
-                or isinstance(self.text_x_offset, int)
+                isinstance(self.text_x_offset, (float, int))
             ):
                 raise InvalidTextOffsetError
 
             if self.text_y_offset and not (
-                isinstance(self.text_y_offset, float)
-                or isinstance(self.text_y_offset, int)
+                isinstance(self.text_y_offset, (float, int))
             ):
                 raise InvalidTextOffsetError
 
