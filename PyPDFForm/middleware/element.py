@@ -77,7 +77,7 @@ class Element:
         """Validates text element's attributes."""
 
         if self._type == ElementType.text:
-            if self.font_size and not (isinstance(self.font_size, (float, int))):
+            if self.font_size and not isinstance(self.font_size, (float, int)):
                 raise InvalidFontSizeError
 
             if self.font_color and not (
