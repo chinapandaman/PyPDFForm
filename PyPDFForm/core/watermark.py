@@ -43,7 +43,9 @@ class Watermark:
 
         if len(element.value) < element.text_wrap_length:
             canv.drawString(
-                coordinate_x + element.text_x_offset, coordinate_y + element.text_y_offset, element.value
+                coordinate_x + element.text_x_offset,
+                coordinate_y + element.text_y_offset,
+                element.value,
             )
         else:
             text_obj = canv.beginText(0, 0)
@@ -59,7 +61,10 @@ class Watermark:
             text_obj.textLine(element.value[start:])
 
             canv.saveState()
-            canv.translate(coordinate_x + element.text_x_offset, coordinate_y + element.text_y_offset)
+            canv.translate(
+                coordinate_x + element.text_x_offset,
+                coordinate_y + element.text_y_offset,
+            )
             canv.drawText(text_obj)
             canv.restoreState()
 
@@ -78,7 +83,13 @@ class Watermark:
         image_buff.write(image_stream)
         image_buff.seek(0)
 
-        canv.drawImage(ImageReader(image_buff), coordinate_x, coordinate_y, width=width, height=height)
+        canv.drawImage(
+            ImageReader(image_buff),
+            coordinate_x,
+            coordinate_y,
+            width=width,
+            height=height,
+        )
 
         image_buff.close()
 
