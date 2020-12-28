@@ -58,9 +58,9 @@ class Filler:
             _watermarks = WatermarkCore().create_watermarks_and_draw(
                 template_stream, page, "text", _elements
             )
-            for i in range(len(_watermarks)):
-                if _watermarks[i]:
-                    watermarks[i] = _watermarks[i]
+            for i, watermark in enumerate(_watermarks):
+                if watermark:
+                    watermarks[i] = watermark
 
         return WatermarkCore().merge_watermarks_with_pdf(
             Utils().generate_stream(template_pdf), watermarks
