@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Contains helpers for image."""
 
 from io import BytesIO
 from typing import Union
@@ -6,7 +7,7 @@ from typing import Union
 from PIL import Image as Img
 
 
-class Image(object):
+class Image:
     """Contains methods for interacting with images."""
 
     @staticmethod

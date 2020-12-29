@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Contains utility helpers."""
 
 from copy import deepcopy
 from io import BytesIO
@@ -7,7 +8,7 @@ from typing import Dict, Union
 import pdfrw
 
 
-class Utils(object):
+class Utils:
     """Contains utility methods for core modules."""
 
     @staticmethod
@@ -32,9 +33,9 @@ class Utils(object):
 
         result = deepcopy(data)
 
-        for k, v in result.items():
-            if isinstance(v, bool):
-                result[k] = pdfrw.PdfName.Yes if v else pdfrw.PdfName.Off
+        for key, value in result.items():
+            if isinstance(value, bool):
+                result[key] = pdfrw.PdfName.Yes if value else pdfrw.PdfName.Off
 
         return result
 

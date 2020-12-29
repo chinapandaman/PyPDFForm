@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+"""Contains constants used for core layer."""
 
 
-class Template(object):
+class Template:
     """Contains constants for pdfrw parsed PDF form."""
 
     @property
@@ -59,7 +60,7 @@ class Template(object):
         return "/Ff"
 
 
-class Merge(object):
+class Merge:
     """Contains constants for merging PDFs."""
 
     @property

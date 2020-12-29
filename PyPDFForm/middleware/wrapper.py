@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Contains user API for PyPDFForm."""
 
 from typing import Dict, Tuple, Union
 
@@ -20,7 +21,7 @@ from .exceptions.input import (InvalidCoordinateError,
 from .template import Template as TemplateMiddleware
 
 
-class PyPDFForm(object):
+class PyPDFForm:
     """A class to represent a PDF form."""
 
     def __init__(
@@ -96,18 +97,18 @@ class PyPDFForm(object):
         if not isinstance(data, dict):
             raise InvalidFormDataError
 
-        for k, v in data.items():
-            if not isinstance(k, str):
+        for key, value in data.items():
+            if not isinstance(key, str):
                 raise InvalidFormDataError
-            if not (isinstance(v, str) or isinstance(v, bool)):
+            if not isinstance(value, (str, bool)):
                 raise InvalidFormDataError
 
-        for k, v in data.items():
-            if k in self.elements:
-                self.elements[k].value = v
-                self.elements[k].validate_constants()
-                self.elements[k].validate_value()
-                self.elements[k].validate_text_attributes()
+        for key, value in data.items():
+            if key in self.elements:
+                self.elements[key].value = value
+                self.elements[key].validate_constants()
+                self.elements[key].validate_value()
+                self.elements[key].validate_text_attributes()
 
         self.stream = FillerCore().fill(self.stream, self.elements)
 
@@ -123,13 +124,13 @@ class PyPDFForm(object):
         if not isinstance(data, dict):
             raise InvalidFormDataError
 
-        for k, v in data.items():
-            if not isinstance(k, str):
+        for key, value in data.items():
+            if not isinstance(key, str):
                 raise InvalidFormDataError
-            if not (isinstance(v, str) or isinstance(v, bool)):
+            if not isinstance(value, (str, bool)):
                 raise InvalidFormDataError
 
-        if not (isinstance(editable, bool)):
+        if not isinstance(editable, bool):
             raise InvalidEditableParameterError
 
         self.stream = FillerCore().simple_fill(self.stream, data, editable)
@@ -160,10 +161,10 @@ class PyPDFForm(object):
         if not isinstance(page_number, int):
             raise InvalidPageNumberError
 
-        if not (isinstance(x, float) or isinstance(x, int)):
+        if not isinstance(x, (float, int)):
             raise InvalidCoordinateError
 
-        if not (isinstance(y, float) or isinstance(y, int)):
+        if not isinstance(y, (float, int)):
             raise InvalidCoordinateError
 
         new_element = ElementMiddleware("new", ElementType.text)
@@ -209,27 +210,27 @@ class PyPDFForm(object):
 
         TemplateMiddleware().validate_stream(self.stream)
 
-        if not (isinstance(rotation, float) or isinstance(rotation, int)):
+        if not isinstance(rotation, (float, int)):
             raise InvalidImageRotationAngleError
 
         try:
             image = ImageCore().rotate_image(image, rotation)
-        except Exception:
-            raise InvalidImageError
+        except Exception as error:
+            raise InvalidImageError from error
 
         if not isinstance(page_number, int):
             raise InvalidPageNumberError
 
-        if not (isinstance(x, float) or isinstance(x, int)):
+        if not isinstance(x, (float, int)):
             raise InvalidCoordinateError
 
-        if not (isinstance(y, float) or isinstance(y, int)):
+        if not isinstance(y, (float, int)):
             raise InvalidCoordinateError
 
-        if not (isinstance(width, float) or isinstance(width, int)):
+        if not isinstance(width, (float, int)):
             raise InvalidImageDimensionError
 
-        if not (isinstance(height, float) or isinstance(height, int)):
+        if not isinstance(height, (float, int)):
             raise InvalidImageDimensionError
 
         watermarks = WatermarkCore().create_watermarks_and_draw(

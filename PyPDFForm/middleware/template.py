@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Contains helpers for template middleware."""
 
 from typing import Dict
 
@@ -7,7 +8,7 @@ from .element import Element
 from .exceptions.template import InvalidTemplateError
 
 
-class Template(object):
+class Template:
     """Contains methods for interacting with template middlewares."""
 
     @staticmethod
