@@ -5,7 +5,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-dev_dependencies = ["pytest"]
+dev_dependencies = ["pylint", "pytest"]
 
 with open("requirements.txt", "r") as requirements:
     dependencies = [
