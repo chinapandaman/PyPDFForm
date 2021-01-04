@@ -59,7 +59,6 @@ def test_draw_text(text_element):
         text_element,
         300,
         225,
-        TextConstants().global_font,
     )
 
     c.save()
