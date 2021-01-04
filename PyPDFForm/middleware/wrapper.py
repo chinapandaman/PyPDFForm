@@ -54,6 +54,7 @@ class PyPDFForm:
 
             for each in self.elements.values():
                 if each.type == ElementType.text:
+                    each.font = TextConstants().global_font
                     each.font_size = global_font_size
                     each.font_color = global_font_color
                     each.text_x_offset = global_text_x_offset
@@ -169,6 +170,7 @@ class PyPDFForm:
 
         new_element = ElementMiddleware("new", ElementType.text)
         new_element.value = text
+        new_element.font = TextConstants().global_font
         new_element.font_size = font_size
         new_element.font_color = font_color
         new_element.text_x_offset = text_x_offset
@@ -187,7 +189,6 @@ class PyPDFForm:
                     new_element,
                     x,
                     y,
-                    TextConstants().global_font,
                 ]
             ],
         )

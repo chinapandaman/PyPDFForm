@@ -5,7 +5,6 @@ from typing import Dict, Union
 
 import pdfrw
 
-from ..middleware.constants import Text as TextConstants
 from ..middleware.element import Element as ElementMiddleware
 from ..middleware.element import ElementType
 from .constants import Template as TemplateConstants
@@ -49,7 +48,6 @@ class Filler:
                             elements[key],
                             TemplateCore().get_element_coordinates(_element)[0],
                             TemplateCore().get_element_coordinates(_element)[1],
-                            TextConstants().global_font,
                         ]
                     )
                 _element.update(pdfrw.PdfDict(**update_dict))
