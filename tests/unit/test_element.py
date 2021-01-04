@@ -2,6 +2,7 @@
 
 import pytest
 
+from  PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.element import Element, ElementType
 from PyPDFForm.middleware.exceptions.element import (InvalidElementNameError,
                                                      InvalidElementTypeError,
@@ -9,12 +10,13 @@ from PyPDFForm.middleware.exceptions.element import (InvalidElementNameError,
                                                      InvalidFontColorError,
                                                      InvalidFontSizeError,
                                                      InvalidTextOffsetError,
-                                                     InvalidWrapLengthError)
+                                                     InvalidWrapLengthError, InvalidFontError)
 
 
 @pytest.fixture
 def text_element_attributes():
     return [
+        "font",
         "font_size",
         "font_color",
         "text_x_offset",
@@ -67,6 +69,16 @@ def test_set_value(text_element, checkbox_element):
 
 
 def test_validate_text_attributes(text_element):
+    text_element.font = 1
+
+    try:
+        text_element.validate_text_attributes()
+        assert False
+    except InvalidFontError:
+        assert True
+
+    text_element.font = TextConstants().global_font
+
     text_element.font_size = "12.5"
 
     try:
