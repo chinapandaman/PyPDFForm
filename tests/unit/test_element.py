@@ -2,7 +2,7 @@
 
 import pytest
 
-from  PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.element import Element, ElementType
 from PyPDFForm.middleware.exceptions.element import (InvalidElementNameError,
                                                      InvalidElementTypeError,
