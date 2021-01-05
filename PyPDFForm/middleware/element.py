@@ -7,9 +7,9 @@ from typing import Union
 from .exceptions.element import (InvalidElementNameError,
                                  InvalidElementTypeError,
                                  InvalidElementValueError,
-                                 InvalidFontColorError, InvalidFontSizeError,
-                                 InvalidTextOffsetError,
-                                 InvalidWrapLengthError, InvalidFontError)
+                                 InvalidFontColorError, InvalidFontError,
+                                 InvalidFontSizeError, InvalidTextOffsetError,
+                                 InvalidWrapLengthError)
 
 
 class ElementType(Enum):

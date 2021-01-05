@@ -8,9 +8,10 @@ from PyPDFForm.middleware.exceptions.element import (InvalidElementNameError,
                                                      InvalidElementTypeError,
                                                      InvalidElementValueError,
                                                      InvalidFontColorError,
+                                                     InvalidFontError,
                                                      InvalidFontSizeError,
                                                      InvalidTextOffsetError,
-                                                     InvalidWrapLengthError, InvalidFontError)
+                                                     InvalidWrapLengthError)
 
 
 @pytest.fixture
