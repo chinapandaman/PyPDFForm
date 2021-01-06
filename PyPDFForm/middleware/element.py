@@ -7,8 +7,8 @@ from typing import Union
 from .exceptions.element import (InvalidElementNameError,
                                  InvalidElementTypeError,
                                  InvalidElementValueError,
-                                 InvalidFontColorError, InvalidFontSizeError,
-                                 InvalidTextOffsetError,
+                                 InvalidFontColorError, InvalidFontError,
+                                 InvalidFontSizeError, InvalidTextOffsetError,
                                  InvalidWrapLengthError)
 
 
@@ -35,6 +35,7 @@ class Element:
         self.value = element_value
 
         if element_type == ElementType.text:
+            self.font = None
             self.font_size = None
             self.font_color = None
             self.text_x_offset = None
@@ -77,6 +78,9 @@ class Element:
         """Validates text element's attributes."""
 
         if self._type == ElementType.text:
+            if self.font and not isinstance(self.font, str):
+                raise InvalidFontError
+
             if self.font_size and not isinstance(self.font_size, (float, int)):
                 raise InvalidFontSizeError
 

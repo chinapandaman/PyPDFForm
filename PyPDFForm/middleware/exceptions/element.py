@@ -30,3 +30,7 @@ class InvalidTextOffsetError(BasePyPDFFormException):
 
 class InvalidWrapLengthError(BasePyPDFFormException):
     """Raised when text wrap length input is not an int."""
+
+
+class InvalidFontError(BasePyPDFFormException):
+    """Raised when font input is not a string."""

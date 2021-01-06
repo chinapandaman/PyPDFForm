@@ -41,6 +41,7 @@ def test_fill(template_stream, data_dict):
     for k, v in data_dict.items():
         if k in elements:
             elements[k].value = v
+            elements[k].font = TextConstants().global_font
             elements[k].font_size = TextConstants().global_font_size
             elements[k].font_color = TextConstants().global_font_color
             elements[k].text_x_offset = TextConstants().global_text_x_offset

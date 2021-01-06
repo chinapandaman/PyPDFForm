@@ -31,12 +31,11 @@ class Watermark:
         element = args[1]
         coordinate_x = args[2]
         coordinate_y = args[3]
-        font = args[4]
 
         if not element.value:
             element.value = ""
 
-        canv.setFont(font, element.font_size)
+        canv.setFont(element.font, element.font_size)
         canv.setFillColorRGB(
             element.font_color[0], element.font_color[1], element.font_color[2]
         )

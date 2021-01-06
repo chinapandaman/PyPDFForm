@@ -33,6 +33,7 @@ def image_stream(pdf_samples):
 def text_element():
     new_element = ElementMiddleware("new", ElementType.text)
     new_element.value = "drawn_text"
+    new_element.font = TextConstants().global_font
     new_element.font_size = TextConstants().global_font_size
     new_element.font_color = TextConstants().global_font_color
     new_element.text_x_offset = TextConstants().global_text_x_offset
@@ -58,7 +59,6 @@ def test_draw_text(text_element):
         text_element,
         300,
         225,
-        TextConstants().global_font,
     )
 
     c.save()
@@ -99,7 +99,6 @@ def test_create_watermarks_and_draw_texts(template_stream, text_element):
                 text_element,
                 300,
                 225,
-                TextConstants().global_font,
             ]
         ],
     )
@@ -119,13 +118,11 @@ def test_create_watermarks_and_draw_texts(template_stream, text_element):
                 text_element,
                 300,
                 225,
-                TextConstants().global_font,
             ],
             [
                 text_element,
                 400,
                 225,
-                TextConstants().global_font,
             ],
         ],
     )
