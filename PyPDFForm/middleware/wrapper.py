@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains user API for PyPDFForm."""
 
-from typing import Dict, Tuple, Union
+from typing import Dict, Tuple, Union, List
 
 from ..core.filler import Filler as FillerCore
 from ..core.image import Image as ImageCore
@@ -241,3 +241,15 @@ class PyPDFForm:
         self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
+
+    @classmethod
+    def register_font(cls, font_name: str, ttf_file: open):
+        """Registers a font from a ttf file."""
+
+        return UtilsCore().register_font(font_name, ttf_file)
+
+    @classmethod
+    def get_available_fonts(cls) -> List[str]:
+        """Get all available fonts."""
+
+        return UtilsCore().get_available_fonts()

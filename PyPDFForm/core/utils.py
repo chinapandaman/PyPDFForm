@@ -3,13 +3,36 @@
 
 from copy import deepcopy
 from io import BytesIO
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 import pdfrw
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen.canvas import Canvas
 
 
 class Utils:
     """Contains utility methods for core modules."""
+
+    @staticmethod
+    def register_font(font_name: str, ttf_file: open) -> bool:
+        """Registers a font from a ttf file."""
+
+        pdfmetrics.registerFont(TTFont(name=font_name, filename=ttf_file))
+
+        return True
+
+    @staticmethod
+    def get_available_fonts() -> List[str]:
+        buff = BytesIO()
+
+        canv = Canvas(buff)
+
+        result = canv.getAvailableFonts()
+
+        buff.close()
+
+        return result
 
     @staticmethod
     def generate_stream(pdf: "pdfrw.PdfReader") -> bytes:
