@@ -38,3 +38,7 @@ class InvalidImageRotationAngleError(BasePyPDFFormException):
 
 class InvalidTextError(BasePyPDFFormException):
     """Raised when text input is not a string."""
+
+
+class InvalidTTFFontFileError(BasePyPDFFormException):
+    """Raised when attempting to register an invalid ttf font file."""
