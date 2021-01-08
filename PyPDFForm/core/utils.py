@@ -28,17 +28,6 @@ class Utils:
         return True
 
     @staticmethod
-    def get_available_fonts() -> List[str]:
-        """Get all available fonts."""
-
-        buff = BytesIO()
-        canv = Canvas(buff)
-        result = canv.getAvailableFonts()
-
-        buff.close()
-        return result
-
-    @staticmethod
     def generate_stream(pdf: "pdfrw.PdfReader") -> bytes:
         """Generates new stream for manipulated PDF form."""
 

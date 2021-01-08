@@ -260,9 +260,3 @@ class PyPDFForm:
             return UtilsCore().register_font(font_name, ttf_stream)
         except Exception as error:
             raise InvalidTTFFontError from error
-
-    @classmethod
-    def get_available_fonts(cls) -> List[str]:
-        """Get all available fonts."""
-
-        return UtilsCore().get_available_fonts()
