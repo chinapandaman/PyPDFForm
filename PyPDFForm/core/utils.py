@@ -3,12 +3,11 @@
 
 from copy import deepcopy
 from io import BytesIO
-from typing import Dict, Union, List
+from typing import Dict, Union
 
 import pdfrw
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen.canvas import Canvas
 
 
 class Utils:
