@@ -18,14 +18,14 @@ class Utils:
     def register_font(font_name: str, ttf_stream: bytes) -> bool:
         """Registers a font from a ttf file stream."""
 
-        with BytesIO() as f:
-            f.write(ttf_stream)
+        buff = BytesIO()
+        buff.write(ttf_stream)
+        buff.seek(0)
 
-            f.seek(0)
+        pdfmetrics.registerFont(TTFont(name=font_name, filename=buff))
 
-            pdfmetrics.registerFont(TTFont(name=font_name, filename=f))
-
-            return True
+        buff.close()
+        return True
 
     @staticmethod
     def get_available_fonts() -> List[str]:
