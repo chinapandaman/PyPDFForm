@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains user API for PyPDFForm."""
 
-from typing import Dict, Tuple, Union, List
+from typing import Dict, Tuple, Union
 
 from ..core.filler import Filler as FillerCore
 from ..core.image import Image as ImageCore
