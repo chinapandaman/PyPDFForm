@@ -17,7 +17,7 @@ from .exceptions.input import (InvalidCoordinateError,
                                InvalidImageDimensionError, InvalidImageError,
                                InvalidImageRotationAngleError,
                                InvalidModeError, InvalidPageNumberError,
-                               InvalidTextError, InvalidTTFFontFileError)
+                               InvalidTextError, InvalidTTFFontError)
 from .template import Template as TemplateMiddleware
 
 
@@ -246,10 +246,20 @@ class PyPDFForm:
     def register_font(cls, font_name: str, ttf_stream: bytes) -> bool:
         """Registers a font from a ttf file stream."""
 
+        if any(
+            [
+                not font_name,
+                not isinstance(font_name, str),
+                not ttf_stream,
+                not isinstance(ttf_stream, bytes)
+            ]
+        ):
+            raise InvalidTTFFontError
+
         try:
             return UtilsCore().register_font(font_name, ttf_stream)
         except Exception as error:
-            raise InvalidTTFFontFileError from error
+            raise InvalidTTFFontError from error
 
     @classmethod
     def get_available_fonts(cls) -> List[str]:
