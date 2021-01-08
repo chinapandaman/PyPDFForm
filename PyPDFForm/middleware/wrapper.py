@@ -243,10 +243,10 @@ class PyPDFForm:
         return self
 
     @classmethod
-    def register_font(cls, font_name: str, ttf_file: open):
-        """Registers a font from a ttf file."""
+    def register_font(cls, font_name: str, ttf_stream: bytes) -> bool:
+        """Registers a font from a ttf file stream."""
 
-        return UtilsCore().register_font(font_name, ttf_file)
+        return UtilsCore().register_font(font_name, ttf_stream)
 
     @classmethod
     def get_available_fonts(cls) -> List[str]:

@@ -15,11 +15,19 @@ class Utils:
     """Contains utility methods for core modules."""
 
     @staticmethod
-    def register_font(font_name: str, ttf_file: open) -> bool:
-        """Registers a font from a ttf file."""
+    def register_font(font_name: str, ttf_stream: bytes) -> bool:
+        """Registers a font from a ttf file stream."""
 
-        pdfmetrics.registerFont(TTFont(name=font_name, filename=ttf_file))
+        buff = BytesIO()
 
+        with buff as f:
+            f.write(ttf_stream)
+
+        buff.seek(0)
+
+        pdfmetrics.registerFont(TTFont(name=font_name, filename=buff))
+
+        buff.close()
         return True
 
     @staticmethod
