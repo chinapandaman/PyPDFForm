@@ -13,7 +13,7 @@ from PyPDFForm.middleware.exceptions.input import (
     InvalidCoordinateError, InvalidEditableParameterError,
     InvalidFormDataError, InvalidImageDimensionError, InvalidImageError,
     InvalidImageRotationAngleError, InvalidModeError, InvalidPageNumberError,
-    InvalidTextError)
+    InvalidTextError, InvalidTTFFontError)
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
 
 
@@ -32,6 +32,11 @@ def template_stream(pdf_samples):
 def image_stream(pdf_samples):
     with open(os.path.join(pdf_samples, "sample_image.jpg"), "rb+") as f:
         return f.read()
+
+
+@pytest.fixture
+def font_samples():
+    return os.path.join(os.path.dirname(__file__), "..", "..", "font_samples")
 
 
 def test_validate_constructor_inputs(template_stream):
@@ -350,3 +355,50 @@ def test_validate_draw_image_inputs(template_stream, image_stream):
 
     PyPDFForm(template_stream).draw_image(*bad_inputs)
     assert True
+
+
+def test_validate_register_font_inputs(font_samples):
+    bad_inputs = [None, None]
+
+    try:
+        PyPDFForm.register_font(*bad_inputs)
+        assert False
+    except InvalidTTFFontError:
+        assert True
+
+    bad_inputs[0] = 1
+
+    try:
+        PyPDFForm.register_font(*bad_inputs)
+        assert False
+    except InvalidTTFFontError:
+        assert True
+
+    bad_inputs[0] = "LiberationSerifBold"
+
+    try:
+        PyPDFForm.register_font(*bad_inputs)
+        assert False
+    except InvalidTTFFontError:
+        assert True
+
+    bad_inputs[1] = "foo"
+
+    try:
+        PyPDFForm.register_font(*bad_inputs)
+        assert False
+    except InvalidTTFFontError:
+        assert True
+
+    bad_inputs[1] = b"foo"
+
+    try:
+        PyPDFForm.register_font(*bad_inputs)
+        assert False
+    except InvalidTTFFontError:
+        assert True
+
+    with open(os.path.join(font_samples, "LiberationSerif-Bold.ttf"), "rb+") as f:
+        bad_inputs[1] = f.read()
+
+        assert PyPDFForm.register_font(*bad_inputs)
