@@ -4,6 +4,7 @@
 from typing import Dict, Tuple, Union
 
 from ..core.filler import Filler as FillerCore
+from ..core.font import Font as FontCore
 from ..core.image import Image as ImageCore
 from ..core.template import Template as TemplateCore
 from ..core.utils import Utils as UtilsCore
@@ -257,6 +258,6 @@ class PyPDFForm:
             raise InvalidTTFFontError
 
         try:
-            return UtilsCore().register_font(font_name, ttf_stream)
+            return FontCore().register_font(font_name, ttf_stream)
         except Exception as error:
             raise InvalidTTFFontError from error

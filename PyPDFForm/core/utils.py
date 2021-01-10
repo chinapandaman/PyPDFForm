@@ -6,25 +6,10 @@ from io import BytesIO
 from typing import Dict, Union
 
 import pdfrw
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
 
 
 class Utils:
     """Contains utility methods for core modules."""
-
-    @staticmethod
-    def register_font(font_name: str, ttf_stream: bytes) -> bool:
-        """Registers a font from a ttf file stream."""
-
-        buff = BytesIO()
-        buff.write(ttf_stream)
-        buff.seek(0)
-
-        pdfmetrics.registerFont(TTFont(name=font_name, filename=buff))
-
-        buff.close()
-        return True
 
     @staticmethod
     def generate_stream(pdf: "pdfrw.PdfReader") -> bytes:
