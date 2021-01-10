@@ -21,3 +21,13 @@ class Font:
 
         buff.close()
         return True
+
+    @staticmethod
+    def is_registered(font_name: str) -> bool:
+        """Checks if a font is registered."""
+
+        try:
+            pdfmetrics.getFont(font_name)
+            return True
+        except KeyError:
+            return False
