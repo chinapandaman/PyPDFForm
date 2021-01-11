@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import pytest
 import os
+
+import pytest
+
 from PyPDFForm.core.font import Font as FontCore
 
 

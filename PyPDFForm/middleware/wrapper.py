@@ -252,7 +252,7 @@ class PyPDFForm:
                 not font_name,
                 not isinstance(font_name, str),
                 not ttf_stream,
-                not isinstance(ttf_stream, bytes)
+                not isinstance(ttf_stream, bytes),
             ]
         ):
             raise InvalidTTFFontError
