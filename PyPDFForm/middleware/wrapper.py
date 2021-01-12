@@ -4,6 +4,7 @@
 from typing import Dict, Tuple, Union
 
 from ..core.filler import Filler as FillerCore
+from ..core.font import Font as FontCore
 from ..core.image import Image as ImageCore
 from ..core.template import Template as TemplateCore
 from ..core.utils import Utils as UtilsCore
@@ -17,7 +18,7 @@ from .exceptions.input import (InvalidCoordinateError,
                                InvalidImageDimensionError, InvalidImageError,
                                InvalidImageRotationAngleError,
                                InvalidModeError, InvalidPageNumberError,
-                               InvalidTextError)
+                               InvalidTextError, InvalidTTFFontError)
 from .template import Template as TemplateMiddleware
 
 
@@ -241,3 +242,22 @@ class PyPDFForm:
         self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
+
+    @classmethod
+    def register_font(cls, font_name: str, ttf_stream: bytes) -> bool:
+        """Registers a font from a ttf file stream."""
+
+        if any(
+            [
+                not font_name,
+                not isinstance(font_name, str),
+                not ttf_stream,
+                not isinstance(ttf_stream, bytes),
+            ]
+        ):
+            raise InvalidTTFFontError
+
+        try:
+            return FontCore().register_font(font_name, ttf_stream)
+        except Exception as error:
+            raise InvalidTTFFontError from error
