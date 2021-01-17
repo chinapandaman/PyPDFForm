@@ -84,6 +84,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         output.write(filled_pdf.stream)
 ```
 
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/simple_fill_editable.py
+
 ## Set global font size and font color on filled text
 
 This example sets a global font size of 20, and a global font color of red 
