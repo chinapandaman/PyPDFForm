@@ -125,6 +125,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         output.write(filled_pdf.stream)
 ```
 
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_global_font_size_color.py
+
 ## Wrap filled text with a length
 
 Sometimes texts printed on the PDF form may be too lengthy. This example 
