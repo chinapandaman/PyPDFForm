@@ -29,6 +29,7 @@ class PyPDFForm:
         self,
         template: bytes = b"",
         simple_mode: bool = True,
+        global_font: str = TextConstants().global_font,
         global_font_size: Union[float, int] = TextConstants().global_font_size,
         global_font_color: Tuple[
             Union[float, int], Union[float, int], Union[float, int]
@@ -55,7 +56,7 @@ class PyPDFForm:
 
             for each in self.elements.values():
                 if each.type == ElementType.text:
-                    each.font = TextConstants().global_font
+                    each.font = global_font
                     each.font_size = global_font_size
                     each.font_color = global_font_color
                     each.text_x_offset = global_text_x_offset
@@ -145,6 +146,7 @@ class PyPDFForm:
         page_number: int,
         x: Union[float, int],
         y: Union[float, int],
+        font: str = TextConstants().global_font,
         font_size: Union[float, int] = TextConstants().global_font_size,
         font_color: Tuple[
             Union[float, int], Union[float, int], Union[float, int]
@@ -171,7 +173,7 @@ class PyPDFForm:
 
         new_element = ElementMiddleware("new", ElementType.text)
         new_element.value = text
-        new_element.font = TextConstants().global_font
+        new_element.font = font
         new_element.font_size = font_size
         new_element.font_color = font_color
         new_element.text_x_offset = text_x_offset

@@ -4,6 +4,7 @@ import os
 
 import pytest
 
+from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm import PyPDFForm
 
 
@@ -27,7 +28,7 @@ def image_stream(pdf_samples):
 def test_draw_text_on_one_page(template_stream, pdf_samples):
     with open(os.path.join(pdf_samples, "sample_pdf_with_drawn_text.pdf"), "rb+") as f:
         obj = PyPDFForm(template_stream).draw_text(
-            "drawn_text", 1, 300, 225, 20, (1, 0, 0), 50, 50, 4
+            "drawn_text", 1, 300, 225, TextConstants().global_font, 20, (1, 0, 0), 50, 50, 4
         )
 
         expected = f.read()

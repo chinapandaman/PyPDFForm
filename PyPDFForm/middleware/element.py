@@ -4,6 +4,7 @@
 from enum import Enum
 from typing import Union
 
+from ..core.font import Font as FontCore
 from .exceptions.element import (InvalidElementNameError,
                                  InvalidElementTypeError,
                                  InvalidElementValueError,
@@ -78,7 +79,7 @@ class Element:
         """Validates text element's attributes."""
 
         if self._type == ElementType.text:
-            if self.font and not isinstance(self.font, str):
+            if (self.font and not isinstance(self.font, str)) or (not FontCore().is_registered(self.font)):
                 raise InvalidFontError
 
             if self.font_size and not isinstance(self.font_size, (float, int)):
