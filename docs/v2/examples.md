@@ -147,9 +147,7 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     filled_pdf = PyPDFForm(
-        template.read(),
-        simple_mode=False,
-        global_text_wrap_length=2,
+        template.read(), simple_mode=False, global_text_wrap_length=2,
     ).fill(
         {
             "test": "test_1",
@@ -164,6 +162,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
         output.write(filled_pdf.stream)
 ```
+
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_text_wrap.py
 
 ## Offset texts globally
 
