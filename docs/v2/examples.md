@@ -226,20 +226,13 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 )  # Change this to where you wish to put your filled PDF form
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read()).fill(
-        {
-            "test": "test_1",
-            "check": True,
-            "test_2": "test_2",
-            "check_2": False,
-            "test_3": "test_3",
-            "check_3": True,
-        },
-    ).draw_text("drawn_text", 1, 300, 225)
+    filled_pdf = PyPDFForm(template.read()).draw_text("drawn_text", 1, 300, 225)
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
         output.write(filled_pdf.stream)
 ```
+
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/draw_text.py
 
 ## Draw image
 
