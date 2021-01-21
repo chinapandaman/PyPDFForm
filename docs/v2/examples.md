@@ -204,6 +204,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         output.write(filled_pdf.stream)
 ```
 
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_text_offset.py
+
 ## Draw text
 
 Sometimes you may want to draw some texts on a PDF form 
