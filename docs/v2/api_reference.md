@@ -5,7 +5,7 @@ of PyPDFForm.
 
 ## PyPDFForm Object
 
-### *class* PyPDFForm.**PyPDFForm**(*template=b"", simple_mode=True, global_font_size=12, global_font_color=(0, 0, 0), global_text_x_offset=0, global_text_y_offset=0, global_text_wrap_length=100*)
+### *class* PyPDFForm.**PyPDFForm**(*template=b"", simple_mode=True, global_font="Helvetica", global_font_size=12, global_font_color=(0, 0, 0), global_text_x_offset=0, global_text_y_offset=0, global_text_wrap_length=100*)
 
 The PyPDFForm object implements a PDF form and acts as 
 the central object. It can be constructed with or without a 
@@ -21,6 +21,9 @@ by Python IO's `.read()` method.
 * **simple_mode** - a simple mode PyPDFForm object only allows filling data without specifying 
 details like font size. Turning simple mode on also allows leaving PDF editable 
 after filling.
+  
+* **global_font** - a string which sets the global font for text filled on the PDF form. The 
+font set by this parameter has to be registered first. This will only take effect if `simple_mode` is `False`. 
   
 * **global_font_size** - an integer/float value which sets the global font size for texts 
 filled on the PDF form. This will only take effect if `simple_mode` is `False`.
@@ -65,7 +68,7 @@ on the specified page, coordinates with specified resolutions and rotation angle
 
 * **rotation** - integer/float, degrees the image will be rotated after drawn.
 
-### **draw_text**(*text, page_number, x, y, font_size=12, font_color=(0, 0, 0), text_x_offset=0, text_y_offset=0, text_wrap_length=100*)
+### **draw_text**(*text, page_number, x, y, font="Helvetica", font_size=12, font_color=(0, 0, 0), text_x_offset=0, text_y_offset=0, text_wrap_length=100*)
 
 The draw text method takes a text string and draws it on the specified page 
 at the specified coordinates.
@@ -79,6 +82,9 @@ at the specified coordinates.
 * **x** - integer/float, horizontal coordinate of which the text will be drawn at.
 
 * **y** - integer/float, vertical coordinate of which the text will be drawn at.
+
+* **font** - string, sets the font for text drawn. Font set by this parameter has to be 
+registered first.
 
 * **font_size** - integer/float, font size of the text drawn.
 
@@ -112,6 +118,18 @@ be printed and a `boolean` will check the corresponding checkboxes.
 
 * **editable** - only available if `simple_mode` is `True`, enabling this will allow the filled PDF to be still 
 editable.
+  
+### **register_font**(*font_name, ttf_stream*)
+
+This class method takes a TTF font file stream and register it with the `font_name` specified. 
+Registered fonts can then be used by any instance of object.
+
+#### Parameters:
+
+* **font_name** - a string of which the font will be registered as. Registered fonts can be referenced and 
+used via this name.
+
+* **ttf_stream** - a byte stream of the ttf font file.
 
 ### **simple_mode** = *True*
 
