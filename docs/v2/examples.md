@@ -48,6 +48,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         output.write(filled_pdf.stream)
 ```
 
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/simple_fill.py
+
 ## Fill a PDF form and enable editing
 
 This example demos filling a PDF form but leave it editable after.
@@ -81,6 +83,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
         output.write(filled_pdf.stream)
 ```
+
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/simple_fill_editable.py
 
 ## Set global font size and font color on filled text
 
@@ -121,6 +125,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         output.write(filled_pdf.stream)
 ```
 
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_global_font_size_color.py
+
 ## Wrap filled text with a length
 
 Sometimes texts printed on the PDF form may be too lengthy. This example 
@@ -141,9 +147,7 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     filled_pdf = PyPDFForm(
-        template.read(),
-        simple_mode=False,
-        global_text_wrap_length=2,
+        template.read(), simple_mode=False, global_text_wrap_length=2,
     ).fill(
         {
             "test": "test_1",
@@ -158,6 +162,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
         output.write(filled_pdf.stream)
 ```
+
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_text_wrap.py
 
 ## Offset texts globally
 
@@ -198,6 +204,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         output.write(filled_pdf.stream)
 ```
 
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_text_offset.py
+
 ## Draw text
 
 Sometimes you may want to draw some texts on a PDF form 
@@ -218,20 +226,13 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 )  # Change this to where you wish to put your filled PDF form
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read()).fill(
-        {
-            "test": "test_1",
-            "check": True,
-            "test_2": "test_2",
-            "check_2": False,
-            "test_3": "test_3",
-            "check_3": True,
-        },
-    ).draw_text("drawn_text", 1, 300, 225)
+    filled_pdf = PyPDFForm(template.read()).draw_text("drawn_text", 1, 300, 225)
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
         output.write(filled_pdf.stream)
 ```
+
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/draw_text.py
 
 ## Draw image
 
@@ -256,20 +257,15 @@ PATH_TO_IMAGE = os.path.join(
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     with open(PATH_TO_IMAGE, "rb+") as image:
-        filled_pdf = PyPDFForm(template.read()).fill(
-            {
-                "test": "test_1",
-                "check": True,
-                "test_2": "test_2",
-                "check_2": False,
-                "test_3": "test_3",
-                "check_3": True,
-            },
-        ).draw_image(image.read(), 2, 100, 100, 400, 225, 0)
+        filled_pdf = PyPDFForm(template.read()).draw_image(
+            image.read(), 2, 100, 100, 400, 225, 0
+        )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
         output.write(filled_pdf.stream)
 ```
+
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/draw_image.py
 
 ## Merge PDF forms
 
@@ -341,6 +337,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         output.write(filled_pdf.stream)
 ```
 
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/merge.py
+
 ## Fill with customized elements
 
 A lot of times you may want one or more elements' details like font size and 
@@ -386,3 +384,5 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
         output.write(pdf_form.stream)
 ```
+
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_customized_elements.py
