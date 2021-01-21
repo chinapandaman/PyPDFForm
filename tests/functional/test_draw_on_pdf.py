@@ -5,11 +5,17 @@ import os
 import pytest
 
 from PyPDFForm import PyPDFForm
+from PyPDFForm.middleware.constants import Text as TextConstants
 
 
 @pytest.fixture
 def pdf_samples():
     return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples", "v2")
+
+
+@pytest.fixture
+def font_samples():
+    return os.path.join(os.path.dirname(__file__), "..", "..", "font_samples")
 
 
 @pytest.fixture
@@ -27,13 +33,56 @@ def image_stream(pdf_samples):
 def test_draw_text_on_one_page(template_stream, pdf_samples):
     with open(os.path.join(pdf_samples, "sample_pdf_with_drawn_text.pdf"), "rb+") as f:
         obj = PyPDFForm(template_stream).draw_text(
-            "drawn_text", 1, 300, 225, 20, (1, 0, 0), 50, 50, 4
+            "drawn_text",
+            1,
+            300,
+            225,
+            TextConstants().global_font,
+            20,
+            (1, 0, 0),
+            50,
+            50,
+            4,
         )
 
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_draw_text_on_one_page_different_font(
+    template_stream, pdf_samples, font_samples
+):
+    with open(
+        os.path.join(font_samples, "LiberationSerif-BoldItalic.ttf"), "rb+"
+    ) as _f:
+        PyPDFForm.register_font("LiberationSerif-BoldItalic", _f.read())
+
+    with open(
+        os.path.join(pdf_samples, "sample_pdf_with_drawn_text_different_font.pdf"),
+        "rb+",
+    ) as f:
+        obj = PyPDFForm(template_stream).draw_text(
+            "drawn_text",
+            1,
+            300,
+            225,
+            "LiberationSerif-BoldItalic",
+            20,
+            (1, 0, 0),
+            50,
+            50,
+            4,
+        )
+
+        expected = f.read()
+
+        if os.name == "nt":
+            assert len(obj.stream) == len(expected)
+            assert obj.stream == expected
+        else:
+            assert obj.stream[:32767] == expected[:32767]
 
 
 def test_draw_image_on_one_page(template_stream, image_stream, pdf_samples):

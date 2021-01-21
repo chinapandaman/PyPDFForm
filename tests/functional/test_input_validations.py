@@ -5,7 +5,9 @@ import os
 import pytest
 
 from PyPDFForm import PyPDFForm
+from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.exceptions.element import (InvalidFontColorError,
+                                                     InvalidFontError,
                                                      InvalidFontSizeError,
                                                      InvalidTextOffsetError,
                                                      InvalidWrapLengthError)
@@ -40,7 +42,7 @@ def font_samples():
 
 
 def test_validate_constructor_inputs(template_stream):
-    bad_inputs = ["", "True", "12", ("0", "0", "0"), "0", "0", "100"]
+    bad_inputs = ["", "True", 1, "12", ("0", "0", "0"), "0", "0", "100"]
 
     try:
         PyPDFForm(*bad_inputs)
@@ -69,10 +71,26 @@ def test_validate_constructor_inputs(template_stream):
     try:
         PyPDFForm(*bad_inputs)
         assert False
+    except InvalidFontError:
+        assert True
+
+    bad_inputs[2] = "bad_font"
+
+    try:
+        PyPDFForm(*bad_inputs)
+        assert False
+    except InvalidFontError:
+        assert True
+
+    bad_inputs[2] = TextConstants().global_font
+
+    try:
+        PyPDFForm(*bad_inputs)
+        assert False
     except InvalidFontSizeError:
         assert True
 
-    bad_inputs[2] = 12
+    bad_inputs[3] = 12
 
     try:
         PyPDFForm(*bad_inputs)
@@ -80,15 +98,7 @@ def test_validate_constructor_inputs(template_stream):
     except InvalidFontColorError:
         assert True
 
-    bad_inputs[3] = (0, 0, 0)
-
-    try:
-        PyPDFForm(*bad_inputs)
-        assert False
-    except InvalidTextOffsetError:
-        assert True
-
-    bad_inputs[4] = 0
+    bad_inputs[4] = (0, 0, 0)
 
     try:
         PyPDFForm(*bad_inputs)
@@ -101,10 +111,18 @@ def test_validate_constructor_inputs(template_stream):
     try:
         PyPDFForm(*bad_inputs)
         assert False
+    except InvalidTextOffsetError:
+        assert True
+
+    bad_inputs[6] = 0
+
+    try:
+        PyPDFForm(*bad_inputs)
+        assert False
     except InvalidWrapLengthError:
         assert True
 
-    bad_inputs[6] = 100
+    bad_inputs[7] = 100
     bad_inputs[0] = b""
     obj = PyPDFForm(*bad_inputs)
     assert obj.elements == {}
@@ -203,7 +221,7 @@ def test_validate_simple_fill_inputs(template_stream):
 
 
 def test_validate_draw_text_inputs(template_stream):
-    bad_inputs = [1, "1", "300", "225", "20", [1, 0, 0], "50", "50", "4"]
+    bad_inputs = [1, "1", "300", "225", 1, "20", [1, 0, 0], "50", "50", "4"]
 
     try:
         obj = PyPDFForm(b"bad_stream")
@@ -247,10 +265,26 @@ def test_validate_draw_text_inputs(template_stream):
     try:
         PyPDFForm(template_stream).draw_text(*bad_inputs)
         assert False
+    except InvalidFontError:
+        assert True
+
+    bad_inputs[4] = "bad_font"
+
+    try:
+        PyPDFForm(template_stream).draw_text(*bad_inputs)
+        assert False
+    except InvalidFontError:
+        assert True
+
+    bad_inputs[4] = TextConstants().global_font
+
+    try:
+        PyPDFForm(template_stream).draw_text(*bad_inputs)
+        assert False
     except InvalidFontSizeError:
         assert True
 
-    bad_inputs[4] = 20
+    bad_inputs[5] = 20
 
     try:
         PyPDFForm(template_stream).draw_text(*bad_inputs)
@@ -258,15 +292,7 @@ def test_validate_draw_text_inputs(template_stream):
     except InvalidFontColorError:
         assert True
 
-    bad_inputs[5] = (1, 0, 0)
-
-    try:
-        PyPDFForm(template_stream).draw_text(*bad_inputs)
-        assert False
-    except InvalidTextOffsetError:
-        assert True
-
-    bad_inputs[6] = 50
+    bad_inputs[6] = (1, 0, 0)
 
     try:
         PyPDFForm(template_stream).draw_text(*bad_inputs)
@@ -279,10 +305,18 @@ def test_validate_draw_text_inputs(template_stream):
     try:
         PyPDFForm(template_stream).draw_text(*bad_inputs)
         assert False
+    except InvalidTextOffsetError:
+        assert True
+
+    bad_inputs[8] = 50
+
+    try:
+        PyPDFForm(template_stream).draw_text(*bad_inputs)
+        assert False
     except InvalidWrapLengthError:
         assert True
 
-    bad_inputs[8] = 4
+    bad_inputs[9] = 4
     PyPDFForm(template_stream).draw_text(*bad_inputs)
     assert True
 
