@@ -64,12 +64,19 @@ def test_fill_simple_mode_editable(template_stream, pdf_samples, data_dict):
         assert obj.stream == expected
 
 
-def test_fill_non_simple_mode_font_liberation_serif_italic(template_stream, pdf_samples, font_samples, data_dict):
+def test_fill_non_simple_mode_font_liberation_serif_italic(
+    template_stream, pdf_samples, font_samples, data_dict
+):
     with open(os.path.join(font_samples, "LiberationSerif-Italic.ttf"), "rb+") as _f:
         PyPDFForm.register_font("LiberationSerif-Italic", _f.read())
 
-    with open(os.path.join(pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"), "rb+") as f:
-        obj = PyPDFForm(template_stream, simple_mode=False, global_font="LiberationSerif-Italic").fill(
+    with open(
+        os.path.join(pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"),
+        "rb+",
+    ) as f:
+        obj = PyPDFForm(
+            template_stream, simple_mode=False, global_font="LiberationSerif-Italic"
+        ).fill(
             data_dict,
         )
 

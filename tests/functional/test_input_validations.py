@@ -7,9 +7,10 @@ import pytest
 from PyPDFForm import PyPDFForm
 from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.exceptions.element import (InvalidFontColorError,
+                                                     InvalidFontError,
                                                      InvalidFontSizeError,
                                                      InvalidTextOffsetError,
-                                                     InvalidWrapLengthError, InvalidFontError)
+                                                     InvalidWrapLengthError)
 from PyPDFForm.middleware.exceptions.input import (
     InvalidCoordinateError, InvalidEditableParameterError,
     InvalidFormDataError, InvalidImageDimensionError, InvalidImageError,
