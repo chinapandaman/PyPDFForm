@@ -78,6 +78,14 @@ def test_validate_text_attributes(text_element):
     except InvalidFontError:
         assert True
 
+    text_element.font = "bad_font"
+
+    try:
+        text_element.validate_text_attributes()
+        assert False
+    except InvalidFontError:
+        assert True
+
     text_element.font = TextConstants().global_font
 
     text_element.font_size = "12.5"
