@@ -12,7 +12,9 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     filled_pdf = PyPDFForm(
-        template.read(), simple_mode=False, global_text_wrap_length=2,
+        template.read(),
+        simple_mode=False,
+        global_text_wrap_length=2,
     ).fill(
         {
             "test": "test_1",
