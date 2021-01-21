@@ -21,6 +21,11 @@ def template_stream(pdf_samples):
 
 
 @pytest.fixture
+def font_samples():
+    return os.path.join(os.path.dirname(__file__), "..", "..", "font_samples")
+
+
+@pytest.fixture
 def data_dict():
     return {
         "test": "test_1",
@@ -59,6 +64,40 @@ def test_fill_simple_mode_editable(template_stream, pdf_samples, data_dict):
         assert obj.stream == expected
 
 
+def test_fill_non_simple_mode_font_liberation_serif_italic(
+    template_stream, pdf_samples, font_samples, data_dict
+):
+    with open(os.path.join(font_samples, "LiberationSerif-Italic.ttf"), "rb+") as _f:
+        PyPDFForm.register_font("LiberationSerif-Italic", _f.read())
+
+    with open(
+        os.path.join(pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"),
+        "rb+",
+    ) as f:
+        obj = PyPDFForm(
+            template_stream, simple_mode=False, global_font="LiberationSerif-Italic"
+        ).fill(
+            data_dict,
+        )
+
+        expected = f.read()
+
+        assert obj.stream == expected
+
+        for k, v in obj.elements.items():
+            assert k in data_dict
+            assert v.name in data_dict
+            assert v.value == data_dict[k]
+
+            if v.type == ElementType.text:
+                assert v.font == "LiberationSerif-Italic"
+                assert v.font_size == TextConstants().global_font_size
+                assert v.font_color == TextConstants().global_font_color
+                assert v.text_x_offset == TextConstants().global_text_x_offset
+                assert v.text_y_offset == TextConstants().global_text_y_offset
+                assert v.text_wrap_length == TextConstants().global_text_wrap_length
+
+
 def test_fill_non_simple_mode_font_20(template_stream, pdf_samples, data_dict):
     with open(os.path.join(pdf_samples, "sample_filled_font_20.pdf"), "rb+") as f:
         obj = PyPDFForm(template_stream, simple_mode=False, global_font_size=20).fill(
@@ -75,6 +114,7 @@ def test_fill_non_simple_mode_font_20(template_stream, pdf_samples, data_dict):
             assert v.value == data_dict[k]
 
             if v.type == ElementType.text:
+                assert v.font == TextConstants().global_font
                 assert v.font_size == 20
                 assert v.font_color == TextConstants().global_font_color
                 assert v.text_x_offset == TextConstants().global_text_x_offset
@@ -102,6 +142,7 @@ def test_fill_non_simple_mode_font_color_red(template_stream, pdf_samples, data_
             assert v.value == data_dict[k]
 
             if v.type == ElementType.text:
+                assert v.font == TextConstants().global_font
                 assert v.font_size == TextConstants().global_font_size
                 assert v.font_color == (1, 0, 0)
                 assert v.text_x_offset == TextConstants().global_text_x_offset
@@ -130,6 +171,7 @@ def test_fill_non_simple_mode_offset_100(template_stream, pdf_samples, data_dict
             assert v.value == data_dict[k]
 
             if v.type == ElementType.text:
+                assert v.font == TextConstants().global_font
                 assert v.font_size == TextConstants().global_font_size
                 assert v.font_color == TextConstants().global_font_color
                 assert v.text_x_offset == 100
@@ -155,6 +197,7 @@ def test_fill_non_simple_mode_wrap_2(template_stream, pdf_samples, data_dict):
             assert v.value == data_dict[k]
 
             if v.type == ElementType.text:
+                assert v.font == TextConstants().global_font
                 assert v.font_size == TextConstants().global_font_size
                 assert v.font_color == TextConstants().global_font_color
                 assert v.text_x_offset == TextConstants().global_text_x_offset

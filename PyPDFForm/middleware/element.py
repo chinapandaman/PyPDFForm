@@ -4,6 +4,7 @@
 from enum import Enum
 from typing import Union
 
+from ..core.font import Font as FontCore
 from .exceptions.element import (InvalidElementNameError,
                                  InvalidElementTypeError,
                                  InvalidElementValueError,
@@ -78,13 +79,17 @@ class Element:
         """Validates text element's attributes."""
 
         if self._type == ElementType.text:
-            if self.font and not isinstance(self.font, str):
+            if (self.font is not None and not isinstance(self.font, str)) or (
+                not FontCore().is_registered(self.font)
+            ):
                 raise InvalidFontError
 
-            if self.font_size and not isinstance(self.font_size, (float, int)):
+            if self.font_size is not None and not isinstance(
+                self.font_size, (float, int)
+            ):
                 raise InvalidFontSizeError
 
-            if self.font_color and not (
+            if self.font_color is not None and not (
                 isinstance(self.font_color, tuple) and len(self.font_color) == 3
             ):
                 raise InvalidFontColorError
@@ -94,15 +99,17 @@ class Element:
                     if not isinstance(each, (float, int)):
                         raise InvalidFontColorError
 
-            if self.text_x_offset and not (
+            if self.text_x_offset is not None and not (
                 isinstance(self.text_x_offset, (float, int))
             ):
                 raise InvalidTextOffsetError
 
-            if self.text_y_offset and not (
+            if self.text_y_offset is not None and not (
                 isinstance(self.text_y_offset, (float, int))
             ):
                 raise InvalidTextOffsetError
 
-            if self.text_wrap_length and not isinstance(self.text_wrap_length, int):
+            if self.text_wrap_length is not None and not isinstance(
+                self.text_wrap_length, int
+            ):
                 raise InvalidWrapLengthError
