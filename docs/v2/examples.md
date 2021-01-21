@@ -337,6 +337,8 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         output.write(filled_pdf.stream)
 ```
 
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/merge.py
+
 ## Fill with customized elements
 
 A lot of times you may want one or more elements' details like font size and 
