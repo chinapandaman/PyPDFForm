@@ -174,6 +174,11 @@ An enum value which represents the type of the element, currently supporting
 This attribute holds the value that's used to fill this element. It is a string 
 if the `element_type` is `text` or a boolean value in the case of `checkbox`.
 
+### **font** = *None*
+
+Only available if the `element_type` is `text`. Setting this string attribute will 
+change the font used for the text filled on this element.
+
 ### **font_size** = *None*
 
 Only available if the `element_type` is `text`. Setting this numerical attribute will 
