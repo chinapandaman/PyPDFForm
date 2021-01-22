@@ -19,7 +19,9 @@ with open(PATH_TO_SAMPLE_TTF_FONT_FILE, "rb+") as font:
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     filled_pdf = PyPDFForm(
-        template.read(), simple_mode=False, global_font="LiberationSerif-Regular",
+        template.read(),
+        simple_mode=False,
+        global_font="LiberationSerif-Regular",
     ).fill(
         {
             "test": "test_1",
