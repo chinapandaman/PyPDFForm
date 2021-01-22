@@ -6,9 +6,16 @@ PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
 )  # Change this to where you downloaded the sample PDF form
 
+PATH_TO_SAMPLE_TTF_FONT_FILE = os.path.join(
+    os.path.expanduser("~/Downloads"), "LiberationSerif-Italic.ttf"
+)  # Change this to where you downloaded the sample font file
+
 PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
+
+with open(PATH_TO_SAMPLE_TTF_FONT_FILE, "rb+") as font:
+    PyPDFForm.register_font("LiberationSerif-Italic", font.read())
 
 with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     pdf_form = PyPDFForm(template.read(), simple_mode=False)
@@ -19,6 +26,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     pdf_form.elements["test_2"].text_y_offset = -50
     pdf_form.elements["test_2"].text_wrap_length = 1
     pdf_form.elements["test_2"].font_color = (0, 1, 0)
+    pdf_form.elements["test_3"].font = "LiberationSerif-Italic"
     pdf_form.elements["test_3"].text_wrap_length = 2
     pdf_form.elements["test_3"].font_color = (0, 0, 1)
 
