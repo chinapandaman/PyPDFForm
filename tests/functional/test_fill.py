@@ -213,6 +213,7 @@ def test_fill_non_simple_mode_with_customized_elements(
     ) as f:
         obj = PyPDFForm(template_stream, simple_mode=False)
 
+        obj.elements["test"].font = "LiberationSerif-Italic"
         obj.elements["test"].font_size = 20
         obj.elements["test"].font_color = (1, 0, 0)
         obj.elements["test_2"].font_color = (0, 1, 0)
@@ -232,6 +233,7 @@ def test_fill_non_simple_mode_with_customized_elements(
             assert v.name in data_dict
             assert v.value == data_dict[k]
 
+        assert obj.elements["test"].font == "LiberationSerif-Italic"
         assert obj.elements["test"].font_size == 20
         assert obj.elements["test"].font_color == (1, 0, 0)
         assert (
