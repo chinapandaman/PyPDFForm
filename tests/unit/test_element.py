@@ -70,7 +70,7 @@ def test_set_value(text_element, checkbox_element):
 
 
 def test_validate_text_attributes(text_element):
-    text_element.font = 1
+    text_element.font = 0
 
     try:
         text_element.validate_text_attributes()
@@ -88,7 +88,7 @@ def test_validate_text_attributes(text_element):
 
     text_element.font = TextConstants().global_font
 
-    text_element.font_size = "12.5"
+    text_element.font_size = ""
 
     try:
         text_element.validate_text_attributes()
@@ -98,7 +98,7 @@ def test_validate_text_attributes(text_element):
 
     text_element.font_size = 12.5
 
-    text_element.font_color = "red"
+    text_element.font_color = ""
 
     try:
         text_element.validate_text_attributes()
@@ -108,7 +108,7 @@ def test_validate_text_attributes(text_element):
 
     text_element.font_color = (1, 0, 0)
 
-    text_element.text_x_offset = "100"
+    text_element.text_x_offset = ""
 
     try:
         text_element.validate_text_attributes()
@@ -118,7 +118,7 @@ def test_validate_text_attributes(text_element):
 
     text_element.text_x_offset = 100
 
-    text_element.text_y_offset = "100"
+    text_element.text_y_offset = ""
 
     try:
         text_element.validate_text_attributes()
@@ -128,6 +128,14 @@ def test_validate_text_attributes(text_element):
 
     text_element.text_y_offset = 100
 
+    text_element.text_wrap_length = ""
+
+    try:
+        text_element.validate_text_attributes()
+        assert False
+    except InvalidWrapLengthError:
+        assert True
+
     text_element.text_wrap_length = 100.5
 
     try:
@@ -135,6 +143,11 @@ def test_validate_text_attributes(text_element):
         assert False
     except InvalidWrapLengthError:
         assert True
+
+    text_element.text_wrap_length = 50
+
+    text_element.validate_text_attributes()
+    assert True
 
 
 def test_setting_invalid_value(text_element, checkbox_element):
