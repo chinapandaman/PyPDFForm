@@ -46,8 +46,8 @@ class Filler:
                     elements_to_fill[page].append(
                         [
                             elements[key],
-                            TemplateCore().get_element_coordinates(_element)[0],
-                            TemplateCore().get_element_coordinates(_element)[1],
+                            TemplateCore().get_draw_text_coordinates(_element)[0],
+                            TemplateCore().get_draw_text_coordinates(_element)[1],
                         ]
                     )
                 _element.update(pdfrw.PdfDict(**update_dict))
