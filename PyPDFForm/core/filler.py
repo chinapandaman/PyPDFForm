@@ -73,56 +73,61 @@ class Filler:
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
         data = Utils().bool_to_checkboxes(data)
 
-        images_to_draw = []
+        images_to_draw = {}
 
-        for element in TemplateCore().iterate_elements(template_pdf):
-            key = TemplateCore().get_element_key(element)
+        for page, elements in (
+            TemplateCore().get_elements_by_page(template_pdf).items()
+        ):
+            images_to_draw[page] = []
+            for element in elements:
+                key = TemplateCore().get_element_key(element)
 
-            if key in data.keys():
-                if data[key] in [
-                    pdfrw.PdfName.Yes,
-                    pdfrw.PdfName.Off,
-                ]:
-                    update_dict = {
-                        TemplateConstants().checkbox_field_value_key.replace(
-                            "/", ""
-                        ): data[key]
-                    }
-                elif isinstance(data[key], bytes):
-                    images_to_draw.append(
-                        [
-                            data[key],
-                            TemplateCore().get_draw_image_coordinates(element)[0],
-                            TemplateCore().get_draw_image_coordinates(element)[1],
-                            TemplateCore().get_draw_image_resolutions(element)[0],
-                            TemplateCore().get_draw_image_resolutions(element)[1],
-                        ]
-                    )
-                    element.update(pdfrw.PdfDict(**{
-                        TemplateConstants().field_editable_key.replace("/", ""): pdfrw.PdfObject(1)
-                    }))
-                    continue
-                else:
-                    update_dict = {
-                        TemplateConstants().text_field_value_key.replace("/", ""): data[
-                            key
-                        ]
-                    }
+                if key in data.keys():
+                    if data[key] in [
+                        pdfrw.PdfName.Yes,
+                        pdfrw.PdfName.Off,
+                    ]:
+                        update_dict = {
+                            TemplateConstants().checkbox_field_value_key.replace(
+                                "/", ""
+                            ): data[key]
+                        }
+                    elif isinstance(data[key], bytes):
+                        images_to_draw[page].append(
+                            [
+                                data[key],
+                                TemplateCore().get_draw_image_coordinates(element)[0],
+                                TemplateCore().get_draw_image_coordinates(element)[1],
+                                TemplateCore().get_draw_image_resolutions(element)[0],
+                                TemplateCore().get_draw_image_resolutions(element)[1],
+                            ]
+                        )
+                        element.update(pdfrw.PdfDict(**{
+                            TemplateConstants().field_editable_key.replace("/", ""): pdfrw.PdfObject(1)
+                        }))
+                        continue
+                    else:
+                        update_dict = {
+                            TemplateConstants().text_field_value_key.replace("/", ""): data[
+                                key
+                            ]
+                        }
 
-                if not editable:
-                    update_dict[
-                        TemplateConstants().field_editable_key.replace("/", "")
-                    ] = pdfrw.PdfObject(1)
+                    if not editable:
+                        update_dict[
+                            TemplateConstants().field_editable_key.replace("/", "")
+                        ] = pdfrw.PdfObject(1)
 
-                element.update(pdfrw.PdfDict(**update_dict))
+                    element.update(pdfrw.PdfDict(**update_dict))
 
         result = Utils().generate_stream(template_pdf)
 
-        if images_to_draw:
-            watermarks = WatermarkCore().create_watermarks_and_draw(
-                result, 1, "image", images_to_draw
-            )
+        for page, images in images_to_draw.items():
+            if images:
+                watermarks = WatermarkCore().create_watermarks_and_draw(
+                    result, page, "image", images
+                )
 
-            result = WatermarkCore().merge_watermarks_with_pdf(result, watermarks)
+                result = WatermarkCore().merge_watermarks_with_pdf(result, watermarks)
 
         return result
