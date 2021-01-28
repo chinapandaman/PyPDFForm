@@ -24,14 +24,16 @@ class Filler:
 
         elements_to_fill = {}
         images_to_draw = {}
-        watermarks = []
+        text_watermarks = []
+        image_watermarks = []
 
         for page, _elements in (
             TemplateCore().get_elements_by_page(template_pdf).items()
         ):
             elements_to_fill[page] = []
             images_to_draw[page] = []
-            watermarks.append(b"")
+            text_watermarks.append(b"")
+            image_watermarks.append(b"")
             for _element in _elements:
                 key = TemplateCore().get_element_key(_element)
 
@@ -70,19 +72,22 @@ class Filler:
             )
             for i, watermark in enumerate(_watermarks):
                 if watermark:
-                    watermarks[i] = watermark
+                    text_watermarks[i] = watermark
 
         result = WatermarkCore().merge_watermarks_with_pdf(
-            Utils().generate_stream(template_pdf), watermarks
+            Utils().generate_stream(template_pdf), text_watermarks
         )
 
         for page, images in images_to_draw.items():
             if images:
-                watermarks = WatermarkCore().create_watermarks_and_draw(
+                _watermarks = WatermarkCore().create_watermarks_and_draw(
                     result, page, "image", images
                 )
+                for i, watermark in enumerate(_watermarks):
+                    if watermark:
+                        image_watermarks[i] = watermark
 
-                result = WatermarkCore().merge_watermarks_with_pdf(result, watermarks)
+        result = WatermarkCore().merge_watermarks_with_pdf(result, image_watermarks)
 
         return result
 
@@ -96,11 +101,13 @@ class Filler:
         data = Utils().bool_to_checkboxes(data)
 
         images_to_draw = {}
+        image_watermarks = []
 
         for page, elements in (
             TemplateCore().get_elements_by_page(template_pdf).items()
         ):
             images_to_draw[page] = []
+            image_watermarks.append(b"")
             for element in elements:
                 key = TemplateCore().get_element_key(element)
 
@@ -146,10 +153,13 @@ class Filler:
 
         for page, images in images_to_draw.items():
             if images:
-                watermarks = WatermarkCore().create_watermarks_and_draw(
+                _watermarks = WatermarkCore().create_watermarks_and_draw(
                     result, page, "image", images
                 )
+                for i, watermark in enumerate(_watermarks):
+                    if watermark:
+                        image_watermarks[i] = watermark
 
-                result = WatermarkCore().merge_watermarks_with_pdf(result, watermarks)
+        result = WatermarkCore().merge_watermarks_with_pdf(result, image_watermarks)
 
         return result
