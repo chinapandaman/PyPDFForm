@@ -92,12 +92,10 @@ class Filler:
                     images_to_draw.append(
                         [
                             data[key],
-                            float(element[TemplateConstants().annotation_rectangle_key][0]),
-                            float(element[TemplateConstants().annotation_rectangle_key][1]),
-                            float(element[TemplateConstants().annotation_rectangle_key][2])
-                            - float(element[TemplateConstants().annotation_rectangle_key][0]),
-                            float(element[TemplateConstants().annotation_rectangle_key][3])
-                            - float(element[TemplateConstants().annotation_rectangle_key][1]),
+                            TemplateCore().get_draw_image_coordinates(element)[0],
+                            TemplateCore().get_draw_image_coordinates(element)[1],
+                            TemplateCore().get_draw_image_resolutions(element)[0],
+                            TemplateCore().get_draw_image_resolutions(element)[1],
                         ]
                     )
                     element.update(pdfrw.PdfDict(**{
