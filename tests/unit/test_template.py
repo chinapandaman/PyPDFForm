@@ -123,7 +123,7 @@ def test_build_elements(template_stream, data_dict):
         assert data_dict[k]
 
 
-def test_get_element_coordinates(template_stream):
+def test_get_draw_text_coordinates(template_stream):
     for element in TemplateCore().iterate_elements(template_stream):
         assert TemplateCore().get_draw_text_coordinates(element) == (
             float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
