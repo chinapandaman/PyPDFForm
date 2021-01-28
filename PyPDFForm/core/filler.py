@@ -120,10 +120,11 @@ class Filler:
 
         result = Utils().generate_stream(template_pdf)
 
-        watermarks = WatermarkCore().create_watermarks_and_draw(
-            result, 1, "image", images_to_draw
-        )
+        if images_to_draw:
+            watermarks = WatermarkCore().create_watermarks_and_draw(
+                result, 1, "image", images_to_draw
+            )
 
-        result = WatermarkCore().merge_watermarks_with_pdf(result, watermarks)
+            result = WatermarkCore().merge_watermarks_with_pdf(result, watermarks)
 
         return result
