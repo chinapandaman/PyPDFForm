@@ -73,13 +73,21 @@ class Template:
         """Returns its annotated type given a PDF form element."""
 
         element_type_mapping = {
-            "/Btn": ElementType.checkbox,
+            "/Btn": "MULTIPLE",
             "/Tx": ElementType.text,
         }
 
-        return element_type_mapping.get(
+        result = element_type_mapping.get(
             str(element[TemplateCoreConstants().element_type_key])
         )
+
+        if result == "MULTIPLE":
+            if element[TemplateCoreConstants().checkbox_field_value_key]:
+                return ElementType.checkbox
+            else:
+                return ElementType.image
+
+        return result
 
     @staticmethod
     def get_draw_text_coordinates(
