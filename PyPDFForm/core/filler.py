@@ -47,15 +47,16 @@ class Filler:
                         TemplateConstants().checkbox_field_value_key.replace("/", "")
                     ] = Utils().bool_to_checkbox(elements[key].value)
                 elif elements[key].type == ElementType.image:
-                    images_to_draw[page].append(
-                        [
-                            elements[key].value,
-                            TemplateCore().get_draw_image_coordinates(_element)[0],
-                            TemplateCore().get_draw_image_coordinates(_element)[1],
-                            TemplateCore().get_draw_image_resolutions(_element)[0],
-                            TemplateCore().get_draw_image_resolutions(_element)[1],
-                        ]
-                    )
+                    if elements[key].value is not None:
+                        images_to_draw[page].append(
+                            [
+                                elements[key].value,
+                                TemplateCore().get_draw_image_coordinates(_element)[0],
+                                TemplateCore().get_draw_image_coordinates(_element)[1],
+                                TemplateCore().get_draw_image_resolutions(_element)[0],
+                                TemplateCore().get_draw_image_resolutions(_element)[1],
+                            ]
+                        )
                 else:
                     texts_to_draw[page].append(
                         [
@@ -67,13 +68,12 @@ class Filler:
                 _element.update(pdfrw.PdfDict(**update_dict))
 
         for page, texts in texts_to_draw.items():
-            if texts:
-                _watermarks = WatermarkCore().create_watermarks_and_draw(
-                    template_stream, page, "text", texts
-                )
-                for i, watermark in enumerate(_watermarks):
-                    if watermark:
-                        text_watermarks[i] = watermark
+            _watermarks = WatermarkCore().create_watermarks_and_draw(
+                template_stream, page, "text", texts
+            )
+            for i, watermark in enumerate(_watermarks):
+                if watermark:
+                    text_watermarks[i] = watermark
 
         result = WatermarkCore().merge_watermarks_with_pdf(
             Utils().generate_stream(template_pdf), text_watermarks
