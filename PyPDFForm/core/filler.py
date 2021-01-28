@@ -30,6 +30,7 @@ class Filler:
             TemplateCore().get_elements_by_page(template_pdf).items()
         ):
             elements_to_fill[page] = []
+            images_to_draw[page] = []
             watermarks.append(b"")
             for _element in _elements:
                 key = TemplateCore().get_element_key(_element)
