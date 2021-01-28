@@ -73,6 +73,8 @@ class Filler:
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
         data = Utils().bool_to_checkboxes(data)
 
+        images_to_draw = []
+
         for element in TemplateCore().iterate_elements(template_pdf):
             key = TemplateCore().get_element_key(element)
 
@@ -86,6 +88,22 @@ class Filler:
                             "/", ""
                         ): data[key]
                     }
+                elif isinstance(data[key], bytes):
+                    images_to_draw.append(
+                        [
+                            data[key],
+                            float(element[TemplateConstants().annotation_rectangle_key][0]),
+                            float(element[TemplateConstants().annotation_rectangle_key][1]),
+                            float(element[TemplateConstants().annotation_rectangle_key][2])
+                            - float(element[TemplateConstants().annotation_rectangle_key][0]),
+                            float(element[TemplateConstants().annotation_rectangle_key][3])
+                            - float(element[TemplateConstants().annotation_rectangle_key][1]),
+                        ]
+                    )
+                    element.update(pdfrw.PdfDict(**{
+                        TemplateConstants().field_editable_key.replace("/", ""): pdfrw.PdfObject(1)
+                    }))
+                    continue
                 else:
                     update_dict = {
                         TemplateConstants().text_field_value_key.replace("/", ""): data[
@@ -100,4 +118,12 @@ class Filler:
 
                 element.update(pdfrw.PdfDict(**update_dict))
 
-        return Utils().generate_stream(template_pdf)
+        result = Utils().generate_stream(template_pdf)
+
+        watermarks = WatermarkCore().create_watermarks_and_draw(
+            result, 1, "image", images_to_draw
+        )
+
+        result = WatermarkCore().merge_watermarks_with_pdf(result, watermarks)
+
+        return result
