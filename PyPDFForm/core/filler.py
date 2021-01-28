@@ -22,7 +22,7 @@ class Filler:
 
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
 
-        elements_to_fill = {}
+        texts_to_draw = {}
         images_to_draw = {}
         text_watermarks = []
         image_watermarks = []
@@ -30,7 +30,7 @@ class Filler:
         for page, _elements in (
             TemplateCore().get_elements_by_page(template_pdf).items()
         ):
-            elements_to_fill[page] = []
+            texts_to_draw[page] = []
             images_to_draw[page] = []
             text_watermarks.append(b"")
             image_watermarks.append(b"")
@@ -57,7 +57,7 @@ class Filler:
                         ]
                     )
                 else:
-                    elements_to_fill[page].append(
+                    texts_to_draw[page].append(
                         [
                             elements[key],
                             TemplateCore().get_draw_text_coordinates(_element)[0],
@@ -66,13 +66,14 @@ class Filler:
                     )
                 _element.update(pdfrw.PdfDict(**update_dict))
 
-        for page, _elements in elements_to_fill.items():
-            _watermarks = WatermarkCore().create_watermarks_and_draw(
-                template_stream, page, "text", _elements
-            )
-            for i, watermark in enumerate(_watermarks):
-                if watermark:
-                    text_watermarks[i] = watermark
+        for page, texts in texts_to_draw.items():
+            if texts:
+                _watermarks = WatermarkCore().create_watermarks_and_draw(
+                    template_stream, page, "text", texts
+                )
+                for i, watermark in enumerate(_watermarks):
+                    if watermark:
+                        text_watermarks[i] = watermark
 
         result = WatermarkCore().merge_watermarks_with_pdf(
             Utils().generate_stream(template_pdf), text_watermarks
