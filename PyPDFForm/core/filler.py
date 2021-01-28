@@ -23,6 +23,7 @@ class Filler:
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
 
         elements_to_fill = {}
+        images_to_draw = {}
         watermarks = []
 
         for page, _elements in (
@@ -42,6 +43,16 @@ class Filler:
                     update_dict[
                         TemplateConstants().checkbox_field_value_key.replace("/", "")
                     ] = Utils().bool_to_checkbox(elements[key].value)
+                elif elements[key].type == ElementType.image:
+                    images_to_draw[page].append(
+                        [
+                            elements[key].value,
+                            TemplateCore().get_draw_image_coordinates(_element)[0],
+                            TemplateCore().get_draw_image_coordinates(_element)[1],
+                            TemplateCore().get_draw_image_resolutions(_element)[0],
+                            TemplateCore().get_draw_image_resolutions(_element)[1],
+                        ]
+                    )
                 else:
                     elements_to_fill[page].append(
                         [
@@ -60,9 +71,19 @@ class Filler:
                 if watermark:
                     watermarks[i] = watermark
 
-        return WatermarkCore().merge_watermarks_with_pdf(
+        result = WatermarkCore().merge_watermarks_with_pdf(
             Utils().generate_stream(template_pdf), watermarks
         )
+
+        for page, images in images_to_draw.items():
+            if images:
+                watermarks = WatermarkCore().create_watermarks_and_draw(
+                    result, page, "image", images
+                )
+
+                result = WatermarkCore().merge_watermarks_with_pdf(result, watermarks)
+
+        return result
 
     @staticmethod
     def simple_fill(

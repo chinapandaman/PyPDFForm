@@ -103,7 +103,7 @@ class PyPDFForm:
         for key, value in data.items():
             if not isinstance(key, str):
                 raise InvalidFormDataError
-            if not isinstance(value, (str, bool)):
+            if not isinstance(value, (str, bool, bytes)):
                 raise InvalidFormDataError
 
         for key, value in data.items():
