@@ -145,6 +145,23 @@ def test_get_draw_text_coordinates(template_stream):
         )
 
 
+def test_get_draw_image_coordinates(template_with_image_stream):
+    for element in TemplateCore().iterate_elements(template_with_image_stream):
+        assert TemplateCore().get_draw_image_coordinates(element) == (
+            float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
+            float(element[TemplateCoreConstants().annotation_rectangle_key][1]))
+
+
+def test_get_draw_image_resolutions(template_with_image_stream):
+    for element in TemplateCore().iterate_elements(template_with_image_stream):
+        assert TemplateCore().get_draw_image_resolutions(element) == (
+            float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
+            float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+        )
+
+
 def test_assign_uuid(template_stream, data_dict):
     for element in TemplateCore().iterate_elements(
         TemplateCore().assign_uuid(template_stream)
