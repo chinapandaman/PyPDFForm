@@ -111,8 +111,10 @@ class Template:
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw image at given a PDF form image element."""
 
-        return (float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
-                float(element[TemplateCoreConstants().annotation_rectangle_key][1]))
+        return (
+            float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
+            float(element[TemplateCoreConstants().annotation_rectangle_key][1]),
+        )
 
     @staticmethod
     def get_draw_image_resolutions(
@@ -124,7 +126,7 @@ class Template:
             float(element[TemplateCoreConstants().annotation_rectangle_key][2])
             - float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
             float(element[TemplateCoreConstants().annotation_rectangle_key][3])
-            - float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][1]),
         )
 
     def assign_uuid(self, pdf: bytes) -> bytes:

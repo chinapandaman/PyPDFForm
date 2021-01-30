@@ -9,8 +9,8 @@ from PyPDFForm.core.constants import Template as TemplateConstants
 from PyPDFForm.core.filler import Filler
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.middleware.constants import Text as TextConstants
-from PyPDFForm.middleware.template import Template as TemplateMiddleware
 from PyPDFForm.middleware.element import ElementType
+from PyPDFForm.middleware.template import Template as TemplateMiddleware
 
 
 @pytest.fixture
@@ -26,7 +26,9 @@ def template_stream(pdf_samples):
 
 @pytest.fixture
 def template_with_image_stream(pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+") as f:
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+"
+    ) as f:
         return f.read()
 
 
@@ -93,7 +95,9 @@ def test_fill(template_stream, data_dict):
             )
 
 
-def test_fill_with_image(template_with_image_stream, data_dict, image_stream, image_stream_2, image_stream_3):
+def test_fill_with_image(
+    template_with_image_stream, data_dict, image_stream, image_stream_2, image_stream_3
+):
     elements = TemplateMiddleware().build_elements(template_with_image_stream)
 
     for k, v in data_dict.items():
@@ -168,7 +172,9 @@ def test_simple_fill(template_stream, data_dict):
         assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
 
 
-def test_simple_fill_with_image(template_with_image_stream, data_dict, image_stream, image_stream_2, image_stream_3):
+def test_simple_fill_with_image(
+    template_with_image_stream, data_dict, image_stream, image_stream_2, image_stream_3
+):
     comparing_stream = Filler().simple_fill(template_with_image_stream, data_dict, True)
 
     data_dict["image_1"] = image_stream

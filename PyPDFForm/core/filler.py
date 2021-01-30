@@ -104,9 +104,7 @@ class Filler:
         images_to_draw = {}
         image_watermarks = []
 
-        for page, elements in (
-            TemplateCore().get_elements_by_page(template_pdf).items()
-        ):
+        for page, elements in TemplateCore().get_elements_by_page(template_pdf).items():
             images_to_draw[page] = []
             image_watermarks.append(b"")
             for element in elements:
@@ -132,15 +130,21 @@ class Filler:
                                 TemplateCore().get_draw_image_resolutions(element)[1],
                             ]
                         )
-                        element.update(pdfrw.PdfDict(**{
-                            TemplateConstants().field_editable_key.replace("/", ""): pdfrw.PdfObject(1)
-                        }))
+                        element.update(
+                            pdfrw.PdfDict(
+                                **{
+                                    TemplateConstants().field_editable_key.replace(
+                                        "/", ""
+                                    ): pdfrw.PdfObject(1)
+                                }
+                            )
+                        )
                         continue
                     else:
                         update_dict = {
-                            TemplateConstants().text_field_value_key.replace("/", ""): data[
-                                key
-                            ]
+                            TemplateConstants().text_field_value_key.replace(
+                                "/", ""
+                            ): data[key]
                         }
 
                     if not editable:

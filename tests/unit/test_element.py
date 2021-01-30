@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+
 import pytest
 
 from PyPDFForm.middleware.constants import Text as TextConstants
@@ -167,7 +168,9 @@ def test_validate_text_attributes(text_element):
     assert True
 
 
-def test_setting_invalid_value(text_element, checkbox_element, image_element, image_stream):
+def test_setting_invalid_value(
+    text_element, checkbox_element, image_element, image_stream
+):
     text_element.value = 0
 
     try:

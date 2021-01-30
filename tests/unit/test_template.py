@@ -27,7 +27,9 @@ def template_stream(pdf_samples):
 
 @pytest.fixture
 def template_with_image_stream(pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+") as f:
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+"
+    ) as f:
         return f.read()
 
 
@@ -149,7 +151,8 @@ def test_get_draw_image_coordinates(template_with_image_stream):
     for element in TemplateCore().iterate_elements(template_with_image_stream):
         assert TemplateCore().get_draw_image_coordinates(element) == (
             float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
-            float(element[TemplateCoreConstants().annotation_rectangle_key][1]))
+            float(element[TemplateCoreConstants().annotation_rectangle_key][1]),
+        )
 
 
 def test_get_draw_image_resolutions(template_with_image_stream):
@@ -158,7 +161,7 @@ def test_get_draw_image_resolutions(template_with_image_stream):
             float(element[TemplateCoreConstants().annotation_rectangle_key][2])
             - float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
             float(element[TemplateCoreConstants().annotation_rectangle_key][3])
-            - float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][1]),
         )
 
 
