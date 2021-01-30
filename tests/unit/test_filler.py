@@ -24,6 +24,30 @@ def template_stream(pdf_samples):
 
 
 @pytest.fixture
+def template_with_image_stream(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+") as f:
+        return f.read()
+
+
+@pytest.fixture
+def image_stream(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_image.jpg"), "rb+") as f:
+        return f.read()
+
+
+@pytest.fixture
+def image_stream_2(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_image_2.jpg"), "rb+") as f:
+        return f.read()
+
+
+@pytest.fixture
+def image_stream_3(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_image_3.jpg"), "rb+") as f:
+        return f.read()
+
+
+@pytest.fixture
 def data_dict():
     return {
         "test": "test_1",
@@ -84,3 +108,33 @@ def test_simple_fill(template_stream, data_dict):
                 == data_dict[key]
             )
         assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
+
+
+def test_simple_fill_with_image(template_with_image_stream, data_dict, image_stream, image_stream_2, image_stream_3):
+    comparing_stream = Filler().simple_fill(template_with_image_stream, data_dict, True)
+
+    data_dict["image_1"] = image_stream
+    data_dict["image_2"] = image_stream_2
+    data_dict["image_3"] = image_stream_3
+
+    result_stream = Filler().simple_fill(template_with_image_stream, data_dict, True)
+
+    assert result_stream != template_with_image_stream
+    assert result_stream != comparing_stream
+
+    for element in TemplateCore().iterate_elements(result_stream):
+        key = TemplateCore().get_element_key(element)
+
+        if isinstance(data_dict[key], bool):
+            assert element[TemplateConstants().checkbox_field_value_key] == (
+                pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
+            )
+        elif isinstance(data_dict[key], bytes):
+            assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
+            continue
+        else:
+            assert (
+                element[TemplateConstants().text_field_value_key][1:-1]
+                == data_dict[key]
+            )
+        assert element[TemplateConstants().field_editable_key] != pdfrw.PdfObject(1)
