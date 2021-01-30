@@ -177,7 +177,7 @@ def test_validate_fill_inputs(template_stream):
     except InvalidFormDataError:
         assert True
 
-    bad_inputs[0] = {"foo": "", "bar": True}
+    bad_inputs[0] = {"foo": "", "bar": True, "foo_bar": b"image"}
 
     PyPDFForm(template_stream, False).fill(*bad_inputs)
     assert True
@@ -208,7 +208,7 @@ def test_validate_simple_fill_inputs(template_stream):
     except InvalidFormDataError:
         assert True
 
-    bad_inputs[0] = {"foo": "", "bar": True}
+    bad_inputs[0] = {"foo": "", "bar": True, "foo_bar": b"image"}
 
     try:
         PyPDFForm(template_stream).fill(*bad_inputs)
