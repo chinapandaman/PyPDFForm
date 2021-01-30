@@ -91,7 +91,7 @@ class PyPDFForm:
 
     def _fill(
         self,
-        data: Dict[str, Union[str, bool]],
+        data: Dict[str, Union[str, bool, bytes]],
     ) -> "PyPDFForm":
         """Fill a PDF form with customized parameters."""
 
@@ -118,7 +118,7 @@ class PyPDFForm:
         return self
 
     def _simple_fill(
-        self, data: Dict[str, Union[str, bool]], editable: bool = False
+        self, data: Dict[str, Union[str, bool, bytes]], editable: bool = False
     ) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
 
