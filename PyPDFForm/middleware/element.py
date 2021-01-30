@@ -29,7 +29,7 @@ class Element:
         self,
         element_name: str,
         element_type: "ElementType",
-        element_value: Union[str, bool] = None,
+        element_value: Union[str, bool, bytes] = None,
     ) -> None:
         """Constructs all attributes for the Element object."""
 

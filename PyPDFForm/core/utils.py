@@ -27,7 +27,7 @@ class Utils:
 
     @staticmethod
     def bool_to_checkboxes(
-        data: Dict[str, Union[str, bool]]
+        data: Dict[str, Union[str, bool, bytes]]
     ) -> Dict[str, Union[str, "pdfrw.PdfName"]]:
         """Converts all boolean values in input data dictionary into PDF checkbox objects."""
 
