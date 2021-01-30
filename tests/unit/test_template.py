@@ -26,6 +26,12 @@ def template_stream(pdf_samples):
 
 
 @pytest.fixture
+def template_with_image_stream(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+") as f:
+        return f.read()
+
+
+@pytest.fixture
 def data_dict():
     return {
         "test": False,
@@ -91,7 +97,7 @@ def test_get_elements_by_page(template_stream):
             assert expected[page][k]
 
 
-def test_get_element_type(template_stream):
+def test_get_element_type(template_with_image_stream):
     type_mapping = {
         "test": ElementType.text,
         "check": ElementType.checkbox,
@@ -99,14 +105,17 @@ def test_get_element_type(template_stream):
         "check_2": ElementType.checkbox,
         "test_3": ElementType.text,
         "check_3": ElementType.checkbox,
+        "image_1": ElementType.image,
+        "image_2": ElementType.image,
+        "image_3": ElementType.image,
     }
 
-    for each in TemplateCore().iterate_elements(template_stream):
+    for each in TemplateCore().iterate_elements(template_with_image_stream):
         assert type_mapping[
             TemplateCore().get_element_key(each)
         ] == TemplateCore().get_element_type(each)
 
-    read_template_stream = pdfrw.PdfReader(fdata=template_stream)
+    read_template_stream = pdfrw.PdfReader(fdata=template_with_image_stream)
 
     for each in TemplateCore().iterate_elements(read_template_stream):
         assert type_mapping[
