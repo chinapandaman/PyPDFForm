@@ -10,6 +10,7 @@ from PyPDFForm.core.filler import Filler
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.template import Template as TemplateMiddleware
+from PyPDFForm.middleware.element import ElementType
 
 
 @pytest.fixture
@@ -65,12 +66,14 @@ def test_fill(template_stream, data_dict):
     for k, v in data_dict.items():
         if k in elements:
             elements[k].value = v
-            elements[k].font = TextConstants().global_font
-            elements[k].font_size = TextConstants().global_font_size
-            elements[k].font_color = TextConstants().global_font_color
-            elements[k].text_x_offset = TextConstants().global_text_x_offset
-            elements[k].text_y_offset = TextConstants().global_text_y_offset
-            elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+
+            if elements[k].type == ElementType.text:
+                elements[k].font = TextConstants().global_font
+                elements[k].font_size = TextConstants().global_font_size
+                elements[k].font_color = TextConstants().global_font_color
+                elements[k].text_x_offset = TextConstants().global_text_x_offset
+                elements[k].text_y_offset = TextConstants().global_text_y_offset
+                elements[k].text_wrap_length = TextConstants().global_text_wrap_length
             elements[k].validate_constants()
             elements[k].validate_value()
             elements[k].validate_text_attributes()
@@ -78,6 +81,61 @@ def test_fill(template_stream, data_dict):
     result_stream = Filler().fill(template_stream, elements)
 
     assert result_stream != template_stream
+
+    for element in TemplateCore().iterate_elements(result_stream):
+        key = TemplateCore().get_element_key(element)
+
+        assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
+
+        if isinstance(data_dict[key], bool):
+            assert element[TemplateConstants().checkbox_field_value_key] == (
+                pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
+            )
+
+
+def test_fill_with_image(template_with_image_stream, data_dict, image_stream, image_stream_2, image_stream_3):
+    elements = TemplateMiddleware().build_elements(template_with_image_stream)
+
+    for k, v in data_dict.items():
+        if k in elements:
+            elements[k].value = v
+
+            if elements[k].type == ElementType.text:
+                elements[k].font = TextConstants().global_font
+                elements[k].font_size = TextConstants().global_font_size
+                elements[k].font_color = TextConstants().global_font_color
+                elements[k].text_x_offset = TextConstants().global_text_x_offset
+                elements[k].text_y_offset = TextConstants().global_text_y_offset
+                elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+            elements[k].validate_constants()
+            elements[k].validate_value()
+            elements[k].validate_text_attributes()
+
+    comparing_stream = Filler().fill(template_with_image_stream, elements)
+
+    data_dict["image_1"] = image_stream
+    data_dict["image_2"] = image_stream_2
+    data_dict["image_3"] = image_stream_3
+
+    for k, v in data_dict.items():
+        if k in elements:
+            elements[k].value = v
+
+            if elements[k].type == ElementType.text:
+                elements[k].font = TextConstants().global_font
+                elements[k].font_size = TextConstants().global_font_size
+                elements[k].font_color = TextConstants().global_font_color
+                elements[k].text_x_offset = TextConstants().global_text_x_offset
+                elements[k].text_y_offset = TextConstants().global_text_y_offset
+                elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+            elements[k].validate_constants()
+            elements[k].validate_value()
+            elements[k].validate_text_attributes()
+
+    result_stream = Filler().fill(template_with_image_stream, elements)
+
+    assert result_stream != template_with_image_stream
+    assert result_stream != comparing_stream
 
     for element in TemplateCore().iterate_elements(result_stream):
         key = TemplateCore().get_element_key(element)
