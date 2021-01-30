@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import pytest
 
 from PyPDFForm.middleware.constants import Text as TextConstants
@@ -12,6 +13,17 @@ from PyPDFForm.middleware.exceptions.element import (InvalidElementNameError,
                                                      InvalidFontSizeError,
                                                      InvalidTextOffsetError,
                                                      InvalidWrapLengthError)
+
+
+@pytest.fixture
+def pdf_samples():
+    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples", "v2")
+
+
+@pytest.fixture
+def image_stream(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_image.jpg"), "rb+") as f:
+        return f.read()
 
 
 @pytest.fixture
@@ -34,6 +46,11 @@ def text_element():
 @pytest.fixture
 def checkbox_element():
     return Element("foo", ElementType.checkbox)
+
+
+@pytest.fixture
+def image_element():
+    return Element("foo", ElementType.image)
 
 
 def test_constructing_text_element(text_element, text_element_attributes):
@@ -150,7 +167,7 @@ def test_validate_text_attributes(text_element):
     assert True
 
 
-def test_setting_invalid_value(text_element, checkbox_element):
+def test_setting_invalid_value(text_element, checkbox_element, image_element, image_stream):
     text_element.value = 0
 
     try:
@@ -159,6 +176,9 @@ def test_setting_invalid_value(text_element, checkbox_element):
     except InvalidElementValueError:
         assert True
 
+    text_element.value = "foo"
+    text_element.validate_value()
+
     checkbox_element.value = ""
 
     try:
@@ -166,6 +186,28 @@ def test_setting_invalid_value(text_element, checkbox_element):
         assert False
     except InvalidElementValueError:
         assert True
+
+    checkbox_element.value = False
+    checkbox_element.validate_value()
+
+    image_element.value = ""
+
+    try:
+        image_element.validate_value()
+        assert False
+    except InvalidElementValueError:
+        assert True
+
+    image_element.value = b"bad_stream"
+
+    try:
+        image_element.validate_value()
+        assert False
+    except InvalidElementValueError:
+        assert True
+
+    image_element.value = image_stream
+    image_element.validate_value()
 
 
 def test_invalid_constants(text_element):
