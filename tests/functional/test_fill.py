@@ -300,7 +300,7 @@ def test_fill_images(
     with open(os.path.join(pdf_samples, "sample_filled_images.pdf"), "rb+") as f:
         obj = PyPDFForm(template_with_image_stream, simple_mode=False).fill(
             {
-                "image": image_stream,
+                "image_1": image_stream,
                 "image_2": image_stream_2,
                 "image_3": image_stream_3,
             }
@@ -308,5 +308,4 @@ def test_fill_images(
 
         expected = f.read()
 
-        # ToDo: needs rewrite with a template without watermarks
-        assert obj.stream[:255] == expected[:255]
+        assert obj.stream == expected
