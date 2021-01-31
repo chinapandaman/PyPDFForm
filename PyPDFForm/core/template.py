@@ -73,19 +73,27 @@ class Template:
         """Returns its annotated type given a PDF form element."""
 
         element_type_mapping = {
-            "/Btn": ElementType.checkbox,
+            "/Btn": "MULTIPLE",
             "/Tx": ElementType.text,
         }
 
-        return element_type_mapping.get(
+        result = element_type_mapping.get(
             str(element[TemplateCoreConstants().element_type_key])
         )
 
+        if result == "MULTIPLE":
+            if element[TemplateCoreConstants().checkbox_field_value_key]:
+                return ElementType.checkbox
+            else:
+                return ElementType.image
+
+        return result
+
     @staticmethod
-    def get_element_coordinates(
+    def get_draw_text_coordinates(
         element: "pdfrw.PdfDict",
     ) -> Tuple[Union[float, int], Union[float, int]]:
-        """Returns its coordinates given a PDF form element."""
+        """Returns coordinates to draw text at given a PDF form text element."""
 
         return (
             float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
@@ -95,6 +103,30 @@ class Template:
             )
             / 2
             - 2,
+        )
+
+    @staticmethod
+    def get_draw_image_coordinates(
+        element: "pdfrw.PdfDict",
+    ) -> Tuple[Union[float, int], Union[float, int]]:
+        """Returns coordinates to draw image at given a PDF form image element."""
+
+        return (
+            float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
+            float(element[TemplateCoreConstants().annotation_rectangle_key][1]),
+        )
+
+    @staticmethod
+    def get_draw_image_resolutions(
+        element: "pdfrw.PdfDict",
+    ) -> Tuple[Union[float, int], Union[float, int]]:
+        """Returns width and height of the image given a PDF form image element."""
+
+        return (
+            float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
+            float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][1]),
         )
 
     def assign_uuid(self, pdf: bytes) -> bytes:

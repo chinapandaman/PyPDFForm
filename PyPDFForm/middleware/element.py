@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Union
 
 from ..core.font import Font as FontCore
+from ..core.image import Image as ImageCore
 from .exceptions.element import (InvalidElementNameError,
                                  InvalidElementTypeError,
                                  InvalidElementValueError,
@@ -18,6 +19,7 @@ class ElementType(Enum):
 
     text = "text"
     checkbox = "checkbox"
+    image = "image"
 
 
 class Element:
@@ -27,7 +29,7 @@ class Element:
         self,
         element_name: str,
         element_type: "ElementType",
-        element_value: Union[str, bool] = None,
+        element_value: Union[str, bool, bytes] = None,
     ) -> None:
         """Constructs all attributes for the Element object."""
 
@@ -74,6 +76,16 @@ class Element:
         if self._type == ElementType.checkbox:
             if self.value is not None and not isinstance(self.value, bool):
                 raise InvalidElementValueError
+
+        if self._type == ElementType.image:
+            if self.value is not None:
+                if not isinstance(self.value, bytes):
+                    raise InvalidElementValueError
+
+                try:
+                    ImageCore().rotate_image(self.value, 0)
+                except Exception as error:
+                    raise InvalidElementValueError from error
 
     def validate_text_attributes(self) -> None:
         """Validates text element's attributes."""

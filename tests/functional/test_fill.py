@@ -37,6 +37,32 @@ def data_dict():
     }
 
 
+@pytest.fixture
+def template_with_image_stream(pdf_samples):
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+"
+    ) as f:
+        return f.read()
+
+
+@pytest.fixture
+def image_stream(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_image.jpg"), "rb+") as f:
+        return f.read()
+
+
+@pytest.fixture
+def image_stream_2(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_image_2.jpg"), "rb+") as f:
+        return f.read()
+
+
+@pytest.fixture
+def image_stream_3(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_image_3.jpg"), "rb+") as f:
+        return f.read()
+
+
 def test_fill_simple_mode(template_stream, pdf_samples, data_dict):
     with open(os.path.join(pdf_samples, "sample_filled_simple_mode.pdf"), "rb+") as f:
         obj = PyPDFForm(template_stream).fill(
@@ -262,3 +288,25 @@ def test_fill_non_simple_mode_with_customized_elements(
             obj.elements["test_3"].text_y_offset == TextConstants().global_text_y_offset
         )
         assert obj.elements["test_3"].text_wrap_length == 2
+
+
+def test_fill_images(
+    pdf_samples,
+    template_with_image_stream,
+    image_stream,
+    image_stream_2,
+    image_stream_3,
+):
+    with open(os.path.join(pdf_samples, "sample_filled_images.pdf"), "rb+") as f:
+        obj = PyPDFForm(template_with_image_stream, simple_mode=False).fill(
+            {
+                "image": image_stream,
+                "image_2": image_stream_2,
+                "image_3": image_stream_3,
+            }
+        )
+
+        expected = f.read()
+
+        # ToDo: needs rewrite with a template without watermarks
+        assert obj.stream[:255] == expected[:255]

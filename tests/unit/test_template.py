@@ -26,6 +26,14 @@ def template_stream(pdf_samples):
 
 
 @pytest.fixture
+def template_with_image_stream(pdf_samples):
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+"
+    ) as f:
+        return f.read()
+
+
+@pytest.fixture
 def data_dict():
     return {
         "test": False,
@@ -91,7 +99,7 @@ def test_get_elements_by_page(template_stream):
             assert expected[page][k]
 
 
-def test_get_element_type(template_stream):
+def test_get_element_type(template_with_image_stream):
     type_mapping = {
         "test": ElementType.text,
         "check": ElementType.checkbox,
@@ -99,14 +107,17 @@ def test_get_element_type(template_stream):
         "check_2": ElementType.checkbox,
         "test_3": ElementType.text,
         "check_3": ElementType.checkbox,
+        "image_1": ElementType.image,
+        "image_2": ElementType.image,
+        "image_3": ElementType.image,
     }
 
-    for each in TemplateCore().iterate_elements(template_stream):
+    for each in TemplateCore().iterate_elements(template_with_image_stream):
         assert type_mapping[
             TemplateCore().get_element_key(each)
         ] == TemplateCore().get_element_type(each)
 
-    read_template_stream = pdfrw.PdfReader(fdata=template_stream)
+    read_template_stream = pdfrw.PdfReader(fdata=template_with_image_stream)
 
     for each in TemplateCore().iterate_elements(read_template_stream):
         assert type_mapping[
@@ -123,9 +134,9 @@ def test_build_elements(template_stream, data_dict):
         assert data_dict[k]
 
 
-def test_get_element_coordinates(template_stream):
+def test_get_draw_text_coordinates(template_stream):
     for element in TemplateCore().iterate_elements(template_stream):
-        assert TemplateCore().get_element_coordinates(element) == (
+        assert TemplateCore().get_draw_text_coordinates(element) == (
             float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
             (
                 float(element[TemplateCoreConstants().annotation_rectangle_key][1])
@@ -133,6 +144,24 @@ def test_get_element_coordinates(template_stream):
             )
             / 2
             - 2,
+        )
+
+
+def test_get_draw_image_coordinates(template_with_image_stream):
+    for element in TemplateCore().iterate_elements(template_with_image_stream):
+        assert TemplateCore().get_draw_image_coordinates(element) == (
+            float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
+            float(element[TemplateCoreConstants().annotation_rectangle_key][1]),
+        )
+
+
+def test_get_draw_image_resolutions(template_with_image_stream):
+    for element in TemplateCore().iterate_elements(template_with_image_stream):
+        assert TemplateCore().get_draw_image_resolutions(element) == (
+            float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
+            float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][1]),
         )
 
 
