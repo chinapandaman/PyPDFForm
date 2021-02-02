@@ -4,11 +4,27 @@
 from io import BytesIO
 from typing import Union
 
-from PIL import Image as Img
+from PIL import Image as Img, UnidentifiedImageError
 
 
 class Image:
     """Contains methods for interacting with images."""
+
+    @staticmethod
+    def is_image(stream: bytes) -> bool:
+        """Checks if a stream is indeed an image."""
+
+        buff = BytesIO()
+        buff.write(stream)
+        buff.seek(0)
+
+        try:
+            Img.open(buff)
+            buff.close()
+            return True
+        except UnidentifiedImageError:
+            buff.close()
+            return False
 
     @staticmethod
     def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:

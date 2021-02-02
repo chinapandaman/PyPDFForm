@@ -183,7 +183,7 @@ def test_validate_fill_inputs(template_stream):
     assert True
 
 
-def test_validate_simple_fill_inputs(template_stream):
+def test_validate_simple_fill_inputs(template_stream, image_stream):
     bad_inputs = ["not_dict", "True"]
 
     try:
@@ -212,6 +212,15 @@ def test_validate_simple_fill_inputs(template_stream):
 
     try:
         PyPDFForm(template_stream).fill(*bad_inputs)
+        assert False
+    except InvalidImageError:
+        assert True
+
+    bad_inputs[0] = {"foo": "", "bar": True, "foo_bar": image_stream}
+
+    try:
+        PyPDFForm(template_stream).fill(*bad_inputs)
+        assert False
     except InvalidEditableParameterError:
         assert True
 

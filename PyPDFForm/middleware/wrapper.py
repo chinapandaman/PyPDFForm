@@ -132,6 +132,9 @@ class PyPDFForm:
                 raise InvalidFormDataError
             if not isinstance(value, (str, bool, bytes)):
                 raise InvalidFormDataError
+            if isinstance(value, bytes):
+                if not ImageCore().is_image(value):
+                    raise InvalidImageError
 
         if not isinstance(editable, bool):
             raise InvalidEditableParameterError
@@ -217,10 +220,10 @@ class PyPDFForm:
         if not isinstance(rotation, (float, int)):
             raise InvalidImageRotationAngleError
 
-        try:
-            image = ImageCore().rotate_image(image, rotation)
-        except Exception as error:
-            raise InvalidImageError from error
+        if not ImageCore().is_image(image):
+            raise InvalidImageError
+
+        image = ImageCore().rotate_image(image, rotation)
 
         if not isinstance(page_number, int):
             raise InvalidPageNumberError

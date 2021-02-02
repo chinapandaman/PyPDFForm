@@ -20,6 +20,11 @@ def image_stream(pdf_samples):
         return f.read()
 
 
+def test_is_image(image_stream):
+    assert not ImageCore().is_image(b"bad_stream")
+    assert ImageCore().is_image(image_stream)
+
+
 def test_rotate_image(image_stream):
     rotated = ImageCore().rotate_image(image_stream, 180)
 
