@@ -262,7 +262,7 @@ class PyPDFForm:
         ):
             raise InvalidTTFFontError
 
-        try:
-            return FontCore().register_font(font_name, ttf_stream)
-        except Exception as error:
-            raise InvalidTTFFontError from error
+        if not FontCore().register_font(font_name, ttf_stream):
+            raise InvalidTTFFontError
+
+        return True

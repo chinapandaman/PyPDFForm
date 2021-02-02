@@ -20,11 +20,12 @@ class Image:
 
         try:
             Img.open(buff)
-            buff.close()
-            return True
+            result = True
         except UnidentifiedImageError:
-            buff.close()
-            return False
+            result = False
+
+        buff.close()
+        return result
 
     @staticmethod
     def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
