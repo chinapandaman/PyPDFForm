@@ -4,7 +4,8 @@
 from io import BytesIO
 from typing import Union
 
-from PIL import Image as Img, UnidentifiedImageError
+from PIL import Image as Img
+from PIL import UnidentifiedImageError
 
 
 class Image:
