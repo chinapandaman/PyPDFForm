@@ -213,7 +213,7 @@ def test_validate_simple_fill_inputs(template_stream, image_stream):
     try:
         PyPDFForm(template_stream).fill(*bad_inputs)
         assert False
-    except InvalidImageError:
+    except InvalidFormDataError:
         assert True
 
     bad_inputs[0] = {"foo": "", "bar": True, "foo_bar": image_stream}

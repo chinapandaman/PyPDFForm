@@ -134,7 +134,7 @@ class PyPDFForm:
                 raise InvalidFormDataError
             if isinstance(value, bytes):
                 if not ImageCore().is_image(value):
-                    raise InvalidImageError
+                    raise InvalidFormDataError
 
         if not isinstance(editable, bool):
             raise InvalidEditableParameterError
