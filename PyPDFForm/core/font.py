@@ -4,7 +4,7 @@
 from io import BytesIO
 
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 
 class Font:
@@ -18,10 +18,14 @@ class Font:
         buff.write(ttf_stream)
         buff.seek(0)
 
-        pdfmetrics.registerFont(TTFont(name=font_name, filename=buff))
+        try:
+            pdfmetrics.registerFont(TTFont(name=font_name, filename=buff))
+            result = True
+        except TTFError:
+            result = False
 
         buff.close()
-        return True
+        return result
 
     @staticmethod
     def is_registered(font_name: str) -> bool:

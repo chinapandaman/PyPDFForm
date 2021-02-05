@@ -12,6 +12,10 @@ def font_samples():
     return os.path.join(os.path.dirname(__file__), "..", "..", "font_samples")
 
 
+def test_register_bad_font():
+    assert not FontCore().register_font("foo", b"bar")
+
+
 def test_register_font_and_is_registered(font_samples):
     assert not FontCore().is_registered("LiberationSerif")
 

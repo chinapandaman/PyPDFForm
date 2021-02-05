@@ -81,11 +81,8 @@ class Element:
             if self.value is not None:
                 if not isinstance(self.value, bytes):
                     raise InvalidElementValueError
-
-                try:
-                    ImageCore().rotate_image(self.value, 0)
-                except Exception as error:
-                    raise InvalidElementValueError from error
+                if not ImageCore().is_image(self.value):
+                    raise InvalidElementValueError
 
     def validate_text_attributes(self) -> None:
         """Validates text element's attributes."""
