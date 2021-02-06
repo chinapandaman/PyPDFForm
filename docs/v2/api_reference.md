@@ -108,16 +108,20 @@ Please read more about `Element()` [here](https://github.com/chinapandaman/PyPDF
 
 The fill method takes a python dictionary object `data` and fill the PDF form 
 template with it. The key of the object should match the annotated names of elements on the PDF form. 
-The value of the object will be printed on the corresponding element if it's a `string`. 
-If the value is a `boolean` the corresponding checkboxes will be checked on the PDF form.
+Based on the type of the value as well as different the type of the element different 
+actions will be performed on the PDF form.
 
 #### Parameters:
 
-* **data** - a python dictionary which holds the data that will be filled on the PDF form. A `string` will 
-be printed and a `boolean` will check the corresponding checkboxes.
+* **data** - a python dictionary which holds the data that will be filled on the PDF form. 
+Its keys have to be `string` and need to match the annotated names of elements. 
+Its values currently support the following:
+    1) A `string`, which will be printed on the corresponding text element.
+    2) A `boolean`, which will check the corresponding checkbox element.
+    3) A valid image `bytes` stream, which will be drawn on the corresponding image element.
 
 * **editable** - only available if `simple_mode` is `True`, enabling this will allow the filled PDF to be still 
-editable.
+editable. NOTE: Image elements that are filled via the `fill` method will NOT be editable even if this is `True`.
   
 ### **register_font**(*font_name, ttf_stream*)
 
@@ -167,12 +171,16 @@ A string which represents the annotated name of the element. Readonly.
 ### **type**
 
 An enum value which represents the type of the element, currently supporting 
-`text` and `checkbox`. Readonly.
+`text`, `checkbox` and `image`. Readonly.
 
 ### **value**
 
-This attribute holds the value that's used to fill this element. It is a string 
-if the `element_type` is `text` or a boolean value in the case of `checkbox`.
+This attribute holds the value that's used to fill this element. 
+It currently supports the following based on the type of the element:
+
+1) A `string`, if the element is a `text`.
+2) A `boolean`, if the element is a `checkbox`.
+3) A valid image `bytes` stream, if the element is an `image`.
 
 ### **font** = *None*
 
