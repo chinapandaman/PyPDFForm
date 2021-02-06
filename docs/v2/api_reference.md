@@ -121,7 +121,7 @@ Its values currently support the following:
     3) A valid image `bytes` stream, which will be drawn on the corresponding `image` element.
 
 * **editable** - only available if `simple_mode` is `True`, enabling this will allow the filled PDF to be still 
-editable. NOTE: Image elements that are filled via the `fill` method will NOT be editable even if this is `True`.
+editable. NOTE: `image` elements that are filled via the `fill` method will NOT be editable even if this is `True`.
   
 ### **register_font**(*font_name, ttf_stream*)
 
@@ -161,8 +161,11 @@ such as font size and text wrap length.
 * **element_type** - an enum which represents the type of the element, currently supporting 
 `text` and `checkbox`.
 
-* **element_value** - this is the value that's used to fill this element. It is a string 
-if the `element_type` is `text` or a boolean value in the case of `checkbox`.
+* **element_value** - this is the value that's used to fill this element. 
+It currently supports the following based on the type of the element:
+  1) A `string`, if the element is a `text`.
+  2) A `boolean`, if the element is a `checkbox`.
+  3) A valid image `bytes` stream, if the element is an `image`.
 
 ### **name**
 
