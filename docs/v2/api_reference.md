@@ -108,7 +108,7 @@ Please read more about `Element()` [here](https://github.com/chinapandaman/PyPDF
 
 The fill method takes a python dictionary object `data` and fill the PDF form 
 template with it. Keys of the objects should match the annotated names of elements on the PDF form. 
-Based types of values as well as different types of elements different 
+Based on types of values as well as different types of elements different 
 actions will be performed on the PDF form.
 
 #### Parameters:
