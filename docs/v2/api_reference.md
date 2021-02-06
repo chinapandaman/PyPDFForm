@@ -159,7 +159,7 @@ such as font size and text wrap length.
 * **element_name** - a string which represents the annotated name of the element.
 
 * **element_type** - an enum which represents the type of the element, currently supporting 
-`text` and `checkbox`.
+`text`, `checkbox` and `image`.
 
 * **element_value** - this is the value that's used to fill this element. 
 It currently supports the following based on the type of the element:
