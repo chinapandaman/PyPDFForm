@@ -116,9 +116,9 @@ actions will be performed on the PDF form.
 * **data** - a python dictionary which holds the data that will be filled on the PDF form. 
 Its keys have to be `string` and need to match the annotated names of elements. 
 Its values currently support the following:
-    1) A `string`, which will be printed on the corresponding text element.
-    2) A `boolean`, which will check the corresponding checkbox element.
-    3) A valid image `bytes` stream, which will be drawn on the corresponding image element.
+    1) A `string`, which will be printed on the corresponding `text` element.
+    2) A `boolean`, which will check the corresponding `checkbox` element.
+    3) A valid image `bytes` stream, which will be drawn on the corresponding `image` element.
 
 * **editable** - only available if `simple_mode` is `True`, enabling this will allow the filled PDF to be still 
 editable. NOTE: Image elements that are filled via the `fill` method will NOT be editable even if this is `True`.
