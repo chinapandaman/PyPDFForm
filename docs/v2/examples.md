@@ -7,9 +7,9 @@ can be used out of box.
 
 The most common tool to create a PDF form is Adobe Acrobat. A tutorial can be found 
 [here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html). 
-There are other free alternatives that support the same functionalities.
+There are other free alternatives like [this](https://pdf.wondershare.com/) that support the same functionalities.
 
-For the purpose of consistency, all examples will use the same PDF form which can be 
+Unless otherwise specified, all examples will use the same PDF form which can be 
 found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_template.pdf). 
 It has three text fields `test`, `test_2`, `test_3` and three checkboxes 
 `check`, `check_2`, `check_3` scattered on three pages.
@@ -439,3 +439,58 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_customized_elements.py
+
+
+## Filling a PDF form with image elements
+
+This example uses this [template](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_template_with_image_field.pdf). 
+It demos filling a PDF form's image elements.
+
+```python
+import os
+
+from PyPDFForm import PyPDFForm
+
+PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
+    os.path.expanduser("~/Downloads"), "sample_template_with_image_field.pdf"
+)  # Change this to where you downloaded the sample PDF form
+
+PATH_TO_IMAGE_1 = os.path.join(
+    os.path.expanduser("~"), "sample_image.jpg"
+)  # Change this to where you downloaded the sample image
+
+PATH_TO_IMAGE_2 = os.path.join(
+    os.path.expanduser("~"), "sample_image_2.jpg"
+)  # Change this to where you downloaded the sample image
+
+PATH_TO_IMAGE_3 = os.path.join(
+    os.path.expanduser("~"), "sample_image_3.jpg"
+)  # Change this to where you downloaded the sample image
+
+PATH_TO_FILLED_PDF_FORM = os.path.join(
+    os.path.expanduser("~"), "output.pdf"
+)  # Change this to where you wish to put your filled PDF form
+
+with open(PATH_TO_IMAGE_1, "rb+") as image:
+    image_stream_1 = image.read()
+
+with open(PATH_TO_IMAGE_2, "rb+") as image:
+    image_stream_2 = image.read()
+
+with open(PATH_TO_IMAGE_3, "rb+") as image:
+    image_stream_3 = image.read()
+
+with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
+    filled_pdf = PyPDFForm(template.read()).fill(
+        {
+            "image_1": image_stream_1,
+            "image_2": image_stream_2,
+            "image_3": image_stream_3,
+        },
+    )
+
+    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+        output.write(filled_pdf.stream)
+```
+
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_images.py
