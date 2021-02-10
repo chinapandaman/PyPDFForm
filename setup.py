@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import re
 import setuptools
+
+
+with open("PyPDFForm/__init__.py", encoding="utf8") as f:
+    version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -16,7 +21,7 @@ with open("requirements.txt", "r") as requirements:
 
 setuptools.setup(
     name="PyPDFForm",
-    version="0.2.2",
+    version=version,
     description="python library for PDF forms",
     long_description=long_description,
     long_description_content_type="text/markdown",
