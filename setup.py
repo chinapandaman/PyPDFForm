@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import re
-import setuptools
 
+import setuptools
 
 with open("PyPDFForm/__init__.py", encoding="utf8") as f:
     version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
