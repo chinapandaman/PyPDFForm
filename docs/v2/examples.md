@@ -441,9 +441,13 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_customized_elements.py
 
 
-## Filling a PDF form with image elements
+## Fill a PDF form with image elements
 
-This example uses this [template](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_template_with_image_field.pdf). 
+This example uses this [template](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_template_with_image_field.pdf) 
+and these images: 
+[image 1](https://github.com/chinapandaman/PyPDFForm/blob/master/image_samples/sample_image.jpg), 
+[image 2](https://github.com/chinapandaman/PyPDFForm/blob/master/image_samples/sample_image_2.jpg),
+[image 3](https://github.com/chinapandaman/PyPDFForm/blob/master/image_samples/sample_image_3.jpg). 
 It demos filling a PDF form's image elements.
 
 ```python

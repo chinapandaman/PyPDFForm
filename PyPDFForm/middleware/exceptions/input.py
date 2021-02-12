@@ -9,7 +9,7 @@ class InvalidModeError(BasePyPDFFormException):
 
 
 class InvalidFormDataError(BasePyPDFFormException):
-    """Raised when form data input is not a dictionary."""
+    """Raised when form data input is not a dictionary with appropriate key value types."""
 
 
 class InvalidEditableParameterError(BasePyPDFFormException):
