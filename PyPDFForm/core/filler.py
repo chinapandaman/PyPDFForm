@@ -104,6 +104,8 @@ class Filler:
         images_to_draw = {}
         image_watermarks = []
 
+        radio_button_tracker = {}
+
         for page, elements in TemplateCore().get_elements_by_page(template_pdf).items():
             images_to_draw[page] = []
             image_watermarks.append(b"")
@@ -120,6 +122,19 @@ class Filler:
                                 "/", ""
                             ): data[key]
                         }
+                    elif isinstance(data[key], int):
+                        if key not in radio_button_tracker:
+                            radio_button_tracker[key] = 0
+                        radio_button_tracker[key] += 1
+
+                        update_dict = {}
+                        if data[key] == radio_button_tracker[key] - 1:
+                            update_dict = {
+                                TemplateConstants().checkbox_field_value_key.replace(
+                                    "/", ""
+                                ): pdfrw.PdfName(str(data[key]))
+                            }
+
                     elif isinstance(data[key], bytes):
                         images_to_draw[page].append(
                             [
