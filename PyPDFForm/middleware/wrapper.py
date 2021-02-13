@@ -91,7 +91,7 @@ class PyPDFForm:
 
     def _fill(
         self,
-        data: Dict[str, Union[str, bool, bytes]],
+        data: Dict[str, Union[str, bool, bytes, int]],
     ) -> "PyPDFForm":
         """Fill a PDF form with customized parameters."""
 
@@ -103,7 +103,7 @@ class PyPDFForm:
         for key, value in data.items():
             if not isinstance(key, str):
                 raise InvalidFormDataError
-            if not isinstance(value, (str, bool, bytes)):
+            if not isinstance(value, (str, bool, bytes, int)):
                 raise InvalidFormDataError
 
         for key, value in data.items():
@@ -118,7 +118,7 @@ class PyPDFForm:
         return self
 
     def _simple_fill(
-        self, data: Dict[str, Union[str, bool, bytes]], editable: bool = False
+        self, data: Dict[str, Union[str, bool, bytes, int]], editable: bool = False
     ) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
 
@@ -130,7 +130,7 @@ class PyPDFForm:
         for key, value in data.items():
             if not isinstance(key, str):
                 raise InvalidFormDataError
-            if not isinstance(value, (str, bool, bytes)):
+            if not isinstance(value, (str, bool, bytes, int)):
                 raise InvalidFormDataError
             if isinstance(value, bytes):
                 if not ImageCore().is_image(value):

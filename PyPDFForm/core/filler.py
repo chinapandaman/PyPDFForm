@@ -95,7 +95,7 @@ class Filler:
 
     @staticmethod
     def simple_fill(
-        template_stream: bytes, data: Dict[str, Union[str, bool, bytes]], editable: bool
+        template_stream: bytes, data: Dict[str, Union[str, bool, bytes, int]], editable: bool
     ) -> bytes:
         """Fills a PDF form in simple mode."""
 
