@@ -4,6 +4,7 @@
 from typing import Dict, Union
 
 import pdfrw
+from pdfrw.objects.pdfname import BasePdfName
 
 from ..middleware.element import Element as ElementMiddleware
 from ..middleware.element import ElementType
@@ -132,7 +133,7 @@ class Filler:
                             element.update(pdfrw.PdfDict(**{
                                 TemplateConstants().checkbox_field_value_key.replace(
                                     "/", ""
-                                ): pdfrw.PdfName(str(data[key])),
+                                ): BasePdfName('/' + str(data[key]), False),
                             }))
 
                             if not editable:
