@@ -28,6 +28,8 @@ class Filler:
         text_watermarks = []
         image_watermarks = []
 
+        radio_button_tracker = {}
+
         for page, _elements in (
             TemplateCore().get_elements_by_page(template_pdf).items()
         ):
@@ -47,6 +49,24 @@ class Filler:
                     update_dict[
                         TemplateConstants().checkbox_field_value_key.replace("/", "")
                     ] = Utils().bool_to_checkbox(elements[key].value)
+                elif elements[key].type == ElementType.radiobutton:
+                    if key not in radio_button_tracker:
+                        radio_button_tracker[key] = 0
+                    radio_button_tracker[key] += 1
+
+                    if elements[key].value == radio_button_tracker[key] - 1:
+                        _element.update(pdfrw.PdfDict(**{
+                            TemplateConstants().checkbox_field_value_key.replace(
+                                "/", ""
+                            ): BasePdfName('/' + str(elements[key].value), False),
+                        }))
+
+                    _element[TemplateConstants().radio_button_group_key].update(
+                        pdfrw.PdfDict(**{
+                            TemplateConstants().field_editable_key.replace("/", ""): pdfrw.PdfObject(1)
+                        })
+                    )
+                    continue
                 elif elements[key].type == ElementType.image:
                     if elements[key].value is not None:
                         images_to_draw[page].append(
