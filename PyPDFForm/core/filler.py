@@ -129,25 +129,19 @@ class Filler:
                         radio_button_tracker[key] += 1
 
                         if data[key] == radio_button_tracker[key] - 1:
-                            if element[TemplateConstants().radio_button_group_key]:
-                                element.update(pdfrw.PdfDict(**{
-                                    TemplateConstants().checkbox_field_value_key.replace(
-                                        "/", ""
-                                    ): pdfrw.PdfName(str(data[key])),
-                                }))
-                                if not editable:
-                                    update_dict = {
-                                        TemplateConstants().field_editable_key.replace("/", ""): pdfrw.PdfObject(1)}
-                                    element[TemplateConstants().radio_button_group_key].update(
-                                        pdfrw.PdfDict(**update_dict)
-                                    )
-                                continue
-
-                            update_dict = {
+                            element.update(pdfrw.PdfDict(**{
                                 TemplateConstants().checkbox_field_value_key.replace(
                                     "/", ""
-                                ): pdfrw.PdfName(str(data[key]))
-                            }
+                                ): pdfrw.PdfName(str(data[key])),
+                            }))
+
+                            if not editable:
+                                element[TemplateConstants().radio_button_group_key].update(
+                                    pdfrw.PdfDict(**{
+                                        TemplateConstants().field_editable_key.replace("/", ""): pdfrw.PdfObject(1)
+                                    })
+                                )
+                            continue
 
                     elif isinstance(data[key], bytes):
                         images_to_draw[page].append(
