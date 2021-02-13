@@ -113,6 +113,7 @@ class Filler:
                 key = TemplateCore().get_element_key(element)
 
                 if key in data.keys():
+                    update_dict = {}
                     if data[key] in [
                         pdfrw.PdfName.Yes,
                         pdfrw.PdfName.Off,
@@ -127,8 +128,21 @@ class Filler:
                             radio_button_tracker[key] = 0
                         radio_button_tracker[key] += 1
 
-                        update_dict = {}
                         if data[key] == radio_button_tracker[key] - 1:
+                            if element[TemplateConstants().radio_button_group_key]:
+                                element.update(pdfrw.PdfDict(**{
+                                    TemplateConstants().checkbox_field_value_key.replace(
+                                        "/", ""
+                                    ): pdfrw.PdfName(str(data[key])),
+                                }))
+                                if not editable:
+                                    update_dict = {
+                                        TemplateConstants().field_editable_key.replace("/", ""): pdfrw.PdfObject(1)}
+                                    element[TemplateConstants().radio_button_group_key].update(
+                                        pdfrw.PdfDict(**update_dict)
+                                    )
+                                continue
+
                             update_dict = {
                                 TemplateConstants().checkbox_field_value_key.replace(
                                     "/", ""
