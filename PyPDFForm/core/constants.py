@@ -55,7 +55,7 @@ class Template:
 
     @property
     def radio_button_group_key(self) -> str:
-        """Used for extracting grouped radio button keys fro pdfrw parsed PDF form."""
+        """Used for extracting grouped radio button keys for pdfrw parsed PDF form."""
 
         return "/Parent"
 
