@@ -54,6 +54,12 @@ class Template:
         return "/AS"
 
     @property
+    def radio_button_group_key(self) -> str:
+        """Used for extracting grouped radio button keys fro pdfrw parsed PDF form."""
+
+        return "/Parent"
+
+    @property
     def field_editable_key(self) -> str:
         """Used for identifying if an element is still editable for pdfrw parsed PDF form."""
 

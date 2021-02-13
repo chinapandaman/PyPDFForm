@@ -34,6 +34,11 @@ class Template:
                         and element[TemplateCoreConstants().annotation_field_key]
                     ):
                         result.append(element)
+                    elif (
+                        element[TemplateCoreConstants().checkbox_field_value_key]
+                        and element[TemplateCoreConstants().radio_button_group_key]
+                    ):
+                        result.append(element)
 
         return result
 
@@ -57,6 +62,11 @@ class Template:
                         element[TemplateCoreConstants().subtype_key]
                         == TemplateCoreConstants().widget_subtype_key
                         and element[TemplateCoreConstants().annotation_field_key]
+                    ):
+                        result[i + 1].append(element)
+                    elif (
+                        element[TemplateCoreConstants().checkbox_field_value_key]
+                        and element[TemplateCoreConstants().radio_button_group_key]
                     ):
                         result[i + 1].append(element)
 
