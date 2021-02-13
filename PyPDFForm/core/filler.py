@@ -143,7 +143,6 @@ class Filler:
                                     })
                                 )
                             continue
-
                     elif isinstance(data[key], bytes):
                         images_to_draw[page].append(
                             [

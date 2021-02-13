@@ -20,6 +20,7 @@ class ElementType(Enum):
     text = "text"
     checkbox = "checkbox"
     image = "image"
+    radiobutton = "radiobutton"
 
 
 class Element:
@@ -83,6 +84,10 @@ class Element:
                     raise InvalidElementValueError
                 if not ImageCore().is_image(self.value):
                     raise InvalidElementValueError
+
+        if self._type == ElementType.radiobutton:
+            if self.value is not None and not isinstance(self.value, int):
+                raise InvalidElementValueError
 
     def validate_text_attributes(self) -> None:
         """Validates text element's attributes."""
