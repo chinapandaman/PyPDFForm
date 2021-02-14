@@ -84,7 +84,7 @@ class Template:
         return element[TemplateCoreConstants().annotation_field_key][1:-1]
 
     @staticmethod
-    def get_element_type(element: "pdfrw.PdfDict") -> "ElementType":
+    def get_element_type(element: "pdfrw.PdfDict") -> Union["ElementType", None]:
         """Returns its annotated type given a PDF form element."""
 
         element_type_mapping = {
