@@ -3,6 +3,7 @@
 import os
 
 import pdfrw
+from pdfrw.objects.pdfname import BasePdfName
 import pytest
 
 from PyPDFForm.core.constants import Template as TemplateConstants
@@ -33,6 +34,14 @@ def template_stream(pdf_samples):
 def template_with_image_stream(pdf_samples):
     with open(
         os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+"
+    ) as f:
+        return f.read()
+
+
+@pytest.fixture
+def template_with_radiobutton_stream(pdf_samples):
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_radio_button.pdf"), "rb+"
     ) as f:
         return f.read()
 
@@ -201,6 +210,38 @@ def test_simple_fill_with_image(
         elif isinstance(data_dict[key], bytes):
             assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
             continue
+        else:
+            assert (
+                element[TemplateConstants().text_field_value_key][1:-1]
+                == data_dict[key]
+            )
+        assert element[TemplateConstants().field_editable_key] != pdfrw.PdfObject(1)
+
+
+def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
+    data_dict["radio_1"] = 0
+    data_dict["radio_2"] = 1
+    data_dict["radio_3"] = 2
+
+    radio_button_tracker = {}
+
+    result_stream = Filler().simple_fill(template_with_radiobutton_stream, data_dict, True)
+
+    for element in TemplateCore().iterate_elements(result_stream):
+        key = TemplateCore().get_element_key(element)
+
+        if isinstance(data_dict[key], bool):
+            assert element[TemplateConstants().checkbox_field_value_key] == (
+                pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
+            )
+        elif isinstance(data_dict[key], int):
+            if key not in radio_button_tracker:
+                radio_button_tracker[key] = 0
+            radio_button_tracker[key] += 1
+
+            if data_dict[key] == radio_button_tracker[key] - 1:
+                assert element[TemplateConstants().checkbox_field_value_key]\
+                       == BasePdfName('/' + str(data_dict[key]), False)
         else:
             assert (
                 element[TemplateConstants().text_field_value_key][1:-1]
