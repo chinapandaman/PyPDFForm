@@ -103,7 +103,7 @@ class Template:
                 return ElementType.image
 
         if not result and element[TemplateCoreConstants().radio_button_group_key]:
-            return ElementType.radiobutton
+            return ElementType.radio
 
         return result
 

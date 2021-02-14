@@ -20,7 +20,7 @@ class ElementType(Enum):
     text = "text"
     checkbox = "checkbox"
     image = "image"
-    radiobutton = "radiobutton"
+    radio = "radio"
 
 
 class Element:
@@ -85,7 +85,7 @@ class Element:
                 if not ImageCore().is_image(self.value):
                     raise InvalidElementValueError
 
-        if self._type == ElementType.radiobutton:
+        if self._type == ElementType.radio:
             if self.value is not None and not isinstance(self.value, int):
                 raise InvalidElementValueError
 

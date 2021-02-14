@@ -147,9 +147,9 @@ def test_get_element_type_radiobutton(template_with_radiobutton_stream):
         "check_2": ElementType.checkbox,
         "test_3": ElementType.text,
         "check_3": ElementType.checkbox,
-        "radio_1": ElementType.radiobutton,
-        "radio_2": ElementType.radiobutton,
-        "radio_3": ElementType.radiobutton,
+        "radio_1": ElementType.radio,
+        "radio_2": ElementType.radio,
+        "radio_3": ElementType.radio,
     }
 
     for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):

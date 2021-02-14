@@ -61,7 +61,7 @@ def image_element():
 
 @pytest.fixture
 def radiobutton_element():
-    return Element("foo", ElementType.radiobutton)
+    return Element("foo", ElementType.radio)
 
 
 def test_constructing_text_element(text_element, text_element_attributes):

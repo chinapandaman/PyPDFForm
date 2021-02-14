@@ -49,7 +49,7 @@ class Filler:
                     update_dict[
                         TemplateConstants().checkbox_field_value_key.replace("/", "")
                     ] = Utils().bool_to_checkbox(elements[key].value)
-                elif elements[key].type == ElementType.radiobutton:
+                elif elements[key].type == ElementType.radio:
                     if key not in radio_button_tracker:
                         radio_button_tracker[key] = 0
                     radio_button_tracker[key] += 1
