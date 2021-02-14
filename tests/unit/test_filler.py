@@ -159,6 +159,8 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
             if data_dict[key] == radio_button_tracker[key] - 1:
                 assert element[TemplateConstants().checkbox_field_value_key]\
                        == BasePdfName('/' + str(data_dict[key]), False)
+            else:
+                assert element[TemplateConstants().checkbox_field_value_key] == pdfrw.PdfName.Off
 
 
 def test_fill_with_image(
@@ -296,6 +298,8 @@ def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dic
             if data_dict[key] == radio_button_tracker[key] - 1:
                 assert element[TemplateConstants().checkbox_field_value_key]\
                        == BasePdfName('/' + str(data_dict[key]), False)
+            else:
+                assert element[TemplateConstants().checkbox_field_value_key] == pdfrw.PdfName.Off
         else:
             assert (
                 element[TemplateConstants().text_field_value_key][1:-1]
