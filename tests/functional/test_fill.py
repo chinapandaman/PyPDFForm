@@ -340,3 +340,16 @@ def test_simple_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
         )
 
         assert obj.stream == f.read()
+
+
+def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
+    with open(os.path.join(pdf_samples, "sample_filled_radiobutton.pdf"), "rb+") as f:
+        obj = PyPDFForm(template_with_radiobutton_stream, simple_mode=False).fill(
+            {
+                "radio_1": 0,
+                "radio_2": 1,
+                "radio_3": 2,
+            },
+        )
+
+        assert obj.stream == f.read()
