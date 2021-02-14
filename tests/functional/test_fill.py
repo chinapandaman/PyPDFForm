@@ -51,6 +51,14 @@ def template_with_image_stream(pdf_samples):
 
 
 @pytest.fixture
+def template_with_radiobutton_stream(pdf_samples):
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_radio_button.pdf"), "rb+"
+    ) as f:
+        return f.read()
+
+
+@pytest.fixture
 def image_stream(image_samples):
     with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as f:
         return f.read()
@@ -318,3 +326,17 @@ def test_fill_images(
             assert obj.stream == expected
         else:
             assert obj.stream[:32767] == expected[:32767]
+
+
+def test_simple_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
+    with open(os.path.join(pdf_samples, "sample_filled_radiobutton_simple.pdf"), "rb+") as f:
+        obj = PyPDFForm(template_with_radiobutton_stream, simple_mode=True).fill(
+            {
+                "radio_1": 0,
+                "radio_2": 1,
+                "radio_3": 2,
+            },
+            editable=True,
+        )
+
+        assert obj.stream == f.read()
