@@ -139,6 +139,32 @@ def test_get_element_type(template_with_image_stream):
         ] == TemplateCore().get_element_type(each)
 
 
+def test_get_element_type_radiobutton(template_with_radiobutton_stream):
+    type_mapping = {
+        "test": ElementType.text,
+        "check": ElementType.checkbox,
+        "test_2": ElementType.text,
+        "check_2": ElementType.checkbox,
+        "test_3": ElementType.text,
+        "check_3": ElementType.checkbox,
+        "radio_1": ElementType.radiobutton,
+        "radio_2": ElementType.radiobutton,
+        "radio_3": ElementType.radiobutton,
+    }
+
+    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
+        assert type_mapping[
+            TemplateCore().get_element_key(each)
+        ] == TemplateCore().get_element_type(each)
+
+    read_template_stream = pdfrw.PdfReader(fdata=template_with_radiobutton_stream)
+
+    for each in TemplateCore().iterate_elements(read_template_stream):
+        assert type_mapping[
+            TemplateCore().get_element_key(each)
+        ] == TemplateCore().get_element_type(each)
+
+
 def test_build_elements(template_with_radiobutton_stream, data_dict):
     for k, v in TemplateMiddleware().build_elements(template_with_radiobutton_stream).items():
         if k in data_dict and k == v.name:
