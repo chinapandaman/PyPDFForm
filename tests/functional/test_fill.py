@@ -329,7 +329,9 @@ def test_fill_images(
 
 
 def test_simple_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
-    with open(os.path.join(pdf_samples, "sample_filled_radiobutton_simple.pdf"), "rb+") as f:
+    with open(
+        os.path.join(pdf_samples, "sample_filled_radiobutton_simple.pdf"), "rb+"
+    ) as f:
         obj = PyPDFForm(template_with_radiobutton_stream, simple_mode=True).fill(
             {
                 "radio_1": 0,

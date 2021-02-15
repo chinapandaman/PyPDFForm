@@ -77,9 +77,9 @@ class Template:
         """Returns its annotated key given a PDF form element."""
 
         if not element[TemplateCoreConstants().annotation_field_key]:
-            return element[
-                TemplateCoreConstants().radio_button_group_key
-            ][TemplateCoreConstants().annotation_field_key][1:-1]
+            return element[TemplateCoreConstants().radio_button_group_key][
+                TemplateCoreConstants().annotation_field_key
+            ][1:-1]
 
         return element[TemplateCoreConstants().annotation_field_key][1:-1]
 

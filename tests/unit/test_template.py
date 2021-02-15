@@ -77,7 +77,9 @@ def test_validate_template_stream(template_stream):
     assert True
 
 
-def test_iterate_elements_and_get_element_key(template_with_radiobutton_stream, data_dict):
+def test_iterate_elements_and_get_element_key(
+    template_with_radiobutton_stream, data_dict
+):
     for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
         data_dict[TemplateCore().get_element_key(each)] = True
 
@@ -104,7 +106,9 @@ def test_get_elements_by_page(template_with_radiobutton_stream):
         },
     }
 
-    for page, elements in TemplateCore().get_elements_by_page(template_with_radiobutton_stream).items():
+    for page, elements in (
+        TemplateCore().get_elements_by_page(template_with_radiobutton_stream).items()
+    ):
         for each in elements:
             expected[page][TemplateCore().get_element_key(each)] = True
 
@@ -166,7 +170,9 @@ def test_get_element_type_radiobutton(template_with_radiobutton_stream):
 
 
 def test_build_elements(template_with_radiobutton_stream, data_dict):
-    for k, v in TemplateMiddleware().build_elements(template_with_radiobutton_stream).items():
+    for k, v in (
+        TemplateMiddleware().build_elements(template_with_radiobutton_stream).items()
+    ):
         if k in data_dict and k == v.name:
             data_dict[k] = True
 

@@ -3,8 +3,8 @@
 import os
 
 import pdfrw
-from pdfrw.objects.pdfname import BasePdfName
 import pytest
+from pdfrw.objects.pdfname import BasePdfName
 
 from PyPDFForm.core.constants import Template as TemplateConstants
 from PyPDFForm.core.filler import Filler
@@ -144,8 +144,8 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
             assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
         else:
             assert element[TemplateConstants().radio_button_group_key][
-                       TemplateConstants().field_editable_key
-                   ] == pdfrw.PdfObject(1)
+                TemplateConstants().field_editable_key
+            ] == pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
             assert element[TemplateConstants().checkbox_field_value_key] == (
@@ -157,10 +157,14 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
             radio_button_tracker[key] += 1
 
             if data_dict[key] == radio_button_tracker[key] - 1:
-                assert element[TemplateConstants().checkbox_field_value_key]\
-                       == BasePdfName('/' + str(data_dict[key]), False)
+                assert element[
+                    TemplateConstants().checkbox_field_value_key
+                ] == BasePdfName("/" + str(data_dict[key]), False)
             else:
-                assert element[TemplateConstants().checkbox_field_value_key] == pdfrw.PdfName.Off
+                assert (
+                    element[TemplateConstants().checkbox_field_value_key]
+                    == pdfrw.PdfName.Off
+                )
 
 
 def test_fill_with_image(
@@ -279,7 +283,9 @@ def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dic
 
     radio_button_tracker = {}
 
-    result_stream = Filler().simple_fill(template_with_radiobutton_stream, data_dict, True)
+    result_stream = Filler().simple_fill(
+        template_with_radiobutton_stream, data_dict, True
+    )
 
     assert result_stream != template_with_radiobutton_stream
 
@@ -296,10 +302,14 @@ def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dic
             radio_button_tracker[key] += 1
 
             if data_dict[key] == radio_button_tracker[key] - 1:
-                assert element[TemplateConstants().checkbox_field_value_key]\
-                       == BasePdfName('/' + str(data_dict[key]), False)
+                assert element[
+                    TemplateConstants().checkbox_field_value_key
+                ] == BasePdfName("/" + str(data_dict[key]), False)
             else:
-                assert element[TemplateConstants().checkbox_field_value_key] == pdfrw.PdfName.Off
+                assert (
+                    element[TemplateConstants().checkbox_field_value_key]
+                    == pdfrw.PdfName.Off
+                )
         else:
             assert (
                 element[TemplateConstants().text_field_value_key][1:-1]

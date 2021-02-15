@@ -55,16 +55,26 @@ class Filler:
                     radio_button_tracker[key] += 1
 
                     if elements[key].value == radio_button_tracker[key] - 1:
-                        _element.update(pdfrw.PdfDict(**{
-                            TemplateConstants().checkbox_field_value_key.replace(
-                                "/", ""
-                            ): BasePdfName('/' + str(elements[key].value), False),
-                        }))
+                        _element.update(
+                            pdfrw.PdfDict(
+                                **{
+                                    TemplateConstants().checkbox_field_value_key.replace(
+                                        "/", ""
+                                    ): BasePdfName(
+                                        "/" + str(elements[key].value), False
+                                    ),
+                                }
+                            )
+                        )
 
                     _element[TemplateConstants().radio_button_group_key].update(
-                        pdfrw.PdfDict(**{
-                            TemplateConstants().field_editable_key.replace("/", ""): pdfrw.PdfObject(1)
-                        })
+                        pdfrw.PdfDict(
+                            **{
+                                TemplateConstants().field_editable_key.replace(
+                                    "/", ""
+                                ): pdfrw.PdfObject(1)
+                            }
+                        )
                     )
                     continue
                 elif elements[key].type == ElementType.image:
@@ -115,7 +125,9 @@ class Filler:
 
     @staticmethod
     def simple_fill(
-        template_stream: bytes, data: Dict[str, Union[str, bool, bytes, int]], editable: bool
+        template_stream: bytes,
+        data: Dict[str, Union[str, bool, bytes, int]],
+        editable: bool,
     ) -> bytes:
         """Fills a PDF form in simple mode."""
 
@@ -150,17 +162,31 @@ class Filler:
                         radio_button_tracker[key] += 1
 
                         if data[key] == radio_button_tracker[key] - 1:
-                            element.update(pdfrw.PdfDict(**{
-                                TemplateConstants().checkbox_field_value_key.replace(
-                                    "/", ""
-                                ): BasePdfName('/' + str(data[key]), False),
-                            }))
+                            element.update(
+                                pdfrw.PdfDict(
+                                    **{
+                                        TemplateConstants().checkbox_field_value_key.replace(
+                                            "/", ""
+                                        ): BasePdfName(
+                                            "/" + str(data[key]), False
+                                        ),
+                                    }
+                                )
+                            )
 
                             if not editable:
-                                element[TemplateConstants().radio_button_group_key].update(
-                                    pdfrw.PdfDict(**{
-                                        TemplateConstants().field_editable_key.replace("/", ""): pdfrw.PdfObject(1)
-                                    })
+                                element[
+                                    TemplateConstants().radio_button_group_key
+                                ].update(
+                                    pdfrw.PdfDict(
+                                        **{
+                                            TemplateConstants().field_editable_key.replace(
+                                                "/", ""
+                                            ): pdfrw.PdfObject(
+                                                1
+                                            )
+                                        }
+                                    )
                                 )
                             continue
                     elif isinstance(data[key], bytes):
