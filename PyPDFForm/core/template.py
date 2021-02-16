@@ -34,6 +34,11 @@ class Template:
                         and element[TemplateCoreConstants().annotation_field_key]
                     ):
                         result.append(element)
+                    elif (
+                        element[TemplateCoreConstants().checkbox_field_value_key]
+                        and element[TemplateCoreConstants().radio_button_group_key]
+                    ):
+                        result.append(element)
 
         return result
 
@@ -59,6 +64,11 @@ class Template:
                         and element[TemplateCoreConstants().annotation_field_key]
                     ):
                         result[i + 1].append(element)
+                    elif (
+                        element[TemplateCoreConstants().checkbox_field_value_key]
+                        and element[TemplateCoreConstants().radio_button_group_key]
+                    ):
+                        result[i + 1].append(element)
 
         return result
 
@@ -66,10 +76,15 @@ class Template:
     def get_element_key(element: "pdfrw.PdfDict") -> str:
         """Returns its annotated key given a PDF form element."""
 
+        if not element[TemplateCoreConstants().annotation_field_key]:
+            return element[TemplateCoreConstants().radio_button_group_key][
+                TemplateCoreConstants().annotation_field_key
+            ][1:-1]
+
         return element[TemplateCoreConstants().annotation_field_key][1:-1]
 
     @staticmethod
-    def get_element_type(element: "pdfrw.PdfDict") -> "ElementType":
+    def get_element_type(element: "pdfrw.PdfDict") -> Union["ElementType", None]:
         """Returns its annotated type given a PDF form element."""
 
         element_type_mapping = {
@@ -86,6 +101,9 @@ class Template:
                 return ElementType.checkbox
             else:
                 return ElementType.image
+
+        if not result and element[TemplateCoreConstants().radio_button_group_key]:
+            return ElementType.radio
 
         return result
 

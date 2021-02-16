@@ -20,6 +20,7 @@ class ElementType(Enum):
     text = "text"
     checkbox = "checkbox"
     image = "image"
+    radio = "radio"
 
 
 class Element:
@@ -29,7 +30,7 @@ class Element:
         self,
         element_name: str,
         element_type: "ElementType",
-        element_value: Union[str, bool, bytes] = None,
+        element_value: Union[str, bool, bytes, int] = None,
     ) -> None:
         """Constructs all attributes for the Element object."""
 
@@ -83,6 +84,10 @@ class Element:
                     raise InvalidElementValueError
                 if not ImageCore().is_image(self.value):
                     raise InvalidElementValueError
+
+        if self._type == ElementType.radio:
+            if self.value is not None and not isinstance(self.value, int):
+                raise InvalidElementValueError
 
     def validate_text_attributes(self) -> None:
         """Validates text element's attributes."""

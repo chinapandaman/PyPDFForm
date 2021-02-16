@@ -59,6 +59,11 @@ def image_element():
     return Element("foo", ElementType.image)
 
 
+@pytest.fixture
+def radiobutton_element():
+    return Element("foo", ElementType.radio)
+
+
 def test_constructing_text_element(text_element, text_element_attributes):
     obj = text_element
 
@@ -174,7 +179,7 @@ def test_validate_text_attributes(text_element):
 
 
 def test_setting_invalid_value(
-    text_element, checkbox_element, image_element, image_stream
+    text_element, checkbox_element, image_element, image_stream, radiobutton_element
 ):
     text_element.value = 0
 
@@ -216,6 +221,19 @@ def test_setting_invalid_value(
 
     image_element.value = image_stream
     image_element.validate_value()
+
+    radiobutton_element.value = "0"
+
+    try:
+        radiobutton_element.validate_value()
+        assert False
+    except InvalidElementValueError:
+        assert True
+
+    radiobutton_element.value = 0
+    radiobutton_element.validate_value()
+
+    assert True
 
 
 def test_invalid_constants(text_element):

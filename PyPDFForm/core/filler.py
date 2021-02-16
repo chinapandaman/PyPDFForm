@@ -4,6 +4,7 @@
 from typing import Dict, Union
 
 import pdfrw
+from pdfrw.objects.pdfname import BasePdfName
 
 from ..middleware.element import Element as ElementMiddleware
 from ..middleware.element import ElementType
@@ -27,6 +28,8 @@ class Filler:
         text_watermarks = []
         image_watermarks = []
 
+        radio_button_tracker = {}
+
         for page, _elements in (
             TemplateCore().get_elements_by_page(template_pdf).items()
         ):
@@ -46,6 +49,34 @@ class Filler:
                     update_dict[
                         TemplateConstants().checkbox_field_value_key.replace("/", "")
                     ] = Utils().bool_to_checkbox(elements[key].value)
+                elif elements[key].type == ElementType.radio:
+                    if key not in radio_button_tracker:
+                        radio_button_tracker[key] = 0
+                    radio_button_tracker[key] += 1
+
+                    if elements[key].value == radio_button_tracker[key] - 1:
+                        _element.update(
+                            pdfrw.PdfDict(
+                                **{
+                                    TemplateConstants().checkbox_field_value_key.replace(
+                                        "/", ""
+                                    ): BasePdfName(
+                                        "/" + str(elements[key].value), False
+                                    ),
+                                }
+                            )
+                        )
+
+                    _element[TemplateConstants().radio_button_group_key].update(
+                        pdfrw.PdfDict(
+                            **{
+                                TemplateConstants().field_editable_key.replace(
+                                    "/", ""
+                                ): pdfrw.PdfObject(1)
+                            }
+                        )
+                    )
+                    continue
                 elif elements[key].type == ElementType.image:
                     if elements[key].value is not None:
                         images_to_draw[page].append(
@@ -94,7 +125,9 @@ class Filler:
 
     @staticmethod
     def simple_fill(
-        template_stream: bytes, data: Dict[str, Union[str, bool, bytes]], editable: bool
+        template_stream: bytes,
+        data: Dict[str, Union[str, bool, bytes, int]],
+        editable: bool,
     ) -> bytes:
         """Fills a PDF form in simple mode."""
 
@@ -104,6 +137,8 @@ class Filler:
         images_to_draw = {}
         image_watermarks = []
 
+        radio_button_tracker = {}
+
         for page, elements in TemplateCore().get_elements_by_page(template_pdf).items():
             images_to_draw[page] = []
             image_watermarks.append(b"")
@@ -111,6 +146,7 @@ class Filler:
                 key = TemplateCore().get_element_key(element)
 
                 if key in data.keys():
+                    update_dict = {}
                     if data[key] in [
                         pdfrw.PdfName.Yes,
                         pdfrw.PdfName.Off,
@@ -120,6 +156,39 @@ class Filler:
                                 "/", ""
                             ): data[key]
                         }
+                    elif isinstance(data[key], int):
+                        if key not in radio_button_tracker:
+                            radio_button_tracker[key] = 0
+                        radio_button_tracker[key] += 1
+
+                        if data[key] == radio_button_tracker[key] - 1:
+                            element.update(
+                                pdfrw.PdfDict(
+                                    **{
+                                        TemplateConstants().checkbox_field_value_key.replace(
+                                            "/", ""
+                                        ): BasePdfName(
+                                            "/" + str(data[key]), False
+                                        ),
+                                    }
+                                )
+                            )
+
+                            if not editable:
+                                element[
+                                    TemplateConstants().radio_button_group_key
+                                ].update(
+                                    pdfrw.PdfDict(
+                                        **{
+                                            TemplateConstants().field_editable_key.replace(
+                                                "/", ""
+                                            ): pdfrw.PdfObject(
+                                                1
+                                            )
+                                        }
+                                    )
+                                )
+                            continue
                     elif isinstance(data[key], bytes):
                         images_to_draw[page].append(
                             [
