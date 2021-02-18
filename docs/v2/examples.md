@@ -441,6 +441,40 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_customized_elements.py
 
 
+## Fill a PDF form with radio buttons
+
+This example uses this [template](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_template_with_radio_button.pdf). 
+It demos filling a PDF form's radio button elements.
+
+```python
+import os
+
+from PyPDFForm import PyPDFForm
+
+PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
+    os.path.expanduser("~/Downloads"), "sample_template_with_radio_button.pdf"
+)  # Change this to where you downloaded the sample PDF form
+
+PATH_TO_FILLED_PDF_FORM = os.path.join(
+    os.path.expanduser("~"), "output.pdf"
+)  # Change this to where you wish to put your filled PDF form
+
+with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
+    filled_pdf = PyPDFForm(template.read()).fill(
+        {
+            "radio_1": 0,
+            "radio_2": 1,
+            "radio_3": 2,
+        },
+    )
+
+    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+        output.write(filled_pdf.stream)
+```
+
+Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/simple_fill_radio.py
+
+
 ## Fill a PDF form with image elements
 
 This example uses this [template](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_template_with_image_field.pdf) 
