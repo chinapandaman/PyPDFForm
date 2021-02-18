@@ -118,7 +118,10 @@ Its keys have to be `string` and need to match the annotated names of elements.
 Its values currently support the following:
     1) A `string`, which will be printed on the corresponding `text` element.
     2) A `boolean`, which will check the corresponding `checkbox` element.
-    3) A valid image `bytes` stream, which will be drawn on the corresponding `image` element.
+    3) An `integer`, which will select the corresponding option of a group of radio buttons with the same name.
+       NOTE: Only groups of radio buttons with the same name are supported. If there is only one 
+       radio button with a name, please consider using `checkbox` instead.
+    4) A valid image `bytes` stream, which will be drawn on the corresponding `image` element.
 
 * **editable** - only available if `simple_mode` is `True`, enabling this will allow the filled PDF to be still 
 editable. NOTE: `image` elements that are filled via the `fill` method will NOT be editable even if this is `True`.
@@ -159,13 +162,14 @@ such as font size and text wrap length.
 * **element_name** - a string which represents the annotated name of the element.
 
 * **element_type** - an enum which represents the type of the element, currently supporting 
-`text`, `checkbox` and `image`.
+`text`, `checkbox`, `radio` and `image`.
 
 * **element_value** - this is the value that's used to fill this element. 
 It currently supports the following based on the type of the element:
   1) A `string`, if the element is a `text`.
   2) A `boolean`, if the element is a `checkbox`.
-  3) A valid image `bytes` stream, if the element is an `image`.
+  3) An `integer`, if the element is a `radio`.
+  4) A valid image `bytes` stream, if the element is an `image`.
 
 ### **name**
 
@@ -174,7 +178,7 @@ A string which represents the annotated name of the element. Readonly.
 ### **type**
 
 An enum value which represents the type of the element, currently supporting 
-`text`, `checkbox` and `image`. Readonly.
+`text`, `checkbox`, `radio` and `image`. Readonly.
 
 ### **value**
 
@@ -183,7 +187,8 @@ It currently supports the following based on the type of the element:
 
 1) A `string`, if the element is a `text`.
 2) A `boolean`, if the element is a `checkbox`.
-3) A valid image `bytes` stream, if the element is an `image`.
+3) An `integer`, if the element is a `radio`.
+4) A valid image `bytes` stream, if the element is an `image`.
 
 ### **font** = *None*
 
