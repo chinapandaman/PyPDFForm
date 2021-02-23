@@ -2,5 +2,5 @@
 """Contains base exception"""
 
 
-class BasePyPDFFormException(Exception):
+class BasePyPDFFormException(ValueError):
     """Base exception for PyPDFForm."""
