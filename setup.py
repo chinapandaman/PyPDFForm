@@ -22,7 +22,7 @@ with open("requirements.txt", "r") as requirements:
 setuptools.setup(
     name="PyPDFForm",
     version=version,
-    description="python library for PDF forms",
+    description="The Python library for PDF forms.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/chinapandaman/PyPDFForm",
