@@ -99,8 +99,7 @@ class Template:
         if result == "MULTIPLE":
             if element[TemplateCoreConstants().checkbox_field_value_key]:
                 return ElementType.checkbox
-            else:
-                return ElementType.image
+            return ElementType.image
 
         if not result and element[TemplateCoreConstants().radio_button_group_key]:
             return ElementType.radio
