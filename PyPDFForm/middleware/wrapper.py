@@ -248,6 +248,9 @@ class PyPDFForm:
 
         return self
 
+    def read(self):
+        return self.stream
+
     @classmethod
     def register_font(cls, font_name: str, ttf_stream: bytes) -> bool:
         """Registers a font from a ttf file stream."""

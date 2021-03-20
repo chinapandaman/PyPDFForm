@@ -76,11 +76,12 @@ def image_stream_3(image_samples):
         return f.read()
 
 
-def test_fill_simple_mode(template_stream, pdf_samples, data_dict):
+def test_fill_simple_mode_and_read(template_stream, pdf_samples, data_dict):
     with open(os.path.join(pdf_samples, "sample_filled_simple_mode.pdf"), "rb+") as f:
         obj = PyPDFForm(template_stream).fill(
             data_dict,
         )
+        assert obj.read() == obj.stream
 
         expected = f.read()
 
