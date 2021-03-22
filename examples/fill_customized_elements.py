@@ -42,4 +42,4 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(pdf_form.stream)
+        output.write(pdf_form.read())

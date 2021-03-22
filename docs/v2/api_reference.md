@@ -126,6 +126,10 @@ Its values currently support the following:
 * **editable** - only available if `simple_mode` is `True`, enabling this will allow the filled PDF to be still 
 editable. NOTE: `image` elements that are filled via the `fill` method will NOT be editable even if this is `True`.
   
+### **read**()
+
+Returns the `stream`. This method allows the implementation of PyPDFForm to behave like a file object.
+
 ### **register_font**(*font_name, ttf_stream*)
 
 This class method takes a TTF font file stream and register it with the `font_name` specified. 

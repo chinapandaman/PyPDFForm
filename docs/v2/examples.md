@@ -45,7 +45,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/simple_fill.py
@@ -81,7 +81,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/simple_fill_editable.py
@@ -126,7 +126,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_font.py
@@ -167,7 +167,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_global_font_size_color.py
@@ -205,7 +205,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_text_wrap.py
@@ -246,7 +246,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_text_offset.py
@@ -274,7 +274,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     filled_pdf = PyPDFForm(template.read()).draw_text("drawn_text", 1, 300, 225)
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/draw_text.py
@@ -307,7 +307,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/draw_image.py
@@ -345,7 +345,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Alternatively you can use the assignment operator to achieve the same.
@@ -379,7 +379,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/merge.py
@@ -435,7 +435,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(pdf_form.stream)
+        output.write(pdf_form.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_customized_elements.py
@@ -469,7 +469,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/simple_fill_radio.py
@@ -528,7 +528,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
     )
 
     with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.stream)
+        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_images.py
