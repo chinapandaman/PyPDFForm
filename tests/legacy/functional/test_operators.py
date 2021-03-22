@@ -13,14 +13,19 @@ def pdf_samples():
 
 
 @pytest.fixture
+def image_samples():
+    return os.path.join(os.path.dirname(__file__), "../..", "..", "image_samples")
+
+
+@pytest.fixture
 def template_stream(pdf_samples):
     with open(os.path.join(pdf_samples, "sample_template.pdf"), "rb+") as f:
         return f.read()
 
 
 @pytest.fixture
-def image_stream(pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_image.jpg"), "rb+") as f:
+def image_stream(image_samples):
+    with open(os.path.join(image_samples, "sample_image_legacy.jpg"), "rb+") as f:
         return f.read()
 
 
