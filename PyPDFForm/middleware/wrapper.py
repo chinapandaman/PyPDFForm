@@ -93,7 +93,7 @@ class PyPDFForm:
 
     def _fill(
         self,
-        data: Dict[str, Union[str, bool, bytes, int]],
+        data: Dict[str, Union[str, bool, bytes, int, BinaryIO]],
     ) -> "PyPDFForm":
         """Fill a PDF form with customized parameters."""
 
@@ -101,6 +101,12 @@ class PyPDFForm:
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
+
+        for key, value in data.items():
+            if isinstance(value, (bytes, str, BinaryIO)):
+                adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(value)
+                if adapted is not None:
+                    data[key] = adapted
 
         for key, value in data.items():
             if not isinstance(key, str):
