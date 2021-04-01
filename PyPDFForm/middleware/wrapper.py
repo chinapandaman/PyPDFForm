@@ -207,7 +207,7 @@ class PyPDFForm:
 
     def draw_image(
         self,
-        image: bytes,
+        image: Union[bytes, str, BinaryIO],
         page_number: int,
         x: Union[float, int],
         y: Union[float, int],
@@ -217,6 +217,7 @@ class PyPDFForm:
     ) -> "PyPDFForm":
         """Draws an image on a PDF form."""
 
+        image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
         TemplateMiddleware().validate_stream(self.stream)
 
         if not isinstance(rotation, (float, int)):

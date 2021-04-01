@@ -12,8 +12,11 @@ class Image:
     """Contains methods for interacting with images."""
 
     @staticmethod
-    def is_image(stream: bytes) -> bool:
+    def is_image(stream: Union[bytes, None]) -> bool:
         """Checks if a stream is indeed an image."""
+
+        if stream is None:
+            return False
 
         buff = BytesIO()
         buff.write(stream)
