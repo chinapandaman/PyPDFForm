@@ -9,7 +9,7 @@ class FileAdapter:
     """Contains methods for adapting user inputs for files."""
 
     @staticmethod
-    def fp_or_f_obj_or_stream_to_stream(fp_or_f_obj_or_stream: Union[str, BinaryIO]) -> Union[bytes, None]:
+    def fp_or_f_obj_or_stream_to_stream(fp_or_f_obj_or_stream: Union[bytes, str, BinaryIO]) -> Union[bytes, None]:
         if isinstance(fp_or_f_obj_or_stream, bytes):
             return fp_or_f_obj_or_stream
 

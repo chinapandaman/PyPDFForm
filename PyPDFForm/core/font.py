@@ -11,8 +11,11 @@ class Font:
     """Contains methods for interacting with fonts."""
 
     @staticmethod
-    def register_font(font_name: str, ttf_stream: bytes) -> bool:
+    def register_font(font_name: str, ttf_stream: [bytes, None]) -> bool:
         """Registers a font from a ttf file stream."""
+
+        if ttf_stream is None:
+            return False
 
         buff = BytesIO()
         buff.write(ttf_stream)
