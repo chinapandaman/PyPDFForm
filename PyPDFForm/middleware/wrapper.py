@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains user API for PyPDFForm."""
 
-from typing import Dict, Tuple, Union
+from typing import Dict, Tuple, Union, BinaryIO
 
 from ..core.filler import Filler as FillerCore
 from ..core.font import Font as FontCore
@@ -20,6 +20,7 @@ from .exceptions.input import (InvalidCoordinateError,
                                InvalidModeError, InvalidPageNumberError,
                                InvalidTextError, InvalidTTFFontError)
 from .template import Template as TemplateMiddleware
+from .adapter import FileAdapter
 
 
 class PyPDFForm:
@@ -27,7 +28,7 @@ class PyPDFForm:
 
     def __init__(
         self,
-        template: bytes = b"",
+        template: Union[bytes, str, BinaryIO] = b"",
         simple_mode: bool = True,
         global_font: str = TextConstants().global_font,
         global_font_size: Union[float, int] = TextConstants().global_font_size,
@@ -40,6 +41,7 @@ class PyPDFForm:
     ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
+        template = FileAdapter().fp_or_f_obj_or_stream_to_stream(template)
         TemplateMiddleware().validate_template(template)
         if not isinstance(simple_mode, bool):
             raise InvalidModeError
