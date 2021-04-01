@@ -120,7 +120,7 @@ class PyPDFForm:
         return self
 
     def _simple_fill(
-        self, data: Dict[str, Union[str, bool, bytes, int]], editable: bool = False
+        self, data: Dict[str, Union[str, bool, bytes, int, BinaryIO]], editable: bool = False
     ) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
 
@@ -128,6 +128,12 @@ class PyPDFForm:
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
+
+        for key, value in data.items():
+            if isinstance(value, (bytes, str, BinaryIO)):
+                adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(value)
+                if adapted is not None:
+                    data[key] = adapted
 
         for key, value in data.items():
             if not isinstance(key, str):
