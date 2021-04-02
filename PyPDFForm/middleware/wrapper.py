@@ -270,22 +270,22 @@ class PyPDFForm:
         return self.stream
 
     @classmethod
-    def register_font(cls, font_name: str, ttf_font: Union[bytes, str, BinaryIO]) -> bool:
-        """Registers a font from a ttf file stream."""
+    def register_font(cls, font_name: str, ttf_file: Union[bytes, str, BinaryIO]) -> bool:
+        """Registers a font from a ttf file."""
 
-        ttf_font = FileAdapter().fp_or_f_obj_or_stream_to_stream(ttf_font)
+        ttf_file = FileAdapter().fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         if any(
             [
                 not font_name,
                 not isinstance(font_name, str),
-                not ttf_font,
-                not isinstance(ttf_font, bytes),
+                not ttf_file,
+                not isinstance(ttf_file, bytes),
             ]
         ):
             raise InvalidTTFFontError
 
-        if not FontCore().register_font(font_name, ttf_font):
+        if not FontCore().register_font(font_name, ttf_file):
             raise InvalidTTFFontError
 
         return True
