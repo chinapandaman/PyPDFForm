@@ -490,3 +490,10 @@ def test_validate_register_font_inputs(font_samples):
         bad_inputs[1] = f.read()
 
         assert PyPDFForm.register_font(*bad_inputs)
+
+        f.seek(0)
+        bad_inputs[1] = f
+        assert PyPDFForm.register_font(*bad_inputs)
+
+        bad_inputs[1] = os.path.join(font_samples, "LiberationSerif-Bold.ttf")
+        assert PyPDFForm.register_font(*bad_inputs)
