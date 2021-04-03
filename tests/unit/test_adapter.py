@@ -22,8 +22,8 @@ def test_readable(pdf_samples):
     assert not FileAdapter().readable(path)
     with open(path, "rb+") as f:
         assert FileAdapter().readable(f)
-        bad_input = [f.read()]
-        assert not FileAdapter().readable(*bad_input)
+        stream = f.read()
+        assert not FileAdapter().readable(stream)
 
 
 def test_file_adapter_fp_or_f_obj_or_stream_to_stream(pdf_samples, template_stream):
