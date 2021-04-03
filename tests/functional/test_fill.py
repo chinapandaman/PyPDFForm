@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import random
 
 import pytest
 
@@ -108,7 +109,15 @@ def test_fill_non_simple_mode_font_liberation_serif_italic(
     template_stream, pdf_samples, font_samples, data_dict
 ):
     with open(os.path.join(font_samples, "LiberationSerif-Italic.ttf"), "rb+") as _f:
-        PyPDFForm.register_font("LiberationSerif-Italic", _f.read())
+        stream = _f.read()
+        _f.seek(0)
+        PyPDFForm.register_font("LiberationSerif-Italic", random.choice(
+            [
+                os.path.join(font_samples, "LiberationSerif-Italic.ttf"),
+                _f,
+                stream
+            ]
+        ))
 
     with open(
         os.path.join(pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"),
