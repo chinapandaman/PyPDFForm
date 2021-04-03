@@ -22,3 +22,5 @@ def test_file_adapter_fp_or_f_obj_or_stream_to_stream(pdf_samples, template_stre
     assert FileAdapter().fp_or_f_obj_or_stream_to_stream(path) == template_stream
     with open(path, "rb+") as f:
         assert FileAdapter().fp_or_f_obj_or_stream_to_stream(f) == template_stream
+        f.seek(0)
+        assert FileAdapter().fp_or_f_obj_or_stream_to_stream(f.read()) == template_stream
