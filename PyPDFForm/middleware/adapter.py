@@ -2,14 +2,14 @@
 """Contains user input adapters."""
 
 import os
-from typing import Union, BinaryIO
+from typing import Any, Union, BinaryIO
 
 
 class FileAdapter:
     """Contains methods for adapting user inputs for files."""
 
     @staticmethod
-    def readable(obj: BinaryIO) -> bool:
+    def readable(obj: Any) -> bool:
         """Checks if an object is readable."""
 
         return callable(getattr(obj, "read", None))
