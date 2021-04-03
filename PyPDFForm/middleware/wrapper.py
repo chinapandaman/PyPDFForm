@@ -103,7 +103,7 @@ class PyPDFForm:
             raise InvalidFormDataError
 
         for key, value in data.items():
-            if isinstance(value, (bytes, str, BinaryIO)):
+            if isinstance(value, (bytes, str)) or FileAdapter().readable(value):
                 adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(value)
                 if adapted is not None:
                     data[key] = adapted
@@ -136,7 +136,7 @@ class PyPDFForm:
             raise InvalidFormDataError
 
         for key, value in data.items():
-            if isinstance(value, (bytes, str, BinaryIO)):
+            if isinstance(value, (bytes, str)) or FileAdapter().readable(value):
                 adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(value)
                 if adapted is not None:
                     data[key] = adapted

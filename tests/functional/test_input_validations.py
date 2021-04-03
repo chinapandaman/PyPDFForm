@@ -167,7 +167,7 @@ def test_validate_addition_operator_inputs(template_stream):
     assert True
 
 
-def test_validate_fill_inputs(template_stream):
+def test_validate_fill_inputs(image_samples, template_stream):
     bad_inputs = ["not_dict"]
 
     try:
@@ -196,6 +196,16 @@ def test_validate_fill_inputs(template_stream):
 
     PyPDFForm(template_stream, False).fill(*bad_inputs)
     assert True
+
+    path = os.path.join(image_samples, "sample_image.jpg")
+    bad_inputs[0] = {"foo": "", "bar": True, "foo_bar": path, "bar_foo": 0}
+    PyPDFForm(template_stream, False).fill(*bad_inputs)
+    assert True
+
+    with open(path, "rb+") as f:
+        bad_inputs[0] = {"foo": "", "bar": True, "foo_bar": f, "bar_foo": 0}
+        PyPDFForm(template_stream, False).fill(*bad_inputs)
+        assert True
 
 
 def test_validate_simple_fill_inputs(template_stream, image_stream):
