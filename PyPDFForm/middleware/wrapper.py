@@ -229,11 +229,11 @@ class PyPDFForm:
     ) -> "PyPDFForm":
         """Draws an image on a PDF form."""
 
+        TemplateMiddleware().validate_stream(self.stream)
+
         image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
         if image is None:
             raise InvalidImageError
-
-        TemplateMiddleware().validate_stream(self.stream)
 
         if not isinstance(rotation, (float, int)):
             raise InvalidImageRotationAngleError
