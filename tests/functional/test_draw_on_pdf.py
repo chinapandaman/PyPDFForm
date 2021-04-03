@@ -116,3 +116,19 @@ def test_draw_image_on_one_page_fp_param(template_stream, image_samples, pdf_sam
         assert obj.stream == expected
     else:
         assert obj.stream[:32767] == expected[:32767]
+
+
+def test_draw_image_on_one_page_f_obj_param(template_stream, image_samples, pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_pdf_with_image.pdf"), "rb+") as f:
+        expected = f.read()
+
+    with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as image:
+        obj = PyPDFForm(template_stream).draw_image(
+            image, 2, 100, 100, 400, 225
+        )
+
+    if os.name == "nt":
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+    else:
+        assert obj.stream[:32767] == expected[:32767]
