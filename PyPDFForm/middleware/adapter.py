@@ -10,7 +10,7 @@ class FileAdapter:
 
     @staticmethod
     def readable(obj: BinaryIO) -> bool:
-        """Checks is an object is readable."""
+        """Checks if an object is readable."""
 
         return callable(getattr(obj, "read", None))
 
