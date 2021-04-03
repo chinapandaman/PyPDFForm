@@ -46,7 +46,7 @@ def font_samples():
     return os.path.join(os.path.dirname(__file__), "..", "..", "font_samples")
 
 
-def test_validate_constructor_inputs(template_stream):
+def test_validate_constructor_inputs(pdf_samples, template_stream):
     bad_inputs = ["", "True", 1, "12", ("0", "0", "0"), "0", "0", "100"]
 
     try:
@@ -131,6 +131,16 @@ def test_validate_constructor_inputs(template_stream):
     bad_inputs[0] = b""
     obj = PyPDFForm(*bad_inputs)
     assert obj.elements == {}
+
+    path = os.path.join(pdf_samples, "sample_template.pdf")
+    bad_inputs[0] = path
+    obj = PyPDFForm(*bad_inputs)
+    assert True
+
+    with open(path, "rb+") as f:
+        bad_inputs[0] = f
+        obj = PyPDFForm(*bad_inputs)
+        assert True
 
 
 def test_validate_addition_operator_inputs(template_stream):
