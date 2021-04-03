@@ -17,6 +17,15 @@ def template_stream(pdf_samples):
         return f.read()
 
 
+def test_readable(pdf_samples, template_stream):
+    assert not FileAdapter().readable(template_stream)
+    path = os.path.join(pdf_samples, "sample_template.pdf")
+    with open(path, "rb+") as f:
+        assert FileAdapter().readable(f)
+        bad_input = [f.read()]
+        assert not FileAdapter().readable(*bad_input)
+
+
 def test_file_adapter_fp_or_f_obj_or_stream_to_stream(pdf_samples, template_stream):
     path = os.path.join(pdf_samples, "sample_template.pdf")
     assert FileAdapter().fp_or_f_obj_or_stream_to_stream(path) == template_stream
