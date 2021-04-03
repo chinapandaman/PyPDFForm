@@ -365,7 +365,7 @@ def test_validate_draw_text_inputs(template_stream):
     assert True
 
 
-def test_validate_draw_image_inputs(template_stream, image_stream):
+def test_validate_draw_image_inputs(image_samples, template_stream, image_stream):
     bad_inputs = [b"", "1", "100", "100", "400", "225", "180"]
 
     try:
@@ -433,6 +433,16 @@ def test_validate_draw_image_inputs(template_stream, image_stream):
 
     PyPDFForm(template_stream).draw_image(*bad_inputs)
     assert True
+
+    path = os.path.join(image_samples, "sample_image.jpg")
+    bad_inputs[0] = path
+    PyPDFForm(template_stream).draw_image(*bad_inputs)
+    assert True
+
+    with open(path, "rb+") as f:
+        bad_inputs[0] = f
+        PyPDFForm(template_stream).draw_image(*bad_inputs)
+        assert True
 
 
 def test_validate_register_font_inputs(font_samples):
