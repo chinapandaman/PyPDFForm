@@ -105,6 +105,31 @@ def test_fill_simple_mode_editable(template_stream, pdf_samples, data_dict):
         assert obj.stream == expected
 
 
+def test_fill_simple_mode_images(
+    pdf_samples,
+    template_with_image_stream,
+    image_stream,
+    image_stream_2,
+    image_stream_3,
+):
+    with open(os.path.join(pdf_samples, "sample_filled_images_simple_mode.pdf"), "rb+") as f:
+        obj = PyPDFForm(template_with_image_stream).fill(
+            {
+                "image_1": image_stream,
+                "image_2": image_stream_2,
+                "image_3": image_stream_3,
+            }
+        )
+
+        expected = f.read()
+
+        if os.name == "nt":
+            assert len(obj.stream) == len(expected)
+            assert obj.stream == expected
+        else:
+            assert obj.stream[:32767] == expected[:32767]
+
+
 def test_fill_non_simple_mode_font_liberation_serif_italic(
     template_stream, pdf_samples, font_samples, data_dict
 ):
