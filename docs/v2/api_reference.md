@@ -172,7 +172,7 @@ It currently supports the following based on the type of the element:
   2) A `boolean`, if the element is a `checkbox`.
   3) An `integer`, if the element is a `radio`.
   4) A valid image `bytes` stream, if the element is an `image`. When setting the value of an `image` element explicitly, 
-    a file path or file object of the image is also accepted. Both cases will however be converted to a `bytes` stream.
+    a file path or file object of the image is also accepted. In either case however the attribute will still be converted to a `bytes` stream.
 
 ### **name**
 
@@ -192,7 +192,7 @@ It currently supports the following based on the type of the element:
 2) A `boolean`, if the element is a `checkbox`.
 3) An `integer`, if the element is a `radio`.
 4) A valid image `bytes` stream, if the element is an `image`. When setting the value of an `image` element explicitly, 
-    a file path or file object of the image is also accepted. Both cases will however be converted to a `bytes` stream.
+    a file path or file object of the image is also accepted. In either case however the attribute will still be converted to a `bytes` stream.
 
 ### **font** = *None*
 
