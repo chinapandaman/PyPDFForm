@@ -4,19 +4,15 @@
 from enum import Enum
 from typing import BinaryIO, Union
 
-from .adapter import FileAdapter
 from ..core.font import Font as FontCore
 from ..core.image import Image as ImageCore
-from .exceptions.element import (
-    InvalidElementNameError,
-    InvalidElementTypeError,
-    InvalidElementValueError,
-    InvalidFontColorError,
-    InvalidFontError,
-    InvalidFontSizeError,
-    InvalidTextOffsetError,
-    InvalidWrapLengthError,
-)
+from .adapter import FileAdapter
+from .exceptions.element import (InvalidElementNameError,
+                                 InvalidElementTypeError,
+                                 InvalidElementValueError,
+                                 InvalidFontColorError, InvalidFontError,
+                                 InvalidFontSizeError, InvalidTextOffsetError,
+                                 InvalidWrapLengthError)
 
 
 class ElementType(Enum):
@@ -66,6 +62,8 @@ class Element:
 
     @value.setter
     def value(self, v) -> None:
+        """Insures the value gets converted to bytes when set to fp or f object."""
+
         if isinstance(v, (bytes, str)) or FileAdapter().readable(v):
             adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(v)
             if adapted is not None:
