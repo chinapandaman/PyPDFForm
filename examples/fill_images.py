@@ -22,23 +22,15 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_IMAGE_1, "rb+") as image:
-    image_stream_1 = image.read()
-
-with open(PATH_TO_IMAGE_2, "rb+") as image:
-    image_stream_2 = image.read()
-
-with open(PATH_TO_IMAGE_3, "rb+") as image:
-    image_stream_3 = image.read()
-
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read()).fill(
-        {
-            "image_1": image_stream_1,
-            "image_2": image_stream_2,
-            "image_3": image_stream_3,
-        },
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        .fill(
+            {
+                "image_1": PATH_TO_IMAGE_1,
+                "image_2": PATH_TO_IMAGE_2,
+                "image_3": PATH_TO_IMAGE_3,
+            },
+        )
+        .read()
     )
-
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
