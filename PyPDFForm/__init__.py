@@ -4,4 +4,4 @@ from .middleware.wrapper import PyPDFForm as Wrapper
 
 PyPDFForm = Wrapper
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"

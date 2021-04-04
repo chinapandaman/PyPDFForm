@@ -32,20 +32,21 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read()).fill(
-        {
-            "test": "test_1",
-            "check": True,
-            "test_2": "test_2",
-            "check_2": False,
-            "test_3": "test_3",
-            "check_3": True,
-        },
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        .fill(
+            {
+                "test": "test_1",
+                "check": True,
+                "test_2": "test_2",
+                "check_2": False,
+                "test_3": "test_3",
+                "check_3": True,
+            },
+        )
+        .read()
     )
-
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/simple_fill.py
@@ -67,21 +68,22 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read()).fill(
-        {
-            "test": "test_1",
-            "check": True,
-            "test_2": "test_2",
-            "check_2": False,
-            "test_3": "test_3",
-            "check_3": True,
-        },
-        editable=True,
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        .fill(
+            {
+                "test": "test_1",
+                "check": True,
+                "test_2": "test_2",
+                "check_2": False,
+                "test_3": "test_3",
+                "check_3": True,
+            },
+            editable=True,
+        )
+        .read()
     )
-
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/simple_fill_editable.py
@@ -108,25 +110,27 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_SAMPLE_TTF_FONT_FILE, "rb+") as font:
-    PyPDFForm.register_font("LiberationSerif-Regular", font.read())
+PyPDFForm.register_font("LiberationSerif-Regular", PATH_TO_SAMPLE_TTF_FONT_FILE)
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(
-        template.read(), simple_mode=False, global_font="LiberationSerif-Regular",
-    ).fill(
-        {
-            "test": "test_1",
-            "check": True,
-            "test_2": "test_2",
-            "check_2": False,
-            "test_3": "test_3",
-            "check_3": True,
-        },
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(
+            PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM,
+            simple_mode=False,
+            global_font="LiberationSerif-Regular",
+        )
+        .fill(
+            {
+                "test": "test_1",
+                "check": True,
+                "test_2": "test_2",
+                "check_2": False,
+                "test_3": "test_3",
+                "check_3": True,
+            },
+        )
+        .read()
     )
-
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_font.py
@@ -149,25 +153,26 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(
-        template.read(),
-        simple_mode=False,
-        global_font_size=20,
-        global_font_color=(1, 0, 0),
-    ).fill(
-        {
-            "test": "test_1",
-            "check": True,
-            "test_2": "test_2",
-            "check_2": False,
-            "test_3": "test_3",
-            "check_3": True,
-        },
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(
+            PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM,
+            simple_mode=False,
+            global_font_size=20,
+            global_font_color=(1, 0, 0),
+        )
+        .fill(
+            {
+                "test": "test_1",
+                "check": True,
+                "test_2": "test_2",
+                "check_2": False,
+                "test_3": "test_3",
+                "check_3": True,
+            },
+        )
+        .read()
     )
-
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_global_font_size_color.py
@@ -190,22 +195,25 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(
-        template.read(), simple_mode=False, global_text_wrap_length=2,
-    ).fill(
-        {
-            "test": "test_1",
-            "check": True,
-            "test_2": "test_2",
-            "check_2": False,
-            "test_3": "test_3",
-            "check_3": True,
-        },
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(
+            PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM,
+            simple_mode=False,
+            global_text_wrap_length=2,
+        )
+        .fill(
+            {
+                "test": "test_1",
+                "check": True,
+                "test_2": "test_2",
+                "check_2": False,
+                "test_3": "test_3",
+                "check_3": True,
+            },
+        )
+        .read()
     )
-
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_text_wrap.py
@@ -228,25 +236,26 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(
-        template.read(),
-        simple_mode=False,
-        global_text_x_offset=100,
-        global_text_y_offset=-100,
-    ).fill(
-        {
-            "test": "test_1",
-            "check": True,
-            "test_2": "test_2",
-            "check_2": False,
-            "test_3": "test_3",
-            "check_3": True,
-        },
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(
+            PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM,
+            simple_mode=False,
+            global_text_x_offset=100,
+            global_text_y_offset=-100,
+        )
+        .fill(
+            {
+                "test": "test_1",
+                "check": True,
+                "test_2": "test_2",
+                "check_2": False,
+                "test_3": "test_3",
+                "check_3": True,
+            },
+        )
+        .read()
     )
-
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_text_offset.py
@@ -270,11 +279,12 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read()).draw_text("drawn_text", 1, 300, 225)
-
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        .draw_text("drawn_text", 1, 300, 225)
+        .read()
+    )
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/draw_text.py
@@ -300,14 +310,12 @@ PATH_TO_IMAGE = os.path.join(
     os.path.expanduser("~"), "sample_image.jpeg"
 )  # Change this to the location of an image of your choice
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    with open(PATH_TO_IMAGE, "rb+") as image:
-        filled_pdf = PyPDFForm(template.read()).draw_image(
-            image.read(), 2, 100, 100, 400, 225, 0
-        )
-
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        .draw_image(PATH_TO_IMAGE, 2, 100, 100, 400, 225, 0)
+        .read()
+    )
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/draw_image.py
@@ -329,11 +337,11 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     filled_pdf = PyPDFForm()
 
     for i in range(3):
-        filled_pdf = filled_pdf + PyPDFForm(template.read()).fill(
+        filled_pdf += PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM).fill(
             {
                 "test": "{}_test_1".format(i),
                 "check": True,
@@ -344,42 +352,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
             },
         )
 
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
-```
-
-Alternatively you can use the assignment operator to achieve the same.
-
-```python
-import os
-
-from PyPDFForm import PyPDFForm
-
-PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
-    os.path.expanduser("~/Downloads"), "sample_template.pdf"
-)  # Change this to where you downloaded the sample PDF form
-
-PATH_TO_FILLED_PDF_FORM = os.path.join(
-    os.path.expanduser("~"), "output.pdf"
-)  # Change this to where you wish to put your filled PDF form
-
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm()
-
-    for i in range(3):
-        filled_pdf += PyPDFForm(template.read()).fill(
-            {
-                "test": "{}_test_1".format(i),
-                "check": True,
-                "test_2": "{}_test_2".format(i),
-                "check_2": False,
-                "test_3": "{}_test_3".format(i),
-                "check_3": True,
-            },
-        )
-
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
+    output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/merge.py
@@ -407,11 +380,10 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_SAMPLE_TTF_FONT_FILE, "rb+") as font:
-    PyPDFForm.register_font("LiberationSerif-Italic", font.read())
+PyPDFForm.register_font("LiberationSerif-Italic", PATH_TO_SAMPLE_TTF_FONT_FILE)
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    pdf_form = PyPDFForm(template.read(), simple_mode=False)
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    pdf_form = PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, simple_mode=False)
 
     pdf_form.elements["test"].font_size = 20
     pdf_form.elements["test"].font_color = (1, 0, 0)
@@ -434,8 +406,7 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
         },
     )
 
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(pdf_form.read())
+    output.write(pdf_form.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_customized_elements.py
@@ -459,17 +430,13 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read()).fill(
-        {
-            "radio_1": 0,
-            "radio_2": 1,
-            "radio_3": 2,
-        },
-    )
 
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        .fill({"radio_1": 0, "radio_2": 1, "radio_3": 2})
+        .read()
+    )
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/simple_fill_radio.py
@@ -509,26 +476,18 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_IMAGE_1, "rb+") as image:
-    image_stream_1 = image.read()
-
-with open(PATH_TO_IMAGE_2, "rb+") as image:
-    image_stream_2 = image.read()
-
-with open(PATH_TO_IMAGE_3, "rb+") as image:
-    image_stream_3 = image.read()
-
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
-    filled_pdf = PyPDFForm(template.read()).fill(
-        {
-            "image_1": image_stream_1,
-            "image_2": image_stream_2,
-            "image_3": image_stream_3,
-        },
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        .fill(
+            {
+                "image_1": PATH_TO_IMAGE_1,
+                "image_2": PATH_TO_IMAGE_2,
+                "image_3": PATH_TO_IMAGE_3,
+            },
+        )
+        .read()
     )
-
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
 ```
 
 Link to this example: https://github.com/chinapandaman/PyPDFForm/blob/master/examples/fill_images.py

@@ -10,11 +10,11 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     filled_pdf = PyPDFForm()
 
     for i in range(3):
-        filled_pdf += PyPDFForm(template.read()).fill(
+        filled_pdf += PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM).fill(
             {
                 "test": "{}_test_1".format(i),
                 "check": True,
@@ -25,5 +25,4 @@ with open(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, "rb+") as template:
             },
         )
 
-    with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-        output.write(filled_pdf.read())
+    output.write(filled_pdf.read())
