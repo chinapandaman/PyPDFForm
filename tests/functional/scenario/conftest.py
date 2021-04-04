@@ -13,5 +13,17 @@ def pdf_directory():
 
 
 @pytest.fixture
+def image_directory():
+    return os.path.join(
+        os.path.dirname(__file__), "..", "..", "..", "image_samples", "scenario"
+    )
+
+
+@pytest.fixture
 def sample_job_application(pdf_directory):
     return os.path.join(pdf_directory, "sample_job_application.pdf")
+
+
+@pytest.fixture
+def sample_signature(image_directory):
+    return os.path.join(image_directory, "sample_signature.jpg")
