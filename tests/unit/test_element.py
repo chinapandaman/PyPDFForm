@@ -253,3 +253,23 @@ def test_invalid_constants(text_element):
         assert False
     except InvalidElementTypeError:
         assert True
+
+
+def test_value_set_and_get_with_fp_and_f_obj(image_samples, image_stream):
+    path = os.path.join(image_samples, "sample_image.jpg")
+
+    foo = Element("foo", ElementType.image, path)
+    assert foo.value == image_stream
+
+    with open(path, "rb+") as f:
+        bar = Element("bar", ElementType.image, f)
+        assert bar.value == image_stream
+
+    foo_bar = Element("foo_bar", ElementType.image)
+    foo_bar.value = path
+    assert foo_bar.value == image_stream
+
+    bar_foo = Element("bar_foo", ElementType.image)
+    with open(path, "rb+") as i:
+        bar_foo.value = i
+        assert bar_foo.value == image_stream

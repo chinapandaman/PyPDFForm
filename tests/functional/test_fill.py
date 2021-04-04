@@ -469,6 +469,59 @@ def test_fill_images_f_obj_params(pdf_samples, image_samples):
         assert obj.stream[:32767] == expected[:32767]
 
 
+def test_fill_images_fp_params_explicitly_setting_elements(pdf_samples, image_samples):
+    with open(os.path.join(pdf_samples, "sample_filled_images.pdf"), "rb+") as f:
+        expected = f.read()
+
+    obj = PyPDFForm(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"),
+        simple_mode=False,
+    )
+
+    obj.elements["image_1"].value = os.path.join(image_samples, "sample_image.jpg")
+    obj.elements["image_2"].value = os.path.join(image_samples, "sample_image_2.jpg")
+    obj.elements["image_3"].value = os.path.join(image_samples, "sample_image_3.jpg")
+
+    obj.fill({})
+
+    if os.name == "nt":
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+    else:
+        assert obj.stream[:32767] == expected[:32767]
+
+
+def test_fill_images_f_obj_params_explicitly_setting_elements(
+    pdf_samples, image_samples
+):
+    with open(os.path.join(pdf_samples, "sample_filled_images.pdf"), "rb+") as f:
+        expected = f.read()
+
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+"
+    ) as template:
+        with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as image:
+            with open(
+                os.path.join(image_samples, "sample_image_2.jpg"), "rb+"
+            ) as image_2:
+                with open(
+                    os.path.join(image_samples, "sample_image_3.jpg"), "rb+"
+                ) as image_3:
+                    obj = PyPDFForm(template, simple_mode=False)
+
+                    obj.elements["image_1"].value = image
+                    obj.elements["image_2"].value = image_2
+                    obj.elements["image_3"].value = image_3
+
+                    obj.fill({})
+
+    if os.name == "nt":
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+    else:
+        assert obj.stream[:32767] == expected[:32767]
+
+
 def test_simple_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
     with open(
         os.path.join(pdf_samples, "sample_filled_radiobutton_simple.pdf"), "rb+"

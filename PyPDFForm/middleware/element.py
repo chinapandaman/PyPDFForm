@@ -2,10 +2,11 @@
 """Contains element middleware."""
 
 from enum import Enum
-from typing import Union
+from typing import BinaryIO, Union
 
 from ..core.font import Font as FontCore
 from ..core.image import Image as ImageCore
+from .adapter import FileAdapter
 from .exceptions.element import (InvalidElementNameError,
                                  InvalidElementTypeError,
                                  InvalidElementValueError,
@@ -30,13 +31,21 @@ class Element:
         self,
         element_name: str,
         element_type: "ElementType",
-        element_value: Union[str, bool, bytes, int] = None,
+        element_value: Union[str, bool, bytes, int, BinaryIO] = None,
     ) -> None:
         """Constructs all attributes for the Element object."""
 
+        if element_type == ElementType.image and (
+            isinstance(element_value, (bytes, str))
+            or FileAdapter().readable(element_value)
+        ):
+            adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(element_value)
+            if adapted is not None:
+                element_value = adapted
+
         self._name = element_name
         self._type = element_type
-        self.value = element_value
+        self._value = element_value
 
         if element_type == ElementType.text:
             self.font = None
@@ -45,6 +54,25 @@ class Element:
             self.text_x_offset = None
             self.text_y_offset = None
             self.text_wrap_length = None
+
+    @property
+    def value(self) -> Union[str, bool, bytes, int, BinaryIO]:
+        """Value of the element."""
+
+        return self._value
+
+    @value.setter
+    def value(self, v) -> None:
+        """Insures the value gets converted to bytes when set to fp or f object."""
+
+        if self._type == ElementType.image and (
+            isinstance(v, (bytes, str)) or FileAdapter().readable(v)
+        ):
+            adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(v)
+            if adapted is not None:
+                v = adapted
+
+        self._value = v
 
     @property
     def name(self) -> str:
