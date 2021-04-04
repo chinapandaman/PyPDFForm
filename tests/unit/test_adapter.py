@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+
 import pytest
 
 from PyPDFForm.middleware.adapter import FileAdapter
@@ -32,4 +33,6 @@ def test_file_adapter_fp_or_f_obj_or_stream_to_stream(pdf_samples, template_stre
     with open(path, "rb+") as f:
         assert FileAdapter().fp_or_f_obj_or_stream_to_stream(f) == template_stream
         f.seek(0)
-        assert FileAdapter().fp_or_f_obj_or_stream_to_stream(f.read()) == template_stream
+        assert (
+            FileAdapter().fp_or_f_obj_or_stream_to_stream(f.read()) == template_stream
+        )

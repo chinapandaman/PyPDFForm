@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains user API for PyPDFForm."""
 
-from typing import Dict, Tuple, Union, BinaryIO
+from typing import BinaryIO, Dict, Tuple, Union
 
 from ..core.filler import Filler as FillerCore
 from ..core.font import Font as FontCore
@@ -9,6 +9,7 @@ from ..core.image import Image as ImageCore
 from ..core.template import Template as TemplateCore
 from ..core.utils import Utils as UtilsCore
 from ..core.watermark import Watermark as WatermarkCore
+from .adapter import FileAdapter
 from .constants import Text as TextConstants
 from .element import Element as ElementMiddleware
 from .element import ElementType
@@ -20,7 +21,6 @@ from .exceptions.input import (InvalidCoordinateError,
                                InvalidModeError, InvalidPageNumberError,
                                InvalidTextError, InvalidTTFFontError)
 from .template import Template as TemplateMiddleware
-from .adapter import FileAdapter
 
 
 class PyPDFForm:
@@ -126,7 +126,9 @@ class PyPDFForm:
         return self
 
     def _simple_fill(
-        self, data: Dict[str, Union[str, bool, bytes, int, BinaryIO]], editable: bool = False
+        self,
+        data: Dict[str, Union[str, bool, bytes, int, BinaryIO]],
+        editable: bool = False,
     ) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
 
@@ -270,7 +272,9 @@ class PyPDFForm:
         return self.stream
 
     @classmethod
-    def register_font(cls, font_name: str, ttf_file: Union[bytes, str, BinaryIO]) -> bool:
+    def register_font(
+        cls, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
+    ) -> bool:
         """Registers a font from a ttf file."""
 
         ttf_file = FileAdapter().fp_or_f_obj_or_stream_to_stream(ttf_file)

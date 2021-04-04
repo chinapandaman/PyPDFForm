@@ -2,7 +2,7 @@
 """Contains user input adapters."""
 
 import os
-from typing import Any, Union, BinaryIO
+from typing import Any, BinaryIO, Union
 
 
 class FileAdapter:
@@ -14,7 +14,9 @@ class FileAdapter:
 
         return callable(getattr(obj, "read", None))
 
-    def fp_or_f_obj_or_stream_to_stream(self, fp_or_f_obj_or_stream: Union[bytes, str, BinaryIO]) -> Union[bytes, None]:
+    def fp_or_f_obj_or_stream_to_stream(
+        self, fp_or_f_obj_or_stream: Union[bytes, str, BinaryIO]
+    ) -> Union[bytes, None]:
         """Converts a file path or a file object to a stream."""
 
         if isinstance(fp_or_f_obj_or_stream, bytes):
