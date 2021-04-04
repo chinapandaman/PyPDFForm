@@ -37,8 +37,7 @@ class Element:
 
         if (
             element_type == ElementType.image
-            and isinstance(element_value, (bytes, str))
-            or FileAdapter().readable(element_value)
+            and (isinstance(element_value, (bytes, str)) or FileAdapter().readable(element_value))
         ):
             adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(element_value)
             if adapted is not None:
@@ -66,7 +65,7 @@ class Element:
     def value(self, v) -> None:
         """Insures the value gets converted to bytes when set to fp or f object."""
 
-        if isinstance(v, (bytes, str)) or FileAdapter().readable(v):
+        if self._type == ElementType.image and (isinstance(v, (bytes, str)) or FileAdapter().readable(v)):
             adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(v)
             if adapted is not None:
                 v = adapted
