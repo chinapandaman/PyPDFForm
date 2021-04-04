@@ -2,16 +2,21 @@
 """Contains element middleware."""
 
 from enum import Enum
-from typing import Union
+from typing import BinaryIO, Union
 
+from .adapter import FileAdapter
 from ..core.font import Font as FontCore
 from ..core.image import Image as ImageCore
-from .exceptions.element import (InvalidElementNameError,
-                                 InvalidElementTypeError,
-                                 InvalidElementValueError,
-                                 InvalidFontColorError, InvalidFontError,
-                                 InvalidFontSizeError, InvalidTextOffsetError,
-                                 InvalidWrapLengthError)
+from .exceptions.element import (
+    InvalidElementNameError,
+    InvalidElementTypeError,
+    InvalidElementValueError,
+    InvalidFontColorError,
+    InvalidFontError,
+    InvalidFontSizeError,
+    InvalidTextOffsetError,
+    InvalidWrapLengthError,
+)
 
 
 class ElementType(Enum):
@@ -34,9 +39,16 @@ class Element:
     ) -> None:
         """Constructs all attributes for the Element object."""
 
+        if isinstance(element_value, (bytes, str)) or FileAdapter().readable(
+            element_value
+        ):
+            adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(element_value)
+            if adapted is not None:
+                element_value = adapted
+
         self._name = element_name
         self._type = element_type
-        self.value = element_value
+        self._value = element_value
 
         if element_type == ElementType.text:
             self.font = None
@@ -45,6 +57,21 @@ class Element:
             self.text_x_offset = None
             self.text_y_offset = None
             self.text_wrap_length = None
+
+    @property
+    def value(self) -> Union[str, bool, bytes, int, BinaryIO]:
+        """Value of the element."""
+
+        return self._value
+
+    @value.setter
+    def value(self, v) -> None:
+        if isinstance(v, (bytes, str)) or FileAdapter().readable(v):
+            adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(v)
+            if adapted is not None:
+                v = adapted
+
+        self._value = v
 
     @property
     def name(self) -> str:
