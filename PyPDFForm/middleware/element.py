@@ -31,12 +31,14 @@ class Element:
         self,
         element_name: str,
         element_type: "ElementType",
-        element_value: Union[str, bool, bytes, int] = None,
+        element_value: Union[str, bool, bytes, int, BinaryIO] = None,
     ) -> None:
         """Constructs all attributes for the Element object."""
 
-        if isinstance(element_value, (bytes, str)) or FileAdapter().readable(
-            element_value
+        if (
+            element_type == ElementType.image
+            and isinstance(element_value, (bytes, str))
+            or FileAdapter().readable(element_value)
         ):
             adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(element_value)
             if adapted is not None:
