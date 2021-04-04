@@ -491,7 +491,9 @@ def test_fill_images_fp_params_explicitly_setting_elements(pdf_samples, image_sa
         assert obj.stream[:32767] == expected[:32767]
 
 
-def test_fill_images_f_obj_params_explicitly_setting_elements(pdf_samples, image_samples):
+def test_fill_images_f_obj_params_explicitly_setting_elements(
+    pdf_samples, image_samples
+):
     with open(os.path.join(pdf_samples, "sample_filled_images.pdf"), "rb+") as f:
         expected = f.read()
 
