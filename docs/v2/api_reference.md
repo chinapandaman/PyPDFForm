@@ -98,7 +98,7 @@ registered first.
 
 ### **elements**
 
-A python dictionary only available when `simple_mode` is `False`. 
+A Python dictionary only available when `simple_mode` is `False`. 
 This attribute is the primary way of customizing details like font size and text wrap length for an individual element. 
 Its keys consist 
 all elements' annotated names while the values hold their corresponding `Element()` objects. 
@@ -106,14 +106,14 @@ Please read more about `Element()` [here](https://github.com/chinapandaman/PyPDF
 
 ### **fill**(*data, editable=False*)
 
-The fill method takes a python dictionary object `data` and fill the PDF form 
+The fill method takes a Python dictionary object `data` and fill the PDF form 
 template with it. Keys of the objects should match the annotated names of elements on the PDF form. 
 Based on types of values as well as different types of elements different 
 actions will be performed on the PDF form.
 
 #### Parameters:
 
-* **data** - a python dictionary which holds the data that will be filled on the PDF form. 
+* **data** - a Python dictionary which holds the data that will be filled on the PDF form. 
 Its keys have to be `string` and need to match the annotated names of elements. 
 Its values currently support the following:
     1) A `string`, which will be printed on the corresponding `text` element.
