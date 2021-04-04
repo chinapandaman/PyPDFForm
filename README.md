@@ -34,10 +34,9 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     output.write(
         PyPDFForm(
-            PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM,
-            simple_mode=False,
-            global_font_size=20,
-        ).fill(
+            PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, simple_mode=False, global_font_size=20,
+        )
+        .fill(
             {
                 "test": "test_1",
                 "check": True,
@@ -46,7 +45,8 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
                 "test_3": "test_3",
                 "check_3": True,
             },
-        ).read()
+        )
+        .read()
     )
 ```
 
