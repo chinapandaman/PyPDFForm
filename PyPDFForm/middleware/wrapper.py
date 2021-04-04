@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains user API for PyPDFForm."""
 
-from typing import Dict, Tuple, Union
+from typing import BinaryIO, Dict, Tuple, Union
 
 from ..core.filler import Filler as FillerCore
 from ..core.font import Font as FontCore
@@ -9,6 +9,7 @@ from ..core.image import Image as ImageCore
 from ..core.template import Template as TemplateCore
 from ..core.utils import Utils as UtilsCore
 from ..core.watermark import Watermark as WatermarkCore
+from .adapter import FileAdapter
 from .constants import Text as TextConstants
 from .element import Element as ElementMiddleware
 from .element import ElementType
@@ -27,7 +28,7 @@ class PyPDFForm:
 
     def __init__(
         self,
-        template: bytes = b"",
+        template: Union[bytes, str, BinaryIO] = b"",
         simple_mode: bool = True,
         global_font: str = TextConstants().global_font,
         global_font_size: Union[float, int] = TextConstants().global_font_size,
@@ -40,6 +41,7 @@ class PyPDFForm:
     ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
+        template = FileAdapter().fp_or_f_obj_or_stream_to_stream(template)
         TemplateMiddleware().validate_template(template)
         if not isinstance(simple_mode, bool):
             raise InvalidModeError
@@ -91,7 +93,7 @@ class PyPDFForm:
 
     def _fill(
         self,
-        data: Dict[str, Union[str, bool, bytes, int]],
+        data: Dict[str, Union[str, bool, bytes, int, BinaryIO]],
     ) -> "PyPDFForm":
         """Fill a PDF form with customized parameters."""
 
@@ -99,6 +101,12 @@ class PyPDFForm:
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
+
+        for key, value in data.items():
+            if isinstance(value, (bytes, str)) or FileAdapter().readable(value):
+                adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(value)
+                if adapted is not None:
+                    data[key] = adapted
 
         for key, value in data.items():
             if not isinstance(key, str):
@@ -118,7 +126,9 @@ class PyPDFForm:
         return self
 
     def _simple_fill(
-        self, data: Dict[str, Union[str, bool, bytes, int]], editable: bool = False
+        self,
+        data: Dict[str, Union[str, bool, bytes, int, BinaryIO]],
+        editable: bool = False,
     ) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
 
@@ -126,6 +136,12 @@ class PyPDFForm:
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
+
+        for key, value in data.items():
+            if isinstance(value, (bytes, str)) or FileAdapter().readable(value):
+                adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(value)
+                if adapted is not None:
+                    data[key] = adapted
 
         for key, value in data.items():
             if not isinstance(key, str):
@@ -205,7 +221,7 @@ class PyPDFForm:
 
     def draw_image(
         self,
-        image: bytes,
+        image: Union[bytes, str, BinaryIO],
         page_number: int,
         x: Union[float, int],
         y: Union[float, int],
@@ -216,6 +232,10 @@ class PyPDFForm:
         """Draws an image on a PDF form."""
 
         TemplateMiddleware().validate_stream(self.stream)
+
+        image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
+        if image is None:
+            raise InvalidImageError
 
         if not isinstance(rotation, (float, int)):
             raise InvalidImageRotationAngleError
@@ -252,20 +272,24 @@ class PyPDFForm:
         return self.stream
 
     @classmethod
-    def register_font(cls, font_name: str, ttf_stream: bytes) -> bool:
-        """Registers a font from a ttf file stream."""
+    def register_font(
+        cls, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
+    ) -> bool:
+        """Registers a font from a ttf file."""
+
+        ttf_file = FileAdapter().fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         if any(
             [
                 not font_name,
                 not isinstance(font_name, str),
-                not ttf_stream,
-                not isinstance(ttf_stream, bytes),
+                not ttf_file,
+                not isinstance(ttf_file, bytes),
             ]
         ):
             raise InvalidTTFFontError
 
-        if not FontCore().register_font(font_name, ttf_stream):
+        if not FontCore().register_font(font_name, ttf_file):
             raise InvalidTTFFontError
 
         return True

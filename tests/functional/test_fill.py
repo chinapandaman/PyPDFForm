@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import random
 
 import pytest
 
@@ -104,11 +105,99 @@ def test_fill_simple_mode_editable(template_stream, pdf_samples, data_dict):
         assert obj.stream == expected
 
 
+def test_fill_simple_mode_images(
+    pdf_samples,
+    template_with_image_stream,
+    image_stream,
+    image_stream_2,
+    image_stream_3,
+):
+    with open(
+        os.path.join(pdf_samples, "sample_filled_images_simple_mode.pdf"), "rb+"
+    ) as f:
+        obj = PyPDFForm(template_with_image_stream).fill(
+            {
+                "image_1": image_stream,
+                "image_2": image_stream_2,
+                "image_3": image_stream_3,
+            }
+        )
+
+        expected = f.read()
+
+        if os.name == "nt":
+            assert len(obj.stream) == len(expected)
+            assert obj.stream == expected
+        else:
+            assert obj.stream[:32767] == expected[:32767]
+
+
+def test_fill_simple_mode_images_fp_params(pdf_samples, image_samples):
+    with open(
+        os.path.join(pdf_samples, "sample_filled_images_simple_mode.pdf"), "rb+"
+    ) as f:
+        expected = f.read()
+
+    obj = PyPDFForm(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"),
+    ).fill(
+        {
+            "image_1": os.path.join(image_samples, "sample_image.jpg"),
+            "image_2": os.path.join(image_samples, "sample_image_2.jpg"),
+            "image_3": os.path.join(image_samples, "sample_image_3.jpg"),
+        }
+    )
+
+    if os.name == "nt":
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+    else:
+        assert obj.stream[:32767] == expected[:32767]
+
+
+def test_fill_simple_mode_images_f_obj_params(pdf_samples, image_samples):
+    with open(
+        os.path.join(pdf_samples, "sample_filled_images_simple_mode.pdf"), "rb+"
+    ) as f:
+        expected = f.read()
+
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+"
+    ) as template:
+        with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as image:
+            with open(
+                os.path.join(image_samples, "sample_image_2.jpg"), "rb+"
+            ) as image_2:
+                with open(
+                    os.path.join(image_samples, "sample_image_3.jpg"), "rb+"
+                ) as image_3:
+                    obj = PyPDFForm(template,).fill(
+                        {
+                            "image_1": image,
+                            "image_2": image_2,
+                            "image_3": image_3,
+                        }
+                    )
+
+    if os.name == "nt":
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+    else:
+        assert obj.stream[:32767] == expected[:32767]
+
+
 def test_fill_non_simple_mode_font_liberation_serif_italic(
     template_stream, pdf_samples, font_samples, data_dict
 ):
     with open(os.path.join(font_samples, "LiberationSerif-Italic.ttf"), "rb+") as _f:
-        PyPDFForm.register_font("LiberationSerif-Italic", _f.read())
+        stream = _f.read()
+        _f.seek(0)
+        PyPDFForm.register_font(
+            "LiberationSerif-Italic",
+            random.choice(
+                [os.path.join(font_samples, "LiberationSerif-Italic.ttf"), _f, stream]
+            ),
+        )
 
     with open(
         os.path.join(pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"),
@@ -327,6 +416,57 @@ def test_fill_images(
             assert obj.stream == expected
         else:
             assert obj.stream[:32767] == expected[:32767]
+
+
+def test_fill_images_fp_params(pdf_samples, image_samples):
+    with open(os.path.join(pdf_samples, "sample_filled_images.pdf"), "rb+") as f:
+        expected = f.read()
+
+    obj = PyPDFForm(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"),
+        simple_mode=False,
+    ).fill(
+        {
+            "image_1": os.path.join(image_samples, "sample_image.jpg"),
+            "image_2": os.path.join(image_samples, "sample_image_2.jpg"),
+            "image_3": os.path.join(image_samples, "sample_image_3.jpg"),
+        }
+    )
+
+    if os.name == "nt":
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+    else:
+        assert obj.stream[:32767] == expected[:32767]
+
+
+def test_fill_images_f_obj_params(pdf_samples, image_samples):
+    with open(os.path.join(pdf_samples, "sample_filled_images.pdf"), "rb+") as f:
+        expected = f.read()
+
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+"
+    ) as template:
+        with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as image:
+            with open(
+                os.path.join(image_samples, "sample_image_2.jpg"), "rb+"
+            ) as image_2:
+                with open(
+                    os.path.join(image_samples, "sample_image_3.jpg"), "rb+"
+                ) as image_3:
+                    obj = PyPDFForm(template, simple_mode=False).fill(
+                        {
+                            "image_1": image,
+                            "image_2": image_2,
+                            "image_3": image_3,
+                        }
+                    )
+
+    if os.name == "nt":
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+    else:
+        assert obj.stream[:32767] == expected[:32767]
 
 
 def test_simple_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):

@@ -46,7 +46,7 @@ def font_samples():
     return os.path.join(os.path.dirname(__file__), "..", "..", "font_samples")
 
 
-def test_validate_constructor_inputs(template_stream):
+def test_validate_constructor_inputs(pdf_samples, template_stream):
     bad_inputs = ["", "True", 1, "12", ("0", "0", "0"), "0", "0", "100"]
 
     try:
@@ -132,6 +132,16 @@ def test_validate_constructor_inputs(template_stream):
     obj = PyPDFForm(*bad_inputs)
     assert obj.elements == {}
 
+    path = os.path.join(pdf_samples, "sample_template.pdf")
+    bad_inputs[0] = path
+    obj = PyPDFForm(*bad_inputs)
+    assert obj.read() == template_stream
+
+    with open(path, "rb+") as f:
+        bad_inputs[0] = f
+        obj = PyPDFForm(*bad_inputs)
+        assert obj.read() == template_stream
+
 
 def test_validate_addition_operator_inputs(template_stream):
     assert (PyPDFForm() + PyPDFForm(template_stream)).stream == template_stream
@@ -157,7 +167,7 @@ def test_validate_addition_operator_inputs(template_stream):
     assert True
 
 
-def test_validate_fill_inputs(template_stream):
+def test_validate_fill_inputs(image_samples, template_stream):
     bad_inputs = ["not_dict"]
 
     try:
@@ -187,8 +197,18 @@ def test_validate_fill_inputs(template_stream):
     PyPDFForm(template_stream, False).fill(*bad_inputs)
     assert True
 
+    path = os.path.join(image_samples, "sample_image.jpg")
+    bad_inputs[0] = {"foo": "", "bar": True, "foo_bar": path, "bar_foo": 0}
+    PyPDFForm(template_stream, False).fill(*bad_inputs)
+    assert True
 
-def test_validate_simple_fill_inputs(template_stream, image_stream):
+    with open(path, "rb+") as f:
+        bad_inputs[0] = {"foo": "", "bar": True, "foo_bar": f, "bar_foo": 0}
+        PyPDFForm(template_stream, False).fill(*bad_inputs)
+        assert True
+
+
+def test_validate_simple_fill_inputs(image_samples, template_stream, image_stream):
     bad_inputs = ["not_dict", "True"]
 
     try:
@@ -232,6 +252,16 @@ def test_validate_simple_fill_inputs(template_stream, image_stream):
     bad_inputs[1] = True
     PyPDFForm(template_stream).fill(*bad_inputs)
     assert True
+
+    path = os.path.join(image_samples, "sample_image.jpg")
+    bad_inputs[0] = {"foo": "", "bar": True, "foo_bar": path, "bar_foo": 0}
+    PyPDFForm(template_stream).fill(*bad_inputs)
+    assert True
+
+    with open(path, "rb+") as f:
+        bad_inputs[0] = {"foo": "", "bar": True, "foo_bar": f, "bar_foo": 0}
+        PyPDFForm(template_stream).fill(*bad_inputs)
+        assert True
 
 
 def test_validate_draw_text_inputs(template_stream):
@@ -335,7 +365,7 @@ def test_validate_draw_text_inputs(template_stream):
     assert True
 
 
-def test_validate_draw_image_inputs(template_stream, image_stream):
+def test_validate_draw_image_inputs(image_samples, template_stream, image_stream):
     bad_inputs = [b"", "1", "100", "100", "400", "225", "180"]
 
     try:
@@ -404,6 +434,16 @@ def test_validate_draw_image_inputs(template_stream, image_stream):
     PyPDFForm(template_stream).draw_image(*bad_inputs)
     assert True
 
+    path = os.path.join(image_samples, "sample_image.jpg")
+    bad_inputs[0] = path
+    PyPDFForm(template_stream).draw_image(*bad_inputs)
+    assert True
+
+    with open(path, "rb+") as f:
+        bad_inputs[0] = f
+        PyPDFForm(template_stream).draw_image(*bad_inputs)
+        assert True
+
 
 def test_validate_register_font_inputs(font_samples):
     bad_inputs = [None, None]
@@ -449,4 +489,11 @@ def test_validate_register_font_inputs(font_samples):
     with open(os.path.join(font_samples, "LiberationSerif-Bold.ttf"), "rb+") as f:
         bad_inputs[1] = f.read()
 
+        assert PyPDFForm.register_font(*bad_inputs)
+
+        f.seek(0)
+        bad_inputs[1] = f
+        assert PyPDFForm.register_font(*bad_inputs)
+
+        bad_inputs[1] = os.path.join(font_samples, "LiberationSerif-Bold.ttf")
         assert PyPDFForm.register_font(*bad_inputs)

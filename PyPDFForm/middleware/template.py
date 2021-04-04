@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for template middleware."""
 
-from typing import Dict
+from typing import Dict, Union
 
 from ..core.template import Template as TemplateCore
 from .element import Element
@@ -12,7 +12,7 @@ class Template:
     """Contains methods for interacting with template middlewares."""
 
     @staticmethod
-    def validate_template(pdf_stream: bytes) -> None:
+    def validate_template(pdf_stream: Union[bytes, None]) -> None:
         """Validates if a template stream is byte type."""
 
         if not isinstance(pdf_stream, bytes):
