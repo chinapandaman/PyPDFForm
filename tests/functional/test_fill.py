@@ -544,6 +544,27 @@ def test_fill_png_images(pdf_samples, image_samples):
         assert obj.stream[:32767] == expected[:32767]
 
 
+def test_simple_fill_png_images(pdf_samples, image_samples):
+    with open(os.path.join(pdf_samples, "sample_filled_png_images_simple_mode.pdf"), "rb+") as f:
+        expected = f.read()
+
+    obj = PyPDFForm(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"),
+    ).fill(
+        {
+            "image_1": os.path.join(image_samples, "before_converted.png"),
+            "image_2": os.path.join(image_samples, "before_converted.png"),
+            "image_3": os.path.join(image_samples, "before_converted.png"),
+        }
+    )
+
+    if os.name == "nt":
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+    else:
+        assert obj.stream[:32767] == expected[:32767]
+
+
 def test_simple_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
     with open(
         os.path.join(pdf_samples, "sample_filled_radiobutton_simple.pdf"), "rb+"
