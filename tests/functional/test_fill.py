@@ -541,7 +541,7 @@ def test_fill_png_images(pdf_samples, image_samples):
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
     else:
-        assert obj.stream[:32767] == expected[:32767]
+        assert obj.stream[:16383] == expected[:16383]
 
 
 def test_simple_fill_png_images(pdf_samples, image_samples):
@@ -562,7 +562,7 @@ def test_simple_fill_png_images(pdf_samples, image_samples):
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
     else:
-        assert obj.stream[:32767] == expected[:32767]
+        assert obj.stream[:16383] == expected[:16383]
 
 
 def test_simple_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
