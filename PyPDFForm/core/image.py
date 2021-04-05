@@ -48,3 +48,25 @@ class Image:
         rotated_buff.close()
 
         return result
+
+    @staticmethod
+    def any_image_to_jpg(image_stream: bytes) -> bytes:
+        """Converts an image of any type to jpg."""
+
+        buff = BytesIO()
+        buff.write(image_stream)
+        buff.seek(0)
+
+        image = Img.open(buff)
+
+        if image.format == "JPEG":
+            buff.close()
+            return image_stream
+
+        with BytesIO() as f:
+            image.save(f, format="JPEG")
+            f.seek(0)
+            result = f.read()
+
+        buff.close()
+        return result

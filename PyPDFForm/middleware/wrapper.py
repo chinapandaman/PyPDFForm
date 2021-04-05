@@ -120,6 +120,9 @@ class PyPDFForm:
                 self.elements[key].validate_constants()
                 self.elements[key].validate_value()
                 self.elements[key].validate_text_attributes()
+                if self.elements[key].type == ElementType.image:
+                    value = ImageCore().any_image_to_jpg(value)
+                    self.elements[key].value = value
 
         self.stream = FillerCore().fill(self.stream, self.elements)
 
@@ -151,6 +154,7 @@ class PyPDFForm:
             if isinstance(value, bytes):
                 if not ImageCore().is_image(value):
                     raise InvalidFormDataError
+                data[key] = ImageCore().any_image_to_jpg(value)
 
         if not isinstance(editable, bool):
             raise InvalidEditableParameterError
@@ -243,6 +247,7 @@ class PyPDFForm:
         if not ImageCore().is_image(image):
             raise InvalidImageError
 
+        image = ImageCore().any_image_to_jpg(image)
         image = ImageCore().rotate_image(image, rotation)
 
         if not isinstance(page_number, int):
