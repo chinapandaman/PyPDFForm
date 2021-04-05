@@ -545,7 +545,9 @@ def test_fill_png_images(pdf_samples, image_samples):
 
 
 def test_simple_fill_png_images(pdf_samples, image_samples):
-    with open(os.path.join(pdf_samples, "sample_filled_png_images_simple_mode.pdf"), "rb+") as f:
+    with open(
+        os.path.join(pdf_samples, "sample_filled_png_images_simple_mode.pdf"), "rb+"
+    ) as f:
         expected = f.read()
 
     obj = PyPDFForm(
