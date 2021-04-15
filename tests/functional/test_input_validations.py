@@ -201,6 +201,7 @@ def test_validate_fill_inputs(template_stream):
         assert True
 
     bad_inputs[0] = {"foo": "", "bar": True, "bar_foo": 0}
+    PyPDFForm(template_stream, False).fill(*bad_inputs)
     assert True
 
 
