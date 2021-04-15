@@ -162,9 +162,7 @@ def test_validate_text_attributes(text_element):
     assert True
 
 
-def test_setting_invalid_value(
-    text_element, checkbox_element, radiobutton_element
-):
+def test_setting_invalid_value(text_element, checkbox_element, radiobutton_element):
     text_element.value = 0
 
     try:
