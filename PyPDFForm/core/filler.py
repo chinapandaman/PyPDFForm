@@ -108,66 +108,65 @@ class Filler:
 
         radio_button_tracker = {}
 
-        for page, elements in TemplateCore().get_elements_by_page(template_pdf).items():
-            for element in elements:
-                key = TemplateCore().get_element_key(element)
+        for element in TemplateCore().iterate_elements(template_pdf):
+            key = TemplateCore().get_element_key(element)
 
-                if key in data.keys():
-                    update_dict = {}
-                    if data[key] in [
-                        pdfrw.PdfName.Yes,
-                        pdfrw.PdfName.Off,
-                    ]:
-                        update_dict = {
-                            TemplateConstants().checkbox_field_value_key.replace(
-                                "/", ""
-                            ): data[key]
-                        }
-                    elif isinstance(data[key], int):
-                        if key not in radio_button_tracker:
-                            radio_button_tracker[key] = 0
-                        radio_button_tracker[key] += 1
+            if key in data.keys():
+                update_dict = {}
+                if data[key] in [
+                    pdfrw.PdfName.Yes,
+                    pdfrw.PdfName.Off,
+                ]:
+                    update_dict = {
+                        TemplateConstants().checkbox_field_value_key.replace(
+                            "/", ""
+                        ): data[key]
+                    }
+                elif isinstance(data[key], int):
+                    if key not in radio_button_tracker:
+                        radio_button_tracker[key] = 0
+                    radio_button_tracker[key] += 1
 
-                        if data[key] == radio_button_tracker[key] - 1:
-                            element.update(
+                    if data[key] == radio_button_tracker[key] - 1:
+                        element.update(
+                            pdfrw.PdfDict(
+                                **{
+                                    TemplateConstants().checkbox_field_value_key.replace(
+                                        "/", ""
+                                    ): BasePdfName(
+                                        "/" + str(data[key]), False
+                                    ),
+                                }
+                            )
+                        )
+
+                        if not editable:
+                            element[
+                                TemplateConstants().radio_button_group_key
+                            ].update(
                                 pdfrw.PdfDict(
                                     **{
-                                        TemplateConstants().checkbox_field_value_key.replace(
+                                        TemplateConstants().field_editable_key.replace(
                                             "/", ""
-                                        ): BasePdfName(
-                                            "/" + str(data[key]), False
-                                        ),
+                                        ): pdfrw.PdfObject(
+                                            1
+                                        )
                                     }
                                 )
                             )
+                        continue
+                else:
+                    update_dict = {
+                        TemplateConstants().text_field_value_key.replace(
+                            "/", ""
+                        ): data[key]
+                    }
 
-                            if not editable:
-                                element[
-                                    TemplateConstants().radio_button_group_key
-                                ].update(
-                                    pdfrw.PdfDict(
-                                        **{
-                                            TemplateConstants().field_editable_key.replace(
-                                                "/", ""
-                                            ): pdfrw.PdfObject(
-                                                1
-                                            )
-                                        }
-                                    )
-                                )
-                            continue
-                    else:
-                        update_dict = {
-                            TemplateConstants().text_field_value_key.replace(
-                                "/", ""
-                            ): data[key]
-                        }
+                if not editable:
+                    update_dict[
+                        TemplateConstants().field_editable_key.replace("/", "")
+                    ] = pdfrw.PdfObject(1)
 
-                    if not editable:
-                        update_dict[
-                            TemplateConstants().field_editable_key.replace("/", "")
-                        ] = pdfrw.PdfObject(1)
-
-                    element.update(pdfrw.PdfDict(**update_dict))
+                element.update(pdfrw.PdfDict(**update_dict))
 
         return Utils().generate_stream(template_pdf)
