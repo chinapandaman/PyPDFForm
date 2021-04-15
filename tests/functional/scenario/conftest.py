@@ -27,13 +27,13 @@ def font_directory():
 
 
 @pytest.fixture
-def sample_job_application(pdf_directory):
-    return os.path.join(pdf_directory, "sample_job_application.pdf")
+def sample_template(pdf_directory):
+    return os.path.join(pdf_directory, "sample_template.pdf")
 
 
 @pytest.fixture
-def sample_signature(image_directory):
-    return os.path.join(image_directory, "sample_signature.jpg")
+def sample_image(image_directory):
+    return os.path.join(image_directory, "sample_image.jpg")
 
 
 @pytest.fixture
