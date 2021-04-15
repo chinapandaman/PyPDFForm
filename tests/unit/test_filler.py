@@ -20,21 +20,8 @@ def pdf_samples():
 
 
 @pytest.fixture
-def image_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "image_samples")
-
-
-@pytest.fixture
 def template_stream(pdf_samples):
     with open(os.path.join(pdf_samples, "sample_template.pdf"), "rb+") as f:
-        return f.read()
-
-
-@pytest.fixture
-def template_with_image_stream(pdf_samples):
-    with open(
-        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+"
-    ) as f:
         return f.read()
 
 
@@ -43,24 +30,6 @@ def template_with_radiobutton_stream(pdf_samples):
     with open(
         os.path.join(pdf_samples, "sample_template_with_radio_button.pdf"), "rb+"
     ) as f:
-        return f.read()
-
-
-@pytest.fixture
-def image_stream(image_samples):
-    with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as f:
-        return f.read()
-
-
-@pytest.fixture
-def image_stream_2(image_samples):
-    with open(os.path.join(image_samples, "sample_image_2.jpg"), "rb+") as f:
-        return f.read()
-
-
-@pytest.fixture
-def image_stream_3(image_samples):
-    with open(os.path.join(image_samples, "sample_image_3.jpg"), "rb+") as f:
         return f.read()
 
 
@@ -167,63 +136,6 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
                 )
 
 
-def test_fill_with_image(
-    template_with_image_stream, data_dict, image_stream, image_stream_2, image_stream_3
-):
-    elements = TemplateMiddleware().build_elements(template_with_image_stream)
-
-    for k, v in data_dict.items():
-        if k in elements:
-            elements[k].value = v
-
-            if elements[k].type == ElementType.text:
-                elements[k].font = TextConstants().global_font
-                elements[k].font_size = TextConstants().global_font_size
-                elements[k].font_color = TextConstants().global_font_color
-                elements[k].text_x_offset = TextConstants().global_text_x_offset
-                elements[k].text_y_offset = TextConstants().global_text_y_offset
-                elements[k].text_wrap_length = TextConstants().global_text_wrap_length
-            elements[k].validate_constants()
-            elements[k].validate_value()
-            elements[k].validate_text_attributes()
-
-    comparing_stream = Filler().fill(template_with_image_stream, elements)
-
-    data_dict["image_1"] = image_stream
-    data_dict["image_2"] = image_stream_2
-    data_dict["image_3"] = image_stream_3
-
-    for k, v in data_dict.items():
-        if k in elements:
-            elements[k].value = v
-
-            if elements[k].type == ElementType.text:
-                elements[k].font = TextConstants().global_font
-                elements[k].font_size = TextConstants().global_font_size
-                elements[k].font_color = TextConstants().global_font_color
-                elements[k].text_x_offset = TextConstants().global_text_x_offset
-                elements[k].text_y_offset = TextConstants().global_text_y_offset
-                elements[k].text_wrap_length = TextConstants().global_text_wrap_length
-            elements[k].validate_constants()
-            elements[k].validate_value()
-            elements[k].validate_text_attributes()
-
-    result_stream = Filler().fill(template_with_image_stream, elements)
-
-    assert result_stream != template_with_image_stream
-    assert result_stream != comparing_stream
-
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
-
-        assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
-
-        if isinstance(data_dict[key], bool):
-            assert element[TemplateConstants().checkbox_field_value_key] == (
-                pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
-            )
-
-
 def test_simple_fill(template_stream, data_dict):
     result_stream = Filler().simple_fill(template_stream, data_dict, False)
 
@@ -242,38 +154,6 @@ def test_simple_fill(template_stream, data_dict):
                 == data_dict[key]
             )
         assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
-
-
-def test_simple_fill_with_image(
-    template_with_image_stream, data_dict, image_stream, image_stream_2, image_stream_3
-):
-    comparing_stream = Filler().simple_fill(template_with_image_stream, data_dict, True)
-
-    data_dict["image_1"] = image_stream
-    data_dict["image_2"] = image_stream_2
-    data_dict["image_3"] = image_stream_3
-
-    result_stream = Filler().simple_fill(template_with_image_stream, data_dict, True)
-
-    assert result_stream != template_with_image_stream
-    assert result_stream != comparing_stream
-
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
-
-        if isinstance(data_dict[key], bool):
-            assert element[TemplateConstants().checkbox_field_value_key] == (
-                pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
-            )
-        elif isinstance(data_dict[key], bytes):
-            assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
-            continue
-        else:
-            assert (
-                element[TemplateConstants().text_field_value_key][1:-1]
-                == data_dict[key]
-            )
-        assert element[TemplateConstants().field_editable_key] != pdfrw.PdfObject(1)
 
 
 def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):

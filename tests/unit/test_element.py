@@ -22,17 +22,6 @@ def pdf_samples():
 
 
 @pytest.fixture
-def image_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "image_samples")
-
-
-@pytest.fixture
-def image_stream(image_samples):
-    with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as f:
-        return f.read()
-
-
-@pytest.fixture
 def text_element_attributes():
     return [
         "font",
@@ -52,11 +41,6 @@ def text_element():
 @pytest.fixture
 def checkbox_element():
     return Element("foo", ElementType.checkbox)
-
-
-@pytest.fixture
-def image_element():
-    return Element("foo", ElementType.image)
 
 
 @pytest.fixture
@@ -179,7 +163,7 @@ def test_validate_text_attributes(text_element):
 
 
 def test_setting_invalid_value(
-    text_element, checkbox_element, image_element, image_stream, radiobutton_element
+    text_element, checkbox_element, radiobutton_element
 ):
     text_element.value = 0
 
@@ -202,25 +186,6 @@ def test_setting_invalid_value(
 
     checkbox_element.value = False
     checkbox_element.validate_value()
-
-    image_element.value = ""
-
-    try:
-        image_element.validate_value()
-        assert False
-    except InvalidElementValueError:
-        assert True
-
-    image_element.value = b"bad_stream"
-
-    try:
-        image_element.validate_value()
-        assert False
-    except InvalidElementValueError:
-        assert True
-
-    image_element.value = image_stream
-    image_element.validate_value()
 
     radiobutton_element.value = "0"
 
@@ -253,23 +218,3 @@ def test_invalid_constants(text_element):
         assert False
     except InvalidElementTypeError:
         assert True
-
-
-def test_value_set_and_get_with_fp_and_f_obj(image_samples, image_stream):
-    path = os.path.join(image_samples, "sample_image.jpg")
-
-    foo = Element("foo", ElementType.image, path)
-    assert foo.value == image_stream
-
-    with open(path, "rb+") as f:
-        bar = Element("bar", ElementType.image, f)
-        assert bar.value == image_stream
-
-    foo_bar = Element("foo_bar", ElementType.image)
-    foo_bar.value = path
-    assert foo_bar.value == image_stream
-
-    bar_foo = Element("bar_foo", ElementType.image)
-    with open(path, "rb+") as i:
-        bar_foo.value = i
-        assert bar_foo.value == image_stream

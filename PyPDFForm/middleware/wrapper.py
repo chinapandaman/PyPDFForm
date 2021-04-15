@@ -93,7 +93,7 @@ class PyPDFForm:
 
     def _fill(
         self,
-        data: Dict[str, Union[str, bool, bytes, int, BinaryIO]],
+        data: Dict[str, Union[str, bool, int]],
     ) -> "PyPDFForm":
         """Fill a PDF form with customized parameters."""
 
@@ -103,15 +103,9 @@ class PyPDFForm:
             raise InvalidFormDataError
 
         for key, value in data.items():
-            if isinstance(value, (bytes, str)) or FileAdapter().readable(value):
-                adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(value)
-                if adapted is not None:
-                    data[key] = adapted
-
-        for key, value in data.items():
             if not isinstance(key, str):
                 raise InvalidFormDataError
-            if not isinstance(value, (str, bool, bytes, int)):
+            if not isinstance(value, (str, bool, int)):
                 raise InvalidFormDataError
 
         for key, value in data.items():
@@ -120,9 +114,6 @@ class PyPDFForm:
                 self.elements[key].validate_constants()
                 self.elements[key].validate_value()
                 self.elements[key].validate_text_attributes()
-                if self.elements[key].type == ElementType.image:
-                    value = ImageCore().any_image_to_jpg(value)
-                    self.elements[key].value = value
 
         self.stream = FillerCore().fill(self.stream, self.elements)
 
@@ -130,7 +121,7 @@ class PyPDFForm:
 
     def _simple_fill(
         self,
-        data: Dict[str, Union[str, bool, bytes, int, BinaryIO]],
+        data: Dict[str, Union[str, bool, int]],
         editable: bool = False,
     ) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
@@ -141,20 +132,10 @@ class PyPDFForm:
             raise InvalidFormDataError
 
         for key, value in data.items():
-            if isinstance(value, (bytes, str)) or FileAdapter().readable(value):
-                adapted = FileAdapter().fp_or_f_obj_or_stream_to_stream(value)
-                if adapted is not None:
-                    data[key] = adapted
-
-        for key, value in data.items():
             if not isinstance(key, str):
                 raise InvalidFormDataError
-            if not isinstance(value, (str, bool, bytes, int)):
+            if not isinstance(value, (str, bool, int)):
                 raise InvalidFormDataError
-            if isinstance(value, bytes):
-                if not ImageCore().is_image(value):
-                    raise InvalidFormDataError
-                data[key] = ImageCore().any_image_to_jpg(value)
 
         if not isinstance(editable, bool):
             raise InvalidEditableParameterError
