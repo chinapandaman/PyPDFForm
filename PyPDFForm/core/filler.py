@@ -141,25 +141,21 @@ class Filler:
                         )
 
                         if not editable:
-                            element[
-                                TemplateConstants().radio_button_group_key
-                            ].update(
+                            element[TemplateConstants().radio_button_group_key].update(
                                 pdfrw.PdfDict(
                                     **{
                                         TemplateConstants().field_editable_key.replace(
                                             "/", ""
-                                        ): pdfrw.PdfObject(
-                                            1
-                                        )
+                                        ): pdfrw.PdfObject(1)
                                     }
                                 )
                             )
                         continue
                 else:
                     update_dict = {
-                        TemplateConstants().text_field_value_key.replace(
-                            "/", ""
-                        ): data[key]
+                        TemplateConstants().text_field_value_key.replace("/", ""): data[
+                            key
+                        ]
                     }
 
                 if not editable:
