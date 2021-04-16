@@ -24,6 +24,7 @@ setuptools.setup(
     version=version,
     description="The Python library for PDF forms.",
     long_description=long_description,
+    author="Jinge Li",
     long_description_content_type="text/markdown",
     url="https://github.com/chinapandaman/PyPDFForm",
     packages=setuptools.find_packages(),
