@@ -28,7 +28,14 @@ def font_samples():
 
 @pytest.fixture
 def data_dict():
-    return {"test": "test_1","check": True,"test_2": "test_2","check_2": False,"test_3": "test_3","check_3": True,}
+    return {
+        "test": "test_1",
+        "check": True,
+        "test_2": "test_2",
+        "check_2": False,
+        "test_3": "test_3",
+        "check_3": True,
+    }
 
 
 @pytest.fixture
