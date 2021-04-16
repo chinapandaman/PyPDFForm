@@ -14,6 +14,9 @@ jobs:
         python-version: [ 3.7 ]
 
     steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.BLACK_ISORT_TOKEN }}
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
@@ -21,9 +24,6 @@ jobs:
       - name: Install black/isort
         run: pip install black isort
       - name: If needed, commit black/isort changes to the pull request
-        uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.BLACK_ISORT_TOKEN }}
         run: |
           black .
           isort .
