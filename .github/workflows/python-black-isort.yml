@@ -14,7 +14,9 @@ jobs:
         python-version: [ 3.7 ]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.BLACK_ISORT_TOKEN }}
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
@@ -27,8 +29,5 @@ jobs:
           isort .
           git config --global user.name 'black-isort-bot'
           git config --global user.email 'bot@domain.com'
-          git remote set-url origin https://x-access-token:${{ secrets.BLACK_ISORT_TOKEN }}@github.com/$GITHUB_REPOSITORY
-          git fetch
-          git checkout $GITHUB_HEAD_REF
           git diff --quiet && git diff --staged --quiet || git commit -am 'linting: black/isort'
           git push
