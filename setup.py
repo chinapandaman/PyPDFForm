@@ -26,6 +26,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/chinapandaman/PyPDFForm",
+    author='Jinge Li',
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
