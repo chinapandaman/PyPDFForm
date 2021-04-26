@@ -63,7 +63,7 @@ class Filler:
                             )
                         )
 
-                    _element[TemplateConstants().radio_button_group_key].update(
+                    _element[TemplateConstants().parent_key].update(
                         pdfrw.PdfDict(
                             **{
                                 TemplateConstants().field_editable_key.replace(
@@ -141,7 +141,7 @@ class Filler:
                         )
 
                         if not editable:
-                            element[TemplateConstants().radio_button_group_key].update(
+                            element[TemplateConstants().parent_key].update(
                                 pdfrw.PdfDict(
                                     **{
                                         TemplateConstants().field_editable_key.replace(

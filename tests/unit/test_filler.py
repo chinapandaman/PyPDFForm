@@ -112,7 +112,7 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
         if isinstance(data_dict[key], bool) or isinstance(data_dict[key], str):
             assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
         else:
-            assert element[TemplateConstants().radio_button_group_key][
+            assert element[TemplateConstants().parent_key][
                 TemplateConstants().field_editable_key
             ] == pdfrw.PdfObject(1)
 
