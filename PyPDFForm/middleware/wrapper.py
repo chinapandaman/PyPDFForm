@@ -121,7 +121,7 @@ class PyPDFForm:
                 self.elements[key].validate_value()
                 self.elements[key].validate_text_attributes()
 
-        self.stream = FillerCore().fill(self.stream, self.elements)
+        self.stream = FillerCore().fill(self.stream, self.elements, self.sejda)
 
         return self
 

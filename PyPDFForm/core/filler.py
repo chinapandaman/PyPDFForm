@@ -18,7 +18,7 @@ class Filler:
     """Contains methods for filling a PDF form with dict."""
 
     @staticmethod
-    def fill(template_stream: bytes, elements: Dict[str, "ElementMiddleware"]) -> bytes:
+    def fill(template_stream: bytes, elements: Dict[str, "ElementMiddleware"], sejda: bool = False) -> bytes:
         """Fills a PDF using watermarks."""
 
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
@@ -29,12 +29,12 @@ class Filler:
         radio_button_tracker = {}
 
         for page, _elements in (
-            TemplateCore().get_elements_by_page(template_pdf).items()
+            TemplateCore().get_elements_by_page(template_pdf, sejda).items()
         ):
             texts_to_draw[page] = []
             text_watermarks.append(b"")
             for _element in _elements:
-                key = TemplateCore().get_element_key(_element)
+                key = TemplateCore().get_element_key(_element, sejda)
 
                 update_dict = {
                     TemplateConstants().field_editable_key.replace(
@@ -42,26 +42,44 @@ class Filler:
                     ): pdfrw.PdfObject(1)
                 }
                 if elements[key].type == ElementType.checkbox:
-                    update_dict[
-                        TemplateConstants().checkbox_field_value_key.replace("/", "")
-                    ] = Utils().bool_to_checkbox(elements[key].value)
+                    if sejda and elements[key].value is True:
+                        texts_to_draw[page].append(
+                            [
+                                Utils().checkbox_radio_to_draw(elements[key]),
+                                TemplateCore().get_draw_checkbox_radio_coordinates(_element)[0],
+                                TemplateCore().get_draw_checkbox_radio_coordinates(_element)[1],
+                            ]
+                        )
+                    else:
+                        update_dict[
+                            TemplateConstants().checkbox_field_value_key.replace("/", "")
+                        ] = Utils().bool_to_checkbox(elements[key].value)
                 elif elements[key].type == ElementType.radio:
                     if key not in radio_button_tracker:
                         radio_button_tracker[key] = 0
                     radio_button_tracker[key] += 1
 
                     if elements[key].value == radio_button_tracker[key] - 1:
-                        _element.update(
-                            pdfrw.PdfDict(
-                                **{
-                                    TemplateConstants().checkbox_field_value_key.replace(
-                                        "/", ""
-                                    ): BasePdfName(
-                                        "/" + str(elements[key].value), False
-                                    ),
-                                }
+                        if sejda:
+                            texts_to_draw[page].append(
+                                [
+                                    Utils().checkbox_radio_to_draw(elements[key]),
+                                    TemplateCore().get_draw_checkbox_radio_coordinates(_element)[0],
+                                    TemplateCore().get_draw_checkbox_radio_coordinates(_element)[1],
+                                ]
                             )
-                        )
+                        else:
+                            _element.update(
+                                pdfrw.PdfDict(
+                                    **{
+                                        TemplateConstants().checkbox_field_value_key.replace(
+                                            "/", ""
+                                        ): BasePdfName(
+                                            "/" + str(elements[key].value), False
+                                        ),
+                                    }
+                                )
+                            )
 
                     _element[TemplateConstants().parent_key].update(
                         pdfrw.PdfDict(
@@ -81,7 +99,10 @@ class Filler:
                             TemplateCore().get_draw_text_coordinates(_element)[1],
                         ]
                     )
-                _element.update(pdfrw.PdfDict(**update_dict))
+                if sejda:
+                    _element[TemplateConstants().parent_key].update(pdfrw.PdfDict(**update_dict))
+                else:
+                    _element.update(pdfrw.PdfDict(**update_dict))
 
         for page, texts in texts_to_draw.items():
             _watermarks = WatermarkCore().create_watermarks_and_draw(
