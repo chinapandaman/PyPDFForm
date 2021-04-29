@@ -186,7 +186,7 @@ class Template:
             - 2,
         )
 
-    def assign_uuid(self, pdf: bytes) -> bytes:
+    def assign_uuid(self, pdf: bytes, sejda: bool = False) -> bytes:
         """Appends a separator and uuid after each element's annotated name."""
 
         _uuid = uuid.uuid4().hex
@@ -206,6 +206,9 @@ class Template:
                     base_key, MergeConstants().separator, existed_uuid or _uuid
                 )
             }
-            element.update(pdfrw.PdfDict(**update_dict))
+            if sejda:
+                element[TemplateCoreConstants().parent_key].update(pdfrw.PdfDict(**update_dict))
+            else:
+                element.update(pdfrw.PdfDict(**update_dict))
 
         return Utils().generate_stream(pdf_file)
