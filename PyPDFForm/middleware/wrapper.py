@@ -38,6 +38,7 @@ class PyPDFForm:
         global_text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
         global_text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
         global_text_wrap_length: int = TextConstants().global_text_wrap_length,
+        sejda: bool = False,
     ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
@@ -45,16 +46,21 @@ class PyPDFForm:
         TemplateMiddleware().validate_template(template)
         if not isinstance(simple_mode, bool):
             raise InvalidModeError
+        if not isinstance(sejda, bool):
+            raise InvalidModeError
 
         self.stream = template
         self.simple_mode = simple_mode
+        self.sejda = sejda
         self.fill = self._simple_fill if simple_mode else self._fill
+        if sejda:
+            self.fill = self._fill
 
-        if not simple_mode:
+        if not simple_mode or sejda:
             self.elements = {}
             if template:
                 TemplateMiddleware().validate_stream(template)
-                self.elements = TemplateMiddleware().build_elements(template)
+                self.elements = TemplateMiddleware().build_elements(template, sejda)
 
             for each in self.elements.values():
                 if each.type == ElementType.text:
@@ -83,8 +89,8 @@ class PyPDFForm:
         TemplateMiddleware().validate_stream(self.stream)
         TemplateMiddleware().validate_stream(other.stream)
 
-        pdf_one = TemplateCore().assign_uuid(self.stream)
-        pdf_two = TemplateCore().assign_uuid(other.stream)
+        pdf_one = TemplateCore().assign_uuid(self.stream, self.sejda)
+        pdf_two = TemplateCore().assign_uuid(other.stream, self.sejda)
 
         new_obj = self.__class__()
         new_obj.stream = UtilsCore().merge_two_pdfs(pdf_one, pdf_two)
@@ -115,7 +121,7 @@ class PyPDFForm:
                 self.elements[key].validate_value()
                 self.elements[key].validate_text_attributes()
 
-        self.stream = FillerCore().fill(self.stream, self.elements)
+        self.stream = FillerCore().fill(self.stream, self.elements, self.sejda)
 
         return self
 

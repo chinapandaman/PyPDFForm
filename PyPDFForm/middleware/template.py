@@ -26,17 +26,17 @@ class Template:
             raise InvalidTemplateError
 
     @staticmethod
-    def build_elements(pdf_stream: bytes) -> Dict[str, "Element"]:
+    def build_elements(pdf_stream: bytes, sejda: bool = False) -> Dict[str, "Element"]:
         """Builds an element dict given a PDF form stream."""
 
         results = {}
 
-        for element in TemplateCore().iterate_elements(pdf_stream):
-            key = TemplateCore().get_element_key(element)
+        for element in TemplateCore().iterate_elements(pdf_stream, sejda):
+            key = TemplateCore().get_element_key(element, sejda)
 
             results[key] = Element(
                 element_name=key,
-                element_type=TemplateCore().get_element_type(element),
+                element_type=TemplateCore().get_element_type(element, sejda),
             )
 
         return results

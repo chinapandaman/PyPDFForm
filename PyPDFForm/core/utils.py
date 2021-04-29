@@ -7,6 +7,9 @@ from typing import Dict, Union
 
 import pdfrw
 
+from ..middleware.constants import Text
+from ..middleware.element import Element, ElementType
+
 
 class Utils:
     """Contains utility methods for core modules."""
@@ -44,6 +47,31 @@ class Utils:
         """Converts a boolean value into a PDF checkbox object."""
 
         return pdfrw.PdfName.Yes if data else pdfrw.PdfName.Off
+
+    @staticmethod
+    def checkbox_radio_to_draw(element: "Element") -> "Element":
+        """Converts a checkbox/radio element to a drawable text element."""
+
+        _map = {
+            ElementType.radio: u"\u25CF",
+            ElementType.checkbox: u'\u2713',
+        }
+
+        if _map.get(element.type):
+            new_element = Element(
+                element_name=element.name,
+                element_type=ElementType.text,
+                element_value=_map[element.type]
+            )
+
+            new_element.font = Text().global_font
+            new_element.font_size = Text().global_font_size
+            new_element.font_color = Text().global_font_color
+            new_element.text_x_offset = Text().global_text_x_offset
+            new_element.text_y_offset = Text().global_text_y_offset
+            new_element.text_wrap_length = Text().global_text_wrap_length
+
+            return new_element
 
     @staticmethod
     def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
