@@ -16,6 +16,21 @@ class Template:
     """Contains methods for interacting with a pdfrw parsed PDF form."""
 
     @staticmethod
+    def remove_all_elements(
+        pdf: bytes
+    ) -> bytes:
+        """Removes all elements from a pdfrw parsed PDF form."""
+
+        pdf = pdfrw.PdfReader(fdata=pdf)
+
+        for i in range(len(pdf.pages)):
+            elements = pdf.pages[i][TemplateCoreConstants().annotation_key]
+            for j in reversed(range(len(elements))):
+                elements.pop(j)
+
+        return Utils().generate_stream(pdf)
+
+    @staticmethod
     def iterate_elements(
         pdf: Union[bytes, "pdfrw.PdfReader"], sejda: bool = False
     ) -> List["pdfrw.PdfDict"]:
