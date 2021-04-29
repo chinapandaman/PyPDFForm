@@ -153,21 +153,23 @@ class Template:
 
     @staticmethod
     def get_draw_checkbox_radio_coordinates(
-            element: "pdfrw.PdfDict",
+        element: "pdfrw.PdfDict",
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw checkbox/radio at given a PDF form text element."""
 
         return (
             (
-                    float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-                    + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+                float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+                + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
             )
-            / 2 - 5,
+            / 2
+            - 5,
             (
-                    float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-                    + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+                float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+                + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
             )
-            / 2 - 4,
+            / 2
+            - 4,
         )
 
     @staticmethod
@@ -207,7 +209,9 @@ class Template:
                 )
             }
             if sejda:
-                element[TemplateCoreConstants().parent_key].update(pdfrw.PdfDict(**update_dict))
+                element[TemplateCoreConstants().parent_key].update(
+                    pdfrw.PdfDict(**update_dict)
+                )
             else:
                 element.update(pdfrw.PdfDict(**update_dict))
 

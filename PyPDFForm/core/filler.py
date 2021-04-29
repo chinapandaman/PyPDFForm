@@ -18,7 +18,11 @@ class Filler:
     """Contains methods for filling a PDF form with dict."""
 
     @staticmethod
-    def fill(template_stream: bytes, elements: Dict[str, "ElementMiddleware"], sejda: bool = False) -> bytes:
+    def fill(
+        template_stream: bytes,
+        elements: Dict[str, "ElementMiddleware"],
+        sejda: bool = False,
+    ) -> bytes:
         """Fills a PDF using watermarks."""
 
         template_pdf = pdfrw.PdfReader(fdata=template_stream)
@@ -46,13 +50,19 @@ class Filler:
                         texts_to_draw[page].append(
                             [
                                 Utils().checkbox_radio_to_draw(elements[key]),
-                                TemplateCore().get_draw_checkbox_radio_coordinates(_element)[0],
-                                TemplateCore().get_draw_checkbox_radio_coordinates(_element)[1],
+                                TemplateCore().get_draw_checkbox_radio_coordinates(
+                                    _element
+                                )[0],
+                                TemplateCore().get_draw_checkbox_radio_coordinates(
+                                    _element
+                                )[1],
                             ]
                         )
                     else:
                         update_dict[
-                            TemplateConstants().checkbox_field_value_key.replace("/", "")
+                            TemplateConstants().checkbox_field_value_key.replace(
+                                "/", ""
+                            )
                         ] = Utils().bool_to_checkbox(elements[key].value)
                 elif elements[key].type == ElementType.radio:
                     if key not in radio_button_tracker:
@@ -64,8 +74,12 @@ class Filler:
                             texts_to_draw[page].append(
                                 [
                                     Utils().checkbox_radio_to_draw(elements[key]),
-                                    TemplateCore().get_draw_checkbox_radio_coordinates(_element)[0],
-                                    TemplateCore().get_draw_checkbox_radio_coordinates(_element)[1],
+                                    TemplateCore().get_draw_checkbox_radio_coordinates(
+                                        _element
+                                    )[0],
+                                    TemplateCore().get_draw_checkbox_radio_coordinates(
+                                        _element
+                                    )[1],
                                 ]
                             )
                         else:
@@ -100,7 +114,9 @@ class Filler:
                         ]
                     )
                 if sejda:
-                    _element[TemplateConstants().parent_key].update(pdfrw.PdfDict(**update_dict))
+                    _element[TemplateConstants().parent_key].update(
+                        pdfrw.PdfDict(**update_dict)
+                    )
                 else:
                     _element.update(pdfrw.PdfDict(**update_dict))
 

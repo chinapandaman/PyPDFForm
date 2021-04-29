@@ -54,14 +54,14 @@ class Utils:
 
         _map = {
             ElementType.radio: u"\u25CF",
-            ElementType.checkbox: u'\u2713',
+            ElementType.checkbox: u"\u2713",
         }
 
         if _map.get(element.type):
             new_element = Element(
                 element_name=element.name,
                 element_type=ElementType.text,
-                element_value=_map[element.type]
+                element_value=_map[element.type],
             )
 
             new_element.font = Text().global_font
