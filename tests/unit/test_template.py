@@ -272,6 +272,22 @@ def test_build_elements(template_with_radiobutton_stream, data_dict):
         assert data_dict[k]
 
 
+def test_build_elements_sejda(sejda_template, sejda_data):
+    data_dict = {
+        key: False
+        for key in sejda_data.keys()
+    }
+
+    for k, v in (
+        TemplateMiddleware().build_elements(sejda_template, sejda=True).items()
+    ):
+        if k in data_dict and k == v.name:
+            data_dict[k] = True
+
+    for k in data_dict.keys():
+        assert data_dict[k]
+
+
 def test_get_draw_text_coordinates(template_stream):
     for element in TemplateCore().iterate_elements(template_stream):
         assert TemplateCore().get_draw_text_coordinates(element) == (
