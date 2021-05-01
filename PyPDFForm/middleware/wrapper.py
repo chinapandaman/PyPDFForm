@@ -52,9 +52,7 @@ class PyPDFForm:
         self.stream = template
         self.simple_mode = simple_mode
         self.sejda = sejda
-        self.fill = self._simple_fill if simple_mode else self._fill
-        if sejda:
-            self.fill = self._fill
+        self.fill = self._simple_fill if simple_mode and not sejda else self._fill
 
         if not simple_mode or sejda:
             self.elements = {}
@@ -89,8 +87,8 @@ class PyPDFForm:
         TemplateMiddleware().validate_stream(self.stream)
         TemplateMiddleware().validate_stream(other.stream)
 
-        pdf_one = TemplateCore().assign_uuid(self.stream, self.sejda)
-        pdf_two = TemplateCore().assign_uuid(other.stream, self.sejda)
+        pdf_one = TemplateCore().assign_uuid(self.stream) if not self.sejda else self.stream
+        pdf_two = TemplateCore().assign_uuid(other.stream) if not other.sejda else other.stream
 
         new_obj = self.__class__()
         new_obj.stream = UtilsCore().merge_two_pdfs(pdf_one, pdf_two)
@@ -121,7 +119,11 @@ class PyPDFForm:
                 self.elements[key].validate_value()
                 self.elements[key].validate_text_attributes()
 
-        self.stream = FillerCore().fill(self.stream, self.elements, self.sejda)
+        _fill_result = FillerCore().fill(self.stream, self.elements, self.sejda)
+        if self.sejda:
+            _fill_result = TemplateCore().remove_all_elements(_fill_result)
+
+        self.stream = _fill_result
 
         return self
 

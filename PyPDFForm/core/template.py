@@ -16,6 +16,21 @@ class Template:
     """Contains methods for interacting with a pdfrw parsed PDF form."""
 
     @staticmethod
+    def remove_all_elements(
+        pdf: bytes
+    ) -> bytes:
+        """Removes all elements from a pdfrw parsed PDF form."""
+
+        pdf = pdfrw.PdfReader(fdata=pdf)
+
+        for i in range(len(pdf.pages)):
+            elements = pdf.pages[i][TemplateCoreConstants().annotation_key]
+            for j in reversed(range(len(elements))):
+                elements.pop(j)
+
+        return Utils().generate_stream(pdf)
+
+    @staticmethod
     def iterate_elements(
         pdf: Union[bytes, "pdfrw.PdfReader"], sejda: bool = False
     ) -> List["pdfrw.PdfDict"]:
@@ -188,7 +203,7 @@ class Template:
             - 2,
         )
 
-    def assign_uuid(self, pdf: bytes, sejda: bool = False) -> bytes:
+    def assign_uuid(self, pdf: bytes) -> bytes:
         """Appends a separator and uuid after each element's annotated name."""
 
         _uuid = uuid.uuid4().hex
@@ -208,11 +223,6 @@ class Template:
                     base_key, MergeConstants().separator, existed_uuid or _uuid
                 )
             }
-            if sejda:
-                element[TemplateCoreConstants().parent_key].update(
-                    pdfrw.PdfDict(**update_dict)
-                )
-            else:
-                element.update(pdfrw.PdfDict(**update_dict))
+            element.update(pdfrw.PdfDict(**update_dict))
 
         return Utils().generate_stream(pdf_file)

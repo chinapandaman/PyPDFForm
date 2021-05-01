@@ -78,6 +78,32 @@ def test_fill(template_stream, data_dict):
             )
 
 
+def test_fill_sejda(sejda_template, sejda_data):
+    elements = TemplateMiddleware().build_elements(sejda_template, sejda=True)
+
+    for k, v in elements.items():
+        if k in sejda_data:
+            v.value = sejda_data[k]
+
+        if elements[k].type == ElementType.text:
+            elements[k].font = TextConstants().global_font
+            elements[k].font_size = TextConstants().global_font_size
+            elements[k].font_color = TextConstants().global_font_color
+            elements[k].text_x_offset = TextConstants().global_text_x_offset
+            elements[k].text_y_offset = TextConstants().global_text_y_offset
+            elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+        elements[k].validate_constants()
+        elements[k].validate_value()
+        elements[k].validate_text_attributes()
+
+    result_stream = Filler().fill(sejda_template, elements, sejda=True)
+
+    assert result_stream != template_stream
+
+    for element in TemplateCore().iterate_elements(result_stream):
+        assert element[TemplateConstants().parent_key][TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
+
+
 def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
     elements = TemplateMiddleware().build_elements(template_with_radiobutton_stream)
 

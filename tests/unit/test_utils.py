@@ -8,6 +8,8 @@ import pytest
 
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.core.utils import Utils
+from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.middleware.element import Element, ElementType
 
 
 @pytest.fixture
@@ -59,6 +61,34 @@ def test_bool_to_checkboxes(data_dict):
 def test_bool_to_checkbox():
     assert Utils().bool_to_checkbox(True) == pdfrw.PdfName.Yes
     assert Utils().bool_to_checkbox(False) == pdfrw.PdfName.Off
+
+
+def checkbox_radio_to_draw():
+    new_checkbox_element = Element("foo", ElementType.checkbox, True)
+    new_radio_element = Element("bar", ElementType.radio, 0)
+
+    new_checkbox_to_draw = Utils().checkbox_radio_to_draw(new_checkbox_element)
+    new_radio_to_draw = Utils().checkbox_radio_to_draw(new_radio_element)
+
+    assert new_checkbox_to_draw.value == u"\u2713"
+    assert new_checkbox_to_draw.type == ElementType.text
+    assert new_checkbox_to_draw.name == "foo"
+    assert new_checkbox_to_draw.font == TextConstants().global_font
+    assert new_checkbox_to_draw.font_size == TextConstants().global_font_size
+    assert new_checkbox_to_draw.font_color == TextConstants().global_font_color
+    assert new_checkbox_to_draw.text_x_offset == TextConstants().global_text_x_offset
+    assert new_checkbox_to_draw.text_y_offset == TextConstants().global_text_y_offset
+    assert new_checkbox_to_draw.text_wrap_length == TextConstants().global_text_wrap_length
+
+    assert new_radio_to_draw.value == u"\u25CF"
+    assert new_radio_to_draw.type == ElementType.text
+    assert new_radio_to_draw.name == "bar"
+    assert new_radio_to_draw.font == TextConstants().global_font
+    assert new_radio_to_draw.font_size == TextConstants().global_font_size
+    assert new_radio_to_draw.font_color == TextConstants().global_font_color
+    assert new_radio_to_draw.text_x_offset == TextConstants().global_text_x_offset
+    assert new_radio_to_draw.text_y_offset == TextConstants().global_text_y_offset
+    assert new_radio_to_draw.text_wrap_length == TextConstants().global_text_wrap_length
 
 
 def test_merge_two_pdfs(template_stream, data_dict):
