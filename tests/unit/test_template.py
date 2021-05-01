@@ -79,6 +79,20 @@ def test_iterate_elements_and_get_element_key(
         assert data_dict[k]
 
 
+def test_iterate_elements_and_get_element_key_sejda(
+    sejda_template, sejda_data
+):
+    data_dict = {
+        key: False
+        for key in sejda_data.keys()
+    }
+    for each in TemplateCore().iterate_elements(sejda_template, sejda=True):
+        data_dict[TemplateCore().get_element_key(each, sejda=True)] = True
+
+    for k in data_dict.keys():
+        assert data_dict[k]
+
+
 def test_get_elements_by_page(template_with_radiobutton_stream):
     expected = {
         1: {
