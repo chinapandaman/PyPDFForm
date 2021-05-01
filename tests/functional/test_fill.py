@@ -308,3 +308,16 @@ def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
         )
 
         assert obj.stream == f.read()
+
+
+def test_fill_sejda_and_read(sejda_template, pdf_samples, sejda_data):
+    with open(os.path.join(pdf_samples, "sample_filled_sejda.pdf"), "rb+") as f:
+        obj = PyPDFForm(sejda_template, sejda=True).fill(
+            sejda_data,
+        )
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
