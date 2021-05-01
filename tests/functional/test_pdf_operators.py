@@ -53,3 +53,19 @@ def test_addition_operator_3_times(template_stream, pdf_samples, data_dict):
                     .split(MergeConstants().separator)[0]
                     in data_dict
                 )
+
+
+def test_addition_operator_3_times_sejda(sejda_template, pdf_samples, sejda_data):
+    with open(os.path.join(pdf_samples, "sample_added_3_copies_sejda.pdf"), "rb+") as f:
+        result = PyPDFForm()
+        expected = f.read()
+
+        for i in range(3):
+            result += PyPDFForm(sejda_template, sejda=True).fill(sejda_data)
+
+        page_count = len(TemplateCore().get_elements_by_page(expected).keys())
+        result_page_count = len(
+            TemplateCore().get_elements_by_page(result.stream).keys()
+        )
+        assert page_count == result_page_count
+        assert result.read() == expected
