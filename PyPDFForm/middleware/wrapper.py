@@ -52,9 +52,7 @@ class PyPDFForm:
         self.stream = template
         self.simple_mode = simple_mode
         self.sejda = sejda
-        self.fill = self._simple_fill if simple_mode else self._fill
-        if sejda:
-            self.fill = self._fill
+        self.fill = self._simple_fill if simple_mode and not sejda else self._fill
 
         if not simple_mode or sejda:
             self.elements = {}
