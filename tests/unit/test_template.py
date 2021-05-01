@@ -69,6 +69,11 @@ def test_validate_template_stream(template_stream):
     assert True
 
 
+def test_remove_all_elements(template_stream):
+    result = TemplateCore().remove_all_elements(template_stream)
+    assert not TemplateCore().iterate_elements(result)
+
+
 def test_iterate_elements_and_get_element_key(
     template_with_radiobutton_stream, data_dict
 ):
