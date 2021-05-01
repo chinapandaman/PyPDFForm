@@ -19,7 +19,7 @@ mode on and off yields different interactions with the fill method.
 
 * **simple_mode** - a simple mode PyPDFForm object only allows filling data without specifying 
 details like font size. Turning simple mode on also allows leaving PDF editable 
-after filling.
+after filling. NOTE: `simple_mode` is not available when `sejda` is set to `True`.
   
 * **global_font** - a string which sets the global font for text filled on the PDF form. The 
 font set by this parameter has to be registered first. This will only take effect if `simple_mode` is `False`. 
@@ -39,6 +39,9 @@ filled on the PDF form. This will only take effect if `simple_mode` is `False`.
 * **global_text_wrap_length** - an integer value which sets the global maximum number of characters before 
 wrapping to a new line for texts 
 filled on the PDF form. This will only take effect if `simple_mode` is `False`.
+  
+* **sejda** - This boolean parameter should be set to `True` if the PDF form template is prepared using Sejda. 
+NOTE: enabling this will disable `simple_mode` even if it's set to `True`.
 
 ### *PyPDFForm()* **+** *PyPDFForm()*
 
@@ -120,7 +123,7 @@ Its values currently support the following:
        NOTE: Only groups of radio buttons with the same name are supported. If there is only one 
        radio button with a name, please consider using `checkbox` instead.
 
-* **editable** - only available if `simple_mode` is `True`, enabling this will allow the filled PDF to be still 
+* **editable** - only available if `simple_mode` is `True` and `sejda` is `False`, enabling this will allow the filled PDF to be still 
 editable.
   
 ### **read**()
