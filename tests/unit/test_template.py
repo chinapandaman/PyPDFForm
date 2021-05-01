@@ -79,13 +79,8 @@ def test_iterate_elements_and_get_element_key(
         assert data_dict[k]
 
 
-def test_iterate_elements_and_get_element_key_sejda(
-    sejda_template, sejda_data
-):
-    data_dict = {
-        key: False
-        for key in sejda_data.keys()
-    }
+def test_iterate_elements_and_get_element_key_sejda(sejda_template, sejda_data):
+    data_dict = {key: False for key in sejda_data.keys()}
     for each in TemplateCore().iterate_elements(sejda_template, sejda=True):
         data_dict[TemplateCore().get_element_key(each, sejda=True)] = True
 
@@ -273,14 +268,9 @@ def test_build_elements(template_with_radiobutton_stream, data_dict):
 
 
 def test_build_elements_sejda(sejda_template, sejda_data):
-    data_dict = {
-        key: False
-        for key in sejda_data.keys()
-    }
+    data_dict = {key: False for key in sejda_data.keys()}
 
-    for k, v in (
-        TemplateMiddleware().build_elements(sejda_template, sejda=True).items()
-    ):
+    for k, v in TemplateMiddleware().build_elements(sejda_template, sejda=True).items():
         if k in data_dict and k == v.name:
             data_dict[k] = True
 
@@ -305,8 +295,8 @@ def test_get_draw_checkbox_radio_coordinates(sejda_template):
     for element in TemplateCore().iterate_elements(sejda_template):
         assert TemplateCore().get_draw_checkbox_radio_coordinates(element) == (
             (
-                    float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-                    + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+                float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+                + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
             )
             / 2
             - 5,

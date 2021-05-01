@@ -12,9 +12,7 @@ def pdf_samples():
 
 @pytest.fixture
 def sejda_template(pdf_samples):
-    with open(
-        os.path.join(pdf_samples, "sample_template_sejda.pdf"), "rb+"
-    ) as f:
+    with open(os.path.join(pdf_samples, "sample_template_sejda.pdf"), "rb+") as f:
         return f.read()
 
 

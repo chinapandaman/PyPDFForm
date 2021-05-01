@@ -101,7 +101,9 @@ def test_fill_sejda(sejda_template, sejda_data):
     assert result_stream != template_stream
 
     for element in TemplateCore().iterate_elements(result_stream):
-        assert element[TemplateConstants().parent_key][TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
+        assert element[TemplateConstants().parent_key][
+            TemplateConstants().field_editable_key
+        ] == pdfrw.PdfObject(1)
 
 
 def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):

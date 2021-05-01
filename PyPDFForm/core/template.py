@@ -16,9 +16,7 @@ class Template:
     """Contains methods for interacting with a pdfrw parsed PDF form."""
 
     @staticmethod
-    def remove_all_elements(
-        pdf: bytes
-    ) -> bytes:
+    def remove_all_elements(pdf: bytes) -> bytes:
         """Removes all elements from a pdfrw parsed PDF form."""
 
         pdf = pdfrw.PdfReader(fdata=pdf)

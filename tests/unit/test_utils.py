@@ -78,7 +78,9 @@ def checkbox_radio_to_draw():
     assert new_checkbox_to_draw.font_color == TextConstants().global_font_color
     assert new_checkbox_to_draw.text_x_offset == TextConstants().global_text_x_offset
     assert new_checkbox_to_draw.text_y_offset == TextConstants().global_text_y_offset
-    assert new_checkbox_to_draw.text_wrap_length == TextConstants().global_text_wrap_length
+    assert (
+        new_checkbox_to_draw.text_wrap_length == TextConstants().global_text_wrap_length
+    )
 
     assert new_radio_to_draw.value == u"\u25CF"
     assert new_radio_to_draw.type == ElementType.text
