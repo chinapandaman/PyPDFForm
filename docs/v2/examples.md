@@ -7,7 +7,7 @@ can be used out of box.
 
 The most common tool to create a PDF form is Adobe Acrobat. A tutorial can be found 
 [here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html). 
-There are other free alternatives like [sejda](https://www.sejda.com/) that support similar functionalities.
+There are other free alternatives like [Sejda](https://www.sejda.com/) that support similar functionalities.
 
 NOTE: Sejda is highly recommended as PyPDFForm 
 provides more stable support to PDF forms prepared using it with a `sejda` mode.
