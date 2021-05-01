@@ -285,6 +285,24 @@ def test_get_draw_text_coordinates(template_stream):
         )
 
 
+def test_get_draw_checkbox_radio_coordinates(sejda_template):
+    for element in TemplateCore().iterate_elements(sejda_template):
+        assert TemplateCore().get_draw_checkbox_radio_coordinates(element) == (
+            (
+                    float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+                    + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+            )
+            / 2
+            - 5,
+            (
+                float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+                + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+            )
+            / 2
+            - 4,
+        )
+
+
 def test_assign_uuid(template_with_radiobutton_stream, data_dict):
     for element in TemplateCore().iterate_elements(
         TemplateCore().assign_uuid(template_with_radiobutton_stream)
