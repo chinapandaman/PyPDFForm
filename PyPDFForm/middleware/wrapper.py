@@ -89,8 +89,8 @@ class PyPDFForm:
         TemplateMiddleware().validate_stream(self.stream)
         TemplateMiddleware().validate_stream(other.stream)
 
-        pdf_one = TemplateCore().assign_uuid(self.stream, self.sejda)
-        pdf_two = TemplateCore().assign_uuid(other.stream, self.sejda)
+        pdf_one = TemplateCore().assign_uuid(self.stream)
+        pdf_two = TemplateCore().assign_uuid(other.stream)
 
         new_obj = self.__class__()
         new_obj.stream = UtilsCore().merge_two_pdfs(pdf_one, pdf_two)
