@@ -47,7 +47,7 @@ def font_samples():
 
 
 def test_validate_constructor_inputs(pdf_samples, template_stream):
-    bad_inputs = ["", "True", 1, "12", ("0", "0", "0"), "0", "0", "100"]
+    bad_inputs = ["", "True", 1, "12", ("0", "0", "0"), "0", "0", "100", "True"]
 
     try:
         PyPDFForm(*bad_inputs)
@@ -64,6 +64,14 @@ def test_validate_constructor_inputs(pdf_samples, template_stream):
         assert True
 
     bad_inputs[1] = False
+
+    try:
+        PyPDFForm(*bad_inputs)
+        assert False
+    except InvalidModeError:
+        assert True
+
+    bad_inputs[8] = False
 
     try:
         PyPDFForm(*bad_inputs)
