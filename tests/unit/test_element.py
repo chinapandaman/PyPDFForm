@@ -18,7 +18,7 @@ from PyPDFForm.middleware.exceptions.element import (InvalidElementNameError,
 
 @pytest.fixture
 def pdf_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples", "v2")
+    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples")
 
 
 @pytest.fixture
