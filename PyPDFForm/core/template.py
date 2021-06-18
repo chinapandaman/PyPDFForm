@@ -183,7 +183,7 @@ class Template:
     def get_element_type_v2(
         self, element: "pdfrw.PdfDict"
     ) -> Union["ElementType", None]:
-        """Returns its annotated type given any PDF form element."""
+        """Finds a PDF element's annotated type by pattern matching."""
 
         patterns_to_type = [
             (
