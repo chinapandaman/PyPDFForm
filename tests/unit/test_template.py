@@ -440,3 +440,44 @@ def test_assign_uuid(template_with_radiobutton_stream, data_dict):
 
     for k in data_dict.keys():
         assert data_dict[k]
+
+
+def test_traverse_pattern(template_with_radiobutton_stream):
+    _data_dict = {
+        "test": "text",
+        "check": "check",
+        "radio_1": "radio",
+        "test_2": "text",
+        "check_2": "check",
+        "radio_2": "radio",
+        "test_3": "text",
+        "check_3": "check",
+        "radio_3": "radio",
+    }
+
+    type_to_pattern = {
+        "text": {TemplateCoreConstants().annotation_field_key: True},
+        "check": {TemplateCoreConstants().annotation_field_key: True},
+        "radio": {
+            TemplateCoreConstants().parent_key: {
+                TemplateCoreConstants().annotation_field_key: True
+            }
+        }
+    }
+
+    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
+        key = TemplateCore().get_element_key(each)
+        pattern = type_to_pattern[_data_dict[key]]
+        assert TemplateCore().traverse_pattern(pattern, each)[1:-1] == key
+
+
+def test_traverse_pattern_sejda(sejda_template):
+    pattern = {
+        TemplateCoreConstants().parent_key: {
+            TemplateCoreConstants().annotation_field_key: True
+        }
+    }
+
+    for each in TemplateCore().iterate_elements(sejda_template):
+        key = TemplateCore().get_element_key(each)
+        assert TemplateCore().traverse_pattern(pattern, each)[1:-1] == key
