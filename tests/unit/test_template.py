@@ -497,12 +497,26 @@ def test_find_pattern_match(template_with_radiobutton_stream):
     }
 
     type_to_pattern = {
-        "text": ({TemplateCoreConstants().element_type_key: TemplateCoreConstants().text_field_identifier},),
-        "check": ({TemplateCoreConstants().element_type_key: TemplateCoreConstants().selectable_identifier},),
+        "text": (
+            {
+                TemplateCoreConstants()
+                .element_type_key: TemplateCoreConstants()
+                .text_field_identifier
+            },
+        ),
+        "check": (
+            {
+                TemplateCoreConstants()
+                .element_type_key: TemplateCoreConstants()
+                .selectable_identifier
+            },
+        ),
         "radio": (
             {
                 TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants().element_type_key: TemplateCoreConstants().selectable_identifier
+                    TemplateCoreConstants()
+                    .element_type_key: TemplateCoreConstants()
+                    .selectable_identifier
                 }
             },
         ),
@@ -533,14 +547,18 @@ def test_find_pattern_match_sejda(sejda_template, sejda_data):
         "text": (
             {
                 TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants().element_type_key: TemplateCoreConstants().text_field_identifier
+                    TemplateCoreConstants()
+                    .element_type_key: TemplateCoreConstants()
+                    .text_field_identifier
                 }
             },
         ),
         "check": (
             {
                 TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants().element_type_key: TemplateCoreConstants().selectable_identifier
+                    TemplateCoreConstants()
+                    .element_type_key: TemplateCoreConstants()
+                    .selectable_identifier
                 }
             },
             {
@@ -554,7 +572,9 @@ def test_find_pattern_match_sejda(sejda_template, sejda_data):
         "radio": (
             {
                 TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants().element_type_key: TemplateCoreConstants().selectable_identifier
+                    TemplateCoreConstants()
+                    .element_type_key: TemplateCoreConstants()
+                    .selectable_identifier
                 }
             },
         ),
