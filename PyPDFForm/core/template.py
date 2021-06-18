@@ -136,7 +136,7 @@ class Template:
                 return result
         return None
 
-    def get_element_key_v2(self, element: "pdfrw.PdfDict") -> str:
+    def get_element_key_v2(self, element: "pdfrw.PdfDict") -> Union[str, None]:
         """Finds a PDF element's annotated key by pattern matching."""
 
         patterns = [
@@ -152,6 +152,8 @@ class Template:
             value = self.traverse_pattern(pattern, element)
             if value:
                 return value[1:-1]
+
+        return None
 
     @staticmethod
     def get_element_type(
