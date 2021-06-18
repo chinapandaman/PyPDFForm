@@ -121,6 +121,21 @@ class Template:
 
         return element[TemplateCoreConstants().annotation_field_key][1:-1]
 
+    def traverse_pattern(self, pattern: dict, element: "pdfrw.PdfDict") -> Union[str, None]:
+        """Traverses down a PDF dict pattern and find the value."""
+
+        for key, value in element.items():
+            result = None
+            if key in pattern:
+                if isinstance(pattern[key], dict) and isinstance(value, pdfrw.PdfDict):
+                    result = self.traverse_pattern(pattern[key], value)
+                else:
+                    if pattern[key] is True and value:
+                        return value
+            if result:
+                return result
+        return None
+
     def get_element_key_v2(self, element: "pdfrw.PdfDict") -> str:
         """Finds a PDF element's annotated key by pattern matching."""
 
@@ -134,7 +149,7 @@ class Template:
         ]
 
         for pattern in patterns:
-            value = self.find_pattern_match(pattern, element, get_value=True)
+            value = self.traverse_pattern(pattern, element)
             if value:
                 return value[1:-1]
 
@@ -181,7 +196,7 @@ class Template:
 
         return result
 
-    def find_pattern_match(self, pattern: dict, element: "pdfrw.PdfDict", get_value=False) -> bool:
+    def find_pattern_match(self, pattern: dict, element: "pdfrw.PdfDict") -> bool:
         """Checks if a PDF dict pattern exists in a PDF element."""
 
         for key, value in element.items():
@@ -190,8 +205,6 @@ class Template:
                 if isinstance(pattern[key], dict) and isinstance(value, pdfrw.PdfDict):
                     result = self.find_pattern_match(pattern[key], value)
                 else:
-                    if get_value:
-                        return value
                     result = pattern[key] == value
             if result:
                 return result
