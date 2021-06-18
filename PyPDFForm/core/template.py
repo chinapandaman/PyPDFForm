@@ -121,6 +121,23 @@ class Template:
 
         return element[TemplateCoreConstants().annotation_field_key][1:-1]
 
+    def get_element_key_v2(self, element: "pdfrw.PdfDict") -> str:
+        """Finds a PDF element's annotated key by pattern matching."""
+
+        patterns = [
+            {TemplateCoreConstants().annotation_field_key: True},
+            {
+                TemplateCoreConstants().parent_key: {
+                    TemplateCoreConstants().annotation_field_key: True
+                }
+            },
+        ]
+
+        for pattern in patterns:
+            value = self.find_pattern_match(pattern, element, get_value=True)
+            if value:
+                return value[1:-1]
+
     @staticmethod
     def get_element_type(
         element: "pdfrw.PdfDict", sejda: bool = False
@@ -164,7 +181,7 @@ class Template:
 
         return result
 
-    def find_pattern_match(self, pattern: dict, element: "pdfrw.PdfDict") -> bool:
+    def find_pattern_match(self, pattern: dict, element: "pdfrw.PdfDict", get_value=False) -> bool:
         """Checks if a PDF dict pattern exists in a PDF element."""
 
         for key, value in element.items():
@@ -173,6 +190,8 @@ class Template:
                 if isinstance(pattern[key], dict) and isinstance(value, pdfrw.PdfDict):
                     result = self.find_pattern_match(pattern[key], value)
                 else:
+                    if get_value:
+                        return value
                     result = pattern[key] == value
             if result:
                 return result
