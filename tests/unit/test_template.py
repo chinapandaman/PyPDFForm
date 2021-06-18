@@ -84,10 +84,29 @@ def test_iterate_elements_and_get_element_key(
         assert data_dict[k]
 
 
+def test_iterate_elements_and_get_element_key_v2(
+    template_with_radiobutton_stream, data_dict
+):
+    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
+        data_dict[TemplateCore().get_element_key_v2(each)] = True
+
+    for k in data_dict.keys():
+        assert data_dict[k]
+
+
 def test_iterate_elements_and_get_element_key_sejda(sejda_template, sejda_data):
     data_dict = {key: False for key in sejda_data.keys()}
     for each in TemplateCore().iterate_elements(sejda_template, sejda=True):
         data_dict[TemplateCore().get_element_key(each, sejda=True)] = True
+
+    for k in data_dict.keys():
+        assert data_dict[k]
+
+
+def test_iterate_elements_and_get_element_key_v2_sejda(sejda_template, sejda_data):
+    data_dict = {key: False for key in sejda_data.keys()}
+    for each in TemplateCore().iterate_elements(sejda_template, sejda=True):
+        data_dict[TemplateCore().get_element_key_v2(each)] = True
 
     for k in data_dict.keys():
         assert data_dict[k]
@@ -245,14 +264,14 @@ def test_get_element_type_v2_sejda(sejda_template):
 
     for each in TemplateCore().iterate_elements(sejda_template, sejda=True):
         assert type_mapping[
-            TemplateCore().get_element_key(each, sejda=True)
+            TemplateCore().get_element_key_v2(each)
         ] == TemplateCore().get_element_type_v2(each)
 
     read_template_stream = pdfrw.PdfReader(fdata=sejda_template)
 
     for each in TemplateCore().iterate_elements(read_template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key(each, sejda=True)
+            TemplateCore().get_element_key_v2(each)
         ] == TemplateCore().get_element_type_v2(each)
 
 
@@ -291,14 +310,14 @@ def test_get_element_type_v2(template_stream):
 
     for each in TemplateCore().iterate_elements(template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key(each)
+            TemplateCore().get_element_key_v2(each)
         ] == TemplateCore().get_element_type_v2(each)
 
     read_template_stream = pdfrw.PdfReader(fdata=template_stream)
 
     for each in TemplateCore().iterate_elements(read_template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key(each)
+            TemplateCore().get_element_key_v2(each)
         ] == TemplateCore().get_element_type_v2(each)
 
 
@@ -343,14 +362,14 @@ def test_get_element_type_v2_radiobutton(template_with_radiobutton_stream):
 
     for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
         assert type_mapping[
-            TemplateCore().get_element_key(each)
+            TemplateCore().get_element_key_v2(each)
         ] == TemplateCore().get_element_type_v2(each)
 
     read_template_stream = pdfrw.PdfReader(fdata=template_with_radiobutton_stream)
 
     for each in TemplateCore().iterate_elements(read_template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key(each)
+            TemplateCore().get_element_key_v2(each)
         ] == TemplateCore().get_element_type_v2(each)
 
 
@@ -421,3 +440,130 @@ def test_assign_uuid(template_with_radiobutton_stream, data_dict):
 
     for k in data_dict.keys():
         assert data_dict[k]
+
+
+def test_traverse_pattern(template_with_radiobutton_stream):
+    _data_dict = {
+        "test": "text",
+        "check": "check",
+        "radio_1": "radio",
+        "test_2": "text",
+        "check_2": "check",
+        "radio_2": "radio",
+        "test_3": "text",
+        "check_3": "check",
+        "radio_3": "radio",
+    }
+
+    type_to_pattern = {
+        "text": {TemplateCoreConstants().annotation_field_key: True},
+        "check": {TemplateCoreConstants().annotation_field_key: True},
+        "radio": {
+            TemplateCoreConstants().parent_key: {
+                TemplateCoreConstants().annotation_field_key: True
+            }
+        }
+    }
+
+    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
+        key = TemplateCore().get_element_key(each)
+        pattern = type_to_pattern[_data_dict[key]]
+        assert TemplateCore().traverse_pattern(pattern, each)[1:-1] == key
+
+
+def test_traverse_pattern_sejda(sejda_template):
+    pattern = {
+        TemplateCoreConstants().parent_key: {
+            TemplateCoreConstants().annotation_field_key: True
+        }
+    }
+
+    for each in TemplateCore().iterate_elements(sejda_template):
+        key = TemplateCore().get_element_key(each)
+        assert TemplateCore().traverse_pattern(pattern, each)[1:-1] == key
+
+
+def test_find_pattern_match(template_with_radiobutton_stream):
+    _data_dict = {
+        "test": "text",
+        "check": "check",
+        "radio_1": "radio",
+        "test_2": "text",
+        "check_2": "check",
+        "radio_2": "radio",
+        "test_3": "text",
+        "check_3": "check",
+        "radio_3": "radio",
+    }
+
+    type_to_pattern = {
+        "text": ({TemplateCoreConstants().element_type_key: "/Tx"},),
+        "check": ({TemplateCoreConstants().element_type_key: "/Btn"},),
+        "radio": (
+            {
+                TemplateCoreConstants().parent_key: {
+                    TemplateCoreConstants().element_type_key: "/Btn"
+                }
+            },
+        )
+    }
+
+    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
+        key = TemplateCore().get_element_key(each)
+        patterns = type_to_pattern[_data_dict[key]]
+        check = True
+        for pattern in patterns:
+            check = check and TemplateCore().find_pattern_match(pattern, each)
+        assert check
+
+
+def test_find_pattern_match_sejda(sejda_template, sejda_data):
+    _data_dict = {}
+    for key, value in sejda_data.items():
+        _type = None
+        if isinstance(value, str):
+            _type = "text"
+        if isinstance(value, int):
+            _type = "radio"
+        if isinstance(value, bool):
+            _type = "check"
+        _data_dict[key] = _type
+
+    type_to_pattern = {
+        "text": (
+            {
+                TemplateCoreConstants().parent_key: {
+                    TemplateCoreConstants().element_type_key: "/Tx"
+                }
+            },
+        ),
+        "check": (
+            {
+                TemplateCoreConstants().parent_key: {
+                    TemplateCoreConstants().element_type_key: "/Btn"
+                }
+            },
+            {
+                TemplateCoreConstants().parent_key: {
+                    TemplateCoreConstants()
+                    .subtype_key: TemplateCoreConstants()
+                    .widget_subtype_key
+                }
+            },
+        ),
+        "radio": (
+            {
+                TemplateCoreConstants().parent_key: {
+                    TemplateCoreConstants().element_type_key: "/Btn"
+                }
+            },
+        )
+    }
+
+    for each in TemplateCore().iterate_elements(sejda_template):
+        key = TemplateCore().get_element_key(each, sejda=True)
+        patterns = type_to_pattern[_data_dict[key]]
+        check = True
+        for pattern in patterns:
+            check = check and TemplateCore().find_pattern_match(pattern, each)
+        assert check
