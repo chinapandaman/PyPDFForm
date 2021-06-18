@@ -212,6 +212,50 @@ def test_get_element_type_sejda(sejda_template):
         ] == TemplateCore().get_element_type(each, sejda=True)
 
 
+def test_get_element_type_v2_sejda(sejda_template):
+    type_mapping = {
+        "date": ElementType.text,
+        "year": ElementType.text,
+        "buyer_name": ElementType.text,
+        "buyer_address": ElementType.text,
+        "seller_name": ElementType.text,
+        "seller_address": ElementType.text,
+        "make": ElementType.text,
+        "model": ElementType.text,
+        "caliber": ElementType.text,
+        "serial_number": ElementType.text,
+        "purchase_option": ElementType.radio,
+        "date_of_this_bill": ElementType.checkbox,
+        "at_future_date": ElementType.checkbox,
+        "other": ElementType.checkbox,
+        "other_reason": ElementType.text,
+        "payment_amount": ElementType.text,
+        "future_date": ElementType.text,
+        "future_year": ElementType.text,
+        "exchange_for": ElementType.text,
+        "buyer_name_printed": ElementType.text,
+        "seller_name_printed": ElementType.text,
+        "buyer_signed_date": ElementType.text,
+        "seller_signed_date": ElementType.text,
+        "buyer_dl_number": ElementType.text,
+        "seller_dl_number": ElementType.text,
+        "buyer_dl_state": ElementType.text,
+        "seller_dl_state": ElementType.text,
+    }
+
+    for each in TemplateCore().iterate_elements(sejda_template, sejda=True):
+        assert type_mapping[
+            TemplateCore().get_element_key(each, sejda=True)
+        ] == TemplateCore().get_element_type_v2(each)
+
+    read_template_stream = pdfrw.PdfReader(fdata=sejda_template)
+
+    for each in TemplateCore().iterate_elements(read_template_stream):
+        assert type_mapping[
+            TemplateCore().get_element_key(each, sejda=True)
+        ] == TemplateCore().get_element_type_v2(each)
+
+
 def test_get_element_type(template_stream):
     type_mapping = {
         "test": ElementType.text,
@@ -233,6 +277,29 @@ def test_get_element_type(template_stream):
         assert type_mapping[
             TemplateCore().get_element_key(each)
         ] == TemplateCore().get_element_type(each)
+
+
+def test_get_element_type_v2(template_stream):
+    type_mapping = {
+        "test": ElementType.text,
+        "check": ElementType.checkbox,
+        "test_2": ElementType.text,
+        "check_2": ElementType.checkbox,
+        "test_3": ElementType.text,
+        "check_3": ElementType.checkbox,
+    }
+
+    for each in TemplateCore().iterate_elements(template_stream):
+        assert type_mapping[
+            TemplateCore().get_element_key(each)
+        ] == TemplateCore().get_element_type_v2(each)
+
+    read_template_stream = pdfrw.PdfReader(fdata=template_stream)
+
+    for each in TemplateCore().iterate_elements(read_template_stream):
+        assert type_mapping[
+            TemplateCore().get_element_key(each)
+        ] == TemplateCore().get_element_type_v2(each)
 
 
 def test_get_element_type_radiobutton(template_with_radiobutton_stream):
@@ -259,6 +326,32 @@ def test_get_element_type_radiobutton(template_with_radiobutton_stream):
         assert type_mapping[
             TemplateCore().get_element_key(each)
         ] == TemplateCore().get_element_type(each)
+
+
+def test_get_element_type_v2_radiobutton(template_with_radiobutton_stream):
+    type_mapping = {
+        "test": ElementType.text,
+        "check": ElementType.checkbox,
+        "test_2": ElementType.text,
+        "check_2": ElementType.checkbox,
+        "test_3": ElementType.text,
+        "check_3": ElementType.checkbox,
+        "radio_1": ElementType.radio,
+        "radio_2": ElementType.radio,
+        "radio_3": ElementType.radio,
+    }
+
+    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
+        assert type_mapping[
+            TemplateCore().get_element_key(each)
+        ] == TemplateCore().get_element_type_v2(each)
+
+    read_template_stream = pdfrw.PdfReader(fdata=template_with_radiobutton_stream)
+
+    for each in TemplateCore().iterate_elements(read_template_stream):
+        assert type_mapping[
+            TemplateCore().get_element_key(each)
+        ] == TemplateCore().get_element_type_v2(each)
 
 
 def test_build_elements(template_with_radiobutton_stream, data_dict):
