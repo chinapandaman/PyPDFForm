@@ -164,9 +164,7 @@ class Template:
 
         return result
 
-    def find_pattern_match(
-        self, pattern: dict, element: "pdfrw.PdfDict"
-    ) -> bool:
+    def find_pattern_match(self, pattern: dict, element: "pdfrw.PdfDict") -> bool:
         """Checks if a PDF dict pattern exists in a PDF element."""
 
         for key, value in element.items():
@@ -186,19 +184,10 @@ class Template:
         """Finds a PDF element's annotated type by pattern matching."""
 
         patterns_to_type = [
+            (({TemplateCoreConstants().element_type_key: "/Tx"},), ElementType.text),
             (
-                (
-                    {
-                        TemplateCoreConstants().element_type_key: "/Tx"
-                    },
-                ), ElementType.text
-            ),
-            (
-                (
-                    {
-                        TemplateCoreConstants().element_type_key: "/Btn"
-                    },
-                ), ElementType.checkbox
+                ({TemplateCoreConstants().element_type_key: "/Btn"},),
+                ElementType.checkbox,
             ),
             (
                 (
@@ -207,7 +196,8 @@ class Template:
                             TemplateCoreConstants().element_type_key: "/Tx"
                         }
                     },
-                ), ElementType.text
+                ),
+                ElementType.text,
             ),
             (
                 (
@@ -218,10 +208,13 @@ class Template:
                     },
                     {
                         TemplateCoreConstants().parent_key: {
-                            TemplateCoreConstants().subtype_key: TemplateCoreConstants().widget_subtype_key
+                            TemplateCoreConstants()
+                            .subtype_key: TemplateCoreConstants()
+                            .widget_subtype_key
                         }
                     },
-                ), ElementType.checkbox
+                ),
+                ElementType.checkbox,
             ),
             (
                 (
@@ -230,7 +223,8 @@ class Template:
                             TemplateCoreConstants().element_type_key: "/Btn"
                         }
                     },
-                ), ElementType.radio
+                ),
+                ElementType.radio,
             ),
         ]
 
