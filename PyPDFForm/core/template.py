@@ -121,7 +121,9 @@ class Template:
 
         return element[TemplateCoreConstants().annotation_field_key][1:-1]
 
-    def traverse_pattern(self, pattern: dict, element: "pdfrw.PdfDict") -> Union[str, None]:
+    def traverse_pattern(
+        self, pattern: dict, element: "pdfrw.PdfDict"
+    ) -> Union[str, None]:
         """Traverses down a PDF dict pattern and find the value."""
 
         for key, value in element.items():

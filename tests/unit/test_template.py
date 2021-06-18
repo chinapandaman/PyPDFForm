@@ -462,7 +462,7 @@ def test_traverse_pattern(template_with_radiobutton_stream):
             TemplateCoreConstants().parent_key: {
                 TemplateCoreConstants().annotation_field_key: True
             }
-        }
+        },
     }
 
     for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
@@ -505,7 +505,7 @@ def test_find_pattern_match(template_with_radiobutton_stream):
                     TemplateCoreConstants().element_type_key: "/Btn"
                 }
             },
-        )
+        ),
     }
 
     for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
@@ -557,7 +557,7 @@ def test_find_pattern_match_sejda(sejda_template, sejda_data):
                     TemplateCoreConstants().element_type_key: "/Btn"
                 }
             },
-        )
+        ),
     }
 
     for each in TemplateCore().iterate_elements(sejda_template):
