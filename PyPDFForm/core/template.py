@@ -9,6 +9,7 @@ import pdfrw
 from ..middleware.element import ElementType
 from .constants import Merge as MergeConstants
 from .constants import Template as TemplateCoreConstants
+from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
 from .utils import Utils
 
 
@@ -141,16 +142,7 @@ class Template:
     def get_element_key_v2(self, element: "pdfrw.PdfDict") -> Union[str, None]:
         """Finds a PDF element's annotated key by pattern matching."""
 
-        patterns = [
-            {TemplateCoreConstants().annotation_field_key: True},
-            {
-                TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants().annotation_field_key: True
-                }
-            },
-        ]
-
-        for pattern in patterns:
+        for pattern in ELEMENT_KEY_PATTERNS:
             value = self.traverse_pattern(pattern, element)
             if value:
                 return value[1:-1]
@@ -168,14 +160,14 @@ class Template:
                 element[TemplateCoreConstants().parent_key][
                     TemplateCoreConstants().element_type_key
                 ]
-                == "/Tx"
+                == TemplateCoreConstants().text_field_identifier
             ):
                 return ElementType.text
             if (
                 element[TemplateCoreConstants().parent_key][
                     TemplateCoreConstants().element_type_key
                 ]
-                == "/Btn"
+                == TemplateCoreConstants().selectable_identifier
             ):
                 if (
                     element[TemplateCoreConstants().parent_key][
@@ -187,8 +179,8 @@ class Template:
                 return ElementType.radio
 
         element_type_mapping = {
-            "/Btn": ElementType.checkbox,
-            "/Tx": ElementType.text,
+            TemplateCoreConstants().selectable_identifier: ElementType.checkbox,
+            TemplateCoreConstants().text_field_identifier: ElementType.text,
         }
 
         result = element_type_mapping.get(
@@ -219,52 +211,7 @@ class Template:
     ) -> Union["ElementType", None]:
         """Finds a PDF element's annotated type by pattern matching."""
 
-        patterns_to_type = [
-            (({TemplateCoreConstants().element_type_key: "/Tx"},), ElementType.text),
-            (
-                ({TemplateCoreConstants().element_type_key: "/Btn"},),
-                ElementType.checkbox,
-            ),
-            (
-                (
-                    {
-                        TemplateCoreConstants().parent_key: {
-                            TemplateCoreConstants().element_type_key: "/Tx"
-                        }
-                    },
-                ),
-                ElementType.text,
-            ),
-            (
-                (
-                    {
-                        TemplateCoreConstants().parent_key: {
-                            TemplateCoreConstants().element_type_key: "/Btn"
-                        }
-                    },
-                    {
-                        TemplateCoreConstants().parent_key: {
-                            TemplateCoreConstants()
-                            .subtype_key: TemplateCoreConstants()
-                            .widget_subtype_key
-                        }
-                    },
-                ),
-                ElementType.checkbox,
-            ),
-            (
-                (
-                    {
-                        TemplateCoreConstants().parent_key: {
-                            TemplateCoreConstants().element_type_key: "/Btn"
-                        }
-                    },
-                ),
-                ElementType.radio,
-            ),
-        ]
-
-        for each in patterns_to_type:
+        for each in ELEMENT_TYPE_PATTERNS:
             patterns, _type = each
             check = True
             for pattern in patterns:
