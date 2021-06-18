@@ -6,16 +6,16 @@ from ..middleware.element import ElementType
 
 
 ELEMENT_TYPE_PATTERNS = [
-    (({Template().element_type_key: "/Tx"},), ElementType.text),
+    (({Template().element_type_key: Template().text_field_identifier},), ElementType.text),
     (
-        ({Template().element_type_key: "/Btn"},),
+        ({Template().element_type_key: Template().selectable_identifier},),
         ElementType.checkbox,
     ),
     (
         (
             {
                 Template().parent_key: {
-                    Template().element_type_key: "/Tx"
+                    Template().element_type_key: Template().text_field_identifier
                 }
             },
         ),
@@ -25,7 +25,7 @@ ELEMENT_TYPE_PATTERNS = [
         (
             {
                 Template().parent_key: {
-                    Template().element_type_key: "/Btn"
+                    Template().element_type_key: Template().selectable_identifier
                 }
             },
             {
@@ -42,7 +42,7 @@ ELEMENT_TYPE_PATTERNS = [
         (
             {
                 Template().parent_key: {
-                    Template().element_type_key: "/Btn"
+                    Template().element_type_key: Template().selectable_identifier
                 }
             },
         ),

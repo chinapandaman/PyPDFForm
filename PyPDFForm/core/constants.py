@@ -65,6 +65,18 @@ class Template:
 
         return "/Ff"
 
+    @property
+    def text_field_identifier(self) -> str:
+        """Used for identifying if an element is a text field."""
+
+        return "/Tx"
+
+    @property
+    def selectable_identifier(self) -> str:
+        """Used for identifying if an element is a checkbox or radio button."""
+
+        return "/Btn"
+
 
 class Merge:
     """Contains constants for merging PDFs."""

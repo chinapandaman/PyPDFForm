@@ -160,14 +160,14 @@ class Template:
                 element[TemplateCoreConstants().parent_key][
                     TemplateCoreConstants().element_type_key
                 ]
-                == "/Tx"
+                == TemplateCoreConstants().text_field_identifier
             ):
                 return ElementType.text
             if (
                 element[TemplateCoreConstants().parent_key][
                     TemplateCoreConstants().element_type_key
                 ]
-                == "/Btn"
+                == TemplateCoreConstants().selectable_identifier
             ):
                 if (
                     element[TemplateCoreConstants().parent_key][
@@ -179,8 +179,8 @@ class Template:
                 return ElementType.radio
 
         element_type_mapping = {
-            "/Btn": ElementType.checkbox,
-            "/Tx": ElementType.text,
+            TemplateCoreConstants().selectable_identifier: ElementType.checkbox,
+            TemplateCoreConstants().text_field_identifier: ElementType.text,
         }
 
         result = element_type_mapping.get(
