@@ -106,6 +106,31 @@ class Template:
 
         return result
 
+    def get_elements_by_page_v2(
+        self, pdf: Union[bytes, "pdfrw.PdfReader"]
+    ) -> Dict[int, List["pdfrw.PdfDict"]]:
+        """Iterates through a PDF and returns all elements found grouped by page."""
+
+        if isinstance(pdf, bytes):
+            pdf = pdfrw.PdfReader(fdata=pdf)
+
+        result = {}
+
+        for i in range(len(pdf.pages)):
+            elements = pdf.pages[i][TemplateCoreConstants().annotation_key]
+            if elements:
+                result[i + 1] = []
+                for element in elements:
+                    for each in ELEMENT_TYPE_PATTERNS:
+                        patterns = each[0]
+                        check = True
+                        for pattern in patterns:
+                            check = check and self.find_pattern_match(pattern, element)
+                        if check:
+                            result[i + 1].append(element)
+
+        return result
+
     @staticmethod
     def get_element_key(element: "pdfrw.PdfDict", sejda: bool = False) -> str:
         """Returns its annotated key given a PDF form element."""
