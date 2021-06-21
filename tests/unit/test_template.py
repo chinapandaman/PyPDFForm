@@ -157,6 +157,51 @@ def test_get_elements_by_page_sejda(sejda_template):
             assert expected[page][k]
 
 
+def test_get_elements_by_page_sejda_v2(sejda_template):
+    expected = {
+        1: {
+            "date": False,
+            "year": False,
+            "buyer_name": False,
+            "buyer_address": False,
+            "seller_name": False,
+            "seller_address": False,
+            "make": False,
+            "model": False,
+            "caliber": False,
+            "serial_number": False,
+            "purchase_option": False,
+            "date_of_this_bill": False,
+            "at_future_date": False,
+            "other": False,
+            "other_reason": False,
+            "future_date": False,
+            "future_year": False,
+            "exchange_for": False,
+        },
+        2: {
+            "buyer_name_printed": False,
+            "seller_name_printed": False,
+            "buyer_signed_date": False,
+            "seller_signed_date": False,
+            "buyer_dl_number": False,
+            "seller_dl_number": False,
+            "buyer_dl_state": False,
+            "seller_dl_state": False,
+        },
+    }
+
+    for page, elements in (
+        TemplateCore().get_elements_by_page_v2(sejda_template).items()
+    ):
+        for each in elements:
+            expected[page][TemplateCore().get_element_key(each, sejda=True)] = True
+
+    for page, elements in expected.items():
+        for k in elements.keys():
+            assert expected[page][k]
+
+
 def test_get_elements_by_page(template_with_radiobutton_stream):
     expected = {
         1: {
@@ -178,6 +223,36 @@ def test_get_elements_by_page(template_with_radiobutton_stream):
 
     for page, elements in (
         TemplateCore().get_elements_by_page(template_with_radiobutton_stream).items()
+    ):
+        for each in elements:
+            expected[page][TemplateCore().get_element_key(each)] = True
+
+    for page, elements in expected.items():
+        for k in elements.keys():
+            assert expected[page][k]
+
+
+def test_get_elements_by_page_v2(template_with_radiobutton_stream):
+    expected = {
+        1: {
+            "test": False,
+            "check": False,
+            "radio_1": False,
+        },
+        2: {
+            "test_2": False,
+            "check_2": False,
+            "radio_2": False,
+        },
+        3: {
+            "test_3": False,
+            "check_3": False,
+            "radio_3": False,
+        },
+    }
+
+    for page, elements in (
+        TemplateCore().get_elements_by_page_v2(template_with_radiobutton_stream).items()
     ):
         for each in elements:
             expected[page][TemplateCore().get_element_key(each)] = True
