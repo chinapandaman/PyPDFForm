@@ -128,6 +128,7 @@ class Template:
                             check = check and self.find_pattern_match(pattern, element)
                         if check:
                             result[i + 1].append(element)
+                            break
 
         return result
 
