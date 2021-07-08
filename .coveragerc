@@ -1,0 +1,5 @@
+[run]
+omit=
+    venv/*
+    venv-linux/*
+    tests/*
