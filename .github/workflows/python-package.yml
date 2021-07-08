@@ -30,4 +30,4 @@ jobs:
         pip install -r requirements.txt
     - name: Test with pytest
       run: |
-        pytest
+        coverage run -m pytest -v -s
