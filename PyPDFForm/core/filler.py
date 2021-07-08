@@ -203,3 +203,75 @@ class Filler:
                 element.update(pdfrw.PdfDict(**update_dict))
 
         return Utils().generate_stream(template_pdf)
+
+    @staticmethod
+    def fill_v2(
+        template_stream: bytes,
+        elements: Dict[str, "ElementMiddleware"],
+    ) -> bytes:
+        """Fills a PDF using watermarks."""
+
+        template_pdf = pdfrw.PdfReader(fdata=template_stream)
+
+        texts_to_draw = {}
+        text_watermarks = []
+
+        radio_button_tracker = {}
+
+        for page, _elements in (
+            TemplateCore().get_elements_by_page_v2(template_pdf).items()
+        ):
+            texts_to_draw[page] = []
+            text_watermarks.append(b"")
+            for _element in _elements:
+                key = TemplateCore().get_element_key_v2(_element)
+
+                if elements[key].type == ElementType.checkbox:
+                    texts_to_draw[page].append(
+                        [
+                            Utils().checkbox_radio_to_draw(elements[key]),
+                            TemplateCore().get_draw_checkbox_radio_coordinates(
+                                _element
+                            )[0],
+                            TemplateCore().get_draw_checkbox_radio_coordinates(
+                                _element
+                            )[1],
+                        ]
+                    )
+                elif elements[key].type == ElementType.radio:
+                    if key not in radio_button_tracker:
+                        radio_button_tracker[key] = 0
+                    radio_button_tracker[key] += 1
+
+                    if elements[key].value == radio_button_tracker[key] - 1:
+                        texts_to_draw[page].append(
+                            [
+                                Utils().checkbox_radio_to_draw(elements[key]),
+                                TemplateCore().get_draw_checkbox_radio_coordinates(
+                                    _element
+                                )[0],
+                                TemplateCore().get_draw_checkbox_radio_coordinates(
+                                    _element
+                                )[1],
+                            ]
+                        )
+                else:
+                    texts_to_draw[page].append(
+                        [
+                            elements[key],
+                            TemplateCore().get_draw_text_coordinates(_element)[0],
+                            TemplateCore().get_draw_text_coordinates(_element)[1],
+                        ]
+                    )
+
+        for page, texts in texts_to_draw.items():
+            _watermarks = WatermarkCore().create_watermarks_and_draw(
+                template_stream, page, "text", texts
+            )
+            for i, watermark in enumerate(_watermarks):
+                if watermark:
+                    text_watermarks[i] = watermark
+
+        return WatermarkCore().merge_watermarks_with_pdf(
+            Utils().generate_stream(template_pdf), text_watermarks
+        )
