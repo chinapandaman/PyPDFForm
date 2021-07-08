@@ -105,7 +105,10 @@ def test_fill_v2(template_stream, data_dict):
         assert element[TemplateConstants().field_editable_key] != pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
-            assert element[TemplateConstants().checkbox_field_value_key] == pdfrw.PdfName.Off
+            assert (
+                element[TemplateConstants().checkbox_field_value_key]
+                == pdfrw.PdfName.Off
+            )
 
 
 def test_fill_sejda(sejda_template, sejda_data):
@@ -160,7 +163,7 @@ def test_fill_sejda_v2(sejda_template, sejda_data):
 
     for element in TemplateCore().iterate_elements(result_stream):
         assert element[TemplateConstants().parent_key][
-           TemplateConstants().field_editable_key
+            TemplateConstants().field_editable_key
         ] != pdfrw.PdfObject(1)
 
 
