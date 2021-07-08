@@ -61,7 +61,8 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/m
 ## Tests
 
 PyPDFForm utilizes [pytest](https://docs.pytest.org/en/stable/) for unit and 
-functional tests. Tests can be run by first installing dependencies using 
+functional tests and [coverage.py](https://coverage.readthedocs.io/) for test coverages. 
+Tests can be run by first installing dependencies using 
 [pip](https://pip.pypa.io/en/stable/quickstart/):
 
 ```shell script
@@ -78,7 +79,7 @@ make build-all
 Activate your virtual environment and run tests using:
 
 ```shell script
-pytest -v
+coverage run -m pytest -v -s && coverage report
 ```
 
 Or you can use this Makefile rule to do the above two steps if you are running Linux:
