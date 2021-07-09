@@ -295,14 +295,19 @@ def test_simple_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
         )
 
         assert obj.stream == f.read()
-        assert PyPDFForm(template_with_radiobutton_stream, simple_mode=True).fill(
-            {
-                "radio_1": 0,
-                "radio_2": 1,
-                "radio_3": 2,
-            },
-            editable=False,
-        ).read() != obj.stream
+        assert (
+            PyPDFForm(template_with_radiobutton_stream, simple_mode=True)
+            .fill(
+                {
+                    "radio_1": 0,
+                    "radio_2": 1,
+                    "radio_3": 2,
+                },
+                editable=False,
+            )
+            .read()
+            != obj.stream
+        )
 
 
 def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
