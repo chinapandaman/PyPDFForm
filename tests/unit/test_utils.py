@@ -6,6 +6,7 @@ from copy import deepcopy
 import pdfrw
 import pytest
 
+from PyPDFForm.core.constants import Template as TemplateCoreConstants
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.core.utils import Utils
 from PyPDFForm.middleware.constants import Text as TextConstants
@@ -106,3 +107,12 @@ def test_merge_two_pdfs(template_stream, data_dict):
             assert TemplateCore().get_element_key(element) in data_dict
 
     assert page_count * 2 == merged_page_count
+
+
+def test_checkbox_radio_font_size():
+    element = pdfrw.PdfDict(**{
+        TemplateCoreConstants().annotation_rectangle_key.replace("/", ""): [
+            0, 0, 16, 16
+        ]
+    })
+    assert Utils().checkbox_radio_font_size(element) == 12
