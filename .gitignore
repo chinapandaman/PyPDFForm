@@ -3,3 +3,5 @@ __pycache__/
 temp/
 venv/
 venv-linux/
+htmlcov/
+.coverage

@@ -30,4 +30,6 @@ jobs:
         pip install -r requirements.txt
     - name: Test with pytest
       run: |
-        pytest
+        coverage run -m pytest -v -s
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1

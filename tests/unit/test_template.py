@@ -87,6 +87,7 @@ def test_iterate_elements_and_get_element_key(
 def test_iterate_elements_and_get_element_key_v2(
     template_with_radiobutton_stream, data_dict
 ):
+    assert TemplateCore().get_element_key_v2(pdfrw.PdfDict()) is None
     for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
         data_dict[TemplateCore().get_element_key_v2(each)] = True
 
@@ -374,6 +375,8 @@ def test_get_element_type(template_stream):
 
 
 def test_get_element_type_v2(template_stream):
+    assert TemplateCore().get_element_type_v2(pdfrw.PdfDict()) is None
+
     type_mapping = {
         "test": ElementType.text,
         "check": ElementType.checkbox,

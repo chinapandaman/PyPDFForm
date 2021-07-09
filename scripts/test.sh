@@ -2,4 +2,4 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
   source "./venv-linux/bin/activate"
 fi
 
-pytest -v
+coverage run -m pytest -v -s && coverage report

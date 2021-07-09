@@ -10,7 +10,7 @@ with open("PyPDFForm/__init__.py", encoding="utf8") as f:
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-dev_dependencies = ["pylint", "pytest"]
+dev_dependencies = ["coverage", "pylint", "pytest"]
 
 with open("requirements.txt", "r") as requirements:
     dependencies = [
