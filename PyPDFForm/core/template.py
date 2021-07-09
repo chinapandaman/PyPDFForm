@@ -273,6 +273,7 @@ class Template:
         element: "pdfrw.PdfDict",
         font_size: Union[float, int],
     ) -> Tuple[Union[float, int], Union[float, int]]:
+        font_size = font_size * 96 / 72
         x_1 = (
                 float(element[TemplateCoreConstants().annotation_rectangle_key][0])
                 + float(element[TemplateCoreConstants().annotation_rectangle_key][2]) - font_size / 2
