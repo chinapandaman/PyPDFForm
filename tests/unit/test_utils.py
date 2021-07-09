@@ -78,9 +78,7 @@ def checkbox_radio_to_draw():
     assert new_checkbox_to_draw.font_color == (0, 0, 0)
     assert new_checkbox_to_draw.text_x_offset == 0
     assert new_checkbox_to_draw.text_y_offset == 0
-    assert (
-        new_checkbox_to_draw.text_wrap_length == 100
-    )
+    assert new_checkbox_to_draw.text_wrap_length == 100
 
     assert new_radio_to_draw.value == u"\u25CF"
     assert new_radio_to_draw.type == ElementType.text
@@ -109,9 +107,14 @@ def test_merge_two_pdfs(template_stream, data_dict):
 
 
 def test_checkbox_radio_font_size():
-    element = pdfrw.PdfDict(**{
-        TemplateCoreConstants().annotation_rectangle_key.replace("/", ""): [
-            0, 0, 16, 16
-        ]
-    })
+    element = pdfrw.PdfDict(
+        **{
+            TemplateCoreConstants().annotation_rectangle_key.replace("/", ""): [
+                0,
+                0,
+                16,
+                16,
+            ]
+        }
+    )
     assert Utils().checkbox_radio_font_size(element) == 12

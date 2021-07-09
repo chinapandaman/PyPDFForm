@@ -8,9 +8,9 @@ from typing import Dict, Union
 
 import pdfrw
 
-from .constants import Template as TemplateCoreConstants
 from ..middleware.constants import Text
 from ..middleware.element import Element, ElementType
+from .constants import Template as TemplateCoreConstants
 
 
 class Utils:
@@ -54,8 +54,10 @@ class Utils:
     def checkbox_radio_font_size(element: "pdfrw.PdfDict") -> Union[float, int]:
         """Calculates the font size it should be drawn with given a checkbox/radio button element."""
 
-        area = abs(float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-                   - float(element[TemplateCoreConstants().annotation_rectangle_key][2])) * abs(
+        area = abs(
+            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+        ) * abs(
             float(element[TemplateCoreConstants().annotation_rectangle_key][1])
             - float(element[TemplateCoreConstants().annotation_rectangle_key][3])
         )
@@ -63,7 +65,9 @@ class Utils:
         return sqrt(area) * 72 / 96
 
     @staticmethod
-    def checkbox_radio_to_draw(element: "Element", font_size: Union[float, int] = Text().global_font_size) -> "Element":
+    def checkbox_radio_to_draw(
+        element: "Element", font_size: Union[float, int] = Text().global_font_size
+    ) -> "Element":
         """Converts a checkbox/radio element to a drawable text element."""
 
         _map = {

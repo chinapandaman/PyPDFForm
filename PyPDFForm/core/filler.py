@@ -230,17 +230,12 @@ class Filler:
                     font_size = Utils().checkbox_radio_font_size(_element)
                     texts_to_draw[page].append(
                         [
-                            Utils().checkbox_radio_to_draw(
-                                elements[key],
-                                font_size
-                            ),
+                            Utils().checkbox_radio_to_draw(elements[key], font_size),
                             TemplateCore().get_draw_checkbox_radio_coordinates_v2(
-                                _element,
-                                font_size
+                                _element, font_size
                             )[0],
                             TemplateCore().get_draw_checkbox_radio_coordinates_v2(
-                                _element,
-                                font_size
+                                _element, font_size
                             )[1],
                         ]
                     )
@@ -254,16 +249,13 @@ class Filler:
                         texts_to_draw[page].append(
                             [
                                 Utils().checkbox_radio_to_draw(
-                                    elements[key],
-                                    font_size
+                                    elements[key], font_size
                                 ),
                                 TemplateCore().get_draw_checkbox_radio_coordinates_v2(
-                                    _element,
-                                    font_size
+                                    _element, font_size
                                 )[0],
                                 TemplateCore().get_draw_checkbox_radio_coordinates_v2(
-                                    _element,
-                                    font_size
+                                    _element, font_size
                                 )[1],
                             ]
                         )

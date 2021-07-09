@@ -668,11 +668,14 @@ def test_find_pattern_match_sejda(sejda_template, sejda_data):
 
 
 def test_get_draw_checkbox_radio_coordinates_v2():
-    element = pdfrw.PdfDict(**{
-        TemplateCoreConstants().annotation_rectangle_key.replace("/", ""): [
-            0, 0, 16, 16
-        ]
-    })
-    assert TemplateCore().get_draw_checkbox_radio_coordinates_v2(
-        element, 12
-    ) == (2, 2)
+    element = pdfrw.PdfDict(
+        **{
+            TemplateCoreConstants().annotation_rectangle_key.replace("/", ""): [
+                0,
+                0,
+                16,
+                16,
+            ]
+        }
+    )
+    assert TemplateCore().get_draw_checkbox_radio_coordinates_v2(element, 12) == (2, 2)
