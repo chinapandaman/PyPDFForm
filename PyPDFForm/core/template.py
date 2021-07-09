@@ -273,6 +273,8 @@ class Template:
         element: "pdfrw.PdfDict",
         font_size: Union[float, int],
     ) -> Tuple[Union[float, int], Union[float, int]]:
+        """Returns coordinates to draw checkbox/radio at given a PDF form text element."""
+
         font_size = font_size * 96 / 72
         x_1 = (
                 float(element[TemplateCoreConstants().annotation_rectangle_key][0])

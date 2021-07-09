@@ -52,6 +52,8 @@ class Utils:
 
     @staticmethod
     def checkbox_radio_font_size(element: "pdfrw.PdfDict") -> Union[float, int]:
+        """Calculates the font size it should be drawn with given a checkbox/radio button element."""
+
         area = abs(float(element[TemplateCoreConstants().annotation_rectangle_key][0])
                    - float(element[TemplateCoreConstants().annotation_rectangle_key][2])) * abs(
             float(element[TemplateCoreConstants().annotation_rectangle_key][1])
