@@ -251,7 +251,7 @@ class Template:
     def get_draw_checkbox_radio_coordinates(
         element: "pdfrw.PdfDict",
     ) -> Tuple[Union[float, int], Union[float, int]]:
-        """Returns coordinates to draw checkbox/radio at given a PDF form text element."""
+        """Returns coordinates to draw at given a PDF form checkbox/radio element."""
 
         return (
             (
@@ -273,7 +273,7 @@ class Template:
         element: "pdfrw.PdfDict",
         font_size: Union[float, int],
     ) -> Tuple[Union[float, int], Union[float, int]]:
-        """Returns coordinates to draw checkbox/radio at given a PDF form text element."""
+        """Returns coordinates to draw at given a PDF form checkbox/radio element."""
 
         font_size = font_size * 96 / 72
         x_1 = (
