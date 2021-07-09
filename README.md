@@ -61,7 +61,7 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/m
 ## Tests
 
 PyPDFForm utilizes [pytest](https://docs.pytest.org/en/stable/) for unit and 
-functional tests and [coverage.py](https://coverage.readthedocs.io/) for test coverages. 
+functional tests and [coverage.py](https://coverage.readthedocs.io/) for test coverage. 
 Tests can be run by first installing dependencies using 
 [pip](https://pip.pypa.io/en/stable/quickstart/):
 
