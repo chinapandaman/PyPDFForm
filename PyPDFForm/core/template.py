@@ -251,7 +251,7 @@ class Template:
     def get_draw_checkbox_radio_coordinates(
         element: "pdfrw.PdfDict",
     ) -> Tuple[Union[float, int], Union[float, int]]:
-        """Returns coordinates to draw checkbox/radio at given a PDF form text element."""
+        """Returns coordinates to draw at given a PDF form checkbox/radio element."""
 
         return (
             (
@@ -267,6 +267,31 @@ class Template:
             / 2
             - 4,
         )
+
+    @staticmethod
+    def get_draw_checkbox_radio_coordinates_v2(
+        element: "pdfrw.PdfDict",
+        font_size: Union[float, int],
+    ) -> Tuple[Union[float, int], Union[float, int]]:
+        """Returns coordinates to draw at given a PDF form checkbox/radio element."""
+
+        font_size = font_size * 96 / 72
+        x_1 = (
+                float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+                + float(element[TemplateCoreConstants().annotation_rectangle_key][2]) - font_size / 2
+            ) / 2
+        y_1 = (
+                float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+                + float(element[TemplateCoreConstants().annotation_rectangle_key][3]) - font_size / 2
+            ) / 2
+        width = abs(float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+                    - float(element[TemplateCoreConstants().annotation_rectangle_key][2]))
+        height = abs(float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+                     - float(element[TemplateCoreConstants().annotation_rectangle_key][3]))
+        x_2 = ((width - font_size) / 2) + float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+        y_2 = ((height - font_size) / 2) + float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+
+        return (x_1 + x_2) / 2, (y_1 + y_2) / 2
 
     @staticmethod
     def get_draw_text_coordinates(

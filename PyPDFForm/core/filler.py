@@ -227,14 +227,20 @@ class Filler:
                 key = TemplateCore().get_element_key_v2(_element)
 
                 if elements[key].type == ElementType.checkbox:
+                    font_size = Utils().checkbox_radio_font_size(_element)
                     texts_to_draw[page].append(
                         [
-                            Utils().checkbox_radio_to_draw(elements[key]),
-                            TemplateCore().get_draw_checkbox_radio_coordinates(
-                                _element
+                            Utils().checkbox_radio_to_draw(
+                                elements[key],
+                                font_size
+                            ),
+                            TemplateCore().get_draw_checkbox_radio_coordinates_v2(
+                                _element,
+                                font_size
                             )[0],
-                            TemplateCore().get_draw_checkbox_radio_coordinates(
-                                _element
+                            TemplateCore().get_draw_checkbox_radio_coordinates_v2(
+                                _element,
+                                font_size
                             )[1],
                         ]
                     )
@@ -244,14 +250,20 @@ class Filler:
                     radio_button_tracker[key] += 1
 
                     if elements[key].value == radio_button_tracker[key] - 1:
+                        font_size = Utils().checkbox_radio_font_size(_element)
                         texts_to_draw[page].append(
                             [
-                                Utils().checkbox_radio_to_draw(elements[key]),
-                                TemplateCore().get_draw_checkbox_radio_coordinates(
-                                    _element
+                                Utils().checkbox_radio_to_draw(
+                                    elements[key],
+                                    font_size
+                                ),
+                                TemplateCore().get_draw_checkbox_radio_coordinates_v2(
+                                    _element,
+                                    font_size
                                 )[0],
-                                TemplateCore().get_draw_checkbox_radio_coordinates(
-                                    _element
+                                TemplateCore().get_draw_checkbox_radio_coordinates_v2(
+                                    _element,
+                                    font_size
                                 )[1],
                             ]
                         )

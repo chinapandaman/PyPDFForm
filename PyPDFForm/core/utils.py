@@ -3,10 +3,12 @@
 
 from copy import deepcopy
 from io import BytesIO
+from math import sqrt
 from typing import Dict, Union
 
 import pdfrw
 
+from .constants import Template as TemplateCoreConstants
 from ..middleware.constants import Text
 from ..middleware.element import Element, ElementType
 
@@ -49,7 +51,19 @@ class Utils:
         return pdfrw.PdfName.Yes if data else pdfrw.PdfName.Off
 
     @staticmethod
-    def checkbox_radio_to_draw(element: "Element") -> "Element":
+    def checkbox_radio_font_size(element: "pdfrw.PdfDict") -> Union[float, int]:
+        """Calculates the font size it should be drawn with given a checkbox/radio button element."""
+
+        area = abs(float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+                   - float(element[TemplateCoreConstants().annotation_rectangle_key][2])) * abs(
+            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+        )
+
+        return sqrt(area) * 72 / 96
+
+    @staticmethod
+    def checkbox_radio_to_draw(element: "Element", font_size: Union[float, int] = Text().global_font_size) -> "Element":
         """Converts a checkbox/radio element to a drawable text element."""
 
         _map = {
@@ -64,12 +78,12 @@ class Utils:
                 element_value=_map[element.type],
             )
 
-            new_element.font = Text().global_font
-            new_element.font_size = Text().global_font_size
-            new_element.font_color = Text().global_font_color
-            new_element.text_x_offset = Text().global_text_x_offset
-            new_element.text_y_offset = Text().global_text_y_offset
-            new_element.text_wrap_length = Text().global_text_wrap_length
+            new_element.font = "Helvetica"
+            new_element.font_size = font_size
+            new_element.font_color = (0, 0, 0)
+            new_element.text_x_offset = 0
+            new_element.text_y_offset = 0
+            new_element.text_wrap_length = 100
 
             return new_element
 

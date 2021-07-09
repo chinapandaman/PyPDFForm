@@ -6,9 +6,9 @@ from copy import deepcopy
 import pdfrw
 import pytest
 
+from PyPDFForm.core.constants import Template as TemplateCoreConstants
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.core.utils import Utils
-from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.element import Element, ElementType
 
 
@@ -67,30 +67,30 @@ def checkbox_radio_to_draw():
     new_checkbox_element = Element("foo", ElementType.checkbox, True)
     new_radio_element = Element("bar", ElementType.radio, 0)
 
-    new_checkbox_to_draw = Utils().checkbox_radio_to_draw(new_checkbox_element)
-    new_radio_to_draw = Utils().checkbox_radio_to_draw(new_radio_element)
+    new_checkbox_to_draw = Utils().checkbox_radio_to_draw(new_checkbox_element, 9)
+    new_radio_to_draw = Utils().checkbox_radio_to_draw(new_radio_element, 9)
 
     assert new_checkbox_to_draw.value == u"\u2713"
     assert new_checkbox_to_draw.type == ElementType.text
     assert new_checkbox_to_draw.name == "foo"
-    assert new_checkbox_to_draw.font == TextConstants().global_font
-    assert new_checkbox_to_draw.font_size == TextConstants().global_font_size
-    assert new_checkbox_to_draw.font_color == TextConstants().global_font_color
-    assert new_checkbox_to_draw.text_x_offset == TextConstants().global_text_x_offset
-    assert new_checkbox_to_draw.text_y_offset == TextConstants().global_text_y_offset
+    assert new_checkbox_to_draw.font == "Helvetica"
+    assert new_checkbox_to_draw.font_size == 9
+    assert new_checkbox_to_draw.font_color == (0, 0, 0)
+    assert new_checkbox_to_draw.text_x_offset == 0
+    assert new_checkbox_to_draw.text_y_offset == 0
     assert (
-        new_checkbox_to_draw.text_wrap_length == TextConstants().global_text_wrap_length
+        new_checkbox_to_draw.text_wrap_length == 100
     )
 
     assert new_radio_to_draw.value == u"\u25CF"
     assert new_radio_to_draw.type == ElementType.text
     assert new_radio_to_draw.name == "bar"
-    assert new_radio_to_draw.font == TextConstants().global_font
-    assert new_radio_to_draw.font_size == TextConstants().global_font_size
-    assert new_radio_to_draw.font_color == TextConstants().global_font_color
-    assert new_radio_to_draw.text_x_offset == TextConstants().global_text_x_offset
-    assert new_radio_to_draw.text_y_offset == TextConstants().global_text_y_offset
-    assert new_radio_to_draw.text_wrap_length == TextConstants().global_text_wrap_length
+    assert new_radio_to_draw.font == "Helvetica"
+    assert new_radio_to_draw.font_size == 9
+    assert new_radio_to_draw.font_color == (0, 0, 0)
+    assert new_radio_to_draw.text_x_offset == 0
+    assert new_radio_to_draw.text_y_offset == 0
+    assert new_radio_to_draw.text_wrap_length == 100
 
 
 def test_merge_two_pdfs(template_stream, data_dict):
@@ -106,3 +106,12 @@ def test_merge_two_pdfs(template_stream, data_dict):
             assert TemplateCore().get_element_key(element) in data_dict
 
     assert page_count * 2 == merged_page_count
+
+
+def test_checkbox_radio_font_size():
+    element = pdfrw.PdfDict(**{
+        TemplateCoreConstants().annotation_rectangle_key.replace("/", ""): [
+            0, 0, 16, 16
+        ]
+    })
+    assert Utils().checkbox_radio_font_size(element) == 12
