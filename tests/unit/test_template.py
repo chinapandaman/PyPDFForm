@@ -700,4 +700,4 @@ def test_get_draw_checkbox_radio_coordinates_v2():
             ]
         }
     )
-    assert TemplateCore().get_draw_checkbox_radio_coordinates_v2(element, 12) == (2, 2)
+    assert TemplateCore().get_draw_checkbox_radio_coordinates_v2(element, 12) == (4, 4)
