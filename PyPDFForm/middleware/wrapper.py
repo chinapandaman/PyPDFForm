@@ -297,17 +297,11 @@ class PyPDFForm:
 class PyPDFForm2:
     """A class to represent a PDF form."""
 
-    def __init__(self,
-                 template: Union[bytes, str, BinaryIO] = b"",
-                 global_font: str = TextConstants().global_font,
-                 global_font_size: Union[float, int] = TextConstants().global_font_size,
-                 global_font_color: Tuple[
-                     Union[float, int], Union[float, int], Union[float, int]
-                 ] = TextConstants().global_font_color,
-                 global_text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
-                 global_text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
-                 global_text_wrap_length: int = TextConstants().global_text_wrap_length,
-                 ) -> None:
+    def __init__(
+        self,
+        template: Union[bytes, str, BinaryIO] = b"",
+        **kwargs,
+    ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
         self.stream = FileAdapter().fp_or_f_obj_or_stream_to_stream(template)
@@ -315,12 +309,12 @@ class PyPDFForm2:
 
         for each in self.elements.values():
             if each.type == ElementType.text:
-                each.font = global_font
-                each.font_size = global_font_size
-                each.font_color = global_font_color
-                each.text_x_offset = global_text_x_offset
-                each.text_y_offset = global_text_y_offset
-                each.text_wrap_length = global_text_wrap_length
+                each.font = kwargs.get("global_font", TextConstants().global_font)
+                each.font_size = kwargs.get("global_font_size", TextConstants().global_font_size)
+                each.font_color = kwargs.get("global_font_color", TextConstants().global_font_color)
+                each.text_x_offset = kwargs.get("global_text_x_offset", TextConstants().global_text_x_offset)
+                each.text_y_offset = kwargs.get("global_text_y_offset", TextConstants().global_text_y_offset)
+                each.text_wrap_length = kwargs.get("global_text_wrap_length", TextConstants().global_text_wrap_length)
 
     def read(self) -> bytes:
         """Reads the file stream of the PDF form."""
@@ -363,25 +357,18 @@ class PyPDFForm2:
         page_number: int,
         x: Union[float, int],
         y: Union[float, int],
-        font: str = TextConstants().global_font,
-        font_size: Union[float, int] = TextConstants().global_font_size,
-        font_color: Tuple[
-            Union[float, int], Union[float, int], Union[float, int]
-        ] = TextConstants().global_font_color,
-        text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
-        text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
-        text_wrap_length: int = TextConstants().global_text_wrap_length,
+        **kwargs,
     ) -> "PyPDFForm2":
         """Draws a text on a PDF form."""
 
         new_element = ElementMiddleware("new", ElementType.text)
         new_element.value = text
-        new_element.font = font
-        new_element.font_size = font_size
-        new_element.font_color = font_color
-        new_element.text_x_offset = text_x_offset
-        new_element.text_y_offset = text_y_offset
-        new_element.text_wrap_length = text_wrap_length
+        new_element.font = kwargs.get("font", TextConstants().global_font)
+        new_element.font_size = kwargs.get("font_size", TextConstants().global_font_size)
+        new_element.font_color = kwargs.get("font_color", TextConstants().global_font_color)
+        new_element.text_x_offset = kwargs.get("text_x_offset", TextConstants().global_text_x_offset)
+        new_element.text_y_offset = kwargs.get("text_y_offset", TextConstants().global_text_y_offset)
+        new_element.text_wrap_length = kwargs.get("text_wrap_length", TextConstants().global_text_wrap_length)
 
         watermarks = WatermarkCore().create_watermarks_and_draw(
             self.stream,
