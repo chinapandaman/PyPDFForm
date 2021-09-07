@@ -321,7 +321,7 @@ class WrapperV2:
 
         return self.stream
 
-    def __add__(self, other: "PyPDFForm2") -> "PyPDFForm2":
+    def __add__(self, other: "WrapperV2") -> "WrapperV2":
         """Overloaded addition operator to perform merging PDFs."""
 
         if not self.stream:
@@ -338,7 +338,7 @@ class WrapperV2:
     def fill(
         self,
         data: Dict[str, Union[str, bool, int]],
-    ) -> "PyPDFForm2":
+    ) -> "WrapperV2":
         """Fill a PDF form."""
 
         for key, value in data.items():
@@ -358,7 +358,7 @@ class WrapperV2:
         x: Union[float, int],
         y: Union[float, int],
         **kwargs,
-    ) -> "PyPDFForm2":
+    ) -> "WrapperV2":
         """Draws a text on a PDF form."""
 
         new_element = ElementMiddleware("new", ElementType.text)
@@ -396,7 +396,7 @@ class WrapperV2:
         width: Union[float, int],
         height: Union[float, int],
         rotation: Union[float, int] = 0,
-    ) -> "PyPDFForm2":
+    ) -> "WrapperV2":
         """Draws an image on a PDF form."""
 
         image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
