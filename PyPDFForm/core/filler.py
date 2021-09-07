@@ -227,18 +227,19 @@ class Filler:
                 key = TemplateCore().get_element_key_v2(_element)
 
                 if elements[key].type == ElementType.checkbox:
-                    font_size = Utils().checkbox_radio_font_size(_element)
-                    texts_to_draw[page].append(
-                        [
-                            Utils().checkbox_radio_to_draw(elements[key], font_size),
-                            TemplateCore().get_draw_checkbox_radio_coordinates_v2(
-                                _element, font_size
-                            )[0],
-                            TemplateCore().get_draw_checkbox_radio_coordinates_v2(
-                                _element, font_size
-                            )[1],
-                        ]
-                    )
+                    if elements[key].value:
+                        font_size = Utils().checkbox_radio_font_size(_element)
+                        texts_to_draw[page].append(
+                            [
+                                Utils().checkbox_radio_to_draw(elements[key], font_size),
+                                TemplateCore().get_draw_checkbox_radio_coordinates_v2(
+                                    _element, font_size
+                                )[0],
+                                TemplateCore().get_draw_checkbox_radio_coordinates_v2(
+                                    _element, font_size
+                                )[1],
+                            ]
+                        )
                 elif elements[key].type == ElementType.radio:
                     if key not in radio_button_tracker:
                         radio_button_tracker[key] = 0

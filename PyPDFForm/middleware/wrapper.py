@@ -265,7 +265,9 @@ class PyPDFForm:
 
         return self
 
-    def read(self):
+    def read(self) -> bytes:
+        """Reads the file stream of the PDF form."""
+
         return self.stream
 
     @classmethod
@@ -290,3 +292,144 @@ class PyPDFForm:
             raise InvalidTTFFontError
 
         return True
+
+
+class PyPDFForm2:
+    """A class to represent a PDF form."""
+
+    def __init__(self,
+                 template: Union[bytes, str, BinaryIO] = b"",
+                 global_font: str = TextConstants().global_font,
+                 global_font_size: Union[float, int] = TextConstants().global_font_size,
+                 global_font_color: Tuple[
+                     Union[float, int], Union[float, int], Union[float, int]
+                 ] = TextConstants().global_font_color,
+                 global_text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
+                 global_text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
+                 global_text_wrap_length: int = TextConstants().global_text_wrap_length,
+                 ) -> None:
+        """Constructs all attributes for the PyPDFForm object."""
+
+        self.stream = FileAdapter().fp_or_f_obj_or_stream_to_stream(template)
+        self.elements = TemplateMiddleware().build_elements_v2(self.stream) if self.stream else {}
+
+        for each in self.elements.values():
+            if each.type == ElementType.text:
+                each.font = global_font
+                each.font_size = global_font_size
+                each.font_color = global_font_color
+                each.text_x_offset = global_text_x_offset
+                each.text_y_offset = global_text_y_offset
+                each.text_wrap_length = global_text_wrap_length
+
+    def read(self) -> bytes:
+        """Reads the file stream of the PDF form."""
+
+        return self.stream
+
+    def __add__(self, other: "PyPDFForm2") -> "PyPDFForm2":
+        """Overloaded addition operator to perform merging PDFs."""
+
+        if not self.stream:
+            return other
+
+        if not other.stream:
+            return self
+
+        new_obj = self.__class__()
+        new_obj.stream = UtilsCore().merge_two_pdfs(self.stream, other.stream)
+
+        return new_obj
+
+    def fill(
+        self,
+        data: Dict[str, Union[str, bool, int]],
+    ) -> "PyPDFForm2":
+        """Fill a PDF form."""
+
+        for key, value in data.items():
+            if key in self.elements:
+                self.elements[key].value = value
+
+        self.stream = TemplateCore().remove_all_elements(
+            FillerCore().fill_v2(self.stream, self.elements)
+        )
+
+        return self
+
+    def draw_text(
+        self,
+        text: str,
+        page_number: int,
+        x: Union[float, int],
+        y: Union[float, int],
+        font: str = TextConstants().global_font,
+        font_size: Union[float, int] = TextConstants().global_font_size,
+        font_color: Tuple[
+            Union[float, int], Union[float, int], Union[float, int]
+        ] = TextConstants().global_font_color,
+        text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
+        text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
+        text_wrap_length: int = TextConstants().global_text_wrap_length,
+    ) -> "PyPDFForm2":
+        """Draws a text on a PDF form."""
+
+        new_element = ElementMiddleware("new", ElementType.text)
+        new_element.value = text
+        new_element.font = font
+        new_element.font_size = font_size
+        new_element.font_color = font_color
+        new_element.text_x_offset = text_x_offset
+        new_element.text_y_offset = text_y_offset
+        new_element.text_wrap_length = text_wrap_length
+
+        watermarks = WatermarkCore().create_watermarks_and_draw(
+            self.stream,
+            page_number,
+            "text",
+            [
+                [
+                    new_element,
+                    x,
+                    y,
+                ]
+            ],
+        )
+
+        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
+
+        return self
+
+    def draw_image(
+        self,
+        image: Union[bytes, str, BinaryIO],
+        page_number: int,
+        x: Union[float, int],
+        y: Union[float, int],
+        width: Union[float, int],
+        height: Union[float, int],
+        rotation: Union[float, int] = 0,
+    ) -> "PyPDFForm2":
+        """Draws an image on a PDF form."""
+
+        image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
+        image = ImageCore().any_image_to_jpg(image)
+        image = ImageCore().rotate_image(image, rotation)\
+
+        watermarks = WatermarkCore().create_watermarks_and_draw(
+            self.stream, page_number, "image", [[image, x, y, width, height]]
+        )
+
+        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
+
+        return self
+
+    @classmethod
+    def register_font(
+        cls, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
+    ) -> bool:
+        """Registers a font from a ttf file."""
+
+        ttf_file = FileAdapter().fp_or_f_obj_or_stream_to_stream(ttf_file)
+
+        return FontCore().register_font(font_name, ttf_file)
