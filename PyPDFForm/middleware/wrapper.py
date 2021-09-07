@@ -266,7 +266,7 @@ class PyPDFForm:
         return self
 
     def read(self) -> bytes:
-        """Reads the file stream of the PDF form."""
+        """Reads the file stream of a PDF form."""
 
         return self.stream
 
