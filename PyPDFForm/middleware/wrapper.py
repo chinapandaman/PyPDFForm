@@ -294,7 +294,7 @@ class PyPDFForm:
         return True
 
 
-class PyPDFForm2:
+class WrapperV2:
     """A class to represent a PDF form."""
 
     def __init__(
