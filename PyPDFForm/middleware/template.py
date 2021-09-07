@@ -40,3 +40,20 @@ class Template:
             )
 
         return results
+
+    @staticmethod
+    def build_elements_v2(pdf_stream: bytes) -> Dict[str, "Element"]:
+        """Builds an element dict given a PDF form stream."""
+
+        results = {}
+
+        for page, elements in TemplateCore().get_elements_by_page_v2(pdf_stream).items():
+            for element in elements:
+                key = TemplateCore().get_element_key_v2(element)
+
+                results[key] = Element(
+                    element_name=key,
+                    element_type=TemplateCore().get_element_type_v2(element)
+                )
+
+        return results

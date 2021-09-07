@@ -462,10 +462,32 @@ def test_build_elements(template_with_radiobutton_stream, data_dict):
         assert data_dict[k]
 
 
+def test_build_elements_v2(template_with_radiobutton_stream, data_dict):
+    for k, v in (
+        TemplateMiddleware().build_elements_v2(template_with_radiobutton_stream).items()
+    ):
+        if k in data_dict and k == v.name:
+            data_dict[k] = True
+
+    for k in data_dict.keys():
+        assert data_dict[k]
+
+
 def test_build_elements_sejda(sejda_template, sejda_data):
     data_dict = {key: False for key in sejda_data.keys()}
 
     for k, v in TemplateMiddleware().build_elements(sejda_template, sejda=True).items():
+        if k in data_dict and k == v.name:
+            data_dict[k] = True
+
+    for k in data_dict.keys():
+        assert data_dict[k]
+
+
+def test_build_elements_v2_sejda(sejda_template, sejda_data):
+    data_dict = {key: False for key in sejda_data.keys()}
+
+    for k, v in TemplateMiddleware().build_elements_v2(sejda_template).items():
         if k in data_dict and k == v.name:
             data_dict[k] = True
 
