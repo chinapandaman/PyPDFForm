@@ -47,13 +47,15 @@ class Template:
 
         results = {}
 
-        for page, elements in TemplateCore().get_elements_by_page_v2(pdf_stream).items():
+        for page, elements in (
+            TemplateCore().get_elements_by_page_v2(pdf_stream).items()
+        ):
             for element in elements:
                 key = TemplateCore().get_element_key_v2(element)
 
                 results[key] = Element(
                     element_name=key,
-                    element_type=TemplateCore().get_element_type_v2(element)
+                    element_type=TemplateCore().get_element_type_v2(element),
                 )
 
         return results
