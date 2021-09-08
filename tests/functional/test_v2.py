@@ -263,3 +263,16 @@ def test_fill_with_customized_elements_v2(
             obj.elements["test_3"].text_y_offset == TextConstants().global_text_y_offset
         )
         assert obj.elements["test_3"].text_wrap_length == 2
+
+
+def test_fill_radiobutton_v2(pdf_samples, template_with_radiobutton_stream):
+    with open(os.path.join(pdf_samples, "sample_filled_radiobutton.pdf"), "rb+") as f:
+        obj = PyPDFForm2(template_with_radiobutton_stream).fill(
+            {
+                "radio_1": 0,
+                "radio_2": 1,
+                "radio_3": 2,
+            },
+        )
+
+        assert obj.stream == f.read()
