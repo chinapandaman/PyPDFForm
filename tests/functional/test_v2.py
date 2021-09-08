@@ -35,12 +35,6 @@ def image_samples():
 
 
 @pytest.fixture
-def image_stream(image_samples):
-    with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as f:
-        return f.read()
-
-
-@pytest.fixture
 def font_samples():
     return os.path.join(os.path.dirname(__file__), "..", "..", "font_samples")
 
@@ -347,6 +341,24 @@ def test_draw_text_on_one_page_different_font_v2(
             text_y_offset=50,
             text_wrap_length=4,
         )
+
+        expected = f.read()
+
+        if os.name == "nt":
+            assert len(obj.stream) == len(expected)
+            assert obj.stream == expected
+        else:
+            assert obj.stream[:32767] == expected[:32767]
+
+
+def test_draw_image_on_one_page_v2(template_stream, image_samples, pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_pdf_with_image.pdf"), "rb+") as f:
+        with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
+            stream = _f.read()
+            _f.seek(0)
+            obj = PyPDFForm2(template_stream).draw_image(random.choice(
+                [os.path.join(image_samples, "sample_image.jpg"), _f, stream]
+            ), 2, 100, 100, 400, 225)
 
         expected = f.read()
 
