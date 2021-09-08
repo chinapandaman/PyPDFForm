@@ -6,6 +6,7 @@ import random
 import pytest
 
 from PyPDFForm import PyPDFForm2
+from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.element import ElementType
 
@@ -62,6 +63,9 @@ def test_fill_v2(template_stream, pdf_samples, data_dict):
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+        for page, elements in TemplateCore().get_elements_by_page_v2(obj.read()).items():
+            assert not elements
 
 
 def test_fill_font_liberation_serif_italic_v2(
@@ -387,3 +391,13 @@ def test_draw_png_image_on_one_page_v2(template_stream, image_samples, pdf_sampl
             assert obj.stream == expected
         else:
             assert obj.stream[:32767] == expected[:32767]
+
+
+def test_addition_operator_3_times_v2(template_stream, pdf_samples, data_dict):
+    with open(os.path.join(pdf_samples, "sample_added_3_copies.pdf"), "rb+") as f:
+        result = PyPDFForm2()
+
+        for i in range(3):
+            result += PyPDFForm2(template_stream).fill(data_dict)
+
+        assert result.read() == f.read()
