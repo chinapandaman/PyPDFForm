@@ -401,6 +401,7 @@ def test_addition_operator_3_times_v2(template_stream, pdf_samples, data_dict):
             result += PyPDFForm2(template_stream).fill(data_dict)
 
         assert result.read() == f.read()
+        assert (result + PyPDFForm2()).read() == result.read()
 
 
 def test_addition_operator_3_times_sejda_v2(sejda_template, pdf_samples, sejda_data):
