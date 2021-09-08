@@ -321,3 +321,37 @@ def test_draw_text_on_one_page_v2(template_stream, pdf_samples):
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_draw_text_on_one_page_different_font_v2(
+    template_stream, pdf_samples, font_samples
+):
+    with open(
+        os.path.join(font_samples, "LiberationSerif-BoldItalic.ttf"), "rb+"
+    ) as _f:
+        PyPDFForm2.register_font("LiberationSerif-BoldItalic", _f.read())
+
+    with open(
+        os.path.join(pdf_samples, "sample_pdf_with_drawn_text_different_font.pdf"),
+        "rb+",
+    ) as f:
+        obj = PyPDFForm2(template_stream).draw_text(
+            "drawn_text",
+            1,
+            300,
+            225,
+            font="LiberationSerif-BoldItalic",
+            font_size=20,
+            font_color=(1, 0, 0),
+            text_x_offset=50,
+            text_y_offset=50,
+            text_wrap_length=4,
+        )
+
+        expected = f.read()
+
+        if os.name == "nt":
+            assert len(obj.stream) == len(expected)
+            assert obj.stream == expected
+        else:
+            assert obj.stream[:32767] == expected[:32767]
