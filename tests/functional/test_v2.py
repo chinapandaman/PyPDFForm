@@ -30,6 +30,17 @@ def template_with_radiobutton_stream(pdf_samples):
 
 
 @pytest.fixture
+def image_samples():
+    return os.path.join(os.path.dirname(__file__), "..", "..", "image_samples")
+
+
+@pytest.fixture
+def image_stream(image_samples):
+    with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as f:
+        return f.read()
+
+
+@pytest.fixture
 def font_samples():
     return os.path.join(os.path.dirname(__file__), "..", "..", "font_samples")
 
@@ -284,6 +295,27 @@ def test_fill_sejda_and_read_v2(sejda_template, pdf_samples, sejda_data):
             sejda_data,
         )
         assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
+def test_draw_text_on_one_page_v2(template_stream, pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_pdf_with_drawn_text.pdf"), "rb+") as f:
+        obj = PyPDFForm2(template_stream).draw_text(
+            "drawn_text",
+            1,
+            300,
+            225,
+            font=TextConstants().global_font,
+            font_size=20,
+            font_color=(1, 0, 0),
+            text_x_offset=50,
+            text_y_offset=50,
+            text_wrap_length=4,
+        )
 
         expected = f.read()
 
