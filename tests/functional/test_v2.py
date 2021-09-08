@@ -98,3 +98,27 @@ def test_fill_font_liberation_serif_italic_v2(
                 assert v.text_x_offset == TextConstants().global_text_x_offset
                 assert v.text_y_offset == TextConstants().global_text_y_offset
                 assert v.text_wrap_length == TextConstants().global_text_wrap_length
+
+
+def test_fill_font_20_v2(template_stream, pdf_samples, data_dict):
+    with open(os.path.join(pdf_samples, "sample_filled_font_20.pdf"), "rb+") as f:
+        obj = PyPDFForm2(template_stream, global_font_size=20).fill(
+            data_dict,
+        )
+
+        expected = f.read()
+
+        assert obj.stream == expected
+
+        for k, v in obj.elements.items():
+            assert k in data_dict
+            assert v.name in data_dict
+            assert v.value == data_dict[k]
+
+            if v.type == ElementType.text:
+                assert v.font == TextConstants().global_font
+                assert v.font_size == 20
+                assert v.font_color == TextConstants().global_font_color
+                assert v.text_x_offset == TextConstants().global_text_x_offset
+                assert v.text_y_offset == TextConstants().global_text_y_offset
+                assert v.text_wrap_length == TextConstants().global_text_wrap_length
