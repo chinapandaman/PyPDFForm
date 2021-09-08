@@ -401,3 +401,13 @@ def test_addition_operator_3_times_v2(template_stream, pdf_samples, data_dict):
             result += PyPDFForm2(template_stream).fill(data_dict)
 
         assert result.read() == f.read()
+
+
+def test_addition_operator_3_times_sejda_v2(sejda_template, pdf_samples, sejda_data):
+    with open(os.path.join(pdf_samples, "sample_added_3_copies_sejda.pdf"), "rb+") as f:
+        result = PyPDFForm2()
+
+        for i in range(3):
+            result += PyPDFForm2(sejda_template).fill(sejda_data)
+
+        assert result.read() == f.read()
