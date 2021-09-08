@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import os
+import random
 
 import pytest
 
 from PyPDFForm import PyPDFForm2
+from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.middleware.element import ElementType
 
 
 @pytest.fixture
@@ -54,3 +57,44 @@ def test_fill_v2(template_stream, pdf_samples, data_dict):
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_fill_font_liberation_serif_italic_v2(
+    template_stream, pdf_samples, font_samples, data_dict
+):
+    with open(os.path.join(font_samples, "LiberationSerif-Italic.ttf"), "rb+") as _f:
+        stream = _f.read()
+        _f.seek(0)
+        PyPDFForm2.register_font(
+            "LiberationSerif-Italic",
+            random.choice(
+                [os.path.join(font_samples, "LiberationSerif-Italic.ttf"), _f, stream]
+            ),
+        )
+
+    with open(
+        os.path.join(pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"),
+        "rb+",
+    ) as f:
+        obj = PyPDFForm2(
+            template_stream, global_font="LiberationSerif-Italic"
+        ).fill(
+            data_dict,
+        )
+
+        expected = f.read()
+
+        assert obj.stream == expected
+
+        for k, v in obj.elements.items():
+            assert k in data_dict
+            assert v.name in data_dict
+            assert v.value == data_dict[k]
+
+            if v.type == ElementType.text:
+                assert v.font == "LiberationSerif-Italic"
+                assert v.font_size == TextConstants().global_font_size
+                assert v.font_color == TextConstants().global_font_color
+                assert v.text_x_offset == TextConstants().global_text_x_offset
+                assert v.text_y_offset == TextConstants().global_text_y_offset
+                assert v.text_wrap_length == TextConstants().global_text_wrap_length
