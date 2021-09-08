@@ -276,8 +276,10 @@ class Template:
         """Returns coordinates to draw at given a PDF form checkbox/radio element."""
 
         return (
-            float(element[TemplateCoreConstants().annotation_rectangle_key][2]) - font_size,
-            float(element[TemplateCoreConstants().annotation_rectangle_key][3]) - font_size
+            float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+            - font_size,
+            float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+            - font_size,
         )
 
     @staticmethod

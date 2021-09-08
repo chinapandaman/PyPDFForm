@@ -305,16 +305,28 @@ class WrapperV2:
         """Constructs all attributes for the PyPDFForm object."""
 
         self.stream = FileAdapter().fp_or_f_obj_or_stream_to_stream(template)
-        self.elements = TemplateMiddleware().build_elements_v2(self.stream) if self.stream else {}
+        self.elements = (
+            TemplateMiddleware().build_elements_v2(self.stream) if self.stream else {}
+        )
 
         for each in self.elements.values():
             if each.type == ElementType.text:
                 each.font = kwargs.get("global_font", TextConstants().global_font)
-                each.font_size = kwargs.get("global_font_size", TextConstants().global_font_size)
-                each.font_color = kwargs.get("global_font_color", TextConstants().global_font_color)
-                each.text_x_offset = kwargs.get("global_text_x_offset", TextConstants().global_text_x_offset)
-                each.text_y_offset = kwargs.get("global_text_y_offset", TextConstants().global_text_y_offset)
-                each.text_wrap_length = kwargs.get("global_text_wrap_length", TextConstants().global_text_wrap_length)
+                each.font_size = kwargs.get(
+                    "global_font_size", TextConstants().global_font_size
+                )
+                each.font_color = kwargs.get(
+                    "global_font_color", TextConstants().global_font_color
+                )
+                each.text_x_offset = kwargs.get(
+                    "global_text_x_offset", TextConstants().global_text_x_offset
+                )
+                each.text_y_offset = kwargs.get(
+                    "global_text_y_offset", TextConstants().global_text_y_offset
+                )
+                each.text_wrap_length = kwargs.get(
+                    "global_text_wrap_length", TextConstants().global_text_wrap_length
+                )
 
     def read(self) -> bytes:
         """Reads the file stream of a PDF form."""
@@ -364,11 +376,21 @@ class WrapperV2:
         new_element = ElementMiddleware("new", ElementType.text)
         new_element.value = text
         new_element.font = kwargs.get("font", TextConstants().global_font)
-        new_element.font_size = kwargs.get("font_size", TextConstants().global_font_size)
-        new_element.font_color = kwargs.get("font_color", TextConstants().global_font_color)
-        new_element.text_x_offset = kwargs.get("text_x_offset", TextConstants().global_text_x_offset)
-        new_element.text_y_offset = kwargs.get("text_y_offset", TextConstants().global_text_y_offset)
-        new_element.text_wrap_length = kwargs.get("text_wrap_length", TextConstants().global_text_wrap_length)
+        new_element.font_size = kwargs.get(
+            "font_size", TextConstants().global_font_size
+        )
+        new_element.font_color = kwargs.get(
+            "font_color", TextConstants().global_font_color
+        )
+        new_element.text_x_offset = kwargs.get(
+            "text_x_offset", TextConstants().global_text_x_offset
+        )
+        new_element.text_y_offset = kwargs.get(
+            "text_y_offset", TextConstants().global_text_y_offset
+        )
+        new_element.text_wrap_length = kwargs.get(
+            "text_wrap_length", TextConstants().global_text_wrap_length
+        )
 
         watermarks = WatermarkCore().create_watermarks_and_draw(
             self.stream,
@@ -401,8 +423,7 @@ class WrapperV2:
 
         image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
         image = ImageCore().any_image_to_jpg(image)
-        image = ImageCore().rotate_image(image, rotation)\
-
+        image = ImageCore().rotate_image(image, rotation)
         watermarks = WatermarkCore().create_watermarks_and_draw(
             self.stream, page_number, "image", [[image, x, y, width, height]]
         )

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from .middleware.wrapper import PyPDFForm as Wrapper, WrapperV2
+from .middleware.wrapper import PyPDFForm as Wrapper
+from .middleware.wrapper import WrapperV2
 
 PyPDFForm = Wrapper
 PyPDFForm2 = WrapperV2

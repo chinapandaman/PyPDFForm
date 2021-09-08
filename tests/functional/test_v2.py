@@ -64,7 +64,9 @@ def test_fill_v2(template_stream, pdf_samples, data_dict):
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
-        for page, elements in TemplateCore().get_elements_by_page_v2(obj.read()).items():
+        for page, elements in (
+            TemplateCore().get_elements_by_page_v2(obj.read()).items()
+        ):
             assert not elements
 
 
@@ -85,9 +87,7 @@ def test_fill_font_liberation_serif_italic_v2(
         os.path.join(pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"),
         "rb+",
     ) as f:
-        obj = PyPDFForm2(
-            template_stream, global_font="LiberationSerif-Italic"
-        ).fill(
+        obj = PyPDFForm2(template_stream, global_font="LiberationSerif-Italic").fill(
             data_dict,
         )
 
@@ -137,9 +137,7 @@ def test_fill_font_color_red_v2(template_stream, pdf_samples, data_dict):
     with open(
         os.path.join(pdf_samples, "sample_filled_font_color_red.pdf"), "rb+"
     ) as f:
-        obj = PyPDFForm2(
-            template_stream, global_font_color=(1, 0, 0)
-        ).fill(
+        obj = PyPDFForm2(template_stream, global_font_color=(1, 0, 0)).fill(
             data_dict,
         )
 
@@ -191,9 +189,7 @@ def test_fill_offset_100_v2(template_stream, pdf_samples, data_dict):
 
 def test_fill_wrap_2_v2(template_stream, pdf_samples, data_dict):
     with open(os.path.join(pdf_samples, "sample_filled_text_wrap_2.pdf"), "rb+") as f:
-        obj = PyPDFForm2(
-            template_stream, global_text_wrap_length=2
-        ).fill(
+        obj = PyPDFForm2(template_stream, global_text_wrap_length=2).fill(
             data_dict,
         )
 
@@ -215,9 +211,7 @@ def test_fill_wrap_2_v2(template_stream, pdf_samples, data_dict):
                 assert v.text_wrap_length == 2
 
 
-def test_fill_with_customized_elements_v2(
-    template_stream, pdf_samples, data_dict
-):
+def test_fill_with_customized_elements_v2(template_stream, pdf_samples, data_dict):
     with open(
         os.path.join(pdf_samples, "sample_filled_customized_elements.pdf"), "rb+"
     ) as f:
@@ -360,9 +354,16 @@ def test_draw_image_on_one_page_v2(template_stream, image_samples, pdf_samples):
         with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
             stream = _f.read()
             _f.seek(0)
-            obj = PyPDFForm2(template_stream).draw_image(random.choice(
-                [os.path.join(image_samples, "sample_image.jpg"), _f, stream]
-            ), 2, 100, 100, 400, 225)
+            obj = PyPDFForm2(template_stream).draw_image(
+                random.choice(
+                    [os.path.join(image_samples, "sample_image.jpg"), _f, stream]
+                ),
+                2,
+                100,
+                100,
+                400,
+                225,
+            )
 
         expected = f.read()
 
