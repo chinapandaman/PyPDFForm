@@ -275,11 +275,19 @@ class Template:
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw at given a PDF form checkbox/radio element."""
 
+        side = font_size * 96 / 72
+        c_half_width = (
+            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+            + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+        ) / 2
+        c_half_height = (
+            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+            + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+        ) / 2
+
         return (
-            float(element[TemplateCoreConstants().annotation_rectangle_key][2])
-            - font_size,
-            float(element[TemplateCoreConstants().annotation_rectangle_key][3])
-            - font_size,
+            (c_half_width - side / 2 + c_half_width) / 2,
+            (c_half_height - side / 2 + c_half_height) / 2,
         )
 
     @staticmethod
