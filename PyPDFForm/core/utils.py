@@ -52,7 +52,10 @@ class Utils:
 
     @staticmethod
     def checkbox_radio_font_size(element: "pdfrw.PdfDict") -> Union[float, int]:
-        """Calculates the font size it should be drawn with given a checkbox/radio button element."""
+        """
+        Calculates the font size it should be drawn with
+        given a checkbox/radio button element.
+        """
 
         area = abs(
             float(element[TemplateCoreConstants().annotation_rectangle_key][0])
@@ -74,14 +77,14 @@ class Utils:
             ElementType.radio: u"\u25CF",
             ElementType.checkbox: u"\u2713",
         }
+        new_element = Element(
+            element_name=element.name,
+            element_type=ElementType.text,
+            element_value="",
+        )
 
         if _map.get(element.type):
-            new_element = Element(
-                element_name=element.name,
-                element_type=ElementType.text,
-                element_value=_map[element.type],
-            )
-
+            new_element.value = _map[element.type]
             new_element.font = "Helvetica"
             new_element.font_size = font_size
             new_element.font_color = (0, 0, 0)
@@ -89,7 +92,7 @@ class Utils:
             new_element.text_y_offset = 0
             new_element.text_wrap_length = 100
 
-            return new_element
+        return new_element
 
     @staticmethod
     def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
