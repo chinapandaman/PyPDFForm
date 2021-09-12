@@ -64,10 +64,10 @@ class Image:
             return image_stream
 
         rgb_image = image.convert("RGB")
-        with BytesIO() as f:
-            rgb_image.save(f, format="JPEG")
-            f.seek(0)
-            result = f.read()
+        with BytesIO() as _file:
+            rgb_image.save(_file, format="JPEG")
+            _file.seek(0)
+            result = _file.read()
 
         buff.close()
         return result
