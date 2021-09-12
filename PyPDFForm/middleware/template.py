@@ -47,9 +47,7 @@ class Template:
 
         results = {}
 
-        for elements in (
-            TemplateCore().get_elements_by_page_v2(pdf_stream).values()
-        ):
+        for elements in TemplateCore().get_elements_by_page_v2(pdf_stream).values():
             for element in elements:
                 key = TemplateCore().get_element_key_v2(element)
 
