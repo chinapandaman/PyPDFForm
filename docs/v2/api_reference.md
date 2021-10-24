@@ -17,7 +17,7 @@ object and can be used to concatenate with other PDFs.
 * **template** - a file path, file object, or `bytes` stream of the unfilled PDF form template.
   
 * **global_font** - a `string` which sets the global font for text filled on the PDF form. The 
-font set by this parameter has to be registered first.
+font set by this parameter has to be [registered](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/v2/api_reference.md#register_fontfont_name-ttf_file) first.
   
 * **global_font_size** - a `float` value which sets the global font size for texts 
 filled on the PDF form.
@@ -77,7 +77,7 @@ at the specified coordinates.
 * **y** - `float`, vertical coordinate of which the text will be drawn at.
 
 * **font** - `string`, sets the font for text drawn. Font set by this parameter has to be 
-registered first.
+[registered](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/v2/api_reference.md#register_fontfont_name-ttf_file) first.
 
 * **font_size** - `float`, font size of the text drawn.
 
