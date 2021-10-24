@@ -231,7 +231,7 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 PyPDFForm2.register_font("LiberationSerif-Italic", PATH_TO_SAMPLE_TTF_FONT_FILE)
 
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-    pdf_form = PyPDFForm2(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, simple_mode=False)
+    pdf_form = PyPDFForm2(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
 
     pdf_form.elements["test"].font_size = 20
     pdf_form.elements["test"].font_color = (1, 0, 0)
