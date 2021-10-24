@@ -58,6 +58,17 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/m
 * [Examples](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/v2/examples.md)
 * [Examples (Old)](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md)
 
+## PyPDFForm vs PyPDFForm2
+
+PyPDFForm provides additional functionalities like editable support for PDF forms created 
+using Adobe Acrobat or Sejda.
+
+PyPDFForm2 supports PDF forms made by a wider range of tools, while cutting some of those additional 
+functionalities.
+
+It is strongly advised that you use PyPDFForm2 since only minimum supports will be made to PyPDFForm 
+from now on.
+
 ## Tests
 
 PyPDFForm utilizes [pytest](https://docs.pytest.org/en/stable/) for unit and 
