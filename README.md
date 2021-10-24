@@ -16,12 +16,12 @@ pip install PyPDFForm
 
 ## Quick Example
 
-A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). Download it and try:
+A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_template.pdf). Download it and try:
 
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PyPDFForm2
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -33,9 +33,7 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     output.write(
-        PyPDFForm(
-            PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, simple_mode=False, global_font_size=20,
-        )
+        PyPDFForm2(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
         .fill(
             {
                 "test": "test_1",
@@ -51,12 +49,12 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
 ```
 
 After running the above code snippet you can find `output.pdf` at the location you specified, 
-and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_filled_font_20.pdf).
+and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_filled.pdf).
 
 ## Documentation
 
-* API Reference: https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md
-* Examples: https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md
+* [API Reference (Old)](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md)
+* [Examples (Old)](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md)
 
 ## Tests
 
