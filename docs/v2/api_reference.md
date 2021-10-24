@@ -43,7 +43,7 @@ This operation can also be done by assignment operator `+=`.
 ### **draw_image**(*image, page_number, x, y, width, height, rotation=0*)
 
 The draw image method takes an image and draws it 
-on the specified page, coordinates with specified resolutions and rotation angle.
+on the specified page and coordinates with specified resolutions and rotation angle.
 
 #### Parameters:
 
