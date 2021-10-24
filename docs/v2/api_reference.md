@@ -17,23 +17,23 @@ object and can be used to concatenate with other PDFs.
 * **template** - a file path, file object, or `bytes` stream of the unfilled PDF form template.
   
 * **global_font** - a string which sets the global font for text filled on the PDF form. The 
-font set by this parameter has to be registered first. This will only take effect if `simple_mode` is `False`. 
+font set by this parameter has to be registered first.
   
 * **global_font_size** - a float value which sets the global font size for texts 
-filled on the PDF form. This will only take effect if `simple_mode` is `False`.
+filled on the PDF form.
   
 * **global_font_color** - an RGB float tuple which sets the global font color for texts 
-filled on the PDF form. This will only take effect if `simple_mode` is `False`.
+filled on the PDF form.
   
 * **global_text_x_offset** - a float value which sets the global horizontal offset for texts 
-filled on the PDF form. This will only take effect if `simple_mode` is `False`.
+filled on the PDF form.
   
 * **global_text_y_offset** - a float value which sets the global vertical offset for texts 
-filled on the PDF form. This will only take effect if `simple_mode` is `False`.
+filled on the PDF form.
   
 * **global_text_wrap_length** - an integer value which sets the global maximum number of characters before 
 wrapping to a new line for texts 
-filled on the PDF form. This will only take effect if `simple_mode` is `False`.
+filled on the PDF form.
 
 ### *PyPDFForm2()* **+** *PyPDFForm2()*
 
