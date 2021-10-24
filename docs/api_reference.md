@@ -5,7 +5,7 @@ of PyPDFForm.
 
 ## PyPDFForm Object
 
-### *class* PyPDFForm.**PyPDFForm**(*template=b"", simple_mode=True, global_font="Helvetica", global_font_size=12, global_font_color=(0, 0, 0), global_text_x_offset=0, global_text_y_offset=0, global_text_wrap_length=100*)
+### *class* PyPDFForm.**PyPDFForm**(*template=b"", simple_mode=True, global_font="Helvetica", global_font_size=12, global_font_color=(0, 0, 0), global_text_x_offset=0, global_text_y_offset=0, global_text_wrap_length=100, sejda=False*)
 
 The PyPDFForm object implements a PDF form and acts as 
 the central object. It can be constructed with or without a 
