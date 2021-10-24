@@ -63,38 +63,8 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/m
 PyPDFForm provides additional functionalities like editable support for PDF forms created 
 using Adobe Acrobat or Sejda.
 
-PyPDFForm2 supports PDF forms made by a wider range of tools, while cutting some of those additional 
+PyPDFForm2 supports PDF forms made by a wider range of tools, while discarding some of those additional 
 functionalities.
 
 It is strongly advised that you use PyPDFForm2 since only minimum supports will be made to PyPDFForm 
 from now on.
-
-## Tests
-
-PyPDFForm utilizes [pytest](https://docs.pytest.org/en/stable/) for unit and 
-functional tests and [coverage.py](https://coverage.readthedocs.io/) for test coverage. 
-Tests can be run by first installing dependencies using 
-[pip](https://pip.pypa.io/en/stable/quickstart/):
-
-```shell script
-pip install -r requirements.txt
-```
-
-Alternatively, there is a Makefile rule which will set up a Python virtual environment 
-and install all needed dependencies if you are running Linux:
-
-```shell script
-make build-all
-```
-
-Activate your virtual environment and run tests using:
-
-```shell script
-coverage run -m pytest -v -s && coverage report
-```
-
-Or you can use this Makefile rule to do the above two steps if you are running Linux:
-
-```shell script
-make test-all
-```
