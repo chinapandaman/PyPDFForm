@@ -16,22 +16,22 @@ object and can be used to concatenate with other PDFs.
 
 * **template** - a file path, file object, or `bytes` stream of the unfilled PDF form template.
   
-* **global_font** - a string which sets the global font for text filled on the PDF form. The 
+* **global_font** - a `string` which sets the global font for text filled on the PDF form. The 
 font set by this parameter has to be registered first.
   
-* **global_font_size** - a float value which sets the global font size for texts 
+* **global_font_size** - a `float` value which sets the global font size for texts 
 filled on the PDF form.
   
-* **global_font_color** - an RGB float tuple which sets the global font color for texts 
+* **global_font_color** - an RGB float `tuple` which sets the global font color for texts 
 filled on the PDF form.
   
-* **global_text_x_offset** - a float value which sets the global horizontal offset for texts 
+* **global_text_x_offset** - a `float` value which sets the global horizontal offset for texts 
 filled on the PDF form.
   
-* **global_text_y_offset** - a float value which sets the global vertical offset for texts 
+* **global_text_y_offset** - a `float` value which sets the global vertical offset for texts 
 filled on the PDF form.
   
-* **global_text_wrap_length** - an integer value which sets the global maximum number of characters before 
+* **global_text_wrap_length** - an `integer` value which sets the global maximum number of characters before 
 wrapping to a new line for texts 
 filled on the PDF form.
 
@@ -49,17 +49,17 @@ on the specified page, coordinates with specified resolutions and rotation angle
 
 * **image** - a file path, file object, or `bytes` stream of the image.
 
-* **page_number** - integer, page number of which the image will be drawn on.
+* **page_number** - `integer`, page number of which the image will be drawn on.
 
-* **x** - float, horizontal coordinate of which the image will be drawn at.
+* **x** - `float`, horizontal coordinate of which the image will be drawn at.
 
-* **y** - float, vertical coordinate of which the image will be drawn at.
+* **y** - `float`, vertical coordinate of which the image will be drawn at.
 
-* **width** - float, horizontal resolution of the image after drawn.
+* **width** - `float`, horizontal resolution of the image after drawn.
 
-* **height** - float, vertical resolution of the image after drawn.
+* **height** - `float`, vertical resolution of the image after drawn.
 
-* **rotation** - float, degrees the image will be rotated after drawn.
+* **rotation** - `float`, degrees the image will be rotated after drawn.
 
 ### **draw_text**(*text, page_number, x, y, font="Helvetica", font_size=12, font_color=(0, 0, 0), text_x_offset=0, text_y_offset=0, text_wrap_length=100*)
 
@@ -68,26 +68,26 @@ at the specified coordinates.
 
 #### Parameters:
 
-* **text** - string, a text string.
+* **text** - `string`, a text string.
 
-* **page_number** - integer, page number of which the text will be drawn on.
+* **page_number** - `integer`, page number of which the text will be drawn on.
 
-* **x** - float, horizontal coordinate of which the text will be drawn at.
+* **x** - `float`, horizontal coordinate of which the text will be drawn at.
 
-* **y** - float, vertical coordinate of which the text will be drawn at.
+* **y** - `float`, vertical coordinate of which the text will be drawn at.
 
-* **font** - string, sets the font for text drawn. Font set by this parameter has to be 
+* **font** - `string`, sets the font for text drawn. Font set by this parameter has to be 
 registered first.
 
-* **font_size** - float, font size of the text drawn.
+* **font_size** - `float`, font size of the text drawn.
 
-* **font_color** - RGB float tuple, font color of the text drawn.
+* **font_color** - RGB float `tuple`, font color of the text drawn.
 
-* **text_x_offset** - float, horizontal offset of the text drawn.
+* **text_x_offset** - `float`, horizontal offset of the text drawn.
 
-* **text_y_offset** - float, vertical offset of the text drawn.
+* **text_y_offset** - `float`, vertical offset of the text drawn.
 
-* **text_wrap_length** - float, maximum number of characters before wrapping to a new line for the text drawn.
+* **text_wrap_length** - `float`, maximum number of characters before wrapping to a new line for the text drawn.
 
 ### **elements**
 
