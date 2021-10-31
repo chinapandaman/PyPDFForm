@@ -24,8 +24,9 @@ class Template:
 
         for i in range(len(pdf.pages)):
             elements = pdf.pages[i][TemplateCoreConstants().annotation_key]
-            for j in reversed(range(len(elements))):
-                elements.pop(j)
+            if elements:
+                for j in reversed(range(len(elements))):
+                    elements.pop(j)
 
         return Utils().generate_stream(pdf)
 
@@ -118,8 +119,8 @@ class Template:
 
         for i in range(len(pdf.pages)):
             elements = pdf.pages[i][TemplateCoreConstants().annotation_key]
+            result[i + 1] = []
             if elements:
-                result[i + 1] = []
                 for element in elements:
                     for each in ELEMENT_TYPE_PATTERNS:
                         patterns = each[0]
