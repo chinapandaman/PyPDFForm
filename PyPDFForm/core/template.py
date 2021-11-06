@@ -81,8 +81,8 @@ class Template:
 
         for i in range(len(pdf.pages)):
             elements = pdf.pages[i][TemplateCoreConstants().annotation_key]
+            result[i + 1] = []
             if elements:
-                result[i + 1] = []
                 for element in elements:
                     if not sejda:
                         if (
@@ -217,7 +217,7 @@ class Template:
         if not result and element[TemplateCoreConstants().parent_key]:
             return ElementType.radio
 
-        return result
+        return result or ElementType.text
 
     def find_pattern_match(self, pattern: dict, element: "pdfrw.PdfDict") -> bool:
         """Checks if a PDF dict pattern exists in a PDF element."""
