@@ -217,7 +217,7 @@ class Template:
         if not result and element[TemplateCoreConstants().parent_key]:
             return ElementType.radio
 
-        return result or ElementType.text
+        return result
 
     def find_pattern_match(self, pattern: dict, element: "pdfrw.PdfDict") -> bool:
         """Checks if a PDF dict pattern exists in a PDF element."""
