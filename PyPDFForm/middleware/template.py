@@ -34,10 +34,12 @@ class Template:
         for element in TemplateCore().iterate_elements(pdf_stream, sejda):
             key = TemplateCore().get_element_key(element, sejda)
 
-            results[key] = Element(
-                element_name=key,
-                element_type=TemplateCore().get_element_type(element, sejda),
-            )
+            element_type = TemplateCore().get_element_type(element, sejda)
+            if element_type is not None:
+                results[key] = Element(
+                    element_name=key,
+                    element_type=element_type,
+                )
 
         return results
 
@@ -51,9 +53,11 @@ class Template:
             for element in elements:
                 key = TemplateCore().get_element_key_v2(element)
 
-                results[key] = Element(
-                    element_name=key,
-                    element_type=TemplateCore().get_element_type_v2(element),
-                )
+                element_type = TemplateCore().get_element_type_v2(element)
+                if element_type is not None:
+                    results[key] = Element(
+                        element_name=key,
+                        element_type=element_type,
+                    )
 
         return results
