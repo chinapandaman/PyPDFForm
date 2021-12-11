@@ -87,7 +87,13 @@ def test_draw_text_on_one_page_different_font(
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
         else:
-            assert obj.stream[:32767] == expected[:32767]
+            with open(
+                    os.path.join(pdf_samples, "sample_pdf_with_drawn_text_different_font_linux.pdf"),
+                    "rb+",
+            ) as f_linux:
+                expected = f_linux.read()
+                assert len(obj.stream) == len(expected)
+                assert obj.stream == expected
 
 
 def test_draw_image_on_one_page(template_stream, image_stream, pdf_samples):
