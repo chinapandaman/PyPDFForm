@@ -6,4 +6,5 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
   source "./venv-linux/bin/activate"
 fi
 
-pip install -r "./requirements.txt"
+pip install -U pip
+pip install -U -r "./requirements.txt"
