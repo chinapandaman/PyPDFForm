@@ -88,8 +88,10 @@ def test_draw_text_on_one_page_different_font(
             assert obj.stream == expected
         else:
             with open(
-                    os.path.join(pdf_samples, "sample_pdf_with_drawn_text_different_font_linux.pdf"),
-                    "rb+",
+                os.path.join(
+                    pdf_samples, "sample_pdf_with_drawn_text_different_font_linux.pdf"
+                ),
+                "rb+",
             ) as f_linux:
                 expected = f_linux.read()
                 assert len(obj.stream) == len(expected)
@@ -106,7 +108,9 @@ def test_draw_image_on_one_page(template_stream, image_stream, pdf_samples):
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
     else:
-        with open(os.path.join(pdf_samples, "sample_pdf_with_image_linux.pdf"), "rb+") as f_linux:
+        with open(
+            os.path.join(pdf_samples, "sample_pdf_with_image_linux.pdf"), "rb+"
+        ) as f_linux:
             expected = f_linux.read()
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
@@ -124,7 +128,9 @@ def test_draw_image_on_one_page_fp_param(template_stream, image_samples, pdf_sam
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
     else:
-        with open(os.path.join(pdf_samples, "sample_pdf_with_image_linux.pdf"), "rb+") as f_linux:
+        with open(
+            os.path.join(pdf_samples, "sample_pdf_with_image_linux.pdf"), "rb+"
+        ) as f_linux:
             expected = f_linux.read()
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
@@ -143,7 +149,9 @@ def test_draw_image_on_one_page_f_obj_param(
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
     else:
-        with open(os.path.join(pdf_samples, "sample_pdf_with_image_linux.pdf"), "rb+") as f_linux:
+        with open(
+            os.path.join(pdf_samples, "sample_pdf_with_image_linux.pdf"), "rb+"
+        ) as f_linux:
             expected = f_linux.read()
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
@@ -166,7 +174,9 @@ def test_draw_png_image_on_one_page(template_stream, image_samples, pdf_samples)
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
         else:
-            with open(os.path.join(pdf_samples, "sample_pdf_with_png_image_linux.pdf"), "rb+") as f_linux:
+            with open(
+                os.path.join(pdf_samples, "sample_pdf_with_png_image_linux.pdf"), "rb+"
+            ) as f_linux:
                 expected = f_linux.read()
                 assert len(obj.stream) == len(expected)
                 assert obj.stream == expected

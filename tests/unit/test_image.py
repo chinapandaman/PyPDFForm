@@ -72,6 +72,4 @@ def test_any_image_to_jpg(before_converted, after_converted, after_converted_lin
     assert len(_converted) == (
         len(after_converted) if os.name == "nt" else len(after_converted_linux)
     )
-    assert _converted == (
-        after_converted if os.name == "nt" else after_converted_linux
-    )
+    assert _converted == (after_converted if os.name == "nt" else after_converted_linux)

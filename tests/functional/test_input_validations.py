@@ -154,9 +154,13 @@ def test_validate_constructor_inputs(pdf_samples, template_stream):
 
 
 def test_validate_addition_operator_inputs(template_stream):
-    assert len((PyPDFForm() + PyPDFForm(template_stream)).stream) == len(template_stream)
+    assert len((PyPDFForm() + PyPDFForm(template_stream)).stream) == len(
+        template_stream
+    )
     assert (PyPDFForm() + PyPDFForm(template_stream)).stream == template_stream
-    assert len((PyPDFForm(template_stream) + PyPDFForm()).stream) == len(template_stream)
+    assert len((PyPDFForm(template_stream) + PyPDFForm()).stream) == len(
+        template_stream
+    )
     assert (PyPDFForm(template_stream) + PyPDFForm()).stream == template_stream
 
     result = PyPDFForm(b"bad_stream")

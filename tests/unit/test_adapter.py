@@ -39,6 +39,4 @@ def test_file_adapter_fp_or_f_obj_or_stream_to_stream(pdf_samples, template_stre
         f.seek(0)
         _read = FileAdapter().fp_or_f_obj_or_stream_to_stream(f.read())
         assert len(_read) == len(template_stream)
-        assert (
-            _read == template_stream
-        )
+        assert _read == template_stream
