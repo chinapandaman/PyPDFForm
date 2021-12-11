@@ -68,4 +68,5 @@ def test_addition_operator_3_times_sejda(sejda_template, pdf_samples, sejda_data
             TemplateCore().get_elements_by_page(result.stream).keys()
         )
         assert page_count == result_page_count
+        assert len(result.read()) == len(expected)
         assert result.read() == expected

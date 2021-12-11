@@ -57,6 +57,7 @@ def test_fill_v2(template_stream, pdf_samples, data_dict):
         obj = PyPDFForm2(template_stream).fill(
             data_dict,
         )
+        assert len(obj.read()) == len(obj.stream)
         assert obj.read() == obj.stream
 
         expected = f.read()
@@ -93,6 +94,7 @@ def test_fill_font_liberation_serif_italic_v2(
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -117,6 +119,7 @@ def test_fill_font_20_v2(template_stream, pdf_samples, data_dict):
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -143,6 +146,7 @@ def test_fill_font_color_red_v2(template_stream, pdf_samples, data_dict):
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -171,6 +175,7 @@ def test_fill_offset_100_v2(template_stream, pdf_samples, data_dict):
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -195,6 +200,7 @@ def test_fill_wrap_2_v2(template_stream, pdf_samples, data_dict):
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -230,6 +236,7 @@ def test_fill_with_customized_elements_v2(template_stream, pdf_samples, data_dic
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -278,7 +285,10 @@ def test_fill_radiobutton_v2(pdf_samples, template_with_radiobutton_stream):
             },
         )
 
-        assert obj.stream == f.read()
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
 
 
 def test_fill_sejda_and_read_v2(sejda_template, pdf_samples, sejda_data):
@@ -286,6 +296,7 @@ def test_fill_sejda_and_read_v2(sejda_template, pdf_samples, sejda_data):
         obj = PyPDFForm2(sejda_template).fill(
             sejda_data,
         )
+        assert len(obj.read()) == len(obj.stream)
         assert obj.read() == obj.stream
 
         expected = f.read()
@@ -346,7 +357,13 @@ def test_draw_text_on_one_page_different_font_v2(
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
         else:
-            assert obj.stream[:32767] == expected[:32767]
+            with open(
+                    os.path.join(pdf_samples, "sample_pdf_with_drawn_text_different_font_linux.pdf"),
+                    "rb+",
+            ) as f_linux:
+                expected = f_linux.read()
+                assert len(obj.stream) == len(expected)
+                assert obj.stream == expected
 
 
 def test_draw_image_on_one_page_v2(template_stream, image_samples, pdf_samples):
@@ -371,7 +388,10 @@ def test_draw_image_on_one_page_v2(template_stream, image_samples, pdf_samples):
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
         else:
-            assert obj.stream[:32767] == expected[:32767]
+            with open(os.path.join(pdf_samples, "sample_pdf_with_image_linux.pdf"), "rb+") as f_linux:
+                expected = f_linux.read()
+                assert len(obj.stream) == len(expected)
+                assert obj.stream == expected
 
 
 def test_draw_png_image_on_one_page_v2(template_stream, image_samples, pdf_samples):
@@ -391,7 +411,10 @@ def test_draw_png_image_on_one_page_v2(template_stream, image_samples, pdf_sampl
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
         else:
-            assert obj.stream[:32767] == expected[:32767]
+            with open(os.path.join(pdf_samples, "sample_pdf_with_png_image_linux.pdf"), "rb+") as f_linux:
+                expected = f_linux.read()
+                assert len(obj.stream) == len(expected)
+                assert obj.stream == expected
 
 
 def test_addition_operator_3_times_v2(template_stream, pdf_samples, data_dict):
@@ -401,7 +424,10 @@ def test_addition_operator_3_times_v2(template_stream, pdf_samples, data_dict):
         for i in range(3):
             result += PyPDFForm2(template_stream).fill(data_dict)
 
-        assert result.read() == f.read()
+        expected = f.read()
+        assert len(result.read()) == len(expected)
+        assert result.read() == expected
+        assert len((result + PyPDFForm2()).read()) == len(result.read())
         assert (result + PyPDFForm2()).read() == result.read()
 
 
@@ -412,4 +438,6 @@ def test_addition_operator_3_times_sejda_v2(sejda_template, pdf_samples, sejda_d
         for i in range(3):
             result += PyPDFForm2(sejda_template).fill(sejda_data)
 
-        assert result.read() == f.read()
+        expected = f.read()
+        assert len(result.read()) == len(expected)
+        assert result.read() == expected

@@ -29,10 +29,16 @@ def test_readable(pdf_samples):
 
 def test_file_adapter_fp_or_f_obj_or_stream_to_stream(pdf_samples, template_stream):
     path = os.path.join(pdf_samples, "sample_template.pdf")
-    assert FileAdapter().fp_or_f_obj_or_stream_to_stream(path) == template_stream
+    _read = FileAdapter().fp_or_f_obj_or_stream_to_stream(path)
+    assert len(_read) == len(template_stream)
+    assert _read == template_stream
     with open(path, "rb+") as f:
-        assert FileAdapter().fp_or_f_obj_or_stream_to_stream(f) == template_stream
+        _read = FileAdapter().fp_or_f_obj_or_stream_to_stream(f)
+        assert len(_read) == len(template_stream)
+        assert _read == template_stream
         f.seek(0)
+        _read = FileAdapter().fp_or_f_obj_or_stream_to_stream(f.read())
+        assert len(_read) == len(template_stream)
         assert (
-            FileAdapter().fp_or_f_obj_or_stream_to_stream(f.read()) == template_stream
+            _read == template_stream
         )
