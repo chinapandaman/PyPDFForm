@@ -166,4 +166,7 @@ def test_draw_png_image_on_one_page(template_stream, image_samples, pdf_samples)
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
         else:
-            assert obj.stream[:32767] == expected[:32767]
+            with open(os.path.join(pdf_samples, "sample_pdf_with_png_image_linux.pdf"), "rb+") as f_linux:
+                expected = f_linux.read()
+                assert len(obj.stream) == len(expected)
+                assert obj.stream == expected
