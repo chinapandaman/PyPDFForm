@@ -51,6 +51,7 @@ def test_fill_simple_mode_and_read(template_stream, pdf_samples, data_dict):
         obj = PyPDFForm(template_stream).fill(
             data_dict,
         )
+        assert len(obj.read()) == len(obj.stream)
         assert obj.read() == obj.stream
 
         expected = f.read()
@@ -99,6 +100,7 @@ def test_fill_non_simple_mode_font_liberation_serif_italic(
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -123,6 +125,7 @@ def test_fill_non_simple_mode_font_20(template_stream, pdf_samples, data_dict):
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -151,6 +154,7 @@ def test_fill_non_simple_mode_font_color_red(template_stream, pdf_samples, data_
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -180,6 +184,7 @@ def test_fill_non_simple_mode_offset_100(template_stream, pdf_samples, data_dict
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -206,6 +211,7 @@ def test_fill_non_simple_mode_wrap_2(template_stream, pdf_samples, data_dict):
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -243,6 +249,7 @@ def test_fill_non_simple_mode_with_customized_elements(
 
         expected = f.read()
 
+        assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
         for k, v in obj.elements.items():
@@ -294,7 +301,10 @@ def test_simple_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
             editable=True,
         )
 
-        assert obj.stream == f.read()
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
         assert (
             PyPDFForm(template_with_radiobutton_stream, simple_mode=True)
             .fill(
@@ -320,7 +330,10 @@ def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
             },
         )
 
-        assert obj.stream == f.read()
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
 
 
 def test_fill_sejda_and_read(sejda_template, pdf_samples, sejda_data):

@@ -7,9 +7,8 @@ from PyPDFForm import PyPDFForm2
 
 def test_filling_pdf_escape_pdf_form(tool_pdf_directory):
     with open(os.path.join(tool_pdf_directory, "pdf_escape_expected.pdf"), "rb+") as f:
-        assert (
-            PyPDFForm2(os.path.join(tool_pdf_directory, "pdf_escape.pdf"))
-            .fill(
+        expected = f.read()
+        result = PyPDFForm2(os.path.join(tool_pdf_directory, "pdf_escape.pdf")).fill(
                 {
                     "test_1": "test_1",
                     "test_2": "test_2",
@@ -20,6 +19,8 @@ def test_filling_pdf_escape_pdf_form(tool_pdf_directory):
                     "radio_1": 2,
                 }
             )
-            .read()
-            == f.read()
+        assert len(result.read()) == len(expected)
+        assert (
+            result.read()
+            == expected
         )

@@ -11,7 +11,9 @@ def test_pdf_form_with_pages_without_elements(issue_pdf_directory):
     )
 
     with open(os.path.join(issue_pdf_directory, "PPF-246-expected.pdf"), "rb+") as f:
-        assert obj.read() == f.read()
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_pdf_form_with_pages_without_elements_v1(issue_pdf_directory):
@@ -20,4 +22,6 @@ def test_pdf_form_with_pages_without_elements_v1(issue_pdf_directory):
     ).fill({"QCredit": "5000.63"})
 
     with open(os.path.join(issue_pdf_directory, "PPF-246-expected-v1.pdf"), "rb+") as f:
-        assert obj.read() == f.read()
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
