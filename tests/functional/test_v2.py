@@ -389,13 +389,6 @@ def test_draw_image_on_one_page_v2(template_stream, image_samples, pdf_samples):
         if os.name == "nt":
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
-        else:
-            with open(
-                os.path.join(pdf_samples, "sample_pdf_with_image_linux.pdf"), "rb+"
-            ) as f_linux:
-                expected = f_linux.read()
-                assert len(obj.stream) == len(expected)
-                assert obj.stream == expected
 
 
 def test_draw_png_image_on_one_page_v2(template_stream, image_samples, pdf_samples):
@@ -414,13 +407,6 @@ def test_draw_png_image_on_one_page_v2(template_stream, image_samples, pdf_sampl
         if os.name == "nt":
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
-        else:
-            with open(
-                os.path.join(pdf_samples, "sample_pdf_with_png_image_linux.pdf"), "rb+"
-            ) as f_linux:
-                expected = f_linux.read()
-                assert len(obj.stream) == len(expected)
-                assert obj.stream == expected
 
 
 def test_addition_operator_3_times_v2(template_stream, pdf_samples, data_dict):
