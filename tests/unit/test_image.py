@@ -37,12 +37,6 @@ def after_converted(image_samples):
         return f.read()
 
 
-@pytest.fixture
-def after_converted_linux(image_samples):
-    with open(os.path.join(image_samples, "after_converted_linux.jpg"), "rb+") as f:
-        return f.read()
-
-
 def test_is_image(image_stream):
     assert not ImageCore().is_image(b"bad_stream")
     assert ImageCore().is_image(image_stream)
@@ -67,9 +61,8 @@ def test_rotate_image(image_stream):
     rotated_buff.close()
 
 
-def test_any_image_to_jpg(before_converted, after_converted, after_converted_linux):
+def test_any_image_to_jpg(before_converted, after_converted):
     _converted = ImageCore().any_image_to_jpg(before_converted)
-    assert len(_converted) == (
-        len(after_converted) if os.name == "nt" else len(after_converted_linux)
-    )
-    assert _converted == (after_converted if os.name == "nt" else after_converted_linux)
+    if os.name == "nt":
+        assert len(_converted) == len(after_converted)
+        assert _converted == after_converted
