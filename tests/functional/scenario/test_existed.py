@@ -6,7 +6,9 @@ from PyPDFForm import PyPDFForm2
 
 
 def test_illinois_gun_bill_of_sale(existed_pdf_directory):
-    obj = PyPDFForm2(os.path.join(existed_pdf_directory, "illinois-gun-bill-of-sale.pdf")).fill(
+    obj = PyPDFForm2(
+        os.path.join(existed_pdf_directory, "illinois-gun-bill-of-sale.pdf")
+    ).fill(
         {
             "Date": "01-01",
             "20": "22",
@@ -40,7 +42,10 @@ def test_illinois_gun_bill_of_sale(existed_pdf_directory):
         }
     )
 
-    with open(os.path.join(existed_pdf_directory, "illinois-gun-bill-of-sale_expected.pdf"), "rb+") as f:
+    with open(
+        os.path.join(existed_pdf_directory, "illinois-gun-bill-of-sale_expected.pdf"),
+        "rb+",
+    ) as f:
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
