@@ -74,8 +74,8 @@ class Utils:
         """Converts a checkbox/radio element to a drawable text element."""
 
         _map = {
-            ElementType.radio: u"\u25CF",
-            ElementType.checkbox: u"\u2713",
+            ElementType.radio: "\u25CF",
+            ElementType.checkbox: "\u2713",
         }
         new_element = Element(
             element_name=element.name,

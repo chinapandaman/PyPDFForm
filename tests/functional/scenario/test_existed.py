@@ -53,7 +53,9 @@ def test_illinois_gun_bill_of_sale(existed_pdf_directory):
 
 def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory):
     obj = PyPDFForm2(
-        os.path.join(existed_pdf_directory, "illinois-real-estate-power-of-attorney-form.pdf")
+        os.path.join(
+            existed_pdf_directory, "illinois-real-estate-power-of-attorney-form.pdf"
+        )
     ).fill(
         {
             "undefined": "John Doe",
@@ -72,13 +74,16 @@ def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory):
             "Text5": "Somethree",
             "Text6": "Somefour",
             "Dated 1": "2019-01-01",
-            "My commission expires": "NOW"
+            "My commission expires": "NOW",
         }
     )
 
     with open(
-            os.path.join(existed_pdf_directory, "illinois-real-estate-power-of-attorney-form_expected.pdf"),
-            "rb+",
+        os.path.join(
+            existed_pdf_directory,
+            "illinois-real-estate-power-of-attorney-form_expected.pdf",
+        ),
+        "rb+",
     ) as f:
         expected = f.read()
         assert len(obj.read()) == len(expected)

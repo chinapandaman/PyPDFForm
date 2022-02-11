@@ -70,7 +70,7 @@ def checkbox_radio_to_draw():
     new_checkbox_to_draw = Utils().checkbox_radio_to_draw(new_checkbox_element, 9)
     new_radio_to_draw = Utils().checkbox_radio_to_draw(new_radio_element, 9)
 
-    assert new_checkbox_to_draw.value == u"\u2713"
+    assert new_checkbox_to_draw.value == "\u2713"
     assert new_checkbox_to_draw.type == ElementType.text
     assert new_checkbox_to_draw.name == "foo"
     assert new_checkbox_to_draw.font == "Helvetica"
@@ -80,7 +80,7 @@ def checkbox_radio_to_draw():
     assert new_checkbox_to_draw.text_y_offset == 0
     assert new_checkbox_to_draw.text_wrap_length == 100
 
-    assert new_radio_to_draw.value == u"\u25CF"
+    assert new_radio_to_draw.value == "\u25CF"
     assert new_radio_to_draw.type == ElementType.text
     assert new_radio_to_draw.name == "bar"
     assert new_radio_to_draw.font == "Helvetica"
