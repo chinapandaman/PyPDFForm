@@ -355,7 +355,6 @@ def test_draw_text_on_one_page_different_font_v2(
 
         if os.name == "nt":
             assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
         else:
             with open(
                 os.path.join(
