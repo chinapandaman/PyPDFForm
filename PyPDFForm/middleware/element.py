@@ -14,7 +14,7 @@ from .exceptions.element import (InvalidElementNameError,
 
 
 class ElementType(Enum):
-    """A enum to represent types of elements."""
+    """An enum to represent types of elements."""
 
     text = "text"
     checkbox = "checkbox"
