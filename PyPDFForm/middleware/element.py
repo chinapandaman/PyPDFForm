@@ -43,6 +43,8 @@ class Element:
             self.text_x_offset = None
             self.text_y_offset = None
             self.text_wrap_length = None
+            self.max_length = None
+            self.comb = None
 
     @property
     def name(self) -> str:

@@ -4,7 +4,7 @@
 from typing import Dict, Union
 
 from ..core.template import Template as TemplateCore
-from .element import Element
+from .element import Element, ElementType
 from .exceptions.template import InvalidTemplateError
 
 
@@ -54,10 +54,18 @@ class Template:
                 key = TemplateCore().get_element_key_v2(element)
 
                 element_type = TemplateCore().get_element_type_v2(element)
+
                 if element_type is not None:
-                    results[key] = Element(
+                    _element = Element(
                         element_name=key,
                         element_type=element_type,
                     )
+
+                    if _element.type == ElementType.text:
+                        _element.max_length = TemplateCore().get_text_field_max_length(element)
+                        if _element.max_length is not None and TemplateCore().is_text_field_comb(element):
+                            _element.comb = True
+
+                    results[key] = _element
 
         return results

@@ -307,6 +307,25 @@ class Template:
             - 2,
         )
 
+    @staticmethod
+    def get_text_field_max_length(element: "pdfrw.PdfDict") -> Union[int, None]:
+        """Returns the max length of the text field if presented or None."""
+
+        return (
+            int(element[TemplateCoreConstants().text_field_max_length_key])
+            if TemplateCoreConstants().text_field_max_length_key in element
+            else None
+        )
+
+    @staticmethod
+    def is_text_field_comb(element: "pdfrw.PdfDict") -> bool:
+        """Returns true if characters in a text field needs to be formatted into combs."""
+
+        try:
+            return "{0:b}".format(int(element["/Ff"]))[::-1][24] == 1
+        except IndexError:
+            return False
+
     def assign_uuid(self, pdf: bytes) -> bytes:
         """Appends a separator and uuid after each element's annotated name."""
 
