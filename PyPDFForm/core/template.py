@@ -322,7 +322,7 @@ class Template:
         """Returns true if characters in a text field needs to be formatted into combs."""
 
         try:
-            return "{0:b}".format(int(element["/Ff"]))[::-1][24] == 1
+            return "{0:b}".format(int(element["/Ff"]))[::-1][24] == "1"
         except IndexError:
             return False
 
