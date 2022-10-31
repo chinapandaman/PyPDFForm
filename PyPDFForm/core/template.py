@@ -11,6 +11,7 @@ from .constants import Merge as MergeConstants
 from .constants import Template as TemplateCoreConstants
 from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
 from .utils import Utils
+from math import sqrt
 
 
 class Template:
@@ -349,3 +350,47 @@ class Template:
             element.update(pdfrw.PdfDict(**update_dict))
 
         return Utils().generate_stream(pdf_file)
+
+    @staticmethod
+    def font_size_for_text_field_with_max_length(
+        element: "pdfrw.PdfDict",
+        max_length: int,
+    ) -> float:
+        """Calculates the font size for a text field with max length."""
+
+        area = abs(
+            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+        ) * abs(
+            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+        )
+
+        return sqrt(area / max_length)
+
+    @staticmethod
+    def get_draw_text_with_max_length_coordinates(
+        element: "pdfrw.PdfDict",
+        font_size: Union[float, int],
+        length: int,
+        comb: bool,
+    ) -> Tuple[Union[float, int], Union[float, int]]:
+        """Returns coordinates to draw at given a PDF form text field with max length."""
+
+        width = font_size * length * 96 / 72
+        height = font_size * 96 / 72
+        c_half_width = (
+           float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+           + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+        ) / 2
+        c_half_height = (
+            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+            + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+        ) / 2
+
+        return (
+            (c_half_width - width / 2 + c_half_width) / 2 - (
+                font_size * 0.5 * 96 / 72 if comb is True and length % 2 == 0 else 0
+            ),
+            (c_half_height - height / 2 + c_half_height) / 2,
+        )
