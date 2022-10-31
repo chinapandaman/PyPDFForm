@@ -2,6 +2,7 @@
 """Contains helpers for template."""
 
 import uuid
+from math import sqrt
 from typing import Dict, List, Tuple, Union
 
 import pdfrw
@@ -11,7 +12,6 @@ from .constants import Merge as MergeConstants
 from .constants import Template as TemplateCoreConstants
 from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
 from .utils import Utils
-from math import sqrt
 
 
 class Template:
@@ -382,8 +382,8 @@ class Template:
         width = font_size * length * 96 / 72
         height = font_size * 96 / 72
         c_half_width = (
-           float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-           + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+            + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
         ) / 2
         c_half_height = (
             float(element[TemplateCoreConstants().annotation_rectangle_key][1])
@@ -391,8 +391,7 @@ class Template:
         ) / 2
 
         return (
-            (c_half_width - width / 2 + c_half_width) / 2 - (
-                font_size * 0.5 * 96 / 72 if (comb is True and length % 2 == 0) else 0
-            ),
+            (c_half_width - width / 2 + c_half_width) / 2
+            - (font_size * 0.5 * 96 / 72 if (comb is True and length % 2 == 0) else 0),
             (c_half_height - height / 2 + c_half_height) / 2,
         )

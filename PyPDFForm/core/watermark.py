@@ -38,7 +38,7 @@ class Watermark:
             text_to_draw = ""
 
         if element.max_length is not None:
-            text_to_draw = text_to_draw[:element.max_length]
+            text_to_draw = text_to_draw[: element.max_length]
 
         canv.setFont(element.font, element.font_size)
         canv.setFillColorRGB(

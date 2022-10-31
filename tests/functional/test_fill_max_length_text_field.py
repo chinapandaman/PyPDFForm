@@ -9,20 +9,28 @@ from PyPDFForm import PyPDFForm2
 
 @pytest.fixture
 def expected_directory():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples", "max_length_text_field_related")
+    return os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "..",
+        "pdf_samples",
+        "max_length_text_field_related",
+    )
 
 
 def test_fill_max_length_text_field_all_chars(
     sample_template_with_max_length_text_field, expected_directory
 ):
-    with open(os.path.join(expected_directory, "max_length_text_field_all_chars.pdf"), "rb+") as f:
+    with open(
+        os.path.join(expected_directory, "max_length_text_field_all_chars.pdf"), "rb+"
+    ) as f:
         obj = PyPDFForm2(sample_template_with_max_length_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
                 "LastName": "XXXXXXXXXX",
                 "Awesomeness": True,
-                "Gender": 0
+                "Gender": 0,
             }
         )
 
@@ -35,14 +43,16 @@ def test_fill_max_length_text_field_all_chars(
 def test_fill_max_length_text_field_odd_chars(
     sample_template_with_max_length_text_field, expected_directory
 ):
-    with open(os.path.join(expected_directory, "max_length_text_field_odd_chars.pdf"), "rb+") as f:
+    with open(
+        os.path.join(expected_directory, "max_length_text_field_odd_chars.pdf"), "rb+"
+    ) as f:
         obj = PyPDFForm2(sample_template_with_max_length_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
                 "LastName": "XXX",
                 "Awesomeness": True,
-                "Gender": 0
+                "Gender": 0,
             }
         )
 
@@ -55,14 +65,16 @@ def test_fill_max_length_text_field_odd_chars(
 def test_fill_max_length_text_field_even_chars(
     sample_template_with_max_length_text_field, expected_directory
 ):
-    with open(os.path.join(expected_directory, "max_length_text_field_even_chars.pdf"), "rb+") as f:
+    with open(
+        os.path.join(expected_directory, "max_length_text_field_even_chars.pdf"), "rb+"
+    ) as f:
         obj = PyPDFForm2(sample_template_with_max_length_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
                 "LastName": "XXXX",
                 "Awesomeness": True,
-                "Gender": 0
+                "Gender": 0,
             }
         )
 
@@ -75,14 +87,16 @@ def test_fill_max_length_text_field_even_chars(
 def test_fill_comb_text_field_all_chars(
     sample_template_with_comb_text_field, expected_directory
 ):
-    with open(os.path.join(expected_directory, "comb_text_field_all_chars.pdf"), "rb+") as f:
+    with open(
+        os.path.join(expected_directory, "comb_text_field_all_chars.pdf"), "rb+"
+    ) as f:
         obj = PyPDFForm2(sample_template_with_comb_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
                 "LastName": "XXXXXXXXXX",
                 "Awesomeness": True,
-                "Gender": 0
+                "Gender": 0,
             }
         )
 
@@ -95,14 +109,16 @@ def test_fill_comb_text_field_all_chars(
 def test_fill_comb_text_field_odd_chars(
     sample_template_with_comb_text_field, expected_directory
 ):
-    with open(os.path.join(expected_directory, "comb_text_field_odd_chars.pdf"), "rb+") as f:
+    with open(
+        os.path.join(expected_directory, "comb_text_field_odd_chars.pdf"), "rb+"
+    ) as f:
         obj = PyPDFForm2(sample_template_with_comb_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
                 "LastName": "XXX",
                 "Awesomeness": True,
-                "Gender": 0
+                "Gender": 0,
             }
         )
 
@@ -115,14 +131,16 @@ def test_fill_comb_text_field_odd_chars(
 def test_fill_comb_text_field_even_chars(
     sample_template_with_comb_text_field, expected_directory
 ):
-    with open(os.path.join(expected_directory, "comb_text_field_even_chars.pdf"), "rb+") as f:
+    with open(
+        os.path.join(expected_directory, "comb_text_field_even_chars.pdf"), "rb+"
+    ) as f:
         obj = PyPDFForm2(sample_template_with_comb_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
                 "LastName": "XXXXXX",
                 "Awesomeness": True,
-                "Gender": 0
+                "Gender": 0,
             }
         )
 
