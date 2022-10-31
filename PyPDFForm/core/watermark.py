@@ -32,19 +32,24 @@ class Watermark:
         coordinate_x = args[2]
         coordinate_y = args[3]
 
-        if not element.value:
-            element.value = ""
+        text_to_draw = element.value
+
+        if not text_to_draw:
+            text_to_draw = ""
+
+        if element.max_length is not None:
+            text_to_draw = text_to_draw[:element.max_length]
 
         canv.setFont(element.font, element.font_size)
         canv.setFillColorRGB(
             element.font_color[0], element.font_color[1], element.font_color[2]
         )
 
-        if len(element.value) < element.text_wrap_length:
+        if len(text_to_draw) < element.text_wrap_length:
             canv.drawString(
                 coordinate_x + element.text_x_offset,
                 coordinate_y + element.text_y_offset,
-                element.value,
+                text_to_draw,
             )
         else:
             text_obj = canv.beginText(0, 0)
@@ -52,12 +57,12 @@ class Watermark:
             start = 0
             end = element.text_wrap_length
 
-            while end < len(element.value):
-                text_obj.textLine(element.value[start:end])
+            while end < len(text_to_draw):
+                text_obj.textLine(text_to_draw[start:end])
                 start += element.text_wrap_length
                 end += element.text_wrap_length
 
-            text_obj.textLine(element.value[start:])
+            text_obj.textLine(text_to_draw[start:])
 
             canv.saveState()
             canv.translate(

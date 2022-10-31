@@ -70,7 +70,7 @@ def test_fill(template_stream, data_dict):
     for element in TemplateCore().iterate_elements(result_stream):
         key = TemplateCore().get_element_key(element)
 
-        assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
+        assert element[TemplateConstants().field_flag_key] == pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
             assert element[TemplateConstants().checkbox_field_value_key] == (
@@ -102,7 +102,7 @@ def test_fill_v2(template_stream, data_dict):
     for element in TemplateCore().iterate_elements(result_stream):
         key = TemplateCore().get_element_key(element)
 
-        assert element[TemplateConstants().field_editable_key] != pdfrw.PdfObject(1)
+        assert element[TemplateConstants().field_flag_key] != pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
             assert (
@@ -135,7 +135,7 @@ def test_fill_sejda(sejda_template, sejda_data):
 
     for element in TemplateCore().iterate_elements(result_stream):
         assert element[TemplateConstants().parent_key][
-            TemplateConstants().field_editable_key
+            TemplateConstants().field_flag_key
         ] == pdfrw.PdfObject(1)
 
 
@@ -163,7 +163,7 @@ def test_fill_sejda_v2(sejda_template, sejda_data):
 
     for element in TemplateCore().iterate_elements(result_stream):
         assert element[TemplateConstants().parent_key][
-            TemplateConstants().field_editable_key
+            TemplateConstants().field_flag_key
         ] != pdfrw.PdfObject(1)
 
 
@@ -199,10 +199,10 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
         key = TemplateCore().get_element_key(element)
 
         if isinstance(data_dict[key], bool) or isinstance(data_dict[key], str):
-            assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
+            assert element[TemplateConstants().field_flag_key] == pdfrw.PdfObject(1)
         else:
             assert element[TemplateConstants().parent_key][
-                TemplateConstants().field_editable_key
+                TemplateConstants().field_flag_key
             ] == pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
@@ -242,7 +242,7 @@ def test_simple_fill(template_stream, data_dict):
                 element[TemplateConstants().text_field_value_key][1:-1]
                 == data_dict[key]
             )
-        assert element[TemplateConstants().field_editable_key] == pdfrw.PdfObject(1)
+        assert element[TemplateConstants().field_flag_key] == pdfrw.PdfObject(1)
 
 
 def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
@@ -284,4 +284,4 @@ def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dic
                 element[TemplateConstants().text_field_value_key][1:-1]
                 == data_dict[key]
             )
-        assert element[TemplateConstants().field_editable_key] != pdfrw.PdfObject(1)
+        assert element[TemplateConstants().field_flag_key] != pdfrw.PdfObject(1)

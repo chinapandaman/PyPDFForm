@@ -60,8 +60,8 @@ class Template:
         return "/Parent"
 
     @property
-    def field_editable_key(self) -> str:
-        """Used for identifying if an element is still editable for pdfrw parsed PDF form."""
+    def field_flag_key(self) -> str:
+        """Field flags specific to text fields."""
 
         return "/Ff"
 
@@ -76,6 +76,12 @@ class Template:
         """Used for identifying if an element is a checkbox or radio button."""
 
         return "/Btn"
+
+    @property
+    def text_field_max_length_key(self) -> str:
+        """Used for identifying a text field's max number of characters allowed."""
+
+        return "/MaxLen"
 
 
 class Merge:

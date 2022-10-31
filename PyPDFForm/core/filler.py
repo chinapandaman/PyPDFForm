@@ -41,7 +41,7 @@ class Filler:
                 key = TemplateCore().get_element_key(_element, sejda)
 
                 update_dict = {
-                    TemplateConstants().field_editable_key.replace(
+                    TemplateConstants().field_flag_key.replace(
                         "/", ""
                     ): pdfrw.PdfObject(1)
                 }
@@ -98,7 +98,7 @@ class Filler:
                     _element[TemplateConstants().parent_key].update(
                         pdfrw.PdfDict(
                             **{
-                                TemplateConstants().field_editable_key.replace(
+                                TemplateConstants().field_flag_key.replace(
                                     "/", ""
                                 ): pdfrw.PdfObject(1)
                             }
@@ -181,7 +181,7 @@ class Filler:
                             element[TemplateConstants().parent_key].update(
                                 pdfrw.PdfDict(
                                     **{
-                                        TemplateConstants().field_editable_key.replace(
+                                        TemplateConstants().field_flag_key.replace(
                                             "/", ""
                                         ): pdfrw.PdfObject(1)
                                     }
@@ -197,7 +197,7 @@ class Filler:
 
                 if not editable:
                     update_dict[
-                        TemplateConstants().field_editable_key.replace("/", "")
+                        TemplateConstants().field_flag_key.replace("/", "")
                     ] = pdfrw.PdfObject(1)
 
                 element.update(pdfrw.PdfDict(**update_dict))
@@ -263,11 +263,22 @@ class Filler:
                             ]
                         )
                 else:
+                    if elements[key].max_length:
+                        x, y = TemplateCore().get_draw_text_with_max_length_coordinates(
+                            _element,
+                            elements[key].font_size,
+                            len(elements[key].value),
+                            elements[key].comb,
+                            elements[key].max_length,
+                        )
+                    else:
+                        x, y = TemplateCore().get_draw_text_coordinates(_element)
+
                     texts_to_draw[page].append(
                         [
                             elements[key],
-                            TemplateCore().get_draw_text_coordinates(_element)[0],
-                            TemplateCore().get_draw_text_coordinates(_element)[1],
+                            x,
+                            y,
                         ]
                     )
 

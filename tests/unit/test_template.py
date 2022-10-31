@@ -495,6 +495,17 @@ def test_build_elements_v2_sejda(sejda_template, sejda_data):
         assert data_dict[k]
 
 
+def test_build_elements_v2_with_comb_text_field(sample_template_with_max_length_text_field,
+                                                sample_template_with_comb_text_field):
+    result = TemplateMiddleware().build_elements_v2(sample_template_with_max_length_text_field)
+    assert result["LastName"].max_length == 8
+    assert result["LastName"].comb is None
+
+    result = TemplateMiddleware().build_elements_v2(sample_template_with_comb_text_field)
+    assert result["LastName"].max_length == 7
+    assert result["LastName"].comb is True
+
+
 def test_get_draw_text_coordinates(template_stream):
     for element in TemplateCore().iterate_elements(template_stream):
         assert TemplateCore().get_draw_text_coordinates(element) == (
