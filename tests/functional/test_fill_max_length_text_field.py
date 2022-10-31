@@ -12,22 +12,6 @@ def expected_directory():
     return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples", "max_length_text_field_related")
 
 
-@pytest.fixture
-def sample_template_with_max_length_text_field(pdf_samples):
-    with open(
-            os.path.join(pdf_samples, "sample_template_with_max_length_text_field.pdf"), "rb+"
-    ) as f:
-        return f.read()
-
-
-@pytest.fixture
-def sample_template_with_comb_text_field(pdf_samples):
-    with open(
-            os.path.join(pdf_samples, "sample_template_with_comb_text_field.pdf"), "rb+"
-    ) as f:
-        return f.read()
-
-
 def test_fill_max_length_text_field_all_chars(
     sample_template_with_max_length_text_field, expected_directory
 ):
