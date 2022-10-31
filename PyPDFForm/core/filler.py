@@ -269,6 +269,7 @@ class Filler:
                             elements[key].font_size,
                             len(elements[key].value),
                             elements[key].comb,
+                            elements[key].max_length,
                         )
                     else:
                         x, y = TemplateCore().get_draw_text_coordinates(_element)

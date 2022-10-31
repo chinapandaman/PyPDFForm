@@ -374,9 +374,11 @@ class Template:
         font_size: Union[float, int],
         length: int,
         comb: bool,
+        max_length: int,
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw at given a PDF form text field with max length."""
 
+        length = min(length, max_length)
         width = font_size * length * 96 / 72
         height = font_size * 96 / 72
         c_half_width = (
@@ -390,7 +392,7 @@ class Template:
 
         return (
             (c_half_width - width / 2 + c_half_width) / 2 - (
-                font_size * 0.5 * 96 / 72 if comb is True and length % 2 == 0 else 0
+                font_size * 0.5 * 96 / 72 if (comb is True and length % 2 == 0) else 0
             ),
             (c_half_height - height / 2 + c_half_height) / 2,
         )
