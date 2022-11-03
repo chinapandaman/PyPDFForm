@@ -439,8 +439,7 @@ class WrapperV2:
         result = dict()
         result["type"] = "object"
         result["properties"] = {
-            key: value.schema_definition
-            for key, value in self.elements.items()
+            key: value.schema_definition for key, value in self.elements.items()
         }
 
         return result

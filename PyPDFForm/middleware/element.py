@@ -68,9 +68,7 @@ class Element:
             ElementType.radio: "integer",
         }
 
-        result = {
-            "type": mapping[self._type]
-        }
+        result = {"type": mapping[self._type]}
         if self._type == ElementType.text and self.max_length is not None:
             result["maxLength"] = self.max_length
 

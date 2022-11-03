@@ -3,8 +3,8 @@
 import os
 import random
 
-from jsonschema import validate, ValidationError
 import pytest
+from jsonschema import ValidationError, validate
 
 from PyPDFForm import PyPDFForm2
 from PyPDFForm.core.template import Template as TemplateCore
@@ -441,7 +441,7 @@ def test_generate_schema(sample_template_with_comb_text_field):
         "MiddleName": "Joe",
         "LastName": "XXXXXXX",
         "Awesomeness": True,
-        "Gender": 0
+        "Gender": 0,
     }
     schema = PyPDFForm2(sample_template_with_comb_text_field).generate_schema()
 
