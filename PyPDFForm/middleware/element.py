@@ -60,7 +60,7 @@ class Element:
 
     @property
     def schema_definition(self) -> dict:
-        """Json schema type of the element."""
+        """Json schema definition of the element."""
 
         mapping = {
             ElementType.text: "string",
