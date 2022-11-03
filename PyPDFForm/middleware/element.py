@@ -58,6 +58,24 @@ class Element:
 
         return self._type
 
+    @property
+    def schema_definition(self) -> dict:
+        """Json schema type of the element."""
+
+        mapping = {
+            ElementType.text: "string",
+            ElementType.checkbox: "boolean",
+            ElementType.radio: "integer",
+        }
+
+        result = {
+            "type": mapping[self._type]
+        }
+        if self._type == ElementType.text and self.max_length is not None:
+            result["maxLength"] = self.max_length
+
+        return result
+
     def validate_constants(self) -> None:
         """Validates unchangeable attributes of the element."""
 
