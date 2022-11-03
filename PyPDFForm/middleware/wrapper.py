@@ -433,6 +433,18 @@ class WrapperV2:
 
         return self
 
+    def generate_schema(self) -> dict:
+        """Generates a json schema for the PDF form template."""
+
+        result = dict()
+        result["type"] = "object"
+        result["properties"] = {
+            key: value.schema_definition
+            for key, value in self.elements.items()
+        }
+
+        return result
+
     @classmethod
     def register_font(
         cls, font_name: str, ttf_file: Union[bytes, str, BinaryIO]

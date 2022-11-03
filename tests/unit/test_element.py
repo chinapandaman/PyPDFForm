@@ -216,3 +216,12 @@ def test_invalid_constants(text_element):
         assert False
     except InvalidElementTypeError:
         assert True
+
+
+def test_element_schema_definition(text_element, checkbox_element, radiobutton_element):
+    assert text_element.schema_definition["type"] == "string"
+    assert checkbox_element.schema_definition["type"] == "boolean"
+    assert radiobutton_element.schema_definition["type"] == "integer"
+
+    text_element.max_length = 10
+    assert text_element.schema_definition["maxLength"] == 10

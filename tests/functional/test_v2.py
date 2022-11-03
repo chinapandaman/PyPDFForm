@@ -3,6 +3,7 @@
 import os
 import random
 
+from jsonschema import validate, ValidationError
 import pytest
 
 from PyPDFForm import PyPDFForm2
@@ -432,3 +433,36 @@ def test_addition_operator_3_times_sejda_v2(sejda_template, pdf_samples, sejda_d
         expected = f.read()
         assert len(result.read()) == len(expected)
         assert result.read() == expected
+
+
+def test_generate_schema(sample_template_with_comb_text_field):
+    data = {
+        "FirstName": "John",
+        "MiddleName": "Joe",
+        "LastName": "XXXXXXX",
+        "Awesomeness": True,
+        "Gender": 0
+    }
+    schema = PyPDFForm2(sample_template_with_comb_text_field).generate_schema()
+
+    assert schema["type"] == "object"
+    properties = schema["properties"]
+    for key, value in data.items():
+        if key == "LastName":
+            assert properties[key]["maxLength"] == 7
+        if isinstance(value, str):
+            assert properties[key]["type"] == "string"
+        elif isinstance(value, bool):
+            assert properties[key]["type"] == "boolean"
+        elif isinstance(value, int):
+            assert properties[key]["type"] == "integer"
+
+    validate(instance=data, schema=schema)
+    assert True
+
+    data["LastName"] = "XXXXXXXX"
+    try:
+        validate(instance=data, schema=schema)
+        assert False
+    except ValidationError:
+        assert True
