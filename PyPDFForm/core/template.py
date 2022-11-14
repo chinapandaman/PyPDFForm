@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple, Union
 
 import pdfrw
 
-from ..middleware.element import ElementType
+from ..middleware.element import ElementType, Element as ElementMiddleware
 from .constants import Merge as MergeConstants
 from .constants import Template as TemplateCoreConstants
 from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
@@ -371,16 +371,13 @@ class Template:
     @staticmethod
     def get_draw_text_with_max_length_coordinates(
         element: "pdfrw.PdfDict",
-        font_size: Union[float, int],
-        length: int,
-        comb: bool,
-        max_length: int,
+        element_middleware: "ElementMiddleware"
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw at given a PDF form text field with max length."""
 
-        length = min(length, max_length)
-        width = font_size * length * 96 / 72
-        height = font_size * 96 / 72
+        length = min(len(element_middleware.value), element_middleware.max_length)
+        width = element_middleware.font_size * length * 96 / 72
+        height = element_middleware.font_size * 96 / 72
         c_half_width = (
             float(element[TemplateCoreConstants().annotation_rectangle_key][0])
             + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
@@ -392,6 +389,7 @@ class Template:
 
         return (
             (c_half_width - width / 2 + c_half_width) / 2
-            - (font_size * 0.5 * 96 / 72 if (comb is True and length % 2 == 0) else 0),
+            - (element_middleware.font_size * 0.5 * 96 / 72 if (element_middleware.comb is True and length % 2 == 0)
+               else 0),
             (c_half_height - height / 2 + c_half_height) / 2,
         )
