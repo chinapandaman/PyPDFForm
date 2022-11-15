@@ -265,8 +265,7 @@ class Filler:
                 else:
                     if elements[key].max_length:
                         x, y = TemplateCore().get_draw_text_with_max_length_coordinates(
-                            _element,
-                            elements[key]
+                            _element, elements[key]
                         )
                     else:
                         x, y = TemplateCore().get_draw_text_coordinates(_element)

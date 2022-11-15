@@ -9,7 +9,7 @@ import pytest
 from PyPDFForm.core.constants import Merge as MergeCoreConstants
 from PyPDFForm.core.constants import Template as TemplateCoreConstants
 from PyPDFForm.core.template import Template as TemplateCore
-from PyPDFForm.middleware.element import ElementType, Element
+from PyPDFForm.middleware.element import Element, ElementType
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
 from PyPDFForm.middleware.template import Template as TemplateMiddleware
 
@@ -720,50 +720,63 @@ def test_get_draw_checkbox_radio_coordinates_v2():
 
 
 def test_get_text_field_max_length(sample_template_with_max_length_text_field):
-    for _page, elements in TemplateCore().get_elements_by_page_v2(sample_template_with_max_length_text_field).items():
+    for _page, elements in (
+        TemplateCore()
+        .get_elements_by_page_v2(sample_template_with_max_length_text_field)
+        .items()
+    ):
         for element in elements:
-            assert (
-                TemplateCore().get_text_field_max_length(element) is (
-                    8 if TemplateCore().get_element_key_v2(element) == "LastName" else None
-                )
+            assert TemplateCore().get_text_field_max_length(element) is (
+                8 if TemplateCore().get_element_key_v2(element) == "LastName" else None
             )
 
 
 def test_is_text_field_comb(sample_template_with_comb_text_field):
-    for _page, elements in TemplateCore().get_elements_by_page_v2(sample_template_with_comb_text_field).items():
+    for _page, elements in (
+        TemplateCore()
+        .get_elements_by_page_v2(sample_template_with_comb_text_field)
+        .items()
+    ):
         for element in elements:
-            assert (
-                TemplateCore().get_text_field_max_length(element) is (
-                    7 if TemplateCore().get_element_key_v2(element) == "LastName" else None
-                )
+            assert TemplateCore().get_text_field_max_length(element) is (
+                7 if TemplateCore().get_element_key_v2(element) == "LastName" else None
             )
             if TemplateCore().get_element_key_v2(element) == "LastName":
                 assert TemplateCore().is_text_field_comb(element) is True
 
 
 def test_font_size_for_text_field_with_max_length(sample_template_with_comb_text_field):
-    for _page, elements in TemplateCore().get_elements_by_page_v2(sample_template_with_comb_text_field).items():
+    for _page, elements in (
+        TemplateCore()
+        .get_elements_by_page_v2(sample_template_with_comb_text_field)
+        .items()
+    ):
         for element in elements:
             if TemplateCore().get_element_key_v2(element) == "LastName":
                 assert isinstance(
                     TemplateCore().font_size_for_text_field_with_max_length(element, 7),
-                    float
+                    float,
                 )
 
 
-def test_get_draw_text_with_max_length_coordinates(sample_template_with_comb_text_field):
+def test_get_draw_text_with_max_length_coordinates(
+    sample_template_with_comb_text_field,
+):
     _element = Element("foo", ElementType.text)
     _element.font_size = 12
     _element.value = "bar"
     _element.comb = True
     _element.max_length = 7
-    for _page, elements in TemplateCore().get_elements_by_page_v2(sample_template_with_comb_text_field).items():
+    for _page, elements in (
+        TemplateCore()
+        .get_elements_by_page_v2(sample_template_with_comb_text_field)
+        .items()
+    ):
         for element in elements:
             if TemplateCore().get_element_key_v2(element) == "LastName":
-                result = TemplateCore().get_draw_text_with_max_length_coordinates(element, _element)
-                assert isinstance(
-                    result,
-                    tuple
+                result = TemplateCore().get_draw_text_with_max_length_coordinates(
+                    element, _element
                 )
+                assert isinstance(result, tuple)
                 for each in result:
                     assert isinstance(each, float)
