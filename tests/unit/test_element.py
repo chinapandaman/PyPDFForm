@@ -30,6 +30,8 @@ def text_element_attributes():
         "text_x_offset",
         "text_y_offset",
         "text_wrap_length",
+        "max_length",
+        "comb"
     ]
 
 
