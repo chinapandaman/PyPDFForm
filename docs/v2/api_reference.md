@@ -119,6 +119,11 @@ Its values currently support the following:
 
 Returns the `stream`. This method allows the implementation of PyPDFForm2 to behave like a file object.
 
+### **generate_schema**()
+
+Returns a JSON schema for the PDF form. The schema can be used to validate the data `dict` 
+of the object.
+
 ### **register_font**(*font_name, ttf_file*)
 
 This class method takes a TTF font file stream and register it with the `font_name` specified. 
@@ -176,6 +181,10 @@ It currently supports the following based on the type of the element:
 2) A `boolean`, if the element is a `checkbox`.
 3) An `integer`, if the element is a `radio`.
 
+### **schema_definition**
+
+This attribute holds a `dict` which is the JSON schema definition of the element.
+
 ### **font** = *None*
 
 Only available if the `element_type` is `text`. Setting this `string` attribute will 
@@ -205,3 +214,13 @@ change the vertical offset used for the text filled on this element.
 
 Only available if the `element_type` is `text`. Setting this `integer` attribute will 
 change the maximum text wrap length used for the text filled on this element.
+
+### **max_length** = *None*
+
+Only available if the `element_type` is `text`. Setting this `integer` attribute will 
+change the maximum length allowed for text filled on this element.
+
+### **comb** = *None*
+
+Only available if the `element_type` is `text`. Setting this `boolean` attribute will 
+change if the text field is displayed in combed format.
