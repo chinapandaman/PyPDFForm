@@ -24,8 +24,8 @@ class Template:
 
         pdf = pdfrw.PdfReader(fdata=pdf)
 
-        for i in range(len(pdf.pages)):
-            elements = pdf.pages[i][TemplateCoreConstants().annotation_key]
+        for page in pdf.pages:
+            elements = page[TemplateCoreConstants().annotation_key]
             if elements:
                 for j in reversed(range(len(elements))):
                     elements.pop(j)
@@ -43,8 +43,8 @@ class Template:
 
         result = []
 
-        for i in range(len(pdf.pages)):
-            elements = pdf.pages[i][TemplateCoreConstants().annotation_key]
+        for page in pdf.pages:
+            elements = page[TemplateCoreConstants().annotation_key]
             if elements:
                 for element in elements:
                     if not sejda:
@@ -81,8 +81,8 @@ class Template:
 
         result = {}
 
-        for i in range(len(pdf.pages)):
-            elements = pdf.pages[i][TemplateCoreConstants().annotation_key]
+        for i, page in enumerate(pdf.pages):
+            elements = page[TemplateCoreConstants().annotation_key]
             result[i + 1] = []
             if elements:
                 for element in elements:
@@ -119,8 +119,8 @@ class Template:
 
         result = {}
 
-        for i in range(len(pdf.pages)):
-            elements = pdf.pages[i][TemplateCoreConstants().annotation_key]
+        for i, page in enumerate(pdf.pages):
+            elements = page[TemplateCoreConstants().annotation_key]
             result[i + 1] = []
             if elements:
                 for element in elements:
@@ -344,9 +344,7 @@ class Template:
             update_dict = {
                 TemplateCoreConstants().annotation_field_key.replace(
                     "/", ""
-                ): "{}{}{}".format(
-                    base_key, MergeConstants().separator, existed_uuid or _uuid
-                )
+                ): f"{base_key}{MergeConstants().separator}{existed_uuid or _uuid}"
             }
             element.update(pdfrw.PdfDict(**update_dict))
 

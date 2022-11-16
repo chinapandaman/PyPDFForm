@@ -156,11 +156,11 @@ class Watermark:
 
         pdf_file = pdfrw.PdfReader(fdata=pdf)
 
-        for i in range(len(pdf_file.pages)):
+        for i, page in enumerate(pdf_file.pages):
             if watermarks[i]:
                 watermark = pdfrw.PdfReader(fdata=watermarks[i])
                 if watermark.pages:
-                    merger = pdfrw.PageMerge(pdf_file.pages[i])
+                    merger = pdfrw.PageMerge(page)
                     merger.add(watermark.pages[0]).render()
 
         return Utils().generate_stream(pdf_file)
