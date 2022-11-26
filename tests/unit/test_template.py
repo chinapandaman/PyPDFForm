@@ -511,19 +511,6 @@ def test_build_elements_v2_with_comb_text_field(
     assert result["LastName"].comb is True
 
 
-def test_get_draw_text_coordinates(template_stream):
-    for element in TemplateCore().iterate_elements(template_stream):
-        assert TemplateCore().get_draw_text_coordinates(element) == (
-            float(element[TemplateCoreConstants().annotation_rectangle_key][0]),
-            (
-                float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-                + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
-            )
-            / 2
-            - 2,
-        )
-
-
 def test_get_draw_checkbox_radio_coordinates(sejda_template):
     for element in TemplateCore().iterate_elements(sejda_template):
         assert TemplateCore().get_draw_checkbox_radio_coordinates(element) == (
