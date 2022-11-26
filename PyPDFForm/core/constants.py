@@ -83,6 +83,12 @@ class Template:
 
         return "/MaxLen"
 
+    @property
+    def text_field_alignment_identifier(self) -> str:
+        """Used for identifying the text alignment of a text field."""
+
+        return "/Q"
+
 
 class Merge:
     """Contains constants for merging PDFs."""
