@@ -295,24 +295,25 @@ class Template:
 
     @staticmethod
     def get_draw_text_coordinates(
-        element: "pdfrw.PdfDict",
-        element_middleware: "ElementMiddleware"
+        element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw text at given a PDF form text element."""
 
         x = float(element[TemplateCoreConstants().annotation_rectangle_key][0])
         y = (
-                float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-                + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
-            ) / 2 - 2
+            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
+            + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+        ) / 2 - 2
 
-        alignment = element[TemplateCoreConstants().text_field_alignment_identifier] or 0
+        alignment = (
+            element[TemplateCoreConstants().text_field_alignment_identifier] or 0
+        )
         if int(alignment) == 1:
             length = len(element_middleware.value)
             width = element_middleware.font_size * length * 96 / 72
             c_half_width = (
-               float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-               + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+                float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+                + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
             ) / 2
             x = (c_half_width - width / 2.9 + c_half_width) / 2
 
