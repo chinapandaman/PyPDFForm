@@ -314,7 +314,11 @@ class Template:
                 float(element[TemplateCoreConstants().annotation_rectangle_key][0])
                 + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
             ) / 2
-            width = stringWidth(element_middleware.value, element_middleware.font, element_middleware.font_size)
+            width = stringWidth(
+                element_middleware.value,
+                element_middleware.font,
+                element_middleware.font_size,
+            )
             x = mid_point - width / 2
 
         return x, y
