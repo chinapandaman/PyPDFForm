@@ -6,6 +6,7 @@ from math import sqrt
 from typing import Dict, List, Tuple, Union
 
 import pdfrw
+from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.element import Element as ElementMiddleware
 from ..middleware.element import ElementType
@@ -309,13 +310,12 @@ class Template:
             element[TemplateCoreConstants().text_field_alignment_identifier] or 0
         )
         if int(alignment) == 1:
-            length = len(element_middleware.value)
-            width = element_middleware.font_size * length * 96 / 72
-            c_half_width = (
+            mid_point = (
                 float(element[TemplateCoreConstants().annotation_rectangle_key][0])
                 + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
             ) / 2
-            x = (c_half_width - width / 2.9 + c_half_width) / 2
+            width = stringWidth(element_middleware.value, element_middleware.font, element_middleware.font_size)
+            x = mid_point - width / 2
 
         return x, y
 
