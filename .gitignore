@@ -5,3 +5,5 @@ venv/
 venv-linux/
 htmlcov/
 .coverage
+test.py
+*.swp
