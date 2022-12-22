@@ -371,15 +371,10 @@ class Template:
     ) -> float:
         """Calculates the font size for a text field with max length."""
 
-        area = abs(
-            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-            - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
-        ) * abs(
+        return abs(
             float(element[TemplateCoreConstants().annotation_rectangle_key][1])
             - float(element[TemplateCoreConstants().annotation_rectangle_key][3])
         )
-
-        return sqrt(area / max_length)
 
     @staticmethod
     def get_draw_text_with_max_length_coordinates(
@@ -388,23 +383,28 @@ class Template:
         """Returns coordinates to draw at given a PDF form text field with max length."""
 
         length = min(len(element_middleware.value), element_middleware.max_length)
-        width = element_middleware.font_size * length * 96 / 72
-        height = element_middleware.font_size * 96 / 72
-        c_half_width = (
+        width_mid_point = (
             float(element[TemplateCoreConstants().annotation_rectangle_key][0])
             + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
         ) / 2
-        c_half_height = (
+        string_width = stringWidth(
+            element_middleware.value[:length],
+            element_middleware.font,
+            element_middleware.font_size,
+        )
+        x = width_mid_point - string_width / 2
+        string_height = element_middleware.font_size * 96 / 72
+        height_mid_point = (
             float(element[TemplateCoreConstants().annotation_rectangle_key][1])
             + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
         ) / 2
 
         return (
-            (c_half_width - width / 2 + c_half_width) / 2
+            x
             - (
-                element_middleware.font_size * 0.5 * 96 / 72
+                stringWidth(element_middleware.value[:1], element_middleware.font, element_middleware.font_size)
                 if (element_middleware.comb is True and length % 2 == 0)
                 else 0
             ),
-            (c_half_height - height / 2 + c_half_height) / 2,
+            (height_mid_point - string_height / 2 + height_mid_point) / 2,
         )
