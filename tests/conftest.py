@@ -34,6 +34,14 @@ def sample_template_with_comb_text_field(pdf_samples):
 
 
 @pytest.fixture
+def sample_template_with_right_aligned_text_field(pdf_samples):
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_right_aligned_text_field.pdf"), "rb+"
+    ) as f:
+        return f.read()
+
+
+@pytest.fixture
 def sejda_data():
     return {
         "date": "01-01",
