@@ -407,7 +407,11 @@ class Template:
         return (
             x
             - (
-                stringWidth(element_middleware.value[:1], element_middleware.font, element_middleware.font_size)
+                stringWidth(
+                    element_middleware.value[:1],
+                    element_middleware.font,
+                    element_middleware.font_size,
+                )
                 if (element_middleware.comb is True and length % 2 == 0)
                 else 0
             ),
