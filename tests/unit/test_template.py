@@ -744,26 +744,3 @@ def test_font_size_for_text_field_with_max_length(sample_template_with_comb_text
                     TemplateCore().font_size_for_text_field_with_max_length(element, 7),
                     float,
                 )
-
-
-def test_get_draw_text_with_max_length_coordinates(
-    sample_template_with_comb_text_field,
-):
-    _element = Element("foo", ElementType.text)
-    _element.font_size = 12
-    _element.value = "bar"
-    _element.comb = True
-    _element.max_length = 7
-    for _page, elements in (
-        TemplateCore()
-        .get_elements_by_page_v2(sample_template_with_comb_text_field)
-        .items()
-    ):
-        for element in elements:
-            if TemplateCore().get_element_key_v2(element) == "LastName":
-                result = TemplateCore().get_draw_text_with_max_length_coordinates(
-                    element, _element
-                )
-                assert isinstance(result, tuple)
-                for each in result:
-                    assert isinstance(each, float)
