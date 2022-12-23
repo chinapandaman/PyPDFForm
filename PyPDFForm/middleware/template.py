@@ -84,7 +84,6 @@ class Template:
 
                         results[key].number_of_options += 1
                         continue
-                        
 
                     results[key] = _element
 
