@@ -290,9 +290,13 @@ class Template:
         ) / 2
 
         return (
-            width_mid_point - stringWidth(
-                element_middleware.value, element_middleware.font, element_middleware.font_size
-            ) / 2,
+            width_mid_point
+            - stringWidth(
+                element_middleware.value,
+                element_middleware.font,
+                element_middleware.font_size,
+            )
+            / 2,
             (height_mid_point - string_height / 2 + height_mid_point) / 2,
         )
 
