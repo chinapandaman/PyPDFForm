@@ -466,3 +466,26 @@ def test_generate_schema(sample_template_with_comb_text_field):
         assert False
     except ValidationError:
         assert True
+
+
+def test_fill_right_aligned(sample_template_with_right_aligned_text_field, pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_filled_right_aligned.pdf"), "rb+") as f:
+        obj = PyPDFForm2(sample_template_with_right_aligned_text_field).fill(
+            {
+                "name": "Hans Mustermann",
+                "fulladdress": "Musterstr. 12, 82903 Musterdorf, Musterland",
+                "advisorname": "Karl Test",
+            },
+        )
+        assert len(obj.read()) == len(obj.stream)
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+        for page, elements in (
+            TemplateCore().get_elements_by_page_v2(obj.read()).items()
+        ):
+            assert not elements
