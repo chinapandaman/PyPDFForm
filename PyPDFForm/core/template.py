@@ -330,7 +330,10 @@ class Template:
             if int(alignment) == 1:
                 x = mid_point - width / 2
             elif int(alignment) == 2:
-                x = float(element[TemplateCoreConstants().annotation_rectangle_key][2]) - width
+                x = (
+                    float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+                    - width
+                )
 
         return x, y
 
