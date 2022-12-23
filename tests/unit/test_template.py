@@ -692,20 +692,6 @@ def test_find_pattern_match_sejda(sejda_template, sejda_data):
         assert check
 
 
-def test_get_draw_checkbox_radio_coordinates_v2():
-    element = pdfrw.PdfDict(
-        **{
-            TemplateCoreConstants().annotation_rectangle_key.replace("/", ""): [
-                0,
-                0,
-                16,
-                16,
-            ]
-        }
-    )
-    assert TemplateCore().get_draw_checkbox_radio_coordinates_v2(element, 12) == (4, 4)
-
-
 def test_get_text_field_max_length(sample_template_with_max_length_text_field):
     for _page, elements in (
         TemplateCore()

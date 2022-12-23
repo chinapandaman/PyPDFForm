@@ -275,23 +275,25 @@ class Template:
     @staticmethod
     def get_draw_checkbox_radio_coordinates_v2(
         element: "pdfrw.PdfDict",
-        font_size: Union[float, int],
+        element_middleware: "ElementMiddleware",
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw at given a PDF form checkbox/radio element."""
 
-        side = font_size * 96 / 72
-        c_half_width = (
+        string_height = element_middleware.font_size * 96 / 72
+        width_mid_point = (
             float(element[TemplateCoreConstants().annotation_rectangle_key][0])
             + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
         ) / 2
-        c_half_height = (
+        height_mid_point = (
             float(element[TemplateCoreConstants().annotation_rectangle_key][1])
             + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
         ) / 2
 
         return (
-            (c_half_width - side / 2 + c_half_width) / 2,
-            (c_half_height - side / 2 + c_half_height) / 2,
+            width_mid_point - stringWidth(
+                element_middleware.value, element_middleware.font, element_middleware.font_size
+            ) / 2,
+            (height_mid_point - string_height / 2 + height_mid_point) / 2,
         )
 
     @staticmethod
