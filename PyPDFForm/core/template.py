@@ -371,10 +371,15 @@ class Template:
     ) -> float:
         """Calculates the font size for a text field with max length."""
 
-        return abs(
+        area = abs(
+            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+        ) * abs(
             float(element[TemplateCoreConstants().annotation_rectangle_key][1])
             - float(element[TemplateCoreConstants().annotation_rectangle_key][3])
         )
+
+        return sqrt(area / max_length)
 
     @staticmethod
     def get_draw_text_with_max_length_coordinates(
