@@ -46,6 +46,9 @@ class Element:
             self.max_length = None
             self.comb = None
 
+        if element_type == ElementType.radio:
+            self.number_of_options = 0
+
     @property
     def name(self) -> str:
         """Name of the element."""
@@ -71,6 +74,8 @@ class Element:
         result = {"type": mapping[self._type]}
         if self._type == ElementType.text and self.max_length is not None:
             result["maxLength"] = self.max_length
+        if self._type == ElementType.radio:
+            result["maximum"] = self.number_of_options - 1
 
         return result
 

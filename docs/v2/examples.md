@@ -374,3 +374,52 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
 
     output.write(filled_pdf.read())
 ```
+
+## Generate JSON schema
+
+This example demos how to generate a JSON schema for a PDF form.
+
+```python
+import json
+import os
+
+from PyPDFForm import PyPDFForm2
+
+PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
+    os.path.expanduser("~/Downloads"), "sample_template.pdf"
+)  # Change this to where you downloaded the sample PDF form
+
+print(
+    json.dumps(PyPDFForm2(
+        PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM
+    ).generate_schema(), indent=4, sort_keys=True)
+)
+```
+
+The above script will print the following JSON schema:
+
+```json
+{
+    "properties": {
+        "check": {
+            "type": "boolean"
+        },
+        "check_2": {
+            "type": "boolean"
+        },
+        "check_3": {
+            "type": "boolean"
+        },
+        "test": {
+            "type": "string"
+        },
+        "test_2": {
+            "type": "string"
+        },
+        "test_3": {
+            "type": "string"
+        }
+    },
+    "type": "object"
+}
+```
