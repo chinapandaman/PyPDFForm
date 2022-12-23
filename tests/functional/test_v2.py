@@ -469,6 +469,7 @@ def test_generate_schema(sample_template_with_comb_text_field):
         assert True
 
     data["LastName"] = "XXXXXXX"
+    data["Gender"] = 1
     validate(instance=data, schema=schema)
     assert True
 
