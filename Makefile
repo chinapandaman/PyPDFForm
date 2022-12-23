@@ -3,3 +3,6 @@ build-all:
 
 test-all:
 	bash ./scripts/test.sh
+
+clear-cache:
+	bash ./scripts/clear_cache.sh
