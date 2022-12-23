@@ -78,6 +78,14 @@ class Template:
                                 )
                             )
 
+                    if _element.type == ElementType.radio:
+                        if key not in results:
+                            results[key] = _element
+
+                        results[key].number_of_options += 1
+                        continue
+                        
+
                     results[key] = _element
 
         return results

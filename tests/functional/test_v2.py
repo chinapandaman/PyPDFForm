@@ -456,11 +456,23 @@ def test_generate_schema(sample_template_with_comb_text_field):
             assert properties[key]["type"] == "boolean"
         elif isinstance(value, int):
             assert properties[key]["type"] == "integer"
+            assert properties[key]["maximum"] == 1
 
     validate(instance=data, schema=schema)
     assert True
 
     data["LastName"] = "XXXXXXXX"
+    try:
+        validate(instance=data, schema=schema)
+        assert False
+    except ValidationError:
+        assert True
+
+    data["LastName"] = "XXXXXXX"
+    validate(instance=data, schema=schema)
+    assert True
+
+    data["Gender"] = 2
     try:
         validate(instance=data, schema=schema)
         assert False
