@@ -398,12 +398,12 @@ pprint(
 
 The above script will print the following JSON schema:
 
-```json
-{'properties': {'check': {'type': 'boolean'},                                                                                                         
-                'check_2': {'type': 'boolean'},                                                                                                       
-                'check_3': {'type': 'boolean'},                                                                                                       
-                'test': {'type': 'string'},                                                                                                           
-                'test_2': {'type': 'string'},                                                                                                         
-                'test_3': {'type': 'string'}},                                                                                                        
+```
+{'properties': {'check': {'type': 'boolean'},
+                'check_2': {'type': 'boolean'},
+                'check_3': {'type': 'boolean'},
+                'test': {'type': 'string'},
+                'test_2': {'type': 'string'},
+                'test_3': {'type': 'string'}},
  'type': 'object'}
 ```
