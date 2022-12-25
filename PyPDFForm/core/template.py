@@ -2,7 +2,6 @@
 """Contains helpers for template."""
 
 import uuid
-from math import sqrt
 from typing import Dict, List, Tuple, Union
 
 import pdfrw
@@ -379,10 +378,10 @@ class Template:
         return Utils().generate_stream(pdf_file)
 
     @staticmethod
-    def get_character_x_coordinates(
+    def get_character_x_paddings(
         element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
     ) -> List[float]:
-        """Returns each character's x coordinates for combed text fields."""
+        """Returns paddings between characters for combed text fields."""
 
         rect_width = abs(
             float(element[TemplateCoreConstants().annotation_rectangle_key][0])

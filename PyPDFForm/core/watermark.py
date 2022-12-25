@@ -48,10 +48,10 @@ class Watermark:
         if element.comb is True:
             for i, char in enumerate(text_to_draw):
                 canv.drawString(
-                        coordinate_x + element.character_x_coordinates[i] + element.text_x_offset,
-                        coordinate_y + element.text_y_offset,
-                        char
-                        )
+                    coordinate_x + element.character_paddings[i] + element.text_x_offset,
+                    coordinate_y + element.text_y_offset,
+                    char
+                )
         elif len(text_to_draw) < element.text_wrap_length:
             canv.drawString(
                 coordinate_x + element.text_x_offset,

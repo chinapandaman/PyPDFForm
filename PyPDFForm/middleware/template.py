@@ -44,8 +44,8 @@ class Template:
         return results
 
     @staticmethod
-    def set_character_x_coordinates(pdf_stream: bytes, eles: Dict[str, "Element"]) -> Dict[str, "Element"]:
-        """Sets each character's x coordinates for combed text fields."""
+    def set_character_paddings(pdf_stream: bytes, eles: Dict[str, "Element"]) -> Dict[str, "Element"]:
+        """Sets paddings between characters for combed text fields."""
         
         for elements in TemplateCore().get_elements_by_page_v2(pdf_stream).values():
             for element in elements:
@@ -53,7 +53,7 @@ class Template:
                 _element = eles[key]
 
                 if _element.type == ElementType.text and _element.comb is True:
-                    _element.character_x_coordinates = TemplateCore().get_character_x_coordinates(element, _element)
+                    _element.character_paddings = TemplateCore().get_character_x_paddings(element, _element)
 
         return eles
 
