@@ -356,8 +356,10 @@ class WrapperV2:
         for key, value in data.items():
             if key in self.elements:
                 self.elements[key].value = value
-        
-        self.elements = TemplateMiddleware().set_character_x_paddings(self.stream, self.elements)
+
+        self.elements = TemplateMiddleware().set_character_x_paddings(
+            self.stream, self.elements
+        )
         self.stream = TemplateCore().remove_all_elements(
             FillerCore().fill_v2(self.stream, self.elements)
         )

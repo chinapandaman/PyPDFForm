@@ -153,12 +153,8 @@ def test_fill_comb_text_field_even_chars(
 def test_fill_comb_text_field_void(
     sample_template_with_comb_text_field, expected_directory
 ):
-    with open(
-        os.path.join(expected_directory, "comb_text_field_void.pdf"), "rb+"
-    ) as f:
-        obj = PyPDFForm2(sample_template_with_comb_text_field).fill(
-            {}
-        )
+    with open(os.path.join(expected_directory, "comb_text_field_void.pdf"), "rb+") as f:
+        obj = PyPDFForm2(sample_template_with_comb_text_field).fill({})
 
         expected = f.read()
 
@@ -170,7 +166,10 @@ def test_fill_comb_text_field_even_chars_right_aligned(
     sample_template_with_comb_text_field_right_aligned, expected_directory
 ):
     with open(
-        os.path.join(expected_directory, "comb_text_field_even_chars_right_aligned.pdf"), "rb+"
+        os.path.join(
+            expected_directory, "comb_text_field_even_chars_right_aligned.pdf"
+        ),
+        "rb+",
     ) as f:
         obj = PyPDFForm2(sample_template_with_comb_text_field_right_aligned).fill(
             {

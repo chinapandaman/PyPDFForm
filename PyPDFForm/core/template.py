@@ -388,7 +388,7 @@ class Template:
             - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
         )
         length = min(len(element_middleware.value or ""), element_middleware.max_length)
-        
+
         char_rect_width = rect_width / element_middleware.max_length
 
         result = []
@@ -397,9 +397,11 @@ class Template:
         for char in (element_middleware.value or "")[:length]:
             current_mid_point = current_x + char_rect_width / 2
             result.append(
-                current_mid_point - stringWidth(
+                current_mid_point
+                - stringWidth(
                     char, element_middleware.font, element_middleware.font_size
-                ) / 2
+                )
+                / 2
             )
             current_x += char_rect_width
 
@@ -432,7 +434,7 @@ class Template:
                 string_width = element_middleware.character_paddings[-1] + stringWidth(
                     element_middleware.value[:length][-1],
                     element_middleware.font,
-                    element_middleware.font_size
+                    element_middleware.font_size,
                 )
 
             if int(alignment) == 1:
@@ -440,7 +442,7 @@ class Template:
             elif int(alignment) == 2:
                 x = (
                     float(element[TemplateCoreConstants().annotation_rectangle_key][2])
-                    - string_width 
+                    - string_width
                 )
 
         string_height = element_middleware.font_size * 96 / 72
@@ -452,12 +454,19 @@ class Template:
         return (
             x
             - (
-                element_middleware.character_paddings[0] + stringWidth(
+                element_middleware.character_paddings[0]
+                + stringWidth(
                     element_middleware.value[:1],
                     element_middleware.font,
                     element_middleware.font_size,
-                ) / 2
-                if (element_middleware.comb is True and length != 0 and length % 2 == 0 and int(alignment) == 1)
+                )
+                / 2
+                if (
+                    element_middleware.comb is True
+                    and length != 0
+                    and length % 2 == 0
+                    and int(alignment) == 1
+                )
                 else 0
             ),
             (height_mid_point - string_height / 2 + height_mid_point) / 2,

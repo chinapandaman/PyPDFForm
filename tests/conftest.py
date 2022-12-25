@@ -36,7 +36,10 @@ def sample_template_with_comb_text_field(pdf_samples):
 @pytest.fixture
 def sample_template_with_comb_text_field_right_aligned(pdf_samples):
     with open(
-        os.path.join(pdf_samples, "sample_template_with_comb_text_field_right_aligned.pdf"), "rb+"
+        os.path.join(
+            pdf_samples, "sample_template_with_comb_text_field_right_aligned.pdf"
+        ),
+        "rb+",
     ) as f:
         return f.read()
 

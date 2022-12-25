@@ -52,11 +52,7 @@ def test_illinois_gun_bill_of_sale(existed_pdf_directory):
 
 
 def test_ds82(existed_pdf_directory):
-    obj = PyPDFForm2(
-        os.path.join(
-            existed_pdf_directory, "DS82.pdf"
-        )
-    ).fill(
+    obj = PyPDFForm2(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
         {
             "LastName": "Smith",
         }
@@ -75,11 +71,7 @@ def test_ds82(existed_pdf_directory):
 
 
 def test_ds82_all_chars_lowercase(existed_pdf_directory):
-    obj = PyPDFForm2(
-        os.path.join(
-            existed_pdf_directory, "DS82.pdf"
-        )
-    ).fill(
+    obj = PyPDFForm2(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
         {
             "LastName": "x" * 30,
         }
@@ -98,11 +90,7 @@ def test_ds82_all_chars_lowercase(existed_pdf_directory):
 
 
 def test_ds82_all_chars_uppercase(existed_pdf_directory):
-    obj = PyPDFForm2(
-        os.path.join(
-            existed_pdf_directory, "DS82.pdf"
-        )
-    ).fill(
+    obj = PyPDFForm2(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
         {
             "LastName": "X" * 30,
         }
@@ -121,11 +109,7 @@ def test_ds82_all_chars_uppercase(existed_pdf_directory):
 
 
 def test_ds82_mixed_case(existed_pdf_directory):
-    obj = PyPDFForm2(
-        os.path.join(
-            existed_pdf_directory, "DS82.pdf"
-        )
-    ).fill(
+    obj = PyPDFForm2(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
         {
             "LastName": "xX" * 10,
         }
