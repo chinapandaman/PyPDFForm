@@ -321,7 +321,7 @@ class Template:
                 + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
             ) / 2
             width = stringWidth(
-                element_middleware.value,
+                element_middleware.value or "",
                 element_middleware.font,
                 element_middleware.font_size,
             )
@@ -387,14 +387,14 @@ class Template:
             float(element[TemplateCoreConstants().annotation_rectangle_key][0])
             - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
         )
-        length = min(len(element_middleware.value), element_middleware.max_length)
+        length = min(len(element_middleware.value or ""), element_middleware.max_length)
         
         char_rect_width = rect_width / element_middleware.max_length
 
         result = []
 
         current_x = 0
-        for char in element_middleware.value[:length]:
+        for char in (element_middleware.value or "")[:length]:
             current_mid_point = current_x + char_rect_width / 2
             result.append(
                 current_mid_point - stringWidth(
@@ -411,7 +411,7 @@ class Template:
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw at given a PDF form text field with max length."""
 
-        length = min(len(element_middleware.value), element_middleware.max_length)
+        length = min(len(element_middleware.value or ""), element_middleware.max_length)
 
         alignment = (
             element[TemplateCoreConstants().text_field_alignment_identifier] or 0
@@ -424,7 +424,7 @@ class Template:
                 + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
             ) / 2
             string_width = stringWidth(
-                element_middleware.value[:length],
+                (element_middleware.value or "")[:length],
                 element_middleware.font,
                 element_middleware.font_size,
             )
