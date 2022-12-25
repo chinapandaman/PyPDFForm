@@ -379,23 +379,32 @@ class Template:
         return Utils().generate_stream(pdf_file)
 
     @staticmethod
-    def get_space_between_characters(
+    def get_character_x_coordinates(
         element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
-    ) -> float:
-        """Returns space between characters for combed text fields."""
+    ) -> List[float]:
+        """Returns each character's x coordinates for combed text fields."""
 
         rect_width = abs(
             float(element[TemplateCoreConstants().annotation_rectangle_key][0])
             - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
         )
+        length = min(len(element_middleware.value), element_middleware.max_length)
+        
+        char_rect_width = rect_width / element_middleware.max_length
 
-        string_width = stringWidth(
-            "".join(["x" for _ in range(element_middleware.max_length)]),
-            element_middleware.font,
-            element_middleware.font_size
-        )
+        result = []
 
-        return (rect_width - string_width) / element_middleware.max_length
+        current_x = 0
+        for char in element_middleware.value[:length]:
+            current_mid_point = current_x + char_rect_width / 2
+            result.append(
+                    current_mid_point - stringWidth(
+                        char, element_middleware.font, element_middleware.font_size
+                        ) / 2
+                    )
+            current_x += char_rect_width
+
+        return result
 
     @staticmethod
     def get_draw_text_with_max_length_coordinates(

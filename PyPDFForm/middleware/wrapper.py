@@ -353,10 +353,11 @@ class WrapperV2:
     ) -> "WrapperV2":
         """Fill a PDF form."""
 
-        self.elements = TemplateMiddleware().set_space_between_characters(self.stream, self.elements)
         for key, value in data.items():
             if key in self.elements:
                 self.elements[key].value = value
+        
+        self.elements = TemplateMiddleware().set_character_x_coordinates(self.stream, self.elements)
 
         self.stream = TemplateCore().remove_all_elements(
             FillerCore().fill_v2(self.stream, self.elements)

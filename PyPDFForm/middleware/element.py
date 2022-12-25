@@ -45,7 +45,7 @@ class Element:
             self.text_wrap_length = None
             self.max_length = None
             self.comb = None
-            self.space_between_characters = 0
+            self.character_x_coordinates = 0
 
         if element_type == ElementType.radio:
             self.number_of_options = 0

@@ -44,8 +44,8 @@ class Template:
         return results
 
     @staticmethod
-    def set_space_between_characters(pdf_stream: bytes, eles: Dict[str, "Element"]) -> Dict[str, "Element"]:
-        """Sets space between characters for combed text fields."""
+    def set_character_x_coordinates(pdf_stream: bytes, eles: Dict[str, "Element"]) -> Dict[str, "Element"]:
+        """Sets each character's x coordinates for combed text fields."""
         
         for elements in TemplateCore().get_elements_by_page_v2(pdf_stream).values():
             for element in elements:
@@ -53,7 +53,7 @@ class Template:
                 _element = eles[key]
 
                 if _element.type == ElementType.text and _element.comb is True:
-                    _element.space_between_characters = TemplateCore().get_space_between_characters(element, _element)
+                    _element.character_x_coordinates = TemplateCore().get_character_x_coordinates(element, _element)
 
         return eles
 
