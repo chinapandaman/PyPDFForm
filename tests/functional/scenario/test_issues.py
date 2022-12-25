@@ -40,3 +40,7 @@ def test_pdf_form_with_central_aligned_text_fields(issue_pdf_directory):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_pdf_form_with_central_aligned_text_fields_void(issue_pdf_directory):
+    assert PyPDFForm2(os.path.join(issue_pdf_directory, "PPF-285.pdf")).fill({}).read()

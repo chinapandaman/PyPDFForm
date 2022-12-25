@@ -213,7 +213,8 @@ change the vertical offset used for the text filled on this element.
 ### **text_wrap_length** = *None*
 
 Only available if the `element_type` is `text`. Setting this `integer` attribute will 
-change the maximum text wrap length used for the text filled on this element.
+change the maximum text wrap length used for the text filled on this element. NOTE: Text 
+wrapping is NOT supported for text fields with `comb`set to `True`. 
 
 ### **max_length** = *None*
 

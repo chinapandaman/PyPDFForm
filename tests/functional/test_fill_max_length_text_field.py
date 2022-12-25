@@ -148,3 +148,41 @@ def test_fill_comb_text_field_even_chars(
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_fill_comb_text_field_void(
+    sample_template_with_comb_text_field, expected_directory
+):
+    with open(
+        os.path.join(expected_directory, "comb_text_field_void.pdf"), "rb+"
+    ) as f:
+        obj = PyPDFForm2(sample_template_with_comb_text_field).fill(
+            {}
+        )
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
+def test_fill_comb_text_field_even_chars_right_aligned(
+    sample_template_with_comb_text_field_right_aligned, expected_directory
+):
+    with open(
+        os.path.join(expected_directory, "comb_text_field_even_chars_right_aligned.pdf"), "rb+"
+    ) as f:
+        obj = PyPDFForm2(sample_template_with_comb_text_field_right_aligned).fill(
+            {
+                "FirstName": "John",
+                "MiddleName": "Joe",
+                "LastName": "XXXXXX",
+                "Awesomeness": True,
+                "Gender": 0,
+            }
+        )
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected

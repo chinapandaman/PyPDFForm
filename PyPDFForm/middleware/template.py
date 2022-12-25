@@ -44,6 +44,20 @@ class Template:
         return results
 
     @staticmethod
+    def set_character_x_paddings(pdf_stream: bytes, eles: Dict[str, "Element"]) -> Dict[str, "Element"]:
+        """Sets paddings between characters for combed text fields."""
+        
+        for elements in TemplateCore().get_elements_by_page_v2(pdf_stream).values():
+            for element in elements:
+                key = TemplateCore().get_element_key_v2(element)
+                _element = eles[key]
+
+                if _element.type == ElementType.text and _element.comb is True:
+                    _element.character_paddings = TemplateCore().get_character_x_paddings(element, _element)
+
+        return eles
+
+    @staticmethod
     def build_elements_v2(pdf_stream: bytes) -> Dict[str, "Element"]:
         """Builds an element dict given a PDF form stream."""
 
@@ -70,13 +84,6 @@ class Template:
                             and TemplateCore().is_text_field_comb(element)
                         ):
                             _element.comb = True
-
-                        if _element.max_length is not None:
-                            _element.font_size = (
-                                TemplateCore().font_size_for_text_field_with_max_length(
-                                    element, _element.max_length
-                                )
-                            )
 
                     if _element.type == ElementType.radio:
                         if key not in results:

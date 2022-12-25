@@ -51,6 +51,98 @@ def test_illinois_gun_bill_of_sale(existed_pdf_directory):
         assert obj.read() == expected
 
 
+def test_ds82(existed_pdf_directory):
+    obj = PyPDFForm2(
+        os.path.join(
+            existed_pdf_directory, "DS82.pdf"
+        )
+    ).fill(
+        {
+            "LastName": "Smith",
+        }
+    )
+
+    with open(
+        os.path.join(
+            existed_pdf_directory,
+            "DS82_expected.pdf",
+        ),
+        "rb+",
+    ) as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_ds82_all_chars_lowercase(existed_pdf_directory):
+    obj = PyPDFForm2(
+        os.path.join(
+            existed_pdf_directory, "DS82.pdf"
+        )
+    ).fill(
+        {
+            "LastName": "x" * 30,
+        }
+    )
+
+    with open(
+        os.path.join(
+            existed_pdf_directory,
+            "DS82_expected_all_chars_lowercase.pdf",
+        ),
+        "rb+",
+    ) as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_ds82_all_chars_uppercase(existed_pdf_directory):
+    obj = PyPDFForm2(
+        os.path.join(
+            existed_pdf_directory, "DS82.pdf"
+        )
+    ).fill(
+        {
+            "LastName": "X" * 30,
+        }
+    )
+
+    with open(
+        os.path.join(
+            existed_pdf_directory,
+            "DS82_expected_all_chars_uppercase.pdf",
+        ),
+        "rb+",
+    ) as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_ds82_mixed_case(existed_pdf_directory):
+    obj = PyPDFForm2(
+        os.path.join(
+            existed_pdf_directory, "DS82.pdf"
+        )
+    ).fill(
+        {
+            "LastName": "xX" * 10,
+        }
+    )
+
+    with open(
+        os.path.join(
+            existed_pdf_directory,
+            "DS82_expected_mixed_case.pdf",
+        ),
+        "rb+",
+    ) as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory):
     obj = PyPDFForm2(
         os.path.join(

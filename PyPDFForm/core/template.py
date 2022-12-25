@@ -2,7 +2,6 @@
 """Contains helpers for template."""
 
 import uuid
-from math import sqrt
 from typing import Dict, List, Tuple, Union
 
 import pdfrw
@@ -322,7 +321,7 @@ class Template:
                 + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
             ) / 2
             width = stringWidth(
-                element_middleware.value,
+                element_middleware.value or "",
                 element_middleware.font,
                 element_middleware.font_size,
             )
@@ -379,21 +378,32 @@ class Template:
         return Utils().generate_stream(pdf_file)
 
     @staticmethod
-    def font_size_for_text_field_with_max_length(
-        element: "pdfrw.PdfDict",
-        max_length: int,
-    ) -> float:
-        """Calculates the font size for a text field with max length."""
+    def get_character_x_paddings(
+        element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
+    ) -> List[float]:
+        """Returns paddings between characters for combed text fields."""
 
-        area = abs(
+        rect_width = abs(
             float(element[TemplateCoreConstants().annotation_rectangle_key][0])
             - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
-        ) * abs(
-            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-            - float(element[TemplateCoreConstants().annotation_rectangle_key][3])
         )
+        length = min(len(element_middleware.value or ""), element_middleware.max_length)
+        
+        char_rect_width = rect_width / element_middleware.max_length
 
-        return sqrt(area / max_length)
+        result = []
+
+        current_x = 0
+        for char in (element_middleware.value or "")[:length]:
+            current_mid_point = current_x + char_rect_width / 2
+            result.append(
+                current_mid_point - stringWidth(
+                    char, element_middleware.font, element_middleware.font_size
+                ) / 2
+            )
+            current_x += char_rect_width
+
+        return result
 
     @staticmethod
     def get_draw_text_with_max_length_coordinates(
@@ -401,17 +411,38 @@ class Template:
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw at given a PDF form text field with max length."""
 
-        length = min(len(element_middleware.value), element_middleware.max_length)
-        width_mid_point = (
-            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-            + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
-        ) / 2
-        string_width = stringWidth(
-            element_middleware.value[:length],
-            element_middleware.font,
-            element_middleware.font_size,
+        length = min(len(element_middleware.value or ""), element_middleware.max_length)
+
+        alignment = (
+            element[TemplateCoreConstants().text_field_alignment_identifier] or 0
         )
-        x = width_mid_point - string_width / 2
+        x = float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+
+        if int(alignment) != 0:
+            width_mid_point = (
+                float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+                + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+            ) / 2
+            string_width = stringWidth(
+                (element_middleware.value or "")[:length],
+                element_middleware.font,
+                element_middleware.font_size,
+            )
+            if element_middleware.comb is True and length:
+                string_width = element_middleware.character_paddings[-1] + stringWidth(
+                    element_middleware.value[:length][-1],
+                    element_middleware.font,
+                    element_middleware.font_size
+                )
+
+            if int(alignment) == 1:
+                x = width_mid_point - string_width / 2
+            elif int(alignment) == 2:
+                x = (
+                    float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+                    - string_width 
+                )
+
         string_height = element_middleware.font_size * 96 / 72
         height_mid_point = (
             float(element[TemplateCoreConstants().annotation_rectangle_key][1])
@@ -421,12 +452,12 @@ class Template:
         return (
             x
             - (
-                stringWidth(
+                element_middleware.character_paddings[0] + stringWidth(
                     element_middleware.value[:1],
                     element_middleware.font,
                     element_middleware.font_size,
-                )
-                if (element_middleware.comb is True and length % 2 == 0)
+                ) / 2
+                if (element_middleware.comb is True and length != 0 and length % 2 == 0 and int(alignment) == 1)
                 else 0
             ),
             (height_mid_point - string_height / 2 + height_mid_point) / 2,

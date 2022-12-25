@@ -312,10 +312,9 @@ class WrapperV2:
         for each in self.elements.values():
             if each.type == ElementType.text:
                 each.font = kwargs.get("global_font", TextConstants().global_font)
-                if each.max_length is None:
-                    each.font_size = kwargs.get(
-                        "global_font_size", TextConstants().global_font_size
-                    )
+                each.font_size = kwargs.get(
+                    "global_font_size", TextConstants().global_font_size
+                )
                 each.font_color = kwargs.get(
                     "global_font_color", TextConstants().global_font_color
                 )
@@ -357,7 +356,8 @@ class WrapperV2:
         for key, value in data.items():
             if key in self.elements:
                 self.elements[key].value = value
-
+        
+        self.elements = TemplateMiddleware().set_character_x_paddings(self.stream, self.elements)
         self.stream = TemplateCore().remove_all_elements(
             FillerCore().fill_v2(self.stream, self.elements)
         )
