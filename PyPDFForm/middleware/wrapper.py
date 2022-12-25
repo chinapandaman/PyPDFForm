@@ -354,6 +354,7 @@ class WrapperV2:
     ) -> "WrapperV2":
         """Fill a PDF form."""
 
+        self.elements = TemplateMiddleware().set_space_between_charactes(self.stream, self.elements)
         for key, value in data.items():
             if key in self.elements:
                 self.elements[key].value = value

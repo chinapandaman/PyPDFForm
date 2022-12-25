@@ -396,6 +396,25 @@ class Template:
         return sqrt(area / max_length)
 
     @staticmethod
+    def get_space_between_characters(
+        element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
+    ) -> float:
+        """Returns space between characters for combed text fields."""
+
+        rect_width = abs(
+            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+            - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+        )
+
+        string_width = stringWidth(
+            "".join(["x" for _ in range(element_middleware.max_length)]),
+            element_middleware.font,
+            element_middleware.font_size
+        )
+
+        return (rect_width - string_width) / element_middleware.max_length
+
+    @staticmethod
     def get_draw_text_with_max_length_coordinates(
         element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
     ) -> Tuple[Union[float, int], Union[float, int]]:
