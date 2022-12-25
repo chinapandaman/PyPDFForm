@@ -379,23 +379,6 @@ class Template:
         return Utils().generate_stream(pdf_file)
 
     @staticmethod
-    def font_size_for_text_field_with_max_length(
-        element: "pdfrw.PdfDict",
-        max_length: int,
-    ) -> float:
-        """Calculates the font size for a text field with max length."""
-
-        area = abs(
-            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-            - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
-        ) * abs(
-            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-            - float(element[TemplateCoreConstants().annotation_rectangle_key][3])
-        )
-
-        return sqrt(area / max_length)
-
-    @staticmethod
     def get_space_between_characters(
         element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
     ) -> float:

@@ -85,13 +85,6 @@ class Template:
                         ):
                             _element.comb = True
 
-                        if _element.max_length is not None:
-                            _element.font_size = (
-                                TemplateCore().font_size_for_text_field_with_max_length(
-                                    element, _element.max_length
-                                )
-                            )
-
                     if _element.type == ElementType.radio:
                         if key not in results:
                             results[key] = _element

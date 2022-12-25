@@ -7,6 +7,7 @@ from typing import List, Union
 import pdfrw
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.element import Element as ElementMiddleware
 from .utils import Utils
@@ -45,7 +46,18 @@ class Watermark:
             element.font_color[0], element.font_color[1], element.font_color[2]
         )
 
-        if len(text_to_draw) < element.text_wrap_length:
+        if element.comb is True:
+            current_x = 0
+            for char in text_to_draw:
+                char_width = stringWidth(char, element.font, element.font_size)
+                canv.drawString(
+                        coordinate_x + element.text_x_offset + current_x,
+                        coordinate_y + element.text_y_offset,
+                        char
+                        )
+                current_x += char_width
+                current_x += element.space_between_characters
+        elif len(text_to_draw) < element.text_wrap_length:
             canv.drawString(
                 coordinate_x + element.text_x_offset,
                 coordinate_y + element.text_y_offset,

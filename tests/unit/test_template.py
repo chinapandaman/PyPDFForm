@@ -716,17 +716,3 @@ def test_is_text_field_comb(sample_template_with_comb_text_field):
             )
             if TemplateCore().get_element_key_v2(element) == "LastName":
                 assert TemplateCore().is_text_field_comb(element) is True
-
-
-def test_font_size_for_text_field_with_max_length(sample_template_with_comb_text_field):
-    for _page, elements in (
-        TemplateCore()
-        .get_elements_by_page_v2(sample_template_with_comb_text_field)
-        .items()
-    ):
-        for element in elements:
-            if TemplateCore().get_element_key_v2(element) == "LastName":
-                assert isinstance(
-                    TemplateCore().font_size_for_text_field_with_max_length(element, 7),
-                    float,
-                )
