@@ -44,7 +44,7 @@ class Template:
         return results
 
     @staticmethod
-    def set_character_paddings(pdf_stream: bytes, eles: Dict[str, "Element"]) -> Dict[str, "Element"]:
+    def set_character_x_paddings(pdf_stream: bytes, eles: Dict[str, "Element"]) -> Dict[str, "Element"]:
         """Sets paddings between characters for combed text fields."""
         
         for elements in TemplateCore().get_elements_by_page_v2(pdf_stream).values():
