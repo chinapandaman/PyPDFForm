@@ -408,12 +408,12 @@ class Template:
         return result
 
     @staticmethod
-    def get_draw_text_with_max_length_coordinates(
+    def get_draw_text_coordinates_v2(
         element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw at given a PDF form text field with max length."""
 
-        length = min(len(element_middleware.value or ""), element_middleware.max_length)
+        length = min(len(element_middleware.value or ""), element_middleware.max_length) if element_middleware.max_length is not None else len(element_middleware.value or "")
 
         alignment = (
             element[TemplateCoreConstants().text_field_alignment_identifier] or 0
