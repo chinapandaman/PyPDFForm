@@ -311,29 +311,6 @@ class Template:
             + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
         ) / 2 - 2
 
-        alignment = (
-            element[TemplateCoreConstants().text_field_alignment_identifier] or 0
-        )
-
-        if int(alignment) != 0:
-            mid_point = (
-                float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-                + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
-            ) / 2
-            width = stringWidth(
-                element_middleware.value or "",
-                element_middleware.font,
-                element_middleware.font_size,
-            )
-
-            if int(alignment) == 1:
-                x = mid_point - width / 2
-            elif int(alignment) == 2:
-                x = (
-                    float(element[TemplateCoreConstants().annotation_rectangle_key][2])
-                    - width
-                )
-
         return x, y
 
     @staticmethod
