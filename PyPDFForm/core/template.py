@@ -411,7 +411,7 @@ class Template:
     def get_draw_text_coordinates_v2(
         element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
     ) -> Tuple[Union[float, int], Union[float, int]]:
-        """Returns coordinates to draw at given a PDF form text field with max length."""
+        """Returns coordinates to draw text at given a PDF form text element."""
 
         length = min(len(element_middleware.value or ""), element_middleware.max_length) if element_middleware.max_length is not None else len(element_middleware.value or "")
 
