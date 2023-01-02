@@ -3,3 +3,6 @@ build-all:
 
 test-all:
 	bash ./scripts/test.sh
+
+check-imports:
+	bash ./scripts/check_imports.sh
