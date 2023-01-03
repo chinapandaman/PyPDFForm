@@ -1,6 +1,6 @@
 # https://github.com/cclauss/autoblack
 
-name: Python black/isort
+name: Code Formatting
 
 on:
   push:
