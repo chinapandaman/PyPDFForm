@@ -355,18 +355,22 @@ class Template:
         return Utils().generate_stream(pdf_file)
 
     @staticmethod
-    def get_character_x_paddings(
-        element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
-    ) -> List[float]:
-        """Returns paddings between characters for combed text fields."""
+    def get_char_rect_width(element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware") -> float:
+        """Returns rectangular width of each character for combed text fields."""
 
         rect_width = abs(
             float(element[TemplateCoreConstants().annotation_rectangle_key][0])
             - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
         )
-        length = min(len(element_middleware.value or ""), element_middleware.max_length)
+        return rect_width / element_middleware.max_length
 
-        char_rect_width = rect_width / element_middleware.max_length
+    def get_character_x_paddings(
+        self, element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
+    ) -> List[float]:
+        """Returns paddings between characters for combed text fields."""
+
+        length = min(len(element_middleware.value or ""), element_middleware.max_length)
+        char_rect_width = self.get_char_rect_width(element, element_middleware)
 
         result = []
 
@@ -384,9 +388,8 @@ class Template:
 
         return result
 
-    @staticmethod
     def get_draw_text_coordinates_v2(
-        element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
+        self, element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw text at given a PDF form text element."""
 
@@ -425,6 +428,8 @@ class Template:
                     float(element[TemplateCoreConstants().annotation_rectangle_key][2])
                     - string_width
                 )
+                if length > 0 and element_middleware.comb is True:
+                    x -= (self.get_char_rect_width(element, element_middleware) - stringWidth(element_middleware.value[-1], element_middleware.font, element_middleware.font_size)) / 2
 
         string_height = element_middleware.font_size * 96 / 72
         height_mid_point = (
