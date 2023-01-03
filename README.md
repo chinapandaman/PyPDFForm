@@ -1,5 +1,7 @@
 # PyPDFForm
 
+![Tests](https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml/badge.svg)
+
 PyPDFForm is a pure Python library for PDF form processing. 
 It allows filling a PDF form programmatically by creating 
 a Python dictionary with keys matching its annotated names 
