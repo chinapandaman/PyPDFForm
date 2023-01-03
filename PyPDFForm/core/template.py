@@ -355,7 +355,9 @@ class Template:
         return Utils().generate_stream(pdf_file)
 
     @staticmethod
-    def get_char_rect_width(element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware") -> float:
+    def get_char_rect_width(
+        element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
+    ) -> float:
         """Returns rectangular width of each character for combed text fields."""
 
         rect_width = abs(
@@ -429,7 +431,14 @@ class Template:
                     - string_width
                 )
                 if length > 0 and element_middleware.comb is True:
-                    x -= (self.get_char_rect_width(element, element_middleware) - stringWidth(element_middleware.value[-1], element_middleware.font, element_middleware.font_size)) / 2
+                    x -= (
+                        self.get_char_rect_width(element, element_middleware)
+                        - stringWidth(
+                            element_middleware.value[-1],
+                            element_middleware.font,
+                            element_middleware.font_size,
+                        )
+                    ) / 2
 
         string_height = element_middleware.font_size * 96 / 72
         height_mid_point = (
