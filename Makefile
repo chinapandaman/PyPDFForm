@@ -4,5 +4,5 @@ build-all:
 test-all:
 	bash ./scripts/test.sh
 
-check-imports:
-	bash ./scripts/check_imports.sh
+check-test-imports:
+	bash ./scripts/check_test_imports.sh
