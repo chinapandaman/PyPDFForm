@@ -110,10 +110,10 @@ class Filler:
                         [
                             elements[key],
                             TemplateCore().get_draw_text_coordinates(
-                                _element, elements[key]
+                                _element
                             )[0],
                             TemplateCore().get_draw_text_coordinates(
-                                _element, elements[key]
+                                _element
                             )[1],
                         ]
                     )
