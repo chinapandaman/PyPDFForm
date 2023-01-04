@@ -170,6 +170,10 @@ def test_fill_sejda_v2(sejda_template, sejda_data):
 def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
     elements = TemplateMiddleware().build_elements(template_with_radiobutton_stream)
 
+    data_dict = {
+        key: value
+        for key, value in data_dict.items()
+    }
     data_dict["radio_1"] = 0
     data_dict["radio_2"] = 1
     data_dict["radio_3"] = 2
@@ -246,6 +250,10 @@ def test_simple_fill(template_stream, data_dict):
 
 
 def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
+    data_dict = {
+        key: value
+        for key, value in data_dict.items()
+    }
     data_dict["radio_1"] = 0
     data_dict["radio_2"] = 1
     data_dict["radio_3"] = 2
