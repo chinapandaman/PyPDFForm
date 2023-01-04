@@ -2,7 +2,7 @@
 """Contains v1 and v2 wrappers."""
 
 from .middleware.wrapper import PyPDFForm as Wrapper
-from .middleware.wrapper import WrapperV2
+from .middleware.wrapper_v2 import WrapperV2
 
 PyPDFForm = Wrapper
 PyPDFForm2 = WrapperV2
