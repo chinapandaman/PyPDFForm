@@ -301,7 +301,7 @@ class Template:
 
     @staticmethod
     def get_draw_text_coordinates(
-        element: "pdfrw.PdfDict"
+        element: "pdfrw.PdfDict",
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw text at given a PDF form text element."""
 

@@ -440,9 +440,12 @@ class WrapperV2:
     def generate_schema(self) -> dict:
         """Generates a json schema for the PDF form template."""
 
-        result = {"type": "object", "properties": {
-            key: value.schema_definition for key, value in self.elements.items()
-        }}
+        result = {
+            "type": "object",
+            "properties": {
+                key: value.schema_definition for key, value in self.elements.items()
+            },
+        }
 
         return result
 

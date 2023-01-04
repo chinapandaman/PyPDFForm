@@ -109,12 +109,8 @@ class Filler:
                     texts_to_draw[page].append(
                         [
                             elements[key],
-                            TemplateCore().get_draw_text_coordinates(
-                                _element
-                            )[0],
-                            TemplateCore().get_draw_text_coordinates(
-                                _element
-                            )[1],
+                            TemplateCore().get_draw_text_coordinates(_element)[0],
+                            TemplateCore().get_draw_text_coordinates(_element)[1],
                         ]
                     )
                 if sejda:
