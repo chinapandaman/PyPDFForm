@@ -3,3 +3,4 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
 fi
 
 pylint ./tests | { grep "unused-import" || true; }
+pylint ./PyPDFForm | { grep "unused-import" || true; }
