@@ -7,4 +7,4 @@ from .middleware.wrapper_v2 import WrapperV2
 PyPDFForm = Wrapper
 PyPDFForm2 = WrapperV2
 
-__version__ = "1.1.9"
+__version__ = "1.2.0"
