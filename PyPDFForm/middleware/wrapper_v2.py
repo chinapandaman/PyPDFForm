@@ -5,7 +5,7 @@ from typing import BinaryIO, Dict, Union
 
 from ..core import filler
 from ..core import font
-from ..core.image import Image as ImageCore
+from ..core import image as image_core
 from ..core.template import Template as TemplateCore
 from ..core.utils import Utils as UtilsCore
 from ..core.watermark import Watermark as WatermarkCore
@@ -149,8 +149,8 @@ class WrapperV2:
         """Draws an image on a PDF form."""
 
         image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
-        image = ImageCore().any_image_to_jpg(image)
-        image = ImageCore().rotate_image(image, rotation)
+        image = image_core.any_image_to_jpg(image)
+        image = image_core.rotate_image(image, rotation)
         watermarks = WatermarkCore().create_watermarks_and_draw(
             self.stream, page_number, "image", [[image, x, y, width, height]]
         )

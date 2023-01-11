@@ -5,7 +5,7 @@ from typing import BinaryIO, Dict, Tuple, Union
 
 from ..core import filler
 from ..core import font as font_core
-from ..core.image import Image as ImageCore
+from ..core import image as image_core
 from ..core.template import Template as TemplateCore
 from ..core.utils import Utils as UtilsCore
 from ..core.watermark import Watermark as WatermarkCore
@@ -236,11 +236,11 @@ class PyPDFForm:
         if not isinstance(rotation, (float, int)):
             raise InvalidImageRotationAngleError
 
-        if not ImageCore().is_image(image):
+        if not image_core.is_image(image):
             raise InvalidImageError
 
-        image = ImageCore().any_image_to_jpg(image)
-        image = ImageCore().rotate_image(image, rotation)
+        image = image_core.any_image_to_jpg(image)
+        image = image_core.rotate_image(image, rotation)
 
         if not isinstance(page_number, int):
             raise InvalidPageNumberError
