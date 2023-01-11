@@ -3,7 +3,7 @@
 
 from typing import BinaryIO, Dict, Union
 
-from ..core.filler import Filler as FillerCore
+from ..core import filler
 from ..core.font import Font as FontCore
 from ..core.image import Image as ImageCore
 from ..core.template import Template as TemplateCore
@@ -85,7 +85,7 @@ class WrapperV2:
             )
 
         self.stream = TemplateCore().remove_all_elements(
-            FillerCore().fill_v2(self.stream, self.elements)
+            filler.fill_v2(self.stream, self.elements)
         )
 
         return self

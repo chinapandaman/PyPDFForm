@@ -3,7 +3,7 @@
 
 from typing import BinaryIO, Dict, Tuple, Union
 
-from ..core.filler import Filler as FillerCore
+from ..core import filler
 from ..core.font import Font as FontCore
 from ..core.image import Image as ImageCore
 from ..core.template import Template as TemplateCore
@@ -122,7 +122,7 @@ class PyPDFForm:
                 self.elements[key].validate_value()
                 self.elements[key].validate_text_attributes()
 
-        _fill_result = FillerCore().fill(self.stream, self.elements, self.sejda)
+        _fill_result = filler.fill(self.stream, self.elements, self.sejda)
         if self.sejda:
             _fill_result = TemplateCore().remove_all_elements(_fill_result)
 
@@ -151,7 +151,7 @@ class PyPDFForm:
         if not isinstance(editable, bool):
             raise InvalidEditableParameterError
 
-        self.stream = FillerCore().simple_fill(self.stream, data, editable)
+        self.stream = filler.simple_fill(self.stream, data, editable)
 
         return self
 

@@ -7,7 +7,7 @@ import pytest
 from pdfrw.objects.pdfname import BasePdfName
 
 from PyPDFForm.core import constants
-from PyPDFForm.core.filler import Filler
+from PyPDFForm.core import filler
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.element import ElementType
@@ -63,7 +63,7 @@ def test_fill(template_stream, data_dict):
             elements[k].validate_value()
             elements[k].validate_text_attributes()
 
-    result_stream = Filler().fill(template_stream, elements)
+    result_stream = filler.fill(template_stream, elements)
 
     assert result_stream != template_stream
 
@@ -96,7 +96,7 @@ def test_fill_v2(template_stream, data_dict):
             elements[k].validate_value()
             elements[k].validate_text_attributes()
 
-    result_stream = Filler().fill_v2(template_stream, elements)
+    result_stream = filler.fill_v2(template_stream, elements)
     assert result_stream != template_stream
 
     for element in TemplateCore().iterate_elements(result_stream):
@@ -129,7 +129,7 @@ def test_fill_sejda(sejda_template, sejda_data):
         elements[k].validate_value()
         elements[k].validate_text_attributes()
 
-    result_stream = Filler().fill(sejda_template, elements, sejda=True)
+    result_stream = filler.fill(sejda_template, elements, sejda=True)
 
     assert result_stream != template_stream
 
@@ -157,7 +157,7 @@ def test_fill_sejda_v2(sejda_template, sejda_data):
         elements[k].validate_value()
         elements[k].validate_text_attributes()
 
-    result_stream = Filler().fill_v2(sejda_template, elements)
+    result_stream = filler.fill_v2(sejda_template, elements)
 
     assert result_stream != template_stream
 
@@ -192,7 +192,7 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
             elements[k].validate_value()
             elements[k].validate_text_attributes()
 
-    result_stream = Filler().fill(template_with_radiobutton_stream, elements)
+    result_stream = filler.fill(template_with_radiobutton_stream, elements)
 
     assert result_stream != template_with_radiobutton_stream
 
@@ -227,7 +227,7 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
 
 
 def test_simple_fill(template_stream, data_dict):
-    result_stream = Filler().simple_fill(template_stream, data_dict, False)
+    result_stream = filler.simple_fill(template_stream, data_dict, False)
 
     assert result_stream != template_stream
 
@@ -254,7 +254,7 @@ def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dic
 
     radio_button_tracker = {}
 
-    result_stream = Filler().simple_fill(
+    result_stream = filler.simple_fill(
         template_with_radiobutton_stream, data_dict, True
     )
 
