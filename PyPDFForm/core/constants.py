@@ -17,13 +17,3 @@ TEXT_FIELD_MAX_LENGTH_KEY = "/MaxLen"
 TEXT_FIELD_ALIGNMENT_IDENTIFIER = "/Q"
 
 SEPARATOR = "_e65c5a97ecc14cf79e4e86f5365be93b_"
-
-
-class Merge:
-    """Contains constants for merging PDFs."""
-
-    @property
-    def separator(self) -> str:
-        """Used for separating uuid from annotated name."""
-
-        return "_e65c5a97ecc14cf79e4e86f5365be93b_"
