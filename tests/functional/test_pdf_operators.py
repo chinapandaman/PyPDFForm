@@ -6,7 +6,7 @@ import pytest
 
 from PyPDFForm import PyPDFForm
 from PyPDFForm.core import constants
-from PyPDFForm.core.template import Template as TemplateCore
+from PyPDFForm.core import template
 
 
 @pytest.fixture
@@ -39,17 +39,16 @@ def test_addition_operator_3_times(template_stream, pdf_samples, data_dict):
         for i in range(3):
             result += PyPDFForm(template_stream).fill(data_dict, editable=True)
 
-        page_count = len(TemplateCore().get_elements_by_page(f.read()).keys())
+        page_count = len(template.get_elements_by_page(f.read()).keys())
         result_page_count = len(
-            TemplateCore().get_elements_by_page(result.stream).keys()
+            template.get_elements_by_page(result.stream).keys()
         )
         assert page_count == result_page_count
 
-        for elements in TemplateCore().get_elements_by_page(result.stream).values():
+        for elements in template.get_elements_by_page(result.stream).values():
             for element in elements:
                 assert (
-                    TemplateCore()
-                    .get_element_key(element)
+                    template.get_element_key(element)
                     .split(constants.SEPARATOR)[0]
                     in data_dict
                 )
@@ -63,9 +62,9 @@ def test_addition_operator_3_times_sejda(sejda_template, pdf_samples, sejda_data
         for i in range(3):
             result += PyPDFForm(sejda_template, sejda=True).fill(sejda_data)
 
-        page_count = len(TemplateCore().get_elements_by_page(expected).keys())
+        page_count = len(template.get_elements_by_page(expected).keys())
         result_page_count = len(
-            TemplateCore().get_elements_by_page(result.stream).keys()
+            template.get_elements_by_page(result.stream).keys()
         )
         assert page_count == result_page_count
         assert len(result.read()) == len(expected)

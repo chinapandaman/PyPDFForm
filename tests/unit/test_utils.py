@@ -7,7 +7,7 @@ import pdfrw
 import pytest
 
 from PyPDFForm.core import constants
-from PyPDFForm.core.template import Template as TemplateCore
+from PyPDFForm.core import template as template_core
 from PyPDFForm.core.utils import Utils
 from PyPDFForm.middleware.element import Element, ElementType
 
@@ -36,8 +36,8 @@ def data_dict():
 
 
 def test_generate_stream(template_stream, data_dict):
-    template = TemplateCore().get_elements_by_page(template_stream)
-    result = TemplateCore().get_elements_by_page(
+    template = template_core.get_elements_by_page(template_stream)
+    result = template_core.get_elements_by_page(
         Utils.generate_stream(pdfrw.PdfReader(fdata=template_stream))
     )
 
@@ -45,7 +45,7 @@ def test_generate_stream(template_stream, data_dict):
     result_page_count = len(result.keys())
     for elements in result.values():
         for element in elements:
-            assert TemplateCore().get_element_key(element) in data_dict
+            assert template_core.get_element_key(element) in data_dict
 
     assert page_count == result_page_count
 
@@ -92,8 +92,8 @@ def checkbox_radio_to_draw():
 
 
 def test_merge_two_pdfs(template_stream, data_dict):
-    template = TemplateCore().get_elements_by_page(template_stream)
-    result = TemplateCore().get_elements_by_page(
+    template = template_core.get_elements_by_page(template_stream)
+    result = template_core.get_elements_by_page(
         Utils().merge_two_pdfs(template_stream, template_stream)
     )
 
@@ -101,7 +101,7 @@ def test_merge_two_pdfs(template_stream, data_dict):
     merged_page_count = len(result.keys())
     for elements in result.values():
         for element in elements:
-            assert TemplateCore().get_element_key(element) in data_dict
+            assert template_core.get_element_key(element) in data_dict
 
     assert page_count * 2 == merged_page_count
 

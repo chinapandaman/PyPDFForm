@@ -3,7 +3,7 @@
 
 from typing import Dict, Union
 
-from ..core.template import Template as TemplateCore
+from ..core import template
 from .element import Element, ElementType
 from .exceptions.template import InvalidTemplateError
 
@@ -31,10 +31,10 @@ class Template:
 
         results = {}
 
-        for element in TemplateCore().iterate_elements(pdf_stream, sejda):
-            key = TemplateCore().get_element_key(element, sejda)
+        for element in template.iterate_elements(pdf_stream, sejda):
+            key = template.get_element_key(element, sejda)
 
-            element_type = TemplateCore().get_element_type(element, sejda)
+            element_type = template.get_element_type(element, sejda)
             if element_type is not None:
                 results[key] = Element(
                     element_name=key,
@@ -49,14 +49,14 @@ class Template:
     ) -> Dict[str, "Element"]:
         """Sets paddings between characters for combed text fields."""
 
-        for elements in TemplateCore().get_elements_by_page_v2(pdf_stream).values():
+        for elements in template.get_elements_by_page_v2(pdf_stream).values():
             for element in elements:
-                key = TemplateCore().get_element_key_v2(element)
+                key = template.get_element_key_v2(element)
                 _element = eles[key]
 
                 if _element.type == ElementType.text and _element.comb is True:
                     _element.character_paddings = (
-                        TemplateCore().get_character_x_paddings(element, _element)
+                        template.get_character_x_paddings(element, _element)
                     )
 
         return eles
@@ -67,11 +67,11 @@ class Template:
 
         results = {}
 
-        for elements in TemplateCore().get_elements_by_page_v2(pdf_stream).values():
+        for elements in template.get_elements_by_page_v2(pdf_stream).values():
             for element in elements:
-                key = TemplateCore().get_element_key_v2(element)
+                key = template.get_element_key_v2(element)
 
-                element_type = TemplateCore().get_element_type_v2(element)
+                element_type = template.get_element_type_v2(element)
 
                 if element_type is not None:
                     _element = Element(
@@ -80,12 +80,12 @@ class Template:
                     )
 
                     if _element.type == ElementType.text:
-                        _element.max_length = TemplateCore().get_text_field_max_length(
+                        _element.max_length = template.get_text_field_max_length(
                             element
                         )
                         if (
                             _element.max_length is not None
-                            and TemplateCore().is_text_field_comb(element)
+                            and template.is_text_field_comb(element)
                         ):
                             _element.comb = True
 

@@ -8,7 +8,7 @@ from pdfrw.objects.pdfname import BasePdfName
 
 from PyPDFForm.core import constants
 from PyPDFForm.core import filler
-from PyPDFForm.core.template import Template as TemplateCore
+from PyPDFForm.core import template
 from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.element import ElementType
 from PyPDFForm.middleware.template import Template as TemplateMiddleware
@@ -67,8 +67,8 @@ def test_fill(template_stream, data_dict):
 
     assert result_stream != template_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
+    for element in template.iterate_elements(result_stream):
+        key = template.get_element_key(element)
 
         assert element[constants.FIELD_FLAG_KEY] == pdfrw.PdfObject(1)
 
@@ -99,8 +99,8 @@ def test_fill_v2(template_stream, data_dict):
     result_stream = filler.fill_v2(template_stream, elements)
     assert result_stream != template_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
+    for element in template.iterate_elements(result_stream):
+        key = template.get_element_key(element)
 
         assert element[constants.FIELD_FLAG_KEY] != pdfrw.PdfObject(1)
 
@@ -133,7 +133,7 @@ def test_fill_sejda(sejda_template, sejda_data):
 
     assert result_stream != template_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
+    for element in template.iterate_elements(result_stream):
         assert element[constants.PARENT_KEY][
             constants.FIELD_FLAG_KEY
         ] == pdfrw.PdfObject(1)
@@ -161,7 +161,7 @@ def test_fill_sejda_v2(sejda_template, sejda_data):
 
     assert result_stream != template_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
+    for element in template.iterate_elements(result_stream):
         assert element[constants.PARENT_KEY][
             constants.FIELD_FLAG_KEY
         ] != pdfrw.PdfObject(1)
@@ -196,8 +196,8 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
 
     assert result_stream != template_with_radiobutton_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
+    for element in template.iterate_elements(result_stream):
+        key = template.get_element_key(element)
 
         if isinstance(data_dict[key], bool) or isinstance(data_dict[key], str):
             assert element[constants.FIELD_FLAG_KEY] == pdfrw.PdfObject(1)
@@ -231,8 +231,8 @@ def test_simple_fill(template_stream, data_dict):
 
     assert result_stream != template_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
+    for element in template.iterate_elements(result_stream):
+        key = template.get_element_key(element)
 
         if isinstance(data_dict[key], bool):
             assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == (
@@ -260,8 +260,8 @@ def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dic
 
     assert result_stream != template_with_radiobutton_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
+    for element in template.iterate_elements(result_stream):
+        key = template.get_element_key(element)
 
         if isinstance(data_dict[key], bool):
             assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == (

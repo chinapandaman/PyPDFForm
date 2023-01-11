@@ -7,7 +7,7 @@ import pytest
 from jsonschema import ValidationError, validate
 
 from PyPDFForm import PyPDFForm2
-from PyPDFForm.core.template import Template as TemplateCore
+from PyPDFForm.core import template as template_core
 from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.element import ElementType
 
@@ -67,7 +67,7 @@ def test_fill_v2(template_stream, pdf_samples, data_dict):
         assert obj.stream == expected
 
         for page, elements in (
-            TemplateCore().get_elements_by_page_v2(obj.read()).items()
+            template_core.get_elements_by_page_v2(obj.read()).items()
         ):
             assert not elements
 
@@ -499,6 +499,6 @@ def test_fill_right_aligned(sample_template_with_right_aligned_text_field, pdf_s
         assert obj.stream == expected
 
         for page, elements in (
-            TemplateCore().get_elements_by_page_v2(obj.read()).items()
+            template_core.get_elements_by_page_v2(obj.read()).items()
         ):
             assert not elements

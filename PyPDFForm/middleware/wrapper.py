@@ -6,7 +6,7 @@ from typing import BinaryIO, Dict, Tuple, Union
 from ..core import filler
 from ..core import font as font_core
 from ..core import image as image_core
-from ..core.template import Template as TemplateCore
+from ..core import template
 from ..core.utils import Utils as UtilsCore
 from ..core.watermark import Watermark as WatermarkCore
 from .adapter import FileAdapter
@@ -85,10 +85,10 @@ class PyPDFForm:
         TemplateMiddleware().validate_stream(other.stream)
 
         pdf_one = (
-            TemplateCore().assign_uuid(self.stream) if not self.sejda else self.stream
+            template.assign_uuid(self.stream) if not self.sejda else self.stream
         )
         pdf_two = (
-            TemplateCore().assign_uuid(other.stream)
+            template.assign_uuid(other.stream)
             if not other.sejda
             else other.stream
         )
@@ -124,7 +124,7 @@ class PyPDFForm:
 
         _fill_result = filler.fill(self.stream, self.elements, self.sejda)
         if self.sejda:
-            _fill_result = TemplateCore().remove_all_elements(_fill_result)
+            _fill_result = template.remove_all_elements(_fill_result)
 
         self.stream = _fill_result
 

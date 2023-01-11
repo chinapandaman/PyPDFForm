@@ -9,7 +9,7 @@ from pdfrw.objects.pdfname import BasePdfName
 from ..middleware.element import Element as ElementMiddleware
 from ..middleware.element import ElementType
 from . import constants
-from .template import Template as TemplateCore
+from . import template
 from .utils import Utils
 from .watermark import Watermark as WatermarkCore
 
@@ -29,12 +29,12 @@ def fill(
     radio_button_tracker = {}
 
     for page, _elements in (
-            TemplateCore().get_elements_by_page(template_pdf, sejda).items()
+            template.get_elements_by_page(template_pdf, sejda).items()
     ):
         texts_to_draw[page] = []
         text_watermarks.append(b"")
         for _element in _elements:
-            key = TemplateCore().get_element_key(_element, sejda)
+            key = template.get_element_key(_element, sejda)
 
             update_dict = {
                 constants.FIELD_FLAG_KEY.replace(
@@ -46,10 +46,10 @@ def fill(
                     texts_to_draw[page].append(
                         [
                             Utils().checkbox_radio_to_draw(elements[key]),
-                            TemplateCore().get_draw_checkbox_radio_coordinates(
+                            template.get_draw_checkbox_radio_coordinates(
                                 _element
                             )[0],
-                            TemplateCore().get_draw_checkbox_radio_coordinates(
+                            template.get_draw_checkbox_radio_coordinates(
                                 _element
                             )[1],
                         ]
@@ -70,10 +70,10 @@ def fill(
                         texts_to_draw[page].append(
                             [
                                 Utils().checkbox_radio_to_draw(elements[key]),
-                                TemplateCore().get_draw_checkbox_radio_coordinates(
+                                template.get_draw_checkbox_radio_coordinates(
                                     _element
                                 )[0],
-                                TemplateCore().get_draw_checkbox_radio_coordinates(
+                                template.get_draw_checkbox_radio_coordinates(
                                     _element
                                 )[1],
                             ]
@@ -105,8 +105,8 @@ def fill(
                 texts_to_draw[page].append(
                     [
                         elements[key],
-                        TemplateCore().get_draw_text_coordinates(_element)[0],
-                        TemplateCore().get_draw_text_coordinates(_element)[1],
+                        template.get_draw_text_coordinates(_element)[0],
+                        template.get_draw_text_coordinates(_element)[1],
                     ]
                 )
             if sejda:
@@ -141,8 +141,8 @@ def simple_fill(
 
     radio_button_tracker = {}
 
-    for element in TemplateCore().iterate_elements(template_pdf):
-        key = TemplateCore().get_element_key(element)
+    for element in template.iterate_elements(template_pdf):
+        key = template.get_element_key(element)
 
         if key in data.keys():
             update_dict = {}
@@ -215,12 +215,12 @@ def fill_v2(
     radio_button_tracker = {}
 
     for page, _elements in (
-        TemplateCore().get_elements_by_page_v2(template_pdf).items()
+        template.get_elements_by_page_v2(template_pdf).items()
     ):
         texts_to_draw[page] = []
         text_watermarks.append(b"")
         for _element in _elements:
-            key = TemplateCore().get_element_key_v2(_element)
+            key = template.get_element_key_v2(_element)
 
             if elements[key].type == ElementType.checkbox:
                 if elements[key].value:
@@ -228,7 +228,7 @@ def fill_v2(
                     _to_draw = Utils().checkbox_radio_to_draw(
                         elements[key], font_size
                     )
-                    x, y = TemplateCore().get_draw_checkbox_radio_coordinates_v2(
+                    x, y = template.get_draw_checkbox_radio_coordinates_v2(
                         _element, _to_draw
                     )
                     texts_to_draw[page].append(
@@ -248,7 +248,7 @@ def fill_v2(
                     _to_draw = Utils().checkbox_radio_to_draw(
                         elements[key], font_size
                     )
-                    x, y = TemplateCore().get_draw_checkbox_radio_coordinates_v2(
+                    x, y = template.get_draw_checkbox_radio_coordinates_v2(
                         _element, _to_draw
                     )
                     texts_to_draw[page].append(
@@ -259,7 +259,7 @@ def fill_v2(
                         ]
                     )
             else:
-                x, y = TemplateCore().get_draw_text_coordinates_v2(
+                x, y = template.get_draw_text_coordinates_v2(
                     _element, elements[key]
                 )
                 texts_to_draw[page].append(
