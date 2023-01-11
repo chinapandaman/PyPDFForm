@@ -10,7 +10,7 @@ import pdfrw
 
 from ..middleware.constants import Text
 from ..middleware.element import Element, ElementType
-from .constants import Template as TemplateCoreConstants
+from . import constants
 
 
 class Utils:
@@ -58,11 +58,11 @@ class Utils:
         """
 
         area = abs(
-            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-            - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+            float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+            - float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
         ) * abs(
-            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-            - float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+            float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+            - float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
         )
 
         return sqrt(area) * 72 / 96

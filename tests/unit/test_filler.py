@@ -6,7 +6,7 @@ import pdfrw
 import pytest
 from pdfrw.objects.pdfname import BasePdfName
 
-from PyPDFForm.core.constants import Template as TemplateConstants
+from PyPDFForm.core import constants
 from PyPDFForm.core.filler import Filler
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.middleware.constants import Text as TextConstants
@@ -70,10 +70,10 @@ def test_fill(template_stream, data_dict):
     for element in TemplateCore().iterate_elements(result_stream):
         key = TemplateCore().get_element_key(element)
 
-        assert element[TemplateConstants().field_flag_key] == pdfrw.PdfObject(1)
+        assert element[constants.FIELD_FLAG_KEY] == pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
-            assert element[TemplateConstants().checkbox_field_value_key] == (
+            assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == (
                 pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
             )
 
@@ -102,11 +102,11 @@ def test_fill_v2(template_stream, data_dict):
     for element in TemplateCore().iterate_elements(result_stream):
         key = TemplateCore().get_element_key(element)
 
-        assert element[TemplateConstants().field_flag_key] != pdfrw.PdfObject(1)
+        assert element[constants.FIELD_FLAG_KEY] != pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
             assert (
-                element[TemplateConstants().checkbox_field_value_key]
+                element[constants.CHECKBOX_FIELD_VALUE_KEY]
                 == pdfrw.PdfName.Off
             )
 
@@ -134,8 +134,8 @@ def test_fill_sejda(sejda_template, sejda_data):
     assert result_stream != template_stream
 
     for element in TemplateCore().iterate_elements(result_stream):
-        assert element[TemplateConstants().parent_key][
-            TemplateConstants().field_flag_key
+        assert element[constants.PARENT_KEY][
+            constants.FIELD_FLAG_KEY
         ] == pdfrw.PdfObject(1)
 
 
@@ -162,8 +162,8 @@ def test_fill_sejda_v2(sejda_template, sejda_data):
     assert result_stream != template_stream
 
     for element in TemplateCore().iterate_elements(result_stream):
-        assert element[TemplateConstants().parent_key][
-            TemplateConstants().field_flag_key
+        assert element[constants.PARENT_KEY][
+            constants.FIELD_FLAG_KEY
         ] != pdfrw.PdfObject(1)
 
 
@@ -200,14 +200,14 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
         key = TemplateCore().get_element_key(element)
 
         if isinstance(data_dict[key], bool) or isinstance(data_dict[key], str):
-            assert element[TemplateConstants().field_flag_key] == pdfrw.PdfObject(1)
+            assert element[constants.FIELD_FLAG_KEY] == pdfrw.PdfObject(1)
         else:
-            assert element[TemplateConstants().parent_key][
-                TemplateConstants().field_flag_key
+            assert element[constants.PARENT_KEY][
+                constants.FIELD_FLAG_KEY
             ] == pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
-            assert element[TemplateConstants().checkbox_field_value_key] == (
+            assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == (
                 pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
             )
         elif isinstance(data_dict[key], int):
@@ -217,11 +217,11 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
 
             if data_dict[key] == radio_button_tracker[key] - 1:
                 assert element[
-                    TemplateConstants().checkbox_field_value_key
+                    constants.CHECKBOX_FIELD_VALUE_KEY
                 ] == BasePdfName("/" + str(data_dict[key]), False)
             else:
                 assert (
-                    element[TemplateConstants().checkbox_field_value_key]
+                    element[constants.CHECKBOX_FIELD_VALUE_KEY]
                     == pdfrw.PdfName.Off
                 )
 
@@ -235,15 +235,15 @@ def test_simple_fill(template_stream, data_dict):
         key = TemplateCore().get_element_key(element)
 
         if isinstance(data_dict[key], bool):
-            assert element[TemplateConstants().checkbox_field_value_key] == (
+            assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == (
                 pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
             )
         else:
             assert (
-                element[TemplateConstants().text_field_value_key][1:-1]
+                element[constants.TEXT_FIELD_VALUE_KEY][1:-1]
                 == data_dict[key]
             )
-        assert element[TemplateConstants().field_flag_key] == pdfrw.PdfObject(1)
+        assert element[constants.FIELD_FLAG_KEY] == pdfrw.PdfObject(1)
 
 
 def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
@@ -264,7 +264,7 @@ def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dic
         key = TemplateCore().get_element_key(element)
 
         if isinstance(data_dict[key], bool):
-            assert element[TemplateConstants().checkbox_field_value_key] == (
+            assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == (
                 pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
             )
         elif isinstance(data_dict[key], int):
@@ -274,16 +274,16 @@ def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dic
 
             if data_dict[key] == radio_button_tracker[key] - 1:
                 assert element[
-                    TemplateConstants().checkbox_field_value_key
+                    constants.CHECKBOX_FIELD_VALUE_KEY
                 ] == BasePdfName("/" + str(data_dict[key]), False)
             else:
                 assert (
-                    element[TemplateConstants().checkbox_field_value_key]
+                    element[constants.CHECKBOX_FIELD_VALUE_KEY]
                     == pdfrw.PdfName.Off
                 )
         else:
             assert (
-                element[TemplateConstants().text_field_value_key][1:-1]
+                element[constants.TEXT_FIELD_VALUE_KEY][1:-1]
                 == data_dict[key]
             )
-        assert element[TemplateConstants().field_flag_key] != pdfrw.PdfObject(1)
+        assert element[constants.FIELD_FLAG_KEY] != pdfrw.PdfObject(1)

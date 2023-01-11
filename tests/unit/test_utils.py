@@ -6,7 +6,7 @@ from copy import deepcopy
 import pdfrw
 import pytest
 
-from PyPDFForm.core.constants import Template as TemplateCoreConstants
+from PyPDFForm.core import constants
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.core.utils import Utils
 from PyPDFForm.middleware.element import Element, ElementType
@@ -109,7 +109,7 @@ def test_merge_two_pdfs(template_stream, data_dict):
 def test_checkbox_radio_font_size():
     element = pdfrw.PdfDict(
         **{
-            TemplateCoreConstants().annotation_rectangle_key.replace("/", ""): [
+            constants.ANNOTATION_RECTANGLE_KEY.replace("/", ""): [
                 0,
                 0,
                 16,

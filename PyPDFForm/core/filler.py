@@ -8,7 +8,7 @@ from pdfrw.objects.pdfname import BasePdfName
 
 from ..middleware.element import Element as ElementMiddleware
 from ..middleware.element import ElementType
-from .constants import Template as TemplateConstants
+from . import constants
 from .template import Template as TemplateCore
 from .utils import Utils
 from .watermark import Watermark as WatermarkCore
@@ -41,7 +41,7 @@ class Filler:
                 key = TemplateCore().get_element_key(_element, sejda)
 
                 update_dict = {
-                    TemplateConstants().field_flag_key.replace(
+                    constants.FIELD_FLAG_KEY.replace(
                         "/", ""
                     ): pdfrw.PdfObject(1)
                 }
@@ -60,7 +60,7 @@ class Filler:
                         )
                     else:
                         update_dict[
-                            TemplateConstants().checkbox_field_value_key.replace(
+                            constants.CHECKBOX_FIELD_VALUE_KEY.replace(
                                 "/", ""
                             )
                         ] = Utils().bool_to_checkbox(elements[key].value)
@@ -86,7 +86,7 @@ class Filler:
                             _element.update(
                                 pdfrw.PdfDict(
                                     **{
-                                        TemplateConstants().checkbox_field_value_key.replace(
+                                        constants.CHECKBOX_FIELD_VALUE_KEY.replace(
                                             "/", ""
                                         ): BasePdfName(
                                             "/" + str(elements[key].value), False
@@ -95,10 +95,10 @@ class Filler:
                                 )
                             )
 
-                    _element[TemplateConstants().parent_key].update(
+                    _element[constants.PARENT_KEY].update(
                         pdfrw.PdfDict(
                             **{
-                                TemplateConstants().field_flag_key.replace(
+                                constants.FIELD_FLAG_KEY.replace(
                                     "/", ""
                                 ): pdfrw.PdfObject(1)
                             }
@@ -114,7 +114,7 @@ class Filler:
                         ]
                     )
                 if sejda:
-                    _element[TemplateConstants().parent_key].update(
+                    _element[constants.PARENT_KEY].update(
                         pdfrw.PdfDict(**update_dict)
                     )
                 else:
@@ -155,7 +155,7 @@ class Filler:
                     pdfrw.PdfName.Off,
                 ]:
                     update_dict = {
-                        TemplateConstants().checkbox_field_value_key.replace(
+                        constants.CHECKBOX_FIELD_VALUE_KEY.replace(
                             "/", ""
                         ): data[key]
                     }
@@ -168,7 +168,7 @@ class Filler:
                         element.update(
                             pdfrw.PdfDict(
                                 **{
-                                    TemplateConstants().checkbox_field_value_key.replace(
+                                    constants.CHECKBOX_FIELD_VALUE_KEY.replace(
                                         "/", ""
                                     ): BasePdfName(
                                         "/" + str(data[key]), False
@@ -178,10 +178,10 @@ class Filler:
                         )
 
                         if not editable:
-                            element[TemplateConstants().parent_key].update(
+                            element[constants.PARENT_KEY].update(
                                 pdfrw.PdfDict(
                                     **{
-                                        TemplateConstants().field_flag_key.replace(
+                                        constants.FIELD_FLAG_KEY.replace(
                                             "/", ""
                                         ): pdfrw.PdfObject(1)
                                     }
@@ -190,14 +190,14 @@ class Filler:
                         continue
                 else:
                     update_dict = {
-                        TemplateConstants().text_field_value_key.replace("/", ""): data[
+                        constants.TEXT_FIELD_VALUE_KEY.replace("/", ""): data[
                             key
                         ]
                     }
 
                 if not editable:
                     update_dict[
-                        TemplateConstants().field_flag_key.replace("/", "")
+                        constants.FIELD_FLAG_KEY.replace("/", "")
                     ] = pdfrw.PdfObject(1)
 
                 element.update(pdfrw.PdfDict(**update_dict))

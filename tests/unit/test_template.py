@@ -6,8 +6,7 @@ import uuid
 import pdfrw
 import pytest
 
-from PyPDFForm.core.constants import Merge as MergeCoreConstants
-from PyPDFForm.core.constants import Template as TemplateCoreConstants
+from PyPDFForm.core import constants
 from PyPDFForm.core.template import Template as TemplateCore
 from PyPDFForm.middleware.element import ElementType
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
@@ -515,14 +514,14 @@ def test_get_draw_checkbox_radio_coordinates(sejda_template):
     for element in TemplateCore().iterate_elements(sejda_template):
         assert TemplateCore().get_draw_checkbox_radio_coordinates(element) == (
             (
-                float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-                + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+                float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+                + float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
             )
             / 2
             - 5,
             (
-                float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-                + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+                float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+                + float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
             )
             / 2
             - 4,
@@ -534,9 +533,9 @@ def test_assign_uuid(template_with_radiobutton_stream, data_dict):
         TemplateCore().assign_uuid(template_with_radiobutton_stream)
     ):
         key = TemplateCore().get_element_key(element)
-        assert MergeCoreConstants().separator in key
+        assert constants.SEPARATOR in key
 
-        key, _uuid = key.split(MergeCoreConstants().separator)
+        key, _uuid = key.split(constants.SEPARATOR)
 
         assert len(_uuid) == len(uuid.uuid4().hex)
         data_dict[key] = True
@@ -559,11 +558,11 @@ def test_traverse_pattern(template_with_radiobutton_stream):
     }
 
     type_to_pattern = {
-        "text": {TemplateCoreConstants().annotation_field_key: True},
-        "check": {TemplateCoreConstants().annotation_field_key: True},
+        "text": {constants.ANNOTATION_FIELD_KEY: True},
+        "check": {constants.ANNOTATION_FIELD_KEY: True},
         "radio": {
-            TemplateCoreConstants().parent_key: {
-                TemplateCoreConstants().annotation_field_key: True
+            constants.PARENT_KEY: {
+                constants.ANNOTATION_FIELD_KEY: True
             }
         },
     }
@@ -576,8 +575,8 @@ def test_traverse_pattern(template_with_radiobutton_stream):
 
 def test_traverse_pattern_sejda(sejda_template):
     pattern = {
-        TemplateCoreConstants().parent_key: {
-            TemplateCoreConstants().annotation_field_key: True
+        constants.PARENT_KEY: {
+            constants.ANNOTATION_FIELD_KEY: True
         }
     }
 
@@ -602,24 +601,18 @@ def test_find_pattern_match(template_with_radiobutton_stream):
     type_to_pattern = {
         "text": (
             {
-                TemplateCoreConstants()
-                .element_type_key: TemplateCoreConstants()
-                .text_field_identifier
+                constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER
             },
         ),
         "check": (
             {
-                TemplateCoreConstants()
-                .element_type_key: TemplateCoreConstants()
-                .selectable_identifier
+                constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
             },
         ),
         "radio": (
             {
-                TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants()
-                    .element_type_key: TemplateCoreConstants()
-                    .selectable_identifier
+                constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
                 }
             },
         ),
@@ -649,35 +642,27 @@ def test_find_pattern_match_sejda(sejda_template, sejda_data):
     type_to_pattern = {
         "text": (
             {
-                TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants()
-                    .element_type_key: TemplateCoreConstants()
-                    .text_field_identifier
+                constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER
                 }
             },
         ),
         "check": (
             {
-                TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants()
-                    .element_type_key: TemplateCoreConstants()
-                    .selectable_identifier
+                constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
                 }
             },
             {
-                TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants()
-                    .subtype_key: TemplateCoreConstants()
-                    .widget_subtype_key
+                constants.PARENT_KEY: {
+                    constants.SUBTYPE_KEY: constants.WIDGET_SUBTYPE_KEY
                 }
             },
         ),
         "radio": (
             {
-                TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants()
-                    .element_type_key: TemplateCoreConstants()
-                    .selectable_identifier
+                constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
                 }
             },
         ),

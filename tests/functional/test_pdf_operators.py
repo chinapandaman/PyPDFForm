@@ -5,7 +5,7 @@ import os
 import pytest
 
 from PyPDFForm import PyPDFForm
-from PyPDFForm.core.constants import Merge as MergeConstants
+from PyPDFForm.core import constants
 from PyPDFForm.core.template import Template as TemplateCore
 
 
@@ -50,7 +50,7 @@ def test_addition_operator_3_times(template_stream, pdf_samples, data_dict):
                 assert (
                     TemplateCore()
                     .get_element_key(element)
-                    .split(MergeConstants().separator)[0]
+                    .split(constants.SEPARATOR)[0]
                     in data_dict
                 )
 

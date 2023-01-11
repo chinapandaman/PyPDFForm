@@ -9,8 +9,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.element import Element as ElementMiddleware
 from ..middleware.element import ElementType
-from .constants import Merge as MergeConstants
-from .constants import Template as TemplateCoreConstants
+from . import constants
 from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
 from .utils import Utils
 
@@ -25,7 +24,7 @@ class Template:
         pdf = pdfrw.PdfReader(fdata=pdf)
 
         for page in pdf.pages:
-            elements = page[TemplateCoreConstants().annotation_key]
+            elements = page[constants.ANNOTATION_KEY]
             if elements:
                 for j in reversed(range(len(elements))):
                     elements.pop(j)
@@ -44,26 +43,26 @@ class Template:
         result = []
 
         for page in pdf.pages:
-            elements = page[TemplateCoreConstants().annotation_key]
+            elements = page[constants.ANNOTATION_KEY]
             if elements:
                 for element in elements:
                     if not sejda:
                         if (
-                            element[TemplateCoreConstants().subtype_key]
-                            == TemplateCoreConstants().widget_subtype_key
-                            and element[TemplateCoreConstants().annotation_field_key]
+                            element[constants.SUBTYPE_KEY]
+                            == constants.WIDGET_SUBTYPE_KEY
+                            and element[constants.ANNOTATION_FIELD_KEY]
                         ):
                             result.append(element)
                         elif (
-                            element[TemplateCoreConstants().checkbox_field_value_key]
-                            and element[TemplateCoreConstants().parent_key]
+                            element[constants.CHECKBOX_FIELD_VALUE_KEY]
+                            and element[constants.PARENT_KEY]
                         ):
                             result.append(element)
                     else:
                         if (
-                            element[TemplateCoreConstants().parent_key]
-                            and element[TemplateCoreConstants().parent_key][
-                                TemplateCoreConstants().element_type_key
+                            element[constants.PARENT_KEY]
+                            and element[constants.PARENT_KEY][
+                                constants.ELEMENT_TYPE_KEY
                             ]
                         ):
                             result.append(element)
@@ -82,27 +81,27 @@ class Template:
         result = {}
 
         for i, page in enumerate(pdf.pages):
-            elements = page[TemplateCoreConstants().annotation_key]
+            elements = page[constants.ANNOTATION_KEY]
             result[i + 1] = []
             if elements:
                 for element in elements:
                     if not sejda:
                         if (
-                            element[TemplateCoreConstants().subtype_key]
-                            == TemplateCoreConstants().widget_subtype_key
-                            and element[TemplateCoreConstants().annotation_field_key]
+                            element[constants.SUBTYPE_KEY]
+                            == constants.WIDGET_SUBTYPE_KEY
+                            and element[constants.ANNOTATION_FIELD_KEY]
                         ):
                             result[i + 1].append(element)
                         elif (
-                            element[TemplateCoreConstants().checkbox_field_value_key]
-                            and element[TemplateCoreConstants().parent_key]
+                            element[constants.CHECKBOX_FIELD_VALUE_KEY]
+                            and element[constants.PARENT_KEY]
                         ):
                             result[i + 1].append(element)
                     else:
                         if (
-                            element[TemplateCoreConstants().parent_key]
-                            and element[TemplateCoreConstants().parent_key][
-                                TemplateCoreConstants().element_type_key
+                            element[constants.PARENT_KEY]
+                            and element[constants.PARENT_KEY][
+                                constants.ELEMENT_TYPE_KEY
                             ]
                         ):
                             result[i + 1].append(element)
@@ -120,7 +119,7 @@ class Template:
         result = {}
 
         for i, page in enumerate(pdf.pages):
-            elements = page[TemplateCoreConstants().annotation_key]
+            elements = page[constants.ANNOTATION_KEY]
             result[i + 1] = []
             if elements:
                 for element in elements:
@@ -140,16 +139,16 @@ class Template:
         """Returns its annotated key given a PDF form element."""
 
         if sejda:
-            return element[TemplateCoreConstants().parent_key][
-                TemplateCoreConstants().annotation_field_key
+            return element[constants.PARENT_KEY][
+                constants.ANNOTATION_FIELD_KEY
             ][1:-1]
 
-        if not element[TemplateCoreConstants().annotation_field_key]:
-            return element[TemplateCoreConstants().parent_key][
-                TemplateCoreConstants().annotation_field_key
+        if not element[constants.ANNOTATION_FIELD_KEY]:
+            return element[constants.PARENT_KEY][
+                constants.ANNOTATION_FIELD_KEY
             ][1:-1]
 
-        return element[TemplateCoreConstants().annotation_field_key][1:-1]
+        return element[constants.ANNOTATION_FIELD_KEY][1:-1]
 
     def traverse_pattern(
         self, pattern: dict, element: "pdfrw.PdfDict"
@@ -186,37 +185,37 @@ class Template:
 
         if sejda:
             if (
-                element[TemplateCoreConstants().parent_key][
-                    TemplateCoreConstants().element_type_key
+                element[constants.PARENT_KEY][
+                    constants.ELEMENT_TYPE_KEY
                 ]
-                == TemplateCoreConstants().text_field_identifier
+                == constants.TEXT_FIELD_IDENTIFIER
             ):
                 return ElementType.text
             if (
-                element[TemplateCoreConstants().parent_key][
-                    TemplateCoreConstants().element_type_key
+                element[constants.PARENT_KEY][
+                    constants.ELEMENT_TYPE_KEY
                 ]
-                == TemplateCoreConstants().selectable_identifier
+                == constants.SELECTABLE_IDENTIFIER
             ):
                 if (
-                    element[TemplateCoreConstants().parent_key][
-                        TemplateCoreConstants().subtype_key
+                    element[constants.PARENT_KEY][
+                        constants.SUBTYPE_KEY
                     ]
-                    == TemplateCoreConstants().widget_subtype_key
+                    == constants.WIDGET_SUBTYPE_KEY
                 ):
                     return ElementType.checkbox
                 return ElementType.radio
 
         element_type_mapping = {
-            TemplateCoreConstants().selectable_identifier: ElementType.checkbox,
-            TemplateCoreConstants().text_field_identifier: ElementType.text,
+            constants.SELECTABLE_IDENTIFIER: ElementType.checkbox,
+            constants.TEXT_FIELD_IDENTIFIER: ElementType.text,
         }
 
         result = element_type_mapping.get(
-            str(element[TemplateCoreConstants().element_type_key])
+            str(element[constants.ELEMENT_TYPE_KEY])
         )
 
-        if not result and element[TemplateCoreConstants().parent_key]:
+        if not result and element[constants.PARENT_KEY]:
             return ElementType.radio
 
         return result
@@ -258,14 +257,14 @@ class Template:
 
         return (
             (
-                float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-                + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+                float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+                + float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
             )
             / 2
             - 5,
             (
-                float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-                + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+                float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+                + float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
             )
             / 2
             - 4,
@@ -280,12 +279,12 @@ class Template:
 
         string_height = element_middleware.font_size * 96 / 72
         width_mid_point = (
-            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-            + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+            float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+            + float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
         ) / 2
         height_mid_point = (
-            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-            + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+            float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+            + float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
         ) / 2
 
         return (
@@ -305,10 +304,10 @@ class Template:
     ) -> Tuple[Union[float, int], Union[float, int]]:
         """Returns coordinates to draw text at given a PDF form text element."""
 
-        x = float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+        x = float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
         y = (
-            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-            + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+            float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+            + float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
         ) / 2 - 2
 
         return x, y
@@ -318,8 +317,8 @@ class Template:
         """Returns the max length of the text field if presented or None."""
 
         return (
-            int(element[TemplateCoreConstants().text_field_max_length_key])
-            if TemplateCoreConstants().text_field_max_length_key in element
+            int(element[constants.TEXT_FIELD_MAX_LENGTH_KEY])
+            if constants.TEXT_FIELD_MAX_LENGTH_KEY in element
             else None
         )
 
@@ -342,13 +341,13 @@ class Template:
         for element in self.iterate_elements(pdf_file):
             base_key = self.get_element_key(element)
             existed_uuid = ""
-            if MergeConstants().separator in base_key:
-                base_key, existed_uuid = base_key.split(MergeConstants().separator)
+            if constants.SEPARATOR in base_key:
+                base_key, existed_uuid = base_key.split(constants.SEPARATOR)
 
             update_dict = {
-                TemplateCoreConstants().annotation_field_key.replace(
+                constants.ANNOTATION_FIELD_KEY.replace(
                     "/", ""
-                ): f"{base_key}{MergeConstants().separator}{existed_uuid or _uuid}"
+                ): f"{base_key}{constants.SEPARATOR}{existed_uuid or _uuid}"
             }
             element.update(pdfrw.PdfDict(**update_dict))
 
@@ -361,8 +360,8 @@ class Template:
         """Returns rectangular width of each character for combed text fields."""
 
         rect_width = abs(
-            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-            - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+            float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+            - float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
         )
         return rect_width / element_middleware.max_length
 
@@ -402,14 +401,14 @@ class Template:
         )
 
         alignment = (
-            element[TemplateCoreConstants().text_field_alignment_identifier] or 0
+            element[constants.TEXT_FIELD_ALIGNMENT_IDENTIFIER] or 0
         )
-        x = float(element[TemplateCoreConstants().annotation_rectangle_key][0])
+        x = float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
 
         if int(alignment) != 0:
             width_mid_point = (
-                float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-                + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+                float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+                + float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
             ) / 2
             string_width = stringWidth(
                 (element_middleware.value or "")[:length],
@@ -427,7 +426,7 @@ class Template:
                 x = width_mid_point - string_width / 2
             elif int(alignment) == 2:
                 x = (
-                    float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+                    float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
                     - string_width
                 )
                 if length > 0 and element_middleware.comb is True:
@@ -442,8 +441,8 @@ class Template:
 
         string_height = element_middleware.font_size * 96 / 72
         height_mid_point = (
-            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-            + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+            float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+            + float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
         ) / 2
 
         return (
