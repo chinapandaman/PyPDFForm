@@ -4,7 +4,7 @@
 from typing import BinaryIO, Dict, Union
 
 from ..core import filler
-from ..core.font import Font as FontCore
+from ..core import font
 from ..core.image import Image as ImageCore
 from ..core.template import Template as TemplateCore
 from ..core.utils import Utils as UtilsCore
@@ -179,4 +179,4 @@ class WrapperV2:
 
         ttf_file = FileAdapter().fp_or_f_obj_or_stream_to_stream(ttf_file)
 
-        return FontCore().register_font(font_name, ttf_file)
+        return font.register_font(font_name, ttf_file)
