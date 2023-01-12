@@ -11,7 +11,7 @@ from PyPDFForm.core import filler
 from PyPDFForm.core import template
 from PyPDFForm.middleware import constants as middleware_constants
 from PyPDFForm.middleware.element import ElementType
-from PyPDFForm.middleware.template import Template as TemplateMiddleware
+from PyPDFForm.middleware import template as template_middleware
 
 
 @pytest.fixture
@@ -46,7 +46,7 @@ def data_dict():
 
 
 def test_fill(template_stream, data_dict):
-    elements = TemplateMiddleware().build_elements(template_stream)
+    elements = template_middleware.build_elements(template_stream)
 
     for k, v in data_dict.items():
         if k in elements:
@@ -79,7 +79,7 @@ def test_fill(template_stream, data_dict):
 
 
 def test_fill_v2(template_stream, data_dict):
-    elements = TemplateMiddleware().build_elements(template_stream)
+    elements = template_middleware.build_elements(template_stream)
 
     for k, v in data_dict.items():
         if k in elements:
@@ -112,7 +112,7 @@ def test_fill_v2(template_stream, data_dict):
 
 
 def test_fill_sejda(sejda_template, sejda_data):
-    elements = TemplateMiddleware().build_elements(sejda_template, sejda=True)
+    elements = template_middleware.build_elements(sejda_template, sejda=True)
 
     for k, v in elements.items():
         if k in sejda_data:
@@ -140,7 +140,7 @@ def test_fill_sejda(sejda_template, sejda_data):
 
 
 def test_fill_sejda_v2(sejda_template, sejda_data):
-    elements = TemplateMiddleware().build_elements(sejda_template, sejda=True)
+    elements = template_middleware.build_elements(sejda_template, sejda=True)
 
     for k, v in elements.items():
         if k in sejda_data:
@@ -168,7 +168,7 @@ def test_fill_sejda_v2(sejda_template, sejda_data):
 
 
 def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
-    elements = TemplateMiddleware().build_elements(template_with_radiobutton_stream)
+    elements = template_middleware.build_elements(template_with_radiobutton_stream)
 
     data_dict = {key: value for key, value in data_dict.items()}
     data_dict["radio_1"] = 0

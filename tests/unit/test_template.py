@@ -10,7 +10,7 @@ from PyPDFForm.core import constants
 from PyPDFForm.core import template
 from PyPDFForm.middleware.element import ElementType
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
-from PyPDFForm.middleware.template import Template as TemplateMiddleware
+from PyPDFForm.middleware import template as template_middleware
 
 
 @pytest.fixture
@@ -51,7 +51,7 @@ def test_validate_template():
     bad_inputs = [""]
 
     try:
-        TemplateMiddleware().validate_template(*bad_inputs)
+        template_middleware.validate_template(*bad_inputs)
         assert False
     except InvalidTemplateError:
         assert True
@@ -59,12 +59,12 @@ def test_validate_template():
 
 def test_validate_template_stream(template_stream):
     try:
-        TemplateMiddleware().validate_stream(b"")
+        template_middleware.validate_stream(b"")
         assert False
     except InvalidTemplateError:
         assert True
 
-    TemplateMiddleware().validate_stream(template_stream)
+    template_middleware.validate_stream(template_stream)
     assert True
 
 
@@ -452,7 +452,7 @@ def test_get_element_type_v2_radiobutton(template_with_radiobutton_stream):
 
 def test_build_elements(template_with_radiobutton_stream, data_dict):
     for k, v in (
-        TemplateMiddleware().build_elements(template_with_radiobutton_stream).items()
+        template_middleware.build_elements(template_with_radiobutton_stream).items()
     ):
         if k in data_dict and k == v.name:
             data_dict[k] = True
@@ -463,7 +463,7 @@ def test_build_elements(template_with_radiobutton_stream, data_dict):
 
 def test_build_elements_v2(template_with_radiobutton_stream, data_dict):
     for k, v in (
-        TemplateMiddleware().build_elements_v2(template_with_radiobutton_stream).items()
+        template_middleware.build_elements_v2(template_with_radiobutton_stream).items()
     ):
         if k in data_dict and k == v.name:
             data_dict[k] = True
@@ -475,7 +475,7 @@ def test_build_elements_v2(template_with_radiobutton_stream, data_dict):
 def test_build_elements_sejda(sejda_template, sejda_data):
     data_dict = {key: False for key in sejda_data.keys()}
 
-    for k, v in TemplateMiddleware().build_elements(sejda_template, sejda=True).items():
+    for k, v in template_middleware.build_elements(sejda_template, sejda=True).items():
         if k in data_dict and k == v.name:
             data_dict[k] = True
 
@@ -486,7 +486,7 @@ def test_build_elements_sejda(sejda_template, sejda_data):
 def test_build_elements_v2_sejda(sejda_template, sejda_data):
     data_dict = {key: False for key in sejda_data.keys()}
 
-    for k, v in TemplateMiddleware().build_elements_v2(sejda_template).items():
+    for k, v in template_middleware.build_elements_v2(sejda_template).items():
         if k in data_dict and k == v.name:
             data_dict[k] = True
 
@@ -497,13 +497,13 @@ def test_build_elements_v2_sejda(sejda_template, sejda_data):
 def test_build_elements_v2_with_comb_text_field(
     sample_template_with_max_length_text_field, sample_template_with_comb_text_field
 ):
-    result = TemplateMiddleware().build_elements_v2(
+    result = template_middleware.build_elements_v2(
         sample_template_with_max_length_text_field
     )
     assert result["LastName"].max_length == 8
     assert result["LastName"].comb is None
 
-    result = TemplateMiddleware().build_elements_v2(
+    result = template_middleware.build_elements_v2(
         sample_template_with_comb_text_field
     )
     assert result["LastName"].max_length == 7

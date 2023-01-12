@@ -13,7 +13,7 @@ from . import adapter
 from . import constants
 from .element import Element as ElementMiddleware
 from .element import ElementType
-from .template import Template as TemplateMiddleware
+from . import template as template_middleware
 
 
 class WrapperV2:
@@ -28,7 +28,7 @@ class WrapperV2:
 
         self.stream = adapter.fp_or_f_obj_or_stream_to_stream(template)
         self.elements = (
-            TemplateMiddleware().build_elements_v2(self.stream) if self.stream else {}
+            template_middleware.build_elements_v2(self.stream) if self.stream else {}
         )
 
         for each in self.elements.values():
@@ -80,7 +80,7 @@ class WrapperV2:
                 self.elements[key].value = value
 
         if self.read():
-            self.elements = TemplateMiddleware().set_character_x_paddings(
+            self.elements = template_middleware.set_character_x_paddings(
                 self.stream, self.elements
             )
 

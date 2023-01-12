@@ -20,7 +20,7 @@ from .exceptions.input import (InvalidCoordinateError,
                                InvalidImageRotationAngleError,
                                InvalidModeError, InvalidPageNumberError,
                                InvalidTextError, InvalidTTFFontError)
-from .template import Template as TemplateMiddleware
+from . import template as template_middleware
 
 
 class PyPDFForm:
@@ -43,7 +43,7 @@ class PyPDFForm:
         """Constructs all attributes for the PyPDFForm object."""
 
         template = adapter.fp_or_f_obj_or_stream_to_stream(template)
-        TemplateMiddleware().validate_template(template)
+        template_middleware.validate_template(template)
         if not isinstance(simple_mode, bool):
             raise InvalidModeError
         if not isinstance(sejda, bool):
@@ -57,8 +57,8 @@ class PyPDFForm:
         if not simple_mode or sejda:
             self.elements = {}
             if template:
-                TemplateMiddleware().validate_stream(template)
-                self.elements = TemplateMiddleware().build_elements(template, sejda)
+                template_middleware.validate_stream(template)
+                self.elements = template_middleware.build_elements(template, sejda)
 
             for each in self.elements.values():
                 if each.type == ElementType.text:
@@ -81,8 +81,8 @@ class PyPDFForm:
         if not other.stream:
             return self
 
-        TemplateMiddleware().validate_stream(self.stream)
-        TemplateMiddleware().validate_stream(other.stream)
+        template_middleware.validate_stream(self.stream)
+        template_middleware.validate_stream(other.stream)
 
         pdf_one = (
             template.assign_uuid(self.stream) if not self.sejda else self.stream
@@ -104,7 +104,7 @@ class PyPDFForm:
     ) -> "PyPDFForm":
         """Fill a PDF form with customized parameters."""
 
-        TemplateMiddleware().validate_stream(self.stream)
+        template_middleware.validate_stream(self.stream)
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
@@ -137,7 +137,7 @@ class PyPDFForm:
     ) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
 
-        TemplateMiddleware().validate_stream(self.stream)
+        template_middleware.validate_stream(self.stream)
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
@@ -172,7 +172,7 @@ class PyPDFForm:
     ) -> "PyPDFForm":
         """Draws a text on a PDF form."""
 
-        TemplateMiddleware().validate_stream(self.stream)
+        template_middleware.validate_stream(self.stream)
 
         if not isinstance(text, str):
             raise InvalidTextError
@@ -227,7 +227,7 @@ class PyPDFForm:
     ) -> "PyPDFForm":
         """Draws an image on a PDF form."""
 
-        TemplateMiddleware().validate_stream(self.stream)
+        template_middleware.validate_stream(self.stream)
 
         image = adapter.fp_or_f_obj_or_stream_to_stream(image)
         if image is None:
