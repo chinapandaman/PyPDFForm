@@ -11,7 +11,7 @@ from ..middleware.element import Element as ElementMiddleware
 from ..middleware.element import ElementType
 from . import constants
 from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
-from .utils import Utils
+from . import utils
 
 
 def remove_all_elements(pdf: bytes) -> bytes:
@@ -25,7 +25,7 @@ def remove_all_elements(pdf: bytes) -> bytes:
             for j in reversed(range(len(elements))):
                 elements.pop(j)
 
-    return Utils().generate_stream(pdf)
+    return utils.generate_stream(pdf)
 
 
 def iterate_elements(
@@ -353,7 +353,7 @@ def assign_uuid(pdf: bytes) -> bytes:
         }
         element.update(pdfrw.PdfDict(**update_dict))
 
-    return Utils().generate_stream(pdf_file)
+    return utils.generate_stream(pdf_file)
 
 
 def get_char_rect_width(

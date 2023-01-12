@@ -10,7 +10,7 @@ from ..middleware.element import Element as ElementMiddleware
 from ..middleware.element import ElementType
 from . import constants
 from . import template
-from .utils import Utils
+from . import utils
 from .watermark import Watermark as WatermarkCore
 
 
@@ -45,7 +45,7 @@ def fill(
                 if sejda and elements[key].value is True:
                     texts_to_draw[page].append(
                         [
-                            Utils().checkbox_radio_to_draw(elements[key]),
+                            utils.checkbox_radio_to_draw(elements[key]),
                             template.get_draw_checkbox_radio_coordinates(
                                 _element
                             )[0],
@@ -59,7 +59,7 @@ def fill(
                         constants.CHECKBOX_FIELD_VALUE_KEY.replace(
                             "/", ""
                         )
-                    ] = Utils().bool_to_checkbox(elements[key].value)
+                    ] = utils.bool_to_checkbox(elements[key].value)
             elif elements[key].type == ElementType.radio:
                 if key not in radio_button_tracker:
                     radio_button_tracker[key] = 0
@@ -69,7 +69,7 @@ def fill(
                     if sejda:
                         texts_to_draw[page].append(
                             [
-                                Utils().checkbox_radio_to_draw(elements[key]),
+                                utils.checkbox_radio_to_draw(elements[key]),
                                 template.get_draw_checkbox_radio_coordinates(
                                     _element
                                 )[0],
@@ -125,7 +125,7 @@ def fill(
                 text_watermarks[i] = watermark
 
     return WatermarkCore().merge_watermarks_with_pdf(
-        Utils().generate_stream(template_pdf), text_watermarks
+        utils.generate_stream(template_pdf), text_watermarks
     )
 
 
@@ -137,7 +137,7 @@ def simple_fill(
     """Fills a PDF form in simple mode."""
 
     template_pdf = pdfrw.PdfReader(fdata=template_stream)
-    data = Utils().bool_to_checkboxes(data)
+    data = utils.bool_to_checkboxes(data)
 
     radio_button_tracker = {}
 
@@ -198,7 +198,7 @@ def simple_fill(
 
             element.update(pdfrw.PdfDict(**update_dict))
 
-    return Utils().generate_stream(template_pdf)
+    return utils.generate_stream(template_pdf)
 
 
 def fill_v2(
@@ -224,8 +224,8 @@ def fill_v2(
 
             if elements[key].type == ElementType.checkbox:
                 if elements[key].value:
-                    font_size = Utils().checkbox_radio_font_size(_element)
-                    _to_draw = Utils().checkbox_radio_to_draw(
+                    font_size = utils.checkbox_radio_font_size(_element)
+                    _to_draw = utils.checkbox_radio_to_draw(
                         elements[key], font_size
                     )
                     x, y = template.get_draw_checkbox_radio_coordinates_v2(
@@ -244,8 +244,8 @@ def fill_v2(
                 radio_button_tracker[key] += 1
 
                 if elements[key].value == radio_button_tracker[key] - 1:
-                    font_size = Utils().checkbox_radio_font_size(_element)
-                    _to_draw = Utils().checkbox_radio_to_draw(
+                    font_size = utils.checkbox_radio_font_size(_element)
+                    _to_draw = utils.checkbox_radio_to_draw(
                         elements[key], font_size
                     )
                     x, y = template.get_draw_checkbox_radio_coordinates_v2(
@@ -279,5 +279,5 @@ def fill_v2(
                 text_watermarks[i] = watermark
 
     return WatermarkCore().merge_watermarks_with_pdf(
-        Utils().generate_stream(template_pdf), text_watermarks
+        utils.generate_stream(template_pdf), text_watermarks
     )

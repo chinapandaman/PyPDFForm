@@ -7,7 +7,7 @@ from ..core import filler
 from ..core import font as font_core
 from ..core import image as image_core
 from ..core import template
-from ..core.utils import Utils as UtilsCore
+from ..core import utils
 from ..core.watermark import Watermark as WatermarkCore
 from .adapter import FileAdapter
 from .constants import Text as TextConstants
@@ -94,7 +94,7 @@ class PyPDFForm:
         )
 
         new_obj = self.__class__()
-        new_obj.stream = UtilsCore().merge_two_pdfs(pdf_one, pdf_two)
+        new_obj.stream = utils.merge_two_pdfs(pdf_one, pdf_two)
 
         return new_obj
 

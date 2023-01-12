@@ -9,7 +9,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
 from ..middleware.element import Element as ElementMiddleware
-from .utils import Utils
+from . import utils
 
 
 class Watermark:
@@ -172,4 +172,4 @@ class Watermark:
                     merger = pdfrw.PageMerge(page)
                     merger.add(watermark.pages[0]).render()
 
-        return Utils().generate_stream(pdf_file)
+        return utils.generate_stream(pdf_file)

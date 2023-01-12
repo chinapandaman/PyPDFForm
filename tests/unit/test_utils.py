@@ -8,7 +8,7 @@ import pytest
 
 from PyPDFForm.core import constants
 from PyPDFForm.core import template as template_core
-from PyPDFForm.core.utils import Utils
+from PyPDFForm.core import utils
 from PyPDFForm.middleware.element import Element, ElementType
 
 
@@ -38,7 +38,7 @@ def data_dict():
 def test_generate_stream(template_stream, data_dict):
     template = template_core.get_elements_by_page(template_stream)
     result = template_core.get_elements_by_page(
-        Utils.generate_stream(pdfrw.PdfReader(fdata=template_stream))
+        utils.generate_stream(pdfrw.PdfReader(fdata=template_stream))
     )
 
     page_count = len(template.keys())
@@ -53,22 +53,22 @@ def test_generate_stream(template_stream, data_dict):
 def test_bool_to_checkboxes(data_dict):
     result = deepcopy(data_dict)
 
-    for k, v in Utils().bool_to_checkboxes(result).items():
+    for k, v in utils.bool_to_checkboxes(result).items():
         if isinstance(data_dict[k], bool):
             assert v == (pdfrw.PdfName.Yes if data_dict[k] else pdfrw.PdfName.Off)
 
 
 def test_bool_to_checkbox():
-    assert Utils().bool_to_checkbox(True) == pdfrw.PdfName.Yes
-    assert Utils().bool_to_checkbox(False) == pdfrw.PdfName.Off
+    assert utils.bool_to_checkbox(True) == pdfrw.PdfName.Yes
+    assert utils.bool_to_checkbox(False) == pdfrw.PdfName.Off
 
 
-def checkbox_radio_to_draw():
+def test_checkbox_radio_to_draw():
     new_checkbox_element = Element("foo", ElementType.checkbox, True)
     new_radio_element = Element("bar", ElementType.radio, 0)
 
-    new_checkbox_to_draw = Utils().checkbox_radio_to_draw(new_checkbox_element, 9)
-    new_radio_to_draw = Utils().checkbox_radio_to_draw(new_radio_element, 9)
+    new_checkbox_to_draw = utils.checkbox_radio_to_draw(new_checkbox_element, 9)
+    new_radio_to_draw = utils.checkbox_radio_to_draw(new_radio_element, 9)
 
     assert new_checkbox_to_draw.value == "\u2713"
     assert new_checkbox_to_draw.type == ElementType.text
@@ -94,7 +94,7 @@ def checkbox_radio_to_draw():
 def test_merge_two_pdfs(template_stream, data_dict):
     template = template_core.get_elements_by_page(template_stream)
     result = template_core.get_elements_by_page(
-        Utils().merge_two_pdfs(template_stream, template_stream)
+        utils.merge_two_pdfs(template_stream, template_stream)
     )
 
     page_count = len(template.keys())
@@ -117,4 +117,4 @@ def test_checkbox_radio_font_size():
             ]
         }
     )
-    assert Utils().checkbox_radio_font_size(element) == 12
+    assert utils.checkbox_radio_font_size(element) == 12

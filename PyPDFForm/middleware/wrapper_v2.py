@@ -7,7 +7,7 @@ from ..core import filler
 from ..core import font
 from ..core import image as image_core
 from ..core import template
-from ..core.utils import Utils as UtilsCore
+from ..core import utils
 from ..core.watermark import Watermark as WatermarkCore
 from .adapter import FileAdapter
 from .constants import Text as TextConstants
@@ -65,7 +65,7 @@ class WrapperV2:
             return self
 
         new_obj = self.__class__()
-        new_obj.stream = UtilsCore().merge_two_pdfs(self.stream, other.stream)
+        new_obj.stream = utils.merge_two_pdfs(self.stream, other.stream)
 
         return new_obj
 
