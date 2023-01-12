@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.middleware import constants
 from PyPDFForm.middleware.element import Element, ElementType
 from PyPDFForm.middleware.exceptions.element import (InvalidElementNameError,
                                                      InvalidElementTypeError,
@@ -100,7 +100,7 @@ def test_validate_text_attributes(text_element):
     except InvalidFontError:
         assert True
 
-    text_element.font = TextConstants().global_font
+    text_element.font = constants.GLOBAL_FONT
 
     text_element.font_size = ""
 

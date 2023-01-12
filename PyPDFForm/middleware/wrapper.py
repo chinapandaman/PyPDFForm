@@ -10,7 +10,7 @@ from ..core import template
 from ..core import utils
 from ..core import watermark as watermark_core
 from . import adapter
-from .constants import Text as TextConstants
+from . import constants
 from .element import Element as ElementMiddleware
 from .element import ElementType
 from .exceptions.input import (InvalidCoordinateError,
@@ -30,14 +30,14 @@ class PyPDFForm:
         self,
         template: Union[bytes, str, BinaryIO] = b"",
         simple_mode: bool = True,
-        global_font: str = TextConstants().global_font,
-        global_font_size: Union[float, int] = TextConstants().global_font_size,
+        global_font: str = constants.GLOBAL_FONT,
+        global_font_size: Union[float, int] = constants.GLOBAL_FONT_SIZE,
         global_font_color: Tuple[
             Union[float, int], Union[float, int], Union[float, int]
-        ] = TextConstants().global_font_color,
-        global_text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
-        global_text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
-        global_text_wrap_length: int = TextConstants().global_text_wrap_length,
+        ] = constants.GLOBAL_FONT_COLOR,
+        global_text_x_offset: Union[float, int] = constants.GLOBAL_TEXT_X_OFFSET,
+        global_text_y_offset: Union[float, int] = constants.GLOBAL_TEXT_Y_OFFSET,
+        global_text_wrap_length: int = constants.GLOBAL_TEXT_WRAP_LENGTH,
         sejda: bool = False,
     ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
@@ -161,14 +161,14 @@ class PyPDFForm:
         page_number: int,
         x: Union[float, int],
         y: Union[float, int],
-        font: str = TextConstants().global_font,
-        font_size: Union[float, int] = TextConstants().global_font_size,
+        font: str = constants.GLOBAL_FONT,
+        font_size: Union[float, int] = constants.GLOBAL_FONT_SIZE,
         font_color: Tuple[
             Union[float, int], Union[float, int], Union[float, int]
-        ] = TextConstants().global_font_color,
-        text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
-        text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
-        text_wrap_length: int = TextConstants().global_text_wrap_length,
+        ] = constants.GLOBAL_FONT_COLOR,
+        text_x_offset: Union[float, int] = constants.GLOBAL_TEXT_X_OFFSET,
+        text_y_offset: Union[float, int] = constants.GLOBAL_TEXT_Y_OFFSET,
+        text_wrap_length: int = constants.GLOBAL_TEXT_WRAP_LENGTH,
     ) -> "PyPDFForm":
         """Draws a text on a PDF form."""
 

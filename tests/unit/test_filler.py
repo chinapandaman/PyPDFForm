@@ -9,7 +9,7 @@ from pdfrw.objects.pdfname import BasePdfName
 from PyPDFForm.core import constants
 from PyPDFForm.core import filler
 from PyPDFForm.core import template
-from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.middleware import constants as middleware_constants
 from PyPDFForm.middleware.element import ElementType
 from PyPDFForm.middleware.template import Template as TemplateMiddleware
 
@@ -53,12 +53,12 @@ def test_fill(template_stream, data_dict):
             elements[k].value = v
 
             if elements[k].type == ElementType.text:
-                elements[k].font = TextConstants().global_font
-                elements[k].font_size = TextConstants().global_font_size
-                elements[k].font_color = TextConstants().global_font_color
-                elements[k].text_x_offset = TextConstants().global_text_x_offset
-                elements[k].text_y_offset = TextConstants().global_text_y_offset
-                elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+                elements[k].font = middleware_constants.GLOBAL_FONT
+                elements[k].font_size = middleware_constants.GLOBAL_FONT_SIZE
+                elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
+                elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
+                elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
+                elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
             elements[k].validate_constants()
             elements[k].validate_value()
             elements[k].validate_text_attributes()
@@ -86,12 +86,12 @@ def test_fill_v2(template_stream, data_dict):
             elements[k].value = v
 
             if elements[k].type == ElementType.text:
-                elements[k].font = TextConstants().global_font
-                elements[k].font_size = TextConstants().global_font_size
-                elements[k].font_color = TextConstants().global_font_color
-                elements[k].text_x_offset = TextConstants().global_text_x_offset
-                elements[k].text_y_offset = TextConstants().global_text_y_offset
-                elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+                elements[k].font = middleware_constants.GLOBAL_FONT
+                elements[k].font_size = middleware_constants.GLOBAL_FONT_SIZE
+                elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
+                elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
+                elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
+                elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
             elements[k].validate_constants()
             elements[k].validate_value()
             elements[k].validate_text_attributes()
@@ -119,12 +119,12 @@ def test_fill_sejda(sejda_template, sejda_data):
             v.value = sejda_data[k]
 
         if elements[k].type == ElementType.text:
-            elements[k].font = TextConstants().global_font
-            elements[k].font_size = TextConstants().global_font_size
-            elements[k].font_color = TextConstants().global_font_color
-            elements[k].text_x_offset = TextConstants().global_text_x_offset
-            elements[k].text_y_offset = TextConstants().global_text_y_offset
-            elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+            elements[k].font = middleware_constants.GLOBAL_FONT
+            elements[k].font_size = middleware_constants.GLOBAL_FONT_SIZE
+            elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
+            elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
+            elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
+            elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
         elements[k].validate_constants()
         elements[k].validate_value()
         elements[k].validate_text_attributes()
@@ -147,12 +147,12 @@ def test_fill_sejda_v2(sejda_template, sejda_data):
             v.value = sejda_data[k]
 
         if elements[k].type == ElementType.text:
-            elements[k].font = TextConstants().global_font
-            elements[k].font_size = TextConstants().global_font_size
-            elements[k].font_color = TextConstants().global_font_color
-            elements[k].text_x_offset = TextConstants().global_text_x_offset
-            elements[k].text_y_offset = TextConstants().global_text_y_offset
-            elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+            elements[k].font = middleware_constants.GLOBAL_FONT
+            elements[k].font_size = middleware_constants.GLOBAL_FONT_SIZE
+            elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
+            elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
+            elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
+            elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
         elements[k].validate_constants()
         elements[k].validate_value()
         elements[k].validate_text_attributes()
@@ -182,12 +182,12 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
             elements[k].value = v
 
             if elements[k].type == ElementType.text:
-                elements[k].font = TextConstants().global_font
-                elements[k].font_size = TextConstants().global_font_size
-                elements[k].font_color = TextConstants().global_font_color
-                elements[k].text_x_offset = TextConstants().global_text_x_offset
-                elements[k].text_y_offset = TextConstants().global_text_y_offset
-                elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+                elements[k].font = middleware_constants.GLOBAL_FONT
+                elements[k].font_size = middleware_constants.GLOBAL_FONT_SIZE
+                elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
+                elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
+                elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
+                elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
             elements[k].validate_constants()
             elements[k].validate_value()
             elements[k].validate_text_attributes()

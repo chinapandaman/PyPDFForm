@@ -10,7 +10,7 @@ from ..core import template
 from ..core import utils
 from ..core import watermark as watermark_core
 from . import adapter
-from .constants import Text as TextConstants
+from . import constants
 from .element import Element as ElementMiddleware
 from .element import ElementType
 from .template import Template as TemplateMiddleware
@@ -33,21 +33,21 @@ class WrapperV2:
 
         for each in self.elements.values():
             if each.type == ElementType.text:
-                each.font = kwargs.get("global_font", TextConstants().global_font)
+                each.font = kwargs.get("global_font", constants.GLOBAL_FONT)
                 each.font_size = kwargs.get(
-                    "global_font_size", TextConstants().global_font_size
+                    "global_font_size", constants.GLOBAL_FONT_SIZE
                 )
                 each.font_color = kwargs.get(
-                    "global_font_color", TextConstants().global_font_color
+                    "global_font_color", constants.GLOBAL_FONT_COLOR
                 )
                 each.text_x_offset = kwargs.get(
-                    "global_text_x_offset", TextConstants().global_text_x_offset
+                    "global_text_x_offset", constants.GLOBAL_TEXT_X_OFFSET
                 )
                 each.text_y_offset = kwargs.get(
-                    "global_text_y_offset", TextConstants().global_text_y_offset
+                    "global_text_y_offset", constants.GLOBAL_TEXT_Y_OFFSET
                 )
                 each.text_wrap_length = kwargs.get(
-                    "global_text_wrap_length", TextConstants().global_text_wrap_length
+                    "global_text_wrap_length", constants.GLOBAL_TEXT_WRAP_LENGTH
                 )
 
     def read(self) -> bytes:
@@ -102,21 +102,21 @@ class WrapperV2:
 
         new_element = ElementMiddleware("new", ElementType.text)
         new_element.value = text
-        new_element.font = kwargs.get("font", TextConstants().global_font)
+        new_element.font = kwargs.get("font", constants.GLOBAL_FONT)
         new_element.font_size = kwargs.get(
-            "font_size", TextConstants().global_font_size
+            "font_size", constants.GLOBAL_FONT_SIZE
         )
         new_element.font_color = kwargs.get(
-            "font_color", TextConstants().global_font_color
+            "font_color", constants.GLOBAL_FONT_COLOR
         )
         new_element.text_x_offset = kwargs.get(
-            "text_x_offset", TextConstants().global_text_x_offset
+            "text_x_offset", constants.GLOBAL_TEXT_X_OFFSET
         )
         new_element.text_y_offset = kwargs.get(
-            "text_y_offset", TextConstants().global_text_y_offset
+            "text_y_offset", constants.GLOBAL_TEXT_Y_OFFSET
         )
         new_element.text_wrap_length = kwargs.get(
-            "text_wrap_length", TextConstants().global_text_wrap_length
+            "text_wrap_length", constants.GLOBAL_TEXT_WRAP_LENGTH
         )
 
         watermarks = watermark_core.create_watermarks_and_draw(

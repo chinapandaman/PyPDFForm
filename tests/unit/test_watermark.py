@@ -8,7 +8,7 @@ from reportlab.pdfgen import canvas
 
 from PyPDFForm.core import watermark as watermark_core
 from PyPDFForm.core import watermark as watermark_core
-from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.middleware import constants
 from PyPDFForm.middleware.element import Element as ElementMiddleware
 from PyPDFForm.middleware.element import ElementType
 
@@ -39,12 +39,12 @@ def image_stream(image_samples):
 def text_element():
     new_element = ElementMiddleware("new", ElementType.text)
     new_element.value = "drawn_text"
-    new_element.font = TextConstants().global_font
-    new_element.font_size = TextConstants().global_font_size
-    new_element.font_color = TextConstants().global_font_color
-    new_element.text_x_offset = TextConstants().global_text_x_offset
-    new_element.text_y_offset = TextConstants().global_text_y_offset
-    new_element.text_wrap_length = TextConstants().global_text_wrap_length
+    new_element.font = constants.GLOBAL_FONT
+    new_element.font_size = constants.GLOBAL_FONT_SIZE
+    new_element.font_color = constants.GLOBAL_FONT_COLOR
+    new_element.text_x_offset = constants.GLOBAL_TEXT_X_OFFSET
+    new_element.text_y_offset = constants.GLOBAL_TEXT_Y_OFFSET
+    new_element.text_wrap_length = constants.GLOBAL_TEXT_WRAP_LENGTH
     new_element.validate_constants()
     new_element.validate_value()
     new_element.validate_text_attributes()
