@@ -9,7 +9,7 @@ from ..core import image as image_core
 from ..core import template
 from ..core import utils
 from ..core import watermark as watermark_core
-from .adapter import FileAdapter
+from . import adapter
 from .constants import Text as TextConstants
 from .element import Element as ElementMiddleware
 from .element import ElementType
@@ -42,7 +42,7 @@ class PyPDFForm:
     ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
-        template = FileAdapter().fp_or_f_obj_or_stream_to_stream(template)
+        template = adapter.fp_or_f_obj_or_stream_to_stream(template)
         TemplateMiddleware().validate_template(template)
         if not isinstance(simple_mode, bool):
             raise InvalidModeError
@@ -229,7 +229,7 @@ class PyPDFForm:
 
         TemplateMiddleware().validate_stream(self.stream)
 
-        image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
+        image = adapter.fp_or_f_obj_or_stream_to_stream(image)
         if image is None:
             raise InvalidImageError
 
@@ -276,7 +276,7 @@ class PyPDFForm:
     ) -> bool:
         """Registers a font from a ttf file."""
 
-        ttf_file = FileAdapter().fp_or_f_obj_or_stream_to_stream(ttf_file)
+        ttf_file = adapter.fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         if any(
             [

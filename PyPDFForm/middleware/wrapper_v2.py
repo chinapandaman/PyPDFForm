@@ -9,7 +9,7 @@ from ..core import image as image_core
 from ..core import template
 from ..core import utils
 from ..core import watermark as watermark_core
-from .adapter import FileAdapter
+from . import adapter
 from .constants import Text as TextConstants
 from .element import Element as ElementMiddleware
 from .element import ElementType
@@ -26,7 +26,7 @@ class WrapperV2:
     ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
-        self.stream = FileAdapter().fp_or_f_obj_or_stream_to_stream(template)
+        self.stream = adapter.fp_or_f_obj_or_stream_to_stream(template)
         self.elements = (
             TemplateMiddleware().build_elements_v2(self.stream) if self.stream else {}
         )
@@ -148,7 +148,7 @@ class WrapperV2:
     ) -> "WrapperV2":
         """Draws an image on a PDF form."""
 
-        image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
+        image = adapter.fp_or_f_obj_or_stream_to_stream(image)
         image = image_core.any_image_to_jpg(image)
         image = image_core.rotate_image(image, rotation)
         watermarks = watermark_core.create_watermarks_and_draw(
@@ -177,6 +177,6 @@ class WrapperV2:
     ) -> bool:
         """Registers a font from a ttf file."""
 
-        ttf_file = FileAdapter().fp_or_f_obj_or_stream_to_stream(ttf_file)
+        ttf_file = adapter.fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         return font.register_font(font_name, ttf_file)
