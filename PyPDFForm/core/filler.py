@@ -11,7 +11,7 @@ from ..middleware.element import ElementType
 from . import constants
 from . import template
 from . import utils
-from .watermark import Watermark as WatermarkCore
+from . import watermark as watermark_core
 
 
 def fill(
@@ -117,14 +117,14 @@ def fill(
                 _element.update(pdfrw.PdfDict(**update_dict))
 
     for page, texts in texts_to_draw.items():
-        _watermarks = WatermarkCore().create_watermarks_and_draw(
+        _watermarks = watermark_core.create_watermarks_and_draw(
             template_stream, page, "text", texts
         )
         for i, watermark in enumerate(_watermarks):
             if watermark:
                 text_watermarks[i] = watermark
 
-    return WatermarkCore().merge_watermarks_with_pdf(
+    return watermark_core.merge_watermarks_with_pdf(
         utils.generate_stream(template_pdf), text_watermarks
     )
 
@@ -271,13 +271,13 @@ def fill_v2(
                 )
 
     for page, texts in texts_to_draw.items():
-        _watermarks = WatermarkCore().create_watermarks_and_draw(
+        _watermarks = watermark_core.create_watermarks_and_draw(
             template_stream, page, "text", texts
         )
         for i, watermark in enumerate(_watermarks):
             if watermark:
                 text_watermarks[i] = watermark
 
-    return WatermarkCore().merge_watermarks_with_pdf(
+    return watermark_core.merge_watermarks_with_pdf(
         utils.generate_stream(template_pdf), text_watermarks
     )

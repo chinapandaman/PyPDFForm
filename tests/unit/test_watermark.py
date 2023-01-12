@@ -6,7 +6,8 @@ from io import BytesIO
 import pytest
 from reportlab.pdfgen import canvas
 
-from PyPDFForm.core.watermark import Watermark as WatermarkCore
+from PyPDFForm.core import watermark as watermark_core
+from PyPDFForm.core import watermark as watermark_core
 from PyPDFForm.middleware.constants import Text as TextConstants
 from PyPDFForm.middleware.element import Element as ElementMiddleware
 from PyPDFForm.middleware.element import ElementType
@@ -59,7 +60,7 @@ def test_draw_text(text_element):
 
     c = canvas.Canvas(buff, pagesize=(100, 100))
 
-    WatermarkCore().draw_text(
+    watermark_core.draw_text(
         c,
         text_element,
         300,
@@ -82,7 +83,7 @@ def test_draw_image(image_stream):
 
     c = canvas.Canvas(buff, pagesize=(100, 100))
 
-    WatermarkCore().draw_image(c, image_stream, 100, 100, 400, 225)
+    watermark_core.draw_image(c, image_stream, 100, 100, 400, 225)
 
     c.save()
     buff.seek(0)
@@ -95,7 +96,7 @@ def test_draw_image(image_stream):
 def test_create_watermarks_and_draw_texts(template_stream, text_element):
     page_number = 2
 
-    watermarks = WatermarkCore().create_watermarks_and_draw(
+    watermarks = watermark_core.create_watermarks_and_draw(
         template_stream,
         page_number,
         "text",
@@ -114,7 +115,7 @@ def test_create_watermarks_and_draw_texts(template_stream, text_element):
         else:
             assert not watermarks[i]
 
-    watermarks_drawn_two_texts = WatermarkCore().create_watermarks_and_draw(
+    watermarks_drawn_two_texts = watermark_core.create_watermarks_and_draw(
         template_stream,
         page_number,
         "text",
@@ -138,7 +139,7 @@ def test_create_watermarks_and_draw_texts(template_stream, text_element):
 def test_create_watermarks_and_draw_images(template_stream, image_stream):
     page_number = 2
 
-    watermarks = WatermarkCore().create_watermarks_and_draw(
+    watermarks = watermark_core.create_watermarks_and_draw(
         template_stream,
         page_number,
         "image",
@@ -159,7 +160,7 @@ def test_create_watermarks_and_draw_images(template_stream, image_stream):
         else:
             assert not watermarks[i]
 
-    watermarks_drawn_two_images = WatermarkCore().create_watermarks_and_draw(
+    watermarks_drawn_two_images = watermark_core.create_watermarks_and_draw(
         template_stream,
         page_number,
         "image",
@@ -185,7 +186,7 @@ def test_create_watermarks_and_draw_images(template_stream, image_stream):
 
 
 def test_merge_watermarks_with_pdf(template_stream, image_stream):
-    watermarks = WatermarkCore().create_watermarks_and_draw(
+    watermarks = watermark_core.create_watermarks_and_draw(
         template_stream,
         2,
         "image",
@@ -200,6 +201,6 @@ def test_merge_watermarks_with_pdf(template_stream, image_stream):
         ],
     )
 
-    assert template_stream != WatermarkCore().merge_watermarks_with_pdf(
+    assert template_stream != watermark_core.merge_watermarks_with_pdf(
         template_stream, watermarks
     )

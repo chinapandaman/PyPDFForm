@@ -8,7 +8,7 @@ from ..core import font
 from ..core import image as image_core
 from ..core import template
 from ..core import utils
-from ..core.watermark import Watermark as WatermarkCore
+from ..core import watermark as watermark_core
 from .adapter import FileAdapter
 from .constants import Text as TextConstants
 from .element import Element as ElementMiddleware
@@ -119,7 +119,7 @@ class WrapperV2:
             "text_wrap_length", TextConstants().global_text_wrap_length
         )
 
-        watermarks = WatermarkCore().create_watermarks_and_draw(
+        watermarks = watermark_core.create_watermarks_and_draw(
             self.stream,
             page_number,
             "text",
@@ -132,7 +132,7 @@ class WrapperV2:
             ],
         )
 
-        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = watermark_core.merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
 
@@ -151,11 +151,11 @@ class WrapperV2:
         image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
         image = image_core.any_image_to_jpg(image)
         image = image_core.rotate_image(image, rotation)
-        watermarks = WatermarkCore().create_watermarks_and_draw(
+        watermarks = watermark_core.create_watermarks_and_draw(
             self.stream, page_number, "image", [[image, x, y, width, height]]
         )
 
-        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = watermark_core.merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
 

@@ -8,7 +8,7 @@ from ..core import font as font_core
 from ..core import image as image_core
 from ..core import template
 from ..core import utils
-from ..core.watermark import Watermark as WatermarkCore
+from ..core import watermark as watermark_core
 from .adapter import FileAdapter
 from .constants import Text as TextConstants
 from .element import Element as ElementMiddleware
@@ -198,7 +198,7 @@ class PyPDFForm:
         new_element.validate_value()
         new_element.validate_text_attributes()
 
-        watermarks = WatermarkCore().create_watermarks_and_draw(
+        watermarks = watermark_core.create_watermarks_and_draw(
             self.stream,
             page_number,
             "text",
@@ -211,7 +211,7 @@ class PyPDFForm:
             ],
         )
 
-        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = watermark_core.merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
 
@@ -257,11 +257,11 @@ class PyPDFForm:
         if not isinstance(height, (float, int)):
             raise InvalidImageDimensionError
 
-        watermarks = WatermarkCore().create_watermarks_and_draw(
+        watermarks = watermark_core.create_watermarks_and_draw(
             self.stream, page_number, "image", [[image, x, y, width, height]]
         )
 
-        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = watermark_core.merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
 
