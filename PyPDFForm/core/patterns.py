@@ -2,22 +2,22 @@
 """Contains patterns used for identifying properties of elements."""
 
 from ..middleware.element import ElementType
-from .constants import Template
+from . import constants
 
 ELEMENT_TYPE_PATTERNS = [
     (
-        ({Template().element_type_key: Template().text_field_identifier},),
+        ({constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER},),
         ElementType.text,
     ),
     (
-        ({Template().element_type_key: Template().selectable_identifier},),
+        ({constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER},),
         ElementType.checkbox,
     ),
     (
         (
             {
-                Template().parent_key: {
-                    Template().element_type_key: Template().text_field_identifier
+                constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER
                 }
             },
         ),
@@ -26,13 +26,13 @@ ELEMENT_TYPE_PATTERNS = [
     (
         (
             {
-                Template().parent_key: {
-                    Template().element_type_key: Template().selectable_identifier
+                constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
                 }
             },
             {
-                Template().parent_key: {
-                    Template().subtype_key: Template().widget_subtype_key
+                constants.PARENT_KEY: {
+                    constants.SUBTYPE_KEY: constants.WIDGET_SUBTYPE_KEY
                 }
             },
         ),
@@ -41,8 +41,8 @@ ELEMENT_TYPE_PATTERNS = [
     (
         (
             {
-                Template().parent_key: {
-                    Template().element_type_key: Template().selectable_identifier
+                constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
                 }
             },
         ),
@@ -51,6 +51,6 @@ ELEMENT_TYPE_PATTERNS = [
 ]
 
 ELEMENT_KEY_PATTERNS = [
-    {Template().annotation_field_key: True},
-    {Template().parent_key: {Template().annotation_field_key: True}},
+    {constants.ANNOTATION_FIELD_KEY: True},
+    {constants.PARENT_KEY: {constants.ANNOTATION_FIELD_KEY: True}},
 ]

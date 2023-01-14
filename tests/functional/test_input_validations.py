@@ -5,7 +5,7 @@ import os
 import pytest
 
 from PyPDFForm import PyPDFForm
-from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.middleware import constants
 from PyPDFForm.middleware.exceptions.element import (InvalidFontColorError,
                                                      InvalidFontError,
                                                      InvalidFontSizeError,
@@ -95,7 +95,7 @@ def test_validate_constructor_inputs(pdf_samples, template_stream):
     except InvalidFontError:
         assert True
 
-    bad_inputs[2] = TextConstants().global_font
+    bad_inputs[2] = constants.GLOBAL_FONT
 
     try:
         PyPDFForm(*bad_inputs)
@@ -323,7 +323,7 @@ def test_validate_draw_text_inputs(template_stream):
     except InvalidFontError:
         assert True
 
-    bad_inputs[4] = TextConstants().global_font
+    bad_inputs[4] = constants.GLOBAL_FONT
 
     try:
         PyPDFForm(template_stream).draw_text(*bad_inputs)

@@ -6,7 +6,7 @@ from io import BytesIO
 import pytest
 from PIL import Image
 
-from PyPDFForm.core.image import Image as ImageCore
+from PyPDFForm.core import image
 
 
 @pytest.fixture
@@ -38,12 +38,12 @@ def after_converted(image_samples):
 
 
 def test_is_image(image_stream):
-    assert not ImageCore().is_image(b"bad_stream")
-    assert ImageCore().is_image(image_stream)
+    assert not image.is_image(b"bad_stream")
+    assert image.is_image(image_stream)
 
 
 def test_rotate_image(image_stream):
-    rotated = ImageCore().rotate_image(image_stream, 180)
+    rotated = image.rotate_image(image_stream, 180)
 
     assert rotated != image_stream
 
@@ -62,7 +62,7 @@ def test_rotate_image(image_stream):
 
 
 def test_any_image_to_jpg(before_converted, after_converted):
-    _converted = ImageCore().any_image_to_jpg(before_converted)
+    _converted = image.any_image_to_jpg(before_converted)
     if os.name == "nt":
         assert len(_converted) == len(after_converted)
         assert _converted == after_converted

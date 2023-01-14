@@ -5,7 +5,7 @@ import os
 import pytest
 
 from PyPDFForm import PyPDFForm
-from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.middleware import constants
 
 
 @pytest.fixture
@@ -42,7 +42,7 @@ def test_draw_text_on_one_page(template_stream, pdf_samples):
             1,
             300,
             225,
-            TextConstants().global_font,
+            constants.GLOBAL_FONT,
             20,
             (1, 0, 0),
             50,

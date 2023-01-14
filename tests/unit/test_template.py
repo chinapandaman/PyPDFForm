@@ -6,12 +6,11 @@ import uuid
 import pdfrw
 import pytest
 
-from PyPDFForm.core.constants import Merge as MergeCoreConstants
-from PyPDFForm.core.constants import Template as TemplateCoreConstants
-from PyPDFForm.core.template import Template as TemplateCore
+from PyPDFForm.core import constants
+from PyPDFForm.core import template
 from PyPDFForm.middleware.element import ElementType
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
-from PyPDFForm.middleware.template import Template as TemplateMiddleware
+from PyPDFForm.middleware import template as template_middleware
 
 
 @pytest.fixture
@@ -52,7 +51,7 @@ def test_validate_template():
     bad_inputs = [""]
 
     try:
-        TemplateMiddleware().validate_template(*bad_inputs)
+        template_middleware.validate_template(*bad_inputs)
         assert False
     except InvalidTemplateError:
         assert True
@@ -60,25 +59,25 @@ def test_validate_template():
 
 def test_validate_template_stream(template_stream):
     try:
-        TemplateMiddleware().validate_stream(b"")
+        template_middleware.validate_stream(b"")
         assert False
     except InvalidTemplateError:
         assert True
 
-    TemplateMiddleware().validate_stream(template_stream)
+    template_middleware.validate_stream(template_stream)
     assert True
 
 
 def test_remove_all_elements(template_stream):
-    result = TemplateCore().remove_all_elements(template_stream)
-    assert not TemplateCore().iterate_elements(result)
+    result = template.remove_all_elements(template_stream)
+    assert not template.iterate_elements(result)
 
 
 def test_iterate_elements_and_get_element_key(
     template_with_radiobutton_stream, data_dict
 ):
-    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
-        data_dict[TemplateCore().get_element_key(each)] = True
+    for each in template.iterate_elements(template_with_radiobutton_stream):
+        data_dict[template.get_element_key(each)] = True
 
     for k in data_dict.keys():
         assert data_dict[k]
@@ -87,9 +86,9 @@ def test_iterate_elements_and_get_element_key(
 def test_iterate_elements_and_get_element_key_v2(
     template_with_radiobutton_stream, data_dict
 ):
-    assert TemplateCore().get_element_key_v2(pdfrw.PdfDict()) is None
-    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
-        data_dict[TemplateCore().get_element_key_v2(each)] = True
+    assert template.get_element_key_v2(pdfrw.PdfDict()) is None
+    for each in template.iterate_elements(template_with_radiobutton_stream):
+        data_dict[template.get_element_key_v2(each)] = True
 
     for k in data_dict.keys():
         assert data_dict[k]
@@ -97,8 +96,8 @@ def test_iterate_elements_and_get_element_key_v2(
 
 def test_iterate_elements_and_get_element_key_sejda(sejda_template, sejda_data):
     data_dict = {key: False for key in sejda_data.keys()}
-    for each in TemplateCore().iterate_elements(sejda_template, sejda=True):
-        data_dict[TemplateCore().get_element_key(each, sejda=True)] = True
+    for each in template.iterate_elements(sejda_template, sejda=True):
+        data_dict[template.get_element_key(each, sejda=True)] = True
 
     for k in data_dict.keys():
         assert data_dict[k]
@@ -106,8 +105,8 @@ def test_iterate_elements_and_get_element_key_sejda(sejda_template, sejda_data):
 
 def test_iterate_elements_and_get_element_key_v2_sejda(sejda_template, sejda_data):
     data_dict = {key: False for key in sejda_data.keys()}
-    for each in TemplateCore().iterate_elements(sejda_template, sejda=True):
-        data_dict[TemplateCore().get_element_key_v2(each)] = True
+    for each in template.iterate_elements(sejda_template, sejda=True):
+        data_dict[template.get_element_key_v2(each)] = True
 
     for k in data_dict.keys():
         assert data_dict[k]
@@ -148,10 +147,10 @@ def test_get_elements_by_page_sejda(sejda_template):
     }
 
     for page, elements in (
-        TemplateCore().get_elements_by_page(sejda_template, sejda=True).items()
+        template.get_elements_by_page(sejda_template, sejda=True).items()
     ):
         for each in elements:
-            expected[page][TemplateCore().get_element_key(each, sejda=True)] = True
+            expected[page][template.get_element_key(each, sejda=True)] = True
 
     for page, elements in expected.items():
         for k in elements.keys():
@@ -193,10 +192,10 @@ def test_get_elements_by_page_sejda_v2(sejda_template):
     }
 
     for page, elements in (
-        TemplateCore().get_elements_by_page_v2(sejda_template).items()
+        template.get_elements_by_page_v2(sejda_template).items()
     ):
         for each in elements:
-            expected[page][TemplateCore().get_element_key(each, sejda=True)] = True
+            expected[page][template.get_element_key(each, sejda=True)] = True
 
     for page, elements in expected.items():
         for k in elements.keys():
@@ -223,10 +222,10 @@ def test_get_elements_by_page(template_with_radiobutton_stream):
     }
 
     for page, elements in (
-        TemplateCore().get_elements_by_page(template_with_radiobutton_stream).items()
+        template.get_elements_by_page(template_with_radiobutton_stream).items()
     ):
         for each in elements:
-            expected[page][TemplateCore().get_element_key(each)] = True
+            expected[page][template.get_element_key(each)] = True
 
     for page, elements in expected.items():
         for k in elements.keys():
@@ -253,10 +252,10 @@ def test_get_elements_by_page_v2(template_with_radiobutton_stream):
     }
 
     for page, elements in (
-        TemplateCore().get_elements_by_page_v2(template_with_radiobutton_stream).items()
+        template.get_elements_by_page_v2(template_with_radiobutton_stream).items()
     ):
         for each in elements:
-            expected[page][TemplateCore().get_element_key(each)] = True
+            expected[page][template.get_element_key(each)] = True
 
     for page, elements in expected.items():
         for k in elements.keys():
@@ -294,17 +293,17 @@ def test_get_element_type_sejda(sejda_template):
         "seller_dl_state": ElementType.text,
     }
 
-    for each in TemplateCore().iterate_elements(sejda_template, sejda=True):
+    for each in template.iterate_elements(sejda_template, sejda=True):
         assert type_mapping[
-            TemplateCore().get_element_key(each, sejda=True)
-        ] == TemplateCore().get_element_type(each, sejda=True)
+            template.get_element_key(each, sejda=True)
+        ] == template.get_element_type(each, sejda=True)
 
     read_template_stream = pdfrw.PdfReader(fdata=sejda_template)
 
-    for each in TemplateCore().iterate_elements(read_template_stream):
+    for each in template.iterate_elements(read_template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key(each, sejda=True)
-        ] == TemplateCore().get_element_type(each, sejda=True)
+            template.get_element_key(each, sejda=True)
+        ] == template.get_element_type(each, sejda=True)
 
 
 def test_get_element_type_v2_sejda(sejda_template):
@@ -338,17 +337,17 @@ def test_get_element_type_v2_sejda(sejda_template):
         "seller_dl_state": ElementType.text,
     }
 
-    for each in TemplateCore().iterate_elements(sejda_template, sejda=True):
+    for each in template.iterate_elements(sejda_template, sejda=True):
         assert type_mapping[
-            TemplateCore().get_element_key_v2(each)
-        ] == TemplateCore().get_element_type_v2(each)
+            template.get_element_key_v2(each)
+        ] == template.get_element_type_v2(each)
 
     read_template_stream = pdfrw.PdfReader(fdata=sejda_template)
 
-    for each in TemplateCore().iterate_elements(read_template_stream):
+    for each in template.iterate_elements(read_template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key_v2(each)
-        ] == TemplateCore().get_element_type_v2(each)
+            template.get_element_key_v2(each)
+        ] == template.get_element_type_v2(each)
 
 
 def test_get_element_type(template_stream):
@@ -361,21 +360,21 @@ def test_get_element_type(template_stream):
         "check_3": ElementType.checkbox,
     }
 
-    for each in TemplateCore().iterate_elements(template_stream):
+    for each in template.iterate_elements(template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key(each)
-        ] == TemplateCore().get_element_type(each)
+            template.get_element_key(each)
+        ] == template.get_element_type(each)
 
     read_template_stream = pdfrw.PdfReader(fdata=template_stream)
 
-    for each in TemplateCore().iterate_elements(read_template_stream):
+    for each in template.iterate_elements(read_template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key(each)
-        ] == TemplateCore().get_element_type(each)
+            template.get_element_key(each)
+        ] == template.get_element_type(each)
 
 
 def test_get_element_type_v2(template_stream):
-    assert TemplateCore().get_element_type_v2(pdfrw.PdfDict()) is None
+    assert template.get_element_type_v2(pdfrw.PdfDict()) is None
 
     type_mapping = {
         "test": ElementType.text,
@@ -386,17 +385,17 @@ def test_get_element_type_v2(template_stream):
         "check_3": ElementType.checkbox,
     }
 
-    for each in TemplateCore().iterate_elements(template_stream):
+    for each in template.iterate_elements(template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key_v2(each)
-        ] == TemplateCore().get_element_type_v2(each)
+            template.get_element_key_v2(each)
+        ] == template.get_element_type_v2(each)
 
     read_template_stream = pdfrw.PdfReader(fdata=template_stream)
 
-    for each in TemplateCore().iterate_elements(read_template_stream):
+    for each in template.iterate_elements(read_template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key_v2(each)
-        ] == TemplateCore().get_element_type_v2(each)
+            template.get_element_key_v2(each)
+        ] == template.get_element_type_v2(each)
 
 
 def test_get_element_type_radiobutton(template_with_radiobutton_stream):
@@ -412,17 +411,17 @@ def test_get_element_type_radiobutton(template_with_radiobutton_stream):
         "radio_3": ElementType.radio,
     }
 
-    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
+    for each in template.iterate_elements(template_with_radiobutton_stream):
         assert type_mapping[
-            TemplateCore().get_element_key(each)
-        ] == TemplateCore().get_element_type(each)
+            template.get_element_key(each)
+        ] == template.get_element_type(each)
 
     read_template_stream = pdfrw.PdfReader(fdata=template_with_radiobutton_stream)
 
-    for each in TemplateCore().iterate_elements(read_template_stream):
+    for each in template.iterate_elements(read_template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key(each)
-        ] == TemplateCore().get_element_type(each)
+            template.get_element_key(each)
+        ] == template.get_element_type(each)
 
 
 def test_get_element_type_v2_radiobutton(template_with_radiobutton_stream):
@@ -438,22 +437,22 @@ def test_get_element_type_v2_radiobutton(template_with_radiobutton_stream):
         "radio_3": ElementType.radio,
     }
 
-    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
+    for each in template.iterate_elements(template_with_radiobutton_stream):
         assert type_mapping[
-            TemplateCore().get_element_key_v2(each)
-        ] == TemplateCore().get_element_type_v2(each)
+            template.get_element_key_v2(each)
+        ] == template.get_element_type_v2(each)
 
     read_template_stream = pdfrw.PdfReader(fdata=template_with_radiobutton_stream)
 
-    for each in TemplateCore().iterate_elements(read_template_stream):
+    for each in template.iterate_elements(read_template_stream):
         assert type_mapping[
-            TemplateCore().get_element_key_v2(each)
-        ] == TemplateCore().get_element_type_v2(each)
+            template.get_element_key_v2(each)
+        ] == template.get_element_type_v2(each)
 
 
 def test_build_elements(template_with_radiobutton_stream, data_dict):
     for k, v in (
-        TemplateMiddleware().build_elements(template_with_radiobutton_stream).items()
+        template_middleware.build_elements(template_with_radiobutton_stream).items()
     ):
         if k in data_dict and k == v.name:
             data_dict[k] = True
@@ -464,7 +463,7 @@ def test_build_elements(template_with_radiobutton_stream, data_dict):
 
 def test_build_elements_v2(template_with_radiobutton_stream, data_dict):
     for k, v in (
-        TemplateMiddleware().build_elements_v2(template_with_radiobutton_stream).items()
+        template_middleware.build_elements_v2(template_with_radiobutton_stream).items()
     ):
         if k in data_dict and k == v.name:
             data_dict[k] = True
@@ -476,7 +475,7 @@ def test_build_elements_v2(template_with_radiobutton_stream, data_dict):
 def test_build_elements_sejda(sejda_template, sejda_data):
     data_dict = {key: False for key in sejda_data.keys()}
 
-    for k, v in TemplateMiddleware().build_elements(sejda_template, sejda=True).items():
+    for k, v in template_middleware.build_elements(sejda_template, sejda=True).items():
         if k in data_dict and k == v.name:
             data_dict[k] = True
 
@@ -487,7 +486,7 @@ def test_build_elements_sejda(sejda_template, sejda_data):
 def test_build_elements_v2_sejda(sejda_template, sejda_data):
     data_dict = {key: False for key in sejda_data.keys()}
 
-    for k, v in TemplateMiddleware().build_elements_v2(sejda_template).items():
+    for k, v in template_middleware.build_elements_v2(sejda_template).items():
         if k in data_dict and k == v.name:
             data_dict[k] = True
 
@@ -498,13 +497,13 @@ def test_build_elements_v2_sejda(sejda_template, sejda_data):
 def test_build_elements_v2_with_comb_text_field(
     sample_template_with_max_length_text_field, sample_template_with_comb_text_field
 ):
-    result = TemplateMiddleware().build_elements_v2(
+    result = template_middleware.build_elements_v2(
         sample_template_with_max_length_text_field
     )
     assert result["LastName"].max_length == 8
     assert result["LastName"].comb is None
 
-    result = TemplateMiddleware().build_elements_v2(
+    result = template_middleware.build_elements_v2(
         sample_template_with_comb_text_field
     )
     assert result["LastName"].max_length == 7
@@ -512,17 +511,17 @@ def test_build_elements_v2_with_comb_text_field(
 
 
 def test_get_draw_checkbox_radio_coordinates(sejda_template):
-    for element in TemplateCore().iterate_elements(sejda_template):
-        assert TemplateCore().get_draw_checkbox_radio_coordinates(element) == (
+    for element in template.iterate_elements(sejda_template):
+        assert template.get_draw_checkbox_radio_coordinates(element) == (
             (
-                float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-                + float(element[TemplateCoreConstants().annotation_rectangle_key][2])
+                float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+                + float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
             )
             / 2
             - 5,
             (
-                float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-                + float(element[TemplateCoreConstants().annotation_rectangle_key][3])
+                float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+                + float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
             )
             / 2
             - 4,
@@ -530,13 +529,13 @@ def test_get_draw_checkbox_radio_coordinates(sejda_template):
 
 
 def test_assign_uuid(template_with_radiobutton_stream, data_dict):
-    for element in TemplateCore().iterate_elements(
-        TemplateCore().assign_uuid(template_with_radiobutton_stream)
+    for element in template.iterate_elements(
+        template.assign_uuid(template_with_radiobutton_stream)
     ):
-        key = TemplateCore().get_element_key(element)
-        assert MergeCoreConstants().separator in key
+        key = template.get_element_key(element)
+        assert constants.SEPARATOR in key
 
-        key, _uuid = key.split(MergeCoreConstants().separator)
+        key, _uuid = key.split(constants.SEPARATOR)
 
         assert len(_uuid) == len(uuid.uuid4().hex)
         data_dict[key] = True
@@ -559,31 +558,31 @@ def test_traverse_pattern(template_with_radiobutton_stream):
     }
 
     type_to_pattern = {
-        "text": {TemplateCoreConstants().annotation_field_key: True},
-        "check": {TemplateCoreConstants().annotation_field_key: True},
+        "text": {constants.ANNOTATION_FIELD_KEY: True},
+        "check": {constants.ANNOTATION_FIELD_KEY: True},
         "radio": {
-            TemplateCoreConstants().parent_key: {
-                TemplateCoreConstants().annotation_field_key: True
+            constants.PARENT_KEY: {
+                constants.ANNOTATION_FIELD_KEY: True
             }
         },
     }
 
-    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
-        key = TemplateCore().get_element_key(each)
+    for each in template.iterate_elements(template_with_radiobutton_stream):
+        key = template.get_element_key(each)
         pattern = type_to_pattern[_data_dict[key]]
-        assert TemplateCore().traverse_pattern(pattern, each)[1:-1] == key
+        assert template.traverse_pattern(pattern, each)[1:-1] == key
 
 
 def test_traverse_pattern_sejda(sejda_template):
     pattern = {
-        TemplateCoreConstants().parent_key: {
-            TemplateCoreConstants().annotation_field_key: True
+        constants.PARENT_KEY: {
+            constants.ANNOTATION_FIELD_KEY: True
         }
     }
 
-    for each in TemplateCore().iterate_elements(sejda_template):
-        key = TemplateCore().get_element_key(each)
-        assert TemplateCore().traverse_pattern(pattern, each)[1:-1] == key
+    for each in template.iterate_elements(sejda_template):
+        key = template.get_element_key(each)
+        assert template.traverse_pattern(pattern, each)[1:-1] == key
 
 
 def test_find_pattern_match(template_with_radiobutton_stream):
@@ -602,35 +601,29 @@ def test_find_pattern_match(template_with_radiobutton_stream):
     type_to_pattern = {
         "text": (
             {
-                TemplateCoreConstants()
-                .element_type_key: TemplateCoreConstants()
-                .text_field_identifier
+                constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER
             },
         ),
         "check": (
             {
-                TemplateCoreConstants()
-                .element_type_key: TemplateCoreConstants()
-                .selectable_identifier
+                constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
             },
         ),
         "radio": (
             {
-                TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants()
-                    .element_type_key: TemplateCoreConstants()
-                    .selectable_identifier
+                constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
                 }
             },
         ),
     }
 
-    for each in TemplateCore().iterate_elements(template_with_radiobutton_stream):
-        key = TemplateCore().get_element_key(each)
+    for each in template.iterate_elements(template_with_radiobutton_stream):
+        key = template.get_element_key(each)
         patterns = type_to_pattern[_data_dict[key]]
         check = True
         for pattern in patterns:
-            check = check and TemplateCore().find_pattern_match(pattern, each)
+            check = check and template.find_pattern_match(pattern, each)
         assert check
 
 
@@ -649,70 +642,60 @@ def test_find_pattern_match_sejda(sejda_template, sejda_data):
     type_to_pattern = {
         "text": (
             {
-                TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants()
-                    .element_type_key: TemplateCoreConstants()
-                    .text_field_identifier
+                constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER
                 }
             },
         ),
         "check": (
             {
-                TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants()
-                    .element_type_key: TemplateCoreConstants()
-                    .selectable_identifier
+                constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
                 }
             },
             {
-                TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants()
-                    .subtype_key: TemplateCoreConstants()
-                    .widget_subtype_key
+                constants.PARENT_KEY: {
+                    constants.SUBTYPE_KEY: constants.WIDGET_SUBTYPE_KEY
                 }
             },
         ),
         "radio": (
             {
-                TemplateCoreConstants().parent_key: {
-                    TemplateCoreConstants()
-                    .element_type_key: TemplateCoreConstants()
-                    .selectable_identifier
+                constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
                 }
             },
         ),
     }
 
-    for each in TemplateCore().iterate_elements(sejda_template):
-        key = TemplateCore().get_element_key(each, sejda=True)
+    for each in template.iterate_elements(sejda_template):
+        key = template.get_element_key(each, sejda=True)
         patterns = type_to_pattern[_data_dict[key]]
         check = True
         for pattern in patterns:
-            check = check and TemplateCore().find_pattern_match(pattern, each)
+            check = check and template.find_pattern_match(pattern, each)
         assert check
 
 
 def test_get_text_field_max_length(sample_template_with_max_length_text_field):
     for _page, elements in (
-        TemplateCore()
-        .get_elements_by_page_v2(sample_template_with_max_length_text_field)
+        template.get_elements_by_page_v2(sample_template_with_max_length_text_field)
         .items()
     ):
         for element in elements:
-            assert TemplateCore().get_text_field_max_length(element) is (
-                8 if TemplateCore().get_element_key_v2(element) == "LastName" else None
+            assert template.get_text_field_max_length(element) is (
+                8 if template.get_element_key_v2(element) == "LastName" else None
             )
 
 
 def test_is_text_field_comb(sample_template_with_comb_text_field):
     for _page, elements in (
-        TemplateCore()
-        .get_elements_by_page_v2(sample_template_with_comb_text_field)
+        template.get_elements_by_page_v2(sample_template_with_comb_text_field)
         .items()
     ):
         for element in elements:
-            assert TemplateCore().get_text_field_max_length(element) is (
-                7 if TemplateCore().get_element_key_v2(element) == "LastName" else None
+            assert template.get_text_field_max_length(element) is (
+                7 if template.get_element_key_v2(element) == "LastName" else None
             )
-            if TemplateCore().get_element_key_v2(element) == "LastName":
-                assert TemplateCore().is_text_field_comb(element) is True
+            if template.get_element_key_v2(element) == "LastName":
+                assert template.is_text_field_comb(element) is True

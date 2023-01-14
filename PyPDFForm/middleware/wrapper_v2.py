@@ -3,17 +3,17 @@
 
 from typing import BinaryIO, Dict, Union
 
-from ..core.filler import Filler as FillerCore
-from ..core.font import Font as FontCore
-from ..core.image import Image as ImageCore
-from ..core.template import Template as TemplateCore
-from ..core.utils import Utils as UtilsCore
-from ..core.watermark import Watermark as WatermarkCore
-from .adapter import FileAdapter
-from .constants import Text as TextConstants
+from ..core import filler
+from ..core import font
+from ..core import image as image_core
+from ..core import template as template_core
+from ..core import utils
+from ..core import watermark as watermark_core
+from . import adapter
+from . import constants
 from .element import Element as ElementMiddleware
 from .element import ElementType
-from .template import Template as TemplateMiddleware
+from . import template as template_middleware
 
 
 class WrapperV2:
@@ -26,28 +26,28 @@ class WrapperV2:
     ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
-        self.stream = FileAdapter().fp_or_f_obj_or_stream_to_stream(template)
+        self.stream = adapter.fp_or_f_obj_or_stream_to_stream(template)
         self.elements = (
-            TemplateMiddleware().build_elements_v2(self.stream) if self.stream else {}
+            template_middleware.build_elements_v2(self.stream) if self.stream else {}
         )
 
         for each in self.elements.values():
             if each.type == ElementType.text:
-                each.font = kwargs.get("global_font", TextConstants().global_font)
+                each.font = kwargs.get("global_font", constants.GLOBAL_FONT)
                 each.font_size = kwargs.get(
-                    "global_font_size", TextConstants().global_font_size
+                    "global_font_size", constants.GLOBAL_FONT_SIZE
                 )
                 each.font_color = kwargs.get(
-                    "global_font_color", TextConstants().global_font_color
+                    "global_font_color", constants.GLOBAL_FONT_COLOR
                 )
                 each.text_x_offset = kwargs.get(
-                    "global_text_x_offset", TextConstants().global_text_x_offset
+                    "global_text_x_offset", constants.GLOBAL_TEXT_X_OFFSET
                 )
                 each.text_y_offset = kwargs.get(
-                    "global_text_y_offset", TextConstants().global_text_y_offset
+                    "global_text_y_offset", constants.GLOBAL_TEXT_Y_OFFSET
                 )
                 each.text_wrap_length = kwargs.get(
-                    "global_text_wrap_length", TextConstants().global_text_wrap_length
+                    "global_text_wrap_length", constants.GLOBAL_TEXT_WRAP_LENGTH
                 )
 
     def read(self) -> bytes:
@@ -65,7 +65,7 @@ class WrapperV2:
             return self
 
         new_obj = self.__class__()
-        new_obj.stream = UtilsCore().merge_two_pdfs(self.stream, other.stream)
+        new_obj.stream = utils.merge_two_pdfs(self.stream, other.stream)
 
         return new_obj
 
@@ -80,12 +80,12 @@ class WrapperV2:
                 self.elements[key].value = value
 
         if self.read():
-            self.elements = TemplateMiddleware().set_character_x_paddings(
+            self.elements = template_middleware.set_character_x_paddings(
                 self.stream, self.elements
             )
 
-        self.stream = TemplateCore().remove_all_elements(
-            FillerCore().fill_v2(self.stream, self.elements)
+        self.stream = template_core.remove_all_elements(
+            filler.fill_v2(self.stream, self.elements)
         )
 
         return self
@@ -102,24 +102,24 @@ class WrapperV2:
 
         new_element = ElementMiddleware("new", ElementType.text)
         new_element.value = text
-        new_element.font = kwargs.get("font", TextConstants().global_font)
+        new_element.font = kwargs.get("font", constants.GLOBAL_FONT)
         new_element.font_size = kwargs.get(
-            "font_size", TextConstants().global_font_size
+            "font_size", constants.GLOBAL_FONT_SIZE
         )
         new_element.font_color = kwargs.get(
-            "font_color", TextConstants().global_font_color
+            "font_color", constants.GLOBAL_FONT_COLOR
         )
         new_element.text_x_offset = kwargs.get(
-            "text_x_offset", TextConstants().global_text_x_offset
+            "text_x_offset", constants.GLOBAL_TEXT_X_OFFSET
         )
         new_element.text_y_offset = kwargs.get(
-            "text_y_offset", TextConstants().global_text_y_offset
+            "text_y_offset", constants.GLOBAL_TEXT_Y_OFFSET
         )
         new_element.text_wrap_length = kwargs.get(
-            "text_wrap_length", TextConstants().global_text_wrap_length
+            "text_wrap_length", constants.GLOBAL_TEXT_WRAP_LENGTH
         )
 
-        watermarks = WatermarkCore().create_watermarks_and_draw(
+        watermarks = watermark_core.create_watermarks_and_draw(
             self.stream,
             page_number,
             "text",
@@ -132,7 +132,7 @@ class WrapperV2:
             ],
         )
 
-        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = watermark_core.merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
 
@@ -148,14 +148,14 @@ class WrapperV2:
     ) -> "WrapperV2":
         """Draws an image on a PDF form."""
 
-        image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
-        image = ImageCore().any_image_to_jpg(image)
-        image = ImageCore().rotate_image(image, rotation)
-        watermarks = WatermarkCore().create_watermarks_and_draw(
+        image = adapter.fp_or_f_obj_or_stream_to_stream(image)
+        image = image_core.any_image_to_jpg(image)
+        image = image_core.rotate_image(image, rotation)
+        watermarks = watermark_core.create_watermarks_and_draw(
             self.stream, page_number, "image", [[image, x, y, width, height]]
         )
 
-        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = watermark_core.merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
 
@@ -177,6 +177,6 @@ class WrapperV2:
     ) -> bool:
         """Registers a font from a ttf file."""
 
-        ttf_file = FileAdapter().fp_or_f_obj_or_stream_to_stream(ttf_file)
+        ttf_file = adapter.fp_or_f_obj_or_stream_to_stream(ttf_file)
 
-        return FontCore().register_font(font_name, ttf_file)
+        return font.register_font(font_name, ttf_file)

@@ -3,14 +3,14 @@
 
 from typing import BinaryIO, Dict, Tuple, Union
 
-from ..core.filler import Filler as FillerCore
-from ..core.font import Font as FontCore
-from ..core.image import Image as ImageCore
-from ..core.template import Template as TemplateCore
-from ..core.utils import Utils as UtilsCore
-from ..core.watermark import Watermark as WatermarkCore
-from .adapter import FileAdapter
-from .constants import Text as TextConstants
+from ..core import filler
+from ..core import font as font_core
+from ..core import image as image_core
+from ..core import template as template_core
+from ..core import utils
+from ..core import watermark as watermark_core
+from . import adapter
+from . import constants
 from .element import Element as ElementMiddleware
 from .element import ElementType
 from .exceptions.input import (InvalidCoordinateError,
@@ -20,7 +20,7 @@ from .exceptions.input import (InvalidCoordinateError,
                                InvalidImageRotationAngleError,
                                InvalidModeError, InvalidPageNumberError,
                                InvalidTextError, InvalidTTFFontError)
-from .template import Template as TemplateMiddleware
+from . import template as template_middleware
 
 
 class PyPDFForm:
@@ -30,20 +30,20 @@ class PyPDFForm:
         self,
         template: Union[bytes, str, BinaryIO] = b"",
         simple_mode: bool = True,
-        global_font: str = TextConstants().global_font,
-        global_font_size: Union[float, int] = TextConstants().global_font_size,
+        global_font: str = constants.GLOBAL_FONT,
+        global_font_size: Union[float, int] = constants.GLOBAL_FONT_SIZE,
         global_font_color: Tuple[
             Union[float, int], Union[float, int], Union[float, int]
-        ] = TextConstants().global_font_color,
-        global_text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
-        global_text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
-        global_text_wrap_length: int = TextConstants().global_text_wrap_length,
+        ] = constants.GLOBAL_FONT_COLOR,
+        global_text_x_offset: Union[float, int] = constants.GLOBAL_TEXT_X_OFFSET,
+        global_text_y_offset: Union[float, int] = constants.GLOBAL_TEXT_Y_OFFSET,
+        global_text_wrap_length: int = constants.GLOBAL_TEXT_WRAP_LENGTH,
         sejda: bool = False,
     ) -> None:
         """Constructs all attributes for the PyPDFForm object."""
 
-        template = FileAdapter().fp_or_f_obj_or_stream_to_stream(template)
-        TemplateMiddleware().validate_template(template)
+        template = adapter.fp_or_f_obj_or_stream_to_stream(template)
+        template_middleware.validate_template(template)
         if not isinstance(simple_mode, bool):
             raise InvalidModeError
         if not isinstance(sejda, bool):
@@ -57,8 +57,8 @@ class PyPDFForm:
         if not simple_mode or sejda:
             self.elements = {}
             if template:
-                TemplateMiddleware().validate_stream(template)
-                self.elements = TemplateMiddleware().build_elements(template, sejda)
+                template_middleware.validate_stream(template)
+                self.elements = template_middleware.build_elements(template, sejda)
 
             for each in self.elements.values():
                 if each.type == ElementType.text:
@@ -81,20 +81,20 @@ class PyPDFForm:
         if not other.stream:
             return self
 
-        TemplateMiddleware().validate_stream(self.stream)
-        TemplateMiddleware().validate_stream(other.stream)
+        template_middleware.validate_stream(self.stream)
+        template_middleware.validate_stream(other.stream)
 
         pdf_one = (
-            TemplateCore().assign_uuid(self.stream) if not self.sejda else self.stream
+            template_core.assign_uuid(self.stream) if not self.sejda else self.stream
         )
         pdf_two = (
-            TemplateCore().assign_uuid(other.stream)
+            template_core.assign_uuid(other.stream)
             if not other.sejda
             else other.stream
         )
 
         new_obj = self.__class__()
-        new_obj.stream = UtilsCore().merge_two_pdfs(pdf_one, pdf_two)
+        new_obj.stream = utils.merge_two_pdfs(pdf_one, pdf_two)
 
         return new_obj
 
@@ -104,7 +104,7 @@ class PyPDFForm:
     ) -> "PyPDFForm":
         """Fill a PDF form with customized parameters."""
 
-        TemplateMiddleware().validate_stream(self.stream)
+        template_middleware.validate_stream(self.stream)
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
@@ -122,9 +122,9 @@ class PyPDFForm:
                 self.elements[key].validate_value()
                 self.elements[key].validate_text_attributes()
 
-        _fill_result = FillerCore().fill(self.stream, self.elements, self.sejda)
+        _fill_result = filler.fill(self.stream, self.elements, self.sejda)
         if self.sejda:
-            _fill_result = TemplateCore().remove_all_elements(_fill_result)
+            _fill_result = template_core.remove_all_elements(_fill_result)
 
         self.stream = _fill_result
 
@@ -137,7 +137,7 @@ class PyPDFForm:
     ) -> "PyPDFForm":
         """Fills a PDF form in simple mode."""
 
-        TemplateMiddleware().validate_stream(self.stream)
+        template_middleware.validate_stream(self.stream)
 
         if not isinstance(data, dict):
             raise InvalidFormDataError
@@ -151,7 +151,7 @@ class PyPDFForm:
         if not isinstance(editable, bool):
             raise InvalidEditableParameterError
 
-        self.stream = FillerCore().simple_fill(self.stream, data, editable)
+        self.stream = filler.simple_fill(self.stream, data, editable)
 
         return self
 
@@ -161,18 +161,18 @@ class PyPDFForm:
         page_number: int,
         x: Union[float, int],
         y: Union[float, int],
-        font: str = TextConstants().global_font,
-        font_size: Union[float, int] = TextConstants().global_font_size,
+        font: str = constants.GLOBAL_FONT,
+        font_size: Union[float, int] = constants.GLOBAL_FONT_SIZE,
         font_color: Tuple[
             Union[float, int], Union[float, int], Union[float, int]
-        ] = TextConstants().global_font_color,
-        text_x_offset: Union[float, int] = TextConstants().global_text_x_offset,
-        text_y_offset: Union[float, int] = TextConstants().global_text_y_offset,
-        text_wrap_length: int = TextConstants().global_text_wrap_length,
+        ] = constants.GLOBAL_FONT_COLOR,
+        text_x_offset: Union[float, int] = constants.GLOBAL_TEXT_X_OFFSET,
+        text_y_offset: Union[float, int] = constants.GLOBAL_TEXT_Y_OFFSET,
+        text_wrap_length: int = constants.GLOBAL_TEXT_WRAP_LENGTH,
     ) -> "PyPDFForm":
         """Draws a text on a PDF form."""
 
-        TemplateMiddleware().validate_stream(self.stream)
+        template_middleware.validate_stream(self.stream)
 
         if not isinstance(text, str):
             raise InvalidTextError
@@ -198,7 +198,7 @@ class PyPDFForm:
         new_element.validate_value()
         new_element.validate_text_attributes()
 
-        watermarks = WatermarkCore().create_watermarks_and_draw(
+        watermarks = watermark_core.create_watermarks_and_draw(
             self.stream,
             page_number,
             "text",
@@ -211,7 +211,7 @@ class PyPDFForm:
             ],
         )
 
-        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = watermark_core.merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
 
@@ -227,20 +227,20 @@ class PyPDFForm:
     ) -> "PyPDFForm":
         """Draws an image on a PDF form."""
 
-        TemplateMiddleware().validate_stream(self.stream)
+        template_middleware.validate_stream(self.stream)
 
-        image = FileAdapter().fp_or_f_obj_or_stream_to_stream(image)
+        image = adapter.fp_or_f_obj_or_stream_to_stream(image)
         if image is None:
             raise InvalidImageError
 
         if not isinstance(rotation, (float, int)):
             raise InvalidImageRotationAngleError
 
-        if not ImageCore().is_image(image):
+        if not image_core.is_image(image):
             raise InvalidImageError
 
-        image = ImageCore().any_image_to_jpg(image)
-        image = ImageCore().rotate_image(image, rotation)
+        image = image_core.any_image_to_jpg(image)
+        image = image_core.rotate_image(image, rotation)
 
         if not isinstance(page_number, int):
             raise InvalidPageNumberError
@@ -257,11 +257,11 @@ class PyPDFForm:
         if not isinstance(height, (float, int)):
             raise InvalidImageDimensionError
 
-        watermarks = WatermarkCore().create_watermarks_and_draw(
+        watermarks = watermark_core.create_watermarks_and_draw(
             self.stream, page_number, "image", [[image, x, y, width, height]]
         )
 
-        self.stream = WatermarkCore().merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = watermark_core.merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
 
@@ -276,7 +276,7 @@ class PyPDFForm:
     ) -> bool:
         """Registers a font from a ttf file."""
 
-        ttf_file = FileAdapter().fp_or_f_obj_or_stream_to_stream(ttf_file)
+        ttf_file = adapter.fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         if any(
             [
@@ -288,7 +288,7 @@ class PyPDFForm:
         ):
             raise InvalidTTFFontError
 
-        if not FontCore().register_font(font_name, ttf_file):
+        if not font_core.register_font(font_name, ttf_file):
             raise InvalidTTFFontError
 
         return True

@@ -7,8 +7,8 @@ import pytest
 from jsonschema import ValidationError, validate
 
 from PyPDFForm import PyPDFForm2
-from PyPDFForm.core.template import Template as TemplateCore
-from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.core import template as template_core
+from PyPDFForm.middleware import constants
 from PyPDFForm.middleware.element import ElementType
 
 
@@ -67,7 +67,7 @@ def test_fill_v2(template_stream, pdf_samples, data_dict):
         assert obj.stream == expected
 
         for page, elements in (
-            TemplateCore().get_elements_by_page_v2(obj.read()).items()
+            template_core.get_elements_by_page_v2(obj.read()).items()
         ):
             assert not elements
 
@@ -105,11 +105,11 @@ def test_fill_font_liberation_serif_italic_v2(
 
             if v.type == ElementType.text:
                 assert v.font == "LiberationSerif-Italic"
-                assert v.font_size == TextConstants().global_font_size
-                assert v.font_color == TextConstants().global_font_color
-                assert v.text_x_offset == TextConstants().global_text_x_offset
-                assert v.text_y_offset == TextConstants().global_text_y_offset
-                assert v.text_wrap_length == TextConstants().global_text_wrap_length
+                assert v.font_size == constants.GLOBAL_FONT_SIZE
+                assert v.font_color == constants.GLOBAL_FONT_COLOR
+                assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
+                assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
+                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
 
 
 def test_fill_font_20_v2(template_stream, pdf_samples, data_dict):
@@ -129,12 +129,12 @@ def test_fill_font_20_v2(template_stream, pdf_samples, data_dict):
             assert v.value == data_dict[k]
 
             if v.type == ElementType.text:
-                assert v.font == TextConstants().global_font
+                assert v.font == constants.GLOBAL_FONT
                 assert v.font_size == 20
-                assert v.font_color == TextConstants().global_font_color
-                assert v.text_x_offset == TextConstants().global_text_x_offset
-                assert v.text_y_offset == TextConstants().global_text_y_offset
-                assert v.text_wrap_length == TextConstants().global_text_wrap_length
+                assert v.font_color == constants.GLOBAL_FONT_COLOR
+                assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
+                assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
+                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
 
 
 def test_fill_font_color_red_v2(template_stream, pdf_samples, data_dict):
@@ -156,12 +156,12 @@ def test_fill_font_color_red_v2(template_stream, pdf_samples, data_dict):
             assert v.value == data_dict[k]
 
             if v.type == ElementType.text:
-                assert v.font == TextConstants().global_font
-                assert v.font_size == TextConstants().global_font_size
+                assert v.font == constants.GLOBAL_FONT
+                assert v.font_size == constants.GLOBAL_FONT_SIZE
                 assert v.font_color == (1, 0, 0)
-                assert v.text_x_offset == TextConstants().global_text_x_offset
-                assert v.text_y_offset == TextConstants().global_text_y_offset
-                assert v.text_wrap_length == TextConstants().global_text_wrap_length
+                assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
+                assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
+                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
 
 
 def test_fill_offset_100_v2(template_stream, pdf_samples, data_dict):
@@ -185,12 +185,12 @@ def test_fill_offset_100_v2(template_stream, pdf_samples, data_dict):
             assert v.value == data_dict[k]
 
             if v.type == ElementType.text:
-                assert v.font == TextConstants().global_font
-                assert v.font_size == TextConstants().global_font_size
-                assert v.font_color == TextConstants().global_font_color
+                assert v.font == constants.GLOBAL_FONT
+                assert v.font_size == constants.GLOBAL_FONT_SIZE
+                assert v.font_color == constants.GLOBAL_FONT_COLOR
                 assert v.text_x_offset == 100
                 assert v.text_y_offset == -100
-                assert v.text_wrap_length == TextConstants().global_text_wrap_length
+                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
 
 
 def test_fill_wrap_2_v2(template_stream, pdf_samples, data_dict):
@@ -210,11 +210,11 @@ def test_fill_wrap_2_v2(template_stream, pdf_samples, data_dict):
             assert v.value == data_dict[k]
 
             if v.type == ElementType.text:
-                assert v.font == TextConstants().global_font
-                assert v.font_size == TextConstants().global_font_size
-                assert v.font_color == TextConstants().global_font_color
-                assert v.text_x_offset == TextConstants().global_text_x_offset
-                assert v.text_y_offset == TextConstants().global_text_y_offset
+                assert v.font == constants.GLOBAL_FONT
+                assert v.font_size == constants.GLOBAL_FONT_SIZE
+                assert v.font_color == constants.GLOBAL_FONT_COLOR
+                assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
+                assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
                 assert v.text_wrap_length == 2
 
 
@@ -249,29 +249,29 @@ def test_fill_with_customized_elements_v2(template_stream, pdf_samples, data_dic
         assert obj.elements["test"].font_size == 20
         assert obj.elements["test"].font_color == (1, 0, 0)
         assert (
-            obj.elements["test"].text_x_offset == TextConstants().global_text_x_offset
+            obj.elements["test"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
         )
         assert (
-            obj.elements["test"].text_y_offset == TextConstants().global_text_y_offset
+            obj.elements["test"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
         )
         assert (
             obj.elements["test"].text_wrap_length
-            == TextConstants().global_text_wrap_length
+            == constants.GLOBAL_TEXT_WRAP_LENGTH
         )
 
-        assert obj.elements["test_2"].font_size == TextConstants().global_font_size
+        assert obj.elements["test_2"].font_size == constants.GLOBAL_FONT_SIZE
         assert obj.elements["test_2"].font_color == (0, 1, 0)
         assert obj.elements["test_2"].text_x_offset == 50
         assert obj.elements["test_2"].text_y_offset == -50
         assert obj.elements["test_2"].text_wrap_length == 1
 
-        assert obj.elements["test_3"].font_size == TextConstants().global_font_size
-        assert obj.elements["test_3"].font_color == TextConstants().global_font_color
+        assert obj.elements["test_3"].font_size == constants.GLOBAL_FONT_SIZE
+        assert obj.elements["test_3"].font_color == constants.GLOBAL_FONT_COLOR
         assert (
-            obj.elements["test_3"].text_x_offset == TextConstants().global_text_x_offset
+            obj.elements["test_3"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
         )
         assert (
-            obj.elements["test_3"].text_y_offset == TextConstants().global_text_y_offset
+            obj.elements["test_3"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
         )
         assert obj.elements["test_3"].text_wrap_length == 2
 
@@ -313,7 +313,7 @@ def test_draw_text_on_one_page_v2(template_stream, pdf_samples):
             1,
             300,
             225,
-            font=TextConstants().global_font,
+            font=constants.GLOBAL_FONT,
             font_size=20,
             font_color=(1, 0, 0),
             text_x_offset=50,
@@ -499,6 +499,6 @@ def test_fill_right_aligned(sample_template_with_right_aligned_text_field, pdf_s
         assert obj.stream == expected
 
         for page, elements in (
-            TemplateCore().get_elements_by_page_v2(obj.read()).items()
+            template_core.get_elements_by_page_v2(obj.read()).items()
         ):
             assert not elements

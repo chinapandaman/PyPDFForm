@@ -8,106 +8,102 @@ from typing import Dict, Union
 
 import pdfrw
 
-from ..middleware.constants import Text
+from ..middleware import constants as middleware_constants
 from ..middleware.element import Element, ElementType
-from .constants import Template as TemplateCoreConstants
+from . import constants
 
 
-class Utils:
-    """Contains utility methods for core modules."""
+def generate_stream(pdf: "pdfrw.PdfReader") -> bytes:
+    """Generates new stream for manipulated PDF form."""
 
-    @staticmethod
-    def generate_stream(pdf: "pdfrw.PdfReader") -> bytes:
-        """Generates new stream for manipulated PDF form."""
+    result_stream = BytesIO()
 
-        result_stream = BytesIO()
+    pdfrw.PdfWriter().write(result_stream, pdf)
+    result_stream.seek(0)
 
-        pdfrw.PdfWriter().write(result_stream, pdf)
-        result_stream.seek(0)
+    result = result_stream.read()
+    result_stream.close()
 
-        result = result_stream.read()
-        result_stream.close()
+    return result
 
-        return result
 
-    @staticmethod
-    def bool_to_checkboxes(
-        data: Dict[str, Union[str, bool, int]]
-    ) -> Dict[str, Union[str, "pdfrw.PdfName"]]:
-        """Converts all boolean values in input data dictionary into PDF checkbox objects."""
+def bool_to_checkboxes(
+    data: Dict[str, Union[str, bool, int]]
+) -> Dict[str, Union[str, "pdfrw.PdfName"]]:
+    """Converts all boolean values in input data dictionary into PDF checkbox objects."""
 
-        result = deepcopy(data)
+    result = deepcopy(data)
 
-        for key, value in result.items():
-            if isinstance(value, bool):
-                result[key] = pdfrw.PdfName.Yes if value else pdfrw.PdfName.Off
+    for key, value in result.items():
+        if isinstance(value, bool):
+            result[key] = pdfrw.PdfName.Yes if value else pdfrw.PdfName.Off
 
-        return result
+    return result
 
-    @staticmethod
-    def bool_to_checkbox(data: bool) -> "pdfrw.PdfName":
-        """Converts a boolean value into a PDF checkbox object."""
 
-        return pdfrw.PdfName.Yes if data else pdfrw.PdfName.Off
+def bool_to_checkbox(data: bool) -> "pdfrw.PdfName":
+    """Converts a boolean value into a PDF checkbox object."""
 
-    @staticmethod
-    def checkbox_radio_font_size(element: "pdfrw.PdfDict") -> Union[float, int]:
-        """
-        Calculates the font size it should be drawn with
-        given a checkbox/radio button element.
-        """
+    return pdfrw.PdfName.Yes if data else pdfrw.PdfName.Off
 
-        area = abs(
-            float(element[TemplateCoreConstants().annotation_rectangle_key][0])
-            - float(element[TemplateCoreConstants().annotation_rectangle_key][2])
-        ) * abs(
-            float(element[TemplateCoreConstants().annotation_rectangle_key][1])
-            - float(element[TemplateCoreConstants().annotation_rectangle_key][3])
-        )
 
-        return sqrt(area) * 72 / 96
+def checkbox_radio_font_size(element: "pdfrw.PdfDict") -> Union[float, int]:
+    """
+    Calculates the font size it should be drawn with
+    given a checkbox/radio button element.
+    """
 
-    @staticmethod
-    def checkbox_radio_to_draw(
-        element: "Element", font_size: Union[float, int] = Text().global_font_size
-    ) -> "Element":
-        """Converts a checkbox/radio element to a drawable text element."""
+    area = abs(
+        float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+        - float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
+    ) * abs(
+        float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+        - float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
+    )
 
-        _map = {
-            ElementType.radio: "\u25CF",
-            ElementType.checkbox: "\u2713",
-        }
-        new_element = Element(
-            element_name=element.name,
-            element_type=ElementType.text,
-            element_value="",
-        )
+    return sqrt(area) * 72 / 96
 
-        if _map.get(element.type):
-            new_element.value = _map[element.type]
-            new_element.font = "Helvetica"
-            new_element.font_size = font_size
-            new_element.font_color = (0, 0, 0)
-            new_element.text_x_offset = 0
-            new_element.text_y_offset = 0
-            new_element.text_wrap_length = 100
 
-        return new_element
+def checkbox_radio_to_draw(
+    element: "Element", font_size: Union[float, int] = middleware_constants.GLOBAL_FONT_SIZE
+) -> "Element":
+    """Converts a checkbox/radio element to a drawable text element."""
 
-    @staticmethod
-    def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
-        """Merges two PDFs into one PDF."""
+    _map = {
+        ElementType.radio: "\u25CF",
+        ElementType.checkbox: "\u2713",
+    }
+    new_element = Element(
+        element_name=element.name,
+        element_type=ElementType.text,
+        element_value="",
+    )
 
-        writer = pdfrw.PdfWriter()
+    if _map.get(element.type):
+        new_element.value = _map[element.type]
+        new_element.font = "Helvetica"
+        new_element.font_size = font_size
+        new_element.font_color = (0, 0, 0)
+        new_element.text_x_offset = 0
+        new_element.text_y_offset = 0
+        new_element.text_wrap_length = 100
 
-        writer.addpages(pdfrw.PdfReader(fdata=pdf).pages)
-        writer.addpages(pdfrw.PdfReader(fdata=other).pages)
+    return new_element
 
-        result_stream = BytesIO()
-        writer.write(result_stream)
-        result_stream.seek(0)
 
-        result = result_stream.read()
-        result_stream.close()
+def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
+    """Merges two PDFs into one PDF."""
 
-        return result
+    writer = pdfrw.PdfWriter()
+
+    writer.addpages(pdfrw.PdfReader(fdata=pdf).pages)
+    writer.addpages(pdfrw.PdfReader(fdata=other).pages)
+
+    result_stream = BytesIO()
+    writer.write(result_stream)
+    result_stream.seek(0)
+
+    result = result_stream.read()
+    result_stream.close()
+
+    return result

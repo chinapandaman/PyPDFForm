@@ -7,32 +7,28 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 
-class Font:
-    """Contains methods for interacting with fonts."""
+def register_font(font_name: str, ttf_stream: bytes) -> bool:
+    """Registers a font from a ttf file stream."""
 
-    @staticmethod
-    def register_font(font_name: str, ttf_stream: bytes) -> bool:
-        """Registers a font from a ttf file stream."""
+    buff = BytesIO()
+    buff.write(ttf_stream)
+    buff.seek(0)
 
-        buff = BytesIO()
-        buff.write(ttf_stream)
-        buff.seek(0)
+    try:
+        pdfmetrics.registerFont(TTFont(name=font_name, filename=buff))
+        result = True
+    except TTFError:
+        result = False
 
-        try:
-            pdfmetrics.registerFont(TTFont(name=font_name, filename=buff))
-            result = True
-        except TTFError:
-            result = False
+    buff.close()
+    return result
 
-        buff.close()
-        return result
 
-    @staticmethod
-    def is_registered(font_name: str) -> bool:
-        """Checks if a font is registered."""
+def is_registered(font_name: str) -> bool:
+    """Checks if a font is registered."""
 
-        try:
-            pdfmetrics.getFont(font_name)
-            return True
-        except KeyError:
-            return False
+    try:
+        pdfmetrics.getFont(font_name)
+        return True
+    except KeyError:
+        return False

@@ -6,12 +6,12 @@ import pdfrw
 import pytest
 from pdfrw.objects.pdfname import BasePdfName
 
-from PyPDFForm.core.constants import Template as TemplateConstants
-from PyPDFForm.core.filler import Filler
-from PyPDFForm.core.template import Template as TemplateCore
-from PyPDFForm.middleware.constants import Text as TextConstants
+from PyPDFForm.core import constants
+from PyPDFForm.core import filler
+from PyPDFForm.core import template
+from PyPDFForm.middleware import constants as middleware_constants
 from PyPDFForm.middleware.element import ElementType
-from PyPDFForm.middleware.template import Template as TemplateMiddleware
+from PyPDFForm.middleware import template as template_middleware
 
 
 @pytest.fixture
@@ -46,129 +46,129 @@ def data_dict():
 
 
 def test_fill(template_stream, data_dict):
-    elements = TemplateMiddleware().build_elements(template_stream)
+    elements = template_middleware.build_elements(template_stream)
 
     for k, v in data_dict.items():
         if k in elements:
             elements[k].value = v
 
             if elements[k].type == ElementType.text:
-                elements[k].font = TextConstants().global_font
-                elements[k].font_size = TextConstants().global_font_size
-                elements[k].font_color = TextConstants().global_font_color
-                elements[k].text_x_offset = TextConstants().global_text_x_offset
-                elements[k].text_y_offset = TextConstants().global_text_y_offset
-                elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+                elements[k].font = middleware_constants.GLOBAL_FONT
+                elements[k].font_size = middleware_constants.GLOBAL_FONT_SIZE
+                elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
+                elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
+                elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
+                elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
             elements[k].validate_constants()
             elements[k].validate_value()
             elements[k].validate_text_attributes()
 
-    result_stream = Filler().fill(template_stream, elements)
+    result_stream = filler.fill(template_stream, elements)
 
     assert result_stream != template_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
+    for element in template.iterate_elements(result_stream):
+        key = template.get_element_key(element)
 
-        assert element[TemplateConstants().field_flag_key] == pdfrw.PdfObject(1)
+        assert element[constants.FIELD_FLAG_KEY] == pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
-            assert element[TemplateConstants().checkbox_field_value_key] == (
+            assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == (
                 pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
             )
 
 
 def test_fill_v2(template_stream, data_dict):
-    elements = TemplateMiddleware().build_elements(template_stream)
+    elements = template_middleware.build_elements(template_stream)
 
     for k, v in data_dict.items():
         if k in elements:
             elements[k].value = v
 
             if elements[k].type == ElementType.text:
-                elements[k].font = TextConstants().global_font
-                elements[k].font_size = TextConstants().global_font_size
-                elements[k].font_color = TextConstants().global_font_color
-                elements[k].text_x_offset = TextConstants().global_text_x_offset
-                elements[k].text_y_offset = TextConstants().global_text_y_offset
-                elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+                elements[k].font = middleware_constants.GLOBAL_FONT
+                elements[k].font_size = middleware_constants.GLOBAL_FONT_SIZE
+                elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
+                elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
+                elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
+                elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
             elements[k].validate_constants()
             elements[k].validate_value()
             elements[k].validate_text_attributes()
 
-    result_stream = Filler().fill_v2(template_stream, elements)
+    result_stream = filler.fill_v2(template_stream, elements)
     assert result_stream != template_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
+    for element in template.iterate_elements(result_stream):
+        key = template.get_element_key(element)
 
-        assert element[TemplateConstants().field_flag_key] != pdfrw.PdfObject(1)
+        assert element[constants.FIELD_FLAG_KEY] != pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
             assert (
-                element[TemplateConstants().checkbox_field_value_key]
+                element[constants.CHECKBOX_FIELD_VALUE_KEY]
                 == pdfrw.PdfName.Off
             )
 
 
 def test_fill_sejda(sejda_template, sejda_data):
-    elements = TemplateMiddleware().build_elements(sejda_template, sejda=True)
+    elements = template_middleware.build_elements(sejda_template, sejda=True)
 
     for k, v in elements.items():
         if k in sejda_data:
             v.value = sejda_data[k]
 
         if elements[k].type == ElementType.text:
-            elements[k].font = TextConstants().global_font
-            elements[k].font_size = TextConstants().global_font_size
-            elements[k].font_color = TextConstants().global_font_color
-            elements[k].text_x_offset = TextConstants().global_text_x_offset
-            elements[k].text_y_offset = TextConstants().global_text_y_offset
-            elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+            elements[k].font = middleware_constants.GLOBAL_FONT
+            elements[k].font_size = middleware_constants.GLOBAL_FONT_SIZE
+            elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
+            elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
+            elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
+            elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
         elements[k].validate_constants()
         elements[k].validate_value()
         elements[k].validate_text_attributes()
 
-    result_stream = Filler().fill(sejda_template, elements, sejda=True)
+    result_stream = filler.fill(sejda_template, elements, sejda=True)
 
     assert result_stream != template_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        assert element[TemplateConstants().parent_key][
-            TemplateConstants().field_flag_key
+    for element in template.iterate_elements(result_stream):
+        assert element[constants.PARENT_KEY][
+            constants.FIELD_FLAG_KEY
         ] == pdfrw.PdfObject(1)
 
 
 def test_fill_sejda_v2(sejda_template, sejda_data):
-    elements = TemplateMiddleware().build_elements(sejda_template, sejda=True)
+    elements = template_middleware.build_elements(sejda_template, sejda=True)
 
     for k, v in elements.items():
         if k in sejda_data:
             v.value = sejda_data[k]
 
         if elements[k].type == ElementType.text:
-            elements[k].font = TextConstants().global_font
-            elements[k].font_size = TextConstants().global_font_size
-            elements[k].font_color = TextConstants().global_font_color
-            elements[k].text_x_offset = TextConstants().global_text_x_offset
-            elements[k].text_y_offset = TextConstants().global_text_y_offset
-            elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+            elements[k].font = middleware_constants.GLOBAL_FONT
+            elements[k].font_size = middleware_constants.GLOBAL_FONT_SIZE
+            elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
+            elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
+            elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
+            elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
         elements[k].validate_constants()
         elements[k].validate_value()
         elements[k].validate_text_attributes()
 
-    result_stream = Filler().fill_v2(sejda_template, elements)
+    result_stream = filler.fill_v2(sejda_template, elements)
 
     assert result_stream != template_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        assert element[TemplateConstants().parent_key][
-            TemplateConstants().field_flag_key
+    for element in template.iterate_elements(result_stream):
+        assert element[constants.PARENT_KEY][
+            constants.FIELD_FLAG_KEY
         ] != pdfrw.PdfObject(1)
 
 
 def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
-    elements = TemplateMiddleware().build_elements(template_with_radiobutton_stream)
+    elements = template_middleware.build_elements(template_with_radiobutton_stream)
 
     data_dict = {key: value for key, value in data_dict.items()}
     data_dict["radio_1"] = 0
@@ -182,32 +182,32 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
             elements[k].value = v
 
             if elements[k].type == ElementType.text:
-                elements[k].font = TextConstants().global_font
-                elements[k].font_size = TextConstants().global_font_size
-                elements[k].font_color = TextConstants().global_font_color
-                elements[k].text_x_offset = TextConstants().global_text_x_offset
-                elements[k].text_y_offset = TextConstants().global_text_y_offset
-                elements[k].text_wrap_length = TextConstants().global_text_wrap_length
+                elements[k].font = middleware_constants.GLOBAL_FONT
+                elements[k].font_size = middleware_constants.GLOBAL_FONT_SIZE
+                elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
+                elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
+                elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
+                elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
             elements[k].validate_constants()
             elements[k].validate_value()
             elements[k].validate_text_attributes()
 
-    result_stream = Filler().fill(template_with_radiobutton_stream, elements)
+    result_stream = filler.fill(template_with_radiobutton_stream, elements)
 
     assert result_stream != template_with_radiobutton_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
+    for element in template.iterate_elements(result_stream):
+        key = template.get_element_key(element)
 
         if isinstance(data_dict[key], bool) or isinstance(data_dict[key], str):
-            assert element[TemplateConstants().field_flag_key] == pdfrw.PdfObject(1)
+            assert element[constants.FIELD_FLAG_KEY] == pdfrw.PdfObject(1)
         else:
-            assert element[TemplateConstants().parent_key][
-                TemplateConstants().field_flag_key
+            assert element[constants.PARENT_KEY][
+                constants.FIELD_FLAG_KEY
             ] == pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
-            assert element[TemplateConstants().checkbox_field_value_key] == (
+            assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == (
                 pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
             )
         elif isinstance(data_dict[key], int):
@@ -217,33 +217,33 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
 
             if data_dict[key] == radio_button_tracker[key] - 1:
                 assert element[
-                    TemplateConstants().checkbox_field_value_key
+                    constants.CHECKBOX_FIELD_VALUE_KEY
                 ] == BasePdfName("/" + str(data_dict[key]), False)
             else:
                 assert (
-                    element[TemplateConstants().checkbox_field_value_key]
+                    element[constants.CHECKBOX_FIELD_VALUE_KEY]
                     == pdfrw.PdfName.Off
                 )
 
 
 def test_simple_fill(template_stream, data_dict):
-    result_stream = Filler().simple_fill(template_stream, data_dict, False)
+    result_stream = filler.simple_fill(template_stream, data_dict, False)
 
     assert result_stream != template_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
+    for element in template.iterate_elements(result_stream):
+        key = template.get_element_key(element)
 
         if isinstance(data_dict[key], bool):
-            assert element[TemplateConstants().checkbox_field_value_key] == (
+            assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == (
                 pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
             )
         else:
             assert (
-                element[TemplateConstants().text_field_value_key][1:-1]
+                element[constants.TEXT_FIELD_VALUE_KEY][1:-1]
                 == data_dict[key]
             )
-        assert element[TemplateConstants().field_flag_key] == pdfrw.PdfObject(1)
+        assert element[constants.FIELD_FLAG_KEY] == pdfrw.PdfObject(1)
 
 
 def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
@@ -254,17 +254,17 @@ def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dic
 
     radio_button_tracker = {}
 
-    result_stream = Filler().simple_fill(
+    result_stream = filler.simple_fill(
         template_with_radiobutton_stream, data_dict, True
     )
 
     assert result_stream != template_with_radiobutton_stream
 
-    for element in TemplateCore().iterate_elements(result_stream):
-        key = TemplateCore().get_element_key(element)
+    for element in template.iterate_elements(result_stream):
+        key = template.get_element_key(element)
 
         if isinstance(data_dict[key], bool):
-            assert element[TemplateConstants().checkbox_field_value_key] == (
+            assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == (
                 pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
             )
         elif isinstance(data_dict[key], int):
@@ -274,16 +274,16 @@ def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dic
 
             if data_dict[key] == radio_button_tracker[key] - 1:
                 assert element[
-                    TemplateConstants().checkbox_field_value_key
+                    constants.CHECKBOX_FIELD_VALUE_KEY
                 ] == BasePdfName("/" + str(data_dict[key]), False)
             else:
                 assert (
-                    element[TemplateConstants().checkbox_field_value_key]
+                    element[constants.CHECKBOX_FIELD_VALUE_KEY]
                     == pdfrw.PdfName.Off
                 )
         else:
             assert (
-                element[TemplateConstants().text_field_value_key][1:-1]
+                element[constants.TEXT_FIELD_VALUE_KEY][1:-1]
                 == data_dict[key]
             )
-        assert element[TemplateConstants().field_flag_key] != pdfrw.PdfObject(1)
+        assert element[constants.FIELD_FLAG_KEY] != pdfrw.PdfObject(1)
