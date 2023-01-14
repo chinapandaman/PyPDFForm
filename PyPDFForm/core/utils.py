@@ -65,7 +65,8 @@ def checkbox_radio_font_size(element: "pdfrw.PdfDict") -> Union[float, int]:
 
 
 def checkbox_radio_to_draw(
-    element: "Element", font_size: Union[float, int] = middleware_constants.GLOBAL_FONT_SIZE
+    element: "Element",
+    font_size: Union[float, int] = middleware_constants.GLOBAL_FONT_SIZE,
 ) -> "Element":
     """Converts a checkbox/radio element to a drawable text element."""
 

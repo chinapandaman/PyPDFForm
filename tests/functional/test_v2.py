@@ -66,9 +66,7 @@ def test_fill_v2(template_stream, pdf_samples, data_dict):
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
-        for page, elements in (
-            template_core.get_elements_by_page_v2(obj.read()).items()
-        ):
+        for page, elements in template_core.get_elements_by_page_v2(obj.read()).items():
             assert not elements
 
 
@@ -248,15 +246,10 @@ def test_fill_with_customized_elements_v2(template_stream, pdf_samples, data_dic
         assert obj.elements["test"].font == "LiberationSerif-Italic"
         assert obj.elements["test"].font_size == 20
         assert obj.elements["test"].font_color == (1, 0, 0)
+        assert obj.elements["test"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
+        assert obj.elements["test"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
         assert (
-            obj.elements["test"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
-        )
-        assert (
-            obj.elements["test"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-        )
-        assert (
-            obj.elements["test"].text_wrap_length
-            == constants.GLOBAL_TEXT_WRAP_LENGTH
+            obj.elements["test"].text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
         )
 
         assert obj.elements["test_2"].font_size == constants.GLOBAL_FONT_SIZE
@@ -267,12 +260,8 @@ def test_fill_with_customized_elements_v2(template_stream, pdf_samples, data_dic
 
         assert obj.elements["test_3"].font_size == constants.GLOBAL_FONT_SIZE
         assert obj.elements["test_3"].font_color == constants.GLOBAL_FONT_COLOR
-        assert (
-            obj.elements["test_3"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
-        )
-        assert (
-            obj.elements["test_3"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-        )
+        assert obj.elements["test_3"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
+        assert obj.elements["test_3"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
         assert obj.elements["test_3"].text_wrap_length == 2
 
 
@@ -498,7 +487,5 @@ def test_fill_right_aligned(sample_template_with_right_aligned_text_field, pdf_s
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
-        for page, elements in (
-            template_core.get_elements_by_page_v2(obj.read()).items()
-        ):
+        for page, elements in template_core.get_elements_by_page_v2(obj.read()).items():
             assert not elements

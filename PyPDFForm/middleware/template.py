@@ -51,8 +51,8 @@ def set_character_x_paddings(
             _element = eles[key]
 
             if _element.type == ElementType.text and _element.comb is True:
-                _element.character_paddings = (
-                    template.get_character_x_paddings(element, _element)
+                _element.character_paddings = template.get_character_x_paddings(
+                    element, _element
                 )
 
     return eles
@@ -76,12 +76,9 @@ def build_elements_v2(pdf_stream: bytes) -> Dict[str, "Element"]:
                 )
 
                 if _element.type == ElementType.text:
-                    _element.max_length = template.get_text_field_max_length(
+                    _element.max_length = template.get_text_field_max_length(element)
+                    if _element.max_length is not None and template.is_text_field_comb(
                         element
-                    )
-                    if (
-                        _element.max_length is not None
-                        and template.is_text_field_comb(element)
                     ):
                         _element.comb = True
 

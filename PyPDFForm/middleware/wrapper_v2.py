@@ -3,17 +3,15 @@
 
 from typing import BinaryIO, Dict, Union
 
-from ..core import filler
-from ..core import font
+from ..core import filler, font
 from ..core import image as image_core
 from ..core import template as template_core
 from ..core import utils
 from ..core import watermark as watermark_core
-from . import adapter
-from . import constants
+from . import adapter, constants
+from . import template as template_middleware
 from .element import Element as ElementMiddleware
 from .element import ElementType
-from . import template as template_middleware
 
 
 class WrapperV2:
@@ -103,12 +101,8 @@ class WrapperV2:
         new_element = ElementMiddleware("new", ElementType.text)
         new_element.value = text
         new_element.font = kwargs.get("font", constants.GLOBAL_FONT)
-        new_element.font_size = kwargs.get(
-            "font_size", constants.GLOBAL_FONT_SIZE
-        )
-        new_element.font_color = kwargs.get(
-            "font_color", constants.GLOBAL_FONT_COLOR
-        )
+        new_element.font_size = kwargs.get("font_size", constants.GLOBAL_FONT_SIZE)
+        new_element.font_color = kwargs.get("font_color", constants.GLOBAL_FONT_COLOR)
         new_element.text_x_offset = kwargs.get(
             "text_x_offset", constants.GLOBAL_TEXT_X_OFFSET
         )

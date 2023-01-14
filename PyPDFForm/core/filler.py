@@ -8,9 +8,7 @@ from pdfrw.objects.pdfname import BasePdfName
 
 from ..middleware.element import Element as ElementMiddleware
 from ..middleware.element import ElementType
-from . import constants
-from . import template
-from . import utils
+from . import constants, template, utils
 from . import watermark as watermark_core
 
 
@@ -28,37 +26,27 @@ def fill(
 
     radio_button_tracker = {}
 
-    for page, _elements in (
-            template.get_elements_by_page(template_pdf, sejda).items()
-    ):
+    for page, _elements in template.get_elements_by_page(template_pdf, sejda).items():
         texts_to_draw[page] = []
         text_watermarks.append(b"")
         for _element in _elements:
             key = template.get_element_key(_element, sejda)
 
             update_dict = {
-                constants.FIELD_FLAG_KEY.replace(
-                    "/", ""
-                ): pdfrw.PdfObject(1)
+                constants.FIELD_FLAG_KEY.replace("/", ""): pdfrw.PdfObject(1)
             }
             if elements[key].type == ElementType.checkbox:
                 if sejda and elements[key].value is True:
                     texts_to_draw[page].append(
                         [
                             utils.checkbox_radio_to_draw(elements[key]),
-                            template.get_draw_checkbox_radio_coordinates(
-                                _element
-                            )[0],
-                            template.get_draw_checkbox_radio_coordinates(
-                                _element
-                            )[1],
+                            template.get_draw_checkbox_radio_coordinates(_element)[0],
+                            template.get_draw_checkbox_radio_coordinates(_element)[1],
                         ]
                     )
                 else:
                     update_dict[
-                        constants.CHECKBOX_FIELD_VALUE_KEY.replace(
-                            "/", ""
-                        )
+                        constants.CHECKBOX_FIELD_VALUE_KEY.replace("/", "")
                     ] = utils.bool_to_checkbox(elements[key].value)
             elif elements[key].type == ElementType.radio:
                 if key not in radio_button_tracker:
@@ -70,12 +58,12 @@ def fill(
                         texts_to_draw[page].append(
                             [
                                 utils.checkbox_radio_to_draw(elements[key]),
-                                template.get_draw_checkbox_radio_coordinates(
-                                    _element
-                                )[0],
-                                template.get_draw_checkbox_radio_coordinates(
-                                    _element
-                                )[1],
+                                template.get_draw_checkbox_radio_coordinates(_element)[
+                                    0
+                                ],
+                                template.get_draw_checkbox_radio_coordinates(_element)[
+                                    1
+                                ],
                             ]
                         )
                     else:
@@ -94,9 +82,9 @@ def fill(
                 _element[constants.PARENT_KEY].update(
                     pdfrw.PdfDict(
                         **{
-                            constants.FIELD_FLAG_KEY.replace(
-                                "/", ""
-                            ): pdfrw.PdfObject(1)
+                            constants.FIELD_FLAG_KEY.replace("/", ""): pdfrw.PdfObject(
+                                1
+                            )
                         }
                     )
                 )
@@ -110,9 +98,7 @@ def fill(
                     ]
                 )
             if sejda:
-                _element[constants.PARENT_KEY].update(
-                    pdfrw.PdfDict(**update_dict)
-                )
+                _element[constants.PARENT_KEY].update(pdfrw.PdfDict(**update_dict))
             else:
                 _element.update(pdfrw.PdfDict(**update_dict))
 
@@ -151,9 +137,7 @@ def simple_fill(
                 pdfrw.PdfName.Off,
             ]:
                 update_dict = {
-                    constants.CHECKBOX_FIELD_VALUE_KEY.replace(
-                        "/", ""
-                    ): data[key]
+                    constants.CHECKBOX_FIELD_VALUE_KEY.replace("/", ""): data[key]
                 }
             elif isinstance(data[key], int):
                 if key not in radio_button_tracker:
@@ -166,9 +150,7 @@ def simple_fill(
                             **{
                                 constants.CHECKBOX_FIELD_VALUE_KEY.replace(
                                     "/", ""
-                                ): BasePdfName(
-                                    "/" + str(data[key]), False
-                                ),
+                                ): BasePdfName("/" + str(data[key]), False),
                             }
                         )
                     )
@@ -186,9 +168,7 @@ def simple_fill(
                     continue
             else:
                 update_dict = {
-                    constants.TEXT_FIELD_VALUE_KEY.replace("/", ""): data[
-                        key
-                    ]
+                    constants.TEXT_FIELD_VALUE_KEY.replace("/", ""): data[key]
                 }
 
             if not editable:
@@ -214,9 +194,7 @@ def fill_v2(
 
     radio_button_tracker = {}
 
-    for page, _elements in (
-        template.get_elements_by_page_v2(template_pdf).items()
-    ):
+    for page, _elements in template.get_elements_by_page_v2(template_pdf).items():
         texts_to_draw[page] = []
         text_watermarks.append(b"")
         for _element in _elements:
@@ -225,9 +203,7 @@ def fill_v2(
             if elements[key].type == ElementType.checkbox:
                 if elements[key].value:
                     font_size = utils.checkbox_radio_font_size(_element)
-                    _to_draw = utils.checkbox_radio_to_draw(
-                        elements[key], font_size
-                    )
+                    _to_draw = utils.checkbox_radio_to_draw(elements[key], font_size)
                     x, y = template.get_draw_checkbox_radio_coordinates_v2(
                         _element, _to_draw
                     )
@@ -245,9 +221,7 @@ def fill_v2(
 
                 if elements[key].value == radio_button_tracker[key] - 1:
                     font_size = utils.checkbox_radio_font_size(_element)
-                    _to_draw = utils.checkbox_radio_to_draw(
-                        elements[key], font_size
-                    )
+                    _to_draw = utils.checkbox_radio_to_draw(elements[key], font_size)
                     x, y = template.get_draw_checkbox_radio_coordinates_v2(
                         _element, _to_draw
                     )
@@ -259,9 +233,7 @@ def fill_v2(
                         ]
                     )
             else:
-                x, y = template.get_draw_text_coordinates_v2(
-                    _element, elements[key]
-                )
+                x, y = template.get_draw_text_coordinates_v2(_element, elements[key])
                 texts_to_draw[page].append(
                     [
                         elements[key],

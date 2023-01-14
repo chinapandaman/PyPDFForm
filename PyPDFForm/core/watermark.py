@@ -44,9 +44,7 @@ def draw_text(
     if element.comb is True:
         for i, char in enumerate(text_to_draw):
             canv.drawString(
-                coordinate_x
-                + element.character_paddings[i]
-                + element.text_x_offset,
+                coordinate_x + element.character_paddings[i] + element.text_x_offset,
                 coordinate_y + element.text_y_offset,
                 char,
             )

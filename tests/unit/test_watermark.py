@@ -7,7 +7,6 @@ import pytest
 from reportlab.pdfgen import canvas
 
 from PyPDFForm.core import watermark as watermark_core
-from PyPDFForm.core import watermark as watermark_core
 from PyPDFForm.middleware import constants
 from PyPDFForm.middleware.element import Element as ElementMiddleware
 from PyPDFForm.middleware.element import ElementType

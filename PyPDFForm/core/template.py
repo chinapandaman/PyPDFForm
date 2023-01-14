@@ -9,9 +9,8 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.element import Element as ElementMiddleware
 from ..middleware.element import ElementType
-from . import constants
+from . import constants, utils
 from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
-from . import utils
 
 
 def remove_all_elements(pdf: bytes) -> bytes:
@@ -44,8 +43,7 @@ def iterate_elements(
             for element in elements:
                 if not sejda:
                     if (
-                        element[constants.SUBTYPE_KEY]
-                        == constants.WIDGET_SUBTYPE_KEY
+                        element[constants.SUBTYPE_KEY] == constants.WIDGET_SUBTYPE_KEY
                         and element[constants.ANNOTATION_FIELD_KEY]
                     ):
                         result.append(element)
@@ -57,9 +55,7 @@ def iterate_elements(
                 else:
                     if (
                         element[constants.PARENT_KEY]
-                        and element[constants.PARENT_KEY][
-                            constants.ELEMENT_TYPE_KEY
-                        ]
+                        and element[constants.PARENT_KEY][constants.ELEMENT_TYPE_KEY]
                     ):
                         result.append(element)
 
@@ -83,8 +79,7 @@ def get_elements_by_page(
             for element in elements:
                 if not sejda:
                     if (
-                        element[constants.SUBTYPE_KEY]
-                        == constants.WIDGET_SUBTYPE_KEY
+                        element[constants.SUBTYPE_KEY] == constants.WIDGET_SUBTYPE_KEY
                         and element[constants.ANNOTATION_FIELD_KEY]
                     ):
                         result[i + 1].append(element)
@@ -96,9 +91,7 @@ def get_elements_by_page(
                 else:
                     if (
                         element[constants.PARENT_KEY]
-                        and element[constants.PARENT_KEY][
-                            constants.ELEMENT_TYPE_KEY
-                        ]
+                        and element[constants.PARENT_KEY][constants.ELEMENT_TYPE_KEY]
                     ):
                         result[i + 1].append(element)
 
@@ -151,21 +144,15 @@ def get_element_key(element: "pdfrw.PdfDict", sejda: bool = False) -> str:
     """Returns its annotated key given a PDF form element."""
 
     if sejda:
-        return element[constants.PARENT_KEY][
-            constants.ANNOTATION_FIELD_KEY
-        ][1:-1]
+        return element[constants.PARENT_KEY][constants.ANNOTATION_FIELD_KEY][1:-1]
 
     if not element[constants.ANNOTATION_FIELD_KEY]:
-        return element[constants.PARENT_KEY][
-            constants.ANNOTATION_FIELD_KEY
-        ][1:-1]
+        return element[constants.PARENT_KEY][constants.ANNOTATION_FIELD_KEY][1:-1]
 
     return element[constants.ANNOTATION_FIELD_KEY][1:-1]
 
 
-def traverse_pattern(
-    pattern: dict, element: "pdfrw.PdfDict"
-) -> Union[str, None]:
+def traverse_pattern(pattern: dict, element: "pdfrw.PdfDict") -> Union[str, None]:
     """Traverses down a PDF dict pattern and find the value."""
 
     for key, value in element.items():
@@ -199,22 +186,16 @@ def get_element_type(
 
     if sejda:
         if (
-            element[constants.PARENT_KEY][
-                constants.ELEMENT_TYPE_KEY
-            ]
+            element[constants.PARENT_KEY][constants.ELEMENT_TYPE_KEY]
             == constants.TEXT_FIELD_IDENTIFIER
         ):
             return ElementType.text
         if (
-            element[constants.PARENT_KEY][
-                constants.ELEMENT_TYPE_KEY
-            ]
+            element[constants.PARENT_KEY][constants.ELEMENT_TYPE_KEY]
             == constants.SELECTABLE_IDENTIFIER
         ):
             if (
-                element[constants.PARENT_KEY][
-                    constants.SUBTYPE_KEY
-                ]
+                element[constants.PARENT_KEY][constants.SUBTYPE_KEY]
                 == constants.WIDGET_SUBTYPE_KEY
             ):
                 return ElementType.checkbox
@@ -225,9 +206,7 @@ def get_element_type(
         constants.TEXT_FIELD_IDENTIFIER: ElementType.text,
     }
 
-    result = element_type_mapping.get(
-        str(element[constants.ELEMENT_TYPE_KEY])
-    )
+    result = element_type_mapping.get(str(element[constants.ELEMENT_TYPE_KEY]))
 
     if not result and element[constants.PARENT_KEY]:
         return ElementType.radio
@@ -235,9 +214,7 @@ def get_element_type(
     return result
 
 
-def get_element_type_v2(
-    element: "pdfrw.PdfDict"
-) -> Union["ElementType", None]:
+def get_element_type_v2(element: "pdfrw.PdfDict") -> Union["ElementType", None]:
     """Finds a PDF element's annotated type by pattern matching."""
 
     for each in ELEMENT_TYPE_PATTERNS:
@@ -383,9 +360,7 @@ def get_character_x_paddings(
         current_mid_point = current_x + char_rect_width / 2
         result.append(
             current_mid_point
-            - stringWidth(
-                char, element_middleware.font, element_middleware.font_size
-            )
+            - stringWidth(char, element_middleware.font, element_middleware.font_size)
             / 2
         )
         current_x += char_rect_width
@@ -404,9 +379,7 @@ def get_draw_text_coordinates_v2(
         else len(element_middleware.value or "")
     )
 
-    alignment = (
-        element[constants.TEXT_FIELD_ALIGNMENT_IDENTIFIER] or 0
-    )
+    alignment = element[constants.TEXT_FIELD_ALIGNMENT_IDENTIFIER] or 0
     x = float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
 
     if int(alignment) != 0:
@@ -429,10 +402,7 @@ def get_draw_text_coordinates_v2(
         if int(alignment) == 1:
             x = width_mid_point - string_width / 2
         elif int(alignment) == 2:
-            x = (
-                float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
-                - string_width
-            )
+            x = float(element[constants.ANNOTATION_RECTANGLE_KEY][2]) - string_width
             if length > 0 and element_middleware.comb is True:
                 x -= (
                     get_char_rect_width(element, element_middleware)

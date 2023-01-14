@@ -9,8 +9,8 @@ from ..core import image as image_core
 from ..core import template as template_core
 from ..core import utils
 from ..core import watermark as watermark_core
-from . import adapter
-from . import constants
+from . import adapter, constants
+from . import template as template_middleware
 from .element import Element as ElementMiddleware
 from .element import ElementType
 from .exceptions.input import (InvalidCoordinateError,
@@ -20,7 +20,6 @@ from .exceptions.input import (InvalidCoordinateError,
                                InvalidImageRotationAngleError,
                                InvalidModeError, InvalidPageNumberError,
                                InvalidTextError, InvalidTTFFontError)
-from . import template as template_middleware
 
 
 class PyPDFForm:
@@ -88,9 +87,7 @@ class PyPDFForm:
             template_core.assign_uuid(self.stream) if not self.sejda else self.stream
         )
         pdf_two = (
-            template_core.assign_uuid(other.stream)
-            if not other.sejda
-            else other.stream
+            template_core.assign_uuid(other.stream) if not other.sejda else other.stream
         )
 
         new_obj = self.__class__()

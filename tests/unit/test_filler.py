@@ -6,12 +6,10 @@ import pdfrw
 import pytest
 from pdfrw.objects.pdfname import BasePdfName
 
-from PyPDFForm.core import constants
-from PyPDFForm.core import filler
-from PyPDFForm.core import template
+from PyPDFForm.core import constants, filler, template
 from PyPDFForm.middleware import constants as middleware_constants
-from PyPDFForm.middleware.element import ElementType
 from PyPDFForm.middleware import template as template_middleware
+from PyPDFForm.middleware.element import ElementType
 
 
 @pytest.fixture
@@ -58,7 +56,9 @@ def test_fill(template_stream, data_dict):
                 elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
                 elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
                 elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
-                elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
+                elements[
+                    k
+                ].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
             elements[k].validate_constants()
             elements[k].validate_value()
             elements[k].validate_text_attributes()
@@ -91,7 +91,9 @@ def test_fill_v2(template_stream, data_dict):
                 elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
                 elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
                 elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
-                elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
+                elements[
+                    k
+                ].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
             elements[k].validate_constants()
             elements[k].validate_value()
             elements[k].validate_text_attributes()
@@ -105,10 +107,7 @@ def test_fill_v2(template_stream, data_dict):
         assert element[constants.FIELD_FLAG_KEY] != pdfrw.PdfObject(1)
 
         if isinstance(data_dict[key], bool):
-            assert (
-                element[constants.CHECKBOX_FIELD_VALUE_KEY]
-                == pdfrw.PdfName.Off
-            )
+            assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == pdfrw.PdfName.Off
 
 
 def test_fill_sejda(sejda_template, sejda_data):
@@ -187,7 +186,9 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
                 elements[k].font_color = middleware_constants.GLOBAL_FONT_COLOR
                 elements[k].text_x_offset = middleware_constants.GLOBAL_TEXT_X_OFFSET
                 elements[k].text_y_offset = middleware_constants.GLOBAL_TEXT_Y_OFFSET
-                elements[k].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
+                elements[
+                    k
+                ].text_wrap_length = middleware_constants.GLOBAL_TEXT_WRAP_LENGTH
             elements[k].validate_constants()
             elements[k].validate_value()
             elements[k].validate_text_attributes()
@@ -216,14 +217,11 @@ def test_fill_with_radiobutton(template_with_radiobutton_stream, data_dict):
             radio_button_tracker[key] += 1
 
             if data_dict[key] == radio_button_tracker[key] - 1:
-                assert element[
-                    constants.CHECKBOX_FIELD_VALUE_KEY
-                ] == BasePdfName("/" + str(data_dict[key]), False)
-            else:
-                assert (
-                    element[constants.CHECKBOX_FIELD_VALUE_KEY]
-                    == pdfrw.PdfName.Off
+                assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == BasePdfName(
+                    "/" + str(data_dict[key]), False
                 )
+            else:
+                assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == pdfrw.PdfName.Off
 
 
 def test_simple_fill(template_stream, data_dict):
@@ -239,10 +237,7 @@ def test_simple_fill(template_stream, data_dict):
                 pdfrw.PdfName.Yes if data_dict[key] else pdfrw.PdfName.Off
             )
         else:
-            assert (
-                element[constants.TEXT_FIELD_VALUE_KEY][1:-1]
-                == data_dict[key]
-            )
+            assert element[constants.TEXT_FIELD_VALUE_KEY][1:-1] == data_dict[key]
         assert element[constants.FIELD_FLAG_KEY] == pdfrw.PdfObject(1)
 
 
@@ -273,17 +268,11 @@ def test_simple_fill_with_radiobutton(template_with_radiobutton_stream, data_dic
             radio_button_tracker[key] += 1
 
             if data_dict[key] == radio_button_tracker[key] - 1:
-                assert element[
-                    constants.CHECKBOX_FIELD_VALUE_KEY
-                ] == BasePdfName("/" + str(data_dict[key]), False)
-            else:
-                assert (
-                    element[constants.CHECKBOX_FIELD_VALUE_KEY]
-                    == pdfrw.PdfName.Off
+                assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == BasePdfName(
+                    "/" + str(data_dict[key]), False
                 )
+            else:
+                assert element[constants.CHECKBOX_FIELD_VALUE_KEY] == pdfrw.PdfName.Off
         else:
-            assert (
-                element[constants.TEXT_FIELD_VALUE_KEY][1:-1]
-                == data_dict[key]
-            )
+            assert element[constants.TEXT_FIELD_VALUE_KEY][1:-1] == data_dict[key]
         assert element[constants.FIELD_FLAG_KEY] != pdfrw.PdfObject(1)

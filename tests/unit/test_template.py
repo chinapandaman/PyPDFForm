@@ -6,11 +6,10 @@ import uuid
 import pdfrw
 import pytest
 
-from PyPDFForm.core import constants
-from PyPDFForm.core import template
+from PyPDFForm.core import constants, template
+from PyPDFForm.middleware import template as template_middleware
 from PyPDFForm.middleware.element import ElementType
 from PyPDFForm.middleware.exceptions.template import InvalidTemplateError
-from PyPDFForm.middleware import template as template_middleware
 
 
 @pytest.fixture
@@ -146,9 +145,9 @@ def test_get_elements_by_page_sejda(sejda_template):
         },
     }
 
-    for page, elements in (
-        template.get_elements_by_page(sejda_template, sejda=True).items()
-    ):
+    for page, elements in template.get_elements_by_page(
+        sejda_template, sejda=True
+    ).items():
         for each in elements:
             expected[page][template.get_element_key(each, sejda=True)] = True
 
@@ -191,9 +190,7 @@ def test_get_elements_by_page_sejda_v2(sejda_template):
         },
     }
 
-    for page, elements in (
-        template.get_elements_by_page_v2(sejda_template).items()
-    ):
+    for page, elements in template.get_elements_by_page_v2(sejda_template).items():
         for each in elements:
             expected[page][template.get_element_key(each, sejda=True)] = True
 
@@ -221,9 +218,9 @@ def test_get_elements_by_page(template_with_radiobutton_stream):
         },
     }
 
-    for page, elements in (
-        template.get_elements_by_page(template_with_radiobutton_stream).items()
-    ):
+    for page, elements in template.get_elements_by_page(
+        template_with_radiobutton_stream
+    ).items():
         for each in elements:
             expected[page][template.get_element_key(each)] = True
 
@@ -251,9 +248,9 @@ def test_get_elements_by_page_v2(template_with_radiobutton_stream):
         },
     }
 
-    for page, elements in (
-        template.get_elements_by_page_v2(template_with_radiobutton_stream).items()
-    ):
+    for page, elements in template.get_elements_by_page_v2(
+        template_with_radiobutton_stream
+    ).items():
         for each in elements:
             expected[page][template.get_element_key(each)] = True
 
@@ -451,9 +448,9 @@ def test_get_element_type_v2_radiobutton(template_with_radiobutton_stream):
 
 
 def test_build_elements(template_with_radiobutton_stream, data_dict):
-    for k, v in (
-        template_middleware.build_elements(template_with_radiobutton_stream).items()
-    ):
+    for k, v in template_middleware.build_elements(
+        template_with_radiobutton_stream
+    ).items():
         if k in data_dict and k == v.name:
             data_dict[k] = True
 
@@ -462,9 +459,9 @@ def test_build_elements(template_with_radiobutton_stream, data_dict):
 
 
 def test_build_elements_v2(template_with_radiobutton_stream, data_dict):
-    for k, v in (
-        template_middleware.build_elements_v2(template_with_radiobutton_stream).items()
-    ):
+    for k, v in template_middleware.build_elements_v2(
+        template_with_radiobutton_stream
+    ).items():
         if k in data_dict and k == v.name:
             data_dict[k] = True
 
@@ -503,9 +500,7 @@ def test_build_elements_v2_with_comb_text_field(
     assert result["LastName"].max_length == 8
     assert result["LastName"].comb is None
 
-    result = template_middleware.build_elements_v2(
-        sample_template_with_comb_text_field
-    )
+    result = template_middleware.build_elements_v2(sample_template_with_comb_text_field)
     assert result["LastName"].max_length == 7
     assert result["LastName"].comb is True
 
@@ -560,11 +555,7 @@ def test_traverse_pattern(template_with_radiobutton_stream):
     type_to_pattern = {
         "text": {constants.ANNOTATION_FIELD_KEY: True},
         "check": {constants.ANNOTATION_FIELD_KEY: True},
-        "radio": {
-            constants.PARENT_KEY: {
-                constants.ANNOTATION_FIELD_KEY: True
-            }
-        },
+        "radio": {constants.PARENT_KEY: {constants.ANNOTATION_FIELD_KEY: True}},
     }
 
     for each in template.iterate_elements(template_with_radiobutton_stream):
@@ -574,11 +565,7 @@ def test_traverse_pattern(template_with_radiobutton_stream):
 
 
 def test_traverse_pattern_sejda(sejda_template):
-    pattern = {
-        constants.PARENT_KEY: {
-            constants.ANNOTATION_FIELD_KEY: True
-        }
-    }
+    pattern = {constants.PARENT_KEY: {constants.ANNOTATION_FIELD_KEY: True}}
 
     for each in template.iterate_elements(sejda_template):
         key = template.get_element_key(each)
@@ -599,16 +586,8 @@ def test_find_pattern_match(template_with_radiobutton_stream):
     }
 
     type_to_pattern = {
-        "text": (
-            {
-                constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER
-            },
-        ),
-        "check": (
-            {
-                constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
-            },
-        ),
+        "text": ({constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER},),
+        "check": ({constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER},),
         "radio": (
             {
                 constants.PARENT_KEY: {
@@ -678,10 +657,9 @@ def test_find_pattern_match_sejda(sejda_template, sejda_data):
 
 
 def test_get_text_field_max_length(sample_template_with_max_length_text_field):
-    for _page, elements in (
-        template.get_elements_by_page_v2(sample_template_with_max_length_text_field)
-        .items()
-    ):
+    for _page, elements in template.get_elements_by_page_v2(
+        sample_template_with_max_length_text_field
+    ).items():
         for element in elements:
             assert template.get_text_field_max_length(element) is (
                 8 if template.get_element_key_v2(element) == "LastName" else None
@@ -689,10 +667,9 @@ def test_get_text_field_max_length(sample_template_with_max_length_text_field):
 
 
 def test_is_text_field_comb(sample_template_with_comb_text_field):
-    for _page, elements in (
-        template.get_elements_by_page_v2(sample_template_with_comb_text_field)
-        .items()
-    ):
+    for _page, elements in template.get_elements_by_page_v2(
+        sample_template_with_comb_text_field
+    ).items():
         for element in elements:
             assert template.get_text_field_max_length(element) is (
                 7 if template.get_element_key_v2(element) == "LastName" else None
