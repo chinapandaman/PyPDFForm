@@ -11,7 +11,6 @@ def readable(obj: Any) -> bool:
     return callable(getattr(obj, "read", None))
 
 
-
 def fp_or_f_obj_or_stream_to_stream(
     fp_or_f_obj_or_stream: Union[bytes, str, BinaryIO]
 ) -> Union[bytes, None]:
