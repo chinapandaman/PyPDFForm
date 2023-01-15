@@ -82,7 +82,7 @@ class Element:
         if self._type == ElementType.radio:
             result["maximum"] = self.number_of_options - 1
         if self._type == ElementType.dropdown:
-            result["maximum"] = len(self.choices)
+            result["maximum"] = len(self.choices) - 1
 
         return result
 
