@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for filling a PDF form."""
+
 from copy import deepcopy
 from typing import Dict, Union
 
