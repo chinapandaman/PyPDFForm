@@ -24,7 +24,7 @@ def test_dropdown_one(sample_template_with_dropdown, pdf_samples):
                 "check_2": True,
                 "check_3": True,
                 "radio_1": 1,
-                "dropdown_1": 0
+                "dropdown_1": 0,
             },
         )
 
@@ -45,7 +45,7 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples):
                 "check_2": True,
                 "check_3": True,
                 "radio_1": 1,
-                "dropdown_1": 1
+                "dropdown_1": 1,
             },
         )
 
@@ -66,7 +66,7 @@ def test_dropdown_three(sample_template_with_dropdown, pdf_samples):
                 "check_2": True,
                 "check_3": True,
                 "radio_1": 1,
-                "dropdown_1": 2
+                "dropdown_1": 2,
             },
         )
 
@@ -87,7 +87,7 @@ def test_dropdown_four(sample_template_with_dropdown, pdf_samples):
                 "check_2": True,
                 "check_3": True,
                 "radio_1": 1,
-                "dropdown_1": 3
+                "dropdown_1": 3,
             },
         )
 

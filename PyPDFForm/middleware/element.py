@@ -73,7 +73,7 @@ class Element:
             ElementType.text: "string",
             ElementType.checkbox: "boolean",
             ElementType.radio: "integer",
-            ElementType.dropdown: "integer"
+            ElementType.dropdown: "integer",
         }
 
         result = {"type": mapping[self._type]}
