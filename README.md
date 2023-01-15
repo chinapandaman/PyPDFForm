@@ -54,9 +54,7 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/m
 ## Documentation
 
 * [API Reference](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/v2/api_reference.md)
-* [API Reference (Old)](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md)
 * [Examples](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/v2/examples.md)
-* [Examples (Old)](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md)
 
 ## PyPDFForm vs PyPDFForm2
 
