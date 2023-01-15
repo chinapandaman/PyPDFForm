@@ -30,7 +30,7 @@ class WrapperV2:
         )
 
         for each in self.elements.values():
-            if each.type == ElementType.text:
+            if each.type in (ElementType.text, ElementType.dropdown):
                 each.font = kwargs.get("global_font", constants.GLOBAL_FONT)
                 each.font_size = kwargs.get(
                     "global_font_size", constants.GLOBAL_FONT_SIZE

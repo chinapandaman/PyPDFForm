@@ -14,6 +14,10 @@ ELEMENT_TYPE_PATTERNS = [
         ElementType.checkbox,
     ),
     (
+        ({constants.ELEMENT_TYPE_KEY: constants.CHOICE_FIELD_IDENTIFIER},),
+        ElementType.dropdown,
+    ),
+    (
         (
             {
                 constants.PARENT_KEY: {

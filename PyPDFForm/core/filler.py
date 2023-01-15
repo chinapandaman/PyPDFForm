@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for filling a PDF form."""
-
+from copy import deepcopy
 from typing import Dict, Union
 
 import pdfrw
@@ -232,6 +232,21 @@ def fill_v2(
                             y,
                         ]
                     )
+            elif elements[key].type == ElementType.dropdown:
+                ele = deepcopy(elements[key])
+                ele.value = (
+                    ele.choices[ele.value]
+                    if ele.value < len(ele.choices)
+                    else ""
+                )
+                x, y = template.get_draw_text_coordinates_v2(_element, ele)
+                texts_to_draw[page].append(
+                    [
+                        ele,
+                        x,
+                        y,
+                    ]
+                )
             else:
                 x, y = template.get_draw_text_coordinates_v2(_element, elements[key])
                 texts_to_draw[page].append(

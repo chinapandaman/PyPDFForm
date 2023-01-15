@@ -310,6 +310,15 @@ def is_text_field_comb(element: "pdfrw.PdfDict") -> bool:
         return False
 
 
+def get_dropdown_choices(element: "pdfrw.PdfDict") -> Tuple[str]:
+    """Returns string options of a dropdown field."""
+
+    return tuple(
+        str(each[1]).replace("(", "").replace(")", "")
+        for each in element[constants.CHOICES_IDENTIFIER]
+    )
+
+
 def assign_uuid(pdf: bytes) -> bytes:
     """Appends a separator and uuid after each element's annotated name."""
 

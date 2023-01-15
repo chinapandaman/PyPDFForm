@@ -19,6 +19,7 @@ class ElementType(Enum):
     text = "text"
     checkbox = "checkbox"
     radio = "radio"
+    dropdown = "dropdown"
 
 
 class Element:
@@ -36,7 +37,7 @@ class Element:
         self._type = element_type
         self.value = element_value
 
-        if element_type == ElementType.text:
+        if element_type in (ElementType.text, ElementType.dropdown):
             self.font = None
             self.font_size = None
             self.font_color = None
@@ -46,6 +47,8 @@ class Element:
             self.max_length = None
             self.comb = None
             self.character_paddings = None
+            if element_type == ElementType.dropdown:
+                self.choices = None
 
         if element_type == ElementType.radio:
             self.number_of_options = 0
@@ -70,6 +73,7 @@ class Element:
             ElementType.text: "string",
             ElementType.checkbox: "boolean",
             ElementType.radio: "integer",
+            ElementType.dropdown: "integer"
         }
 
         result = {"type": mapping[self._type]}
@@ -77,6 +81,8 @@ class Element:
             result["maxLength"] = self.max_length
         if self._type == ElementType.radio:
             result["maximum"] = self.number_of_options - 1
+        if self._type == ElementType.dropdown:
+            result["maximum"] = len(self.choices)
 
         return result
 
