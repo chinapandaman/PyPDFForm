@@ -82,6 +82,9 @@ def build_elements_v2(pdf_stream: bytes) -> Dict[str, "Element"]:
                     ):
                         _element.comb = True
 
+                if _element.type == ElementType.dropdown:
+                    _element.choices = template.get_dropdown_choices(element)
+
                 if _element.type == ElementType.radio:
                     if key not in results:
                         results[key] = _element

@@ -284,6 +284,33 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     )
 ```
 
+## Fill a PDF form with dropdown
+
+This example uses this [template](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf). 
+It demos filling a PDF form's dropdown elements.
+
+```python
+import os
+
+from PyPDFForm import PyPDFForm2
+
+PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
+    os.path.expanduser("~/Downloads"), "sample_template_with_dropdown.pdf"
+)  # Change this to where you downloaded the sample PDF form
+
+PATH_TO_FILLED_PDF_FORM = os.path.join(
+    os.path.expanduser("~"), "output.pdf"
+)  # Change this to where you wish to put your filled PDF form
+
+
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm2(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        .fill({"dropdown_1": 1})
+        .read()
+    )
+```
+
 ## Draw text
 
 Sometimes you may want to draw some texts on a PDF form 

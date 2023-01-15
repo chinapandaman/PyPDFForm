@@ -95,7 +95,6 @@ A Python dictionary which
 is the primary way of customizing details like font size and text wrap length for an individual element. 
 Its keys consist 
 all elements' annotated names while the values hold their corresponding `Element()` objects. 
-Please read more about `Element()` [here](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/v2/api_reference.md#element-object).
 
 ### **fill**(*data*)
 
@@ -140,88 +139,3 @@ used via this name.
 
 A `bytes` object which holds the stream with the current state of the PDF form. This can be used by 
 Python IO to `.write` to another destination.
-
-## Element Object
-
-### *class* PyPDFForm.middleware.element.**Element**(*element_name, element_type, element_value*)
-
-The Element object implements a single PDF form element. It is constructed for each element 
-of a `PyPDFForm2` object constructed with a template stream and makes up the `elements` attribute. 
-When accessed through the `elements` attribute it can be used to customize an individual element's detail for filling method 
-such as font size and text wrap length.
-
-#### Parameters:
-
-* **element_name** - a `string` which represents the annotated name of the element.
-
-* **element_type** - an `enum` which represents the type of the element, currently supporting 
-`text`, `checkbox`, and `radio`.
-
-* **element_value** - this is the value that's used to fill this element. 
-It currently supports the following based on the type of the element:
-  1) A `string`, if the element is a `text`.
-  2) A `boolean`, if the element is a `checkbox`.
-  3) An `integer`, if the element is a `radio`.
-
-### **name**
-
-A `string` which represents the annotated name of the element. Readonly.
-
-### **type**
-
-An `enum` value which represents the type of the element, currently supporting 
-`text`, `checkbox`, and `radio`. Readonly.
-
-### **value**
-
-This attribute holds the value that's used to fill this element. 
-It currently supports the following based on the type of the element:
-
-1) A `string`, if the element is a `text`.
-2) A `boolean`, if the element is a `checkbox`.
-3) An `integer`, if the element is a `radio`.
-
-### **schema_definition**
-
-This attribute holds a `dict` which is the JSON schema definition of the element.
-
-### **font** = *None*
-
-Only available if the `element_type` is `text`. Setting this `string` attribute will 
-change the font used for the text filled on this element.
-
-### **font_size** = *None*
-
-Only available if the `element_type` is `text`. Setting this `float` attribute will 
-change the font size used for the text filled on this element.
-
-### **font_color** = *None*
-
-Only available if the `element_type` is `text`. Setting this `tuple` of RGB values will 
-change the font color used for the text filled on this element.
-
-### **text_x_offset** = *None*
-
-Only available if the `element_type` is `text`. Setting this `float` attribute will 
-change the horizontal offset used for the text filled on this element.
-
-### **text_y_offset** = *None*
-
-Only available if the `element_type` is `text`. Setting this `float` attribute will 
-change the vertical offset used for the text filled on this element.
-
-### **text_wrap_length** = *None*
-
-Only available if the `element_type` is `text`. Setting this `integer` attribute will 
-change the maximum text wrap length used for the text filled on this element. NOTE: Text 
-wrapping is NOT supported for text fields with `comb`set to `True`. 
-
-### **max_length** = *None*
-
-Only available if the `element_type` is `text`. Setting this `integer` attribute will 
-change the maximum length allowed for text filled on this element.
-
-### **comb** = *None*
-
-Only available if the `element_type` is `text`. Setting this `boolean` attribute will 
-change if the text field is displayed in combed format.

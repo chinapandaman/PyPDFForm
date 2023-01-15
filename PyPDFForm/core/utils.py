@@ -71,8 +71,8 @@ def checkbox_radio_to_draw(
     """Converts a checkbox/radio element to a drawable text element."""
 
     _map = {
-        ElementType.radio: "\u25CF",
-        ElementType.checkbox: "\u2713",
+        ElementType.radio: constants.RADIO_TO_DRAW,
+        ElementType.checkbox: constants.CHECKBOX_TO_DRAW,
     }
     new_element = Element(
         element_name=element.name,
