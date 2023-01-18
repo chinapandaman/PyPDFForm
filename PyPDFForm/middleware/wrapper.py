@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Contains v2 user API for PyPDFForm."""
+"""Contains user API for PyPDFForm."""
 
 from __future__ import annotations
 
