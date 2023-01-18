@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from PyPDFForm import PyPDFForm2
+from PyPDFForm import PyPDFForm
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def test_fill_max_length_text_field_all_chars(
     with open(
         os.path.join(expected_directory, "max_length_text_field_all_chars.pdf"), "rb+"
     ) as f:
-        obj = PyPDFForm2(sample_template_with_max_length_text_field).fill(
+        obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -45,7 +45,7 @@ def test_fill_max_length_text_field_odd_chars(
     with open(
         os.path.join(expected_directory, "max_length_text_field_odd_chars.pdf"), "rb+"
     ) as f:
-        obj = PyPDFForm2(sample_template_with_max_length_text_field).fill(
+        obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -67,7 +67,7 @@ def test_fill_max_length_text_field_even_chars(
     with open(
         os.path.join(expected_directory, "max_length_text_field_even_chars.pdf"), "rb+"
     ) as f:
-        obj = PyPDFForm2(sample_template_with_max_length_text_field).fill(
+        obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -89,7 +89,7 @@ def test_fill_comb_text_field_all_chars(
     with open(
         os.path.join(expected_directory, "comb_text_field_all_chars.pdf"), "rb+"
     ) as f:
-        obj = PyPDFForm2(sample_template_with_comb_text_field).fill(
+        obj = PyPDFForm(sample_template_with_comb_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -111,7 +111,7 @@ def test_fill_comb_text_field_odd_chars(
     with open(
         os.path.join(expected_directory, "comb_text_field_odd_chars.pdf"), "rb+"
     ) as f:
-        obj = PyPDFForm2(sample_template_with_comb_text_field).fill(
+        obj = PyPDFForm(sample_template_with_comb_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -133,7 +133,7 @@ def test_fill_comb_text_field_even_chars(
     with open(
         os.path.join(expected_directory, "comb_text_field_even_chars.pdf"), "rb+"
     ) as f:
-        obj = PyPDFForm2(sample_template_with_comb_text_field).fill(
+        obj = PyPDFForm(sample_template_with_comb_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -153,7 +153,7 @@ def test_fill_comb_text_field_void(
     sample_template_with_comb_text_field, expected_directory
 ):
     with open(os.path.join(expected_directory, "comb_text_field_void.pdf"), "rb+") as f:
-        obj = PyPDFForm2(sample_template_with_comb_text_field).fill({})
+        obj = PyPDFForm(sample_template_with_comb_text_field).fill({})
 
         expected = f.read()
 
@@ -170,7 +170,7 @@ def test_fill_comb_text_field_even_chars_right_aligned(
         ),
         "rb+",
     ) as f:
-        obj = PyPDFForm2(sample_template_with_comb_text_field_right_aligned).fill(
+        obj = PyPDFForm(sample_template_with_comb_text_field_right_aligned).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",

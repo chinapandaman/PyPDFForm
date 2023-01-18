@@ -5,15 +5,15 @@ from __future__ import annotations
 
 from typing import BinaryIO, Dict, Union
 
-from ..core import filler, font
-from ..core import image as image_core
-from ..core import template as template_core
-from ..core import utils
-from ..core import watermark as watermark_core
-from . import adapter, constants
-from . import template as template_middleware
-from .element import Element as ElementMiddleware
-from .element import ElementType
+from .core import filler, font
+from .core import image as image_core
+from .core import template as template_core
+from .core import utils
+from .core import watermark as watermark_core
+from .middleware import adapter, constants
+from .middleware import template as template_middleware
+from .middleware.element import Element as ElementMiddleware
+from .middleware.element import ElementType
 
 
 class Wrapper:

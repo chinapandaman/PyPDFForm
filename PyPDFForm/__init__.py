@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Contains wrapper."""
 
-from .middleware.wrapper import Wrapper
+from .wrapper import Wrapper
 
-PyPDFForm2 = Wrapper
+PyPDFForm = Wrapper
 
 __version__ = "1.2.1"

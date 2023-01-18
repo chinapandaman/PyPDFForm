@@ -2,11 +2,11 @@
 
 import os
 
-from PyPDFForm import PyPDFForm2
+from PyPDFForm import PyPDFForm
 
 
 def test_generate_schema(sample_template_with_dropdown):
-    schema = PyPDFForm2(sample_template_with_dropdown).generate_schema()
+    schema = PyPDFForm(sample_template_with_dropdown).generate_schema()
 
     for key, value in schema["properties"].items():
         if key == "dropdown_1":
@@ -15,7 +15,7 @@ def test_generate_schema(sample_template_with_dropdown):
 
 def test_dropdown_one(sample_template_with_dropdown, pdf_samples):
     with open(os.path.join(pdf_samples, "dropdown", "dropdown_one.pdf"), "rb+") as f:
-        obj = PyPDFForm2(sample_template_with_dropdown).fill(
+        obj = PyPDFForm(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -36,7 +36,7 @@ def test_dropdown_one(sample_template_with_dropdown, pdf_samples):
 
 def test_dropdown_two(sample_template_with_dropdown, pdf_samples):
     with open(os.path.join(pdf_samples, "dropdown", "dropdown_two.pdf"), "rb+") as f:
-        obj = PyPDFForm2(sample_template_with_dropdown).fill(
+        obj = PyPDFForm(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -57,7 +57,7 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples):
 
 def test_dropdown_three(sample_template_with_dropdown, pdf_samples):
     with open(os.path.join(pdf_samples, "dropdown", "dropdown_three.pdf"), "rb+") as f:
-        obj = PyPDFForm2(sample_template_with_dropdown).fill(
+        obj = PyPDFForm(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -78,7 +78,7 @@ def test_dropdown_three(sample_template_with_dropdown, pdf_samples):
 
 def test_dropdown_four(sample_template_with_dropdown, pdf_samples):
     with open(os.path.join(pdf_samples, "dropdown", "dropdown_four.pdf"), "rb+") as f:
-        obj = PyPDFForm2(sample_template_with_dropdown).fill(
+        obj = PyPDFForm(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",

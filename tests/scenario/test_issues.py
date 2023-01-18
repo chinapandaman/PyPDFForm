@@ -2,11 +2,11 @@
 
 import os
 
-from PyPDFForm import PyPDFForm2
+from PyPDFForm import PyPDFForm
 
 
 def test_pdf_form_with_pages_without_elements(issue_pdf_directory):
-    obj = PyPDFForm2(os.path.join(issue_pdf_directory, "PPF-246.pdf")).fill(
+    obj = PyPDFForm(os.path.join(issue_pdf_directory, "PPF-246.pdf")).fill(
         {"QCredit": "5000.63"}
     )
 
@@ -17,7 +17,7 @@ def test_pdf_form_with_pages_without_elements(issue_pdf_directory):
 
 
 def test_pdf_form_with_central_aligned_text_fields(issue_pdf_directory):
-    obj = PyPDFForm2(os.path.join(issue_pdf_directory, "PPF-285.pdf")).fill(
+    obj = PyPDFForm(os.path.join(issue_pdf_directory, "PPF-285.pdf")).fill(
         {
             "name": "Hans Mustermann",
             "fulladdress": "Musterstr. 12, 82903 Musterdorf, Musterland",
@@ -32,4 +32,4 @@ def test_pdf_form_with_central_aligned_text_fields(issue_pdf_directory):
 
 
 def test_pdf_form_with_central_aligned_text_fields_void(issue_pdf_directory):
-    assert PyPDFForm2(os.path.join(issue_pdf_directory, "PPF-285.pdf")).fill({}).read()
+    assert PyPDFForm(os.path.join(issue_pdf_directory, "PPF-285.pdf")).fill({}).read()

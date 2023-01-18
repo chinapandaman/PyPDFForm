@@ -21,7 +21,7 @@ A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm
 ```python
 import os
 
-from PyPDFForm import PyPDFForm2
+from PyPDFForm import PyPDFForm
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -33,7 +33,7 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     output.write(
-        PyPDFForm2(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
         .fill(
             {
                 "test": "test_1",
@@ -53,7 +53,6 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/m
 
 ## Documentation
 
-* [API Reference](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md)
 * [Examples](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md)
 
 ## How to Contribute
