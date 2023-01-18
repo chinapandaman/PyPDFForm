@@ -28,7 +28,7 @@ class Wrapper:
 
         self.stream = adapter.fp_or_f_obj_or_stream_to_stream(template)
         self.elements = (
-            template_middleware.build_elements_v2(self.stream) if self.stream else {}
+            template_middleware.build_elements(self.stream) if self.stream else {}
         )
 
         for each in self.elements.values():
@@ -85,7 +85,7 @@ class Wrapper:
             )
 
         self.stream = template_core.remove_all_elements(
-            filler.fill_v2(self.stream, self.elements)
+            filler.fill(self.stream, self.elements)
         )
 
         return self

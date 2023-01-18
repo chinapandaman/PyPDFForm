@@ -26,7 +26,7 @@ def remove_all_elements(pdf: bytes) -> bytes:
     return utils.generate_stream(pdf)
 
 
-def get_elements_by_page_v2(
+def get_elements_by_page(
     pdf: Union[bytes, pdfrw.PdfReader]
 ) -> Dict[int, List[pdfrw.PdfDict]]:
     """Iterates through a PDF and returns all elements found grouped by page."""
@@ -84,7 +84,7 @@ def traverse_pattern(pattern: dict, element: pdfrw.PdfDict) -> Union[str, None]:
     return None
 
 
-def get_element_key_v2(element: pdfrw.PdfDict) -> Union[str]:
+def get_element_key(element: pdfrw.PdfDict) -> Union[str]:
     """Finds a PDF element's annotated key by pattern matching."""
 
     result = None
@@ -96,7 +96,7 @@ def get_element_key_v2(element: pdfrw.PdfDict) -> Union[str]:
     return result
 
 
-def get_element_type_v2(element: pdfrw.PdfDict) -> Union[ElementType, None]:
+def get_element_type(element: pdfrw.PdfDict) -> Union[ElementType, None]:
     """Finds a PDF element's annotated type by pattern matching."""
 
     result = None
@@ -111,7 +111,7 @@ def get_element_type_v2(element: pdfrw.PdfDict) -> Union[ElementType, None]:
     return result
 
 
-def get_draw_checkbox_radio_coordinates_v2(
+def get_draw_checkbox_radio_coordinates(
     element: pdfrw.PdfDict,
     element_middleware: ElementMiddleware,
 ) -> Tuple[Union[float, int], Union[float, int]]:
@@ -202,7 +202,7 @@ def get_character_x_paddings(
     return result
 
 
-def get_draw_text_coordinates_v2(
+def get_draw_text_coordinates(
     element: pdfrw.PdfDict, element_middleware: ElementMiddleware
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw text at given a PDF form text element."""
