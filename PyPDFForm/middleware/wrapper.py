@@ -2,6 +2,7 @@
 """Contains user API for PyPDFForm."""
 
 from __future__ import annotations
+
 from typing import BinaryIO, Dict, Tuple, Union
 
 from ..core import filler
