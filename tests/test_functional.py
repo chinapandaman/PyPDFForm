@@ -13,7 +13,7 @@ from PyPDFForm.middleware.element import ElementType
 
 @pytest.fixture
 def pdf_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples", "v2")
+    return os.path.join(os.path.dirname(__file__), "..", "pdf_samples", "v2")
 
 
 @pytest.fixture
@@ -32,12 +32,12 @@ def template_with_radiobutton_stream(pdf_samples):
 
 @pytest.fixture
 def image_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "image_samples")
+    return os.path.join(os.path.dirname(__file__), "..", "image_samples")
 
 
 @pytest.fixture
 def font_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "font_samples")
+    return os.path.join(os.path.dirname(__file__), "..", "font_samples")
 
 
 @pytest.fixture

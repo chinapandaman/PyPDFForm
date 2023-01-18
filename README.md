@@ -16,7 +16,7 @@ pip install PyPDFForm
 
 ## Quick Example
 
-A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_template.pdf). Download it and try:
+A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). Download it and try:
 
 ```python
 import os
@@ -49,23 +49,12 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
 ```
 
 After running the above code snippet you can find `output.pdf` at the location you specified, 
-and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/v2/sample_filled.pdf).
+and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_filled.pdf).
 
 ## Documentation
 
 * [API Reference](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/api_reference.md)
 * [Examples](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md)
-
-## PyPDFForm vs PyPDFForm2
-
-PyPDFForm provides additional functionalities like editable support for PDF forms created 
-using Adobe Acrobat or Sejda.
-
-PyPDFForm2 supports PDF forms made by a wider range of tools, while discarding some of those additional 
-functionalities.
-
-It is strongly advised that you use PyPDFForm2 since only minimum supports will be made to PyPDFForm 
-from now on.
 
 ## How to Contribute
 

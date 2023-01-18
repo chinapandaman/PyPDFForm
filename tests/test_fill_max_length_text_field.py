@@ -12,7 +12,6 @@ def expected_directory():
     return os.path.join(
         os.path.dirname(__file__),
         "..",
-        "..",
         "pdf_samples",
         "max_length_text_field_related",
     )
