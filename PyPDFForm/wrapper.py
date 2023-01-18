@@ -175,4 +175,6 @@ class Wrapper:
 
         ttf_file = adapter.fp_or_f_obj_or_stream_to_stream(ttf_file)
 
-        return font.register_font(font_name, ttf_file) if ttf_file is not None else False
+        return (
+            font.register_font(font_name, ttf_file) if ttf_file is not None else False
+        )

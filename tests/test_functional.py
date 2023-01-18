@@ -38,10 +38,7 @@ def test_fill_font_liberation_serif_italic(
     with open(os.path.join(font_samples, "LiberationSerif-Italic.ttf"), "rb+") as _f:
         stream = _f.read()
         _f.seek(0)
-        PyPDFForm.register_font(
-            "LiberationSerif-Italic",
-            stream
-        )
+        PyPDFForm.register_font("LiberationSerif-Italic", stream)
 
     with open(
         os.path.join(pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"),

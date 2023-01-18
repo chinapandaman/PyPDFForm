@@ -9,7 +9,10 @@ def test_fill_max_length_text_field_all_chars(
     sample_template_with_max_length_text_field, max_length_expected_directory
 ):
     with open(
-        os.path.join(max_length_expected_directory, "max_length_text_field_all_chars.pdf"), "rb+"
+        os.path.join(
+            max_length_expected_directory, "max_length_text_field_all_chars.pdf"
+        ),
+        "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
             {
@@ -31,7 +34,10 @@ def test_fill_max_length_text_field_odd_chars(
     sample_template_with_max_length_text_field, max_length_expected_directory
 ):
     with open(
-        os.path.join(max_length_expected_directory, "max_length_text_field_odd_chars.pdf"), "rb+"
+        os.path.join(
+            max_length_expected_directory, "max_length_text_field_odd_chars.pdf"
+        ),
+        "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
             {
@@ -53,7 +59,10 @@ def test_fill_max_length_text_field_even_chars(
     sample_template_with_max_length_text_field, max_length_expected_directory
 ):
     with open(
-        os.path.join(max_length_expected_directory, "max_length_text_field_even_chars.pdf"), "rb+"
+        os.path.join(
+            max_length_expected_directory, "max_length_text_field_even_chars.pdf"
+        ),
+        "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
             {
@@ -75,7 +84,8 @@ def test_fill_comb_text_field_all_chars(
     sample_template_with_comb_text_field, max_length_expected_directory
 ):
     with open(
-        os.path.join(max_length_expected_directory, "comb_text_field_all_chars.pdf"), "rb+"
+        os.path.join(max_length_expected_directory, "comb_text_field_all_chars.pdf"),
+        "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_comb_text_field).fill(
             {
@@ -97,7 +107,8 @@ def test_fill_comb_text_field_odd_chars(
     sample_template_with_comb_text_field, max_length_expected_directory
 ):
     with open(
-        os.path.join(max_length_expected_directory, "comb_text_field_odd_chars.pdf"), "rb+"
+        os.path.join(max_length_expected_directory, "comb_text_field_odd_chars.pdf"),
+        "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_comb_text_field).fill(
             {
@@ -119,7 +130,8 @@ def test_fill_comb_text_field_even_chars(
     sample_template_with_comb_text_field, max_length_expected_directory
 ):
     with open(
-        os.path.join(max_length_expected_directory, "comb_text_field_even_chars.pdf"), "rb+"
+        os.path.join(max_length_expected_directory, "comb_text_field_even_chars.pdf"),
+        "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_comb_text_field).fill(
             {
@@ -140,7 +152,9 @@ def test_fill_comb_text_field_even_chars(
 def test_fill_comb_text_field_void(
     sample_template_with_comb_text_field, max_length_expected_directory
 ):
-    with open(os.path.join(max_length_expected_directory, "comb_text_field_void.pdf"), "rb+") as f:
+    with open(
+        os.path.join(max_length_expected_directory, "comb_text_field_void.pdf"), "rb+"
+    ) as f:
         obj = PyPDFForm(sample_template_with_comb_text_field).fill({})
 
         expected = f.read()
@@ -154,7 +168,8 @@ def test_fill_comb_text_field_even_chars_right_aligned(
 ):
     with open(
         os.path.join(
-            max_length_expected_directory, "comb_text_field_even_chars_right_aligned.pdf"
+            max_length_expected_directory,
+            "comb_text_field_even_chars_right_aligned.pdf",
         ),
         "rb+",
     ) as f:
