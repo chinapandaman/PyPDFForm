@@ -22,13 +22,3 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
 
     buff.close()
     return result
-
-
-def is_registered(font_name: str) -> bool:
-    """Checks if a font is registered."""
-
-    try:
-        pdfmetrics.getFont(font_name)
-        return True
-    except KeyError:
-        return False

@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """Contains utility helpers."""
 
-from copy import deepcopy
 from io import BytesIO
 from math import sqrt
-from typing import Dict, Union
+from typing import Union
 
 import pdfrw
 
@@ -25,26 +24,6 @@ def generate_stream(pdf: pdfrw.PdfReader) -> bytes:
     result_stream.close()
 
     return result
-
-
-def bool_to_checkboxes(
-    data: Dict[str, Union[str, bool, int]]
-) -> Dict[str, Union[str, pdfrw.PdfName]]:
-    """Converts all boolean values in input data dictionary into PDF checkbox objects."""
-
-    result = deepcopy(data)
-
-    for key, value in result.items():
-        if isinstance(value, bool):
-            result[key] = pdfrw.PdfName.Yes if value else pdfrw.PdfName.Off
-
-    return result
-
-
-def bool_to_checkbox(data: bool) -> pdfrw.PdfName:
-    """Converts a boolean value into a PDF checkbox object."""
-
-    return pdfrw.PdfName.Yes if data else pdfrw.PdfName.Off
 
 
 def checkbox_radio_font_size(element: pdfrw.PdfDict) -> Union[float, int]:

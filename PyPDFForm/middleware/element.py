@@ -4,14 +4,6 @@
 from enum import Enum
 from typing import Union
 
-from ..core import font
-from .exceptions.element import (InvalidElementNameError,
-                                 InvalidElementTypeError,
-                                 InvalidElementValueError,
-                                 InvalidFontColorError, InvalidFontError,
-                                 InvalidFontSizeError, InvalidTextOffsetError,
-                                 InvalidWrapLengthError)
-
 
 class ElementType(Enum):
     """An enum to represent types of elements."""
@@ -85,66 +77,3 @@ class Element:
             result["maximum"] = len(self.choices) - 1
 
         return result
-
-    def validate_constants(self) -> None:
-        """Validates unchangeable attributes of the element."""
-
-        if not isinstance(self._name, str):
-            raise InvalidElementNameError
-
-        if not isinstance(self._type, ElementType):
-            raise InvalidElementTypeError
-
-    def validate_value(self) -> None:
-        """Validates the value of the element."""
-
-        if self._type == ElementType.text:
-            if self.value is not None and not isinstance(self.value, str):
-                raise InvalidElementValueError
-
-        if self._type == ElementType.checkbox:
-            if self.value is not None and not isinstance(self.value, bool):
-                raise InvalidElementValueError
-
-        if self._type == ElementType.radio:
-            if self.value is not None and not isinstance(self.value, int):
-                raise InvalidElementValueError
-
-    def validate_text_attributes(self) -> None:
-        """Validates text element's attributes."""
-
-        if self._type == ElementType.text:
-            if (self.font is not None and not isinstance(self.font, str)) or (
-                not font.is_registered(self.font)
-            ):
-                raise InvalidFontError
-
-            if self.font_size is not None and not isinstance(
-                self.font_size, (float, int)
-            ):
-                raise InvalidFontSizeError
-
-            if self.font_color is not None and not (
-                isinstance(self.font_color, tuple) and len(self.font_color) == 3
-            ):
-                raise InvalidFontColorError
-
-            if isinstance(self.font_color, tuple):
-                for each in self.font_color:
-                    if not isinstance(each, (float, int)):
-                        raise InvalidFontColorError
-
-            if self.text_x_offset is not None and not (
-                isinstance(self.text_x_offset, (float, int))
-            ):
-                raise InvalidTextOffsetError
-
-            if self.text_y_offset is not None and not (
-                isinstance(self.text_y_offset, (float, int))
-            ):
-                raise InvalidTextOffsetError
-
-            if self.text_wrap_length is not None and not isinstance(
-                self.text_wrap_length, int
-            ):
-                raise InvalidWrapLengthError
