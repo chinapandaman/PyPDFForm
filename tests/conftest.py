@@ -129,3 +129,13 @@ def sejda_data():
         "buyer_dl_state": "IL",
         "seller_dl_state": "IL",
     }
+
+
+@pytest.fixture
+def max_length_expected_directory():
+    return os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "pdf_samples",
+        "max_length_text_field_related",
+    )
