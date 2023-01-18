@@ -28,8 +28,8 @@ def remove_all_elements(pdf: bytes) -> bytes:
 
 
 def iterate_elements(
-    pdf: Union[bytes, "pdfrw.PdfReader"], sejda: bool = False
-) -> List["pdfrw.PdfDict"]:
+    pdf: Union[bytes, pdfrw.PdfReader], sejda: bool = False
+) -> List[pdfrw.PdfDict]:
     """Iterates through a PDF and returns all elements found."""
 
     if isinstance(pdf, bytes):
@@ -63,8 +63,8 @@ def iterate_elements(
 
 
 def get_elements_by_page(
-    pdf: Union[bytes, "pdfrw.PdfReader"], sejda: bool = False
-) -> Dict[int, List["pdfrw.PdfDict"]]:
+    pdf: Union[bytes, pdfrw.PdfReader], sejda: bool = False
+) -> Dict[int, List[pdfrw.PdfDict]]:
     """Iterates through a PDF and returns all elements found grouped by page."""
 
     if isinstance(pdf, bytes):
@@ -99,8 +99,8 @@ def get_elements_by_page(
 
 
 def get_elements_by_page_v2(
-    pdf: Union[bytes, "pdfrw.PdfReader"]
-) -> Dict[int, List["pdfrw.PdfDict"]]:
+    pdf: Union[bytes, pdfrw.PdfReader]
+) -> Dict[int, List[pdfrw.PdfDict]]:
     """Iterates through a PDF and returns all elements found grouped by page."""
 
     if isinstance(pdf, bytes):
@@ -125,7 +125,7 @@ def get_elements_by_page_v2(
     return result
 
 
-def find_pattern_match(pattern: dict, element: "pdfrw.PdfDict") -> bool:
+def find_pattern_match(pattern: dict, element: pdfrw.PdfDict) -> bool:
     """Checks if a PDF dict pattern exists in a PDF element."""
 
     for key, value in element.items():
@@ -140,7 +140,7 @@ def find_pattern_match(pattern: dict, element: "pdfrw.PdfDict") -> bool:
     return False
 
 
-def get_element_key(element: "pdfrw.PdfDict", sejda: bool = False) -> str:
+def get_element_key(element: pdfrw.PdfDict, sejda: bool = False) -> str:
     """Returns its annotated key given a PDF form element."""
 
     if sejda:
@@ -152,7 +152,7 @@ def get_element_key(element: "pdfrw.PdfDict", sejda: bool = False) -> str:
     return element[constants.ANNOTATION_FIELD_KEY][1:-1]
 
 
-def traverse_pattern(pattern: dict, element: "pdfrw.PdfDict") -> Union[str, None]:
+def traverse_pattern(pattern: dict, element: pdfrw.PdfDict) -> Union[str, None]:
     """Traverses down a PDF dict pattern and find the value."""
 
     for key, value in element.items():
@@ -168,7 +168,7 @@ def traverse_pattern(pattern: dict, element: "pdfrw.PdfDict") -> Union[str, None
     return None
 
 
-def get_element_key_v2(element: "pdfrw.PdfDict") -> Union[str, None]:
+def get_element_key_v2(element: pdfrw.PdfDict) -> Union[str, None]:
     """Finds a PDF element's annotated key by pattern matching."""
 
     for pattern in ELEMENT_KEY_PATTERNS:
@@ -180,8 +180,8 @@ def get_element_key_v2(element: "pdfrw.PdfDict") -> Union[str, None]:
 
 
 def get_element_type(
-    element: "pdfrw.PdfDict", sejda: bool = False
-) -> Union["ElementType", None]:
+    element: pdfrw.PdfDict, sejda: bool = False
+) -> Union[ElementType, None]:
     """Returns its annotated type given a PDF form element."""
 
     if sejda:
@@ -214,7 +214,7 @@ def get_element_type(
     return result
 
 
-def get_element_type_v2(element: "pdfrw.PdfDict") -> Union["ElementType", None]:
+def get_element_type_v2(element: pdfrw.PdfDict) -> Union[ElementType, None]:
     """Finds a PDF element's annotated type by pattern matching."""
 
     for each in ELEMENT_TYPE_PATTERNS:
@@ -229,7 +229,7 @@ def get_element_type_v2(element: "pdfrw.PdfDict") -> Union["ElementType", None]:
 
 
 def get_draw_checkbox_radio_coordinates(
-    element: "pdfrw.PdfDict",
+    element: pdfrw.PdfDict,
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw at given a PDF form checkbox/radio element."""
 
@@ -250,8 +250,8 @@ def get_draw_checkbox_radio_coordinates(
 
 
 def get_draw_checkbox_radio_coordinates_v2(
-    element: "pdfrw.PdfDict",
-    element_middleware: "ElementMiddleware",
+    element: pdfrw.PdfDict,
+    element_middleware: ElementMiddleware,
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw at given a PDF form checkbox/radio element."""
 
@@ -278,7 +278,7 @@ def get_draw_checkbox_radio_coordinates_v2(
 
 
 def get_draw_text_coordinates(
-    element: "pdfrw.PdfDict",
+    element: pdfrw.PdfDict,
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw text at given a PDF form text element."""
 
@@ -291,7 +291,7 @@ def get_draw_text_coordinates(
     return x, y
 
 
-def get_text_field_max_length(element: "pdfrw.PdfDict") -> Union[int, None]:
+def get_text_field_max_length(element: pdfrw.PdfDict) -> Union[int, None]:
     """Returns the max length of the text field if presented or None."""
 
     return (
@@ -301,7 +301,7 @@ def get_text_field_max_length(element: "pdfrw.PdfDict") -> Union[int, None]:
     )
 
 
-def is_text_field_comb(element: "pdfrw.PdfDict") -> bool:
+def is_text_field_comb(element: pdfrw.PdfDict) -> bool:
     """Returns true if characters in a text field needs to be formatted into combs."""
 
     try:
@@ -310,7 +310,7 @@ def is_text_field_comb(element: "pdfrw.PdfDict") -> bool:
         return False
 
 
-def get_dropdown_choices(element: "pdfrw.PdfDict") -> Tuple[str]:
+def get_dropdown_choices(element: pdfrw.PdfDict) -> Tuple[str]:
     """Returns string options of a dropdown field."""
 
     return tuple(
@@ -343,7 +343,7 @@ def assign_uuid(pdf: bytes) -> bytes:
 
 
 def get_char_rect_width(
-    element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
+    element: pdfrw.PdfDict, element_middleware: ElementMiddleware
 ) -> float:
     """Returns rectangular width of each character for combed text fields."""
 
@@ -355,7 +355,7 @@ def get_char_rect_width(
 
 
 def get_character_x_paddings(
-    element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
+    element: pdfrw.PdfDict, element_middleware: ElementMiddleware
 ) -> List[float]:
     """Returns paddings between characters for combed text fields."""
 
@@ -378,7 +378,7 @@ def get_character_x_paddings(
 
 
 def get_draw_text_coordinates_v2(
-    element: "pdfrw.PdfDict", element_middleware: "ElementMiddleware"
+    element: pdfrw.PdfDict, element_middleware: ElementMiddleware
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw text at given a PDF form text element."""
 

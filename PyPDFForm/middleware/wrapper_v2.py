@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains v2 user API for PyPDFForm."""
 
+from __future__ import annotations
 from typing import BinaryIO, Dict, Union
 
 from ..core import filler, font
@@ -53,7 +54,7 @@ class WrapperV2:
 
         return self.stream
 
-    def __add__(self, other: "WrapperV2") -> "WrapperV2":
+    def __add__(self, other: WrapperV2) -> WrapperV2:
         """Overloaded addition operator to perform merging PDFs."""
 
         if not self.stream:
@@ -70,7 +71,7 @@ class WrapperV2:
     def fill(
         self,
         data: Dict[str, Union[str, bool, int]],
-    ) -> "WrapperV2":
+    ) -> WrapperV2:
         """Fill a PDF form."""
 
         for key, value in data.items():
@@ -95,7 +96,7 @@ class WrapperV2:
         x: Union[float, int],
         y: Union[float, int],
         **kwargs,
-    ) -> "WrapperV2":
+    ) -> WrapperV2:
         """Draws a text on a PDF form."""
 
         new_element = ElementMiddleware("new", ElementType.text)
@@ -139,7 +140,7 @@ class WrapperV2:
         width: Union[float, int],
         height: Union[float, int],
         rotation: Union[float, int] = 0,
-    ) -> "WrapperV2":
+    ) -> WrapperV2:
         """Draws an image on a PDF form."""
 
         image = adapter.fp_or_f_obj_or_stream_to_stream(image)

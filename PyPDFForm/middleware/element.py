@@ -28,7 +28,7 @@ class Element:
     def __init__(
         self,
         element_name: str,
-        element_type: "ElementType",
+        element_type: ElementType,
         element_value: Union[str, bool, int] = None,
     ) -> None:
         """Constructs all attributes for the Element object."""
@@ -60,7 +60,7 @@ class Element:
         return self._name
 
     @property
-    def type(self) -> "ElementType":
+    def type(self) -> ElementType:
         """Type of the element."""
 
         return self._type

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains user API for PyPDFForm."""
 
+from __future__ import annotations
 from typing import BinaryIO, Dict, Tuple, Union
 
 from ..core import filler
@@ -71,7 +72,7 @@ class PyPDFForm:
                 each.validate_value()
                 each.validate_text_attributes()
 
-    def __add__(self, other: "PyPDFForm") -> "PyPDFForm":
+    def __add__(self, other: PyPDFForm) -> PyPDFForm:
         """Overloaded addition operator to perform merging PDFs."""
 
         if not self.stream:
@@ -98,7 +99,7 @@ class PyPDFForm:
     def _fill(
         self,
         data: Dict[str, Union[str, bool, int]],
-    ) -> "PyPDFForm":
+    ) -> PyPDFForm:
         """Fill a PDF form with customized parameters."""
 
         template_middleware.validate_stream(self.stream)
@@ -131,7 +132,7 @@ class PyPDFForm:
         self,
         data: Dict[str, Union[str, bool, int]],
         editable: bool = False,
-    ) -> "PyPDFForm":
+    ) -> PyPDFForm:
         """Fills a PDF form in simple mode."""
 
         template_middleware.validate_stream(self.stream)
@@ -166,7 +167,7 @@ class PyPDFForm:
         text_x_offset: Union[float, int] = constants.GLOBAL_TEXT_X_OFFSET,
         text_y_offset: Union[float, int] = constants.GLOBAL_TEXT_Y_OFFSET,
         text_wrap_length: int = constants.GLOBAL_TEXT_WRAP_LENGTH,
-    ) -> "PyPDFForm":
+    ) -> PyPDFForm:
         """Draws a text on a PDF form."""
 
         template_middleware.validate_stream(self.stream)
@@ -221,7 +222,7 @@ class PyPDFForm:
         width: Union[float, int],
         height: Union[float, int],
         rotation: Union[float, int] = 0,
-    ) -> "PyPDFForm":
+    ) -> PyPDFForm:
         """Draws an image on a PDF form."""
 
         template_middleware.validate_stream(self.stream)

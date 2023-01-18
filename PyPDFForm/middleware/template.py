@@ -22,7 +22,7 @@ def validate_stream(pdf_stream: bytes) -> None:
         raise InvalidTemplateError
 
 
-def build_elements(pdf_stream: bytes, sejda: bool = False) -> Dict[str, "Element"]:
+def build_elements(pdf_stream: bytes, sejda: bool = False) -> Dict[str, Element]:
     """Builds an element dict given a PDF form stream."""
 
     results = {}
@@ -41,8 +41,8 @@ def build_elements(pdf_stream: bytes, sejda: bool = False) -> Dict[str, "Element
 
 
 def set_character_x_paddings(
-    pdf_stream: bytes, eles: Dict[str, "Element"]
-) -> Dict[str, "Element"]:
+    pdf_stream: bytes, eles: Dict[str, Element]
+) -> Dict[str, Element]:
     """Sets paddings between characters for combed text fields."""
 
     for elements in template.get_elements_by_page_v2(pdf_stream).values():
@@ -58,7 +58,7 @@ def set_character_x_paddings(
     return eles
 
 
-def build_elements_v2(pdf_stream: bytes) -> Dict[str, "Element"]:
+def build_elements_v2(pdf_stream: bytes) -> Dict[str, Element]:
     """Builds an element dict given a PDF form stream."""
 
     results = {}

@@ -14,8 +14,8 @@ from . import utils
 
 def draw_text(
     *args: Union[
-        "canvas.Canvas",
-        "ElementMiddleware",
+        canvas.Canvas,
+        ElementMiddleware,
         float,
         int,
         str,
@@ -76,7 +76,7 @@ def draw_text(
         canv.restoreState()
 
 
-def draw_image(*args: Union["canvas.Canvas", bytes, float, int]) -> None:
+def draw_image(*args: Union[canvas.Canvas, bytes, float, int]) -> None:
     """Draws an image on the watermark."""
 
     canv = args[0]
@@ -111,7 +111,7 @@ def create_watermarks_and_draw(
                 bytes,
                 float,
                 int,
-                "ElementMiddleware",
+                ElementMiddleware,
                 str,
             ]
         ]
