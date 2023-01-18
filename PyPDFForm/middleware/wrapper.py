@@ -16,7 +16,7 @@ from .element import Element as ElementMiddleware
 from .element import ElementType
 
 
-class WrapperV2:
+class Wrapper:
     """A class to represent a PDF form."""
 
     def __init__(
@@ -24,7 +24,7 @@ class WrapperV2:
         template: Union[bytes, str, BinaryIO] = b"",
         **kwargs,
     ) -> None:
-        """Constructs all attributes for the PyPDFForm object."""
+        """Constructs all attributes for the object."""
 
         self.stream = adapter.fp_or_f_obj_or_stream_to_stream(template)
         self.elements = (
@@ -55,7 +55,7 @@ class WrapperV2:
 
         return self.stream
 
-    def __add__(self, other: WrapperV2) -> WrapperV2:
+    def __add__(self, other: Wrapper) -> Wrapper:
         """Overloaded addition operator to perform merging PDFs."""
 
         if not self.stream:
@@ -72,7 +72,7 @@ class WrapperV2:
     def fill(
         self,
         data: Dict[str, Union[str, bool, int]],
-    ) -> WrapperV2:
+    ) -> Wrapper:
         """Fill a PDF form."""
 
         for key, value in data.items():
@@ -97,7 +97,7 @@ class WrapperV2:
         x: Union[float, int],
         y: Union[float, int],
         **kwargs,
-    ) -> WrapperV2:
+    ) -> Wrapper:
         """Draws a text on a PDF form."""
 
         new_element = ElementMiddleware("new", ElementType.text)
@@ -141,7 +141,7 @@ class WrapperV2:
         width: Union[float, int],
         height: Union[float, int],
         rotation: Union[float, int] = 0,
-    ) -> WrapperV2:
+    ) -> Wrapper:
         """Draws an image on a PDF form."""
 
         image = adapter.fp_or_f_obj_or_stream_to_stream(image)
