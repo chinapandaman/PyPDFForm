@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Builds package for release."""
 
 import re
 
@@ -7,12 +8,12 @@ import setuptools
 with open("PyPDFForm/__init__.py", encoding="utf8") as f:
     version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
 
-with open("README.md", "r") as fh:
+with open("README.md", mode="r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 dev_dependencies = ["coverage", "jsonschema", "pylint", "pytest", "pudb"]
 
-with open("requirements.txt", "r") as requirements:
+with open("requirements.txt", mode="r", encoding="utf-8") as requirements:
     dependencies = [
         each.replace("\n", "")
         for each in requirements.readlines()

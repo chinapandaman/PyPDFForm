@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for template."""
 
-import uuid
 from typing import Dict, List, Tuple, Union
 
 import pdfrw
@@ -27,78 +26,7 @@ def remove_all_elements(pdf: bytes) -> bytes:
     return utils.generate_stream(pdf)
 
 
-def iterate_elements(
-    pdf: Union[bytes, pdfrw.PdfReader], sejda: bool = False
-) -> List[pdfrw.PdfDict]:
-    """Iterates through a PDF and returns all elements found."""
-
-    if isinstance(pdf, bytes):
-        pdf = pdfrw.PdfReader(fdata=pdf)
-
-    result = []
-
-    for page in pdf.pages:
-        elements = page[constants.ANNOTATION_KEY]
-        if elements:
-            for element in elements:
-                if not sejda:
-                    if (
-                        element[constants.SUBTYPE_KEY] == constants.WIDGET_SUBTYPE_KEY
-                        and element[constants.ANNOTATION_FIELD_KEY]
-                    ):
-                        result.append(element)
-                    elif (
-                        element[constants.CHECKBOX_FIELD_VALUE_KEY]
-                        and element[constants.PARENT_KEY]
-                    ):
-                        result.append(element)
-                else:
-                    if (
-                        element[constants.PARENT_KEY]
-                        and element[constants.PARENT_KEY][constants.ELEMENT_TYPE_KEY]
-                    ):
-                        result.append(element)
-
-    return result
-
-
 def get_elements_by_page(
-    pdf: Union[bytes, pdfrw.PdfReader], sejda: bool = False
-) -> Dict[int, List[pdfrw.PdfDict]]:
-    """Iterates through a PDF and returns all elements found grouped by page."""
-
-    if isinstance(pdf, bytes):
-        pdf = pdfrw.PdfReader(fdata=pdf)
-
-    result = {}
-
-    for i, page in enumerate(pdf.pages):
-        elements = page[constants.ANNOTATION_KEY]
-        result[i + 1] = []
-        if elements:
-            for element in elements:
-                if not sejda:
-                    if (
-                        element[constants.SUBTYPE_KEY] == constants.WIDGET_SUBTYPE_KEY
-                        and element[constants.ANNOTATION_FIELD_KEY]
-                    ):
-                        result[i + 1].append(element)
-                    elif (
-                        element[constants.CHECKBOX_FIELD_VALUE_KEY]
-                        and element[constants.PARENT_KEY]
-                    ):
-                        result[i + 1].append(element)
-                else:
-                    if (
-                        element[constants.PARENT_KEY]
-                        and element[constants.PARENT_KEY][constants.ELEMENT_TYPE_KEY]
-                    ):
-                        result[i + 1].append(element)
-
-    return result
-
-
-def get_elements_by_page_v2(
     pdf: Union[bytes, pdfrw.PdfReader]
 ) -> Dict[int, List[pdfrw.PdfDict]]:
     """Iterates through a PDF and returns all elements found grouped by page."""
@@ -140,18 +68,6 @@ def find_pattern_match(pattern: dict, element: pdfrw.PdfDict) -> bool:
     return False
 
 
-def get_element_key(element: pdfrw.PdfDict, sejda: bool = False) -> str:
-    """Returns its annotated key given a PDF form element."""
-
-    if sejda:
-        return element[constants.PARENT_KEY][constants.ANNOTATION_FIELD_KEY][1:-1]
-
-    if not element[constants.ANNOTATION_FIELD_KEY]:
-        return element[constants.PARENT_KEY][constants.ANNOTATION_FIELD_KEY][1:-1]
-
-    return element[constants.ANNOTATION_FIELD_KEY][1:-1]
-
-
 def traverse_pattern(pattern: dict, element: pdfrw.PdfDict) -> Union[str, None]:
     """Traverses down a PDF dict pattern and find the value."""
 
@@ -168,88 +84,34 @@ def traverse_pattern(pattern: dict, element: pdfrw.PdfDict) -> Union[str, None]:
     return None
 
 
-def get_element_key_v2(element: pdfrw.PdfDict) -> Union[str, None]:
+def get_element_key(element: pdfrw.PdfDict) -> Union[str]:
     """Finds a PDF element's annotated key by pattern matching."""
 
+    result = None
     for pattern in ELEMENT_KEY_PATTERNS:
         value = traverse_pattern(pattern, element)
         if value:
-            return value[1:-1]
-
-    return None
-
-
-def get_element_type(
-    element: pdfrw.PdfDict, sejda: bool = False
-) -> Union[ElementType, None]:
-    """Returns its annotated type given a PDF form element."""
-
-    if sejda:
-        if (
-            element[constants.PARENT_KEY][constants.ELEMENT_TYPE_KEY]
-            == constants.TEXT_FIELD_IDENTIFIER
-        ):
-            return ElementType.text
-        if (
-            element[constants.PARENT_KEY][constants.ELEMENT_TYPE_KEY]
-            == constants.SELECTABLE_IDENTIFIER
-        ):
-            if (
-                element[constants.PARENT_KEY][constants.SUBTYPE_KEY]
-                == constants.WIDGET_SUBTYPE_KEY
-            ):
-                return ElementType.checkbox
-            return ElementType.radio
-
-    element_type_mapping = {
-        constants.SELECTABLE_IDENTIFIER: ElementType.checkbox,
-        constants.TEXT_FIELD_IDENTIFIER: ElementType.text,
-    }
-
-    result = element_type_mapping.get(str(element[constants.ELEMENT_TYPE_KEY]))
-
-    if not result and element[constants.PARENT_KEY]:
-        return ElementType.radio
-
+            result = value[1:-1]
+            break
     return result
 
 
-def get_element_type_v2(element: pdfrw.PdfDict) -> Union[ElementType, None]:
+def get_element_type(element: pdfrw.PdfDict) -> Union[ElementType, None]:
     """Finds a PDF element's annotated type by pattern matching."""
 
+    result = None
     for each in ELEMENT_TYPE_PATTERNS:
         patterns, _type = each
         check = True
         for pattern in patterns:
             check = check and find_pattern_match(pattern, element)
         if check:
-            return _type
-
-    return None
+            result = _type
+            break
+    return result
 
 
 def get_draw_checkbox_radio_coordinates(
-    element: pdfrw.PdfDict,
-) -> Tuple[Union[float, int], Union[float, int]]:
-    """Returns coordinates to draw at given a PDF form checkbox/radio element."""
-
-    return (
-        (
-            float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
-            + float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
-        )
-        / 2
-        - 5,
-        (
-            float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
-            + float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
-        )
-        / 2
-        - 4,
-    )
-
-
-def get_draw_checkbox_radio_coordinates_v2(
     element: pdfrw.PdfDict,
     element_middleware: ElementMiddleware,
 ) -> Tuple[Union[float, int], Union[float, int]]:
@@ -277,20 +139,6 @@ def get_draw_checkbox_radio_coordinates_v2(
     )
 
 
-def get_draw_text_coordinates(
-    element: pdfrw.PdfDict,
-) -> Tuple[Union[float, int], Union[float, int]]:
-    """Returns coordinates to draw text at given a PDF form text element."""
-
-    x = float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
-    y = (
-        float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
-        + float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
-    ) / 2 - 2
-
-    return x, y
-
-
 def get_text_field_max_length(element: pdfrw.PdfDict) -> Union[int, None]:
     """Returns the max length of the text field if presented or None."""
 
@@ -305,7 +153,7 @@ def is_text_field_comb(element: pdfrw.PdfDict) -> bool:
     """Returns true if characters in a text field needs to be formatted into combs."""
 
     try:
-        return "{0:b}".format(int(element["/Ff"]))[::-1][24] == "1"
+        return "{0:b}".format(int(element[constants.FIELD_FLAG_KEY]))[::-1][24] == "1"
     except IndexError:
         return False
 
@@ -317,29 +165,6 @@ def get_dropdown_choices(element: pdfrw.PdfDict) -> Tuple[str]:
         str(each[1]).replace("(", "").replace(")", "")
         for each in element[constants.CHOICES_IDENTIFIER]
     )
-
-
-def assign_uuid(pdf: bytes) -> bytes:
-    """Appends a separator and uuid after each element's annotated name."""
-
-    _uuid = uuid.uuid4().hex
-
-    pdf_file = pdfrw.PdfReader(fdata=pdf)
-
-    for element in iterate_elements(pdf_file):
-        base_key = get_element_key(element)
-        existed_uuid = ""
-        if constants.SEPARATOR in base_key:
-            base_key, existed_uuid = base_key.split(constants.SEPARATOR)
-
-        update_dict = {
-            constants.ANNOTATION_FIELD_KEY.replace(
-                "/", ""
-            ): f"{base_key}{constants.SEPARATOR}{existed_uuid or _uuid}"
-        }
-        element.update(pdfrw.PdfDict(**update_dict))
-
-    return utils.generate_stream(pdf_file)
 
 
 def get_char_rect_width(
@@ -377,7 +202,7 @@ def get_character_x_paddings(
     return result
 
 
-def get_draw_text_coordinates_v2(
+def get_draw_text_coordinates(
     element: pdfrw.PdfDict, element_middleware: ElementMiddleware
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw text at given a PDF form text element."""

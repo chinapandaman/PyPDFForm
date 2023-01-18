@@ -2,13 +2,13 @@
 
 import os
 
-from PyPDFForm import PyPDFForm2
+from PyPDFForm import PyPDFForm
 
 
 def test_filling_pdf_escape_pdf_form(tool_pdf_directory):
     with open(os.path.join(tool_pdf_directory, "pdf_escape_expected.pdf"), "rb+") as f:
         expected = f.read()
-        result = PyPDFForm2(os.path.join(tool_pdf_directory, "pdf_escape.pdf")).fill(
+        result = PyPDFForm(os.path.join(tool_pdf_directory, "pdf_escape.pdf")).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -26,7 +26,7 @@ def test_filling_pdf_escape_pdf_form(tool_pdf_directory):
 def test_filling_docfly_pdf_form(tool_pdf_directory):
     with open(os.path.join(tool_pdf_directory, "docfly_expected.pdf"), "rb+") as f:
         expected = f.read()
-        result = PyPDFForm2(os.path.join(tool_pdf_directory, "docfly.pdf")).fill(
+        result = PyPDFForm(os.path.join(tool_pdf_directory, "docfly.pdf")).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",

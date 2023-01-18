@@ -16,17 +16,18 @@ def fp_or_f_obj_or_stream_to_stream(
 ) -> Union[bytes, None]:
     """Converts a file path or a file object to a stream."""
 
+    result = None
     if isinstance(fp_or_f_obj_or_stream, bytes):
-        return fp_or_f_obj_or_stream
+        result = fp_or_f_obj_or_stream
 
-    if readable(fp_or_f_obj_or_stream):
-        return fp_or_f_obj_or_stream.read()
+    elif readable(fp_or_f_obj_or_stream):
+        result = fp_or_f_obj_or_stream.read()
 
-    if isinstance(fp_or_f_obj_or_stream, str):
+    elif isinstance(fp_or_f_obj_or_stream, str):
         if not os.path.isfile(fp_or_f_obj_or_stream):
-            return None
+            result = None
 
-        with open(fp_or_f_obj_or_stream, "rb+") as _file:
-            return _file.read()
-
-    return None
+        else:
+            with open(fp_or_f_obj_or_stream, "rb+") as _file:
+                result = _file.read()
+    return result

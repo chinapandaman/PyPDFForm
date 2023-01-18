@@ -1,43 +1,10 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for template middleware."""
 
-from typing import Dict, Union
+from typing import Dict
 
 from ..core import template
 from .element import Element, ElementType
-from .exceptions.template import InvalidTemplateError
-
-
-def validate_template(pdf_stream: Union[bytes, None]) -> None:
-    """Validates if a template stream is byte type."""
-
-    if not isinstance(pdf_stream, bytes):
-        raise InvalidTemplateError
-
-
-def validate_stream(pdf_stream: bytes) -> None:
-    """Validates if a template stream is indeed a PDF stream."""
-
-    if b"%PDF" not in pdf_stream:
-        raise InvalidTemplateError
-
-
-def build_elements(pdf_stream: bytes, sejda: bool = False) -> Dict[str, Element]:
-    """Builds an element dict given a PDF form stream."""
-
-    results = {}
-
-    for element in template.iterate_elements(pdf_stream, sejda):
-        key = template.get_element_key(element, sejda)
-
-        element_type = template.get_element_type(element, sejda)
-        if element_type is not None:
-            results[key] = Element(
-                element_name=key,
-                element_type=element_type,
-            )
-
-    return results
 
 
 def set_character_x_paddings(
@@ -45,9 +12,9 @@ def set_character_x_paddings(
 ) -> Dict[str, Element]:
     """Sets paddings between characters for combed text fields."""
 
-    for elements in template.get_elements_by_page_v2(pdf_stream).values():
+    for elements in template.get_elements_by_page(pdf_stream).values():
         for element in elements:
-            key = template.get_element_key_v2(element)
+            key = template.get_element_key(element)
             _element = eles[key]
 
             if _element.type == ElementType.text and _element.comb is True:
@@ -58,16 +25,16 @@ def set_character_x_paddings(
     return eles
 
 
-def build_elements_v2(pdf_stream: bytes) -> Dict[str, Element]:
+def build_elements(pdf_stream: bytes) -> Dict[str, Element]:
     """Builds an element dict given a PDF form stream."""
 
     results = {}
 
-    for elements in template.get_elements_by_page_v2(pdf_stream).values():
+    for elements in template.get_elements_by_page(pdf_stream).values():
         for element in elements:
-            key = template.get_element_key_v2(element)
+            key = template.get_element_key(element)
 
-            element_type = template.get_element_type_v2(element)
+            element_type = template.get_element_type(element)
 
             if element_type is not None:
                 _element = Element(
