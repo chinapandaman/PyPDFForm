@@ -53,7 +53,7 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/m
 
 ## Documentation
 
-* [Examples](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md)
+[Examples](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md)
 
 ## How to Contribute
 
