@@ -10,7 +10,7 @@ with open("PyPDFForm/__init__.py", encoding="utf8") as f:
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-dev_dependencies = ["coverage", "jsonschema", "pylint", "pytest"]
+dev_dependencies = ["coverage", "jsonschema", "pylint", "pytest", "pudb"]
 
 with open("requirements.txt", "r") as requirements:
     dependencies = [
@@ -33,6 +33,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=dependencies,
 )

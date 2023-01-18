@@ -15,7 +15,7 @@ from . import watermark as watermark_core
 
 def fill(
     template_stream: bytes,
-    elements: Dict[str, "ElementMiddleware"],
+    elements: Dict[str, ElementMiddleware],
     sejda: bool = False,
 ) -> bytes:
     """Fills a PDF using watermarks."""
@@ -184,7 +184,7 @@ def simple_fill(
 
 def fill_v2(
     template_stream: bytes,
-    elements: Dict[str, "ElementMiddleware"],
+    elements: Dict[str, ElementMiddleware],
 ) -> bytes:
     """Fills a PDF using watermarks."""
 

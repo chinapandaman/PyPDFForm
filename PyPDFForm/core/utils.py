@@ -13,7 +13,7 @@ from ..middleware.element import Element, ElementType
 from . import constants
 
 
-def generate_stream(pdf: "pdfrw.PdfReader") -> bytes:
+def generate_stream(pdf: pdfrw.PdfReader) -> bytes:
     """Generates new stream for manipulated PDF form."""
 
     result_stream = BytesIO()
@@ -29,7 +29,7 @@ def generate_stream(pdf: "pdfrw.PdfReader") -> bytes:
 
 def bool_to_checkboxes(
     data: Dict[str, Union[str, bool, int]]
-) -> Dict[str, Union[str, "pdfrw.PdfName"]]:
+) -> Dict[str, Union[str, pdfrw.PdfName]]:
     """Converts all boolean values in input data dictionary into PDF checkbox objects."""
 
     result = deepcopy(data)
@@ -41,13 +41,13 @@ def bool_to_checkboxes(
     return result
 
 
-def bool_to_checkbox(data: bool) -> "pdfrw.PdfName":
+def bool_to_checkbox(data: bool) -> pdfrw.PdfName:
     """Converts a boolean value into a PDF checkbox object."""
 
     return pdfrw.PdfName.Yes if data else pdfrw.PdfName.Off
 
 
-def checkbox_radio_font_size(element: "pdfrw.PdfDict") -> Union[float, int]:
+def checkbox_radio_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
     """
     Calculates the font size it should be drawn with
     given a checkbox/radio button element.
@@ -65,7 +65,7 @@ def checkbox_radio_font_size(element: "pdfrw.PdfDict") -> Union[float, int]:
 
 
 def checkbox_radio_to_draw(
-    element: "Element",
+    element: Element,
     font_size: Union[float, int] = middleware_constants.GLOBAL_FONT_SIZE,
 ) -> "Element":
     """Converts a checkbox/radio element to a drawable text element."""
