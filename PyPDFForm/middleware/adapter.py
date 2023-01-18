@@ -28,5 +28,3 @@ def fp_or_f_obj_or_stream_to_stream(
 
         with open(fp_or_f_obj_or_stream, "rb+") as _file:
             return _file.read()
-
-    return None

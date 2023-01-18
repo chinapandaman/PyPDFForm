@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import random
 
 import pytest
 from jsonschema import ValidationError, validate
@@ -70,6 +69,11 @@ def test_fill_v2(template_stream, pdf_samples, data_dict):
             assert not elements
 
 
+def test_register_bad_fonts():
+    assert not PyPDFForm2.register_font("foo", b"foo")
+    assert not PyPDFForm2.register_font("foo", "foo")
+
+
 def test_fill_font_liberation_serif_italic_v2(
     template_stream, pdf_samples, font_samples, data_dict
 ):
@@ -78,9 +82,7 @@ def test_fill_font_liberation_serif_italic_v2(
         _f.seek(0)
         PyPDFForm2.register_font(
             "LiberationSerif-Italic",
-            random.choice(
-                [os.path.join(font_samples, "LiberationSerif-Italic.ttf"), _f, stream]
-            ),
+            stream
         )
 
     with open(
@@ -360,12 +362,8 @@ def test_draw_text_on_one_page_different_font_v2(
 def test_draw_image_on_one_page_v2(template_stream, image_samples, pdf_samples):
     with open(os.path.join(pdf_samples, "sample_pdf_with_image.pdf"), "rb+") as f:
         with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
-            stream = _f.read()
-            _f.seek(0)
             obj = PyPDFForm2(template_stream).draw_image(
-                random.choice(
-                    [os.path.join(image_samples, "sample_image.jpg"), _f, stream]
-                ),
+                _f,
                 2,
                 100,
                 100,

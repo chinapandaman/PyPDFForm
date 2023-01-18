@@ -92,8 +92,6 @@ def get_element_key_v2(element: pdfrw.PdfDict) -> Union[str, None]:
         if value:
             return value[1:-1]
 
-    return None
-
 
 def get_element_type_v2(element: pdfrw.PdfDict) -> Union[ElementType, None]:
     """Finds a PDF element's annotated type by pattern matching."""
@@ -105,8 +103,6 @@ def get_element_type_v2(element: pdfrw.PdfDict) -> Union[ElementType, None]:
             check = check and find_pattern_match(pattern, element)
         if check:
             return _type
-
-    return None
 
 
 def get_draw_checkbox_radio_coordinates_v2(
