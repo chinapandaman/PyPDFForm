@@ -8,7 +8,7 @@ drawing image and merging multiple PDFs together.
 
 ## Installing
 
-Install using [pip](https://pip.pypa.io/en/stable/quickstart/):
+Install using [pip](https://pip.pypa.io/en/stable/):
 
 ```shell script
 pip install PyPDFForm

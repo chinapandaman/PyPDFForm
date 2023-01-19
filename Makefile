@@ -4,5 +4,8 @@ build-all:
 test-all:
 	bash ./scripts/test.sh
 
+coverage-all:
+	bash ./scripts/coverage.sh
+
 check-imports:
 	bash ./scripts/check_imports.sh
