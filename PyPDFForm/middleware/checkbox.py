@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Contains checkbox middleware."""
 
-from .element import ElementV2
+from .element import Element
 
 
-class Checkbox(ElementV2):
+class Checkbox(Element):
     """A class to represent a checkbox element."""
 
     def __init__(

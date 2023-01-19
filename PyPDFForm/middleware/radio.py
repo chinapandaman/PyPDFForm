@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Contains radio middleware."""
 
-from .element import ElementV2
+from .element import Element
 
 
-class Radio(ElementV2):
+class Radio(Element):
     """A class to represent a radiobutton element."""
 
     def __init__(

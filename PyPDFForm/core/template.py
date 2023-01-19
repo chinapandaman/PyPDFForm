@@ -6,8 +6,11 @@ from typing import Dict, List, Tuple, Union
 import pdfrw
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from ..middleware.element import Element as ElementMiddleware
-from ..middleware.element import ElementType
+from ..middleware.constants import ELEMENT_TYPES
+from ..middleware.text import Text
+from ..middleware.checkbox import Checkbox
+from ..middleware.radio import Radio
+from ..middleware.dropdown import Dropdown
 from . import constants, utils
 from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
 
@@ -96,7 +99,7 @@ def get_element_key(element: pdfrw.PdfDict) -> Union[str]:
     return result
 
 
-def get_element_type(element: pdfrw.PdfDict) -> Union[ElementType, None]:
+def get_element_type(element: pdfrw.PdfDict) -> Union[ELEMENT_TYPES, None]:
     """Finds a PDF element's annotated type by pattern matching."""
 
     result = None
@@ -113,7 +116,7 @@ def get_element_type(element: pdfrw.PdfDict) -> Union[ElementType, None]:
 
 def get_draw_checkbox_radio_coordinates(
     element: pdfrw.PdfDict,
-    element_middleware: ElementMiddleware,
+    element_middleware: Union[Checkbox, Radio],
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw at given a PDF form checkbox/radio element."""
 
@@ -168,7 +171,7 @@ def get_dropdown_choices(element: pdfrw.PdfDict) -> Tuple[str]:
 
 
 def get_char_rect_width(
-    element: pdfrw.PdfDict, element_middleware: ElementMiddleware
+    element: pdfrw.PdfDict, element_middleware: Text
 ) -> float:
     """Returns rectangular width of each character for combed text fields."""
 
@@ -180,7 +183,7 @@ def get_char_rect_width(
 
 
 def get_character_x_paddings(
-    element: pdfrw.PdfDict, element_middleware: ElementMiddleware
+    element: pdfrw.PdfDict, element_middleware: Text
 ) -> List[float]:
     """Returns paddings between characters for combed text fields."""
 
@@ -203,7 +206,7 @@ def get_character_x_paddings(
 
 
 def get_draw_text_coordinates(
-    element: pdfrw.PdfDict, element_middleware: ElementMiddleware
+    element: pdfrw.PdfDict, element_middleware: Union[Text, Dropdown]
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw text at given a PDF form text element."""
 

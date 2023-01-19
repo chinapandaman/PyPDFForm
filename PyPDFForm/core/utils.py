@@ -8,7 +8,9 @@ from typing import Union
 import pdfrw
 
 from ..middleware import constants as middleware_constants
-from ..middleware.element import Element, ElementType
+from ..middleware.text import Text
+from ..middleware.checkbox import Checkbox
+from ..middleware.radio import Radio
 from . import constants
 
 
@@ -44,29 +46,26 @@ def checkbox_radio_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
 
 
 def checkbox_radio_to_draw(
-    element: Element,
+    element: Union[Checkbox, Radio],
     font_size: Union[float, int] = middleware_constants.GLOBAL_FONT_SIZE,
-) -> "Element":
+) -> Text:
     """Converts a checkbox/radio element to a drawable text element."""
 
-    _map = {
-        ElementType.radio: constants.RADIO_TO_DRAW,
-        ElementType.checkbox: constants.CHECKBOX_TO_DRAW,
-    }
-    new_element = Element(
+    new_element = Text(
         element_name=element.name,
-        element_type=ElementType.text,
         element_value="",
     )
+    new_element.font = "Helvetica"
+    new_element.font_size = font_size
+    new_element.font_color = (0, 0, 0)
+    new_element.text_x_offset = 0
+    new_element.text_y_offset = 0
+    new_element.text_wrap_length = 100
 
-    if _map.get(element.type):
-        new_element.value = _map[element.type]
-        new_element.font = "Helvetica"
-        new_element.font_size = font_size
-        new_element.font_color = (0, 0, 0)
-        new_element.text_x_offset = 0
-        new_element.text_y_offset = 0
-        new_element.text_wrap_length = 100
+    if isinstance(element, Checkbox):
+        new_element.value = constants.CHECKBOX_TO_DRAW
+    elif isinstance(element, Radio):
+        new_element.value = constants.RADIO_TO_DRAW
 
     return new_element
 

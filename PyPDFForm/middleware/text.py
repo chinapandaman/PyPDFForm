@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Contains text middleware."""
 
-from .element import ElementV2
+from .element import Element
 
 
-class Text(ElementV2):
+class Text(Element):
     """A class to represent a text field element."""
 
     def __init__(

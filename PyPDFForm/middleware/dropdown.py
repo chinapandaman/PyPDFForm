@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Contains dropdown middleware."""
 
-from .element import ElementV2
+from .text import Text
 
 
-class Dropdown(ElementV2):
+class Dropdown(Text):
     """A class to represent a dropdown element."""
 
     def __init__(
@@ -15,13 +15,6 @@ class Dropdown(ElementV2):
         """Constructs all attributes for the dropdown."""
 
         super().__init__(element_name, element_value)
-
-        self.font = None
-        self.font_size = None
-        self.font_color = None
-        self.text_x_offset = None
-        self.text_y_offset = None
-        self.text_wrap_length = None
 
         self.choices = None
 

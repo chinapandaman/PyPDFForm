@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
 """Contains patterns used for identifying properties of elements."""
 
-from ..middleware.element import ElementType
+from ..middleware.text import Text
+from ..middleware.checkbox import Checkbox
+from ..middleware.radio import Radio
+from ..middleware.dropdown import Dropdown
 from . import constants
 
 ELEMENT_TYPE_PATTERNS = [
     (
         ({constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER},),
-        ElementType.text,
+        Text,
     ),
     (
         ({constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER},),
-        ElementType.checkbox,
+        Checkbox,
     ),
     (
         ({constants.ELEMENT_TYPE_KEY: constants.CHOICE_FIELD_IDENTIFIER},),
-        ElementType.dropdown,
+        Dropdown,
     ),
     (
         (
@@ -25,7 +28,7 @@ ELEMENT_TYPE_PATTERNS = [
                 }
             },
         ),
-        ElementType.text,
+        Text,
     ),
     (
         (
@@ -40,7 +43,7 @@ ELEMENT_TYPE_PATTERNS = [
                 }
             },
         ),
-        ElementType.checkbox,
+        Checkbox,
     ),
     (
         (
@@ -50,7 +53,7 @@ ELEMENT_TYPE_PATTERNS = [
                 }
             },
         ),
-        ElementType.radio,
+        Radio,
     ),
 ]
 

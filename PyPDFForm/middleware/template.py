@@ -4,12 +4,15 @@
 from typing import Dict
 
 from ..core import template
-from .element import Element, ElementType
+from .constants import ELEMENT_TYPES
+from .text import Text
+from .radio import Radio
+from .dropdown import Dropdown
 
 
 def set_character_x_paddings(
-    pdf_stream: bytes, eles: Dict[str, Element]
-) -> Dict[str, Element]:
+    pdf_stream: bytes, eles: Dict[str, ELEMENT_TYPES]
+) -> Dict[str, ELEMENT_TYPES]:
     """Sets paddings between characters for combed text fields."""
 
     for elements in template.get_elements_by_page(pdf_stream).values():
@@ -17,7 +20,7 @@ def set_character_x_paddings(
             key = template.get_element_key(element)
             _element = eles[key]
 
-            if _element.type == ElementType.text and _element.comb is True:
+            if isinstance(_element, Text) and _element.comb is True:
                 _element.character_paddings = template.get_character_x_paddings(
                     element, _element
                 )
@@ -25,7 +28,7 @@ def set_character_x_paddings(
     return eles
 
 
-def build_elements(pdf_stream: bytes) -> Dict[str, Element]:
+def build_elements(pdf_stream: bytes) -> Dict[str, ELEMENT_TYPES]:
     """Builds an element dict given a PDF form stream."""
 
     results = {}
@@ -37,22 +40,21 @@ def build_elements(pdf_stream: bytes) -> Dict[str, Element]:
             element_type = template.get_element_type(element)
 
             if element_type is not None:
-                _element = Element(
+                _element = element_type(
                     element_name=key,
-                    element_type=element_type,
                 )
 
-                if _element.type == ElementType.text:
+                if isinstance(_element, Text):
                     _element.max_length = template.get_text_field_max_length(element)
                     if _element.max_length is not None and template.is_text_field_comb(
                         element
                     ):
                         _element.comb = True
 
-                if _element.type == ElementType.dropdown:
+                if isinstance(_element, Dropdown):
                     _element.choices = template.get_dropdown_choices(element)
 
-                if _element.type == ElementType.radio:
+                if isinstance(_element, Radio):
                     if key not in results:
                         results[key] = _element
 

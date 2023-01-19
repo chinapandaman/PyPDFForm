@@ -7,7 +7,16 @@ from jsonschema import ValidationError, validate
 from PyPDFForm import PyPDFForm
 from PyPDFForm.core import template as template_core
 from PyPDFForm.middleware import constants
-from PyPDFForm.middleware.element import ElementType
+from PyPDFForm.middleware.element import Element
+from PyPDFForm.middleware.text import Text
+
+
+def test_base_schema_definition():
+    try:
+        Element("foo").schema_definition()
+        assert False
+    except NotImplementedError:
+        assert True
 
 
 def test_fill(template_stream, pdf_samples, data_dict):
@@ -58,7 +67,7 @@ def test_fill_font_liberation_serif_italic(
             assert v.name in data_dict
             assert v.value == data_dict[k]
 
-            if v.type == ElementType.text:
+            if isinstance(v, Text):
                 assert v.font == "LiberationSerif-Italic"
                 assert v.font_size == constants.GLOBAL_FONT_SIZE
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
@@ -83,7 +92,7 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict):
             assert v.name in data_dict
             assert v.value == data_dict[k]
 
-            if v.type == ElementType.text:
+            if isinstance(v, Text):
                 assert v.font == constants.GLOBAL_FONT
                 assert v.font_size == 20
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
@@ -110,7 +119,7 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict):
             assert v.name in data_dict
             assert v.value == data_dict[k]
 
-            if v.type == ElementType.text:
+            if isinstance(v, Text):
                 assert v.font == constants.GLOBAL_FONT
                 assert v.font_size == constants.GLOBAL_FONT_SIZE
                 assert v.font_color == (1, 0, 0)
@@ -139,7 +148,7 @@ def test_fill_offset_100(template_stream, pdf_samples, data_dict):
             assert v.name in data_dict
             assert v.value == data_dict[k]
 
-            if v.type == ElementType.text:
+            if isinstance(v, Text):
                 assert v.font == constants.GLOBAL_FONT
                 assert v.font_size == constants.GLOBAL_FONT_SIZE
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
@@ -164,7 +173,7 @@ def test_fill_wrap_2(template_stream, pdf_samples, data_dict):
             assert v.name in data_dict
             assert v.value == data_dict[k]
 
-            if v.type == ElementType.text:
+            if isinstance(v, Text):
                 assert v.font == constants.GLOBAL_FONT
                 assert v.font_size == constants.GLOBAL_FONT_SIZE
                 assert v.font_color == constants.GLOBAL_FONT_COLOR

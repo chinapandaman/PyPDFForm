@@ -12,8 +12,8 @@ from .core import utils
 from .core import watermark as watermark_core
 from .middleware import adapter, constants
 from .middleware import template as template_middleware
-from .middleware.element import Element as ElementMiddleware
-from .middleware.element import ElementType
+from .middleware.text import Text
+from .middleware.dropdown import Dropdown
 
 
 class Wrapper:
@@ -32,7 +32,7 @@ class Wrapper:
         )
 
         for each in self.elements.values():
-            if each.type in (ElementType.text, ElementType.dropdown):
+            if isinstance(each, (Text, Dropdown)):
                 each.font = kwargs.get("global_font", constants.GLOBAL_FONT)
                 each.font_size = kwargs.get(
                     "global_font_size", constants.GLOBAL_FONT_SIZE
@@ -100,7 +100,7 @@ class Wrapper:
     ) -> Wrapper:
         """Draws a text on a PDF form."""
 
-        new_element = ElementMiddleware("new", ElementType.text)
+        new_element = Text("new")
         new_element.value = text
         new_element.font = kwargs.get("font", constants.GLOBAL_FONT)
         new_element.font_size = kwargs.get("font_size", constants.GLOBAL_FONT_SIZE)

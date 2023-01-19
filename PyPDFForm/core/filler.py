@@ -6,15 +6,17 @@ from typing import Dict
 
 import pdfrw
 
-from ..middleware.element import Element as ElementMiddleware
-from ..middleware.element import ElementType
+from ..middleware.constants import ELEMENT_TYPES
+from ..middleware.checkbox import Checkbox
+from ..middleware.radio import Radio
+from ..middleware.dropdown import Dropdown
 from . import template, utils
 from . import watermark as watermark_core
 
 
 def fill(
     template_stream: bytes,
-    elements: Dict[str, ElementMiddleware],
+    elements: Dict[str, ELEMENT_TYPES],
 ) -> bytes:
     """Fills a PDF using watermarks."""
 
@@ -31,7 +33,7 @@ def fill(
         for _element in _elements:
             key = template.get_element_key(_element)
 
-            if elements[key].type == ElementType.checkbox:
+            if isinstance(elements[key], Checkbox):
                 if elements[key].value:
                     font_size = utils.checkbox_radio_font_size(_element)
                     _to_draw = utils.checkbox_radio_to_draw(elements[key], font_size)
@@ -45,7 +47,7 @@ def fill(
                             y,
                         ]
                     )
-            elif elements[key].type == ElementType.radio:
+            elif isinstance(elements[key], Radio):
                 if key not in radio_button_tracker:
                     radio_button_tracker[key] = 0
                 radio_button_tracker[key] += 1
@@ -63,7 +65,7 @@ def fill(
                             y,
                         ]
                     )
-            elif elements[key].type == ElementType.dropdown:
+            elif isinstance(elements[key], Dropdown):
                 ele = deepcopy(elements[key])
                 ele.value = (
                     ele.choices[ele.value] if ele.value < len(ele.choices) else ""
