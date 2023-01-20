@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Contains patterns used for identifying properties of elements."""
 
-from ..middleware.text import Text
 from ..middleware.checkbox import Checkbox
-from ..middleware.radio import Radio
 from ..middleware.dropdown import Dropdown
+from ..middleware.radio import Radio
+from ..middleware.text import Text
 from . import constants
 
 ELEMENT_TYPE_PATTERNS = [

@@ -8,10 +8,10 @@ class Text(Element):
     """A class to represent a text field element."""
 
     def __init__(
-            self,
-            element_name: str,
-            element_value: str = None,
-            ) -> None:
+        self,
+        element_name: str,
+        element_value: str = None,
+    ) -> None:
         """Constructs all attributes for the text field."""
 
         super().__init__(element_name, element_value)

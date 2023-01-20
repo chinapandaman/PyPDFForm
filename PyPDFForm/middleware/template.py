@@ -5,9 +5,9 @@ from typing import Dict
 
 from ..core import template
 from .constants import ELEMENT_TYPES
-from .text import Text
-from .radio import Radio
 from .dropdown import Dropdown
+from .radio import Radio
+from .text import Text
 
 
 def set_character_x_paddings(

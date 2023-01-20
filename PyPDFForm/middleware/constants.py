@@ -2,10 +2,11 @@
 """Contains constants for middleware layer."""
 
 from typing import Union
-from .text import Text
+
 from .checkbox import Checkbox
-from .radio import Radio
 from .dropdown import Dropdown
+from .radio import Radio
+from .text import Text
 
 GLOBAL_FONT = "Helvetica"
 GLOBAL_FONT_SIZE = 12

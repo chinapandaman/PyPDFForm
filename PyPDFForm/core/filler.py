@@ -6,10 +6,10 @@ from typing import Dict
 
 import pdfrw
 
-from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.checkbox import Checkbox
-from ..middleware.radio import Radio
+from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.dropdown import Dropdown
+from ..middleware.radio import Radio
 from . import template, utils
 from . import watermark as watermark_core
 

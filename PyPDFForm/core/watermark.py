@@ -8,8 +8,8 @@ import pdfrw
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
-from ..middleware.text import Text
 from ..middleware.dropdown import Dropdown
+from ..middleware.text import Text
 from . import utils
 
 

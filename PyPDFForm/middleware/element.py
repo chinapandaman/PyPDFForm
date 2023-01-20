@@ -8,10 +8,10 @@ class Element:
     """Base class for all PDF form elements."""
 
     def __init__(
-            self,
-            element_name: str,
-            element_value: Union[str, bool, int] = None,
-            ) -> None:
+        self,
+        element_name: str,
+        element_value: Union[str, bool, int] = None,
+    ) -> None:
         """Constructs basic attributes for the object."""
 
         self._name = element_name

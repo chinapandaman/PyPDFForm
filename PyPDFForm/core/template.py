@@ -7,8 +7,8 @@ import pdfrw
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.constants import ELEMENT_TYPES
-from ..middleware.text import Text
 from ..middleware.dropdown import Dropdown
+from ..middleware.text import Text
 from . import constants, utils
 from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
 
@@ -168,9 +168,7 @@ def get_dropdown_choices(element: pdfrw.PdfDict) -> Tuple[str]:
     )
 
 
-def get_char_rect_width(
-    element: pdfrw.PdfDict, element_middleware: Text
-) -> float:
+def get_char_rect_width(element: pdfrw.PdfDict, element_middleware: Text) -> float:
     """Returns rectangular width of each character for combed text fields."""
 
     rect_width = abs(

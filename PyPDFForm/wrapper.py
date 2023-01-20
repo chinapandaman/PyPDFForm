@@ -12,8 +12,8 @@ from .core import utils
 from .core import watermark as watermark_core
 from .middleware import adapter, constants
 from .middleware import template as template_middleware
-from .middleware.text import Text
 from .middleware.dropdown import Dropdown
+from .middleware.text import Text
 
 
 class Wrapper:
