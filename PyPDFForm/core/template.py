@@ -8,8 +8,6 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
-from ..middleware.checkbox import Checkbox
-from ..middleware.radio import Radio
 from ..middleware.dropdown import Dropdown
 from . import constants, utils
 from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
@@ -99,7 +97,7 @@ def get_element_key(element: pdfrw.PdfDict) -> Union[str]:
     return result
 
 
-def get_element_type(element: pdfrw.PdfDict) -> Union[ELEMENT_TYPES, None]:
+def construct_element(element: pdfrw.PdfDict, key: str) -> Union[ELEMENT_TYPES, None]:
     """Finds a PDF element's annotated type by pattern matching."""
 
     result = None
@@ -109,14 +107,14 @@ def get_element_type(element: pdfrw.PdfDict) -> Union[ELEMENT_TYPES, None]:
         for pattern in patterns:
             check = check and find_pattern_match(pattern, element)
         if check:
-            result = _type
+            result = _type(key)
             break
     return result
 
 
 def get_draw_checkbox_radio_coordinates(
     element: pdfrw.PdfDict,
-    element_middleware: Union[Checkbox, Radio],
+    element_middleware: Text,
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw at given a PDF form checkbox/radio element."""
 

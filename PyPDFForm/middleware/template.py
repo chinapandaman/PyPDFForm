@@ -37,13 +37,9 @@ def build_elements(pdf_stream: bytes) -> Dict[str, ELEMENT_TYPES]:
         for element in elements:
             key = template.get_element_key(element)
 
-            element_type = template.get_element_type(element)
+            _element = template.construct_element(element, key)
 
-            if element_type is not None:
-                _element = element_type(
-                    element_name=key,
-                )
-
+            if _element is not None:
                 if isinstance(_element, Text):
                     _element.max_length = template.get_text_field_max_length(element)
                     if _element.max_length is not None and template.is_text_field_comb(

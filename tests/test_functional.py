@@ -13,7 +13,7 @@ from PyPDFForm.middleware.text import Text
 
 def test_base_schema_definition():
     try:
-        Element("foo").schema_definition()
+        assert Element("foo").schema_definition
         assert False
     except NotImplementedError:
         assert True

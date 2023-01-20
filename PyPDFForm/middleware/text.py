@@ -26,7 +26,6 @@ class Text(Element):
         self.comb = None
         self.character_paddings = None
 
-
     @property
     def schema_definition(self) -> dict:
         """Json schema definition of the text field."""
