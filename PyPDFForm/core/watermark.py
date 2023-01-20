@@ -8,14 +8,15 @@ import pdfrw
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
-from ..middleware.element import Element as ElementMiddleware
+from ..middleware.text import Text
+from ..middleware.dropdown import Dropdown
 from . import utils
 
 
 def draw_text(
     *args: Union[
         canvas.Canvas,
-        ElementMiddleware,
+        Union[Text, Dropdown],
         float,
         int,
         str,
@@ -111,7 +112,7 @@ def create_watermarks_and_draw(
                 bytes,
                 float,
                 int,
-                ElementMiddleware,
+                Union[Text, Dropdown],
                 str,
             ]
         ]
