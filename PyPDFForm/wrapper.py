@@ -78,8 +78,10 @@ class Wrapper:
         for key, value in data.items():
             if key in self.elements:
                 self.elements[key].value = value
-            if isinstance(self.elements[key], Dropdown):
-                self.elements[key] = template_middleware.dropdown_to_text(self.elements[key])
+
+        for key, value in self.elements.items():
+            if isinstance(value, Dropdown):
+                self.elements[key] = template_middleware.dropdown_to_text(value)
 
         if self.read():
             self.elements = template_middleware.set_character_x_paddings(
