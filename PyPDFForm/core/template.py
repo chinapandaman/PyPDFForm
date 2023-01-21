@@ -202,7 +202,7 @@ def get_character_x_paddings(
 
 
 def get_draw_text_coordinates(
-    element: pdfrw.PdfDict, element_middleware: Union[Text, Dropdown]
+    element: pdfrw.PdfDict, element_middleware: Text
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw text at given a PDF form text element."""
 

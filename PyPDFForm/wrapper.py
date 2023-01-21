@@ -32,7 +32,7 @@ class Wrapper:
         )
 
         for each in self.elements.values():
-            if isinstance(each, (Text, Dropdown)):
+            if isinstance(each, Text):
                 each.font = kwargs.get("global_font", constants.GLOBAL_FONT)
                 each.font_size = kwargs.get(
                     "global_font_size", constants.GLOBAL_FONT_SIZE
@@ -78,6 +78,8 @@ class Wrapper:
         for key, value in data.items():
             if key in self.elements:
                 self.elements[key].value = value
+            if isinstance(self.elements[key], Dropdown):
+                self.elements[key] = template_middleware.dropdown_to_text(self.elements[key])
 
         if self.read():
             self.elements = template_middleware.set_character_x_paddings(

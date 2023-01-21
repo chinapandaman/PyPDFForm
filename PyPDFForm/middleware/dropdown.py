@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Contains dropdown middleware."""
 
-from .text import Text
+from .element import Element
 
 
-class Dropdown(Text):
+class Dropdown(Element):
     """A class to represent a dropdown element."""
 
     def __init__(

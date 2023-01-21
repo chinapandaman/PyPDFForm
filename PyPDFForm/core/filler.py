@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for filling a PDF form."""
 
-from copy import deepcopy
 from typing import Dict
 
 import pdfrw
 
 from ..middleware.checkbox import Checkbox
 from ..middleware.constants import ELEMENT_TYPES
-from ..middleware.dropdown import Dropdown
 from ..middleware.radio import Radio
 from . import template, utils
 from . import watermark as watermark_core
@@ -65,19 +63,6 @@ def fill(
                             y,
                         ]
                     )
-            elif isinstance(elements[key], Dropdown):
-                ele = deepcopy(elements[key])
-                ele.value = (
-                    ele.choices[ele.value] if ele.value < len(ele.choices) else ""
-                )
-                x, y = template.get_draw_text_coordinates(_element, ele)
-                texts_to_draw[page].append(
-                    [
-                        ele,
-                        x,
-                        y,
-                    ]
-                )
             else:
                 x, y = template.get_draw_text_coordinates(_element, elements[key])
                 texts_to_draw[page].append(

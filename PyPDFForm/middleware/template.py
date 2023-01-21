@@ -4,15 +4,15 @@
 from typing import Dict
 
 from ..core import template
-from .constants import ELEMENT_TYPES
+from . import constants
 from .dropdown import Dropdown
 from .radio import Radio
 from .text import Text
 
 
 def set_character_x_paddings(
-    pdf_stream: bytes, eles: Dict[str, ELEMENT_TYPES]
-) -> Dict[str, ELEMENT_TYPES]:
+    pdf_stream: bytes, eles: Dict[str, constants.ELEMENT_TYPES]
+) -> Dict[str, constants.ELEMENT_TYPES]:
     """Sets paddings between characters for combed text fields."""
 
     for elements in template.get_elements_by_page(pdf_stream).values():
@@ -28,7 +28,7 @@ def set_character_x_paddings(
     return eles
 
 
-def build_elements(pdf_stream: bytes) -> Dict[str, ELEMENT_TYPES]:
+def build_elements(pdf_stream: bytes) -> Dict[str, constants.ELEMENT_TYPES]:
     """Builds an element dict given a PDF form stream."""
 
     results = {}
@@ -60,3 +60,22 @@ def build_elements(pdf_stream: bytes) -> Dict[str, ELEMENT_TYPES]:
                 results[key] = _element
 
     return results
+
+
+def dropdown_to_text(dropdown: Dropdown) -> Text:
+    """Converts a dropdown element to a text element."""
+
+    result = Text(dropdown.name)
+
+    result.font = constants.GLOBAL_FONT
+    result.font_size = constants.GLOBAL_FONT_SIZE
+    result.font_color = constants.GLOBAL_FONT_COLOR
+    result.text_x_offset = constants.GLOBAL_TEXT_X_OFFSET
+    result.text_y_offset = constants.GLOBAL_TEXT_Y_OFFSET
+    result.text_wrap_length = constants.GLOBAL_TEXT_WRAP_LENGTH
+
+    result.value = (
+            dropdown.choices[dropdown.value] if dropdown.value < len(dropdown.choices) else ""
+            )
+
+    return result
