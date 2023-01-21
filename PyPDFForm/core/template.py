@@ -7,7 +7,6 @@ import pdfrw
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.constants import ELEMENT_TYPES
-from ..middleware.dropdown import Dropdown
 from ..middleware.text import Text
 from . import constants, utils
 from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
