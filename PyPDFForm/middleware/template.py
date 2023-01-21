@@ -76,7 +76,9 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
 
     if dropdown.value is not None:
         result.value = (
-                dropdown.choices[dropdown.value] if dropdown.value < len(dropdown.choices) else ""
-                )
+            dropdown.choices[dropdown.value]
+            if dropdown.value < len(dropdown.choices)
+            else ""
+        )
 
     return result

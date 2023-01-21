@@ -14,7 +14,9 @@ def test_generate_schema(sample_template_with_dropdown):
 
 
 def test_dropdown_not_specified(sample_template_with_dropdown):
-    assert PyPDFForm(sample_template_with_dropdown).fill(
+    assert (
+        PyPDFForm(sample_template_with_dropdown)
+        .fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -23,8 +25,10 @@ def test_dropdown_not_specified(sample_template_with_dropdown):
                 "check_2": True,
                 "check_3": True,
                 "radio_1": 1,
-                }
-            ).read()
+            }
+        )
+        .read()
+    )
 
 
 def test_dropdown_one(sample_template_with_dropdown, pdf_samples):
