@@ -73,6 +73,6 @@ ELEMENT_KEY_PATTERNS = [
 ]
 
 DROPDOWN_CHOICE_PATTERNS = [
-        {constants.CHOICES_IDENTIFIER: True},
-        {constants.PARENT_KEY: {constants.CHOICES_IDENTIFIER: True}},
-        ]
+    {constants.CHOICES_IDENTIFIER: True},
+    {constants.PARENT_KEY: {constants.CHOICES_IDENTIFIER: True}},
+]

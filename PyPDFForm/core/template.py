@@ -9,7 +9,8 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 from . import constants, utils
-from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS, DROPDOWN_CHOICE_PATTERNS
+from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_KEY_PATTERNS,
+                       ELEMENT_TYPE_PATTERNS)
 
 
 def remove_all_elements(pdf: bytes) -> bytes:
@@ -166,7 +167,9 @@ def get_dropdown_choices(element: pdfrw.PdfDict) -> Union[Tuple[str], None]:
         choices = traverse_pattern(pattern, element)
         if choices:
             result = tuple(
-                (each if isinstance(each, str) else str(each[1])).replace("(", "").replace(")", "")
+                (each if isinstance(each, str) else str(each[1]))
+                .replace("(", "")
+                .replace(")", "")
                 for each in choices
             )
 
