@@ -9,7 +9,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 from . import constants, utils
-from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS
+from .patterns import ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS, DROPDOWN_CHOICE_PATTERNS
 
 
 def remove_all_elements(pdf: bytes) -> bytes:
@@ -68,7 +68,7 @@ def find_pattern_match(pattern: dict, element: pdfrw.PdfDict) -> bool:
     return False
 
 
-def traverse_pattern(pattern: dict, element: pdfrw.PdfDict) -> Union[str, None]:
+def traverse_pattern(pattern: dict, element: pdfrw.PdfDict) -> Union[str, list, None]:
     """Traverses down a PDF dict pattern and find the value."""
 
     for key, value in element.items():
@@ -158,13 +158,19 @@ def is_text_field_comb(element: pdfrw.PdfDict) -> bool:
         return False
 
 
-def get_dropdown_choices(element: pdfrw.PdfDict) -> Tuple[str]:
+def get_dropdown_choices(element: pdfrw.PdfDict) -> Union[Tuple[str], None]:
     """Returns string options of a dropdown field."""
 
-    return tuple(
-        str(each[1]).replace("(", "").replace(")", "")
-        for each in element[constants.CHOICES_IDENTIFIER]
-    )
+    result = None
+    for pattern in DROPDOWN_CHOICE_PATTERNS:
+        choices = traverse_pattern(pattern, element)
+        if choices:
+            result = tuple(
+                (each if isinstance(each, str) else str(each[1])).replace("(", "").replace(")", "")
+                for each in choices
+            )
+
+    return result
 
 
 def get_char_rect_width(element: pdfrw.PdfDict, element_middleware: Text) -> float:

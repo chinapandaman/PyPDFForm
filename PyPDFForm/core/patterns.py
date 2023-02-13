@@ -24,6 +24,16 @@ ELEMENT_TYPE_PATTERNS = [
         (
             {
                 constants.PARENT_KEY: {
+                    constants.ELEMENT_TYPE_KEY: constants.CHOICE_FIELD_IDENTIFIER
+                }
+            },
+        ),
+        Dropdown,
+    ),
+    (
+        (
+            {
+                constants.PARENT_KEY: {
                     constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER
                 }
             },
@@ -61,3 +71,8 @@ ELEMENT_KEY_PATTERNS = [
     {constants.ANNOTATION_FIELD_KEY: True},
     {constants.PARENT_KEY: {constants.ANNOTATION_FIELD_KEY: True}},
 ]
+
+DROPDOWN_CHOICE_PATTERNS = [
+        {constants.CHOICES_IDENTIFIER: True},
+        {constants.PARENT_KEY: {constants.CHOICES_IDENTIFIER: True}},
+        ]

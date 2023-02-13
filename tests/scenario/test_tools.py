@@ -39,3 +39,15 @@ def test_filling_docfly_pdf_form(tool_pdf_directory):
         )
         assert len(result.read()) == len(expected)
         assert result.read() == expected
+
+
+def test_filling_sejda_dropdown_pdf_form(tool_pdf_directory):
+    with open(os.path.join(tool_pdf_directory, "sejda_dropdown_expected.pdf"), "rb+") as f:
+        expected = f.read()
+        result = PyPDFForm(os.path.join(tool_pdf_directory, "sejda_dropdown.pdf")).fill(
+            {
+                "dropdown_1": 2
+            }
+        )
+        assert len(result.read()) == len(expected)
+        assert result.read() == expected
