@@ -99,6 +99,15 @@ def sample_template_with_dropdown(pdf_samples):
 
 
 @pytest.fixture
+def dropdown_alignment(pdf_samples):
+    with open(
+        os.path.join(pdf_samples, "dropdown", "dropdown_alignment.pdf"),
+        "rb+",
+    ) as f:
+        return f.read()
+
+
+@pytest.fixture
 def sejda_data():
     return {
         "date": "01-01",
