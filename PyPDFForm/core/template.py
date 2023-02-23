@@ -10,7 +10,7 @@ from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 from . import constants, utils
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_KEY_PATTERNS,
-                       ELEMENT_TYPE_PATTERNS)
+                       ELEMENT_TYPE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS)
 
 
 def remove_all_elements(pdf: bytes) -> bytes:
@@ -85,7 +85,7 @@ def traverse_pattern(pattern: dict, element: pdfrw.PdfDict) -> Union[str, list, 
     return None
 
 
-def get_element_key(element: pdfrw.PdfDict) -> Union[str]:
+def get_element_key(element: pdfrw.PdfDict) -> Union[str, None]:
     """Finds a PDF element's annotated key by pattern matching."""
 
     result = None
@@ -93,6 +93,18 @@ def get_element_key(element: pdfrw.PdfDict) -> Union[str]:
         value = traverse_pattern(pattern, element)
         if value:
             result = value[1:-1]
+            break
+    return result
+
+
+def get_element_alignment(element: pdfrw.PdfDict) -> Union[str, None]:
+    """Finds a PDF element's alignment by pattern matching."""
+
+    result = None
+    for pattern in ELEMENT_ALIGNMENT_PATTERNS:
+        value = traverse_pattern(pattern, element)
+        if value:
+            result = value
             break
     return result
 
@@ -214,13 +226,20 @@ def get_draw_text_coordinates(
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw text at given a PDF form text element."""
 
+    element_value = element_middleware.value or ""
     length = (
-        min(len(element_middleware.value or ""), element_middleware.max_length)
+        min(len(element_value), element_middleware.max_length)
         if element_middleware.max_length is not None
-        else len(element_middleware.value or "")
+        else len(element_value)
     )
+    element_value = element_value[:length]
+    character_paddings = (
+            element_middleware.character_paddings[:length]
+            if element_middleware.character_paddings is not None
+            else element_middleware.character_paddings
+            )
 
-    alignment = element[constants.TEXT_FIELD_ALIGNMENT_IDENTIFIER] or 0
+    alignment = get_element_alignment(element) or 0
     x = float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
 
     if int(alignment) != 0:
@@ -229,13 +248,13 @@ def get_draw_text_coordinates(
             + float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
         ) / 2
         string_width = stringWidth(
-            (element_middleware.value or "")[:length],
+            element_value,
             element_middleware.font,
             element_middleware.font_size,
         )
         if element_middleware.comb is True and length:
-            string_width = element_middleware.character_paddings[-1] + stringWidth(
-                element_middleware.value[:length][-1],
+            string_width = character_paddings[-1] + stringWidth(
+                element_value[-1],
                 element_middleware.font,
                 element_middleware.font_size,
             )
@@ -248,7 +267,7 @@ def get_draw_text_coordinates(
                 x -= (
                     get_char_rect_width(element, element_middleware)
                     - stringWidth(
-                        element_middleware.value[-1],
+                        element_value[-1],
                         element_middleware.font,
                         element_middleware.font_size,
                     )
@@ -263,9 +282,9 @@ def get_draw_text_coordinates(
     return (
         x
         - (
-            element_middleware.character_paddings[0]
+            character_paddings[0]
             + stringWidth(
-                element_middleware.value[:1],
+                element_value[:1],
                 element_middleware.font,
                 element_middleware.font_size,
             )
