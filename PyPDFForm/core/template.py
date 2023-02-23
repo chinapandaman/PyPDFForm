@@ -10,7 +10,7 @@ from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 from . import constants, utils
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_KEY_PATTERNS,
-                       ELEMENT_TYPE_PATTERNS)
+                       ELEMENT_TYPE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS)
 
 
 def remove_all_elements(pdf: bytes) -> bytes:
@@ -85,7 +85,7 @@ def traverse_pattern(pattern: dict, element: pdfrw.PdfDict) -> Union[str, list, 
     return None
 
 
-def get_element_key(element: pdfrw.PdfDict) -> Union[str]:
+def get_element_key(element: pdfrw.PdfDict) -> Union[str, None]:
     """Finds a PDF element's annotated key by pattern matching."""
 
     result = None
@@ -93,6 +93,18 @@ def get_element_key(element: pdfrw.PdfDict) -> Union[str]:
         value = traverse_pattern(pattern, element)
         if value:
             result = value[1:-1]
+            break
+    return result
+
+
+def get_element_alignment(element: pdfrw.PdfDict) -> Union[str, None]:
+    """Finds a PDF element's alignment by pattern matching."""
+
+    result = None
+    for pattern in ELEMENT_ALIGNMENT_PATTERNS:
+        value = traverse_pattern(pattern, element)
+        if value:
+            result = value
             break
     return result
 
@@ -227,7 +239,7 @@ def get_draw_text_coordinates(
             else element_middleware.character_paddings
             )
 
-    alignment = element[constants.TEXT_FIELD_ALIGNMENT_IDENTIFIER] or 0
+    alignment = get_element_alignment(element) or 0
     x = float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
 
     if int(alignment) != 0:

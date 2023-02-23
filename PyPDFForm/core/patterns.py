@@ -76,3 +76,8 @@ DROPDOWN_CHOICE_PATTERNS = [
     {constants.CHOICES_IDENTIFIER: True},
     {constants.PARENT_KEY: {constants.CHOICES_IDENTIFIER: True}},
 ]
+
+ELEMENT_ALIGNMENT_PATTERNS = [
+    {constants.TEXT_FIELD_ALIGNMENT_IDENTIFIER: True},
+    {constants.PARENT_KEY: {constants.TEXT_FIELD_ALIGNMENT_IDENTIFIER: True}},
+        ]

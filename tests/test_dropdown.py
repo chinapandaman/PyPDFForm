@@ -129,3 +129,20 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples):
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples):
+    with open(os.path.join(pdf_samples,
+        "dropdown", "dropdown_alignment_sejda_expected.pdf"), "rb+") as f:
+        obj = PyPDFForm(dropdown_alignment_sejda).fill(
+            {
+                "dropdown_left": 0,
+                "dropdown_center": 1,
+                "dropdown_right": 2,
+            },
+        )
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
