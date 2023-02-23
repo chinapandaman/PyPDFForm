@@ -9,8 +9,8 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 from . import constants, utils
-from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_KEY_PATTERNS,
-                       ELEMENT_TYPE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS)
+from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
+                       ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS)
 
 
 def remove_all_elements(pdf: bytes) -> bytes:
@@ -234,10 +234,10 @@ def get_draw_text_coordinates(
     )
     element_value = element_value[:length]
     character_paddings = (
-            element_middleware.character_paddings[:length]
-            if element_middleware.character_paddings is not None
-            else element_middleware.character_paddings
-            )
+        element_middleware.character_paddings[:length]
+        if element_middleware.character_paddings is not None
+        else element_middleware.character_paddings
+    )
 
     alignment = get_element_alignment(element) or 0
     x = float(element[constants.ANNOTATION_RECTANGLE_KEY][0])

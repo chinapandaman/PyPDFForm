@@ -116,7 +116,9 @@ def test_dropdown_four(sample_template_with_dropdown, pdf_samples):
 
 
 def test_dropdown_alignment(dropdown_alignment, pdf_samples):
-    with open(os.path.join(pdf_samples, "dropdown", "dropdown_alignment_expected.pdf"), "rb+") as f:
+    with open(
+        os.path.join(pdf_samples, "dropdown", "dropdown_alignment_expected.pdf"), "rb+"
+    ) as f:
         obj = PyPDFForm(dropdown_alignment).fill(
             {
                 "dropdown_left": 0,
@@ -132,8 +134,10 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples):
 
 
 def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples):
-    with open(os.path.join(pdf_samples,
-        "dropdown", "dropdown_alignment_sejda_expected.pdf"), "rb+") as f:
+    with open(
+        os.path.join(pdf_samples, "dropdown", "dropdown_alignment_sejda_expected.pdf"),
+        "rb+",
+    ) as f:
         obj = PyPDFForm(dropdown_alignment_sejda).fill(
             {
                 "dropdown_left": 0,
