@@ -1,4 +1,12 @@
-# PyPDFForm ![code formatting](https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-black-isort.yml/badge.svg) ![tests](https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml/badge.svg) [![codecov](https://codecov.io/gh/chinapandaman/PyPDFForm/branch/master/graph/badge.svg?token=CSRLN14IFE)](https://codecov.io/gh/chinapandaman/PyPDFForm) ![deploy](https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-publish.yml/badge.svg)
+<p align="center"><img src="https://github.com/chinapandaman/PyPDFForm/blob/master/logo.png"></p>
+<p align="center">
+    <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-black-isort.yml/badge.svg"><img src="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-black-isort.yml/badge.svg"></a>
+    <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml/badge.svg"><img src="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml/badge.svg"></a>
+    <a href="https://codecov.io/gh/chinapandaman/PyPDFForm"><img src="https://codecov.io/gh/chinapandaman/PyPDFForm/branch/master/graph/badge.svg?token=CSRLN14IFE"></a>
+    <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-publish.yml/badge.svg"><img src="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-publish.yml/badge.svg"></a>
+</p>
+
+## Introduction
 
 PyPDFForm is a pure Python library for PDF form processing. 
 It allows filling a PDF form programmatically by creating 
