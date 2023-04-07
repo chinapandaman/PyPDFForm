@@ -24,7 +24,7 @@ pip install PyPDFForm
 
 ## Quick Example
 
-![](https://github.com/chinapandaman/PyPDFForm/blob/PPF-337/demo.gif)
+![](https://github.com/chinapandaman/PyPDFForm/blob/master/demo.gif)
 
 A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). Download it and try:
 
