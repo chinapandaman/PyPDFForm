@@ -1,4 +1,4 @@
-<p align="center"><img src="https://github.com/chinapandaman/PyPDFForm/blob/master/logo.png"></p>
+<p align="center"><img src="https://github.com/chinapandaman/PyPDFForm/raw/master/logo.png"></p>
 <p align="center">
     <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-black-isort.yml/badge.svg"><img src="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-black-isort.yml/badge.svg"></a>
     <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml/badge.svg"><img src="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml/badge.svg"></a>
@@ -24,7 +24,7 @@ pip install PyPDFForm
 
 ## Quick Example
 
-![](https://github.com/chinapandaman/PyPDFForm/blob/master/demo.gif)
+![](https://github.com/chinapandaman/PyPDFForm/raw/master/demo.gif)
 
 A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). Download it and try:
 
