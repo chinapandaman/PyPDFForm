@@ -24,9 +24,9 @@ pip install PyPDFForm
 
 ## Quick Example
 
-![](https://github.com/chinapandaman/PyPDFForm/raw/master/demo.gif)
+![Check out [demo.gif](https://github.com/chinapandaman/PyPDFForm/raw/master/demo.gif) for a live demo](https://github.com/chinapandaman/PyPDFForm/raw/master/demo.gif)
 
-A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). Download it and try:
+A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf). Download it and try:
 
 ```python
 import os
@@ -59,7 +59,7 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
 ```
 
 After running the above code snippet you can find `output.pdf` at the location you specified, 
-and it should look like [this](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_filled.pdf).
+and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_filled.pdf).
 
 ## Documentation
 

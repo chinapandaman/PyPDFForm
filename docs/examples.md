@@ -10,7 +10,7 @@ The most common tool to create a PDF form is Adobe Acrobat. A tutorial can be fo
 There are other free alternatives like [DocFly](https://www.docfly.com/) that support similar functionalities.
 
 Unless otherwise specified, all examples will use the same PDF form which can be 
-found [here](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template.pdf). 
+found [here](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf). 
 It has three text fields `test`, `test_2`, `test_3` and three checkboxes 
 `check`, `check_2`, `check_3` scattered on three pages.
 
@@ -51,7 +51,7 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
 
 ## Register font and set registered global font on filled text
 
-This example registers a [LiberationSerif-Regular](https://github.com/chinapandaman/PyPDFForm/blob/master/font_samples/LiberationSerif-Regular.ttf) 
+This example registers a [LiberationSerif-Regular](https://github.com/chinapandaman/PyPDFForm/raw/master/font_samples/LiberationSerif-Regular.ttf) 
 font and sets it as the global font on the filled PDF form.
 
 ```python
@@ -259,7 +259,7 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
 
 ## Fill a PDF form with radio buttons
 
-This example uses this [template](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/sample_template_with_radio_button.pdf). 
+This example uses this [template](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_radio_button.pdf). 
 It demos filling a PDF form's radio button elements.
 
 ```python
@@ -286,7 +286,7 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
 
 ## Fill a PDF form with dropdown
 
-This example uses this [template](https://github.com/chinapandaman/PyPDFForm/blob/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf). 
+This example uses this [template](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf). 
 It demos filling a PDF form's dropdown elements.
 
 ```python
