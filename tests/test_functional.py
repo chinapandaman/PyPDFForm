@@ -451,3 +451,19 @@ def test_fill_right_aligned(sample_template_with_right_aligned_text_field, pdf_s
 
         for _, elements in template_core.get_elements_by_page(obj.read()).items():
             assert not elements
+
+
+def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples):
+    with open(os.path.join(pdf_samples, "test_paragraph_y_coordinate.pdf"), "rb+") as f:
+        obj = PyPDFForm(sample_template_with_paragraph).fill(
+            {
+                "paragraph_1": "test paragraph"
+            }
+        )
+        assert len(obj.read()) == len(obj.stream)
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected

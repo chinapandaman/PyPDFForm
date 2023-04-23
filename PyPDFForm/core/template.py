@@ -171,6 +171,15 @@ def is_text_field_comb(element: pdfrw.PdfDict) -> bool:
         return False
 
 
+def is_text_multiline(element: pdfrw.PdfDict) -> bool:
+    """Returns true if a text field is a paragraph field."""
+
+    try:
+        return "{0:b}".format(int(element[constants.FIELD_FLAG_KEY]))[::-1][12] == "1"
+    except (IndexError, TypeError):
+        return False
+
+
 def get_dropdown_choices(element: pdfrw.PdfDict) -> Union[Tuple[str], None]:
     """Returns string options of a dropdown field."""
 
@@ -278,6 +287,9 @@ def get_draw_text_coordinates(
         float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
         + float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
     ) / 2
+    y = (height_mid_point - string_height / 2 + height_mid_point) / 2
+    if is_text_multiline(element):
+        y = float(element[constants.ANNOTATION_RECTANGLE_KEY][3]) - string_height / 2
 
     return (
         x
@@ -297,5 +309,5 @@ def get_draw_text_coordinates(
             )
             else 0
         ),
-        (height_mid_point - string_height / 2 + height_mid_point) / 2,
+        y,
     )
