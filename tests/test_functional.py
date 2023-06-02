@@ -16,7 +16,7 @@ def test_base_schema_definition():
         assert Element("foo").schema_definition
         assert False
     except NotImplementedError:
-        assert True
+        pass
 
 
 def test_fill(template_stream, pdf_samples, data_dict, request):
@@ -470,26 +470,24 @@ def test_generate_schema(sample_template_with_comb_text_field):
             assert properties[key]["maximum"] == 1
 
     validate(instance=data, schema=schema)
-    assert True
 
     data["LastName"] = "XXXXXXXX"
     try:
         validate(instance=data, schema=schema)
         assert False
     except ValidationError:
-        assert True
+        pass
 
     data["LastName"] = "XXXXXXX"
     data["Gender"] = 1
     validate(instance=data, schema=schema)
-    assert True
 
     data["Gender"] = 2
     try:
         validate(instance=data, schema=schema)
         assert False
     except ValidationError:
-        assert True
+        pass
 
 
 def test_fill_right_aligned(sample_template_with_right_aligned_text_field, pdf_samples, request):
