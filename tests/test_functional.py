@@ -19,11 +19,15 @@ def test_base_schema_definition():
         assert True
 
 
-def test_fill(template_stream, pdf_samples, data_dict):
-    with open(os.path.join(pdf_samples, "sample_filled.pdf"), "rb+") as f:
+def test_fill(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "sample_filled.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(template_stream).fill(
             data_dict,
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
         assert len(obj.read()) == len(obj.stream)
         assert obj.read() == obj.stream
 
@@ -42,20 +46,24 @@ def test_register_bad_fonts():
 
 
 def test_fill_font_liberation_serif_italic(
-    template_stream, pdf_samples, font_samples, data_dict
+    template_stream, pdf_samples, font_samples, data_dict, request
 ):
     with open(os.path.join(font_samples, "LiberationSerif-Italic.ttf"), "rb+") as _f:
         stream = _f.read()
         _f.seek(0)
         PyPDFForm.register_font("LiberationSerif-Italic", stream)
 
+    expected_path = os.path.join(pdf_samples, "sample_filled_font_liberation_serif_italic.pdf")
     with open(
-        os.path.join(pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"),
+        expected_path,
         "rb+",
     ) as f:
         obj = PyPDFForm(template_stream, global_font="LiberationSerif-Italic").fill(
             data_dict,
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
 
         expected = f.read()
 
@@ -76,11 +84,15 @@ def test_fill_font_liberation_serif_italic(
                 assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
 
 
-def test_fill_font_20(template_stream, pdf_samples, data_dict):
-    with open(os.path.join(pdf_samples, "sample_filled_font_20.pdf"), "rb+") as f:
+def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "sample_filled_font_20.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(template_stream, global_font_size=20).fill(
             data_dict,
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
 
         expected = f.read()
 
@@ -101,13 +113,17 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict):
                 assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
 
 
-def test_fill_font_color_red(template_stream, pdf_samples, data_dict):
+def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "sample_filled_font_color_red.pdf")
     with open(
-        os.path.join(pdf_samples, "sample_filled_font_color_red.pdf"), "rb+"
+        expected_path, "rb+"
     ) as f:
         obj = PyPDFForm(template_stream, global_font_color=(1, 0, 0)).fill(
             data_dict,
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
 
         expected = f.read()
 
@@ -128,8 +144,9 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict):
                 assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
 
 
-def test_fill_offset_100(template_stream, pdf_samples, data_dict):
-    with open(os.path.join(pdf_samples, "sample_filled_offset_100.pdf"), "rb+") as f:
+def test_fill_offset_100(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "sample_filled_offset_100.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(
             template_stream,
             global_text_x_offset=100,
@@ -137,6 +154,9 @@ def test_fill_offset_100(template_stream, pdf_samples, data_dict):
         ).fill(
             data_dict,
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
 
         expected = f.read()
 
@@ -157,11 +177,15 @@ def test_fill_offset_100(template_stream, pdf_samples, data_dict):
                 assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
 
 
-def test_fill_wrap_2(template_stream, pdf_samples, data_dict):
-    with open(os.path.join(pdf_samples, "sample_filled_text_wrap_2.pdf"), "rb+") as f:
+def test_fill_wrap_2(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "sample_filled_text_wrap_2.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(template_stream, global_text_wrap_length=2).fill(
             data_dict,
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
 
         expected = f.read()
 
@@ -182,9 +206,10 @@ def test_fill_wrap_2(template_stream, pdf_samples, data_dict):
                 assert v.text_wrap_length == 2
 
 
-def test_fill_with_customized_elements(template_stream, pdf_samples, data_dict):
+def test_fill_with_customized_elements(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "sample_filled_customized_elements.pdf")
     with open(
-        os.path.join(pdf_samples, "sample_filled_customized_elements.pdf"), "rb+"
+        expected_path, "rb+"
     ) as f:
         obj = PyPDFForm(template_stream)
 
@@ -198,6 +223,9 @@ def test_fill_with_customized_elements(template_stream, pdf_samples, data_dict):
         obj.elements["test_3"].text_wrap_length = 2
 
         obj.fill(data_dict)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
 
         expected = f.read()
 
@@ -231,8 +259,9 @@ def test_fill_with_customized_elements(template_stream, pdf_samples, data_dict):
         assert obj.elements["test_3"].text_wrap_length == 2
 
 
-def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
-    with open(os.path.join(pdf_samples, "sample_filled_radiobutton.pdf"), "rb+") as f:
+def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream, request):
+    expected_path = os.path.join(pdf_samples, "sample_filled_radiobutton.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(template_with_radiobutton_stream).fill(
             {
                 "radio_1": 0,
@@ -241,17 +270,24 @@ def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream):
             },
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
 
-def test_fill_sejda_and_read(sejda_template, pdf_samples, sejda_data):
-    with open(os.path.join(pdf_samples, "sample_filled_sejda.pdf"), "rb+") as f:
+def test_fill_sejda_and_read(sejda_template, pdf_samples, sejda_data, request):
+    expected_path = os.path.join(pdf_samples, "sample_filled_sejda.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sejda_template).fill(
             sejda_data,
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
         assert len(obj.read()) == len(obj.stream)
         assert obj.read() == obj.stream
 
@@ -261,8 +297,9 @@ def test_fill_sejda_and_read(sejda_template, pdf_samples, sejda_data):
         assert obj.stream == expected
 
 
-def test_draw_text_on_one_page(template_stream, pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_pdf_with_drawn_text.pdf"), "rb+") as f:
+def test_draw_text_on_one_page(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "sample_pdf_with_drawn_text.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(template_stream).draw_text(
             "drawn_text",
             1,
@@ -276,6 +313,9 @@ def test_draw_text_on_one_page(template_stream, pdf_samples):
             text_wrap_length=4,
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
@@ -283,15 +323,16 @@ def test_draw_text_on_one_page(template_stream, pdf_samples):
 
 
 def test_draw_text_on_one_page_different_font(
-    template_stream, pdf_samples, font_samples
+    template_stream, pdf_samples, font_samples, request
 ):
     with open(
         os.path.join(font_samples, "LiberationSerif-BoldItalic.ttf"), "rb+"
     ) as _f:
         PyPDFForm.register_font("LiberationSerif-BoldItalic", _f.read())
 
+    expected_path = os.path.join(pdf_samples, "sample_pdf_with_drawn_text_different_font.pdf")
     with open(
-        os.path.join(pdf_samples, "sample_pdf_with_drawn_text_different_font.pdf"),
+        expected_path,
         "rb+",
     ) as f:
         obj = PyPDFForm(template_stream).draw_text(
@@ -306,12 +347,17 @@ def test_draw_text_on_one_page_different_font(
             text_y_offset=50,
             text_wrap_length=4,
         )
+        request.config.results["stream"] = obj.read()
+        request.config.results["expected_path"] = expected_path
 
         expected = f.read()
 
         if os.name == "nt":
             assert len(obj.stream) == len(expected)
         else:
+            expected_path = os.path.join(
+                    pdf_samples, "sample_pdf_with_drawn_text_different_font_linux.pdf")
+            request.config.results["expected_path"] = expected_path
             with open(
                 os.path.join(
                     pdf_samples, "sample_pdf_with_drawn_text_different_font_linux.pdf"
@@ -323,8 +369,9 @@ def test_draw_text_on_one_page_different_font(
                 assert obj.stream == expected
 
 
-def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_pdf_with_image.pdf"), "rb+") as f:
+def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "sample_pdf_with_image.pdf")
+    with open(expected_path, "rb+") as f:
         with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
             obj = PyPDFForm(template_stream).draw_image(
                 _f,
@@ -338,12 +385,15 @@ def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples):
         expected = f.read()
 
         if os.name == "nt":
+            request.config.results["expected_path"] = expected_path
+            request.config.results["stream"] = obj.read()
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
 
 
-def test_draw_png_image_on_one_page(template_stream, image_samples, pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_pdf_with_png_image.pdf"), "rb+") as f:
+def test_draw_png_image_on_one_page(template_stream, image_samples, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "sample_pdf_with_png_image.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(template_stream).draw_image(
             os.path.join(image_samples, "sample_png_image.png"),
             2,
@@ -356,16 +406,22 @@ def test_draw_png_image_on_one_page(template_stream, image_samples, pdf_samples)
         expected = f.read()
 
         if os.name == "nt":
+            request.config.results["expected_path"] = expected_path
+            request.config.results["stream"] = obj.read()
             assert len(obj.stream) == len(expected)
             assert obj.stream == expected
 
 
-def test_addition_operator_3_times(template_stream, pdf_samples, data_dict):
-    with open(os.path.join(pdf_samples, "sample_added_3_copies.pdf"), "rb+") as f:
+def test_addition_operator_3_times(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "sample_added_3_copies.pdf")
+    with open(expected_path, "rb+") as f:
         result = PyPDFForm()
 
         for _ in range(3):
             result += PyPDFForm(template_stream).fill(data_dict)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = result.read()
 
         expected = f.read()
         assert len(result.read()) == len(expected)
@@ -374,12 +430,16 @@ def test_addition_operator_3_times(template_stream, pdf_samples, data_dict):
         assert (result + PyPDFForm()).read() == result.read()
 
 
-def test_addition_operator_3_times_sejda(sejda_template, pdf_samples, sejda_data):
-    with open(os.path.join(pdf_samples, "sample_added_3_copies_sejda.pdf"), "rb+") as f:
+def test_addition_operator_3_times_sejda(sejda_template, pdf_samples, sejda_data, request):
+    expected_path = os.path.join(pdf_samples, "sample_added_3_copies_sejda.pdf")
+    with open(expected_path, "rb+") as f:
         result = PyPDFForm()
 
         for _ in range(3):
             result += PyPDFForm(sejda_template).fill(sejda_data)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = result.read()
 
         expected = f.read()
         assert len(result.read()) == len(expected)
@@ -432,8 +492,9 @@ def test_generate_schema(sample_template_with_comb_text_field):
         assert True
 
 
-def test_fill_right_aligned(sample_template_with_right_aligned_text_field, pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_filled_right_aligned.pdf"), "rb+") as f:
+def test_fill_right_aligned(sample_template_with_right_aligned_text_field, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "sample_filled_right_aligned.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_right_aligned_text_field).fill(
             {
                 "name": "Hans Mustermann",
@@ -441,6 +502,9 @@ def test_fill_right_aligned(sample_template_with_right_aligned_text_field, pdf_s
                 "advisorname": "Karl Test",
             },
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
         assert len(obj.read()) == len(obj.stream)
         assert obj.read() == obj.stream
 
@@ -453,11 +517,15 @@ def test_fill_right_aligned(sample_template_with_right_aligned_text_field, pdf_s
             assert not elements
 
 
-def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples):
-    with open(os.path.join(pdf_samples, "test_paragraph_y_coordinate.pdf"), "rb+") as f:
+def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_paragraph_y_coordinate.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_paragraph).fill(
             {"paragraph_1": "test paragraph"}
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
         assert len(obj.read()) == len(obj.stream)
         assert obj.read() == obj.stream
 

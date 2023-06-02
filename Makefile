@@ -9,3 +9,6 @@ coverage-all:
 
 check-imports:
 	bash ./scripts/check_imports.sh
+
+generate-new-pdf-samples:
+	bash ./scripts/new_pdf_samples.sh

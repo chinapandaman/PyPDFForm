@@ -31,8 +31,9 @@ def test_dropdown_not_specified(sample_template_with_dropdown):
     )
 
 
-def test_dropdown_one(sample_template_with_dropdown, pdf_samples):
-    with open(os.path.join(pdf_samples, "dropdown", "dropdown_one.pdf"), "rb+") as f:
+def test_dropdown_one(sample_template_with_dropdown, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "dropdown", "dropdown_one.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
@@ -46,14 +47,18 @@ def test_dropdown_one(sample_template_with_dropdown, pdf_samples):
             },
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
 
-def test_dropdown_two(sample_template_with_dropdown, pdf_samples):
-    with open(os.path.join(pdf_samples, "dropdown", "dropdown_two.pdf"), "rb+") as f:
+def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "dropdown", "dropdown_two.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
@@ -67,14 +72,18 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples):
             },
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
 
-def test_dropdown_three(sample_template_with_dropdown, pdf_samples):
-    with open(os.path.join(pdf_samples, "dropdown", "dropdown_three.pdf"), "rb+") as f:
+def test_dropdown_three(sample_template_with_dropdown, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "dropdown", "dropdown_three.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
@@ -88,14 +97,18 @@ def test_dropdown_three(sample_template_with_dropdown, pdf_samples):
             },
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
 
-def test_dropdown_four(sample_template_with_dropdown, pdf_samples):
-    with open(os.path.join(pdf_samples, "dropdown", "dropdown_four.pdf"), "rb+") as f:
+def test_dropdown_four(sample_template_with_dropdown, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "dropdown", "dropdown_four.pdf")
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
@@ -109,15 +122,19 @@ def test_dropdown_four(sample_template_with_dropdown, pdf_samples):
             },
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
 
-def test_dropdown_alignment(dropdown_alignment, pdf_samples):
+def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "dropdown", "dropdown_alignment_expected.pdf")
     with open(
-        os.path.join(pdf_samples, "dropdown", "dropdown_alignment_expected.pdf"), "rb+"
+        expected_path, "rb+"
     ) as f:
         obj = PyPDFForm(dropdown_alignment).fill(
             {
@@ -127,15 +144,19 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples):
             },
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
 
-def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples):
+def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "dropdown", "dropdown_alignment_sejda_expected.pdf")
     with open(
-        os.path.join(pdf_samples, "dropdown", "dropdown_alignment_sejda_expected.pdf"),
+        expected_path,
         "rb+",
     ) as f:
         obj = PyPDFForm(dropdown_alignment_sejda).fill(
@@ -145,6 +166,9 @@ def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples):
                 "dropdown_right": 2,
             },
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
 
         expected = f.read()
 

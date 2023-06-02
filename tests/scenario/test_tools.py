@@ -5,8 +5,9 @@ import os
 from PyPDFForm import PyPDFForm
 
 
-def test_filling_pdf_escape_pdf_form(tool_pdf_directory):
-    with open(os.path.join(tool_pdf_directory, "pdf_escape_expected.pdf"), "rb+") as f:
+def test_filling_pdf_escape_pdf_form(tool_pdf_directory, request):
+    expected_path = os.path.join(tool_pdf_directory, "pdf_escape_expected.pdf")
+    with open(expected_path, "rb+") as f:
         expected = f.read()
         result = PyPDFForm(os.path.join(tool_pdf_directory, "pdf_escape.pdf")).fill(
             {
@@ -19,12 +20,15 @@ def test_filling_pdf_escape_pdf_form(tool_pdf_directory):
                 "radio_1": 2,
             }
         )
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = result.read()
         assert len(result.read()) == len(expected)
         assert result.read() == expected
 
 
-def test_filling_docfly_pdf_form(tool_pdf_directory):
-    with open(os.path.join(tool_pdf_directory, "docfly_expected.pdf"), "rb+") as f:
+def test_filling_docfly_pdf_form(tool_pdf_directory, request):
+    expected_path = os.path.join(tool_pdf_directory, "docfly_expected.pdf")
+    with open(expected_path, "rb+") as f:
         expected = f.read()
         result = PyPDFForm(os.path.join(tool_pdf_directory, "docfly.pdf")).fill(
             {
@@ -37,17 +41,22 @@ def test_filling_docfly_pdf_form(tool_pdf_directory):
                 "radio_1": 1,
             }
         )
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = result.read()
         assert len(result.read()) == len(expected)
         assert result.read() == expected
 
 
-def test_filling_sejda_dropdown_pdf_form(tool_pdf_directory):
+def test_filling_sejda_dropdown_pdf_form(tool_pdf_directory, request):
+    expected_path = os.path.join(tool_pdf_directory, "sejda_dropdown_expected.pdf")
     with open(
-        os.path.join(tool_pdf_directory, "sejda_dropdown_expected.pdf"), "rb+"
+        expected_path, "rb+"
     ) as f:
         expected = f.read()
         result = PyPDFForm(os.path.join(tool_pdf_directory, "sejda_dropdown.pdf")).fill(
             {"dropdown_1": 2}
         )
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = result.read()
         assert len(result.read()) == len(expected)
         assert result.read() == expected
