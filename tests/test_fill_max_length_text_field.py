@@ -6,12 +6,15 @@ from PyPDFForm import PyPDFForm
 
 
 def test_fill_max_length_text_field_all_chars(
-    sample_template_with_max_length_text_field, max_length_expected_directory
+    sample_template_with_max_length_text_field, max_length_expected_directory, request
 ):
-    with open(
+    expected_path = (
         os.path.join(
             max_length_expected_directory, "max_length_text_field_all_chars.pdf"
-        ),
+        )
+            )
+    with open(
+        expected_path,
         "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
@@ -24,6 +27,9 @@ def test_fill_max_length_text_field_all_chars(
             }
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
@@ -31,12 +37,15 @@ def test_fill_max_length_text_field_all_chars(
 
 
 def test_fill_max_length_text_field_odd_chars(
-    sample_template_with_max_length_text_field, max_length_expected_directory
+    sample_template_with_max_length_text_field, max_length_expected_directory, request
 ):
-    with open(
+    expected_path = (
         os.path.join(
             max_length_expected_directory, "max_length_text_field_odd_chars.pdf"
-        ),
+        )
+            )
+    with open(
+        expected_path,
         "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
@@ -49,6 +58,9 @@ def test_fill_max_length_text_field_odd_chars(
             }
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
@@ -56,12 +68,15 @@ def test_fill_max_length_text_field_odd_chars(
 
 
 def test_fill_max_length_text_field_even_chars(
-    sample_template_with_max_length_text_field, max_length_expected_directory
+    sample_template_with_max_length_text_field, max_length_expected_directory, request
 ):
-    with open(
+    expected_path = (
         os.path.join(
             max_length_expected_directory, "max_length_text_field_even_chars.pdf"
-        ),
+        )
+            )
+    with open(
+        expected_path,
         "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
@@ -74,6 +89,9 @@ def test_fill_max_length_text_field_even_chars(
             }
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
@@ -81,10 +99,15 @@ def test_fill_max_length_text_field_even_chars(
 
 
 def test_fill_comb_text_field_all_chars(
-    sample_template_with_comb_text_field, max_length_expected_directory
+    sample_template_with_comb_text_field, max_length_expected_directory, request
 ):
+    expected_path = (
+        os.path.join(
+            max_length_expected_directory, "comb_text_field_all_chars.pdf"
+        )
+            )
     with open(
-        os.path.join(max_length_expected_directory, "comb_text_field_all_chars.pdf"),
+        expected_path,
         "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_comb_text_field).fill(
@@ -97,6 +120,9 @@ def test_fill_comb_text_field_all_chars(
             }
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
@@ -104,10 +130,15 @@ def test_fill_comb_text_field_all_chars(
 
 
 def test_fill_comb_text_field_odd_chars(
-    sample_template_with_comb_text_field, max_length_expected_directory
+    sample_template_with_comb_text_field, max_length_expected_directory, request
 ):
+    expected_path = (
+        os.path.join(
+            max_length_expected_directory, "comb_text_field_odd_chars.pdf"
+        )
+            )
     with open(
-        os.path.join(max_length_expected_directory, "comb_text_field_odd_chars.pdf"),
+        expected_path,
         "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_comb_text_field).fill(
@@ -120,6 +151,9 @@ def test_fill_comb_text_field_odd_chars(
             }
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
@@ -127,10 +161,15 @@ def test_fill_comb_text_field_odd_chars(
 
 
 def test_fill_comb_text_field_even_chars(
-    sample_template_with_comb_text_field, max_length_expected_directory
+    sample_template_with_comb_text_field, max_length_expected_directory, request
 ):
+    expected_path = (
+        os.path.join(
+            max_length_expected_directory, "comb_text_field_even_chars.pdf"
+        )
+            )
     with open(
-        os.path.join(max_length_expected_directory, "comb_text_field_even_chars.pdf"),
+        expected_path,
         "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_comb_text_field).fill(
@@ -143,6 +182,9 @@ def test_fill_comb_text_field_even_chars(
             }
         )
 
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
         expected = f.read()
 
         assert len(obj.stream) == len(expected)
@@ -150,12 +192,20 @@ def test_fill_comb_text_field_even_chars(
 
 
 def test_fill_comb_text_field_void(
-    sample_template_with_comb_text_field, max_length_expected_directory
+    sample_template_with_comb_text_field, max_length_expected_directory, request
 ):
+    expected_path = (
+        os.path.join(
+            max_length_expected_directory, "comb_text_field_void.pdf"
+        )
+            )
     with open(
-        os.path.join(max_length_expected_directory, "comb_text_field_void.pdf"), "rb+"
+        expected_path, "rb+"
     ) as f:
         obj = PyPDFForm(sample_template_with_comb_text_field).fill({})
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
 
         expected = f.read()
 
@@ -164,13 +214,15 @@ def test_fill_comb_text_field_void(
 
 
 def test_fill_comb_text_field_even_chars_right_aligned(
-    sample_template_with_comb_text_field_right_aligned, max_length_expected_directory
+    sample_template_with_comb_text_field_right_aligned, max_length_expected_directory, request
 ):
-    with open(
+    expected_path = (
         os.path.join(
-            max_length_expected_directory,
-            "comb_text_field_even_chars_right_aligned.pdf",
-        ),
+            max_length_expected_directory, "comb_text_field_even_chars_right_aligned.pdf"
+        )
+            )
+    with open(
+        expected_path,
         "rb+",
     ) as f:
         obj = PyPDFForm(sample_template_with_comb_text_field_right_aligned).fill(
@@ -182,6 +234,9 @@ def test_fill_comb_text_field_even_chars_right_aligned(
                 "Gender": 0,
             }
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
 
         expected = f.read()
 

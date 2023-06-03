@@ -5,6 +5,24 @@ import os
 import pytest
 
 
+def pytest_configure(config):
+    config.results = {}
+
+
+def pytest_addoption(parser):
+    parser.addoption("--regenerate", action="store", default="0")
+
+
+@pytest.fixture(autouse=True)
+def generate_new_pdf_samples(request):
+    request.config.results = {}
+    yield
+    if request.config.getoption("--regenerate") == "1":
+        if request.config.results:
+            with open(request.config.results["expected_path"], "wb+") as f:
+                f.write(request.config.results["stream"])
+
+
 @pytest.fixture
 def pdf_samples():
     return os.path.join(os.path.dirname(__file__), "..", "pdf_samples")
