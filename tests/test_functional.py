@@ -53,7 +53,9 @@ def test_fill_font_liberation_serif_italic(
         _f.seek(0)
         PyPDFForm.register_font("LiberationSerif-Italic", stream)
 
-    expected_path = os.path.join(pdf_samples, "sample_filled_font_liberation_serif_italic.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"
+    )
     with open(
         expected_path,
         "rb+",
@@ -115,9 +117,7 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
 
 def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "sample_filled_font_color_red.pdf")
-    with open(
-        expected_path, "rb+"
-    ) as f:
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(template_stream, global_font_color=(1, 0, 0)).fill(
             data_dict,
         )
@@ -206,11 +206,11 @@ def test_fill_wrap_2(template_stream, pdf_samples, data_dict, request):
                 assert v.text_wrap_length == 2
 
 
-def test_fill_with_customized_elements(template_stream, pdf_samples, data_dict, request):
+def test_fill_with_customized_elements(
+    template_stream, pdf_samples, data_dict, request
+):
     expected_path = os.path.join(pdf_samples, "sample_filled_customized_elements.pdf")
-    with open(
-        expected_path, "rb+"
-    ) as f:
+    with open(expected_path, "rb+") as f:
         obj = PyPDFForm(template_stream)
 
         obj.elements["test"].font = "LiberationSerif-Italic"
@@ -330,7 +330,9 @@ def test_draw_text_on_one_page_different_font(
     ) as _f:
         PyPDFForm.register_font("LiberationSerif-BoldItalic", _f.read())
 
-    expected_path = os.path.join(pdf_samples, "sample_pdf_with_drawn_text_different_font.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "sample_pdf_with_drawn_text_different_font.pdf"
+    )
     with open(
         expected_path,
         "rb+",
@@ -356,7 +358,8 @@ def test_draw_text_on_one_page_different_font(
             assert len(obj.stream) == len(expected)
         else:
             expected_path = os.path.join(
-                    pdf_samples, "sample_pdf_with_drawn_text_different_font_linux.pdf")
+                pdf_samples, "sample_pdf_with_drawn_text_different_font_linux.pdf"
+            )
             request.config.results["expected_path"] = expected_path
             with open(
                 os.path.join(
@@ -391,7 +394,9 @@ def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples, req
             assert obj.stream == expected
 
 
-def test_draw_png_image_on_one_page(template_stream, image_samples, pdf_samples, request):
+def test_draw_png_image_on_one_page(
+    template_stream, image_samples, pdf_samples, request
+):
     expected_path = os.path.join(pdf_samples, "sample_pdf_with_png_image.pdf")
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(template_stream).draw_image(
@@ -430,7 +435,9 @@ def test_addition_operator_3_times(template_stream, pdf_samples, data_dict, requ
         assert (result + PyPDFForm()).read() == result.read()
 
 
-def test_addition_operator_3_times_sejda(sejda_template, pdf_samples, sejda_data, request):
+def test_addition_operator_3_times_sejda(
+    sejda_template, pdf_samples, sejda_data, request
+):
     expected_path = os.path.join(pdf_samples, "sample_added_3_copies_sejda.pdf")
     with open(expected_path, "rb+") as f:
         result = PyPDFForm()
@@ -490,7 +497,9 @@ def test_generate_schema(sample_template_with_comb_text_field):
         pass
 
 
-def test_fill_right_aligned(sample_template_with_right_aligned_text_field, pdf_samples, request):
+def test_fill_right_aligned(
+    sample_template_with_right_aligned_text_field, pdf_samples, request
+):
     expected_path = os.path.join(pdf_samples, "sample_filled_right_aligned.pdf")
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_right_aligned_text_field).fill(

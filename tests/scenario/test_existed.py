@@ -42,7 +42,9 @@ def test_illinois_gun_bill_of_sale(existed_pdf_directory, request):
         }
     )
 
-    expected_path = os.path.join(existed_pdf_directory, "illinois-gun-bill-of-sale_expected.pdf")
+    expected_path = os.path.join(
+        existed_pdf_directory, "illinois-gun-bill-of-sale_expected.pdf"
+    )
     request.config.results["expected_path"] = expected_path
     request.config.results["stream"] = obj.read()
     with open(
@@ -61,12 +63,10 @@ def test_ds82(existed_pdf_directory, request):
         }
     )
 
-    expected_path = (
-        os.path.join(
-            existed_pdf_directory,
-            "DS82_expected.pdf",
-        )
-            )
+    expected_path = os.path.join(
+        existed_pdf_directory,
+        "DS82_expected.pdf",
+    )
     request.config.results["expected_path"] = expected_path
     request.config.results["stream"] = obj.read()
     with open(
@@ -85,12 +85,10 @@ def test_ds82_all_chars_lowercase(existed_pdf_directory, request):
         }
     )
 
-    expected_path = (
-        os.path.join(
-            existed_pdf_directory,
-            "DS82_expected_all_chars_lowercase.pdf",
-        )
-            )
+    expected_path = os.path.join(
+        existed_pdf_directory,
+        "DS82_expected_all_chars_lowercase.pdf",
+    )
     request.config.results["expected_path"] = expected_path
     request.config.results["stream"] = obj.read()
     with open(
@@ -109,12 +107,10 @@ def test_ds82_all_chars_uppercase(existed_pdf_directory, request):
         }
     )
 
-    expected_path = (
-        os.path.join(
-            existed_pdf_directory,
-            "DS82_expected_all_chars_uppercase.pdf",
-        )
-            )
+    expected_path = os.path.join(
+        existed_pdf_directory,
+        "DS82_expected_all_chars_uppercase.pdf",
+    )
     request.config.results["expected_path"] = expected_path
     request.config.results["stream"] = obj.read()
     with open(
@@ -133,12 +129,10 @@ def test_ds82_mixed_case(existed_pdf_directory, request):
         }
     )
 
-    expected_path = (
-        os.path.join(
-            existed_pdf_directory,
-            "DS82_expected_mixed_case.pdf",
-        )
-            )
+    expected_path = os.path.join(
+        existed_pdf_directory,
+        "DS82_expected_mixed_case.pdf",
+    )
     request.config.results["expected_path"] = expected_path
     request.config.results["stream"] = obj.read()
     with open(
@@ -177,12 +171,10 @@ def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory, requ
         }
     )
 
-    expected_path = (
-        os.path.join(
-            existed_pdf_directory,
-            "illinois-real-estate-power-of-attorney-form_expected.pdf",
-        )
-            )
+    expected_path = os.path.join(
+        existed_pdf_directory,
+        "illinois-real-estate-power-of-attorney-form_expected.pdf",
+    )
     request.config.results["expected_path"] = expected_path
     request.config.results["stream"] = obj.read()
     with open(
