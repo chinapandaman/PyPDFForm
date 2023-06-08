@@ -2,7 +2,6 @@
 """Contains utility helpers."""
 
 from io import BytesIO
-from math import sqrt
 from typing import Union
 
 import pdfrw
@@ -26,23 +25,6 @@ def generate_stream(pdf: pdfrw.PdfReader) -> bytes:
     result_stream.close()
 
     return result
-
-
-def checkbox_radio_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
-    """
-    Calculates the font size it should be drawn with
-    given a checkbox/radio button element.
-    """
-
-    area = abs(
-        float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
-        - float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
-    ) * abs(
-        float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
-        - float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
-    )
-
-    return sqrt(area) * 72 / 96
 
 
 def checkbox_radio_to_draw(

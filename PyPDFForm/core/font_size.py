@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-"""Contains helpers for calculating font size."""
+"""Contains helpers for calculating font sizes."""
 
-from typing import Dict
+from math import sqrt
+from typing import Dict, Union
 
 import pdfrw
 
 from ..middleware.text import Text
 from ..middleware.constants import ELEMENT_TYPES
+from . import constants
 from . import template
 
 
@@ -23,4 +25,38 @@ def update_text_field_font_sizes(
             key = template.get_element_key(_element)
 
             if isinstance(elements[key], Text) and elements[key].font_size is None:
-                elements[key].font_size = template.get_text_field_font_size(_element) or 12
+                elements[key].font_size = (
+                        template.get_text_field_font_size(_element)
+                        or text_field_font_size(_element)
+                        )
+
+
+def text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
+    """
+    Calculates the font size it should be drawn with
+    given a text field element.
+    """
+
+    height = abs(
+        float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+        - float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
+    )
+
+    return height * 2 / 3
+
+
+def checkbox_radio_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
+    """
+    Calculates the font size it should be drawn with
+    given a checkbox/radio button element.
+    """
+
+    area = abs(
+        float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+        - float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
+    ) * abs(
+        float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+        - float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
+    )
+
+    return sqrt(area) * 72 / 96
