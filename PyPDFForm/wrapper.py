@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import BinaryIO, Dict, Union
 
-from .core import filler, font
+from .core import filler, font, font_size
 from .core import image as image_core
 from .core import template as template_core
 from .core import utils
@@ -35,7 +35,7 @@ class Wrapper:
             if isinstance(each, Text):
                 each.font = kwargs.get("global_font", constants.GLOBAL_FONT)
                 each.font_size = kwargs.get(
-                    "global_font_size", constants.GLOBAL_FONT_SIZE
+                    "global_font_size"
                 )
                 each.font_color = kwargs.get(
                     "global_font_color", constants.GLOBAL_FONT_COLOR
@@ -83,6 +83,7 @@ class Wrapper:
             if isinstance(value, Dropdown):
                 self.elements[key] = template_middleware.dropdown_to_text(value)
 
+        font_size.update_text_field_font_sizes(self.stream, self.elements)
         if self.read():
             self.elements = template_middleware.set_character_x_paddings(
                 self.stream, self.elements

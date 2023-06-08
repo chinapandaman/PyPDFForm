@@ -10,6 +10,7 @@ from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 from . import constants, utils
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
+                       TEXT_FIELD_APPEARANCE_PATTERNS,
                        ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS)
 
 
@@ -150,6 +151,23 @@ def get_draw_checkbox_radio_coordinates(
         / 2,
         (height_mid_point - string_height / 2 + height_mid_point) / 2,
     )
+
+
+def get_text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
+    """Returns the font size of the text field if presented or zero."""
+
+    result = 0
+    for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
+        text_appearance = traverse_pattern(pattern, element)
+        if text_appearance:
+            properties = text_appearance.split(" ")
+            if len(properties) > 1:
+                try:
+                    result = float(properties[1])
+                except ValueError:
+                    pass
+
+    return result
 
 
 def get_text_field_max_length(element: pdfrw.PdfDict) -> Union[int, None]:
