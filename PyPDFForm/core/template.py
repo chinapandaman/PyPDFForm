@@ -309,23 +309,18 @@ def get_draw_text_coordinates(
     if is_text_multiline(element):
         y = float(element[constants.ANNOTATION_RECTANGLE_KEY][3]) - string_height / 2
 
+    if int(alignment) == 1 and element_middleware.comb is True and length != 0:
+        x -= character_paddings[0] / 2
+        if length % 2 == 0:
+            x -= (
+                character_paddings[0]
+                + stringWidth(
+                    element_value[:1],
+                    element_middleware.font,
+                    element_middleware.font_size,
+                )
+                / 2)
+
     return (
-        x
-        - (
-            character_paddings[0]
-            + stringWidth(
-                element_value[:1],
-                element_middleware.font,
-                element_middleware.font_size,
-            )
-            / 2
-            if (
-                element_middleware.comb is True
-                and length != 0
-                and length % 2 == 0
-                and int(alignment) == 1
-            )
-            else 0
-        ),
-        y,
+        x, y
     )
