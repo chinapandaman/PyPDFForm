@@ -6,7 +6,6 @@ from typing import Union
 
 import pdfrw
 
-from ..middleware import constants as middleware_constants
 from ..middleware.checkbox import Checkbox
 from ..middleware.radio import Radio
 from ..middleware.text import Text
