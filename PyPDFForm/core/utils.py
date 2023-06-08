@@ -29,7 +29,7 @@ def generate_stream(pdf: pdfrw.PdfReader) -> bytes:
 
 def checkbox_radio_to_draw(
     element: Union[Checkbox, Radio],
-    font_size: Union[float, int] = middleware_constants.GLOBAL_FONT_SIZE,
+    font_size: Union[float, int]
 ) -> Text:
     """Converts a checkbox/radio element to a drawable text element."""
 
