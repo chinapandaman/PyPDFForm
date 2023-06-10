@@ -536,7 +536,9 @@ def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples, req
         assert obj.stream == expected
 
 
-def test_paragraph_auto_font(sample_template_with_paragraph_auto_font, pdf_samples, request):
+def test_paragraph_auto_font(
+    sample_template_with_paragraph_auto_font, pdf_samples, request
+):
     expected_path = os.path.join(pdf_samples, "test_paragraph_auto_font.pdf")
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_paragraph_auto_font).fill(
