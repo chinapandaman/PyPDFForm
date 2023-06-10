@@ -6,7 +6,7 @@ from typing import Dict, Union
 
 import pdfrw
 
-from ..middleware.constants import ELEMENT_TYPES
+from ..middleware.constants import ELEMENT_TYPES, GLOBAL_FONT_SIZE
 from ..middleware.text import Text
 from . import constants, template
 
@@ -34,6 +34,9 @@ def text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
     Calculates the font size it should be drawn with
     given a text field element.
     """
+
+    if template.is_text_multiline(element):
+        return GLOBAL_FONT_SIZE
 
     height = abs(
         float(element[constants.ANNOTATION_RECTANGLE_KEY][1])

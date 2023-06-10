@@ -307,7 +307,7 @@ def get_draw_text_coordinates(
     ) / 2
     y = (height_mid_point - string_height / 2 + height_mid_point) / 2
     if is_text_multiline(element):
-        y = float(element[constants.ANNOTATION_RECTANGLE_KEY][3]) - string_height / 2
+        y = float(element[constants.ANNOTATION_RECTANGLE_KEY][3]) - string_height / 1.5
 
     if int(alignment) == 1 and element_middleware.comb is True and length != 0:
         x -= character_paddings[0] / 2
@@ -322,4 +322,4 @@ def get_draw_text_coordinates(
                 / 2
             )
 
-    return (x, y)
+    return x, y
