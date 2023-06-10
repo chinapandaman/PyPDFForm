@@ -8,7 +8,8 @@ import pdfrw
 from ..middleware.checkbox import Checkbox
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.radio import Radio
-from . import template, utils, font_size as font_size_core
+from . import font_size as font_size_core
+from . import template, utils
 from . import watermark as watermark_core
 
 

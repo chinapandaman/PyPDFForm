@@ -10,8 +10,8 @@ from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 from . import constants, utils
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
-                       TEXT_FIELD_APPEARANCE_PATTERNS,
-                       ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS)
+                       ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS,
+                       TEXT_FIELD_APPEARANCE_PATTERNS)
 
 
 def remove_all_elements(pdf: bytes) -> bytes:
@@ -319,8 +319,7 @@ def get_draw_text_coordinates(
                     element_middleware.font,
                     element_middleware.font_size,
                 )
-                / 2)
+                / 2
+            )
 
-    return (
-        x, y
-    )
+    return (x, y)
