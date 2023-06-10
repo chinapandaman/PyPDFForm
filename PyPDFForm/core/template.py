@@ -10,6 +10,7 @@ from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 from . import constants, utils
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
+                       TEXT_FIELD_APPEARANCE_PATTERNS,
                        ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS)
 
 
@@ -152,6 +153,23 @@ def get_draw_checkbox_radio_coordinates(
     )
 
 
+def get_text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
+    """Returns the font size of the text field if presented or zero."""
+
+    result = 0
+    for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
+        text_appearance = traverse_pattern(pattern, element)
+        if text_appearance:
+            properties = text_appearance.split(" ")
+            if len(properties) > 1:
+                try:
+                    result = float(properties[1])
+                except ValueError:
+                    pass
+
+    return result
+
+
 def get_text_field_max_length(element: pdfrw.PdfDict) -> Union[int, None]:
     """Returns the max length of the text field if presented or None."""
 
@@ -291,23 +309,18 @@ def get_draw_text_coordinates(
     if is_text_multiline(element):
         y = float(element[constants.ANNOTATION_RECTANGLE_KEY][3]) - string_height / 2
 
+    if int(alignment) == 1 and element_middleware.comb is True and length != 0:
+        x -= character_paddings[0] / 2
+        if length % 2 == 0:
+            x -= (
+                character_paddings[0]
+                + stringWidth(
+                    element_value[:1],
+                    element_middleware.font,
+                    element_middleware.font_size,
+                )
+                / 2)
+
     return (
-        x
-        - (
-            character_paddings[0]
-            + stringWidth(
-                element_value[:1],
-                element_middleware.font,
-                element_middleware.font_size,
-            )
-            / 2
-            if (
-                element_middleware.comb is True
-                and length != 0
-                and length % 2 == 0
-                and int(alignment) == 1
-            )
-            else 0
-        ),
-        y,
+        x, y
     )
