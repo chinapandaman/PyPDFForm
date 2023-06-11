@@ -82,6 +82,11 @@ ELEMENT_ALIGNMENT_PATTERNS = [
     {constants.PARENT_KEY: {constants.TEXT_FIELD_ALIGNMENT_IDENTIFIER: True}},
 ]
 
+TEXT_FIELD_FLAG_PATTERNS = [
+    {constants.FIELD_FLAG_KEY: True},
+    {constants.PARENT_KEY: {constants.FIELD_FLAG_KEY: True}},
+]
+
 TEXT_FIELD_APPEARANCE_PATTERNS = [
     {constants.TEXT_FIELD_APPEARANCE_IDENTIFIER: True},
     {constants.PARENT_KEY: {constants.TEXT_FIELD_APPEARANCE_IDENTIFIER: True}},

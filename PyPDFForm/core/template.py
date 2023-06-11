@@ -11,7 +11,7 @@ from ..middleware.text import Text
 from . import constants, utils
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
                        ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS,
-                       TEXT_FIELD_APPEARANCE_PATTERNS)
+                       TEXT_FIELD_APPEARANCE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS)
 
 
 def remove_all_elements(pdf: bytes) -> bytes:
@@ -164,6 +164,7 @@ def get_text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
             if len(properties) > 1:
                 try:
                     result = float(properties[1])
+                    break
                 except ValueError:
                     pass
 
@@ -192,8 +193,17 @@ def is_text_field_comb(element: pdfrw.PdfDict) -> bool:
 def is_text_multiline(element: pdfrw.PdfDict) -> bool:
     """Returns true if a text field is a paragraph field."""
 
+    field_flag = None
+    for pattern in TEXT_FIELD_FLAG_PATTERNS:
+        field_flag = traverse_pattern(pattern, element)
+        if field_flag is not None:
+            break
+
+    if field_flag is None:
+        return False
+
     try:
-        return "{0:b}".format(int(element[constants.FIELD_FLAG_KEY]))[::-1][12] == "1"
+        return "{0:b}".format(int(field_flag))[::-1][12] == "1"
     except (IndexError, TypeError):
         return False
 
