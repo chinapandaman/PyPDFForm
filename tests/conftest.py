@@ -72,7 +72,9 @@ def sejda_template(pdf_samples):
 
 @pytest.fixture
 def sejda_template_complex(pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_template_sejda_complex.pdf"), "rb+") as f:
+    with open(
+        os.path.join(pdf_samples, "sample_template_sejda_complex.pdf"), "rb+"
+    ) as f:
         return f.read()
 
 

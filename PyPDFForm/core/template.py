@@ -11,7 +11,8 @@ from ..middleware.text import Text
 from . import constants, utils
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
                        ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS,
-                       TEXT_FIELD_APPEARANCE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS)
+                       TEXT_FIELD_APPEARANCE_PATTERNS,
+                       TEXT_FIELD_FLAG_PATTERNS)
 
 
 def remove_all_elements(pdf: bytes) -> bytes:
