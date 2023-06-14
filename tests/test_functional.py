@@ -82,7 +82,7 @@ def test_fill_font_liberation_serif_italic(
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
                 assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
                 assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
+                assert v.text_wrap_length is None
 
 
 def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
@@ -111,7 +111,7 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
                 assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
                 assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
+                assert v.text_wrap_length is None
 
 
 def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
@@ -139,7 +139,7 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
                 assert v.font_color == (1, 0, 0)
                 assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
                 assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
+                assert v.text_wrap_length is None
 
 
 def test_fill_offset_100(template_stream, pdf_samples, data_dict, request):
@@ -171,7 +171,7 @@ def test_fill_offset_100(template_stream, pdf_samples, data_dict, request):
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
                 assert v.text_x_offset == 100
                 assert v.text_y_offset == -100
-                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
+                assert v.text_wrap_length is None
 
 
 def test_fill_wrap_2(template_stream, pdf_samples, data_dict, request):
@@ -239,7 +239,7 @@ def test_fill_with_customized_elements(
         assert obj.elements["test"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
         assert obj.elements["test"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
         assert (
-            obj.elements["test"].text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
+            obj.elements["test"].text_wrap_length is None
         )
 
         assert obj.elements["test_2"].font_color == (0, 1, 0)

@@ -71,7 +71,6 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
     result.font_color = constants.GLOBAL_FONT_COLOR
     result.text_x_offset = constants.GLOBAL_TEXT_X_OFFSET
     result.text_y_offset = constants.GLOBAL_TEXT_Y_OFFSET
-    result.text_wrap_length = constants.GLOBAL_TEXT_WRAP_LENGTH
 
     if dropdown.value is not None:
         result.value = (

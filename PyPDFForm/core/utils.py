@@ -2,14 +2,15 @@
 """Contains utility helpers."""
 
 from io import BytesIO
-from typing import Union
+from typing import Union, Dict
 
 import pdfrw
 
 from ..middleware.checkbox import Checkbox
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from . import constants
+from ..middleware.constants import ELEMENT_TYPES
+from . import constants, template, font_size as font_size_core
 
 
 def generate_stream(pdf: pdfrw.PdfReader) -> bytes:
@@ -24,6 +25,24 @@ def generate_stream(pdf: pdfrw.PdfReader) -> bytes:
     result_stream.close()
 
     return result
+
+
+def update_text_field_attributes(
+    template_stream: bytes,
+    elements: Dict[str, ELEMENT_TYPES],
+) -> None:
+    """Updates text fields' font sizes."""
+
+    template_pdf = pdfrw.PdfReader(fdata=template_stream)
+
+    for _, _elements in template.get_elements_by_page(template_pdf).items():
+        for _element in _elements:
+            key = template.get_element_key(_element)
+
+            if isinstance(elements[key], Text) and elements[key].font_size is None:
+                elements[key].font_size = template.get_text_field_font_size(
+                    _element
+                ) or font_size_core.text_field_font_size(_element)
 
 
 def checkbox_radio_to_draw(
