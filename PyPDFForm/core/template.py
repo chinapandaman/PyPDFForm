@@ -8,25 +8,11 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
-from . import constants, utils
+from . import constants
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
                        ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS,
                        TEXT_FIELD_APPEARANCE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS)
-
-
-def remove_all_elements(pdf: bytes) -> bytes:
-    """Removes all elements from a pdfrw parsed PDF form."""
-
-    pdf = pdfrw.PdfReader(fdata=pdf)
-
-    for page in pdf.pages:
-        elements = page[constants.ANNOTATION_KEY]
-        if elements:
-            for j in reversed(range(len(elements))):
-                elements.pop(j)
-
-    return utils.generate_stream(pdf)
 
 
 def get_elements_by_page(

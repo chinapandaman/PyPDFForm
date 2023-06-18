@@ -7,7 +7,6 @@ from typing import BinaryIO, Dict, Union
 
 from .core import filler, font
 from .core import image as image_core
-from .core import template as template_core
 from .core import utils
 from .core import watermark as watermark_core
 from .middleware import adapter, constants
@@ -87,7 +86,7 @@ class Wrapper:
                 self.stream, self.elements
             )
 
-        self.stream = template_core.remove_all_elements(
+        self.stream = utils.remove_all_elements(
             filler.fill(self.stream, self.elements)
         )
 

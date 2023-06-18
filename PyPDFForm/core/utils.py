@@ -46,7 +46,9 @@ def update_text_field_attributes(
                         _element
                     ) or font_size_core.text_field_font_size(_element)
                 if template.is_text_multiline(_element):
-                    elements[key].text_wrap_length = get_paragraph_auto_wrap_length(_element, elements[key])
+                    elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
+                        _element, elements[key]
+                    )
 
 
 def get_paragraph_auto_wrap_length(element: pdfrw.PdfDict, element_middleware: Text) -> int:
@@ -101,6 +103,20 @@ def checkbox_radio_to_draw(
         new_element.value = constants.RADIO_TO_DRAW
 
     return new_element
+
+
+def remove_all_elements(pdf: bytes) -> bytes:
+    """Removes all elements from a pdfrw parsed PDF form."""
+
+    pdf = pdfrw.PdfReader(fdata=pdf)
+
+    for page in pdf.pages:
+        elements = page[constants.ANNOTATION_KEY]
+        if elements:
+            for j in reversed(range(len(elements))):
+                elements.pop(j)
+
+    return generate_stream(pdf)
 
 
 def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
