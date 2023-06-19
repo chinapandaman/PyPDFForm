@@ -32,7 +32,7 @@ def update_text_field_attributes(
     template_stream: bytes,
     elements: Dict[str, ELEMENT_TYPES],
 ) -> None:
-    """Updates text fields' font sizes."""
+    """Auto updates text fields' attributes."""
 
     template_pdf = pdfrw.PdfReader(fdata=template_stream)
 
