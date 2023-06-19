@@ -536,6 +536,25 @@ def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples, req
         assert obj.stream == expected
 
 
+def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_paragraph_auto_wrap.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PyPDFForm(sample_template_with_paragraph).fill(
+            {"paragraph_1": "test paragraphxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(obj.stream)
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+        assert obj.elements["paragraph_1"].text_wrap_length is not None
+
+
 def test_paragraph_auto_font(
     sample_template_with_paragraph_auto_font, pdf_samples, request
 ):
@@ -543,6 +562,27 @@ def test_paragraph_auto_font(
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_paragraph_auto_font).fill(
             {"paragraph": "test paragraph"}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(obj.stream)
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+        assert obj.elements["paragraph"].text_wrap_length is not None
+
+
+def test_paragraph_auto_font_auto_wrap(
+    sample_template_with_paragraph_auto_font, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "test_paragraph_auto_font_auto_wrap.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PyPDFForm(sample_template_with_paragraph_auto_font).fill(
+            {"paragraph": "test paragraphxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
         )
 
         request.config.results["expected_path"] = expected_path
