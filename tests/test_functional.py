@@ -82,7 +82,7 @@ def test_fill_font_liberation_serif_italic(
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
                 assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
                 assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
+                assert v.text_wrap_length is None
 
 
 def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
@@ -111,7 +111,7 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
                 assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
                 assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
+                assert v.text_wrap_length is None
 
 
 def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
@@ -139,7 +139,7 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
                 assert v.font_color == (1, 0, 0)
                 assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
                 assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
+                assert v.text_wrap_length is None
 
 
 def test_fill_offset_100(template_stream, pdf_samples, data_dict, request):
@@ -171,7 +171,7 @@ def test_fill_offset_100(template_stream, pdf_samples, data_dict, request):
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
                 assert v.text_x_offset == 100
                 assert v.text_y_offset == -100
-                assert v.text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
+                assert v.text_wrap_length is None
 
 
 def test_fill_wrap_2(template_stream, pdf_samples, data_dict, request):
@@ -239,7 +239,7 @@ def test_fill_with_customized_elements(
         assert obj.elements["test"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
         assert obj.elements["test"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
         assert (
-            obj.elements["test"].text_wrap_length == constants.GLOBAL_TEXT_WRAP_LENGTH
+            obj.elements["test"].text_wrap_length is None
         )
 
         assert obj.elements["test_2"].font_color == (0, 1, 0)
@@ -536,6 +536,25 @@ def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples, req
         assert obj.stream == expected
 
 
+def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_paragraph_auto_wrap.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PyPDFForm(sample_template_with_paragraph).fill(
+            {"paragraph_1": "test paragraphxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(obj.stream)
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+        assert obj.elements["paragraph_1"].text_wrap_length is not None
+
+
 def test_paragraph_auto_font(
     sample_template_with_paragraph_auto_font, pdf_samples, request
 ):
@@ -554,6 +573,27 @@ def test_paragraph_auto_font(
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_paragraph_auto_font_auto_wrap(
+    sample_template_with_paragraph_auto_font, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "test_paragraph_auto_font_auto_wrap.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PyPDFForm(sample_template_with_paragraph_auto_font).fill(
+            {"paragraph": "test paragraphxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(obj.stream)
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+        assert obj.elements["paragraph"].text_wrap_length is not None
 
 
 def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):

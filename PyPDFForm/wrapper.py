@@ -5,9 +5,8 @@ from __future__ import annotations
 
 from typing import BinaryIO, Dict, Union
 
-from .core import filler, font, font_size
+from .core import filler, font
 from .core import image as image_core
-from .core import template as template_core
 from .core import utils
 from .core import watermark as watermark_core
 from .middleware import adapter, constants
@@ -45,7 +44,7 @@ class Wrapper:
                     "global_text_y_offset", constants.GLOBAL_TEXT_Y_OFFSET
                 )
                 each.text_wrap_length = kwargs.get(
-                    "global_text_wrap_length", constants.GLOBAL_TEXT_WRAP_LENGTH
+                    "global_text_wrap_length"
                 )
 
     def read(self) -> bytes:
@@ -81,13 +80,13 @@ class Wrapper:
             if isinstance(value, Dropdown):
                 self.elements[key] = template_middleware.dropdown_to_text(value)
 
-        font_size.update_text_field_font_sizes(self.stream, self.elements)
+        utils.update_text_field_attributes(self.stream, self.elements)
         if self.read():
             self.elements = template_middleware.set_character_x_paddings(
                 self.stream, self.elements
             )
 
-        self.stream = template_core.remove_all_elements(
+        self.stream = utils.remove_all_elements(
             filler.fill(self.stream, self.elements)
         )
 
@@ -115,7 +114,7 @@ class Wrapper:
             "text_y_offset", constants.GLOBAL_TEXT_Y_OFFSET
         )
         new_element.text_wrap_length = kwargs.get(
-            "text_wrap_length", constants.GLOBAL_TEXT_WRAP_LENGTH
+            "text_wrap_length"
         )
 
         watermarks = watermark_core.create_watermarks_and_draw(

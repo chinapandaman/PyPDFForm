@@ -48,7 +48,7 @@ def draw_text(
                 coordinate_y + element.text_y_offset,
                 char,
             )
-    elif len(text_to_draw) < element.text_wrap_length:
+    elif element.text_wrap_length is None or len(text_to_draw) < element.text_wrap_length:
         canv.drawString(
             coordinate_x + element.text_x_offset,
             coordinate_y + element.text_y_offset,
