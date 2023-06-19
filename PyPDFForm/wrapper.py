@@ -43,9 +43,7 @@ class Wrapper:
                 each.text_y_offset = kwargs.get(
                     "global_text_y_offset", constants.GLOBAL_TEXT_Y_OFFSET
                 )
-                each.text_wrap_length = kwargs.get(
-                    "global_text_wrap_length"
-                )
+                each.text_wrap_length = kwargs.get("global_text_wrap_length")
 
     def read(self) -> bytes:
         """Reads the file stream of a PDF form."""
@@ -86,9 +84,7 @@ class Wrapper:
                 self.stream, self.elements
             )
 
-        self.stream = utils.remove_all_elements(
-            filler.fill(self.stream, self.elements)
-        )
+        self.stream = utils.remove_all_elements(filler.fill(self.stream, self.elements))
 
         return self
 
@@ -113,9 +109,7 @@ class Wrapper:
         new_element.text_y_offset = kwargs.get(
             "text_y_offset", constants.GLOBAL_TEXT_Y_OFFSET
         )
-        new_element.text_wrap_length = kwargs.get(
-            "text_wrap_length"
-        )
+        new_element.text_wrap_length = kwargs.get("text_wrap_length")
 
         watermarks = watermark_core.create_watermarks_and_draw(
             self.stream,

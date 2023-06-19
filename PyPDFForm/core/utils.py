@@ -2,16 +2,18 @@
 """Contains utility helpers."""
 
 from io import BytesIO
-from typing import Union, Dict
+from typing import Dict, Union
 
 import pdfrw
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.checkbox import Checkbox
+from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from ..middleware.constants import ELEMENT_TYPES
-from . import constants, template, font_size as font_size_core
+from . import constants
+from . import font_size as font_size_core
+from . import template
 
 
 def generate_stream(pdf: pdfrw.PdfReader) -> bytes:
@@ -51,7 +53,9 @@ def update_text_field_attributes(
                     )
 
 
-def get_paragraph_auto_wrap_length(element: pdfrw.PdfDict, element_middleware: Text) -> int:
+def get_paragraph_auto_wrap_length(
+    element: pdfrw.PdfDict, element_middleware: Text
+) -> int:
     """Calculates the text wrap length of a paragraph field."""
 
     value = element_middleware.value or ""

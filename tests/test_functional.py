@@ -238,9 +238,7 @@ def test_fill_with_customized_elements(
         assert obj.elements["test"].font_color == (1, 0, 0)
         assert obj.elements["test"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
         assert obj.elements["test"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-        assert (
-            obj.elements["test"].text_wrap_length is None
-        )
+        assert obj.elements["test"].text_wrap_length is None
 
         assert obj.elements["test_2"].font_color == (0, 1, 0)
         assert obj.elements["test_2"].text_x_offset == 50
@@ -540,7 +538,9 @@ def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, reques
     expected_path = os.path.join(pdf_samples, "test_paragraph_auto_wrap.pdf")
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_paragraph).fill(
-            {"paragraph_1": "test paragraphxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
+            {
+                "paragraph_1": "test paragraphxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            }
         )
 
         request.config.results["expected_path"] = expected_path
@@ -581,7 +581,9 @@ def test_paragraph_auto_font_auto_wrap(
     expected_path = os.path.join(pdf_samples, "test_paragraph_auto_font_auto_wrap.pdf")
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_paragraph_auto_font).fill(
-            {"paragraph": "test paragraphxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
+            {
+                "paragraph": "test paragraphxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            }
         )
 
         request.config.results["expected_path"] = expected_path
