@@ -259,7 +259,7 @@ def get_draw_text_coordinates(
     )
     element_value = element_value[:length]
 
-    if is_text_multiline(element) and element_middleware.text_wrap_length is not None:
+    if element_middleware.text_wrap_length is not None:
         element_value = element_value[:element_middleware.text_wrap_length]
 
     character_paddings = (
