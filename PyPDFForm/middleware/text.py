@@ -25,7 +25,7 @@ class Text(Element):
         self.max_length = None
         self.comb = None
         self.character_paddings = None
-        self.last_line_x_offset = None
+        self.last_line_x_coordinate = None
 
     @property
     def schema_definition(self) -> dict:

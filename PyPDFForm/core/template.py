@@ -327,9 +327,12 @@ def get_draw_text_coordinates(
     return x, y
 
 
-def get_last_line_x_offset(
+def get_last_line_x_coordinate(
     element: pdfrw.PdfDict, element_middleware: Text
-):
+) -> Union[float, int, None]:
+    """Returns the x coordinate to draw the last line
+    of the text at given a PDF form paragraph element."""
+
     if (
         is_text_multiline(element)
         and element_middleware.text_wrap_length is not None
@@ -339,9 +342,6 @@ def get_last_line_x_offset(
         _ele = deepcopy(element_middleware)
         _ele.value = _ele.value[-1 * (len(_ele.value) % _ele.text_wrap_length):]
 
-        return abs(
-            get_draw_text_coordinates(element, _ele)[0]
-            - float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
-        )
+        return get_draw_text_coordinates(element, _ele)[0]
 
     return None

@@ -67,8 +67,8 @@ def draw_text(
             start += element.text_wrap_length
             end += element.text_wrap_length
 
-        if element.last_line_x_offset is not None:
-            text_obj.moveCursor(element.last_line_x_offset, 0)
+        if element.last_line_x_coordinate is not None:
+            text_obj.moveCursor(element.last_line_x_coordinate - coordinate_x, 0)
 
         text_obj.textLine(text_to_draw[start:])
 
