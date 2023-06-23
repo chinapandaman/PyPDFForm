@@ -336,8 +336,7 @@ def get_last_line_x_coordinate(
     """
 
     if (
-        is_text_multiline(element)
-        and element_middleware.text_wrap_length is not None
+        element_middleware.text_wrap_length is not None
         and isinstance(element_middleware.value, str)
         and len(element_middleware.value) > element_middleware.text_wrap_length
     ):
