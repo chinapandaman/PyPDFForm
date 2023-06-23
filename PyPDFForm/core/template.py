@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for template."""
 
+from copy import deepcopy
 from typing import Dict, List, Tuple, Union
 
 import pdfrw
@@ -257,6 +258,10 @@ def get_draw_text_coordinates(
         else len(element_value)
     )
     element_value = element_value[:length]
+
+    if is_text_multiline(element) and element_middleware.text_wrap_length is not None:
+        element_value = element_value[:element_middleware.text_wrap_length]
+
     character_paddings = (
         element_middleware.character_paddings[:length]
         if element_middleware.character_paddings is not None
@@ -320,3 +325,23 @@ def get_draw_text_coordinates(
             )
 
     return x, y
+
+
+def get_last_line_x_offset(
+    element: pdfrw.PdfDict, element_middleware: Text
+):
+    if (
+        is_text_multiline(element)
+        and element_middleware.text_wrap_length is not None
+        and isinstance(element_middleware.value, str)
+        and len(element_middleware.value) > element_middleware.text_wrap_length
+    ):
+        _ele = deepcopy(element_middleware)
+        _ele.value = _ele.value[-1 * (len(_ele.value) % _ele.text_wrap_length):]
+
+        return abs(
+            get_draw_text_coordinates(element, _ele)[0]
+            - float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+        )
+
+    return None
