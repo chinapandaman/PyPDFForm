@@ -260,7 +260,7 @@ def get_draw_text_coordinates(
     element_value = element_value[:length]
 
     if element_middleware.text_wrap_length is not None:
-        element_value = element_value[:element_middleware.text_wrap_length]
+        element_value = element_value[: element_middleware.text_wrap_length]
 
     character_paddings = (
         element_middleware.character_paddings[:length]
@@ -341,7 +341,7 @@ def get_last_line_x_coordinate(
         and len(element_middleware.value) > element_middleware.text_wrap_length
     ):
         _ele = deepcopy(element_middleware)
-        _ele.value = _ele.value[-1 * (len(_ele.value) % _ele.text_wrap_length):]
+        _ele.value = _ele.value[-1 * (len(_ele.value) % _ele.text_wrap_length) :]
 
         return get_draw_text_coordinates(element, _ele)[0]
 
