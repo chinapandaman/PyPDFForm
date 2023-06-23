@@ -330,8 +330,10 @@ def get_draw_text_coordinates(
 def get_last_line_x_coordinate(
     element: pdfrw.PdfDict, element_middleware: Text
 ) -> Union[float, int, None]:
-    """Returns the x coordinate to draw the last line
-    of the text at given a PDF form paragraph element."""
+    """
+    Returns the x coordinate to draw the last line
+    of the text at given a PDF form paragraph element.
+    """
 
     if (
         is_text_multiline(element)
