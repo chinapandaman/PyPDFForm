@@ -664,3 +664,32 @@ def test_sejda_complex_paragraph_multiple_line_alignment(
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_paragraph_complex(
+    sample_template_paragraph_complex, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "test_paragraph_complex.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PyPDFForm(sample_template_paragraph_complex).fill(
+            {
+                "paragraph_font_auto_left": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+                "paragraph_font_auto_right": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+                "paragraph_font_auto_center": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+                "paragraph_font_ten_left": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+                "paragraph_font_ten_right": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+                "paragraph_font_ten_center": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+            }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(obj.stream)
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected

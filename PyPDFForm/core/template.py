@@ -341,7 +341,8 @@ def get_last_line_x_coordinate(
         and len(element_middleware.value) > element_middleware.text_wrap_length
     ):
         _ele = deepcopy(element_middleware)
-        _ele.value = _ele.value[-1 * (len(_ele.value) % _ele.text_wrap_length) :]
+        last_line_mark = -1 * (len(_ele.value) % _ele.text_wrap_length)
+        _ele.value = _ele.value[last_line_mark:]
 
         return get_draw_text_coordinates(element, _ele)[0]
 
