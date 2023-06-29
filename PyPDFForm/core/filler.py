@@ -36,9 +36,7 @@ def fill(
             if isinstance(elements[key], (Checkbox, Radio)):
                 font_size = font_size_core.checkbox_radio_font_size(_element)
                 _to_draw = utils.checkbox_radio_to_draw(elements[key], font_size)
-                x, y = template.get_draw_checkbox_radio_coordinates(
-                    _element, _to_draw
-                )
+                x, y = template.get_draw_checkbox_radio_coordinates(_element, _to_draw)
                 if isinstance(elements[key], Checkbox) and elements[key].value:
                     needs_to_be_drawn = True
                 elif isinstance(elements[key], Radio):
