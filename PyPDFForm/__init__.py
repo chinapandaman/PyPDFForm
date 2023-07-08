@@ -5,4 +5,4 @@ from .wrapper import Wrapper
 
 PyPDFForm = Wrapper
 
-__version__ = "1.2.10"
+__version__ = "1.2.11"
