@@ -2,7 +2,7 @@
 """Contains utility helpers."""
 
 from io import BytesIO
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 import pdfrw
 from reportlab.pdfbase.pdfmetrics import stringWidth
@@ -48,9 +48,43 @@ def update_text_field_attributes(
                         _element
                     ) or font_size_core.text_field_font_size(_element)
                 if template.is_text_multiline(_element):
-                    elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
-                        _element, elements[key]
-                    )
+                    if elements[key].text_wrap_length is None:
+                        elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
+                            _element, elements[key]
+                        )
+                    elements[key].text_lines = get_paragraph_lines(elements[key])
+
+
+def get_paragraph_lines(
+    element_middleware: Text
+) -> Union[List[str], None]:
+    """Splits the paragraph field's text to a list of lines."""
+
+    if element_middleware.text_wrap_length is None:
+        return None
+
+    lines = []
+    result = []
+    value = element_middleware.value or ""
+    if element_middleware.max_length is not None:
+        value = value[:element_middleware.max_length]
+    characters = value.split(" ")
+    current_line = ""
+    for each in characters:
+        line_extended = f"{current_line} {each}" if current_line else each
+        if len(line_extended) <= element_middleware.text_wrap_length:
+            current_line = line_extended
+        else:
+            lines.append(current_line)
+            current_line = each
+
+    for each in lines:
+        result.append(f"{each} ")
+
+    if current_line:
+        result.append(current_line)
+
+    return result
 
 
 def get_paragraph_auto_wrap_length(
