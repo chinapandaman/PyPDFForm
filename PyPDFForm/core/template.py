@@ -346,6 +346,7 @@ def get_text_line_x_coordinates(
         _ele = deepcopy(element_middleware)
         for each in element_middleware.text_lines:
             _ele.value = each
+            _ele.text_wrap_length = None
             result.append(get_draw_text_coordinates(element, _ele)[0])
 
         return result
