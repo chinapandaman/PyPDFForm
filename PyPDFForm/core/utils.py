@@ -56,7 +56,7 @@ def update_text_field_attributes(
 
 def get_paragraph_lines(
     element_middleware: Text
-) -> Union[List[str], None]:
+) -> List[str]:
     """Splits the paragraph field's text to a list of lines."""
 
     lines = []
