@@ -82,7 +82,6 @@ def test_fill_font_liberation_serif_italic(
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
                 assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
                 assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-                assert v.text_wrap_length is None
 
 
 def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
@@ -111,7 +110,6 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
                 assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
                 assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-                assert v.text_wrap_length is None
 
 
 def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
@@ -139,7 +137,6 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
                 assert v.font_color == (1, 0, 0)
                 assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
                 assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-                assert v.text_wrap_length is None
 
 
 def test_fill_offset_100(template_stream, pdf_samples, data_dict, request):
@@ -171,35 +168,6 @@ def test_fill_offset_100(template_stream, pdf_samples, data_dict, request):
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
                 assert v.text_x_offset == 100
                 assert v.text_y_offset == -100
-                assert v.text_wrap_length is None
-
-
-def test_fill_wrap_2(template_stream, pdf_samples, data_dict, request):
-    expected_path = os.path.join(pdf_samples, "sample_filled_text_wrap_2.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(template_stream, global_text_wrap_length=2).fill(
-            data_dict,
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
-
-        for k, v in obj.elements.items():
-            assert k in data_dict
-            assert v.name in data_dict
-            assert v.value == data_dict[k]
-
-            if isinstance(v, Text):
-                assert v.font == constants.GLOBAL_FONT
-                assert v.font_color == constants.GLOBAL_FONT_COLOR
-                assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
-                assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-                assert v.text_wrap_length == 2
 
 
 def test_fill_with_customized_elements(
@@ -215,8 +183,6 @@ def test_fill_with_customized_elements(
         obj.elements["test_2"].font_color = (0, 1, 0)
         obj.elements["test_2"].text_x_offset = 50
         obj.elements["test_2"].text_y_offset = -50
-        obj.elements["test_2"].text_wrap_length = 1
-        obj.elements["test_3"].text_wrap_length = 2
 
         obj.fill(data_dict)
 
@@ -238,17 +204,14 @@ def test_fill_with_customized_elements(
         assert obj.elements["test"].font_color == (1, 0, 0)
         assert obj.elements["test"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
         assert obj.elements["test"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-        assert obj.elements["test"].text_wrap_length is None
 
         assert obj.elements["test_2"].font_color == (0, 1, 0)
         assert obj.elements["test_2"].text_x_offset == 50
         assert obj.elements["test_2"].text_y_offset == -50
-        assert obj.elements["test_2"].text_wrap_length == 1
 
         assert obj.elements["test_3"].font_color == constants.GLOBAL_FONT_COLOR
         assert obj.elements["test_3"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
         assert obj.elements["test_3"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-        assert obj.elements["test_3"].text_wrap_length == 2
 
 
 def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream, request):
@@ -302,7 +265,6 @@ def test_draw_text_on_one_page(template_stream, pdf_samples, request):
             font_color=(1, 0, 0),
             text_x_offset=50,
             text_y_offset=50,
-            text_wrap_length=4,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -339,7 +301,6 @@ def test_draw_text_on_one_page_different_font(
             font_color=(1, 0, 0),
             text_x_offset=50,
             text_y_offset=50,
-            text_wrap_length=4,
         )
         request.config.results["stream"] = obj.read()
         request.config.results["expected_path"] = expected_path
