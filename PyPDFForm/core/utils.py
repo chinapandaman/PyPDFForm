@@ -77,12 +77,20 @@ def get_paragraph_lines(
         else:
             lines.append(current_line)
             current_line = each
+    lines.append(current_line)
 
     for each in lines:
-        result.append(f"{each} ")
+        while len(each) > element_middleware.text_wrap_length:
+            result.append(each[:(element_middleware.text_wrap_length - 1)])
+            each = each[(element_middleware.text_wrap_length - 1):]
+        if each:
+            if result and len(each) + 1 + len(result[-1]) <= element_middleware.text_wrap_length:
+                result[-1] = f"{result[-1]}{each} "
+            else:
+                result.append(f"{each} ")
 
-    if current_line:
-        result.append(current_line)
+    if result:
+        result[-1] = result[-1][:-1]
 
     return result
 

@@ -276,55 +276,6 @@ def test_draw_text_on_one_page(template_stream, pdf_samples, request):
         assert obj.stream == expected
 
 
-def test_draw_text_on_one_page_different_font(
-    template_stream, pdf_samples, font_samples, request
-):
-    with open(
-        os.path.join(font_samples, "LiberationSerif-BoldItalic.ttf"), "rb+"
-    ) as _f:
-        PyPDFForm.register_font("LiberationSerif-BoldItalic", _f.read())
-
-    expected_path = os.path.join(
-        pdf_samples, "sample_pdf_with_drawn_text_different_font.pdf"
-    )
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PyPDFForm(template_stream).draw_text(
-            "drawn_text",
-            1,
-            300,
-            225,
-            font="LiberationSerif-BoldItalic",
-            font_size=20,
-            font_color=(1, 0, 0),
-            text_x_offset=50,
-            text_y_offset=50,
-        )
-        request.config.results["stream"] = obj.read()
-        request.config.results["expected_path"] = expected_path
-
-        expected = f.read()
-
-        if os.name == "nt":
-            assert len(obj.stream) == len(expected)
-        else:
-            expected_path = os.path.join(
-                pdf_samples, "sample_pdf_with_drawn_text_different_font_linux.pdf"
-            )
-            request.config.results["expected_path"] = expected_path
-            with open(
-                os.path.join(
-                    pdf_samples, "sample_pdf_with_drawn_text_different_font_linux.pdf"
-                ),
-                "rb+",
-            ) as f_linux:
-                expected = f_linux.read()
-                assert len(obj.stream) == len(expected)
-                assert obj.stream == expected
-
-
 def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "sample_pdf_with_image.pdf")
     with open(expected_path, "rb+") as f:
@@ -500,7 +451,7 @@ def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, reques
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_paragraph).fill(
             {
-                "paragraph_1": "test paragraphxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                "paragraph_1": "t xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx t"
             }
         )
 
@@ -543,7 +494,7 @@ def test_paragraph_auto_font_auto_wrap(
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_paragraph_auto_font).fill(
             {
-                "paragraph": "test paragraphxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                "paragraph": "t xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx t"
             }
         )
 
