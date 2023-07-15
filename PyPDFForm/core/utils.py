@@ -2,7 +2,7 @@
 """Contains utility helpers."""
 
 from io import BytesIO
-from typing import Dict, Union, List
+from typing import Dict, List, Union
 
 import pdfrw
 from reportlab.pdfbase.pdfmetrics import stringWidth
@@ -47,16 +47,17 @@ def update_text_field_attributes(
                     elements[key].font_size = template.get_text_field_font_size(
                         _element
                     ) or font_size_core.text_field_font_size(_element)
-                if template.is_text_multiline(_element) and elements[key].text_wrap_length is None:
+                if (
+                    template.is_text_multiline(_element)
+                    and elements[key].text_wrap_length is None
+                ):
                     elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
                         _element, elements[key]
                     )
                     elements[key].text_lines = get_paragraph_lines(elements[key])
 
 
-def get_paragraph_lines(
-    element_middleware: Text
-) -> List[str]:
+def get_paragraph_lines(element_middleware: Text) -> List[str]:
     """Splits the paragraph field's text to a list of lines."""
 
     lines = []
@@ -64,7 +65,7 @@ def get_paragraph_lines(
     text_wrap_length = element_middleware.text_wrap_length
     value = element_middleware.value or ""
     if element_middleware.max_length is not None:
-        value = value[:element_middleware.max_length]
+        value = value[: element_middleware.max_length]
     characters = value.split(" ")
     current_line = ""
     for each in characters:

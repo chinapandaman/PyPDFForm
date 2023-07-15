@@ -64,11 +64,15 @@ def draw_text(
                 element.text_line_x_coordinates is not None
                 and element.text_line_x_coordinates[i] - coordinate_x != 0
             ):
-                text_obj.moveCursor(element.text_line_x_coordinates[i] - coordinate_x, 0)
+                text_obj.moveCursor(
+                    element.text_line_x_coordinates[i] - coordinate_x, 0
+                )
                 cursor_moved = True
             text_obj.textLine(line)
             if cursor_moved:
-                text_obj.moveCursor(-1 * (element.text_line_x_coordinates[i] - coordinate_x), 0)
+                text_obj.moveCursor(
+                    -1 * (element.text_line_x_coordinates[i] - coordinate_x), 0
+                )
 
         canv.saveState()
         canv.translate(

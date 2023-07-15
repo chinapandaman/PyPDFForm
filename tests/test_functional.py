@@ -603,7 +603,9 @@ def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, reque
         assert obj.stream == expected
 
 
-def test_paragraph_max_length(sample_template_with_paragraph_max_length, pdf_samples, request):
+def test_paragraph_max_length(
+    sample_template_with_paragraph_max_length, pdf_samples, request
+):
     expected_path = os.path.join(pdf_samples, "test_paragraph_max_length.pdf")
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_paragraph_max_length).fill(
