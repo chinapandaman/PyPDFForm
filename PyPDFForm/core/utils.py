@@ -52,16 +52,13 @@ def update_text_field_attributes(
                         elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
                             _element, elements[key]
                         )
-                    elements[key].text_lines = get_paragraph_lines(elements[key])
+                        elements[key].text_lines = get_paragraph_lines(elements[key])
 
 
 def get_paragraph_lines(
     element_middleware: Text
 ) -> Union[List[str], None]:
     """Splits the paragraph field's text to a list of lines."""
-
-    if element_middleware.text_wrap_length is None:
-        return None
 
     lines = []
     result = []
