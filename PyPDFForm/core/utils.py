@@ -47,12 +47,11 @@ def update_text_field_attributes(
                     elements[key].font_size = template.get_text_field_font_size(
                         _element
                     ) or font_size_core.text_field_font_size(_element)
-                if template.is_text_multiline(_element):
-                    if elements[key].text_wrap_length is None:
-                        elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
-                            _element, elements[key]
-                        )
-                        elements[key].text_lines = get_paragraph_lines(elements[key])
+                if template.is_text_multiline(_element) and elements[key].text_wrap_length is None:
+                    elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
+                        _element, elements[key]
+                    )
+                    elements[key].text_lines = get_paragraph_lines(elements[key])
 
 
 def get_paragraph_lines(
@@ -62,6 +61,7 @@ def get_paragraph_lines(
 
     lines = []
     result = []
+    text_wrap_length = element_middleware.text_wrap_length
     value = element_middleware.value or ""
     if element_middleware.max_length is not None:
         value = value[:element_middleware.max_length]
@@ -69,7 +69,7 @@ def get_paragraph_lines(
     current_line = ""
     for each in characters:
         line_extended = f"{current_line} {each}" if current_line else each
-        if len(line_extended) <= element_middleware.text_wrap_length:
+        if len(line_extended) <= text_wrap_length:
             current_line = line_extended
         else:
             lines.append(current_line)
@@ -77,11 +77,12 @@ def get_paragraph_lines(
     lines.append(current_line)
 
     for each in lines:
-        while len(each) > element_middleware.text_wrap_length:
-            result.append(each[:(element_middleware.text_wrap_length - 1)])
-            each = each[(element_middleware.text_wrap_length - 1):]
+        while len(each) > text_wrap_length:
+            last_index = text_wrap_length - 1
+            result.append(each[:last_index])
+            each = each[last_index:]
         if each:
-            if result and len(each) + 1 + len(result[-1]) <= element_middleware.text_wrap_length:
+            if result and len(each) + 1 + len(result[-1]) <= text_wrap_length:
                 result[-1] = f"{result[-1]}{each} "
             else:
                 result.append(f"{each} ")
