@@ -87,6 +87,14 @@ def sample_template_paragraph_complex(pdf_samples):
 
 
 @pytest.fixture
+def sample_template_with_paragraph_max_length(pdf_samples):
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_paragraph_max_length.pdf"), "rb+"
+    ) as f:
+        return f.read()
+
+
+@pytest.fixture
 def sample_template_with_max_length_text_field(pdf_samples):
     with open(
         os.path.join(pdf_samples, "sample_template_with_max_length_text_field.pdf"),

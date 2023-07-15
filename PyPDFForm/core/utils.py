@@ -2,7 +2,7 @@
 """Contains utility helpers."""
 
 from io import BytesIO
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 import pdfrw
 from reportlab.pdfbase.pdfmetrics import stringWidth
@@ -47,10 +47,50 @@ def update_text_field_attributes(
                     elements[key].font_size = template.get_text_field_font_size(
                         _element
                     ) or font_size_core.text_field_font_size(_element)
-                if template.is_text_multiline(_element):
+                if template.is_text_multiline(_element) and elements[key].text_wrap_length is None:
                     elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
                         _element, elements[key]
                     )
+                    elements[key].text_lines = get_paragraph_lines(elements[key])
+
+
+def get_paragraph_lines(
+    element_middleware: Text
+) -> List[str]:
+    """Splits the paragraph field's text to a list of lines."""
+
+    lines = []
+    result = []
+    text_wrap_length = element_middleware.text_wrap_length
+    value = element_middleware.value or ""
+    if element_middleware.max_length is not None:
+        value = value[:element_middleware.max_length]
+    characters = value.split(" ")
+    current_line = ""
+    for each in characters:
+        line_extended = f"{current_line} {each}" if current_line else each
+        if len(line_extended) <= text_wrap_length:
+            current_line = line_extended
+        else:
+            lines.append(current_line)
+            current_line = each
+    lines.append(current_line)
+
+    for each in lines:
+        while len(each) > text_wrap_length:
+            last_index = text_wrap_length - 1
+            result.append(each[:last_index])
+            each = each[last_index:]
+        if each:
+            if result and len(each) + 1 + len(result[-1]) <= text_wrap_length:
+                result[-1] = f"{result[-1]}{each} "
+            else:
+                result.append(f"{each} ")
+
+    if result:
+        result[-1] = result[-1][:-1]
+
+    return result
 
 
 def get_paragraph_auto_wrap_length(

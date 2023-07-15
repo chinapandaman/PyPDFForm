@@ -58,22 +58,17 @@ def draw_text(
         )
     else:
         text_obj = canv.beginText(0, 0)
-
-        start = 0
-        end = element.text_wrap_length
-
-        while end < len(text_to_draw):
-            text_obj.textLine(text_to_draw[start:end])
-            start += element.text_wrap_length
-            end += element.text_wrap_length
-
-        if (
-            element.last_line_x_coordinate is not None
-            and element.last_line_x_coordinate - coordinate_x != 0
-        ):
-            text_obj.moveCursor(element.last_line_x_coordinate - coordinate_x, 0)
-
-        text_obj.textLine(text_to_draw[start:])
+        for i, line in enumerate(element.text_lines):
+            cursor_moved = False
+            if (
+                element.text_line_x_coordinates is not None
+                and element.text_line_x_coordinates[i] - coordinate_x != 0
+            ):
+                text_obj.moveCursor(element.text_line_x_coordinates[i] - coordinate_x, 0)
+                cursor_moved = True
+            text_obj.textLine(line)
+            if cursor_moved:
+                text_obj.moveCursor(-1 * (element.text_line_x_coordinates[i] - coordinate_x), 0)
 
         canv.saveState()
         canv.translate(

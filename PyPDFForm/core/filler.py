@@ -48,7 +48,7 @@ def fill(
             else:
                 elements[
                     key
-                ].last_line_x_coordinate = template.get_last_line_x_coordinate(
+                ].text_line_x_coordinates = template.get_text_line_x_coordinates(
                     _element, elements[key]
                 )
                 x, y = template.get_draw_text_coordinates(_element, elements[key])
