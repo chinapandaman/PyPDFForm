@@ -138,9 +138,6 @@ def checkbox_radio_to_draw(
     new_element.font = "Helvetica"
     new_element.font_size = font_size
     new_element.font_color = (0, 0, 0)
-    new_element.text_x_offset = 0
-    new_element.text_y_offset = 0
-    new_element.text_wrap_length = 100
 
     if isinstance(element, Checkbox):
         new_element.value = constants.CHECKBOX_TO_DRAW
