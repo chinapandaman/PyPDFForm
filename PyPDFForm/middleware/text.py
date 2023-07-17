@@ -19,8 +19,6 @@ class Text(Element):
         self.font = None
         self.font_size = None
         self.font_color = None
-        self.text_x_offset = None
-        self.text_y_offset = None
         self.text_wrap_length = None
         self.max_length = None
         self.comb = None

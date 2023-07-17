@@ -44,16 +44,16 @@ def draw_text(
     if element.comb is True:
         for i, char in enumerate(text_to_draw):
             canv.drawString(
-                coordinate_x + element.character_paddings[i] + element.text_x_offset,
-                coordinate_y + element.text_y_offset,
+                coordinate_x + element.character_paddings[i],
+                coordinate_y,
                 char,
             )
     elif (
         element.text_wrap_length is None or len(text_to_draw) < element.text_wrap_length
     ):
         canv.drawString(
-            coordinate_x + element.text_x_offset,
-            coordinate_y + element.text_y_offset,
+            coordinate_x,
+            coordinate_y,
             text_to_draw,
         )
     else:
@@ -76,8 +76,8 @@ def draw_text(
 
         canv.saveState()
         canv.translate(
-            coordinate_x + element.text_x_offset,
-            coordinate_y + element.text_y_offset,
+            coordinate_x,
+            coordinate_y,
         )
         canv.drawText(text_obj)
         canv.restoreState()

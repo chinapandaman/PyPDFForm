@@ -37,12 +37,6 @@ class Wrapper:
                 each.font_color = kwargs.get(
                     "global_font_color", constants.GLOBAL_FONT_COLOR
                 )
-                each.text_x_offset = kwargs.get(
-                    "global_text_x_offset", constants.GLOBAL_TEXT_X_OFFSET
-                )
-                each.text_y_offset = kwargs.get(
-                    "global_text_y_offset", constants.GLOBAL_TEXT_Y_OFFSET
-                )
 
     def read(self) -> bytes:
         """Reads the file stream of a PDF form."""
@@ -102,12 +96,6 @@ class Wrapper:
         new_element.font = kwargs.get("font", constants.GLOBAL_FONT)
         new_element.font_size = kwargs.get("font_size", constants.GLOBAL_FONT_SIZE)
         new_element.font_color = kwargs.get("font_color", constants.GLOBAL_FONT_COLOR)
-        new_element.text_x_offset = kwargs.get(
-            "text_x_offset", constants.GLOBAL_TEXT_X_OFFSET
-        )
-        new_element.text_y_offset = kwargs.get(
-            "text_y_offset", constants.GLOBAL_TEXT_Y_OFFSET
-        )
 
         watermarks = watermark_core.create_watermarks_and_draw(
             self.stream,

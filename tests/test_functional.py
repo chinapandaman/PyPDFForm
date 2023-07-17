@@ -80,8 +80,6 @@ def test_fill_font_liberation_serif_italic(
             if isinstance(v, Text):
                 assert v.font == "LiberationSerif-Italic"
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
-                assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
-                assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
 
 
 def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
@@ -108,8 +106,6 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
                 assert v.font == constants.GLOBAL_FONT
                 assert v.font_size == 20
                 assert v.font_color == constants.GLOBAL_FONT_COLOR
-                assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
-                assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
 
 
 def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
@@ -135,39 +131,6 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
             if isinstance(v, Text):
                 assert v.font == constants.GLOBAL_FONT
                 assert v.font_color == (1, 0, 0)
-                assert v.text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
-                assert v.text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-
-
-def test_fill_offset_100(template_stream, pdf_samples, data_dict, request):
-    expected_path = os.path.join(pdf_samples, "sample_filled_offset_100.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(
-            template_stream,
-            global_text_x_offset=100,
-            global_text_y_offset=-100,
-        ).fill(
-            data_dict,
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
-
-        for k, v in obj.elements.items():
-            assert k in data_dict
-            assert v.name in data_dict
-            assert v.value == data_dict[k]
-
-            if isinstance(v, Text):
-                assert v.font == constants.GLOBAL_FONT
-                assert v.font_color == constants.GLOBAL_FONT_COLOR
-                assert v.text_x_offset == 100
-                assert v.text_y_offset == -100
 
 
 def test_fill_with_customized_elements(
@@ -181,8 +144,6 @@ def test_fill_with_customized_elements(
         obj.elements["test"].font_size = 20
         obj.elements["test"].font_color = (1, 0, 0)
         obj.elements["test_2"].font_color = (0, 1, 0)
-        obj.elements["test_2"].text_x_offset = 50
-        obj.elements["test_2"].text_y_offset = -50
 
         obj.fill(data_dict)
 
@@ -202,16 +163,7 @@ def test_fill_with_customized_elements(
         assert obj.elements["test"].font == "LiberationSerif-Italic"
         assert obj.elements["test"].font_size == 20
         assert obj.elements["test"].font_color == (1, 0, 0)
-        assert obj.elements["test"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
-        assert obj.elements["test"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
-
         assert obj.elements["test_2"].font_color == (0, 1, 0)
-        assert obj.elements["test_2"].text_x_offset == 50
-        assert obj.elements["test_2"].text_y_offset == -50
-
-        assert obj.elements["test_3"].font_color == constants.GLOBAL_FONT_COLOR
-        assert obj.elements["test_3"].text_x_offset == constants.GLOBAL_TEXT_X_OFFSET
-        assert obj.elements["test_3"].text_y_offset == constants.GLOBAL_TEXT_Y_OFFSET
 
 
 def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream, request):
@@ -263,8 +215,6 @@ def test_draw_text_on_one_page(template_stream, pdf_samples, request):
             font=constants.GLOBAL_FONT,
             font_size=20,
             font_color=(1, 0, 0),
-            text_x_offset=50,
-            text_y_offset=50,
         )
 
         request.config.results["expected_path"] = expected_path
