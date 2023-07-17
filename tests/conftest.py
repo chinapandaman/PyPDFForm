@@ -73,7 +73,8 @@ def sejda_template(pdf_samples):
 @pytest.fixture
 def sejda_template_complex(pdf_samples):
     with open(
-        os.path.join(pdf_samples, "paragraph", "sample_template_sejda_complex.pdf"), "rb+"
+        os.path.join(pdf_samples, "paragraph", "sample_template_sejda_complex.pdf"),
+        "rb+",
     ) as f:
         return f.read()
 
@@ -81,7 +82,8 @@ def sejda_template_complex(pdf_samples):
 @pytest.fixture
 def sample_template_paragraph_complex(pdf_samples):
     with open(
-        os.path.join(pdf_samples, "paragraph", "sample_template_paragraph_complex.pdf"), "rb+"
+        os.path.join(pdf_samples, "paragraph", "sample_template_paragraph_complex.pdf"),
+        "rb+",
     ) as f:
         return f.read()
 
@@ -89,7 +91,9 @@ def sample_template_paragraph_complex(pdf_samples):
 @pytest.fixture
 def sample_template_with_paragraph_max_length(pdf_samples):
     with open(
-        os.path.join(pdf_samples, "paragraph", "sample_template_with_paragraph_max_length.pdf"),
+        os.path.join(
+            pdf_samples, "paragraph", "sample_template_with_paragraph_max_length.pdf"
+        ),
         "rb+",
     ) as f:
         return f.read()
@@ -144,7 +148,9 @@ def sample_template_with_paragraph(pdf_samples):
 @pytest.fixture
 def sample_template_with_paragraph_auto_font(pdf_samples):
     with open(
-        os.path.join(pdf_samples, "paragraph", "sample_template_with_paragraph_auto_font.pdf"),
+        os.path.join(
+            pdf_samples, "paragraph", "sample_template_with_paragraph_auto_font.pdf"
+        ),
         "rb+",
     ) as f:
         return f.read()
