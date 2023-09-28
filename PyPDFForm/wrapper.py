@@ -43,6 +43,27 @@ class Wrapper:
 
         return self.stream
 
+    @property
+    def version(self) -> Union[str, None]:
+        """Gets the version of the PDF."""
+
+        for each in constants.VERSION_IDENTIFIERS:
+            if self.stream.startswith(each):
+                return each.replace(constants.VERSION_IDENTIFIER_PREFIX, b"").decode()
+
+        return None
+
+    def change_version(self, version: str) -> Wrapper:
+        """Changes the version of the PDF."""
+
+        self.stream = self.stream.replace(
+            constants.VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
+            constants.VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
+            1
+        )
+
+        return self
+
     def __add__(self, other: Wrapper) -> Wrapper:
         """Overloaded addition operator to perform merging PDFs."""
 
@@ -148,27 +169,6 @@ class Wrapper:
         }
 
         return result
-
-    @property
-    def version(self) -> Union[str, None]:
-        """Gets the version of the PDF."""
-
-        for each in constants.VERSION_IDENTIFIERS:
-            if self.stream.startswith(each):
-                return each.replace(constants.VERSION_IDENTIFIER_PREFIX, b"").decode()
-
-        return None
-
-    def change_version(self, version: str) -> Wrapper:
-        """Changes the version of the PDF."""
-
-        self.stream = self.stream.replace(
-            constants.VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
-            constants.VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
-            1
-        )
-
-        return self
 
     @classmethod
     def register_font(
