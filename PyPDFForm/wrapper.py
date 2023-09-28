@@ -149,6 +149,27 @@ class Wrapper:
 
         return result
 
+    @property
+    def version(self) -> Union[str, None]:
+        """Gets the version of the PDF."""
+
+        for each in constants.VERSION_IDENTIFIERS:
+            if self.stream.startswith(each):
+                return each.replace(constants.VERSION_IDENTIFIER_PREFIX, b"").decode()
+
+        return None
+
+    def change_version(self, version: str) -> Wrapper:
+        """Changes the version of the PDF."""
+
+        self.stream = self.stream.replace(
+            constants.VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
+            constants.VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
+            1
+        )
+
+        return self
+
     @classmethod
     def register_font(
         cls, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
