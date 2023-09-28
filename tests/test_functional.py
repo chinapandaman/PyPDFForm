@@ -376,3 +376,15 @@ def test_fill_right_aligned(
 
         for _, elements in template_core.get_elements_by_page(obj.read()).items():
             assert not elements
+
+
+def test_version(pdf_samples):
+    versions = ["1.0", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "2.0"]
+
+    for version in versions:
+        obj = PyPDFForm(os.path.join(pdf_samples, "versions", f"{version}.pdf"))
+        assert obj.version == version
+        assert obj.change_version("2.0").version == "2.0"
+
+    obj = PyPDFForm(os.path.join(pdf_samples, "versions", "unknown.pdf"))
+    assert obj.version is None

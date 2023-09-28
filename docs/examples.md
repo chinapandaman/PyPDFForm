@@ -372,3 +372,28 @@ The above script will print the following JSON schema:
     "type": "object"
 }
 ```
+
+## Change the version of a PDF
+
+This example demos how to change the version of a PDF to 2.0.
+
+```python
+import os
+
+from PyPDFForm import PyPDFForm
+
+PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
+    os.path.expanduser("~/Downloads"), "sample_template.pdf"
+)  # Change this to where you downloaded the sample PDF form
+
+PATH_TO_FILLED_PDF_FORM = os.path.join(
+    os.path.expanduser("~"), "output.pdf"
+)  # Change this to where you wish to put your filled PDF form
+
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        .change_version("2.0")
+        .read()
+    )
+```
