@@ -13,7 +13,15 @@ GLOBAL_FONT_SIZE = 12
 GLOBAL_FONT_COLOR = (0, 0, 0)
 
 VERSION_IDENTIFIERS = [
-    b"%PDF-1.0", b"%PDF-1.1", b"%PDF-1.2", b"%PDF-1.3", b"%PDF-1.4", b"%PDF-1.5", b"%PDF-1.6", b"%PDF-1.7", b"%PDF-2.0",
+    b"%PDF-1.0",
+    b"%PDF-1.1",
+    b"%PDF-1.2",
+    b"%PDF-1.3",
+    b"%PDF-1.4",
+    b"%PDF-1.5",
+    b"%PDF-1.6",
+    b"%PDF-1.7",
+    b"%PDF-2.0",
 ]
 VERSION_IDENTIFIER_PREFIX = b"%PDF-"
 

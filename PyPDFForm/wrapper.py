@@ -59,7 +59,7 @@ class Wrapper:
         self.stream = self.stream.replace(
             constants.VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
             constants.VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
-            1
+            1,
         )
 
         return self
