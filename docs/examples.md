@@ -373,7 +373,7 @@ The above script will print the following JSON schema:
 }
 ```
 
-## Changes the version of a PDF
+## Change the version of a PDF
 
 This example demos how to change the version of a PDF to 2.0.
 

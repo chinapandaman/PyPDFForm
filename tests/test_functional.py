@@ -385,3 +385,6 @@ def test_version(pdf_samples):
         obj = PyPDFForm(os.path.join(pdf_samples, "versions", f"{version}.pdf"))
         assert obj.version == version
         assert obj.change_version("2.0").version == "2.0"
+
+    obj = PyPDFForm(os.path.join(pdf_samples, "versions", "unknown.pdf"))
+    assert obj.version is None
