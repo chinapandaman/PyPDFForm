@@ -35,7 +35,7 @@ class Wrapper:
                 each.font = kwargs.get("global_font", constants.GLOBAL_FONT)
                 each.font_size = kwargs.get("global_font_size")
                 each.font_color = kwargs.get(
-                    "global_font_color", constants.GLOBAL_FONT_COLOR
+                    "global_font_color"
                 )
 
     def read(self) -> bytes:
