@@ -151,13 +151,13 @@ def get_text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
             text_appearance = text_appearance.replace("(", "").replace(")", "")
             properties = text_appearance.split(" ")
             for i, val in enumerate(properties):
-                if val == "Tf":
+                if val == constants.FONT_SIZE_IDENTIFIER:
                     return float(properties[i - 1])
 
     return result
 
 
-def get_text_field_font_color(element: pdfrw.PdfDict) -> Union[tuple, None]:
+def get_text_field_font_color(element: pdfrw.PdfDict) -> Union[Tuple[float, float, float], None]:
     """Returns the font color tuple of the text field if presented or black."""
 
     result = (0, 0, 0)
