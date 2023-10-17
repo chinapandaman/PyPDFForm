@@ -82,7 +82,7 @@ class Wrapper:
         self,
         data: Dict[str, Union[str, bool, int]],
     ) -> Wrapper:
-        """Fill a PDF form."""
+        """Fills a PDF form."""
 
         for key, value in data.items():
             if key in self.elements:
