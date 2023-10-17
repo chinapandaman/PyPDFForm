@@ -390,9 +390,7 @@ def test_version(pdf_samples):
     assert obj.version is None
 
 
-def test_fill_font_color(
-    sample_template_with_font_colors, pdf_samples, request
-):
+def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_fill_font_color.pdf")
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(sample_template_with_font_colors).fill(
@@ -400,7 +398,7 @@ def test_fill_font_color(
                 "red_12": "red",
                 "green_14": "green",
                 "blue_16": "blue",
-                "mixed_auto": "mixed"
+                "mixed_auto": "mixed",
             },
         )
 

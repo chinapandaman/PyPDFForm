@@ -34,9 +34,7 @@ class Wrapper:
             if isinstance(each, Text):
                 each.font = kwargs.get("global_font", constants.GLOBAL_FONT)
                 each.font_size = kwargs.get("global_font_size")
-                each.font_color = kwargs.get(
-                    "global_font_color"
-                )
+                each.font_color = kwargs.get("global_font_color")
 
     def read(self) -> bytes:
         """Reads the file stream of a PDF form."""
