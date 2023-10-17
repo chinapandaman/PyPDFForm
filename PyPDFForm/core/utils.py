@@ -47,6 +47,8 @@ def update_text_field_attributes(
                     elements[key].font_size = template.get_text_field_font_size(
                         _element
                     ) or font_size_core.text_field_font_size(_element)
+                if elements[key].font_color is None:
+                    elements[key].font_color = template.get_text_field_font_color(_element)
                 if (
                     template.is_text_multiline(_element)
                     and elements[key].text_wrap_length is None

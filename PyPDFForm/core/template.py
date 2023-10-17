@@ -148,13 +148,32 @@ def get_text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
     for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
         text_appearance = traverse_pattern(pattern, element)
         if text_appearance:
+            text_appearance = text_appearance.replace("(", "").replace(")", "")
             properties = text_appearance.split(" ")
-            if len(properties) > 1:
-                try:
-                    result = float(properties[1])
+            for i, val in enumerate(properties):
+                if val == constants.FONT_SIZE_IDENTIFIER:
+                    return float(properties[i - 1])
+
+    return result
+
+
+def get_text_field_font_color(element: pdfrw.PdfDict) -> Union[Tuple[float, float, float], None]:
+    """Returns the font color tuple of the text field if presented or black."""
+
+    result = (0, 0, 0)
+    for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
+        text_appearance = traverse_pattern(pattern, element)
+        if text_appearance:
+            if constants.FONT_COLOR_IDENTIFIER not in text_appearance:
+                return result
+
+            text_appearance = text_appearance.replace("(", "").replace(")", "").split(" ")
+            for i, val in enumerate(text_appearance):
+                if val == constants.FONT_COLOR_IDENTIFIER.replace(" ", ""):
+                    result = (float(text_appearance[i - 3]),
+                              float(text_appearance[i - 2]),
+                              float(text_appearance[i - 1]))
                     break
-                except ValueError:
-                    pass
 
     return result
 
