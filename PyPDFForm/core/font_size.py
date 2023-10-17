@@ -6,7 +6,7 @@ from typing import Union
 
 import pdfrw
 
-from ..middleware.constants import GLOBAL_FONT_SIZE
+from .constants import DEFAULT_FONT_SIZE
 from . import constants, template
 
 
@@ -17,7 +17,7 @@ def text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
     """
 
     if template.is_text_multiline(element):
-        return GLOBAL_FONT_SIZE
+        return DEFAULT_FONT_SIZE
 
     height = abs(
         float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
