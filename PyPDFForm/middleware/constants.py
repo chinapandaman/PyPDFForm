@@ -8,10 +8,6 @@ from .dropdown import Dropdown
 from .radio import Radio
 from .text import Text
 
-GLOBAL_FONT = "Helvetica"
-GLOBAL_FONT_SIZE = 12
-GLOBAL_FONT_COLOR = (0, 0, 0)
-
 VERSION_IDENTIFIERS = [
     b"%PDF-1.0",
     b"%PDF-1.1",

@@ -6,7 +6,7 @@ from jsonschema import ValidationError, validate
 
 from PyPDFForm import PyPDFForm
 from PyPDFForm.core import template as template_core
-from PyPDFForm.middleware import constants
+from PyPDFForm.core import constants
 from PyPDFForm.middleware.element import Element
 from PyPDFForm.middleware.text import Text
 
@@ -79,7 +79,7 @@ def test_fill_font_liberation_serif_italic(
 
             if isinstance(v, Text):
                 assert v.font == "LiberationSerif-Italic"
-                assert v.font_color == constants.GLOBAL_FONT_COLOR
+                assert v.font_color == constants.DEFAULT_FONT_COLOR
 
 
 def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
@@ -103,9 +103,9 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
             assert v.value == data_dict[k]
 
             if isinstance(v, Text):
-                assert v.font == constants.GLOBAL_FONT
+                assert v.font == constants.DEFAULT_FONT
                 assert v.font_size == 20
-                assert v.font_color == constants.GLOBAL_FONT_COLOR
+                assert v.font_color == constants.DEFAULT_FONT_COLOR
 
 
 def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
@@ -129,7 +129,7 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
             assert v.value == data_dict[k]
 
             if isinstance(v, Text):
-                assert v.font == constants.GLOBAL_FONT
+                assert v.font == constants.DEFAULT_FONT
                 assert v.font_color == (1, 0, 0)
 
 
@@ -212,7 +212,7 @@ def test_draw_text_on_one_page(template_stream, pdf_samples, request):
             1,
             300,
             225,
-            font=constants.GLOBAL_FONT,
+            font=constants.DEFAULT_FONT,
             font_size=20,
             font_color=(1, 0, 0),
         )

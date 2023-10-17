@@ -67,8 +67,6 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
 
     result = Text(dropdown.name)
 
-    result.font = constants.GLOBAL_FONT
-
     if dropdown.value is not None:
         result.value = (
             dropdown.choices[dropdown.value]

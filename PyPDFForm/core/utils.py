@@ -14,6 +14,7 @@ from ..middleware.text import Text
 from . import constants
 from . import font_size as font_size_core
 from . import template
+from . import font as font_core
 
 
 def generate_stream(pdf: pdfrw.PdfReader) -> bytes:
@@ -43,6 +44,8 @@ def update_text_field_attributes(
             key = template.get_element_key(_element)
 
             if isinstance(elements[key], Text):
+                if elements[key].font is None:
+                    elements[key].font = font_core.auto_detect_font(_element)
                 if elements[key].font_size is None:
                     elements[key].font_size = template.get_text_field_font_size(
                         _element
@@ -139,9 +142,9 @@ def checkbox_radio_to_draw(
         element_name=element.name,
         element_value="",
     )
-    new_element.font = "Helvetica"
+    new_element.font = constants.DEFAULT_FONT
     new_element.font_size = font_size
-    new_element.font_color = (0, 0, 0)
+    new_element.font_color = constants.DEFAULT_FONT_COLOR
 
     if isinstance(element, Checkbox):
         new_element.value = constants.CHECKBOX_TO_DRAW
