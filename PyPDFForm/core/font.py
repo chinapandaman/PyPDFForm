@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for font."""
 
-import pdfrw
-from io import BytesIO
 import re
+from io import BytesIO
 
+import pdfrw
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
+
+from . import constants
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .template import traverse_pattern
-from . import constants
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
@@ -44,10 +45,12 @@ def auto_detect_font(element: pdfrw.PdfDict) -> str:
 
             for each in text_appearance:
                 if each.startswith("/"):
-                    text_segments = re.findall('[A-Z][^A-Z]*', each.replace("/", ""))
+                    text_segments = re.findall("[A-Z][^A-Z]*", each.replace("/", ""))
 
                     for font in pdfmetrics.standardFonts:
-                        font_segments = re.findall('[A-Z][^A-Z]*', font.replace("-", ""))
+                        font_segments = re.findall(
+                            "[A-Z][^A-Z]*", font.replace("-", "")
+                        )
                         if len(font_segments) != len(text_segments):
                             continue
 

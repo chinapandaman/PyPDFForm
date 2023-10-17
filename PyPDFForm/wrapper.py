@@ -5,11 +5,11 @@ from __future__ import annotations
 
 from typing import BinaryIO, Dict, Union
 
+from .core import constants as core_constants
 from .core import filler, font
 from .core import image as image_core
 from .core import utils
 from .core import watermark as watermark_core
-from .core import constants as core_constants
 from .middleware import adapter, constants
 from .middleware import template as template_middleware
 from .middleware.dropdown import Dropdown
@@ -114,8 +114,12 @@ class Wrapper:
         new_element = Text("new")
         new_element.value = text
         new_element.font = kwargs.get("font", core_constants.DEFAULT_FONT)
-        new_element.font_size = kwargs.get("font_size", core_constants.DEFAULT_FONT_SIZE)
-        new_element.font_color = kwargs.get("font_color", core_constants.DEFAULT_FONT_COLOR)
+        new_element.font_size = kwargs.get(
+            "font_size", core_constants.DEFAULT_FONT_SIZE
+        )
+        new_element.font_color = kwargs.get(
+            "font_color", core_constants.DEFAULT_FONT_COLOR
+        )
 
         watermarks = watermark_core.create_watermarks_and_draw(
             self.stream,

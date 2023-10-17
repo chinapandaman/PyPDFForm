@@ -5,8 +5,8 @@ import os
 from jsonschema import ValidationError, validate
 
 from PyPDFForm import PyPDFForm
-from PyPDFForm.core import template as template_core
 from PyPDFForm.core import constants
+from PyPDFForm.core import template as template_core
 from PyPDFForm.middleware.element import Element
 from PyPDFForm.middleware.text import Text
 

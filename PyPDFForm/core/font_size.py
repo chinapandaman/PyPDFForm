@@ -6,8 +6,8 @@ from typing import Union
 
 import pdfrw
 
-from .constants import DEFAULT_FONT_SIZE
 from . import constants, template
+from .constants import DEFAULT_FONT_SIZE
 
 
 def text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:

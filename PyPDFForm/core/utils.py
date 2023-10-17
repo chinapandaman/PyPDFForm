@@ -12,9 +12,9 @@ from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.radio import Radio
 from ..middleware.text import Text
 from . import constants
+from . import font as font_core
 from . import font_size as font_size_core
 from . import template
-from . import font as font_core
 
 
 def generate_stream(pdf: pdfrw.PdfReader) -> bytes:
