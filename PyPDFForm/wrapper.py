@@ -77,6 +77,18 @@ class Wrapper:
 
         return new_obj
 
+    @property
+    def preview(self) -> bytes:
+        """Inspects all supported elements' names of the PDF form."""
+
+        return filler.fill(
+            self.stream,
+            {
+               key: utils.preview_element_to_draw(value)
+               for key, value in self.elements.items()
+            },
+        )
+
     def fill(
         self,
         data: Dict[str, Union[str, bool, int]],

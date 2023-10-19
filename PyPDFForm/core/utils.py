@@ -154,6 +154,23 @@ def checkbox_radio_to_draw(
     return new_element
 
 
+def preview_element_to_draw(
+    element: ELEMENT_TYPES
+) -> Text:
+    """Converts an element to a preview text element."""
+
+    new_element = Text(
+        element_name=element.name,
+        element_value="{" + f" {element.name} " + "}",
+    )
+    new_element.font = constants.DEFAULT_FONT
+    new_element.font_size = constants.DEFAULT_FONT_SIZE
+    new_element.font_color = constants.PREVIEW_FONT_COLOR
+    new_element.preview = True
+
+    return new_element
+
+
 def remove_all_elements(pdf: bytes) -> bytes:
     """Removes all elements from a pdfrw parsed PDF form."""
 
