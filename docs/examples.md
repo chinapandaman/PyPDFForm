@@ -14,6 +14,30 @@ found [here](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/s
 It has three text fields `test`, `test_2`, `test_3` and three checkboxes 
 `check`, `check_2`, `check_3` scattered on three pages.
 
+## Preview a PDF form
+
+This example demos how to preview a PDF form. The preview can be used to inspect the elements' names for the PDF form. 
+The generated output will have each element's name labeled on top of it in red.
+
+```python
+import os
+
+from PyPDFForm import PyPDFForm
+
+PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
+    os.path.expanduser("~/Downloads"), "sample_template.pdf"
+)  # Change this to where you downloaded the sample PDF form
+
+PATH_TO_FILLED_PDF_FORM = os.path.join(
+    os.path.expanduser("~"), "output.pdf"
+)  # Change this to where you wish to put your filled PDF form
+
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM).preview
+    )
+```
+
 ## Filling a PDF form
 
 This example demos filling a PDF form in the most straight forward way 
