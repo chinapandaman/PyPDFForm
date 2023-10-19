@@ -79,7 +79,7 @@ class Wrapper:
 
     @property
     def preview(self) -> bytes:
-        """Inspects all supported elements' names of the PDF form."""
+        """Inspects all supported elements' names for the PDF form."""
 
         return filler.fill(
             self.stream,
