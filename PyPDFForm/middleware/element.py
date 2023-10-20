@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains element middleware."""
 
-from typing import Union, Any
+from typing import Any, Union
 
 
 class Element:

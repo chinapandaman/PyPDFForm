@@ -46,10 +46,7 @@ class Wrapper:
     def sample_data(self) -> dict:
         """Returns a valid sample data that can be filled into the PDF form."""
 
-        return {
-            key: value.sample_value
-            for key, value in self.elements.items()
-        }
+        return {key: value.sample_value for key, value in self.elements.items()}
 
     @property
     def version(self) -> Union[str, None]:
