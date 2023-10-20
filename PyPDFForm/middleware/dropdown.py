@@ -23,3 +23,9 @@ class Dropdown(Element):
         """Json schema definition of the dropdown."""
 
         return {"type": "integer", "maximum": len(self.choices) - 1}
+
+    @property
+    def sample_value(self) -> int:
+        """Sample value of the dropdown."""
+
+        return 0

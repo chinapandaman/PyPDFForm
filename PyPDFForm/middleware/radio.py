@@ -23,3 +23,9 @@ class Radio(Element):
         """Json schema definition of the radiobutton."""
 
         return {"type": "integer", "maximum": self.number_of_options - 1}
+
+    @property
+    def sample_value(self) -> int:
+        """Sample value of the radiobutton."""
+
+        return 0

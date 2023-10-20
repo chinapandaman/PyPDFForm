@@ -36,3 +36,9 @@ class Text(Element):
             result["maxLength"] = self.max_length
 
         return result
+
+    @property
+    def sample_value(self) -> str:
+        """Sample value of the text field."""
+
+        return self.name
