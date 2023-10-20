@@ -21,3 +21,9 @@ class Checkbox(Element):
         """Json schema definition of the checkbox."""
 
         return {"type": "boolean"}
+
+    @property
+    def sample_value(self) -> bool:
+        """Sample value of the checkbox."""
+
+        return True

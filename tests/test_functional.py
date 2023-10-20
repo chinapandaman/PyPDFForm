@@ -351,6 +351,21 @@ def test_generate_schema(sample_template_with_comb_text_field):
         pass
 
 
+def test_sample_data(sejda_template_complex):
+    obj = PyPDFForm(sejda_template_complex)
+    try:
+        validate(instance=obj.sample_data, schema=obj.generate_schema())
+    except ValidationError:
+        assert False
+
+    element = Element("foo")
+    try:
+        element.sample_value()
+        assert False
+    except NotImplementedError:
+        pass
+
+
 def test_fill_right_aligned(
     sample_template_with_right_aligned_text_field, pdf_samples, request
 ):
