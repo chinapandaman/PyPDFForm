@@ -15,9 +15,8 @@ def test_preview(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        if os.name == 'nt':
-            assert len(preview) == len(expected)
-            assert preview == expected
+        assert len(preview) == len(expected)
+        assert preview == expected
 
 
 def test_preview_sejda(sejda_template, pdf_samples, request):
@@ -30,9 +29,8 @@ def test_preview_sejda(sejda_template, pdf_samples, request):
 
         expected = f.read()
 
-        if os.name == 'nt':
-            assert len(preview) == len(expected)
-            assert preview == expected
+        assert len(preview) == len(expected)
+        assert preview == expected
 
 
 def test_preview_paragraph_complex(sample_template_paragraph_complex, pdf_samples, request):
@@ -45,9 +43,8 @@ def test_preview_paragraph_complex(sample_template_paragraph_complex, pdf_sample
 
         expected = f.read()
 
-        if os.name == 'nt':
-            assert len(preview) == len(expected)
-            assert preview == expected
+        assert len(preview) == len(expected)
+        assert preview == expected
 
 
 def test_preview_sejda_complex(sejda_template_complex, pdf_samples, request):
@@ -60,9 +57,8 @@ def test_preview_sejda_complex(sejda_template_complex, pdf_samples, request):
 
         expected = f.read()
 
-        if os.name == 'nt':
-            assert len(preview) == len(expected)
-            assert preview == expected
+        assert len(preview) == len(expected)
+        assert preview == expected
 
 
 def test_preview_comb_text_field(sample_template_with_comb_text_field, pdf_samples, request):
@@ -75,6 +71,5 @@ def test_preview_comb_text_field(sample_template_with_comb_text_field, pdf_sampl
 
         expected = f.read()
 
-        if os.name == 'nt':
-            assert len(preview) == len(expected)
-            assert preview == expected
+        assert len(preview) == len(expected)
+        assert preview == expected
