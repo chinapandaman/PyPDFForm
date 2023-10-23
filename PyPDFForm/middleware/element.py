@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains element middleware."""
 
-from typing import Union
+from typing import Any, Union
 
 
 class Element:
@@ -26,5 +26,11 @@ class Element:
     @property
     def schema_definition(self) -> dict:
         """Json schema definition of the element."""
+
+        raise NotImplementedError
+
+    @property
+    def sample_value(self) -> Any:
+        """Sample value of the element."""
 
         raise NotImplementedError

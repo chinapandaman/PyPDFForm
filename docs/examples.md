@@ -73,6 +73,22 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     )
 ```
 
+## Sample data of a PDF form
+
+This example shows how to get a sample dictionary that's valid to be filled into the PDF form.
+
+```python
+import os
+
+from PyPDFForm import PyPDFForm
+
+PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
+    os.path.expanduser("~/Downloads"), "sample_template.pdf"
+)  # Change this to where you downloaded the sample PDF form
+
+print(PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM).sample_data)
+```
+
 ## Register font and set registered global font on filled text
 
 This example registers a [LiberationSerif-Regular](https://github.com/chinapandaman/PyPDFForm/raw/master/font_samples/LiberationSerif-Regular.ttf) 
