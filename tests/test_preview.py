@@ -33,8 +33,12 @@ def test_preview_sejda(sejda_template, pdf_samples, request):
         assert preview == expected
 
 
-def test_preview_paragraph_complex(sample_template_paragraph_complex, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "preview", "test_preview_paragraph_complex.pdf")
+def test_preview_paragraph_complex(
+    sample_template_paragraph_complex, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "preview", "test_preview_paragraph_complex.pdf"
+    )
     with open(expected_path, "rb+") as f:
         preview = PyPDFForm(sample_template_paragraph_complex).preview
 
@@ -48,7 +52,9 @@ def test_preview_paragraph_complex(sample_template_paragraph_complex, pdf_sample
 
 
 def test_preview_sejda_complex(sejda_template_complex, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "preview", "test_preview_sejda_complex.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "preview", "test_preview_sejda_complex.pdf"
+    )
     with open(expected_path, "rb+") as f:
         preview = PyPDFForm(sejda_template_complex).preview
 
@@ -61,8 +67,12 @@ def test_preview_sejda_complex(sejda_template_complex, pdf_samples, request):
         assert preview == expected
 
 
-def test_preview_comb_text_field(sample_template_with_comb_text_field, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "preview", "test_preview_comb_text_field.pdf")
+def test_preview_comb_text_field(
+    sample_template_with_comb_text_field, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "preview", "test_preview_comb_text_field.pdf"
+    )
     with open(expected_path, "rb+") as f:
         preview = PyPDFForm(sample_template_with_comb_text_field).preview
 

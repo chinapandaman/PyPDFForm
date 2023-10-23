@@ -154,9 +154,7 @@ def checkbox_radio_to_draw(
     return new_element
 
 
-def preview_element_to_draw(
-    element: ELEMENT_TYPES
-) -> Text:
+def preview_element_to_draw(element: ELEMENT_TYPES) -> Text:
     """Converts an element to a preview text element."""
 
     new_element = Text(

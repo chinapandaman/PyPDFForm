@@ -279,7 +279,7 @@ def get_draw_text_coordinates(
     if element_middleware.preview:
         return (
             float(element[constants.ANNOTATION_RECTANGLE_KEY][0]),
-            float(element[constants.ANNOTATION_RECTANGLE_KEY][3]) + 5
+            float(element[constants.ANNOTATION_RECTANGLE_KEY][3]) + 5,
         )
 
     element_value = element_middleware.value or ""

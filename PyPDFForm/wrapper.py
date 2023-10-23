@@ -90,8 +90,8 @@ class Wrapper:
         return filler.fill(
             self.stream,
             {
-               key: utils.preview_element_to_draw(value)
-               for key, value in self.elements.items()
+                key: utils.preview_element_to_draw(value)
+                for key, value in self.elements.items()
             },
         )
 
