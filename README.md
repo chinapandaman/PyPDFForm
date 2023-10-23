@@ -68,10 +68,6 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/ma
 
 ## How to Contribute
 
-If you wish to improve this library, there is one specific way you can contribute 
-on top of the usual open source project norms such as issues and pull requests.
-
 It is difficult to make sure that the library supports all the PDF form creating tools out 
-there. So if you run into a case where the library does not work for certain PDF forms created by 
-certain tools, feel free to open an issue with the problematic PDF form attached. I will seek 
+there. So if you run into a case where the library does not work for certain PDF forms created by certain tools, feel free to open an issue with the problematic PDF form attached. I will seek 
 to make the library support the attached PDF form as well as the tool used to create it.
