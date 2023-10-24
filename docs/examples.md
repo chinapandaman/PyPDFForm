@@ -26,11 +26,11 @@ PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
 )  # Change this to where you downloaded the sample PDF form
 
-PATH_TO_FILLED_PDF_FORM = os.path.join(
+PATH_TO_PDF_FORM_PREVIEW = os.path.join(
     os.path.expanduser("~"), "output.pdf"
-)  # Change this to where you wish to put your filled PDF form
+)  # Change this to where you wish to put your PDF form preview
 
-with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+with open(PATH_TO_PDF_FORM_PREVIEW, "wb+") as output:
     output.write(
         PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM).preview
     )
@@ -424,11 +424,11 @@ PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
 )  # Change this to where you downloaded the sample PDF form
 
-PATH_TO_FILLED_PDF_FORM = os.path.join(
+PATH_TO_NEW_VERSION_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
-)  # Change this to where you wish to put your filled PDF form
+)  # Change this to where you wish to put your new version PDF form
 
-with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+with open(PATH_TO_NEW_VERSION_PDF_FORM, "wb+") as output:
     output.write(
         PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
         .change_version("2.0")
