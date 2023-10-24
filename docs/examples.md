@@ -3,7 +3,7 @@
 This part of the documentation provides some useful example code snippets that 
 can be used out of box.
 
-## Preparing PDF Form
+## Preparing a PDF Form
 
 The most common tool to create a PDF form is Adobe Acrobat. A tutorial can be found 
 [here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html). 
