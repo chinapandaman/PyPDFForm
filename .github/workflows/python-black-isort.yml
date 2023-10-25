@@ -9,18 +9,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [ "3.10" ]
 
     steps:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.BLACK_ISORT_TOKEN }}
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.x'
       - name: Install black/isort
         run: pip install black isort
       - name: If needed, commit black/isort changes to the pull request
