@@ -38,6 +38,7 @@ def auto_detect_font(element: pdfrw.PdfDict) -> str:
 
     result = constants.DEFAULT_FONT
 
+    text_appearance = None
     for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
         text_appearance = traverse_pattern(pattern, element)
 
