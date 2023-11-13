@@ -8,7 +8,7 @@ import pdfrw
 from ..middleware.checkbox import Checkbox
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.radio import Radio
-from . import font_size as font_size_core
+from .font import checkbox_radio_font_size
 from . import template, utils
 from . import watermark as watermark_core
 
@@ -34,7 +34,7 @@ def fill(
             needs_to_be_drawn = False
 
             if isinstance(elements[key], (Checkbox, Radio)):
-                font_size = font_size_core.checkbox_radio_font_size(_element)
+                font_size = checkbox_radio_font_size(_element)
                 _to_draw = utils.checkbox_radio_to_draw(elements[key], font_size)
                 x, y = template.get_draw_checkbox_radio_coordinates(_element, _to_draw)
                 if isinstance(elements[key], Checkbox) and elements[key].value:
