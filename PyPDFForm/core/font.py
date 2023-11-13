@@ -38,28 +38,32 @@ def auto_detect_font(element: pdfrw.PdfDict) -> str:
     for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
         text_appearance = traverse_pattern(pattern, element)
 
-        if text_appearance:
-            text_appearance = (
-                text_appearance.replace("(", "").replace(")", "").split(" ")
-            )
+        if not text_appearance:
+            return result
 
-            for each in text_appearance:
-                if each.startswith("/"):
-                    text_segments = re.findall("[A-Z][^A-Z]*", each.replace("/", ""))
+        text_appearance = (
+            text_appearance.replace("(", "").replace(")", "").split(" ")
+        )
 
-                    for font in pdfmetrics.standardFonts:
-                        font_segments = re.findall(
-                            "[A-Z][^A-Z]*", font.replace("-", "")
-                        )
-                        if len(font_segments) != len(text_segments):
-                            continue
+        for each in text_appearance:
+            if not each.startswith("/"):
+                return result
 
-                        found = True
-                        for i, val in enumerate(font_segments):
-                            if not val.startswith(text_segments[i]):
-                                found = False
+            text_segments = re.findall("[A-Z][^A-Z]*", each.replace("/", ""))
 
-                        if found:
-                            return font
+            for font in pdfmetrics.standardFonts:
+                font_segments = re.findall(
+                    "[A-Z][^A-Z]*", font.replace("-", "")
+                )
+                if len(font_segments) != len(text_segments):
+                    continue
+
+                found = True
+                for i, val in enumerate(font_segments):
+                    if not val.startswith(text_segments[i]):
+                        found = False
+
+                if found:
+                    return font
 
     return result
