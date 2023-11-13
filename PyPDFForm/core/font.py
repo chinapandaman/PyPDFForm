@@ -65,8 +65,6 @@ def auto_detect_font(element: pdfrw.PdfDict) -> str:
                 if found:
                     return font
 
-    return result
-
 
 def text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
     """
