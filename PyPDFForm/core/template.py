@@ -199,7 +199,7 @@ def is_text_field_comb(element: pdfrw.PdfDict) -> bool:
 
     try:
         return "{0:b}".format(int(element[constants.FIELD_FLAG_KEY]))[::-1][24] == "1"
-    except (TypeError, IndexError):
+    except (IndexError, TypeError):
         return False
 
 
@@ -217,7 +217,7 @@ def is_text_multiline(element: pdfrw.PdfDict) -> bool:
 
     try:
         return "{0:b}".format(int(field_flag))[::-1][12] == "1"
-    except (TypeError, IndexError):
+    except (IndexError, TypeError):
         return False
 
 
