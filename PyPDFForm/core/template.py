@@ -234,6 +234,7 @@ def get_dropdown_choices(element: pdfrw.PdfDict) -> Union[Tuple[str], None]:
                 .replace(")", "")
                 for each in choices
             )
+            break
 
     return result
 
