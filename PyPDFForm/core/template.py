@@ -199,7 +199,7 @@ def is_text_field_comb(element: pdfrw.PdfDict) -> bool:
 
     try:
         return "{0:b}".format(int(element[constants.FIELD_FLAG_KEY]))[::-1][24] == "1"
-    except IndexError:
+    except (IndexError, TypeError):
         return False
 
 
