@@ -3,6 +3,8 @@
 
 import re
 from io import BytesIO
+from typing import Union
+from math import sqrt
 
 import pdfrw
 from reportlab.pdfbase import pdfmetrics
@@ -10,7 +12,8 @@ from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from . import constants
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .template import traverse_pattern
+from .template import traverse_pattern, is_text_multiline
+from .constants import DEFAULT_FONT_SIZE
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
@@ -63,3 +66,37 @@ def auto_detect_font(element: pdfrw.PdfDict) -> str:
                     return font
 
     return result
+
+
+def text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
+    """
+    Calculates the font size it should be drawn with
+    given a text field element.
+    """
+
+    if is_text_multiline(element):
+        return DEFAULT_FONT_SIZE
+
+    height = abs(
+        float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+        - float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
+    )
+
+    return height * 2 / 3
+
+
+def checkbox_radio_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
+    """
+    Calculates the font size it should be drawn with
+    given a checkbox/radio button element.
+    """
+
+    area = abs(
+        float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+        - float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
+    ) * abs(
+        float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
+        - float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
+    )
+
+    return sqrt(area) * 72 / 96

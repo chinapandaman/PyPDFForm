@@ -13,7 +13,6 @@ from ..middleware.radio import Radio
 from ..middleware.text import Text
 from . import constants
 from . import font as font_core
-from . import font_size as font_size_core
 from . import template
 
 
@@ -49,7 +48,7 @@ def update_text_field_attributes(
                 if elements[key].font_size is None:
                     elements[key].font_size = template.get_text_field_font_size(
                         _element
-                    ) or font_size_core.text_field_font_size(_element)
+                    ) or font_core.text_field_font_size(_element)
                 if elements[key].font_color is None:
                     elements[key].font_color = template.get_text_field_font_color(
                         _element
