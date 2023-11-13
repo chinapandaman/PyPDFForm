@@ -3,17 +3,17 @@
 
 import re
 from io import BytesIO
-from typing import Union
 from math import sqrt
+from typing import Union
 
 import pdfrw
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from . import constants
-from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .template import traverse_pattern, is_text_multiline
 from .constants import DEFAULT_FONT_SIZE
+from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
+from .template import is_text_multiline, traverse_pattern
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:

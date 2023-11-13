@@ -11,9 +11,8 @@ from ..middleware.checkbox import Checkbox
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from . import constants
+from . import constants, template
 from .font import auto_detect_font, text_field_font_size
-from . import template
 
 
 def generate_stream(pdf: pdfrw.PdfReader) -> bytes:

@@ -8,9 +8,9 @@ import pdfrw
 from ..middleware.checkbox import Checkbox
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.radio import Radio
-from .font import checkbox_radio_font_size
 from . import template, utils
 from . import watermark as watermark_core
+from .font import checkbox_radio_font_size
 
 
 def fill(
