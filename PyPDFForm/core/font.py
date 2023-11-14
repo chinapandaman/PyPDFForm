@@ -4,7 +4,6 @@
 import re
 from io import BytesIO
 from math import sqrt
-import math
 from typing import Union
 
 import pdfrw
