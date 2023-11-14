@@ -1,4 +1,4 @@
-name: Coverage
+name: Linting
 
 on:
   push:
@@ -21,8 +21,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Test with pytest
+    - name: Analyze code with pylint
       run: |
-        coverage run -m pytest
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+        pylint PyPDFForm
