@@ -1,4 +1,4 @@
-name: Coverage
+name: Linting
 
 on:
   push:
@@ -17,12 +17,10 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
-    - name: Install dependencies
+    - name: Install pylint
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Test with pytest
+        pip install pylint
+    - name: Analyze code with pylint
       run: |
-        coverage run -m pytest
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+        pylint PyPDFForm
