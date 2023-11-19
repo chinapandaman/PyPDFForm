@@ -93,3 +93,34 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     result_stream.close()
 
     return result
+
+
+def find_pattern_match(pattern: dict, element: pdfrw.PdfDict) -> bool:
+    """Checks if a PDF dict pattern exists in a PDF element."""
+
+    for key, value in element.items():
+        result = False
+        if key in pattern:
+            if isinstance(pattern[key], dict) and isinstance(value, pdfrw.PdfDict):
+                result = find_pattern_match(pattern[key], value)
+            else:
+                result = pattern[key] == value
+        if result:
+            return result
+    return False
+
+
+def traverse_pattern(pattern: dict, element: pdfrw.PdfDict) -> Union[str, list, None]:
+    """Traverses down a PDF dict pattern and find the value."""
+
+    for key, value in element.items():
+        result = None
+        if key in pattern:
+            if isinstance(pattern[key], dict) and isinstance(value, pdfrw.PdfDict):
+                result = traverse_pattern(pattern[key], value)
+            else:
+                if pattern[key] is True and value:
+                    return value
+        if result:
+            return result
+    return None

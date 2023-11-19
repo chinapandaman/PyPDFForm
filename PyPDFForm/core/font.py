@@ -18,7 +18,8 @@ from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .template import (get_element_key, get_elements_by_page,
                        get_paragraph_auto_wrap_length, get_paragraph_lines,
                        get_text_field_font_color, get_text_field_font_size,
-                       is_text_multiline, traverse_pattern)
+                       is_text_multiline)
+from .utils import traverse_pattern
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
