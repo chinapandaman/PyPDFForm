@@ -11,6 +11,8 @@ from ..middleware.radio import Radio
 from . import template, utils
 from . import watermark as watermark_core
 from .font import checkbox_radio_font_size
+from .coordinate import get_draw_checkbox_radio_coordinates, \
+    get_draw_text_coordinates, get_text_line_x_coordinates
 
 
 def fill(
@@ -36,7 +38,7 @@ def fill(
             if isinstance(elements[key], (Checkbox, Radio)):
                 font_size = checkbox_radio_font_size(_element)
                 _to_draw = utils.checkbox_radio_to_draw(elements[key], font_size)
-                x, y = template.get_draw_checkbox_radio_coordinates(_element, _to_draw)
+                x, y = get_draw_checkbox_radio_coordinates(_element, _to_draw)
                 if isinstance(elements[key], Checkbox) and elements[key].value:
                     needs_to_be_drawn = True
                 elif isinstance(elements[key], Radio):
@@ -48,10 +50,10 @@ def fill(
             else:
                 elements[
                     key
-                ].text_line_x_coordinates = template.get_text_line_x_coordinates(
+                ].text_line_x_coordinates = get_text_line_x_coordinates(
                     _element, elements[key]
                 )
-                x, y = template.get_draw_text_coordinates(_element, elements[key])
+                x, y = get_draw_text_coordinates(_element, elements[key])
                 _to_draw = elements[key]
                 needs_to_be_drawn = True
 
