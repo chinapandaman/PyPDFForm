@@ -4,7 +4,7 @@
 import re
 from io import BytesIO
 from math import sqrt
-from typing import Dict, Union, Tuple
+from typing import Dict, Tuple, Union
 
 import pdfrw
 from reportlab.pdfbase import pdfmetrics

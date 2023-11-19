@@ -10,9 +10,10 @@ from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.radio import Radio
 from . import template, utils
 from . import watermark as watermark_core
+from .coordinate import (get_draw_checkbox_radio_coordinates,
+                         get_draw_text_coordinates,
+                         get_text_line_x_coordinates)
 from .font import checkbox_radio_font_size
-from .coordinate import get_draw_checkbox_radio_coordinates, \
-    get_draw_text_coordinates, get_text_line_x_coordinates
 
 
 def fill(
@@ -48,9 +49,7 @@ def fill(
                     if elements[key].value == radio_button_tracker[key] - 1:
                         needs_to_be_drawn = True
             else:
-                elements[
-                    key
-                ].text_line_x_coordinates = get_text_line_x_coordinates(
+                elements[key].text_line_x_coordinates = get_text_line_x_coordinates(
                     _element, elements[key]
                 )
                 x, y = get_draw_text_coordinates(_element, elements[key])

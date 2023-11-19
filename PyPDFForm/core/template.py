@@ -9,10 +9,10 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 from . import constants
-from .utils import find_pattern_match, traverse_pattern
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
                        ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS)
+from .utils import find_pattern_match, traverse_pattern
 
 
 def get_elements_by_page(

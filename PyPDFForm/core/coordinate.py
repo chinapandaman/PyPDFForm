@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for coordinates calculations."""
 
-from typing import Tuple, Union, List
 from copy import deepcopy
+from typing import List, Tuple, Union
+
 import pdfrw
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.text import Text
 from .constants import ANNOTATION_RECTANGLE_KEY
-from .template import get_element_alignment, get_char_rect_width, is_text_multiline
+from .template import (get_char_rect_width, get_element_alignment,
+                       is_text_multiline)
 
 
 def get_draw_checkbox_radio_coordinates(
