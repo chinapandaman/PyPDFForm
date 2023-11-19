@@ -13,7 +13,6 @@ from . import constants
 from .utils import find_pattern_match, traverse_pattern
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
                        ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS,
-                       TEXT_FIELD_APPEARANCE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS)
 
 
@@ -109,49 +108,6 @@ def get_draw_checkbox_radio_coordinates(
         / 2,
         (height_mid_point - string_height / 2 + height_mid_point) / 2,
     )
-
-
-def get_text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
-    """Returns the font size of the text field if presented or zero."""
-
-    result = 0
-    for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
-        text_appearance = traverse_pattern(pattern, element)
-        if text_appearance:
-            text_appearance = text_appearance.replace("(", "").replace(")", "")
-            properties = text_appearance.split(" ")
-            for i, val in enumerate(properties):
-                if val == constants.FONT_SIZE_IDENTIFIER:
-                    return float(properties[i - 1])
-
-    return result
-
-
-def get_text_field_font_color(
-    element: pdfrw.PdfDict,
-) -> Union[Tuple[float, float, float], None]:
-    """Returns the font color tuple of the text field if presented or black."""
-
-    result = (0, 0, 0)
-    for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
-        text_appearance = traverse_pattern(pattern, element)
-        if text_appearance:
-            if constants.FONT_COLOR_IDENTIFIER not in text_appearance:
-                return result
-
-            text_appearance = (
-                text_appearance.replace("(", "").replace(")", "").split(" ")
-            )
-            for i, val in enumerate(text_appearance):
-                if val == constants.FONT_COLOR_IDENTIFIER.replace(" ", ""):
-                    result = (
-                        float(text_appearance[i - 3]),
-                        float(text_appearance[i - 2]),
-                        float(text_appearance[i - 1]),
-                    )
-                    break
-
-    return result
 
 
 def get_text_field_max_length(element: pdfrw.PdfDict) -> Union[int, None]:
