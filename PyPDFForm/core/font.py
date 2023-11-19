@@ -14,7 +14,8 @@ from . import constants
 from .constants import DEFAULT_FONT_SIZE
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .template import is_text_multiline, traverse_pattern, get_elements_by_page, get_element_key, \
-    get_text_field_font_size, get_text_field_font_color, get_paragraph_auto_wrap_length, get_paragraph_lines
+    get_text_field_font_size, get_text_field_font_color, \
+    get_paragraph_auto_wrap_length, get_paragraph_lines
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 
