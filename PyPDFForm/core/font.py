@@ -10,14 +10,15 @@ import pdfrw
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
+from ..middleware.constants import ELEMENT_TYPES
+from ..middleware.text import Text
 from . import constants
 from .constants import DEFAULT_FONT_SIZE
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .template import is_text_multiline, traverse_pattern, get_elements_by_page, get_element_key, \
-    get_text_field_font_size, get_text_field_font_color, \
-    get_paragraph_auto_wrap_length, get_paragraph_lines
-from ..middleware.constants import ELEMENT_TYPES
-from ..middleware.text import Text
+from .template import (get_element_key, get_elements_by_page,
+                       get_paragraph_auto_wrap_length, get_paragraph_lines,
+                       get_text_field_font_color, get_text_field_font_size,
+                       is_text_multiline, traverse_pattern)
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
@@ -109,8 +110,8 @@ def checkbox_radio_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
 
 
 def update_text_field_attributes(
-        template_stream: bytes,
-        elements: Dict[str, ELEMENT_TYPES],
+    template_stream: bytes,
+    elements: Dict[str, ELEMENT_TYPES],
 ) -> None:
     """Auto updates text fields' attributes."""
 
@@ -128,12 +129,10 @@ def update_text_field_attributes(
                         _element
                     ) or text_field_font_size(_element)
                 if elements[key].font_color is None:
-                    elements[key].font_color = get_text_field_font_color(
-                        _element
-                    )
+                    elements[key].font_color = get_text_field_font_color(_element)
                 if (
-                        is_text_multiline(_element)
-                        and elements[key].text_wrap_length is None
+                    is_text_multiline(_element)
+                    and elements[key].text_wrap_length is None
                 ):
                     elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
                         _element, elements[key]
