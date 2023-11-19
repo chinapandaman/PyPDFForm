@@ -10,6 +10,7 @@ from .core import filler, font
 from .core import image as image_core
 from .core import utils
 from .core import watermark as watermark_core
+from .core.font import update_text_field_attributes
 from .middleware import adapter, constants
 from .middleware import template as template_middleware
 from .middleware.dropdown import Dropdown
@@ -109,7 +110,7 @@ class Wrapper:
             if isinstance(value, Dropdown):
                 self.elements[key] = template_middleware.dropdown_to_text(value)
 
-        utils.update_text_field_attributes(self.stream, self.elements)
+        update_text_field_attributes(self.stream, self.elements)
         if self.read():
             self.elements = template_middleware.set_character_x_paddings(
                 self.stream, self.elements

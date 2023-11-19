@@ -4,7 +4,7 @@
 import re
 from io import BytesIO
 from math import sqrt
-from typing import Union
+from typing import Dict, Union
 
 import pdfrw
 from reportlab.pdfbase import pdfmetrics
@@ -13,7 +13,10 @@ from reportlab.pdfbase.ttfonts import TTFError, TTFont
 from . import constants
 from .constants import DEFAULT_FONT_SIZE
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .template import is_text_multiline, traverse_pattern
+from .template import is_text_multiline, traverse_pattern, get_elements_by_page, get_element_key, \
+    get_text_field_font_size, get_text_field_font_color, get_paragraph_auto_wrap_length, get_paragraph_lines
+from ..middleware.constants import ELEMENT_TYPES
+from ..middleware.text import Text
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
@@ -102,3 +105,36 @@ def checkbox_radio_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
     )
 
     return sqrt(area) * 72 / 96
+
+
+def update_text_field_attributes(
+        template_stream: bytes,
+        elements: Dict[str, ELEMENT_TYPES],
+) -> None:
+    """Auto updates text fields' attributes."""
+
+    template_pdf = pdfrw.PdfReader(fdata=template_stream)
+
+    for _, _elements in get_elements_by_page(template_pdf).items():
+        for _element in _elements:
+            key = get_element_key(_element)
+
+            if isinstance(elements[key], Text):
+                if elements[key].font is None:
+                    elements[key].font = auto_detect_font(_element)
+                if elements[key].font_size is None:
+                    elements[key].font_size = get_text_field_font_size(
+                        _element
+                    ) or text_field_font_size(_element)
+                if elements[key].font_color is None:
+                    elements[key].font_color = get_text_field_font_color(
+                        _element
+                    )
+                if (
+                        is_text_multiline(_element)
+                        and elements[key].text_wrap_length is None
+                ):
+                    elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
+                        _element, elements[key]
+                    )
+                    elements[key].text_lines = get_paragraph_lines(elements[key])

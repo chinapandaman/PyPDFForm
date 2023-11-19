@@ -384,3 +384,72 @@ def get_text_line_x_coordinates(
         return result
 
     return None
+
+
+def get_paragraph_lines(element_middleware: Text) -> List[str]:
+    """Splits the paragraph field's text to a list of lines."""
+
+    lines = []
+    result = []
+    text_wrap_length = element_middleware.text_wrap_length
+    value = element_middleware.value or ""
+    if element_middleware.max_length is not None:
+        value = value[: element_middleware.max_length]
+    characters = value.split(" ")
+    current_line = ""
+    for each in characters:
+        line_extended = f"{current_line} {each}" if current_line else each
+        if len(line_extended) <= text_wrap_length:
+            current_line = line_extended
+        else:
+            lines.append(current_line)
+            current_line = each
+    lines.append(current_line)
+
+    for each in lines:
+        while len(each) > text_wrap_length:
+            last_index = text_wrap_length - 1
+            result.append(each[:last_index])
+            each = each[last_index:]
+        if each:
+            if result and len(each) + 1 + len(result[-1]) <= text_wrap_length:
+                result[-1] = f"{result[-1]}{each} "
+            else:
+                result.append(f"{each} ")
+
+    if result:
+        result[-1] = result[-1][:-1]
+
+    return result
+
+
+def get_paragraph_auto_wrap_length(
+    element: pdfrw.PdfDict, element_middleware: Text
+) -> int:
+    """Calculates the text wrap length of a paragraph field."""
+
+    value = element_middleware.value or ""
+    width = abs(
+        float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
+        - float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
+    )
+    text_width = stringWidth(
+        value,
+        element_middleware.font,
+        element_middleware.font_size,
+    )
+
+    lines = text_width / width
+    if lines > 1:
+        counter = 0
+        _width = 0
+        while _width <= width:
+            counter += 1
+            _width = stringWidth(
+                value[:counter],
+                element_middleware.font,
+                element_middleware.font_size,
+            )
+        return counter - 1
+
+    return len(value) + 1
