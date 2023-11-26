@@ -4,7 +4,7 @@
 from io import BytesIO
 from typing import Union
 
-from PIL.Image import open
+from PIL import Image
 
 
 def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
@@ -14,7 +14,7 @@ def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
     buff.write(image_stream)
     buff.seek(0)
 
-    image = open(buff)
+    image = Image.open(buff)
 
     rotated_buff = BytesIO()
     image.rotate(rotation, expand=True).save(rotated_buff, format=image.format)
@@ -35,7 +35,7 @@ def any_image_to_jpg(image_stream: bytes) -> bytes:
     buff.write(image_stream)
     buff.seek(0)
 
-    image = open(buff)
+    image = Image.open(buff)
 
     if image.format == "JPEG":
         buff.close()
