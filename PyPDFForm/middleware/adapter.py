@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains user input adapters."""
 
-import os
+from os.path import isfile
 from typing import Any, BinaryIO, Union
 
 
@@ -24,7 +24,7 @@ def fp_or_f_obj_or_stream_to_stream(
         result = fp_or_f_obj_or_stream.read()
 
     elif isinstance(fp_or_f_obj_or_stream, str):
-        if not os.path.isfile(fp_or_f_obj_or_stream):
+        if not isfile(fp_or_f_obj_or_stream):
             result = None
 
         else:

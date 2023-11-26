@@ -8,8 +8,7 @@ from typing import BinaryIO, Dict, Union
 from .core.constants import DEFAULT_FONT, \
     DEFAULT_FONT_SIZE, DEFAULT_FONT_COLOR
 from .core.filler import fill
-from .core.font import register_font
-from .core.font import update_text_field_attributes
+from .core.font import register_font, update_text_field_attributes
 from .core.image import any_image_to_jpg, rotate_image
 from .core.utils import merge_two_pdfs, \
     preview_element_to_draw, remove_all_elements
