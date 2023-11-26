@@ -4,21 +4,23 @@
 from io import BytesIO
 from typing import Union
 
-import pdfrw
+from pdfrw import PdfReader, PdfWriter, PdfDict
 
 from ..middleware.checkbox import Checkbox
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from . import constants
+from .constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, \
+    CHECKBOX_TO_DRAW, RADIO_TO_DRAW, \
+    DEFAULT_FONT_SIZE, PREVIEW_FONT_COLOR, ANNOTATION_KEY
 
 
-def generate_stream(pdf: pdfrw.PdfReader) -> bytes:
+def generate_stream(pdf: PdfReader) -> bytes:
     """Generates new stream for manipulated PDF form."""
 
     result_stream = BytesIO()
 
-    pdfrw.PdfWriter().write(result_stream, pdf)
+    PdfWriter().write(result_stream, pdf)
     result_stream.seek(0)
 
     result = result_stream.read()
@@ -36,14 +38,14 @@ def checkbox_radio_to_draw(
         element_name=element.name,
         element_value="",
     )
-    new_element.font = constants.DEFAULT_FONT
+    new_element.font = DEFAULT_FONT
     new_element.font_size = font_size
-    new_element.font_color = constants.DEFAULT_FONT_COLOR
+    new_element.font_color = DEFAULT_FONT_COLOR
 
     if isinstance(element, Checkbox):
-        new_element.value = constants.CHECKBOX_TO_DRAW
+        new_element.value = CHECKBOX_TO_DRAW
     elif isinstance(element, Radio):
-        new_element.value = constants.RADIO_TO_DRAW
+        new_element.value = RADIO_TO_DRAW
 
     return new_element
 
@@ -55,9 +57,9 @@ def preview_element_to_draw(element: ELEMENT_TYPES) -> Text:
         element_name=element.name,
         element_value="{" + f" {element.name} " + "}",
     )
-    new_element.font = constants.DEFAULT_FONT
-    new_element.font_size = constants.DEFAULT_FONT_SIZE
-    new_element.font_color = constants.PREVIEW_FONT_COLOR
+    new_element.font = DEFAULT_FONT
+    new_element.font_size = DEFAULT_FONT_SIZE
+    new_element.font_color = PREVIEW_FONT_COLOR
     new_element.preview = True
 
     return new_element
@@ -66,10 +68,10 @@ def preview_element_to_draw(element: ELEMENT_TYPES) -> Text:
 def remove_all_elements(pdf: bytes) -> bytes:
     """Removes all elements from a pdfrw parsed PDF form."""
 
-    pdf = pdfrw.PdfReader(fdata=pdf)
+    pdf = PdfReader(fdata=pdf)
 
     for page in pdf.pages:
-        elements = page[constants.ANNOTATION_KEY]
+        elements = page[ANNOTATION_KEY]
         if elements:
             for j in reversed(range(len(elements))):
                 elements.pop(j)
@@ -80,10 +82,10 @@ def remove_all_elements(pdf: bytes) -> bytes:
 def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     """Merges two PDFs into one PDF."""
 
-    writer = pdfrw.PdfWriter()
+    writer = PdfWriter()
 
-    writer.addpages(pdfrw.PdfReader(fdata=pdf).pages)
-    writer.addpages(pdfrw.PdfReader(fdata=other).pages)
+    writer.addpages(PdfReader(fdata=pdf).pages)
+    writer.addpages(PdfReader(fdata=other).pages)
 
     result_stream = BytesIO()
     writer.write(result_stream)
@@ -95,13 +97,13 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     return result
 
 
-def find_pattern_match(pattern: dict, element: pdfrw.PdfDict) -> bool:
+def find_pattern_match(pattern: dict, element: PdfDict) -> bool:
     """Checks if a PDF dict pattern exists in a PDF element."""
 
     for key, value in element.items():
         result = False
         if key in pattern:
-            if isinstance(pattern[key], dict) and isinstance(value, pdfrw.PdfDict):
+            if isinstance(pattern[key], dict) and isinstance(value, PdfDict):
                 result = find_pattern_match(pattern[key], value)
             else:
                 result = pattern[key] == value
@@ -110,13 +112,13 @@ def find_pattern_match(pattern: dict, element: pdfrw.PdfDict) -> bool:
     return False
 
 
-def traverse_pattern(pattern: dict, element: pdfrw.PdfDict) -> Union[str, list, None]:
+def traverse_pattern(pattern: dict, element: PdfDict) -> Union[str, list, None]:
     """Traverses down a PDF dict pattern and find the value."""
 
     for key, value in element.items():
         result = None
         if key in pattern:
-            if isinstance(pattern[key], dict) and isinstance(value, pdfrw.PdfDict):
+            if isinstance(pattern[key], dict) and isinstance(value, PdfDict):
                 result = traverse_pattern(pattern[key], value)
             else:
                 if pattern[key] is True and value:

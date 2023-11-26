@@ -3,12 +3,13 @@
 
 from typing import Dict, List, Tuple, Union
 
-import pdfrw
+from pdfrw import PdfReader, PdfDict
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
-from . import constants
+from .constants import ANNOTATION_KEY, TEXT_FIELD_MAX_LENGTH_KEY, \
+    FIELD_FLAG_KEY, ANNOTATION_RECTANGLE_KEY
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
                        ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS)
@@ -16,17 +17,17 @@ from .utils import find_pattern_match, traverse_pattern
 
 
 def get_elements_by_page(
-    pdf: Union[bytes, pdfrw.PdfReader]
-) -> Dict[int, List[pdfrw.PdfDict]]:
+    pdf: Union[bytes, PdfReader]
+) -> Dict[int, List[PdfDict]]:
     """Iterates through a PDF and returns all elements found grouped by page."""
 
     if isinstance(pdf, bytes):
-        pdf = pdfrw.PdfReader(fdata=pdf)
+        pdf = PdfReader(fdata=pdf)
 
     result = {}
 
     for i, page in enumerate(pdf.pages):
-        elements = page[constants.ANNOTATION_KEY]
+        elements = page[ANNOTATION_KEY]
         result[i + 1] = []
         if elements:
             for element in elements:
@@ -42,7 +43,7 @@ def get_elements_by_page(
     return result
 
 
-def get_element_key(element: pdfrw.PdfDict) -> Union[str, None]:
+def get_element_key(element: PdfDict) -> Union[str, None]:
     """Finds a PDF element's annotated key by pattern matching."""
 
     result = None
@@ -54,7 +55,7 @@ def get_element_key(element: pdfrw.PdfDict) -> Union[str, None]:
     return result
 
 
-def get_element_alignment(element: pdfrw.PdfDict) -> Union[str, None]:
+def get_element_alignment(element: PdfDict) -> Union[str, None]:
     """Finds a PDF element's alignment by pattern matching."""
 
     result = None
@@ -66,7 +67,7 @@ def get_element_alignment(element: pdfrw.PdfDict) -> Union[str, None]:
     return result
 
 
-def construct_element(element: pdfrw.PdfDict, key: str) -> Union[ELEMENT_TYPES, None]:
+def construct_element(element: PdfDict, key: str) -> Union[ELEMENT_TYPES, None]:
     """Finds a PDF element's annotated type by pattern matching."""
 
     result = None
@@ -81,26 +82,26 @@ def construct_element(element: pdfrw.PdfDict, key: str) -> Union[ELEMENT_TYPES, 
     return result
 
 
-def get_text_field_max_length(element: pdfrw.PdfDict) -> Union[int, None]:
+def get_text_field_max_length(element: PdfDict) -> Union[int, None]:
     """Returns the max length of the text field if presented or None."""
 
     return (
-        int(element[constants.TEXT_FIELD_MAX_LENGTH_KEY])
-        if constants.TEXT_FIELD_MAX_LENGTH_KEY in element
+        int(element[TEXT_FIELD_MAX_LENGTH_KEY])
+        if TEXT_FIELD_MAX_LENGTH_KEY in element
         else None
     )
 
 
-def is_text_field_comb(element: pdfrw.PdfDict) -> bool:
+def is_text_field_comb(element: PdfDict) -> bool:
     """Returns true if characters in a text field needs to be formatted into combs."""
 
     try:
-        return "{0:b}".format(int(element[constants.FIELD_FLAG_KEY]))[::-1][24] == "1"
+        return "{0:b}".format(int(element[FIELD_FLAG_KEY]))[::-1][24] == "1"
     except (IndexError, TypeError):
         return False
 
 
-def is_text_multiline(element: pdfrw.PdfDict) -> bool:
+def is_text_multiline(element: PdfDict) -> bool:
     """Returns true if a text field is a paragraph field."""
 
     field_flag = None
@@ -118,7 +119,7 @@ def is_text_multiline(element: pdfrw.PdfDict) -> bool:
         return False
 
 
-def get_dropdown_choices(element: pdfrw.PdfDict) -> Union[Tuple[str], None]:
+def get_dropdown_choices(element: PdfDict) -> Union[Tuple[str], None]:
     """Returns string options of a dropdown field."""
 
     result = None
@@ -136,18 +137,18 @@ def get_dropdown_choices(element: pdfrw.PdfDict) -> Union[Tuple[str], None]:
     return result
 
 
-def get_char_rect_width(element: pdfrw.PdfDict, element_middleware: Text) -> float:
+def get_char_rect_width(element: PdfDict, element_middleware: Text) -> float:
     """Returns rectangular width of each character for combed text fields."""
 
     rect_width = abs(
-        float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
-        - float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
+        float(element[ANNOTATION_RECTANGLE_KEY][0])
+        - float(element[ANNOTATION_RECTANGLE_KEY][2])
     )
     return rect_width / element_middleware.max_length
 
 
 def get_character_x_paddings(
-    element: pdfrw.PdfDict, element_middleware: Text
+    element: PdfDict, element_middleware: Text
 ) -> List[float]:
     """Returns paddings between characters for combed text fields."""
 
@@ -207,14 +208,14 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
 
 
 def get_paragraph_auto_wrap_length(
-    element: pdfrw.PdfDict, element_middleware: Text
+    element: PdfDict, element_middleware: Text
 ) -> int:
     """Calculates the text wrap length of a paragraph field."""
 
     value = element_middleware.value or ""
     width = abs(
-        float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
-        - float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
+        float(element[ANNOTATION_RECTANGLE_KEY][0])
+        - float(element[ANNOTATION_RECTANGLE_KEY][2])
     )
     text_width = stringWidth(
         value,

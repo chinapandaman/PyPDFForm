@@ -5,26 +5,31 @@ from ..middleware.checkbox import Checkbox
 from ..middleware.dropdown import Dropdown
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from . import constants
+from .constants import ELEMENT_TYPE_KEY, TEXT_FIELD_IDENTIFIER, \
+    SELECTABLE_IDENTIFIER, CHOICE_FIELD_IDENTIFIER, \
+    PARENT_KEY, SUBTYPE_KEY, WIDGET_SUBTYPE_KEY, \
+    ANNOTATION_FIELD_KEY, CHOICES_IDENTIFIER, \
+    TEXT_FIELD_ALIGNMENT_IDENTIFIER, FIELD_FLAG_KEY, \
+    TEXT_FIELD_APPEARANCE_IDENTIFIER
 
 ELEMENT_TYPE_PATTERNS = [
     (
-        ({constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER},),
+        ({ELEMENT_TYPE_KEY: TEXT_FIELD_IDENTIFIER},),
         Text,
     ),
     (
-        ({constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER},),
+        ({ELEMENT_TYPE_KEY: SELECTABLE_IDENTIFIER},),
         Checkbox,
     ),
     (
-        ({constants.ELEMENT_TYPE_KEY: constants.CHOICE_FIELD_IDENTIFIER},),
+        ({ELEMENT_TYPE_KEY: CHOICE_FIELD_IDENTIFIER},),
         Dropdown,
     ),
     (
         (
             {
-                constants.PARENT_KEY: {
-                    constants.ELEMENT_TYPE_KEY: constants.CHOICE_FIELD_IDENTIFIER
+                PARENT_KEY: {
+                    ELEMENT_TYPE_KEY: CHOICE_FIELD_IDENTIFIER
                 }
             },
         ),
@@ -33,8 +38,8 @@ ELEMENT_TYPE_PATTERNS = [
     (
         (
             {
-                constants.PARENT_KEY: {
-                    constants.ELEMENT_TYPE_KEY: constants.TEXT_FIELD_IDENTIFIER
+                PARENT_KEY: {
+                    ELEMENT_TYPE_KEY: TEXT_FIELD_IDENTIFIER
                 }
             },
         ),
@@ -43,13 +48,13 @@ ELEMENT_TYPE_PATTERNS = [
     (
         (
             {
-                constants.PARENT_KEY: {
-                    constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
+                PARENT_KEY: {
+                    ELEMENT_TYPE_KEY: SELECTABLE_IDENTIFIER
                 }
             },
             {
-                constants.PARENT_KEY: {
-                    constants.SUBTYPE_KEY: constants.WIDGET_SUBTYPE_KEY
+                PARENT_KEY: {
+                    SUBTYPE_KEY: WIDGET_SUBTYPE_KEY
                 }
             },
         ),
@@ -58,8 +63,8 @@ ELEMENT_TYPE_PATTERNS = [
     (
         (
             {
-                constants.PARENT_KEY: {
-                    constants.ELEMENT_TYPE_KEY: constants.SELECTABLE_IDENTIFIER
+                PARENT_KEY: {
+                    ELEMENT_TYPE_KEY: SELECTABLE_IDENTIFIER
                 }
             },
         ),
@@ -68,26 +73,26 @@ ELEMENT_TYPE_PATTERNS = [
 ]
 
 ELEMENT_KEY_PATTERNS = [
-    {constants.ANNOTATION_FIELD_KEY: True},
-    {constants.PARENT_KEY: {constants.ANNOTATION_FIELD_KEY: True}},
+    {ANNOTATION_FIELD_KEY: True},
+    {PARENT_KEY: {ANNOTATION_FIELD_KEY: True}},
 ]
 
 DROPDOWN_CHOICE_PATTERNS = [
-    {constants.CHOICES_IDENTIFIER: True},
-    {constants.PARENT_KEY: {constants.CHOICES_IDENTIFIER: True}},
+    {CHOICES_IDENTIFIER: True},
+    {PARENT_KEY: {CHOICES_IDENTIFIER: True}},
 ]
 
 ELEMENT_ALIGNMENT_PATTERNS = [
-    {constants.TEXT_FIELD_ALIGNMENT_IDENTIFIER: True},
-    {constants.PARENT_KEY: {constants.TEXT_FIELD_ALIGNMENT_IDENTIFIER: True}},
+    {TEXT_FIELD_ALIGNMENT_IDENTIFIER: True},
+    {PARENT_KEY: {TEXT_FIELD_ALIGNMENT_IDENTIFIER: True}},
 ]
 
 TEXT_FIELD_FLAG_PATTERNS = [
-    {constants.FIELD_FLAG_KEY: True},
-    {constants.PARENT_KEY: {constants.FIELD_FLAG_KEY: True}},
+    {FIELD_FLAG_KEY: True},
+    {PARENT_KEY: {FIELD_FLAG_KEY: True}},
 ]
 
 TEXT_FIELD_APPEARANCE_PATTERNS = [
-    {constants.TEXT_FIELD_APPEARANCE_IDENTIFIER: True},
-    {constants.PARENT_KEY: {constants.TEXT_FIELD_APPEARANCE_IDENTIFIER: True}},
+    {TEXT_FIELD_APPEARANCE_IDENTIFIER: True},
+    {PARENT_KEY: {TEXT_FIELD_APPEARANCE_IDENTIFIER: True}},
 ]

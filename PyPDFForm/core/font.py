@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for font."""
 
-import re
+from re import findall
 from io import BytesIO
 from math import sqrt
 from typing import Dict, Tuple, Union
 
-import pdfrw
-from reportlab.pdfbase import pdfmetrics
+from pdfrw import PdfDict, PdfReader
+from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
-from . import constants
-from .constants import DEFAULT_FONT_SIZE
+from .constants import DEFAULT_FONT, ANNOTATION_RECTANGLE_KEY, \
+    FONT_SIZE_IDENTIFIER, DEFAULT_FONT_SIZE, FONT_COLOR_IDENTIFIER
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .template import (get_element_key, get_elements_by_page,
                        get_paragraph_auto_wrap_length, get_paragraph_lines,
@@ -29,7 +29,7 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
     buff.seek(0)
 
     try:
-        pdfmetrics.registerFont(TTFont(name=font_name, filename=buff))
+        registerFont(TTFont(name=font_name, filename=buff))
         result = True
     except TTFError:
         result = False
@@ -38,10 +38,10 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
     return result
 
 
-def auto_detect_font(element: pdfrw.PdfDict) -> str:
+def auto_detect_font(element: PdfDict) -> str:
     """Returns the font of the text field if it is one of the standard fonts."""
 
-    result = constants.DEFAULT_FONT
+    result = DEFAULT_FONT
 
     text_appearance = None
     for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
@@ -57,10 +57,10 @@ def auto_detect_font(element: pdfrw.PdfDict) -> str:
 
     for each in text_appearance:
         if each.startswith("/"):
-            text_segments = re.findall("[A-Z][^A-Z]*", each.replace("/", ""))
+            text_segments = findall("[A-Z][^A-Z]*", each.replace("/", ""))
 
-            for font in pdfmetrics.standardFonts:
-                font_segments = re.findall("[A-Z][^A-Z]*", font.replace("-", ""))
+            for font in standardFonts:
+                font_segments = findall("[A-Z][^A-Z]*", font.replace("-", ""))
                 if len(font_segments) != len(text_segments):
                     continue
 
@@ -75,7 +75,7 @@ def auto_detect_font(element: pdfrw.PdfDict) -> str:
     return result
 
 
-def text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
+def text_field_font_size(element: PdfDict) -> Union[float, int]:
     """
     Calculates the font size it should be drawn with
     given a text field element.
@@ -85,31 +85,31 @@ def text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
         return DEFAULT_FONT_SIZE
 
     height = abs(
-        float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
-        - float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
+        float(element[ANNOTATION_RECTANGLE_KEY][1])
+        - float(element[ANNOTATION_RECTANGLE_KEY][3])
     )
 
     return height * 2 / 3
 
 
-def checkbox_radio_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
+def checkbox_radio_font_size(element: PdfDict) -> Union[float, int]:
     """
     Calculates the font size it should be drawn with
     given a checkbox/radio button element.
     """
 
     area = abs(
-        float(element[constants.ANNOTATION_RECTANGLE_KEY][0])
-        - float(element[constants.ANNOTATION_RECTANGLE_KEY][2])
+        float(element[ANNOTATION_RECTANGLE_KEY][0])
+        - float(element[ANNOTATION_RECTANGLE_KEY][2])
     ) * abs(
-        float(element[constants.ANNOTATION_RECTANGLE_KEY][1])
-        - float(element[constants.ANNOTATION_RECTANGLE_KEY][3])
+        float(element[ANNOTATION_RECTANGLE_KEY][1])
+        - float(element[ANNOTATION_RECTANGLE_KEY][3])
     )
 
     return sqrt(area) * 72 / 96
 
 
-def get_text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
+def get_text_field_font_size(element: PdfDict) -> Union[float, int]:
     """Returns the font size of the text field if presented or zero."""
 
     result = 0
@@ -119,14 +119,14 @@ def get_text_field_font_size(element: pdfrw.PdfDict) -> Union[float, int]:
             text_appearance = text_appearance.replace("(", "").replace(")", "")
             properties = text_appearance.split(" ")
             for i, val in enumerate(properties):
-                if val == constants.FONT_SIZE_IDENTIFIER:
+                if val == FONT_SIZE_IDENTIFIER:
                     return float(properties[i - 1])
 
     return result
 
 
 def get_text_field_font_color(
-    element: pdfrw.PdfDict,
+    element: PdfDict,
 ) -> Union[Tuple[float, float, float], None]:
     """Returns the font color tuple of the text field if presented or black."""
 
@@ -134,14 +134,14 @@ def get_text_field_font_color(
     for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
         text_appearance = traverse_pattern(pattern, element)
         if text_appearance:
-            if constants.FONT_COLOR_IDENTIFIER not in text_appearance:
+            if FONT_COLOR_IDENTIFIER not in text_appearance:
                 return result
 
             text_appearance = (
                 text_appearance.replace("(", "").replace(")", "").split(" ")
             )
             for i, val in enumerate(text_appearance):
-                if val == constants.FONT_COLOR_IDENTIFIER.replace(" ", ""):
+                if val == FONT_COLOR_IDENTIFIER.replace(" ", ""):
                     result = (
                         float(text_appearance[i - 3]),
                         float(text_appearance[i - 2]),
@@ -158,7 +158,7 @@ def update_text_field_attributes(
 ) -> None:
     """Auto updates text fields' attributes."""
 
-    template_pdf = pdfrw.PdfReader(fdata=template_stream)
+    template_pdf = PdfReader(fdata=template_stream)
 
     for _, _elements in get_elements_by_page(template_pdf).items():
         for _element in _elements:
