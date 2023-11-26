@@ -5,21 +5,20 @@ from __future__ import annotations
 
 from typing import BinaryIO, Dict, Union
 
-from .core.constants import DEFAULT_FONT, \
-    DEFAULT_FONT_SIZE, DEFAULT_FONT_COLOR
+from .core.constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE
 from .core.filler import fill
 from .core.font import register_font, update_text_field_attributes
 from .core.image import any_image_to_jpg, rotate_image
-from .core.utils import merge_two_pdfs, \
-    preview_element_to_draw, remove_all_elements
-from .core.watermark import create_watermarks_and_draw, \
-    merge_watermarks_with_pdf
+from .core.utils import (merge_two_pdfs, preview_element_to_draw,
+                         remove_all_elements)
+from .core.watermark import (create_watermarks_and_draw,
+                             merge_watermarks_with_pdf)
 from .middleware.adapter import fp_or_f_obj_or_stream_to_stream
-from .middleware.constants import VERSION_IDENTIFIERS, \
-    VERSION_IDENTIFIER_PREFIX
+from .middleware.constants import (VERSION_IDENTIFIER_PREFIX,
+                                   VERSION_IDENTIFIERS)
 from .middleware.dropdown import Dropdown
-from .middleware.template import build_elements, \
-    dropdown_to_text, set_character_x_paddings
+from .middleware.template import (build_elements, dropdown_to_text,
+                                  set_character_x_paddings)
 from .middleware.text import Text
 
 
@@ -34,9 +33,7 @@ class Wrapper:
         """Constructs all attributes for the object."""
 
         self.stream = fp_or_f_obj_or_stream_to_stream(template)
-        self.elements = (
-            build_elements(self.stream) if self.stream else {}
-        )
+        self.elements = build_elements(self.stream) if self.stream else {}
 
         for each in self.elements.values():
             if isinstance(each, Text):
@@ -118,9 +115,7 @@ class Wrapper:
 
         update_text_field_attributes(self.stream, self.elements)
         if self.read():
-            self.elements = set_character_x_paddings(
-                self.stream, self.elements
-            )
+            self.elements = set_character_x_paddings(self.stream, self.elements)
 
         self.stream = remove_all_elements(fill(self.stream, self.elements))
 
@@ -139,12 +134,8 @@ class Wrapper:
         new_element = Text("new")
         new_element.value = text
         new_element.font = kwargs.get("font", DEFAULT_FONT)
-        new_element.font_size = kwargs.get(
-            "font_size", DEFAULT_FONT_SIZE
-        )
-        new_element.font_color = kwargs.get(
-            "font_color", DEFAULT_FONT_COLOR
-        )
+        new_element.font_size = kwargs.get("font_size", DEFAULT_FONT_SIZE)
+        new_element.font_color = kwargs.get("font_color", DEFAULT_FONT_COLOR)
 
         watermarks = create_watermarks_and_draw(
             self.stream,
@@ -206,6 +197,4 @@ class Wrapper:
 
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
-        return (
-            register_font(font_name, ttf_file) if ttf_file is not None else False
-        )
+        return register_font(font_name, ttf_file) if ttf_file is not None else False

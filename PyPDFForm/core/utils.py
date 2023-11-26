@@ -4,15 +4,15 @@
 from io import BytesIO
 from typing import Union
 
-from pdfrw import PdfReader, PdfWriter, PdfDict
+from pdfrw import PdfDict, PdfReader, PdfWriter
 
 from ..middleware.checkbox import Checkbox
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from .constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, \
-    CHECKBOX_TO_DRAW, RADIO_TO_DRAW, \
-    DEFAULT_FONT_SIZE, PREVIEW_FONT_COLOR, ANNOTATION_KEY
+from .constants import (ANNOTATION_KEY, CHECKBOX_TO_DRAW, DEFAULT_FONT,
+                        DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
+                        PREVIEW_FONT_COLOR, RADIO_TO_DRAW)
 
 
 def generate_stream(pdf: PdfReader) -> bytes:

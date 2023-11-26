@@ -4,12 +4,12 @@
 from io import BytesIO
 from typing import List, Union
 
-from pdfrw import PdfReader, PageMerge
+from pdfrw import PageMerge, PdfReader
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
-from .utils import generate_stream
 from ..middleware.text import Text
+from .utils import generate_stream
 
 
 def draw_text(

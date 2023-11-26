@@ -3,22 +3,20 @@
 
 from typing import Dict, List, Tuple, Union
 
-from pdfrw import PdfReader, PdfDict
+from pdfrw import PdfDict, PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
-from .constants import ANNOTATION_KEY, TEXT_FIELD_MAX_LENGTH_KEY, \
-    FIELD_FLAG_KEY, ANNOTATION_RECTANGLE_KEY
+from .constants import (ANNOTATION_KEY, ANNOTATION_RECTANGLE_KEY,
+                        FIELD_FLAG_KEY, TEXT_FIELD_MAX_LENGTH_KEY)
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
                        ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS)
 from .utils import find_pattern_match, traverse_pattern
 
 
-def get_elements_by_page(
-    pdf: Union[bytes, PdfReader]
-) -> Dict[int, List[PdfDict]]:
+def get_elements_by_page(pdf: Union[bytes, PdfReader]) -> Dict[int, List[PdfDict]]:
     """Iterates through a PDF and returns all elements found grouped by page."""
 
     if isinstance(pdf, bytes):
@@ -147,9 +145,7 @@ def get_char_rect_width(element: PdfDict, element_middleware: Text) -> float:
     return rect_width / element_middleware.max_length
 
 
-def get_character_x_paddings(
-    element: PdfDict, element_middleware: Text
-) -> List[float]:
+def get_character_x_paddings(element: PdfDict, element_middleware: Text) -> List[float]:
     """Returns paddings between characters for combed text fields."""
 
     length = min(len(element_middleware.value or ""), element_middleware.max_length)
@@ -207,9 +203,7 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
     return result
 
 
-def get_paragraph_auto_wrap_length(
-    element: PdfDict, element_middleware: Text
-) -> int:
+def get_paragraph_auto_wrap_length(element: PdfDict, element_middleware: Text) -> int:
     """Calculates the text wrap length of a paragraph field."""
 
     value = element_middleware.value or ""

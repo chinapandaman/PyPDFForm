@@ -8,13 +8,13 @@ from pdfrw import PdfReader
 from ..middleware.checkbox import Checkbox
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.radio import Radio
-from .template import get_elements_by_page, get_element_key
-from .utils import checkbox_radio_to_draw, generate_stream
-from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_text_coordinates,
                          get_text_line_x_coordinates)
 from .font import checkbox_radio_font_size
+from .template import get_element_key, get_elements_by_page
+from .utils import checkbox_radio_to_draw, generate_stream
+from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def fill(
@@ -67,13 +67,9 @@ def fill(
                 )
 
     for page, texts in texts_to_draw.items():
-        _watermarks = create_watermarks_and_draw(
-            template_stream, page, "text", texts
-        )
+        _watermarks = create_watermarks_and_draw(template_stream, page, "text", texts)
         for i, watermark in enumerate(_watermarks):
             if watermark:
                 text_watermarks[i] = watermark
 
-    return merge_watermarks_with_pdf(
-        generate_stream(template_pdf), text_watermarks
-    )
+    return merge_watermarks_with_pdf(generate_stream(template_pdf), text_watermarks)

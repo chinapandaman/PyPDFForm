@@ -5,12 +5,12 @@ from ..middleware.checkbox import Checkbox
 from ..middleware.dropdown import Dropdown
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from .constants import ELEMENT_TYPE_KEY, TEXT_FIELD_IDENTIFIER, \
-    SELECTABLE_IDENTIFIER, CHOICE_FIELD_IDENTIFIER, \
-    PARENT_KEY, SUBTYPE_KEY, WIDGET_SUBTYPE_KEY, \
-    ANNOTATION_FIELD_KEY, CHOICES_IDENTIFIER, \
-    TEXT_FIELD_ALIGNMENT_IDENTIFIER, FIELD_FLAG_KEY, \
-    TEXT_FIELD_APPEARANCE_IDENTIFIER
+from .constants import (ANNOTATION_FIELD_KEY, CHOICE_FIELD_IDENTIFIER,
+                        CHOICES_IDENTIFIER, ELEMENT_TYPE_KEY, FIELD_FLAG_KEY,
+                        PARENT_KEY, SELECTABLE_IDENTIFIER, SUBTYPE_KEY,
+                        TEXT_FIELD_ALIGNMENT_IDENTIFIER,
+                        TEXT_FIELD_APPEARANCE_IDENTIFIER,
+                        TEXT_FIELD_IDENTIFIER, WIDGET_SUBTYPE_KEY)
 
 ELEMENT_TYPE_PATTERNS = [
     (
@@ -26,48 +26,22 @@ ELEMENT_TYPE_PATTERNS = [
         Dropdown,
     ),
     (
-        (
-            {
-                PARENT_KEY: {
-                    ELEMENT_TYPE_KEY: CHOICE_FIELD_IDENTIFIER
-                }
-            },
-        ),
+        ({PARENT_KEY: {ELEMENT_TYPE_KEY: CHOICE_FIELD_IDENTIFIER}},),
         Dropdown,
     ),
     (
-        (
-            {
-                PARENT_KEY: {
-                    ELEMENT_TYPE_KEY: TEXT_FIELD_IDENTIFIER
-                }
-            },
-        ),
+        ({PARENT_KEY: {ELEMENT_TYPE_KEY: TEXT_FIELD_IDENTIFIER}},),
         Text,
     ),
     (
         (
-            {
-                PARENT_KEY: {
-                    ELEMENT_TYPE_KEY: SELECTABLE_IDENTIFIER
-                }
-            },
-            {
-                PARENT_KEY: {
-                    SUBTYPE_KEY: WIDGET_SUBTYPE_KEY
-                }
-            },
+            {PARENT_KEY: {ELEMENT_TYPE_KEY: SELECTABLE_IDENTIFIER}},
+            {PARENT_KEY: {SUBTYPE_KEY: WIDGET_SUBTYPE_KEY}},
         ),
         Checkbox,
     ),
     (
-        (
-            {
-                PARENT_KEY: {
-                    ELEMENT_TYPE_KEY: SELECTABLE_IDENTIFIER
-                }
-            },
-        ),
+        ({PARENT_KEY: {ELEMENT_TYPE_KEY: SELECTABLE_IDENTIFIER}},),
         Radio,
     ),
 ]

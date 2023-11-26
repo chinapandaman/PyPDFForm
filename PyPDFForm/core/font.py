@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for font."""
 
-from re import findall
 from io import BytesIO
 from math import sqrt
+from re import findall
 from typing import Dict, Tuple, Union
 
 from pdfrw import PdfDict, PdfReader
@@ -12,8 +12,9 @@ from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
-from .constants import DEFAULT_FONT, ANNOTATION_RECTANGLE_KEY, \
-    FONT_SIZE_IDENTIFIER, DEFAULT_FONT_SIZE, FONT_COLOR_IDENTIFIER
+from .constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
+                        DEFAULT_FONT_SIZE, FONT_COLOR_IDENTIFIER,
+                        FONT_SIZE_IDENTIFIER)
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .template import (get_element_key, get_elements_by_page,
                        get_paragraph_auto_wrap_length, get_paragraph_lines,

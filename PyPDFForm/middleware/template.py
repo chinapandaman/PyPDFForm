@@ -3,14 +3,14 @@
 
 from typing import Dict
 
+from ..core.template import (construct_element, get_character_x_paddings,
+                             get_dropdown_choices, get_element_key,
+                             get_elements_by_page, get_text_field_max_length,
+                             is_text_field_comb)
 from .constants import ELEMENT_TYPES
 from .dropdown import Dropdown
 from .radio import Radio
 from .text import Text
-from ..core.template import get_element_key, \
-    get_elements_by_page, get_character_x_paddings, \
-    construct_element, get_text_field_max_length, \
-    is_text_field_comb, get_dropdown_choices
 
 
 def set_character_x_paddings(
@@ -45,9 +45,7 @@ def build_elements(pdf_stream: bytes) -> Dict[str, ELEMENT_TYPES]:
             if _element is not None:
                 if isinstance(_element, Text):
                     _element.max_length = get_text_field_max_length(element)
-                    if _element.max_length is not None and is_text_field_comb(
-                        element
-                    ):
+                    if _element.max_length is not None and is_text_field_comb(element):
                         _element.comb = True
 
                 if isinstance(_element, Dropdown):
