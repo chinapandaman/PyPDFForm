@@ -4,17 +4,17 @@
 from io import BytesIO
 from typing import List, Union
 
-import pdfrw
+from pdfrw import PdfReader, PageMerge
 from reportlab.lib.utils import ImageReader
-from reportlab.pdfgen import canvas
+from reportlab.pdfgen.canvas import Canvas
 
+from .utils import generate_stream
 from ..middleware.text import Text
-from . import utils
 
 
 def draw_text(
     *args: Union[
-        canvas.Canvas,
+        Canvas,
         Text,
         float,
         int,
@@ -83,7 +83,7 @@ def draw_text(
         canv.restoreState()
 
 
-def draw_image(*args: Union[canvas.Canvas, bytes, float, int]) -> None:
+def draw_image(*args: Union[Canvas, bytes, float, int]) -> None:
     """Draws an image on the watermark."""
 
     canv = args[0]
@@ -126,10 +126,10 @@ def create_watermarks_and_draw(
 ) -> List[bytes]:
     """Creates a canvas watermark and draw some stuffs on it."""
 
-    pdf_file = pdfrw.PdfReader(fdata=pdf)
+    pdf_file = PdfReader(fdata=pdf)
     buff = BytesIO()
 
-    canv = canvas.Canvas(
+    canv = Canvas(
         buff,
         pagesize=(
             float(pdf_file.pages[page_number - 1].MediaBox[2]),
@@ -164,13 +164,13 @@ def merge_watermarks_with_pdf(
 ) -> bytes:
     """Merges watermarks with PDF."""
 
-    pdf_file = pdfrw.PdfReader(fdata=pdf)
+    pdf_file = PdfReader(fdata=pdf)
 
     for i, page in enumerate(pdf_file.pages):
         if watermarks[i]:
-            watermark = pdfrw.PdfReader(fdata=watermarks[i])
+            watermark = PdfReader(fdata=watermarks[i])
             if watermark.pages:
-                merger = pdfrw.PageMerge(page)
+                merger = PageMerge(page)
                 merger.add(watermark.pages[0]).render()
 
-    return utils.generate_stream(pdf_file)
+    return generate_stream(pdf_file)

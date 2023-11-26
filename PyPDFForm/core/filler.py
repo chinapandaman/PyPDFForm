@@ -3,13 +3,14 @@
 
 from typing import Dict
 
-import pdfrw
+from pdfrw import PdfReader
 
 from ..middleware.checkbox import Checkbox
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.radio import Radio
-from . import template, utils
-from . import watermark as watermark_core
+from .template import get_elements_by_page, get_element_key
+from .utils import checkbox_radio_to_draw, generate_stream
+from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_text_coordinates,
                          get_text_line_x_coordinates)
@@ -22,23 +23,23 @@ def fill(
 ) -> bytes:
     """Fills a PDF using watermarks."""
 
-    template_pdf = pdfrw.PdfReader(fdata=template_stream)
+    template_pdf = PdfReader(fdata=template_stream)
 
     texts_to_draw = {}
     text_watermarks = []
 
     radio_button_tracker = {}
 
-    for page, _elements in template.get_elements_by_page(template_pdf).items():
+    for page, _elements in get_elements_by_page(template_pdf).items():
         texts_to_draw[page] = []
         text_watermarks.append(b"")
         for _element in _elements:
-            key = template.get_element_key(_element)
+            key = get_element_key(_element)
             needs_to_be_drawn = False
 
             if isinstance(elements[key], (Checkbox, Radio)):
                 font_size = checkbox_radio_font_size(_element)
-                _to_draw = utils.checkbox_radio_to_draw(elements[key], font_size)
+                _to_draw = checkbox_radio_to_draw(elements[key], font_size)
                 x, y = get_draw_checkbox_radio_coordinates(_element, _to_draw)
                 if isinstance(elements[key], Checkbox) and elements[key].value:
                     needs_to_be_drawn = True
@@ -66,13 +67,13 @@ def fill(
                 )
 
     for page, texts in texts_to_draw.items():
-        _watermarks = watermark_core.create_watermarks_and_draw(
+        _watermarks = create_watermarks_and_draw(
             template_stream, page, "text", texts
         )
         for i, watermark in enumerate(_watermarks):
             if watermark:
                 text_watermarks[i] = watermark
 
-    return watermark_core.merge_watermarks_with_pdf(
-        utils.generate_stream(template_pdf), text_watermarks
+    return merge_watermarks_with_pdf(
+        generate_stream(template_pdf), text_watermarks
     )

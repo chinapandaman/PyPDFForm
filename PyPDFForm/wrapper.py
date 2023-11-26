@@ -5,15 +5,22 @@ from __future__ import annotations
 
 from typing import BinaryIO, Dict, Union
 
-from .core import constants as core_constants
-from .core import filler, font
-from .core import image as image_core
-from .core import utils
-from .core import watermark as watermark_core
+from .core.constants import DEFAULT_FONT, \
+    DEFAULT_FONT_SIZE, DEFAULT_FONT_COLOR
+from .core.filler import fill
+from .core.font import register_font
 from .core.font import update_text_field_attributes
-from .middleware import adapter, constants
-from .middleware import template as template_middleware
+from .core.image import any_image_to_jpg, rotate_image
+from .core.utils import merge_two_pdfs, \
+    preview_element_to_draw, remove_all_elements
+from .core.watermark import create_watermarks_and_draw, \
+    merge_watermarks_with_pdf
+from .middleware.adapter import fp_or_f_obj_or_stream_to_stream
+from .middleware.constants import VERSION_IDENTIFIERS, \
+    VERSION_IDENTIFIER_PREFIX
 from .middleware.dropdown import Dropdown
+from .middleware.template import build_elements, \
+    dropdown_to_text, set_character_x_paddings
 from .middleware.text import Text
 
 
@@ -27,9 +34,9 @@ class Wrapper:
     ) -> None:
         """Constructs all attributes for the object."""
 
-        self.stream = adapter.fp_or_f_obj_or_stream_to_stream(template)
+        self.stream = fp_or_f_obj_or_stream_to_stream(template)
         self.elements = (
-            template_middleware.build_elements(self.stream) if self.stream else {}
+            build_elements(self.stream) if self.stream else {}
         )
 
         for each in self.elements.values():
@@ -53,9 +60,9 @@ class Wrapper:
     def version(self) -> Union[str, None]:
         """Gets the version of the PDF."""
 
-        for each in constants.VERSION_IDENTIFIERS:
+        for each in VERSION_IDENTIFIERS:
             if self.stream.startswith(each):
-                return each.replace(constants.VERSION_IDENTIFIER_PREFIX, b"").decode()
+                return each.replace(VERSION_IDENTIFIER_PREFIX, b"").decode()
 
         return None
 
@@ -63,8 +70,8 @@ class Wrapper:
         """Changes the version of the PDF."""
 
         self.stream = self.stream.replace(
-            constants.VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
-            constants.VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
+            VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
+            VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
             1,
         )
 
@@ -80,7 +87,7 @@ class Wrapper:
             return self
 
         new_obj = self.__class__()
-        new_obj.stream = utils.merge_two_pdfs(self.stream, other.stream)
+        new_obj.stream = merge_two_pdfs(self.stream, other.stream)
 
         return new_obj
 
@@ -88,10 +95,10 @@ class Wrapper:
     def preview(self) -> bytes:
         """Inspects all supported elements' names for the PDF form."""
 
-        return filler.fill(
+        return fill(
             self.stream,
             {
-                key: utils.preview_element_to_draw(value)
+                key: preview_element_to_draw(value)
                 for key, value in self.elements.items()
             },
         )
@@ -108,15 +115,15 @@ class Wrapper:
 
         for key, value in self.elements.items():
             if isinstance(value, Dropdown):
-                self.elements[key] = template_middleware.dropdown_to_text(value)
+                self.elements[key] = dropdown_to_text(value)
 
         update_text_field_attributes(self.stream, self.elements)
         if self.read():
-            self.elements = template_middleware.set_character_x_paddings(
+            self.elements = set_character_x_paddings(
                 self.stream, self.elements
             )
 
-        self.stream = utils.remove_all_elements(filler.fill(self.stream, self.elements))
+        self.stream = remove_all_elements(fill(self.stream, self.elements))
 
         return self
 
@@ -132,15 +139,15 @@ class Wrapper:
 
         new_element = Text("new")
         new_element.value = text
-        new_element.font = kwargs.get("font", core_constants.DEFAULT_FONT)
+        new_element.font = kwargs.get("font", DEFAULT_FONT)
         new_element.font_size = kwargs.get(
-            "font_size", core_constants.DEFAULT_FONT_SIZE
+            "font_size", DEFAULT_FONT_SIZE
         )
         new_element.font_color = kwargs.get(
-            "font_color", core_constants.DEFAULT_FONT_COLOR
+            "font_color", DEFAULT_FONT_COLOR
         )
 
-        watermarks = watermark_core.create_watermarks_and_draw(
+        watermarks = create_watermarks_and_draw(
             self.stream,
             page_number,
             "text",
@@ -153,7 +160,7 @@ class Wrapper:
             ],
         )
 
-        self.stream = watermark_core.merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
 
@@ -169,14 +176,14 @@ class Wrapper:
     ) -> Wrapper:
         """Draws an image on a PDF form."""
 
-        image = adapter.fp_or_f_obj_or_stream_to_stream(image)
-        image = image_core.any_image_to_jpg(image)
-        image = image_core.rotate_image(image, rotation)
-        watermarks = watermark_core.create_watermarks_and_draw(
+        image = fp_or_f_obj_or_stream_to_stream(image)
+        image = any_image_to_jpg(image)
+        image = rotate_image(image, rotation)
+        watermarks = create_watermarks_and_draw(
             self.stream, page_number, "image", [[image, x, y, width, height]]
         )
 
-        self.stream = watermark_core.merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = merge_watermarks_with_pdf(self.stream, watermarks)
 
         return self
 
@@ -198,8 +205,8 @@ class Wrapper:
     ) -> bool:
         """Registers a font from a ttf file."""
 
-        ttf_file = adapter.fp_or_f_obj_or_stream_to_stream(ttf_file)
+        ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         return (
-            font.register_font(font_name, ttf_file) if ttf_file is not None else False
+            register_font(font_name, ttf_file) if ttf_file is not None else False
         )
