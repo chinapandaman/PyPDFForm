@@ -175,16 +175,18 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
     value = element_middleware.value or ""
     if element_middleware.max_length is not None:
         value = value[: element_middleware.max_length]
-    characters = value.split(" ")
-    current_line = ""
-    for each in characters:
-        line_extended = f"{current_line} {each}" if current_line else each
-        if len(line_extended) <= text_wrap_length:
-            current_line = line_extended
-        else:
-            lines.append(current_line)
-            current_line = each
-    lines.append(current_line)
+
+    for line in value.split("\n"):
+        characters = line.split(" ")
+        current_line = ""
+        for each in characters:
+            line_extended = f"{current_line} {each}" if current_line else each
+            if len(line_extended) <= text_wrap_length:
+                current_line = line_extended
+            else:
+                lines.append(current_line)
+                current_line = each
+        lines.append(current_line)
 
     for each in lines:
         while len(each) > text_wrap_length:
