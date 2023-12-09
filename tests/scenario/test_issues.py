@@ -39,3 +39,19 @@ def test_pdf_form_with_central_aligned_text_fields(issue_pdf_directory, request)
 
 def test_pdf_form_with_central_aligned_text_fields_void(issue_pdf_directory):
     assert PyPDFForm(os.path.join(issue_pdf_directory, "PPF-285.pdf")).fill({}).read()
+
+
+def test_pdf_form_with_paragraph_fields_new_line_symbol_text(issue_pdf_directory, request):
+    obj = PyPDFForm(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
+        {
+            "Address": "Mr John Smith\n132, My Street\nKingston, New York 12401"
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-415-expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
