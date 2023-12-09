@@ -219,7 +219,20 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
 def get_paragraph_auto_wrap_length(element: PdfDict, element_middleware: Text) -> int:
     """Calculates the text wrap length of a paragraph field."""
 
+    def helper(v):
+        counter = 0
+        _width = 0
+        while _width <= width:
+            counter += 1
+            _width = stringWidth(
+                v[:counter],
+                element_middleware.font,
+                element_middleware.font_size,
+            )
+        return counter - 1
+
     value = element_middleware.value or ""
+    value = value.replace(NEW_LINE_SYMBOL, " ")
     width = abs(
         float(element[ANNOTATION_RECTANGLE_KEY][0])
         - float(element[ANNOTATION_RECTANGLE_KEY][2])
@@ -232,15 +245,15 @@ def get_paragraph_auto_wrap_length(element: PdfDict, element_middleware: Text) -
 
     lines = text_width / width
     if lines > 1:
-        counter = 0
-        _width = 0
-        while _width <= width:
-            counter += 1
-            _width = stringWidth(
-                value[:counter],
-                element_middleware.font,
-                element_middleware.font_size,
-            )
-        return counter - 1
+        current_min = len(value)
+        while current_min <= len(value):
+            result = helper(value)
+            value = value[result:]
+            if current_min is None:
+                current_min = result
+            else:
+                if result < current_min:
+                    current_min = result
+        return current_min
 
     return len(value) + 1
