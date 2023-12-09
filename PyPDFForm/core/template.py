@@ -188,9 +188,9 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
             else:
                 lines.append(current_line)
                 current_line = each
-        if len(split_by_new_line_symbol) > 1:
-            current_line += NEW_LINE_SYMBOL
-        lines.append(current_line)
+        lines.append(current_line + NEW_LINE_SYMBOL
+                     if len(split_by_new_line_symbol) > 1
+                     else current_line)
 
     for each in lines:
         if NEW_LINE_SYMBOL in each:
