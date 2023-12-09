@@ -198,7 +198,11 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
             result.append(each[:last_index])
             each = each[last_index:]
         if each:
-            if result and len(each) + 1 + len(result[-1]) <= text_wrap_length and NEW_LINE_SYMBOL not in result[-1]:
+            if (
+                result
+                and len(each) + 1 + len(result[-1]) <= text_wrap_length
+                and NEW_LINE_SYMBOL not in result[-1]
+            ):
                 result[-1] = f"{result[-1]}{each} "
             else:
                 result.append(f"{each} ")
