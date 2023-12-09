@@ -193,18 +193,18 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
                      else current_line)
 
     for each in lines:
-        if NEW_LINE_SYMBOL in each:
-            result.append(each.replace(NEW_LINE_SYMBOL, " "))
-            continue
         while len(each) > text_wrap_length:
             last_index = text_wrap_length - 1
             result.append(each[:last_index])
             each = each[last_index:]
         if each:
-            if result and len(each) + 1 + len(result[-1]) <= text_wrap_length:
+            if result and len(each) + 1 + len(result[-1]) <= text_wrap_length and NEW_LINE_SYMBOL not in result[-1]:
                 result[-1] = f"{result[-1]}{each} "
             else:
                 result.append(f"{each} ")
+
+    for i, each in enumerate(result):
+        result[i] = each.replace(NEW_LINE_SYMBOL, "")
 
     if result:
         result[-1] = result[-1][:-1]
