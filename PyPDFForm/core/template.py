@@ -249,7 +249,7 @@ def get_paragraph_auto_wrap_length(element: PdfDict, element_middleware: Text) -
         while current_min < len(value):
             result = helper(value)
             value = value[result:]
-            if current_min is 0:
+            if current_min == 0:
                 current_min = result
             else:
                 if result < current_min:
