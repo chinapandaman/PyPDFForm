@@ -72,3 +72,19 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_text_overflow(issue_pdf_
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_directory, request):
+    obj = PyPDFForm(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
+        {
+            "Address": "J Smith\n132 A St\nNYC, NY 12401"
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-415-3-expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
