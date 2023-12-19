@@ -9,7 +9,8 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 from .constants import (ANNOTATION_KEY, ANNOTATION_RECTANGLE_KEY,
-                        FIELD_FLAG_KEY, TEXT_FIELD_MAX_LENGTH_KEY)
+                        FIELD_FLAG_KEY, TEXT_FIELD_MAX_LENGTH_KEY,
+                        NEW_LINE_SYMBOL)
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
                        ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS)
@@ -175,16 +176,21 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
     value = element_middleware.value or ""
     if element_middleware.max_length is not None:
         value = value[: element_middleware.max_length]
-    characters = value.split(" ")
-    current_line = ""
-    for each in characters:
-        line_extended = f"{current_line} {each}" if current_line else each
-        if len(line_extended) <= text_wrap_length:
-            current_line = line_extended
-        else:
-            lines.append(current_line)
-            current_line = each
-    lines.append(current_line)
+
+    split_by_new_line_symbol = value.split(NEW_LINE_SYMBOL)
+    for line in split_by_new_line_symbol:
+        characters = line.split(" ")
+        current_line = ""
+        for each in characters:
+            line_extended = f"{current_line} {each}" if current_line else each
+            if len(line_extended) <= text_wrap_length:
+                current_line = line_extended
+            else:
+                lines.append(current_line)
+                current_line = each
+        lines.append(current_line + NEW_LINE_SYMBOL
+                     if len(split_by_new_line_symbol) > 1
+                     else current_line)
 
     for each in lines:
         while len(each) > text_wrap_length:
@@ -192,10 +198,17 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
             result.append(each[:last_index])
             each = each[last_index:]
         if each:
-            if result and len(each) + 1 + len(result[-1]) <= text_wrap_length:
+            if (
+                result
+                and len(each) + 1 + len(result[-1]) <= text_wrap_length
+                and NEW_LINE_SYMBOL not in result[-1]
+            ):
                 result[-1] = f"{result[-1]}{each} "
             else:
                 result.append(f"{each} ")
+
+    for i, each in enumerate(result):
+        result[i] = each.replace(NEW_LINE_SYMBOL, "")
 
     if result:
         result[-1] = result[-1][:-1]
@@ -206,7 +219,22 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
 def get_paragraph_auto_wrap_length(element: PdfDict, element_middleware: Text) -> int:
     """Calculates the text wrap length of a paragraph field."""
 
+    def calculate_wrap_length(v: str) -> int:
+        """Increments the substring until reaching maximum horizontal width."""
+
+        counter = 0
+        _width = 0
+        while _width <= width and counter < len(value):
+            counter += 1
+            _width = stringWidth(
+                v[:counter],
+                element_middleware.font,
+                element_middleware.font_size,
+            )
+        return counter - 1
+
     value = element_middleware.value or ""
+    value = value.replace(NEW_LINE_SYMBOL, " ")
     width = abs(
         float(element[ANNOTATION_RECTANGLE_KEY][0])
         - float(element[ANNOTATION_RECTANGLE_KEY][2])
@@ -219,15 +247,14 @@ def get_paragraph_auto_wrap_length(element: PdfDict, element_middleware: Text) -
 
     lines = text_width / width
     if lines > 1:
-        counter = 0
-        _width = 0
-        while _width <= width:
-            counter += 1
-            _width = stringWidth(
-                value[:counter],
-                element_middleware.font,
-                element_middleware.font_size,
-            )
-        return counter - 1
+        current_min = 0
+        while len(value) and current_min < len(value):
+            result = calculate_wrap_length(value)
+            value = value[result:]
+            if current_min == 0:
+                current_min = result
+            elif result < current_min:
+                current_min = result
+        return current_min
 
     return len(value) + 1

@@ -49,7 +49,8 @@ def draw_text(
                 char,
             )
     elif (
-        element.text_wrap_length is None or len(text_to_draw) < element.text_wrap_length
+        (element.text_wrap_length is None or len(text_to_draw) < element.text_wrap_length)
+        and element.text_lines is None
     ):
         canv.drawString(
             coordinate_x,
