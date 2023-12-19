@@ -9,8 +9,8 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from ..middleware.constants import ELEMENT_TYPES
 from ..middleware.text import Text
 from .constants import (ANNOTATION_KEY, ANNOTATION_RECTANGLE_KEY,
-                        FIELD_FLAG_KEY, TEXT_FIELD_MAX_LENGTH_KEY,
-                        NEW_LINE_SYMBOL)
+                        FIELD_FLAG_KEY, NEW_LINE_SYMBOL,
+                        TEXT_FIELD_MAX_LENGTH_KEY)
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
                        ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS)
@@ -188,9 +188,11 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
             else:
                 lines.append(current_line)
                 current_line = each
-        lines.append(current_line + NEW_LINE_SYMBOL
-                     if len(split_by_new_line_symbol) > 1
-                     else current_line)
+        lines.append(
+            current_line + NEW_LINE_SYMBOL
+            if len(split_by_new_line_symbol) > 1
+            else current_line
+        )
 
     for each in lines:
         while len(each) > text_wrap_length:
