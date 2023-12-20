@@ -196,7 +196,7 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
 
     for each in lines:
         while len(each) > text_wrap_length:
-            last_index = text_wrap_length - 1
+            last_index = text_wrap_length
             result.append(each[:last_index])
             each = each[last_index:]
         if each:
