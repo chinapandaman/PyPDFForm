@@ -232,9 +232,8 @@ def get_paragraph_lines(element: PdfDict, element_middleware: Text) -> List[str]
 
     for each in lines:
         while len(each) > text_wrap_length:
-            last_index = text_wrap_length
-            result.append(each[:last_index])
-            each = each[last_index:]
+            result.append(each[:text_wrap_length])
+            each = each[text_wrap_length:]
         if each:
             if (
                 result
