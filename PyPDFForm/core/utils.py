@@ -2,7 +2,7 @@
 """Contains utility helpers."""
 
 from io import BytesIO
-from typing import Union, List
+from typing import List, Union
 
 from pdfrw import PdfDict, PdfReader, PdfWriter
 

@@ -3,14 +3,14 @@
 
 from __future__ import annotations
 
-from typing import BinaryIO, Dict, Union, List
+from typing import BinaryIO, Dict, List, Union
 
 from .core.constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE
 from .core.filler import fill
 from .core.font import register_font, update_text_field_attributes
 from .core.image import any_image_to_jpg, rotate_image
-from .core.utils import (merge_two_pdfs, preview_element_to_draw,
-                         remove_all_elements, get_page_streams)
+from .core.utils import (get_page_streams, merge_two_pdfs,
+                         preview_element_to_draw, remove_all_elements)
 from .core.watermark import (create_watermarks_and_draw,
                              merge_watermarks_with_pdf)
 from .middleware.adapter import fp_or_f_obj_or_stream_to_stream
@@ -66,10 +66,7 @@ class Wrapper:
     def pages(self) -> List[Wrapper]:
         """Returns a list of wrapper objects where each is a page of the PDF form."""
 
-        return [
-            self.__class__(each)
-            for each in get_page_streams(self.stream)
-        ]
+        return [self.__class__(each) for each in get_page_streams(self.stream)]
 
     def change_version(self, version: str) -> Wrapper:
         """Changes the version of the PDF."""
