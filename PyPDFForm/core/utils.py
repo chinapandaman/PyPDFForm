@@ -2,7 +2,7 @@
 """Contains utility helpers."""
 
 from io import BytesIO
-from typing import Union
+from typing import Union, List
 
 from pdfrw import PdfDict, PdfReader, PdfWriter
 
@@ -77,6 +77,23 @@ def remove_all_elements(pdf: bytes) -> bytes:
                 elements.pop(j)
 
     return generate_stream(pdf)
+
+
+def get_page_streams(pdf: bytes) -> List[bytes]:
+    """Returns a list of streams where each is a page of the input PDF."""
+
+    pdf = PdfReader(fdata=pdf)
+    result = []
+
+    for page in pdf.pages:
+        writer = PdfWriter()
+        writer.addPage(page)
+        with BytesIO() as f:
+            writer.write(f)
+            f.seek(0)
+            result.append(f.read())
+
+    return result
 
 
 def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
