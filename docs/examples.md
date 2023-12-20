@@ -435,3 +435,36 @@ with open(PATH_TO_NEW_VERSION_PDF_FORM, "wb+") as output:
         .read()
     )
 ```
+
+## Extract pages out of a PDF
+
+This example demos how to extract pages out of a PDF. Note that each page object is also a PyPDFForm object.
+
+```python
+import os
+
+from PyPDFForm import PyPDFForm
+
+PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
+    os.path.expanduser("~/Downloads"), "sample_template.pdf"
+)  # Change this to where you downloaded the sample PDF form
+
+PATH_TO_FILLED_PDF_FORM = os.path.join(
+    os.path.expanduser("~"), "output.pdf"
+)  # Change this to where you wish to put your filled PDF form
+
+obj = PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+print(obj.pages[0].generate_schema())
+
+with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
+    output.write(
+        obj.pages[0]
+        .fill(
+            {
+                "test": "test_1",
+                "check": True,
+            },
+        )
+        .read()
+    )
+```
