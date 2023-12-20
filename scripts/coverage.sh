@@ -1,5 +1,5 @@
 if [[ "$VIRTUAL_ENV" == "" ]]; then
-  source "./venv-linux/bin/activate"
+  source "./venv/bin/activate"
 fi
 
 rm -rf htmlcov/

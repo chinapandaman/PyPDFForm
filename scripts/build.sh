@@ -1,9 +1,9 @@
-if [ ! -d "./venv-linux" ]; then
-  python3 -m venv venv-linux
+if [ ! -d "./venv" ]; then
+  python3 -m venv venv
 fi
 
 if [[ "$VIRTUAL_ENV" == "" ]]; then
-  source "./venv-linux/bin/activate"
+  source "./venv/bin/activate"
 fi
 
 pip install -U pip
