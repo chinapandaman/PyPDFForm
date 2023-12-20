@@ -167,15 +167,43 @@ def get_character_x_paddings(element: PdfDict, element_middleware: Text) -> List
     return result
 
 
-def get_paragraph_lines(element_middleware: Text) -> List[str]:
+def calculate_wrap_length(element: PdfDict, element_middleware: Text, v: str) -> int:
+    """Increments the substring until reaching maximum horizontal width."""
+
+    width = abs(
+        float(element[ANNOTATION_RECTANGLE_KEY][0])
+        - float(element[ANNOTATION_RECTANGLE_KEY][2])
+    )
+    value = element_middleware.value or ""
+    value = value.replace(NEW_LINE_SYMBOL, " ")
+
+    counter = 0
+    _width = 0
+    while _width <= width and counter < len(value):
+        counter += 1
+        _width = stringWidth(
+            v[:counter],
+            element_middleware.font,
+            element_middleware.font_size,
+        )
+    return counter - 1
+
+
+def get_paragraph_lines(element: PdfDict, element_middleware: Text) -> List[str]:
     """Splits the paragraph field's text to a list of lines."""
 
+    # pylint: disable=R0912
     lines = []
     result = []
     text_wrap_length = element_middleware.text_wrap_length
     value = element_middleware.value or ""
     if element_middleware.max_length is not None:
         value = value[: element_middleware.max_length]
+
+    width = abs(
+        float(element[ANNOTATION_RECTANGLE_KEY][0])
+        - float(element[ANNOTATION_RECTANGLE_KEY][2])
+    )
 
     split_by_new_line_symbol = value.split(NEW_LINE_SYMBOL)
     for line in split_by_new_line_symbol:
@@ -193,6 +221,14 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
             if len(split_by_new_line_symbol) > 1
             else current_line
         )
+
+    for line in lines:
+        while stringWidth(
+            line[:text_wrap_length],
+            element_middleware.font,
+            element_middleware.font_size,
+        ) > width:
+            text_wrap_length -= 1
 
     for each in lines:
         while len(each) > text_wrap_length:
@@ -221,20 +257,6 @@ def get_paragraph_lines(element_middleware: Text) -> List[str]:
 def get_paragraph_auto_wrap_length(element: PdfDict, element_middleware: Text) -> int:
     """Calculates the text wrap length of a paragraph field."""
 
-    def calculate_wrap_length(v: str) -> int:
-        """Increments the substring until reaching maximum horizontal width."""
-
-        counter = 0
-        _width = 0
-        while _width <= width and counter < len(value):
-            counter += 1
-            _width = stringWidth(
-                v[:counter],
-                element_middleware.font,
-                element_middleware.font_size,
-            )
-        return counter - 1
-
     value = element_middleware.value or ""
     value = value.replace(NEW_LINE_SYMBOL, " ")
     width = abs(
@@ -251,7 +273,7 @@ def get_paragraph_auto_wrap_length(element: PdfDict, element_middleware: Text) -
     if lines > 1:
         current_min = 0
         while len(value) and current_min < len(value):
-            result = calculate_wrap_length(value)
+            result = calculate_wrap_length(element, element_middleware, value)
             value = value[result:]
             if current_min == 0:
                 current_min = result
