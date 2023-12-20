@@ -66,6 +66,10 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/ma
 
 [Examples](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md)
 
+## Public Speak
+
+[Chicago Python User Group - Dec 14, 2023](https://youtu.be/8t1RdAKwr9w?si=TLgumBNXv9H8szSn)
+
 ## How to Contribute
 
 It is difficult to make sure that the library supports all the PDF form creating tools out 
