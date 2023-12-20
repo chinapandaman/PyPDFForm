@@ -223,11 +223,14 @@ def get_paragraph_lines(element: PdfDict, element_middleware: Text) -> List[str]
         )
 
     for line in lines:
-        while stringWidth(
-            line[:text_wrap_length],
-            element_middleware.font,
-            element_middleware.font_size,
-        ) > width:
+        while (
+            stringWidth(
+                line[:text_wrap_length],
+                element_middleware.font,
+                element_middleware.font_size,
+            )
+            > width
+        ):
             text_wrap_length -= 1
 
     for each in lines:

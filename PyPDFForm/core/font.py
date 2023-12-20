@@ -181,4 +181,6 @@ def update_text_field_attributes(
                     elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
                         _element, elements[key]
                     )
-                    elements[key].text_lines = get_paragraph_lines(_element, elements[key])
+                    elements[key].text_lines = get_paragraph_lines(
+                        _element, elements[key]
+                    )
