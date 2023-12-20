@@ -455,3 +455,22 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_pages(template_stream, pdf_samples):
+    obj = PyPDFForm(template_stream)
+
+    with open(os.path.join(
+        pdf_samples, "pages", "sample_template_page_1.pdf"
+    ), "rb+") as f:
+        assert obj.pages[0].read() == f.read()
+
+    with open(os.path.join(
+        pdf_samples, "pages", "sample_template_page_2.pdf"
+    ), "rb+") as f:
+        assert obj.pages[1].read() == f.read()
+
+    with open(os.path.join(
+        pdf_samples, "pages", "sample_template_page_3.pdf"
+    ), "rb+") as f:
+        assert obj.pages[2].read() == f.read()
