@@ -6,19 +6,19 @@ from typing import Dict, List, Tuple, Union
 from pdfrw import PdfDict, PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from ..middleware.constants import ELEMENT_TYPES
+from ..middleware.constants import WIDGET_TYPES
 from ..middleware.text import Text
 from .constants import (ANNOTATION_KEY, ANNOTATION_RECTANGLE_KEY,
                         FIELD_FLAG_KEY, NEW_LINE_SYMBOL,
                         TEXT_FIELD_MAX_LENGTH_KEY)
-from .patterns import (DROPDOWN_CHOICE_PATTERNS, ELEMENT_ALIGNMENT_PATTERNS,
-                       ELEMENT_KEY_PATTERNS, ELEMENT_TYPE_PATTERNS,
+from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
+                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS)
 from .utils import find_pattern_match, traverse_pattern
 
 
-def get_elements_by_page(pdf: Union[bytes, PdfReader]) -> Dict[int, List[PdfDict]]:
-    """Iterates through a PDF and returns all elements found grouped by page."""
+def get_widgets_by_page(pdf: Union[bytes, PdfReader]) -> Dict[int, List[PdfDict]]:
+    """Iterates through a PDF and returns all widgets found grouped by page."""
 
     if isinstance(pdf, bytes):
         pdf = PdfReader(fdata=pdf)
@@ -26,86 +26,86 @@ def get_elements_by_page(pdf: Union[bytes, PdfReader]) -> Dict[int, List[PdfDict
     result = {}
 
     for i, page in enumerate(pdf.pages):
-        elements = page[ANNOTATION_KEY]
+        widgets = page[ANNOTATION_KEY]
         result[i + 1] = []
-        if elements:
-            for element in elements:
-                for each in ELEMENT_TYPE_PATTERNS:
+        if widgets:
+            for widget in widgets:
+                for each in WIDGET_TYPE_PATTERNS:
                     patterns = each[0]
                     check = True
                     for pattern in patterns:
-                        check = check and find_pattern_match(pattern, element)
+                        check = check and find_pattern_match(pattern, widget)
                     if check:
-                        result[i + 1].append(element)
+                        result[i + 1].append(widget)
                         break
 
     return result
 
 
-def get_element_key(element: PdfDict) -> Union[str, None]:
-    """Finds a PDF element's annotated key by pattern matching."""
+def get_widget_key(widget: PdfDict) -> Union[str, None]:
+    """Finds a PDF widget's annotated key by pattern matching."""
 
     result = None
-    for pattern in ELEMENT_KEY_PATTERNS:
-        value = traverse_pattern(pattern, element)
+    for pattern in WIDGET_KEY_PATTERNS:
+        value = traverse_pattern(pattern, widget)
         if value:
             result = value[1:-1]
             break
     return result
 
 
-def get_element_alignment(element: PdfDict) -> Union[str, None]:
-    """Finds a PDF element's alignment by pattern matching."""
+def get_widget_alignment(widget: PdfDict) -> Union[str, None]:
+    """Finds a PDF widget's alignment by pattern matching."""
 
     result = None
-    for pattern in ELEMENT_ALIGNMENT_PATTERNS:
-        value = traverse_pattern(pattern, element)
+    for pattern in WIDGET_ALIGNMENT_PATTERNS:
+        value = traverse_pattern(pattern, widget)
         if value:
             result = value
             break
     return result
 
 
-def construct_element(element: PdfDict, key: str) -> Union[ELEMENT_TYPES, None]:
-    """Finds a PDF element's annotated type by pattern matching."""
+def construct_widget(widget: PdfDict, key: str) -> Union[WIDGET_TYPES, None]:
+    """Finds a PDF widget's annotated type by pattern matching."""
 
     result = None
-    for each in ELEMENT_TYPE_PATTERNS:
+    for each in WIDGET_TYPE_PATTERNS:
         patterns, _type = each
         check = True
         for pattern in patterns:
-            check = check and find_pattern_match(pattern, element)
+            check = check and find_pattern_match(pattern, widget)
         if check:
             result = _type(key)
             break
     return result
 
 
-def get_text_field_max_length(element: PdfDict) -> Union[int, None]:
+def get_text_field_max_length(widget: PdfDict) -> Union[int, None]:
     """Returns the max length of the text field if presented or None."""
 
     return (
-        int(element[TEXT_FIELD_MAX_LENGTH_KEY])
-        if TEXT_FIELD_MAX_LENGTH_KEY in element
+        int(widget[TEXT_FIELD_MAX_LENGTH_KEY])
+        if TEXT_FIELD_MAX_LENGTH_KEY in widget
         else None
     )
 
 
-def is_text_field_comb(element: PdfDict) -> bool:
+def is_text_field_comb(widget: PdfDict) -> bool:
     """Returns true if characters in a text field needs to be formatted into combs."""
 
     try:
-        return "{0:b}".format(int(element[FIELD_FLAG_KEY]))[::-1][24] == "1"
+        return "{0:b}".format(int(widget[FIELD_FLAG_KEY]))[::-1][24] == "1"
     except (IndexError, TypeError):
         return False
 
 
-def is_text_multiline(element: PdfDict) -> bool:
+def is_text_multiline(widget: PdfDict) -> bool:
     """Returns true if a text field is a paragraph field."""
 
     field_flag = None
     for pattern in TEXT_FIELD_FLAG_PATTERNS:
-        field_flag = traverse_pattern(pattern, element)
+        field_flag = traverse_pattern(pattern, widget)
         if field_flag is not None:
             break
 
@@ -118,12 +118,12 @@ def is_text_multiline(element: PdfDict) -> bool:
         return False
 
 
-def get_dropdown_choices(element: PdfDict) -> Union[Tuple[str], None]:
+def get_dropdown_choices(widget: PdfDict) -> Union[Tuple[str], None]:
     """Returns string options of a dropdown field."""
 
     result = None
     for pattern in DROPDOWN_CHOICE_PATTERNS:
-        choices = traverse_pattern(pattern, element)
+        choices = traverse_pattern(pattern, widget)
         if choices:
             result = tuple(
                 (each if isinstance(each, str) else str(each[1]))
@@ -136,30 +136,30 @@ def get_dropdown_choices(element: PdfDict) -> Union[Tuple[str], None]:
     return result
 
 
-def get_char_rect_width(element: PdfDict, element_middleware: Text) -> float:
+def get_char_rect_width(widget: PdfDict, widget_middleware: Text) -> float:
     """Returns rectangular width of each character for combed text fields."""
 
     rect_width = abs(
-        float(element[ANNOTATION_RECTANGLE_KEY][0])
-        - float(element[ANNOTATION_RECTANGLE_KEY][2])
+        float(widget[ANNOTATION_RECTANGLE_KEY][0])
+        - float(widget[ANNOTATION_RECTANGLE_KEY][2])
     )
-    return rect_width / element_middleware.max_length
+    return rect_width / widget_middleware.max_length
 
 
-def get_character_x_paddings(element: PdfDict, element_middleware: Text) -> List[float]:
+def get_character_x_paddings(widget: PdfDict, widget_middleware: Text) -> List[float]:
     """Returns paddings between characters for combed text fields."""
 
-    length = min(len(element_middleware.value or ""), element_middleware.max_length)
-    char_rect_width = get_char_rect_width(element, element_middleware)
+    length = min(len(widget_middleware.value or ""), widget_middleware.max_length)
+    char_rect_width = get_char_rect_width(widget, widget_middleware)
 
     result = []
 
     current_x = 0
-    for char in (element_middleware.value or "")[:length]:
+    for char in (widget_middleware.value or "")[:length]:
         current_mid_point = current_x + char_rect_width / 2
         result.append(
             current_mid_point
-            - stringWidth(char, element_middleware.font, element_middleware.font_size)
+            - stringWidth(char, widget_middleware.font, widget_middleware.font_size)
             / 2
         )
         current_x += char_rect_width
@@ -167,14 +167,14 @@ def get_character_x_paddings(element: PdfDict, element_middleware: Text) -> List
     return result
 
 
-def calculate_wrap_length(element: PdfDict, element_middleware: Text, v: str) -> int:
+def calculate_wrap_length(widget: PdfDict, widget_middleware: Text, v: str) -> int:
     """Increments the substring until reaching maximum horizontal width."""
 
     width = abs(
-        float(element[ANNOTATION_RECTANGLE_KEY][0])
-        - float(element[ANNOTATION_RECTANGLE_KEY][2])
+        float(widget[ANNOTATION_RECTANGLE_KEY][0])
+        - float(widget[ANNOTATION_RECTANGLE_KEY][2])
     )
-    value = element_middleware.value or ""
+    value = widget_middleware.value or ""
     value = value.replace(NEW_LINE_SYMBOL, " ")
 
     counter = 0
@@ -183,26 +183,26 @@ def calculate_wrap_length(element: PdfDict, element_middleware: Text, v: str) ->
         counter += 1
         _width = stringWidth(
             v[:counter],
-            element_middleware.font,
-            element_middleware.font_size,
+            widget_middleware.font,
+            widget_middleware.font_size,
         )
     return counter - 1
 
 
-def get_paragraph_lines(element: PdfDict, element_middleware: Text) -> List[str]:
+def get_paragraph_lines(widget: PdfDict, widget_middleware: Text) -> List[str]:
     """Splits the paragraph field's text to a list of lines."""
 
     # pylint: disable=R0912
     lines = []
     result = []
-    text_wrap_length = element_middleware.text_wrap_length
-    value = element_middleware.value or ""
-    if element_middleware.max_length is not None:
-        value = value[: element_middleware.max_length]
+    text_wrap_length = widget_middleware.text_wrap_length
+    value = widget_middleware.value or ""
+    if widget_middleware.max_length is not None:
+        value = value[: widget_middleware.max_length]
 
     width = abs(
-        float(element[ANNOTATION_RECTANGLE_KEY][0])
-        - float(element[ANNOTATION_RECTANGLE_KEY][2])
+        float(widget[ANNOTATION_RECTANGLE_KEY][0])
+        - float(widget[ANNOTATION_RECTANGLE_KEY][2])
     )
 
     split_by_new_line_symbol = value.split(NEW_LINE_SYMBOL)
@@ -226,8 +226,8 @@ def get_paragraph_lines(element: PdfDict, element_middleware: Text) -> List[str]
         while (
             stringWidth(
                 line[:text_wrap_length],
-                element_middleware.font,
-                element_middleware.font_size,
+                widget_middleware.font,
+                widget_middleware.font_size,
             )
             > width
         ):
@@ -256,26 +256,26 @@ def get_paragraph_lines(element: PdfDict, element_middleware: Text) -> List[str]
     return result
 
 
-def get_paragraph_auto_wrap_length(element: PdfDict, element_middleware: Text) -> int:
+def get_paragraph_auto_wrap_length(widget: PdfDict, widget_middleware: Text) -> int:
     """Calculates the text wrap length of a paragraph field."""
 
-    value = element_middleware.value or ""
+    value = widget_middleware.value or ""
     value = value.replace(NEW_LINE_SYMBOL, " ")
     width = abs(
-        float(element[ANNOTATION_RECTANGLE_KEY][0])
-        - float(element[ANNOTATION_RECTANGLE_KEY][2])
+        float(widget[ANNOTATION_RECTANGLE_KEY][0])
+        - float(widget[ANNOTATION_RECTANGLE_KEY][2])
     )
     text_width = stringWidth(
         value,
-        element_middleware.font,
-        element_middleware.font_size,
+        widget_middleware.font,
+        widget_middleware.font_size,
     )
 
     lines = text_width / width
     if lines > 1:
         current_min = 0
         while len(value) and current_min < len(value):
-            result = calculate_wrap_length(element, element_middleware, value)
+            result = calculate_wrap_length(widget, widget_middleware, value)
             value = value[result:]
             if current_min == 0:
                 current_min = result

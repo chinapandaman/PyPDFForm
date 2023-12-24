@@ -23,70 +23,70 @@ def draw_text(
 ) -> None:
     """Draws a text on the watermark."""
 
-    canv = args[0]
-    element = args[1]
+    canvas = args[0]
+    widget = args[1]
     coordinate_x = args[2]
     coordinate_y = args[3]
 
-    text_to_draw = element.value
+    text_to_draw = widget.value
 
     if not text_to_draw:
         text_to_draw = ""
 
-    if element.max_length is not None:
-        text_to_draw = text_to_draw[: element.max_length]
+    if widget.max_length is not None:
+        text_to_draw = text_to_draw[: widget.max_length]
 
-    canv.setFont(element.font, element.font_size)
-    canv.setFillColorRGB(
-        element.font_color[0], element.font_color[1], element.font_color[2]
+    canvas.setFont(widget.font, widget.font_size)
+    canvas.setFillColorRGB(
+        widget.font_color[0], widget.font_color[1], widget.font_color[2]
     )
 
-    if element.comb is True:
+    if widget.comb is True:
         for i, char in enumerate(text_to_draw):
-            canv.drawString(
-                coordinate_x + element.character_paddings[i],
+            canvas.drawString(
+                coordinate_x + widget.character_paddings[i],
                 coordinate_y,
                 char,
             )
     elif (
-        element.text_wrap_length is None or len(text_to_draw) < element.text_wrap_length
-    ) and element.text_lines is None:
-        canv.drawString(
+        widget.text_wrap_length is None or len(text_to_draw) < widget.text_wrap_length
+    ) and widget.text_lines is None:
+        canvas.drawString(
             coordinate_x,
             coordinate_y,
             text_to_draw,
         )
     else:
-        text_obj = canv.beginText(0, 0)
-        for i, line in enumerate(element.text_lines):
+        text_obj = canvas.beginText(0, 0)
+        for i, line in enumerate(widget.text_lines):
             cursor_moved = False
             if (
-                element.text_line_x_coordinates is not None
-                and element.text_line_x_coordinates[i] - coordinate_x != 0
+                widget.text_line_x_coordinates is not None
+                and widget.text_line_x_coordinates[i] - coordinate_x != 0
             ):
                 text_obj.moveCursor(
-                    element.text_line_x_coordinates[i] - coordinate_x, 0
+                    widget.text_line_x_coordinates[i] - coordinate_x, 0
                 )
                 cursor_moved = True
             text_obj.textLine(line)
             if cursor_moved:
                 text_obj.moveCursor(
-                    -1 * (element.text_line_x_coordinates[i] - coordinate_x), 0
+                    -1 * (widget.text_line_x_coordinates[i] - coordinate_x), 0
                 )
 
-        canv.saveState()
-        canv.translate(
+        canvas.saveState()
+        canvas.translate(
             coordinate_x,
             coordinate_y,
         )
-        canv.drawText(text_obj)
-        canv.restoreState()
+        canvas.drawText(text_obj)
+        canvas.restoreState()
 
 
 def draw_image(*args: Union[Canvas, bytes, float, int]) -> None:
     """Draws an image on the watermark."""
 
-    canv = args[0]
+    canvas = args[0]
     image_stream = args[1]
     coordinate_x = args[2]
     coordinate_y = args[3]
@@ -97,7 +97,7 @@ def draw_image(*args: Union[Canvas, bytes, float, int]) -> None:
     image_buff.write(image_stream)
     image_buff.seek(0)
 
-    canv.drawImage(
+    canvas.drawImage(
         ImageReader(image_buff),
         coordinate_x,
         coordinate_y,
@@ -129,7 +129,7 @@ def create_watermarks_and_draw(
     pdf_file = PdfReader(fdata=pdf)
     buff = BytesIO()
 
-    canv = Canvas(
+    canvas = Canvas(
         buff,
         pagesize=(
             float(pdf_file.pages[page_number - 1].MediaBox[2]),
@@ -139,12 +139,12 @@ def create_watermarks_and_draw(
 
     if action_type == "image":
         for each in actions:
-            draw_image(*([canv, *each]))
+            draw_image(*([canvas, *each]))
     elif action_type == "text":
         for each in actions:
-            draw_text(*([canv, *each]))
+            draw_text(*([canvas, *each]))
 
-    canv.save()
+    canvas.save()
     buff.seek(0)
 
     watermark = buff.read()

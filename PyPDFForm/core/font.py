@@ -10,13 +10,13 @@ from pdfrw import PdfDict, PdfReader
 from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
-from ..middleware.constants import ELEMENT_TYPES
+from ..middleware.constants import WIDGET_TYPES
 from ..middleware.text import Text
 from .constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
                         DEFAULT_FONT_SIZE, FONT_COLOR_IDENTIFIER,
                         FONT_SIZE_IDENTIFIER)
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .template import (get_element_key, get_elements_by_page,
+from .template import (get_widget_key, get_widgets_by_page,
                        get_paragraph_auto_wrap_length, get_paragraph_lines,
                        is_text_multiline)
 from .utils import traverse_pattern
@@ -39,14 +39,14 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
     return result
 
 
-def auto_detect_font(element: PdfDict) -> str:
+def auto_detect_font(widget: PdfDict) -> str:
     """Returns the font of the text field if it is one of the standard fonts."""
 
     result = DEFAULT_FONT
 
     text_appearance = None
     for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
-        text_appearance = traverse_pattern(pattern, element)
+        text_appearance = traverse_pattern(pattern, widget)
 
         if text_appearance:
             break
@@ -76,46 +76,46 @@ def auto_detect_font(element: PdfDict) -> str:
     return result
 
 
-def text_field_font_size(element: PdfDict) -> Union[float, int]:
+def text_field_font_size(widget: PdfDict) -> Union[float, int]:
     """
     Calculates the font size it should be drawn with
-    given a text field element.
+    given a text field widget.
     """
 
-    if is_text_multiline(element):
+    if is_text_multiline(widget):
         return DEFAULT_FONT_SIZE
 
     height = abs(
-        float(element[ANNOTATION_RECTANGLE_KEY][1])
-        - float(element[ANNOTATION_RECTANGLE_KEY][3])
+        float(widget[ANNOTATION_RECTANGLE_KEY][1])
+        - float(widget[ANNOTATION_RECTANGLE_KEY][3])
     )
 
     return height * 2 / 3
 
 
-def checkbox_radio_font_size(element: PdfDict) -> Union[float, int]:
+def checkbox_radio_font_size(widget: PdfDict) -> Union[float, int]:
     """
     Calculates the font size it should be drawn with
-    given a checkbox/radio button element.
+    given a checkbox/radio button widget.
     """
 
     area = abs(
-        float(element[ANNOTATION_RECTANGLE_KEY][0])
-        - float(element[ANNOTATION_RECTANGLE_KEY][2])
+        float(widget[ANNOTATION_RECTANGLE_KEY][0])
+        - float(widget[ANNOTATION_RECTANGLE_KEY][2])
     ) * abs(
-        float(element[ANNOTATION_RECTANGLE_KEY][1])
-        - float(element[ANNOTATION_RECTANGLE_KEY][3])
+        float(widget[ANNOTATION_RECTANGLE_KEY][1])
+        - float(widget[ANNOTATION_RECTANGLE_KEY][3])
     )
 
     return sqrt(area) * 72 / 96
 
 
-def get_text_field_font_size(element: PdfDict) -> Union[float, int]:
+def get_text_field_font_size(widget: PdfDict) -> Union[float, int]:
     """Returns the font size of the text field if presented or zero."""
 
     result = 0
     for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
-        text_appearance = traverse_pattern(pattern, element)
+        text_appearance = traverse_pattern(pattern, widget)
         if text_appearance:
             text_appearance = text_appearance.replace("(", "").replace(")", "")
             properties = text_appearance.split(" ")
@@ -127,13 +127,13 @@ def get_text_field_font_size(element: PdfDict) -> Union[float, int]:
 
 
 def get_text_field_font_color(
-    element: PdfDict,
+    widget: PdfDict,
 ) -> Union[Tuple[float, float, float], None]:
     """Returns the font color tuple of the text field if presented or black."""
 
     result = (0, 0, 0)
     for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
-        text_appearance = traverse_pattern(pattern, element)
+        text_appearance = traverse_pattern(pattern, widget)
         if text_appearance:
             if FONT_COLOR_IDENTIFIER not in text_appearance:
                 return result
@@ -155,32 +155,32 @@ def get_text_field_font_color(
 
 def update_text_field_attributes(
     template_stream: bytes,
-    elements: Dict[str, ELEMENT_TYPES],
+    widgets: Dict[str, WIDGET_TYPES],
 ) -> None:
     """Auto updates text fields' attributes."""
 
     template_pdf = PdfReader(fdata=template_stream)
 
-    for _, _elements in get_elements_by_page(template_pdf).items():
-        for _element in _elements:
-            key = get_element_key(_element)
+    for _, _widgets in get_widgets_by_page(template_pdf).items():
+        for _widget in _widgets:
+            key = get_widget_key(_widget)
 
-            if isinstance(elements[key], Text):
-                if elements[key].font is None:
-                    elements[key].font = auto_detect_font(_element)
-                if elements[key].font_size is None:
-                    elements[key].font_size = get_text_field_font_size(
-                        _element
-                    ) or text_field_font_size(_element)
-                if elements[key].font_color is None:
-                    elements[key].font_color = get_text_field_font_color(_element)
+            if isinstance(widgets[key], Text):
+                if widgets[key].font is None:
+                    widgets[key].font = auto_detect_font(_widget)
+                if widgets[key].font_size is None:
+                    widgets[key].font_size = get_text_field_font_size(
+                        _widget
+                    ) or text_field_font_size(_widget)
+                if widgets[key].font_color is None:
+                    widgets[key].font_color = get_text_field_font_color(_widget)
                 if (
-                    is_text_multiline(_element)
-                    and elements[key].text_wrap_length is None
+                    is_text_multiline(_widget)
+                    and widgets[key].text_wrap_length is None
                 ):
-                    elements[key].text_wrap_length = get_paragraph_auto_wrap_length(
-                        _element, elements[key]
+                    widgets[key].text_wrap_length = get_paragraph_auto_wrap_length(
+                        _widget, widgets[key]
                     )
-                    elements[key].text_lines = get_paragraph_lines(
-                        _element, elements[key]
+                    widgets[key].text_lines = get_paragraph_lines(
+                        _widget, widgets[key]
                     )

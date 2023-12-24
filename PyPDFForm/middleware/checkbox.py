@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 """Contains checkbox middleware."""
 
-from .element import Element
+from .widget import Widget
 
 
-class Checkbox(Element):
-    """A class to represent a checkbox element."""
+class Checkbox(Widget):
+    """A class to represent a checkbox widget."""
 
     def __init__(
         self,
-        element_name: str,
-        element_value: bool = None,
+        name: str,
+        value: bool = None,
     ) -> None:
         """Constructs all attributes for the checkbox."""
 
-        super().__init__(element_name, element_value)
+        super().__init__(name, value)
 
     @property
     def schema_definition(self) -> dict:

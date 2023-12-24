@@ -6,20 +6,20 @@ from typing import Dict
 from pdfrw import PdfReader
 
 from ..middleware.checkbox import Checkbox
-from ..middleware.constants import ELEMENT_TYPES
+from ..middleware.constants import WIDGET_TYPES
 from ..middleware.radio import Radio
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_text_coordinates,
                          get_text_line_x_coordinates)
 from .font import checkbox_radio_font_size
-from .template import get_element_key, get_elements_by_page
+from .template import get_widget_key, get_widgets_by_page
 from .utils import checkbox_radio_to_draw, generate_stream
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def fill(
     template_stream: bytes,
-    elements: Dict[str, ELEMENT_TYPES],
+    widgets: Dict[str, WIDGET_TYPES],
 ) -> bytes:
     """Fills a PDF using watermarks."""
 
@@ -30,31 +30,31 @@ def fill(
 
     radio_button_tracker = {}
 
-    for page, _elements in get_elements_by_page(template_pdf).items():
+    for page, _widgets in get_widgets_by_page(template_pdf).items():
         texts_to_draw[page] = []
         text_watermarks.append(b"")
-        for _element in _elements:
-            key = get_element_key(_element)
+        for _widget in _widgets:
+            key = get_widget_key(_widget)
             needs_to_be_drawn = False
 
-            if isinstance(elements[key], (Checkbox, Radio)):
-                font_size = checkbox_radio_font_size(_element)
-                _to_draw = checkbox_radio_to_draw(elements[key], font_size)
-                x, y = get_draw_checkbox_radio_coordinates(_element, _to_draw)
-                if isinstance(elements[key], Checkbox) and elements[key].value:
+            if isinstance(widgets[key], (Checkbox, Radio)):
+                font_size = checkbox_radio_font_size(_widget)
+                _to_draw = checkbox_radio_to_draw(widgets[key], font_size)
+                x, y = get_draw_checkbox_radio_coordinates(_widget, _to_draw)
+                if isinstance(widgets[key], Checkbox) and widgets[key].value:
                     needs_to_be_drawn = True
-                elif isinstance(elements[key], Radio):
+                elif isinstance(widgets[key], Radio):
                     if key not in radio_button_tracker:
                         radio_button_tracker[key] = 0
                     radio_button_tracker[key] += 1
-                    if elements[key].value == radio_button_tracker[key] - 1:
+                    if widgets[key].value == radio_button_tracker[key] - 1:
                         needs_to_be_drawn = True
             else:
-                elements[key].text_line_x_coordinates = get_text_line_x_coordinates(
-                    _element, elements[key]
+                widgets[key].text_line_x_coordinates = get_text_line_x_coordinates(
+                    _widget, widgets[key]
                 )
-                x, y = get_draw_text_coordinates(_element, elements[key])
-                _to_draw = elements[key]
+                x, y = get_draw_text_coordinates(_widget, widgets[key])
+                _to_draw = widgets[key]
                 needs_to_be_drawn = True
 
             if needs_to_be_drawn:

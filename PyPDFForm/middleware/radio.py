@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 """Contains radio middleware."""
 
-from .element import Element
+from .widget import Widget
 
 
-class Radio(Element):
-    """A class to represent a radiobutton element."""
+class Radio(Widget):
+    """A class to represent a radiobutton widget."""
 
     def __init__(
         self,
-        element_name: str,
-        element_value: int = None,
+        name: str,
+        value: int = None,
     ) -> None:
         """Constructs all attributes for the radiobutton."""
 
-        super().__init__(element_name, element_value)
+        super().__init__(name, value)
 
         self.number_of_options = 0
 

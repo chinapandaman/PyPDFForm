@@ -6,7 +6,7 @@ import os
 from PyPDFForm import PyPDFForm
 
 
-def test_pdf_form_with_pages_without_elements(issue_pdf_directory, request):
+def test_pdf_form_with_pages_without_widgets(issue_pdf_directory, request):
     obj = PyPDFForm(os.path.join(issue_pdf_directory, "PPF-246.pdf")).fill(
         {"QCredit": "5000.63"}
     )
