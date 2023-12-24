@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 """Contains text middleware."""
 
-from .element import Element
+from .widget import Widget
 
 
-class Text(Element):
-    """A class to represent a text field element."""
+class Text(Widget):
+    """A class to represent a text field widget."""
 
     def __init__(
         self,
-        element_name: str,
-        element_value: str = None,
+        name: str,
+        value: str = None,
     ) -> None:
         """Constructs all attributes for the text field."""
 
-        super().__init__(element_name, element_value)
+        super().__init__(name, value)
 
         self.font = None
         self.font_size = None

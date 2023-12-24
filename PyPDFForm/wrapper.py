@@ -10,14 +10,14 @@ from .core.filler import fill
 from .core.font import register_font, update_text_field_attributes
 from .core.image import any_image_to_jpg, rotate_image
 from .core.utils import (get_page_streams, merge_two_pdfs,
-                         preview_element_to_draw, remove_all_elements)
+                         preview_widget_to_draw, remove_all_widgets)
 from .core.watermark import (create_watermarks_and_draw,
                              merge_watermarks_with_pdf)
 from .middleware.adapter import fp_or_f_obj_or_stream_to_stream
 from .middleware.constants import (VERSION_IDENTIFIER_PREFIX,
                                    VERSION_IDENTIFIERS)
 from .middleware.dropdown import Dropdown
-from .middleware.template import (build_elements, dropdown_to_text,
+from .middleware.template import (build_widgets, dropdown_to_text,
                                   set_character_x_paddings)
 from .middleware.text import Text
 
@@ -33,9 +33,9 @@ class Wrapper:
         """Constructs all attributes for the object."""
 
         self.stream = fp_or_f_obj_or_stream_to_stream(template)
-        self.elements = build_elements(self.stream) if self.stream else {}
+        self.widgets = build_widgets(self.stream) if self.stream else {}
 
-        for each in self.elements.values():
+        for each in self.widgets.values():
             if isinstance(each, Text):
                 each.font = kwargs.get("global_font")
                 each.font_size = kwargs.get("global_font_size")
@@ -50,7 +50,7 @@ class Wrapper:
     def sample_data(self) -> dict:
         """Returns a valid sample data that can be filled into the PDF form."""
 
-        return {key: value.sample_value for key, value in self.elements.items()}
+        return {key: value.sample_value for key, value in self.widgets.items()}
 
     @property
     def version(self) -> Union[str, None]:
@@ -95,13 +95,13 @@ class Wrapper:
 
     @property
     def preview(self) -> bytes:
-        """Inspects all supported elements' names for the PDF form."""
+        """Inspects all supported widgets' names for the PDF form."""
 
         return fill(
             self.stream,
             {
-                key: preview_element_to_draw(value)
-                for key, value in self.elements.items()
+                key: preview_widget_to_draw(value)
+                for key, value in self.widgets.items()
             },
         )
 
@@ -112,18 +112,18 @@ class Wrapper:
         """Fills a PDF form."""
 
         for key, value in data.items():
-            if key in self.elements:
-                self.elements[key].value = value
+            if key in self.widgets:
+                self.widgets[key].value = value
 
-        for key, value in self.elements.items():
+        for key, value in self.widgets.items():
             if isinstance(value, Dropdown):
-                self.elements[key] = dropdown_to_text(value)
+                self.widgets[key] = dropdown_to_text(value)
 
-        update_text_field_attributes(self.stream, self.elements)
+        update_text_field_attributes(self.stream, self.widgets)
         if self.read():
-            self.elements = set_character_x_paddings(self.stream, self.elements)
+            self.widgets = set_character_x_paddings(self.stream, self.widgets)
 
-        self.stream = remove_all_elements(fill(self.stream, self.elements))
+        self.stream = remove_all_widgets(fill(self.stream, self.widgets))
 
         return self
 
@@ -137,11 +137,11 @@ class Wrapper:
     ) -> Wrapper:
         """Draws a text on a PDF form."""
 
-        new_element = Text("new")
-        new_element.value = text
-        new_element.font = kwargs.get("font", DEFAULT_FONT)
-        new_element.font_size = kwargs.get("font_size", DEFAULT_FONT_SIZE)
-        new_element.font_color = kwargs.get("font_color", DEFAULT_FONT_COLOR)
+        new_widget = Text("new")
+        new_widget.value = text
+        new_widget.font = kwargs.get("font", DEFAULT_FONT)
+        new_widget.font_size = kwargs.get("font_size", DEFAULT_FONT_SIZE)
+        new_widget.font_color = kwargs.get("font_color", DEFAULT_FONT_COLOR)
 
         watermarks = create_watermarks_and_draw(
             self.stream,
@@ -149,7 +149,7 @@ class Wrapper:
             "text",
             [
                 [
-                    new_element,
+                    new_widget,
                     x,
                     y,
                 ]
@@ -189,7 +189,7 @@ class Wrapper:
         result = {
             "type": "object",
             "properties": {
-                key: value.schema_definition for key, value in self.elements.items()
+                key: value.schema_definition for key, value in self.widgets.items()
             },
         }
 

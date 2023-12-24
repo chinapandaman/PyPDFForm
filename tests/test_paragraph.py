@@ -46,7 +46,7 @@ def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, reques
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
-        assert obj.elements["paragraph_1"].text_wrap_length is not None
+        assert obj.widgets["paragraph_1"].text_wrap_length is not None
 
 
 def test_paragraph_auto_font(
@@ -93,7 +93,7 @@ def test_paragraph_auto_font_auto_wrap(
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
-        assert obj.elements["paragraph"].text_wrap_length is not None
+        assert obj.widgets["paragraph"].text_wrap_length is not None
 
 
 def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):

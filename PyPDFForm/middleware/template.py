@@ -3,68 +3,68 @@
 
 from typing import Dict
 
-from ..core.template import (construct_element, get_character_x_paddings,
-                             get_dropdown_choices, get_element_key,
-                             get_elements_by_page, get_text_field_max_length,
+from ..core.template import (construct_widget, get_character_x_paddings,
+                             get_dropdown_choices, get_widget_key,
+                             get_widgets_by_page, get_text_field_max_length,
                              is_text_field_comb)
-from .constants import ELEMENT_TYPES
+from .constants import WIDGET_TYPES
 from .dropdown import Dropdown
 from .radio import Radio
 from .text import Text
 
 
 def set_character_x_paddings(
-    pdf_stream: bytes, eles: Dict[str, ELEMENT_TYPES]
-) -> Dict[str, ELEMENT_TYPES]:
+    pdf_stream: bytes, widgets: Dict[str, WIDGET_TYPES]
+) -> Dict[str, WIDGET_TYPES]:
     """Sets paddings between characters for combed text fields."""
 
-    for elements in get_elements_by_page(pdf_stream).values():
-        for element in elements:
-            key = get_element_key(element)
-            _element = eles[key]
+    for _widgets in get_widgets_by_page(pdf_stream).values():
+        for widget in _widgets:
+            key = get_widget_key(widget)
+            _widget = widgets[key]
 
-            if isinstance(_element, Text) and _element.comb is True:
-                _element.character_paddings = get_character_x_paddings(
-                    element, _element
+            if isinstance(_widget, Text) and _widget.comb is True:
+                _widget.character_paddings = get_character_x_paddings(
+                    widget, _widget
                 )
 
-    return eles
+    return widgets
 
 
-def build_elements(pdf_stream: bytes) -> Dict[str, ELEMENT_TYPES]:
-    """Builds an element dict given a PDF form stream."""
+def build_widgets(pdf_stream: bytes) -> Dict[str, WIDGET_TYPES]:
+    """Builds a widget dict given a PDF form stream."""
 
     results = {}
 
-    for elements in get_elements_by_page(pdf_stream).values():
-        for element in elements:
-            key = get_element_key(element)
+    for widgets in get_widgets_by_page(pdf_stream).values():
+        for widget in widgets:
+            key = get_widget_key(widget)
 
-            _element = construct_element(element, key)
+            _widget = construct_widget(widget, key)
 
-            if _element is not None:
-                if isinstance(_element, Text):
-                    _element.max_length = get_text_field_max_length(element)
-                    if _element.max_length is not None and is_text_field_comb(element):
-                        _element.comb = True
+            if _widget is not None:
+                if isinstance(_widget, Text):
+                    _widget.max_length = get_text_field_max_length(widget)
+                    if _widget.max_length is not None and is_text_field_comb(widget):
+                        _widget.comb = True
 
-                if isinstance(_element, Dropdown):
-                    _element.choices = get_dropdown_choices(element)
+                if isinstance(_widget, Dropdown):
+                    _widget.choices = get_dropdown_choices(widget)
 
-                if isinstance(_element, Radio):
+                if isinstance(_widget, Radio):
                     if key not in results:
-                        results[key] = _element
+                        results[key] = _widget
 
                     results[key].number_of_options += 1
                     continue
 
-                results[key] = _element
+                results[key] = _widget
 
     return results
 
 
 def dropdown_to_text(dropdown: Dropdown) -> Text:
-    """Converts a dropdown element to a text element."""
+    """Converts a dropdown widget to a text widget."""
 
     result = Text(dropdown.name)
 

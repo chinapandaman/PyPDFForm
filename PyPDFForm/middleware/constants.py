@@ -21,4 +21,4 @@ VERSION_IDENTIFIERS = [
 ]
 VERSION_IDENTIFIER_PREFIX = b"%PDF-"
 
-ELEMENT_TYPES = Union[Text, Checkbox, Radio, Dropdown]
+WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown]

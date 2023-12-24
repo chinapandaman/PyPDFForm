@@ -1,36 +1,36 @@
 # -*- coding: utf-8 -*-
-"""Contains element middleware."""
+"""Contains widget middleware."""
 
 from typing import Any, Union
 
 
-class Element:
-    """Base class for all PDF form elements."""
+class Widget:
+    """Base class for all PDF form widgets."""
 
     def __init__(
         self,
-        element_name: str,
-        element_value: Union[str, bool, int] = None,
+        name: str,
+        value: Union[str, bool, int] = None,
     ) -> None:
         """Constructs basic attributes for the object."""
 
-        self._name = element_name
-        self.value = element_value
+        self._name = name
+        self.value = value
 
     @property
     def name(self) -> str:
-        """Name of the element."""
+        """Name of the widget."""
 
         return self._name
 
     @property
     def schema_definition(self) -> dict:
-        """Json schema definition of the element."""
+        """Json schema definition of the widget."""
 
         raise NotImplementedError
 
     @property
     def sample_value(self) -> Any:
-        """Sample value of the element."""
+        """Sample value of the widget."""
 
         raise NotImplementedError

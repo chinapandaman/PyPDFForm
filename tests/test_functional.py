@@ -7,13 +7,13 @@ from jsonschema import ValidationError, validate
 from PyPDFForm import PyPDFForm
 from PyPDFForm.core import constants
 from PyPDFForm.core import template as template_core
-from PyPDFForm.middleware.element import Element
+from PyPDFForm.middleware.widget import Widget
 from PyPDFForm.middleware.text import Text
 
 
 def test_base_schema_definition():
     try:
-        assert Element("foo").schema_definition
+        assert Widget("foo").schema_definition
         assert False
     except NotImplementedError:
         pass
@@ -36,8 +36,8 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
-        for _, elements in template_core.get_elements_by_page(obj.read()).items():
-            assert not elements
+        for _, widgets in template_core.get_widgets_by_page(obj.read()).items():
+            assert not widgets
 
 
 def test_register_bad_fonts():
@@ -72,7 +72,7 @@ def test_fill_font_liberation_serif_italic(
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
-        for k, v in obj.elements.items():
+        for k, v in obj.widgets.items():
             assert k in data_dict
             assert v.name in data_dict
             assert v.value == data_dict[k]
@@ -97,7 +97,7 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
-        for k, v in obj.elements.items():
+        for k, v in obj.widgets.items():
             assert k in data_dict
             assert v.name in data_dict
             assert v.value == data_dict[k]
@@ -123,7 +123,7 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
-        for k, v in obj.elements.items():
+        for k, v in obj.widgets.items():
             assert k in data_dict
             assert v.name in data_dict
             assert v.value == data_dict[k]
@@ -133,17 +133,17 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
                 assert v.font_color == (1, 0, 0)
 
 
-def test_fill_with_customized_elements(
+def test_fill_with_customized_widgets(
     template_stream, pdf_samples, data_dict, request
 ):
-    expected_path = os.path.join(pdf_samples, "sample_filled_customized_elements.pdf")
+    expected_path = os.path.join(pdf_samples, "sample_filled_customized_widgets.pdf")
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(template_stream)
 
-        obj.elements["test"].font = "LiberationSerif-Italic"
-        obj.elements["test"].font_size = 20
-        obj.elements["test"].font_color = (1, 0, 0)
-        obj.elements["test_2"].font_color = (0, 1, 0)
+        obj.widgets["test"].font = "LiberationSerif-Italic"
+        obj.widgets["test"].font_size = 20
+        obj.widgets["test"].font_color = (1, 0, 0)
+        obj.widgets["test_2"].font_color = (0, 1, 0)
 
         obj.fill(data_dict)
 
@@ -155,15 +155,15 @@ def test_fill_with_customized_elements(
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
 
-        for k, v in obj.elements.items():
+        for k, v in obj.widgets.items():
             assert k in data_dict
             assert v.name in data_dict
             assert v.value == data_dict[k]
 
-        assert obj.elements["test"].font == "LiberationSerif-Italic"
-        assert obj.elements["test"].font_size == 20
-        assert obj.elements["test"].font_color == (1, 0, 0)
-        assert obj.elements["test_2"].font_color == (0, 1, 0)
+        assert obj.widgets["test"].font == "LiberationSerif-Italic"
+        assert obj.widgets["test"].font_size == 20
+        assert obj.widgets["test"].font_color == (1, 0, 0)
+        assert obj.widgets["test_2"].font_color == (0, 1, 0)
 
 
 def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream, request):
@@ -358,9 +358,9 @@ def test_sample_data(sejda_template_complex):
     except ValidationError:
         assert False
 
-    element = Element("foo")
+    widget = Widget("foo")
     try:
-        element.sample_value()
+        widget.sample_value()
         assert False
     except NotImplementedError:
         pass
@@ -389,8 +389,8 @@ def test_fill_right_aligned(
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
-        for _, elements in template_core.get_elements_by_page(obj.read()).items():
-            assert not elements
+        for _, widgets in template_core.get_widgets_by_page(obj.read()).items():
+            assert not widgets
 
 
 def test_version(pdf_samples):

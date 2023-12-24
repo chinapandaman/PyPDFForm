@@ -14,8 +14,8 @@ found [here](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/s
 
 ## Preview a PDF form
 
-This example demos how to preview a PDF form. The preview can be used to inspect the elements' names for the PDF form. 
-The generated output will have each element's name labeled on top of it in red.
+This example demos how to preview a PDF form. The preview can be used to inspect the widgets' names for the PDF form. 
+The generated output will have each widget's name labeled on top of it in red.
 
 ```python
 import os
@@ -169,11 +169,11 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     )
 ```
 
-## Fill with customized elements
+## Fill with customized widgets
 
-A lot of times you may want one or more elements' details like font size and 
+A lot of times you may want one or more widgets' details like font size and 
 text wrap length to be different from the global setting. This can be done by manipulating 
-the `elements` attributes of the object.
+the `widgets` attributes of the object.
 
 ```python
 import os
@@ -197,11 +197,11 @@ PyPDFForm.register_font("LiberationSerif-Italic", PATH_TO_SAMPLE_TTF_FONT_FILE)
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     pdf_form = PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
 
-    pdf_form.elements["test"].font_size = 20
-    pdf_form.elements["test"].font_color = (1, 0, 0)
-    pdf_form.elements["test_2"].font_color = (0, 1, 0)
-    pdf_form.elements["test_3"].font = "LiberationSerif-Italic"
-    pdf_form.elements["test_3"].font_color = (0, 0, 1)
+    pdf_form.widgets["test"].font_size = 20
+    pdf_form.widgets["test"].font_color = (1, 0, 0)
+    pdf_form.widgets["test_2"].font_color = (0, 1, 0)
+    pdf_form.widgets["test_3"].font = "LiberationSerif-Italic"
+    pdf_form.widgets["test_3"].font_color = (0, 0, 1)
 
     pdf_form.fill(
         {
@@ -220,7 +220,7 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
 ## Fill a PDF form with radio buttons
 
 This example uses this [template](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_radio_button.pdf). 
-It demos filling a PDF form's radio button elements.
+It demos filling a PDF form's radio button widgets.
 
 ```python
 import os
@@ -247,7 +247,7 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
 ## Fill a PDF form with dropdown
 
 This example uses this [template](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf). 
-It demos filling a PDF form's dropdown elements.
+It demos filling a PDF form's dropdown widgets.
 
 ```python
 import os
@@ -274,7 +274,7 @@ with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
 ## Draw text
 
 Sometimes you may want to draw some texts on a PDF form 
-even though there are no corresponding text elements. 
+even though there are no corresponding text widgets. 
 This example shows how.
 
 ```python

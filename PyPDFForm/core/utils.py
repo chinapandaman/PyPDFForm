@@ -7,7 +7,7 @@ from typing import List, Union
 from pdfrw import PdfDict, PdfReader, PdfWriter
 
 from ..middleware.checkbox import Checkbox
-from ..middleware.constants import ELEMENT_TYPES
+from ..middleware.constants import WIDGET_TYPES
 from ..middleware.radio import Radio
 from ..middleware.text import Text
 from .constants import (ANNOTATION_KEY, CHECKBOX_TO_DRAW, DEFAULT_FONT,
@@ -30,51 +30,51 @@ def generate_stream(pdf: PdfReader) -> bytes:
 
 
 def checkbox_radio_to_draw(
-    element: Union[Checkbox, Radio], font_size: Union[float, int]
+    widget: Union[Checkbox, Radio], font_size: Union[float, int]
 ) -> Text:
-    """Converts a checkbox/radio element to a drawable text element."""
+    """Converts a checkbox/radio widget to a drawable text widget."""
 
-    new_element = Text(
-        element_name=element.name,
-        element_value="",
+    new_widget = Text(
+        name=widget.name,
+        value="",
     )
-    new_element.font = DEFAULT_FONT
-    new_element.font_size = font_size
-    new_element.font_color = DEFAULT_FONT_COLOR
+    new_widget.font = DEFAULT_FONT
+    new_widget.font_size = font_size
+    new_widget.font_color = DEFAULT_FONT_COLOR
 
-    if isinstance(element, Checkbox):
-        new_element.value = CHECKBOX_TO_DRAW
-    elif isinstance(element, Radio):
-        new_element.value = RADIO_TO_DRAW
+    if isinstance(widget, Checkbox):
+        new_widget.value = CHECKBOX_TO_DRAW
+    elif isinstance(widget, Radio):
+        new_widget.value = RADIO_TO_DRAW
 
-    return new_element
+    return new_widget
 
 
-def preview_element_to_draw(element: ELEMENT_TYPES) -> Text:
-    """Converts an element to a preview text element."""
+def preview_widget_to_draw(widget: WIDGET_TYPES) -> Text:
+    """Converts a widget to a preview text widget."""
 
-    new_element = Text(
-        element_name=element.name,
-        element_value="{" + f" {element.name} " + "}",
+    new_widget = Text(
+        name=widget.name,
+        value="{" + f" {widget.name} " + "}",
     )
-    new_element.font = DEFAULT_FONT
-    new_element.font_size = DEFAULT_FONT_SIZE
-    new_element.font_color = PREVIEW_FONT_COLOR
-    new_element.preview = True
+    new_widget.font = DEFAULT_FONT
+    new_widget.font_size = DEFAULT_FONT_SIZE
+    new_widget.font_color = PREVIEW_FONT_COLOR
+    new_widget.preview = True
 
-    return new_element
+    return new_widget
 
 
-def remove_all_elements(pdf: bytes) -> bytes:
-    """Removes all elements from a pdfrw parsed PDF form."""
+def remove_all_widgets(pdf: bytes) -> bytes:
+    """Removes all widgets from a pdfrw parsed PDF form."""
 
     pdf = PdfReader(fdata=pdf)
 
     for page in pdf.pages:
-        elements = page[ANNOTATION_KEY]
-        if elements:
-            for j in reversed(range(len(elements))):
-                elements.pop(j)
+        widgets = page[ANNOTATION_KEY]
+        if widgets:
+            for j in reversed(range(len(widgets))):
+                widgets.pop(j)
 
     return generate_stream(pdf)
 
@@ -114,10 +114,10 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     return result
 
 
-def find_pattern_match(pattern: dict, element: PdfDict) -> bool:
-    """Checks if a PDF dict pattern exists in a PDF element."""
+def find_pattern_match(pattern: dict, widget: PdfDict) -> bool:
+    """Checks if a PDF dict pattern exists in a PDF widget."""
 
-    for key, value in element.items():
+    for key, value in widget.items():
         result = False
         if key in pattern:
             if isinstance(pattern[key], dict) and isinstance(value, PdfDict):
@@ -129,10 +129,10 @@ def find_pattern_match(pattern: dict, element: PdfDict) -> bool:
     return False
 
 
-def traverse_pattern(pattern: dict, element: PdfDict) -> Union[str, list, None]:
+def traverse_pattern(pattern: dict, widget: PdfDict) -> Union[str, list, None]:
     """Traverses down a PDF dict pattern and find the value."""
 
-    for key, value in element.items():
+    for key, value in widget.items():
         result = None
         if key in pattern:
             if isinstance(pattern[key], dict) and isinstance(value, PdfDict):

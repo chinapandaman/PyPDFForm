@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 """Contains dropdown middleware."""
 
-from .element import Element
+from .widget import Widget
 
 
-class Dropdown(Element):
-    """A class to represent a dropdown element."""
+class Dropdown(Widget):
+    """A class to represent a dropdown widget."""
 
     def __init__(
         self,
-        element_name: str,
-        element_value: int = None,
+        name: str,
+        value: int = None,
     ) -> None:
         """Constructs all attributes for the dropdown."""
 
-        super().__init__(element_name, element_value)
+        super().__init__(name, value)
 
         self.choices = None
 

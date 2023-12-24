@@ -1,52 +1,52 @@
 # -*- coding: utf-8 -*-
-"""Contains patterns used for identifying properties of elements."""
+"""Contains patterns used for identifying properties of widgets."""
 
 from ..middleware.checkbox import Checkbox
 from ..middleware.dropdown import Dropdown
 from ..middleware.radio import Radio
 from ..middleware.text import Text
 from .constants import (ANNOTATION_FIELD_KEY, CHOICE_FIELD_IDENTIFIER,
-                        CHOICES_IDENTIFIER, ELEMENT_TYPE_KEY, FIELD_FLAG_KEY,
+                        CHOICES_IDENTIFIER, WIDGET_TYPE_KEY, FIELD_FLAG_KEY,
                         PARENT_KEY, SELECTABLE_IDENTIFIER, SUBTYPE_KEY,
                         TEXT_FIELD_ALIGNMENT_IDENTIFIER,
                         TEXT_FIELD_APPEARANCE_IDENTIFIER,
                         TEXT_FIELD_IDENTIFIER, WIDGET_SUBTYPE_KEY)
 
-ELEMENT_TYPE_PATTERNS = [
+WIDGET_TYPE_PATTERNS = [
     (
-        ({ELEMENT_TYPE_KEY: TEXT_FIELD_IDENTIFIER},),
+        ({WIDGET_TYPE_KEY: TEXT_FIELD_IDENTIFIER},),
         Text,
     ),
     (
-        ({ELEMENT_TYPE_KEY: SELECTABLE_IDENTIFIER},),
+        ({WIDGET_TYPE_KEY: SELECTABLE_IDENTIFIER},),
         Checkbox,
     ),
     (
-        ({ELEMENT_TYPE_KEY: CHOICE_FIELD_IDENTIFIER},),
+        ({WIDGET_TYPE_KEY: CHOICE_FIELD_IDENTIFIER},),
         Dropdown,
     ),
     (
-        ({PARENT_KEY: {ELEMENT_TYPE_KEY: CHOICE_FIELD_IDENTIFIER}},),
+        ({PARENT_KEY: {WIDGET_TYPE_KEY: CHOICE_FIELD_IDENTIFIER}},),
         Dropdown,
     ),
     (
-        ({PARENT_KEY: {ELEMENT_TYPE_KEY: TEXT_FIELD_IDENTIFIER}},),
+        ({PARENT_KEY: {WIDGET_TYPE_KEY: TEXT_FIELD_IDENTIFIER}},),
         Text,
     ),
     (
         (
-            {PARENT_KEY: {ELEMENT_TYPE_KEY: SELECTABLE_IDENTIFIER}},
+            {PARENT_KEY: {WIDGET_TYPE_KEY: SELECTABLE_IDENTIFIER}},
             {PARENT_KEY: {SUBTYPE_KEY: WIDGET_SUBTYPE_KEY}},
         ),
         Checkbox,
     ),
     (
-        ({PARENT_KEY: {ELEMENT_TYPE_KEY: SELECTABLE_IDENTIFIER}},),
+        ({PARENT_KEY: {WIDGET_TYPE_KEY: SELECTABLE_IDENTIFIER}},),
         Radio,
     ),
 ]
 
-ELEMENT_KEY_PATTERNS = [
+WIDGET_KEY_PATTERNS = [
     {ANNOTATION_FIELD_KEY: True},
     {PARENT_KEY: {ANNOTATION_FIELD_KEY: True}},
 ]
@@ -56,7 +56,7 @@ DROPDOWN_CHOICE_PATTERNS = [
     {PARENT_KEY: {CHOICES_IDENTIFIER: True}},
 ]
 
-ELEMENT_ALIGNMENT_PATTERNS = [
+WIDGET_ALIGNMENT_PATTERNS = [
     {TEXT_FIELD_ALIGNMENT_IDENTIFIER: True},
     {PARENT_KEY: {TEXT_FIELD_ALIGNMENT_IDENTIFIER: True}},
 ]
