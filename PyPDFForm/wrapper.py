@@ -47,6 +47,15 @@ class Wrapper:
         return self.stream
 
     @property
+    def elements(self) -> None:
+        """Deprecated elements attribute."""
+
+        raise DeprecationWarning(
+            # pylint: disable=line-too-long
+            "Wrapper.elements is deprecated and was removed in PyPDFForm 1.4.0. Use Wrapper.widgets instead."
+        )
+
+    @property
     def sample_data(self) -> dict:
         """Returns a valid sample data that can be filled into the PDF form."""
 

@@ -19,6 +19,14 @@ def test_base_schema_definition():
         pass
 
 
+def test_elements_deprecated(template_stream):
+    try:
+        assert PyPDFForm(template_stream).elements
+        assert False
+    except DeprecationWarning:
+        assert True
+
+
 def test_fill(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "sample_filled.pdf")
     with open(expected_path, "rb+") as f:
