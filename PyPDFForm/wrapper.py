@@ -14,7 +14,7 @@ from .core.utils import (get_page_streams, merge_two_pdfs,
 from .core.watermark import (create_watermarks_and_draw,
                              merge_watermarks_with_pdf)
 from .middleware.adapter import fp_or_f_obj_or_stream_to_stream
-from .middleware.constants import (VERSION_IDENTIFIER_PREFIX,
+from .middleware.constants import (DEPRECATION_NOTICE, VERSION_IDENTIFIER_PREFIX,
                                    VERSION_IDENTIFIERS)
 from .middleware.dropdown import Dropdown
 from .middleware.template import (build_widgets, dropdown_to_text,
@@ -51,8 +51,10 @@ class Wrapper:
         """Deprecated elements attribute."""
 
         raise DeprecationWarning(
-            # pylint: disable=line-too-long
-            "Wrapper.elements is deprecated and was removed in PyPDFForm 1.4.0. Use Wrapper.widgets instead."
+            DEPRECATION_NOTICE.format(
+                "Wrapper.elements",
+                "Wrapper.widgets"
+            )
         )
 
     @property
