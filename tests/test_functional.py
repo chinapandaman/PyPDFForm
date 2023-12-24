@@ -7,8 +7,8 @@ from jsonschema import ValidationError, validate
 from PyPDFForm import PyPDFForm
 from PyPDFForm.core import constants
 from PyPDFForm.core import template as template_core
-from PyPDFForm.middleware.widget import Widget
 from PyPDFForm.middleware.text import Text
+from PyPDFForm.middleware.widget import Widget
 
 
 def test_base_schema_definition():
@@ -141,9 +141,7 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
                 assert v.font_color == (1, 0, 0)
 
 
-def test_fill_with_customized_widgets(
-    template_stream, pdf_samples, data_dict, request
-):
+def test_fill_with_customized_widgets(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "sample_filled_customized_widgets.pdf")
     with open(expected_path, "rb+") as f:
         obj = PyPDFForm(template_stream)

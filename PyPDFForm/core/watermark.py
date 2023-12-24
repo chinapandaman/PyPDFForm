@@ -64,9 +64,7 @@ def draw_text(
                 widget.text_line_x_coordinates is not None
                 and widget.text_line_x_coordinates[i] - coordinate_x != 0
             ):
-                text_obj.moveCursor(
-                    widget.text_line_x_coordinates[i] - coordinate_x, 0
-                )
+                text_obj.moveCursor(widget.text_line_x_coordinates[i] - coordinate_x, 0)
                 cursor_moved = True
             text_obj.textLine(line)
             if cursor_moved:

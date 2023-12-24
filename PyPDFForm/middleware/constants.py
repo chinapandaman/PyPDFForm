@@ -23,4 +23,6 @@ VERSION_IDENTIFIER_PREFIX = b"%PDF-"
 
 WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown]
 
-DEPRECATION_NOTICE = "{} is deprecated and was removed in PyPDFForm 1.4.0. Use {} instead."
+DEPRECATION_NOTICE = (
+    "{} is deprecated and was removed in PyPDFForm 1.4.0. Use {} instead."
+)

@@ -14,7 +14,8 @@ from .core.utils import (get_page_streams, merge_two_pdfs,
 from .core.watermark import (create_watermarks_and_draw,
                              merge_watermarks_with_pdf)
 from .middleware.adapter import fp_or_f_obj_or_stream_to_stream
-from .middleware.constants import (DEPRECATION_NOTICE, VERSION_IDENTIFIER_PREFIX,
+from .middleware.constants import (DEPRECATION_NOTICE,
+                                   VERSION_IDENTIFIER_PREFIX,
                                    VERSION_IDENTIFIERS)
 from .middleware.dropdown import Dropdown
 from .middleware.template import (build_widgets, dropdown_to_text,
@@ -51,10 +52,7 @@ class Wrapper:
         """Deprecated elements attribute."""
 
         raise DeprecationWarning(
-            DEPRECATION_NOTICE.format(
-                "Wrapper.elements",
-                "Wrapper.widgets"
-            )
+            DEPRECATION_NOTICE.format("Wrapper.elements", "Wrapper.widgets")
         )
 
     @property
@@ -110,10 +108,7 @@ class Wrapper:
 
         return fill(
             self.stream,
-            {
-                key: preview_widget_to_draw(value)
-                for key, value in self.widgets.items()
-            },
+            {key: preview_widget_to_draw(value) for key, value in self.widgets.items()},
         )
 
     def fill(

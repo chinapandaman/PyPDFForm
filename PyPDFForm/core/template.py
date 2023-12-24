@@ -11,9 +11,9 @@ from ..middleware.text import Text
 from .constants import (ANNOTATION_KEY, ANNOTATION_RECTANGLE_KEY,
                         FIELD_FLAG_KEY, NEW_LINE_SYMBOL,
                         TEXT_FIELD_MAX_LENGTH_KEY)
-from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
-                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
-                       TEXT_FIELD_FLAG_PATTERNS)
+from .patterns import (DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
+                       WIDGET_ALIGNMENT_PATTERNS, WIDGET_KEY_PATTERNS,
+                       WIDGET_TYPE_PATTERNS)
 from .utils import find_pattern_match, traverse_pattern
 
 
@@ -159,8 +159,7 @@ def get_character_x_paddings(widget: PdfDict, widget_middleware: Text) -> List[f
         current_mid_point = current_x + char_rect_width / 2
         result.append(
             current_mid_point
-            - stringWidth(char, widget_middleware.font, widget_middleware.font_size)
-            / 2
+            - stringWidth(char, widget_middleware.font, widget_middleware.font_size) / 2
         )
         current_x += char_rect_width
 

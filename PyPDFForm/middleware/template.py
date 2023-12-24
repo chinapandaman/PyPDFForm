@@ -4,8 +4,8 @@
 from typing import Dict
 
 from ..core.template import (construct_widget, get_character_x_paddings,
-                             get_dropdown_choices, get_widget_key,
-                             get_widgets_by_page, get_text_field_max_length,
+                             get_dropdown_choices, get_text_field_max_length,
+                             get_widget_key, get_widgets_by_page,
                              is_text_field_comb)
 from .constants import WIDGET_TYPES
 from .dropdown import Dropdown
@@ -24,9 +24,7 @@ def set_character_x_paddings(
             _widget = widgets[key]
 
             if isinstance(_widget, Text) and _widget.comb is True:
-                _widget.character_paddings = get_character_x_paddings(
-                    widget, _widget
-                )
+                _widget.character_paddings = get_character_x_paddings(widget, _widget)
 
     return widgets
 

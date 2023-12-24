@@ -16,9 +16,8 @@ from .constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
                         DEFAULT_FONT_SIZE, FONT_COLOR_IDENTIFIER,
                         FONT_SIZE_IDENTIFIER)
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .template import (get_widget_key, get_widgets_by_page,
-                       get_paragraph_auto_wrap_length, get_paragraph_lines,
-                       is_text_multiline)
+from .template import (get_paragraph_auto_wrap_length, get_paragraph_lines,
+                       get_widget_key, get_widgets_by_page, is_text_multiline)
 from .utils import traverse_pattern
 
 
@@ -174,13 +173,8 @@ def update_text_field_attributes(
                     ) or text_field_font_size(_widget)
                 if widgets[key].font_color is None:
                     widgets[key].font_color = get_text_field_font_color(_widget)
-                if (
-                    is_text_multiline(_widget)
-                    and widgets[key].text_wrap_length is None
-                ):
+                if is_text_multiline(_widget) and widgets[key].text_wrap_length is None:
                     widgets[key].text_wrap_length = get_paragraph_auto_wrap_length(
                         _widget, widgets[key]
                     )
-                    widgets[key].text_lines = get_paragraph_lines(
-                        _widget, widgets[key]
-                    )
+                    widgets[key].text_lines = get_paragraph_lines(_widget, widgets[key])

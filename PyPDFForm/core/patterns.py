@@ -6,11 +6,12 @@ from ..middleware.dropdown import Dropdown
 from ..middleware.radio import Radio
 from ..middleware.text import Text
 from .constants import (ANNOTATION_FIELD_KEY, CHOICE_FIELD_IDENTIFIER,
-                        CHOICES_IDENTIFIER, WIDGET_TYPE_KEY, FIELD_FLAG_KEY,
-                        PARENT_KEY, SELECTABLE_IDENTIFIER, SUBTYPE_KEY,
+                        CHOICES_IDENTIFIER, FIELD_FLAG_KEY, PARENT_KEY,
+                        SELECTABLE_IDENTIFIER, SUBTYPE_KEY,
                         TEXT_FIELD_ALIGNMENT_IDENTIFIER,
                         TEXT_FIELD_APPEARANCE_IDENTIFIER,
-                        TEXT_FIELD_IDENTIFIER, WIDGET_SUBTYPE_KEY)
+                        TEXT_FIELD_IDENTIFIER, WIDGET_SUBTYPE_KEY,
+                        WIDGET_TYPE_KEY)
 
 WIDGET_TYPE_PATTERNS = [
     (
