@@ -228,6 +228,8 @@ class PyPDFForm(PdfWrapper):
         template: Union[bytes, str, BinaryIO] = b"",
         **kwargs,
     ):
+        """Only extra thing is the deprecation notice."""
+
         warn(
             DEPRECATION_NOTICE.format(
                 "PyPDFForm.PyPDFForm", "PyPDFForm.PdfWrapper"
