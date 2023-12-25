@@ -73,7 +73,7 @@ class PdfWrapper:
 
     @property
     def pages(self) -> List[PdfWrapper]:
-        """Returns a list of wrapper objects where each is a page of the PDF form."""
+        """Returns a list of pdf wrapper objects where each is a page of the PDF form."""
 
         return [self.__class__(each) for each in get_page_streams(self.stream)]
 
