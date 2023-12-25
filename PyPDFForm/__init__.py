@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Contains wrapper."""
-
-from .wrapper import Wrapper
-
-PyPDFForm = Wrapper
+"""Contains any object users might need."""
 
 __version__ = "1.3.5"
+
+from .wrapper import PdfWrapper

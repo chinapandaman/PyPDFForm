@@ -23,7 +23,7 @@ from .middleware.template import (build_widgets, dropdown_to_text,
 from .middleware.text import Text
 
 
-class Wrapper:
+class PdfWrapper:
     """A class to represent a PDF form."""
 
     def __init__(
@@ -52,7 +52,7 @@ class Wrapper:
         """Deprecated elements attribute."""
 
         raise DeprecationWarning(
-            DEPRECATION_NOTICE.format("Wrapper.elements", "Wrapper.widgets")
+            DEPRECATION_NOTICE.format("PdfWrapper.elements", "1.4.0", "PdfWrapper.widgets")
         )
 
     @property
@@ -72,12 +72,12 @@ class Wrapper:
         return None
 
     @property
-    def pages(self) -> List[Wrapper]:
+    def pages(self) -> List[PdfWrapper]:
         """Returns a list of wrapper objects where each is a page of the PDF form."""
 
         return [self.__class__(each) for each in get_page_streams(self.stream)]
 
-    def change_version(self, version: str) -> Wrapper:
+    def change_version(self, version: str) -> PdfWrapper:
         """Changes the version of the PDF."""
 
         self.stream = self.stream.replace(
@@ -88,7 +88,7 @@ class Wrapper:
 
         return self
 
-    def __add__(self, other: Wrapper) -> Wrapper:
+    def __add__(self, other: PdfWrapper) -> PdfWrapper:
         """Overloaded addition operator to perform merging PDFs."""
 
         if not self.stream:
@@ -114,7 +114,7 @@ class Wrapper:
     def fill(
         self,
         data: Dict[str, Union[str, bool, int]],
-    ) -> Wrapper:
+    ) -> PdfWrapper:
         """Fills a PDF form."""
 
         for key, value in data.items():
@@ -140,7 +140,7 @@ class Wrapper:
         x: Union[float, int],
         y: Union[float, int],
         **kwargs,
-    ) -> Wrapper:
+    ) -> PdfWrapper:
         """Draws a text on a PDF form."""
 
         new_widget = Text("new")
@@ -175,7 +175,7 @@ class Wrapper:
         width: Union[float, int],
         height: Union[float, int],
         rotation: Union[float, int] = 0,
-    ) -> Wrapper:
+    ) -> PdfWrapper:
         """Draws an image on a PDF form."""
 
         image = fp_or_f_obj_or_stream_to_stream(image)

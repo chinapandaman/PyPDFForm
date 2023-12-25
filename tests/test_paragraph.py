@@ -3,7 +3,7 @@
 
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 
 def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples, request):
@@ -11,7 +11,7 @@ def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples, req
         pdf_samples, "paragraph", "test_paragraph_y_coordinate.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_paragraph).fill(
+        obj = PdfWrapper(sample_template_with_paragraph).fill(
             {"paragraph_1": "test paragraph"}
         )
 
@@ -31,7 +31,7 @@ def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, reques
         pdf_samples, "paragraph", "test_paragraph_auto_wrap.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_paragraph).fill(
+        obj = PdfWrapper(sample_template_with_paragraph).fill(
             {
                 "paragraph_1": "t xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx t"
             }
@@ -56,7 +56,7 @@ def test_paragraph_auto_font(
         pdf_samples, "paragraph", "test_paragraph_auto_font.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_paragraph_auto_font).fill(
+        obj = PdfWrapper(sample_template_with_paragraph_auto_font).fill(
             {"paragraph": "test paragraph"}
         )
 
@@ -78,7 +78,7 @@ def test_paragraph_auto_font_auto_wrap(
         pdf_samples, "paragraph", "test_paragraph_auto_font_auto_wrap.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_paragraph_auto_font).fill(
+        obj = PdfWrapper(sample_template_with_paragraph_auto_font).fill(
             {
                 "paragraph": "t xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx t"
             }
@@ -101,7 +101,7 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
         pdf_samples, "paragraph", "sample_filled_sejda_complex.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sejda_template_complex).fill(
+        obj = PdfWrapper(sejda_template_complex).fill(
             {
                 "checkbox": True,
                 "radio": 0,
@@ -146,7 +146,7 @@ def test_sejda_complex_paragraph_multiple_line_alignment(
         "sample_filled_sejda_complex_paragraph_multiple_line_alignment.pdf",
     )
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sejda_template_complex).fill(
+        obj = PdfWrapper(sejda_template_complex).fill(
             {
                 "paragraph_font_auto_left": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
                 "paragraph_font_auto_right": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
@@ -171,7 +171,7 @@ def test_sejda_complex_paragraph_multiple_line_alignment(
 def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "paragraph", "test_paragraph_complex.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_paragraph_complex).fill(
+        obj = PdfWrapper(sample_template_paragraph_complex).fill(
             {
                 "paragraph_font_auto_left": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
                 "paragraph_font_auto_right": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
@@ -200,7 +200,7 @@ def test_paragraph_max_length(
         pdf_samples, "paragraph", "test_paragraph_max_length.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_paragraph_max_length).fill(
+        obj = PdfWrapper(sample_template_with_paragraph_max_length).fill(
             {
                 "paragraph": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
             }

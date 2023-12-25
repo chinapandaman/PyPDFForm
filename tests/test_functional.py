@@ -4,7 +4,7 @@ import os
 
 from jsonschema import ValidationError, validate
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 from PyPDFForm.core import constants
 from PyPDFForm.core import template as template_core
 from PyPDFForm.middleware.text import Text
@@ -21,7 +21,15 @@ def test_base_schema_definition():
 
 def test_elements_deprecated(template_stream):
     try:
-        assert PyPDFForm(template_stream).elements
+        assert PdfWrapper(template_stream).elements
+        assert False
+    except DeprecationWarning:
+        assert True
+
+
+def test_pypdfform_deprecated(template_stream):
+    try:
+        from PyPDFForm import PyPDFForm
         assert False
     except DeprecationWarning:
         assert True
@@ -30,7 +38,7 @@ def test_elements_deprecated(template_stream):
 def test_fill(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "sample_filled.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(template_stream).fill(
+        obj = PdfWrapper(template_stream).fill(
             data_dict,
         )
 
@@ -49,8 +57,8 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
 
 
 def test_register_bad_fonts():
-    assert not PyPDFForm.register_font("foo", b"foo")
-    assert not PyPDFForm.register_font("foo", "foo")
+    assert not PdfWrapper.register_font("foo", b"foo")
+    assert not PdfWrapper.register_font("foo", "foo")
 
 
 def test_fill_font_liberation_serif_italic(
@@ -59,7 +67,7 @@ def test_fill_font_liberation_serif_italic(
     with open(os.path.join(font_samples, "LiberationSerif-Italic.ttf"), "rb+") as _f:
         stream = _f.read()
         _f.seek(0)
-        PyPDFForm.register_font("LiberationSerif-Italic", stream)
+        PdfWrapper.register_font("LiberationSerif-Italic", stream)
 
     expected_path = os.path.join(
         pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"
@@ -68,7 +76,7 @@ def test_fill_font_liberation_serif_italic(
         expected_path,
         "rb+",
     ) as f:
-        obj = PyPDFForm(template_stream, global_font="LiberationSerif-Italic").fill(
+        obj = PdfWrapper(template_stream, global_font="LiberationSerif-Italic").fill(
             data_dict,
         )
 
@@ -93,7 +101,7 @@ def test_fill_font_liberation_serif_italic(
 def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "sample_filled_font_20.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(template_stream, global_font_size=20).fill(
+        obj = PdfWrapper(template_stream, global_font_size=20).fill(
             data_dict,
         )
 
@@ -119,7 +127,7 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
 def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "sample_filled_font_color_red.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(template_stream, global_font_color=(1, 0, 0)).fill(
+        obj = PdfWrapper(template_stream, global_font_color=(1, 0, 0)).fill(
             data_dict,
         )
 
@@ -144,7 +152,7 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
 def test_fill_with_customized_widgets(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "sample_filled_customized_widgets.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(template_stream)
+        obj = PdfWrapper(template_stream)
 
         obj.widgets["test"].font = "LiberationSerif-Italic"
         obj.widgets["test"].font_size = 20
@@ -175,7 +183,7 @@ def test_fill_with_customized_widgets(template_stream, pdf_samples, data_dict, r
 def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream, request):
     expected_path = os.path.join(pdf_samples, "sample_filled_radiobutton.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(template_with_radiobutton_stream).fill(
+        obj = PdfWrapper(template_with_radiobutton_stream).fill(
             {
                 "radio_1": 0,
                 "radio_2": 1,
@@ -195,7 +203,7 @@ def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream, request
 def test_fill_sejda_and_read(sejda_template, pdf_samples, sejda_data, request):
     expected_path = os.path.join(pdf_samples, "sample_filled_sejda.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sejda_template).fill(
+        obj = PdfWrapper(sejda_template).fill(
             sejda_data,
         )
 
@@ -213,7 +221,7 @@ def test_fill_sejda_and_read(sejda_template, pdf_samples, sejda_data, request):
 def test_draw_text_on_one_page(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "sample_pdf_with_drawn_text.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(template_stream).draw_text(
+        obj = PdfWrapper(template_stream).draw_text(
             "drawn_text",
             1,
             300,
@@ -236,7 +244,7 @@ def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples, req
     expected_path = os.path.join(pdf_samples, "sample_pdf_with_image.pdf")
     with open(expected_path, "rb+") as f:
         with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
-            obj = PyPDFForm(template_stream).draw_image(
+            obj = PdfWrapper(template_stream).draw_image(
                 _f,
                 2,
                 100,
@@ -259,7 +267,7 @@ def test_draw_png_image_on_one_page(
 ):
     expected_path = os.path.join(pdf_samples, "sample_pdf_with_png_image.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(template_stream).draw_image(
+        obj = PdfWrapper(template_stream).draw_image(
             os.path.join(image_samples, "sample_png_image.png"),
             2,
             100,
@@ -280,10 +288,10 @@ def test_draw_png_image_on_one_page(
 def test_addition_operator_3_times(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "sample_added_3_copies.pdf")
     with open(expected_path, "rb+") as f:
-        result = PyPDFForm()
+        result = PdfWrapper()
 
         for _ in range(3):
-            result += PyPDFForm(template_stream).fill(data_dict)
+            result += PdfWrapper(template_stream).fill(data_dict)
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = result.read()
@@ -291,8 +299,8 @@ def test_addition_operator_3_times(template_stream, pdf_samples, data_dict, requ
         expected = f.read()
         assert len(result.read()) == len(expected)
         assert result.read() == expected
-        assert len((result + PyPDFForm()).read()) == len(result.read())
-        assert (result + PyPDFForm()).read() == result.read()
+        assert len((result + PdfWrapper()).read()) == len(result.read())
+        assert (result + PdfWrapper()).read() == result.read()
 
 
 def test_addition_operator_3_times_sejda(
@@ -300,10 +308,10 @@ def test_addition_operator_3_times_sejda(
 ):
     expected_path = os.path.join(pdf_samples, "sample_added_3_copies_sejda.pdf")
     with open(expected_path, "rb+") as f:
-        result = PyPDFForm()
+        result = PdfWrapper()
 
         for _ in range(3):
-            result += PyPDFForm(sejda_template).fill(sejda_data)
+            result += PdfWrapper(sejda_template).fill(sejda_data)
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = result.read()
@@ -321,7 +329,7 @@ def test_generate_schema(sample_template_with_comb_text_field):
         "Awesomeness": True,
         "Gender": 0,
     }
-    schema = PyPDFForm(sample_template_with_comb_text_field).generate_schema()
+    schema = PdfWrapper(sample_template_with_comb_text_field).generate_schema()
 
     assert schema["type"] == "object"
     properties = schema["properties"]
@@ -358,7 +366,7 @@ def test_generate_schema(sample_template_with_comb_text_field):
 
 
 def test_sample_data(sejda_template_complex):
-    obj = PyPDFForm(sejda_template_complex)
+    obj = PdfWrapper(sejda_template_complex)
     try:
         validate(instance=obj.sample_data, schema=obj.generate_schema())
     except ValidationError:
@@ -377,7 +385,7 @@ def test_fill_right_aligned(
 ):
     expected_path = os.path.join(pdf_samples, "sample_filled_right_aligned.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_right_aligned_text_field).fill(
+        obj = PdfWrapper(sample_template_with_right_aligned_text_field).fill(
             {
                 "name": "Hans Mustermann",
                 "fulladdress": "Musterstr. 12, 82903 Musterdorf, Musterland",
@@ -403,18 +411,18 @@ def test_version(pdf_samples):
     versions = ["1.0", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "2.0"]
 
     for version in versions:
-        obj = PyPDFForm(os.path.join(pdf_samples, "versions", f"{version}.pdf"))
+        obj = PdfWrapper(os.path.join(pdf_samples, "versions", f"{version}.pdf"))
         assert obj.version == version
         assert obj.change_version("2.0").version == "2.0"
 
-    obj = PyPDFForm(os.path.join(pdf_samples, "versions", "unknown.pdf"))
+    obj = PdfWrapper(os.path.join(pdf_samples, "versions", "unknown.pdf"))
     assert obj.version is None
 
 
 def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_fill_font_color.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_font_colors).fill(
+        obj = PdfWrapper(sample_template_with_font_colors).fill(
             {
                 "red_12": "red",
                 "green_14": "green",
@@ -437,7 +445,7 @@ def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request)
 def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_fill_complex_fonts.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_complex_fonts).fill(
+        obj = PdfWrapper(sample_template_with_complex_fonts).fill(
             {
                 "Courier": "Test",
                 "Courier-Bold": "Test",
@@ -464,7 +472,7 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
 
 
 def test_pages(template_stream, pdf_samples):
-    obj = PyPDFForm(template_stream)
+    obj = PdfWrapper(template_stream)
 
     with open(
         os.path.join(pdf_samples, "pages", "sample_template_page_1.pdf"), "rb+"
