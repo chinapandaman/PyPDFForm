@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from warnings import warn
 from typing import BinaryIO, Dict, List, Union
 
 from .core.constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE
@@ -48,14 +49,19 @@ class PdfWrapper:
         return self.stream
 
     @property
-    def elements(self) -> None:
-        """Deprecated elements attribute."""
+    def elements(self) -> dict:
+        """About to be deprecated."""
 
-        raise DeprecationWarning(
+        warn(
             DEPRECATION_NOTICE.format(
-                "PdfWrapper.elements", "1.4.0", "PdfWrapper.widgets"
-            )
+                f"{self.__class__.__name__}.elements",
+                f"{self.__class__.__name__}.widgets"
+            ),
+            DeprecationWarning,
+            stacklevel=2
         )
+
+        return self.widgets
 
     @property
     def sample_data(self) -> dict:
@@ -212,3 +218,22 @@ class PdfWrapper:
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         return register_font(font_name, ttf_file) if ttf_file is not None else False
+
+
+class PyPDFForm(PdfWrapper):
+    """About to be deprecated."""
+
+    def __init__(
+        self,
+        template: Union[bytes, str, BinaryIO] = b"",
+        **kwargs,
+    ):
+        warn(
+            DEPRECATION_NOTICE.format(
+                "PyPDFForm.PyPDFForm", "PyPDFForm.PdfWrapper"
+            ),
+            DeprecationWarning,
+            stacklevel=2
+        )
+
+        super().__init__(template, **kwargs)

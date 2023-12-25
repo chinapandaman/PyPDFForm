@@ -3,4 +3,4 @@
 
 __version__ = "1.3.5"
 
-from .wrapper import PdfWrapper
+from .wrapper import PdfWrapper, PyPDFForm
