@@ -24,7 +24,7 @@ def test_elements_deprecation_notice(template_stream):
     with pytest.warns(DeprecationWarning) as r:
         obj = PdfWrapper(template_stream)
         assert not r
-
+        assert obj.elements is obj.widgets
         obj.elements["test"].font_size = 20
         assert obj.widgets["test"].font_size == 20
         assert r
