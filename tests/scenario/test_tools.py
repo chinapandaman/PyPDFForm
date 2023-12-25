@@ -51,9 +51,9 @@ def test_filling_sejda_dropdown_pdf_form(tool_pdf_directory, request):
     expected_path = os.path.join(tool_pdf_directory, "sejda_dropdown_expected.pdf")
     with open(expected_path, "rb+") as f:
         expected = f.read()
-        result = PdfWrapper(os.path.join(tool_pdf_directory, "sejda_dropdown.pdf")).fill(
-            {"dropdown_1": 2}
-        )
+        result = PdfWrapper(
+            os.path.join(tool_pdf_directory, "sejda_dropdown.pdf")
+        ).fill({"dropdown_1": 2})
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = result.read()
         assert len(result.read()) == len(expected)

@@ -52,7 +52,9 @@ class PdfWrapper:
         """Deprecated elements attribute."""
 
         raise DeprecationWarning(
-            DEPRECATION_NOTICE.format("PdfWrapper.elements", "1.4.0", "PdfWrapper.widgets")
+            DEPRECATION_NOTICE.format(
+                "PdfWrapper.elements", "1.4.0", "PdfWrapper.widgets"
+            )
         )
 
     @property

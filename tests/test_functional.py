@@ -30,6 +30,7 @@ def test_elements_deprecated(template_stream):
 def test_pypdfform_deprecated(template_stream):
     try:
         from PyPDFForm import PyPDFForm
+
         assert False
     except DeprecationWarning:
         assert True
