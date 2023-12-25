@@ -3,8 +3,8 @@
 
 from __future__ import annotations
 
-from warnings import warn
 from typing import BinaryIO, Dict, List, Union
+from warnings import warn
 
 from .core.constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE
 from .core.filler import fill
@@ -55,10 +55,10 @@ class PdfWrapper:
         warn(
             DEPRECATION_NOTICE.format(
                 f"{self.__class__.__name__}.elements",
-                f"{self.__class__.__name__}.widgets"
+                f"{self.__class__.__name__}.widgets",
             ),
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
 
         return self.widgets
@@ -231,11 +231,9 @@ class PyPDFForm(PdfWrapper):
         """Only extra thing is the deprecation notice."""
 
         warn(
-            DEPRECATION_NOTICE.format(
-                "PyPDFForm.PyPDFForm", "PyPDFForm.PdfWrapper"
-            ),
+            DEPRECATION_NOTICE.format("PyPDFForm.PyPDFForm", "PyPDFForm.PdfWrapper"),
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
 
         super().__init__(template, **kwargs)
