@@ -20,7 +20,7 @@ def test_base_schema_definition():
         pass
 
 
-def test_elements_deprecated(template_stream):
+def test_elements_deprecation_notice(template_stream):
     with pytest.warns(DeprecationWarning) as r:
         obj = PdfWrapper(template_stream)
         assert not r
@@ -30,7 +30,7 @@ def test_elements_deprecated(template_stream):
         assert r
 
 
-def test_pypdfform_deprecated(template_stream):
+def test_pypdfform_deprecation_notice(template_stream):
     with pytest.warns(DeprecationWarning) as r:
         assert PyPDFForm(template_stream)
         assert r
