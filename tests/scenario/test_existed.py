@@ -2,11 +2,11 @@
 
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 
 def test_illinois_gun_bill_of_sale(existed_pdf_directory, request):
-    obj = PyPDFForm(
+    obj = PdfWrapper(
         os.path.join(existed_pdf_directory, "illinois-gun-bill-of-sale.pdf")
     ).fill(
         {
@@ -57,7 +57,7 @@ def test_illinois_gun_bill_of_sale(existed_pdf_directory, request):
 
 
 def test_ds82(existed_pdf_directory, request):
-    obj = PyPDFForm(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
+    obj = PdfWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
         {
             "LastName": "Smith",
         }
@@ -79,7 +79,7 @@ def test_ds82(existed_pdf_directory, request):
 
 
 def test_ds82_all_chars_lowercase(existed_pdf_directory, request):
-    obj = PyPDFForm(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
+    obj = PdfWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
         {
             "LastName": "x" * 30,
         }
@@ -101,7 +101,7 @@ def test_ds82_all_chars_lowercase(existed_pdf_directory, request):
 
 
 def test_ds82_all_chars_uppercase(existed_pdf_directory, request):
-    obj = PyPDFForm(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
+    obj = PdfWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
         {
             "LastName": "X" * 30,
         }
@@ -123,7 +123,7 @@ def test_ds82_all_chars_uppercase(existed_pdf_directory, request):
 
 
 def test_ds82_mixed_case(existed_pdf_directory, request):
-    obj = PyPDFForm(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
+    obj = PdfWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
         {
             "LastName": "xX" * 10,
         }
@@ -145,7 +145,7 @@ def test_ds82_mixed_case(existed_pdf_directory, request):
 
 
 def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory, request):
-    obj = PyPDFForm(
+    obj = PdfWrapper(
         os.path.join(
             existed_pdf_directory, "illinois-real-estate-power-of-attorney-form.pdf"
         )

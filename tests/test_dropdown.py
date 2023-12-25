@@ -2,11 +2,11 @@
 
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 
 def test_generate_schema(sample_template_with_dropdown):
-    schema = PyPDFForm(sample_template_with_dropdown).generate_schema()
+    schema = PdfWrapper(sample_template_with_dropdown).generate_schema()
 
     for key, value in schema["properties"].items():
         if key == "dropdown_1":
@@ -15,7 +15,7 @@ def test_generate_schema(sample_template_with_dropdown):
 
 def test_dropdown_not_specified(sample_template_with_dropdown):
     assert (
-        PyPDFForm(sample_template_with_dropdown)
+        PdfWrapper(sample_template_with_dropdown)
         .fill(
             {
                 "test_1": "test_1",
@@ -34,7 +34,7 @@ def test_dropdown_not_specified(sample_template_with_dropdown):
 def test_dropdown_one(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "dropdown", "dropdown_one.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_dropdown).fill(
+        obj = PdfWrapper(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -59,7 +59,7 @@ def test_dropdown_one(sample_template_with_dropdown, pdf_samples, request):
 def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "dropdown", "dropdown_two.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_dropdown).fill(
+        obj = PdfWrapper(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -84,7 +84,7 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
 def test_dropdown_three(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "dropdown", "dropdown_three.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_dropdown).fill(
+        obj = PdfWrapper(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -109,7 +109,7 @@ def test_dropdown_three(sample_template_with_dropdown, pdf_samples, request):
 def test_dropdown_four(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "dropdown", "dropdown_four.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_dropdown).fill(
+        obj = PdfWrapper(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -136,7 +136,7 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
         pdf_samples, "dropdown", "dropdown_alignment_expected.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(dropdown_alignment).fill(
+        obj = PdfWrapper(dropdown_alignment).fill(
             {
                 "dropdown_left": 0,
                 "dropdown_center": 1,
@@ -161,7 +161,7 @@ def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples, request
         expected_path,
         "rb+",
     ) as f:
-        obj = PyPDFForm(dropdown_alignment_sejda).fill(
+        obj = PdfWrapper(dropdown_alignment_sejda).fill(
             {
                 "dropdown_left": 0,
                 "dropdown_center": 1,

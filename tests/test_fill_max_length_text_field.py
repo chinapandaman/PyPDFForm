@@ -2,7 +2,7 @@
 
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 
 def test_fill_max_length_text_field_all_chars(
@@ -15,7 +15,7 @@ def test_fill_max_length_text_field_all_chars(
         expected_path,
         "rb+",
     ) as f:
-        obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
+        obj = PdfWrapper(sample_template_with_max_length_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -44,7 +44,7 @@ def test_fill_max_length_text_field_odd_chars(
         expected_path,
         "rb+",
     ) as f:
-        obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
+        obj = PdfWrapper(sample_template_with_max_length_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -73,7 +73,7 @@ def test_fill_max_length_text_field_even_chars(
         expected_path,
         "rb+",
     ) as f:
-        obj = PyPDFForm(sample_template_with_max_length_text_field).fill(
+        obj = PdfWrapper(sample_template_with_max_length_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -102,7 +102,7 @@ def test_fill_comb_text_field_all_chars(
         expected_path,
         "rb+",
     ) as f:
-        obj = PyPDFForm(sample_template_with_comb_text_field).fill(
+        obj = PdfWrapper(sample_template_with_comb_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -131,7 +131,7 @@ def test_fill_comb_text_field_odd_chars(
         expected_path,
         "rb+",
     ) as f:
-        obj = PyPDFForm(sample_template_with_comb_text_field).fill(
+        obj = PdfWrapper(sample_template_with_comb_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -160,7 +160,7 @@ def test_fill_comb_text_field_even_chars(
         expected_path,
         "rb+",
     ) as f:
-        obj = PyPDFForm(sample_template_with_comb_text_field).fill(
+        obj = PdfWrapper(sample_template_with_comb_text_field).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",
@@ -186,7 +186,7 @@ def test_fill_comb_text_field_void(
         max_length_expected_directory, "comb_text_field_void.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PyPDFForm(sample_template_with_comb_text_field).fill({})
+        obj = PdfWrapper(sample_template_with_comb_text_field).fill({})
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
@@ -209,7 +209,7 @@ def test_fill_comb_text_field_even_chars_right_aligned(
         expected_path,
         "rb+",
     ) as f:
-        obj = PyPDFForm(sample_template_with_comb_text_field_right_aligned).fill(
+        obj = PdfWrapper(sample_template_with_comb_text_field_right_aligned).fill(
             {
                 "FirstName": "John",
                 "MiddleName": "Joe",

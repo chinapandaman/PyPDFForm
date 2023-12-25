@@ -20,7 +20,7 @@ The generated output will have each widget's name labeled on top of it in red.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -32,7 +32,7 @@ PATH_TO_PDF_FORM_PREVIEW = os.path.join(
 
 with open(PATH_TO_PDF_FORM_PREVIEW, "wb+") as output:
     output.write(
-        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM).preview
+        PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM).preview
     )
 ```
 
@@ -44,7 +44,7 @@ and write it to an output disk file.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -56,7 +56,7 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     output.write(
-        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
         .fill(
             {
                 "test": "test_1",
@@ -78,13 +78,13 @@ This example shows how to get a sample dictionary that's valid to be filled into
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
 )  # Change this to where you downloaded the sample PDF form
 
-print(PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM).sample_data)
+print(PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM).sample_data)
 ```
 
 ## Register font and set registered global font on filled text
@@ -95,7 +95,7 @@ font and sets it as the global font on the filled PDF form.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -109,11 +109,11 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-PyPDFForm.register_font("LiberationSerif-Regular", PATH_TO_SAMPLE_TTF_FONT_FILE)
+PdfWrapper.register_font("LiberationSerif-Regular", PATH_TO_SAMPLE_TTF_FONT_FILE)
 
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     output.write(
-        PyPDFForm(
+        PdfWrapper(
             PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM, global_font="LiberationSerif-Regular",
         )
         .fill(
@@ -138,7 +138,7 @@ on the filled PDF form.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -150,7 +150,7 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     output.write(
-        PyPDFForm(
+        PdfWrapper(
             PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM,
             global_font_size=20,
             global_font_color=(1, 0, 0),
@@ -178,7 +178,7 @@ the `widgets` attributes of the object.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -192,10 +192,10 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-PyPDFForm.register_font("LiberationSerif-Italic", PATH_TO_SAMPLE_TTF_FONT_FILE)
+PdfWrapper.register_font("LiberationSerif-Italic", PATH_TO_SAMPLE_TTF_FONT_FILE)
 
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
-    pdf_form = PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+    pdf_form = PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
 
     pdf_form.widgets["test"].font_size = 20
     pdf_form.widgets["test"].font_color = (1, 0, 0)
@@ -225,7 +225,7 @@ It demos filling a PDF form's radio button widgets.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template_with_radio_button.pdf"
@@ -235,10 +235,9 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     output.write(
-        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
         .fill({"radio_1": 0, "radio_2": 1, "radio_3": 2})
         .read()
     )
@@ -252,7 +251,7 @@ It demos filling a PDF form's dropdown widgets.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template_with_dropdown.pdf"
@@ -262,10 +261,9 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     output.write(
-        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
         .fill({"dropdown_1": 1})
         .read()
     )
@@ -280,7 +278,7 @@ This example shows how.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -292,7 +290,7 @@ PATH_TO_OUTPUT_PDF_FORM = os.path.join(
 
 with open(PATH_TO_OUTPUT_PDF_FORM, "wb+") as output:
     output.write(
-        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
         .draw_text("drawn_text", 1, 300, 225)
         .read()
     )
@@ -305,7 +303,7 @@ This example demos how to draw an image on a PDF form.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -321,7 +319,7 @@ PATH_TO_IMAGE = os.path.join(
 
 with open(PATH_TO_OUTPUT_PDF_FORM, "wb+") as output:
     output.write(
-        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
         .draw_image(PATH_TO_IMAGE, 2, 100, 100, 400, 225, 0)
         .read()
     )
@@ -334,7 +332,7 @@ This example demos how to merge PDFs together using the overloaded addition oper
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -345,10 +343,10 @@ PATH_TO_OUTPUT_PDF_FORM = os.path.join(
 )  # Change this to where you wish to put your output PDF form
 
 with open(PATH_TO_OUTPUT_PDF_FORM, "wb+") as output:
-    filled_pdf = PyPDFForm()
+    filled_pdf = PdfWrapper()
 
     for i in range(3):
-        filled_pdf += PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM).fill(
+        filled_pdf += PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM).fill(
             {
                 "test": "{}_test_1".format(i),
                 "check": True,
@@ -370,14 +368,14 @@ This example demos how to generate a JSON schema for a PDF form.
 import json
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
 )  # Change this to where you downloaded the sample PDF form
 
 print(
-    json.dumps(PyPDFForm(
+    json.dumps(PdfWrapper(
         PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM
     ).generate_schema(), indent=4, sort_keys=True)
 )
@@ -418,7 +416,7 @@ This example demos how to change the version of a PDF to 2.0.
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -430,7 +428,7 @@ PATH_TO_NEW_VERSION_PDF_FORM = os.path.join(
 
 with open(PATH_TO_NEW_VERSION_PDF_FORM, "wb+") as output:
     output.write(
-        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
         .change_version("2.0")
         .read()
     )
@@ -443,7 +441,7 @@ This example demos how to extract pages out of a PDF. Note that each page object
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -453,7 +451,7 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
     os.path.expanduser("~"), "output.pdf"
 )  # Change this to where you wish to put your filled PDF form
 
-obj = PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+obj = PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
 print(obj.pages[0].generate_schema())
 
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:

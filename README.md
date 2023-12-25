@@ -32,7 +32,7 @@ A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm
 ```python
 import os
 
-from PyPDFForm import PyPDFForm
+from PyPDFForm import PdfWrapper
 
 PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
     os.path.expanduser("~/Downloads"), "sample_template.pdf"
@@ -44,7 +44,7 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     output.write(
-        PyPDFForm(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
+        PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
         .fill(
             {
                 "test": "test_1",
