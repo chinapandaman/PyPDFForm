@@ -30,6 +30,14 @@ def test_elements_deprecation_notice(template_stream):
         assert r
 
 
+def test_generate_schema_deprecation_notice(template_stream):
+    with pytest.warns(DeprecationWarning) as r:
+        obj = PdfWrapper(template_stream)
+        assert not r
+        assert obj.generate_schema() == obj.schema
+        assert r
+
+
 def test_pypdfform_deprecation_notice(template_stream):
     with pytest.warns(DeprecationWarning) as r:
         assert PyPDFForm(template_stream)
@@ -322,7 +330,7 @@ def test_addition_operator_3_times_sejda(
         assert result.read() == expected
 
 
-def test_generate_schema(sample_template_with_comb_text_field):
+def test_schema(sample_template_with_comb_text_field):
     data = {
         "FirstName": "John",
         "MiddleName": "Joe",
@@ -330,7 +338,7 @@ def test_generate_schema(sample_template_with_comb_text_field):
         "Awesomeness": True,
         "Gender": 0,
     }
-    schema = PdfWrapper(sample_template_with_comb_text_field).generate_schema()
+    schema = PdfWrapper(sample_template_with_comb_text_field).schema
 
     assert schema["type"] == "object"
     properties = schema["properties"]
@@ -369,7 +377,7 @@ def test_generate_schema(sample_template_with_comb_text_field):
 def test_sample_data(sejda_template_complex):
     obj = PdfWrapper(sejda_template_complex)
     try:
-        validate(instance=obj.sample_data, schema=obj.generate_schema())
+        validate(instance=obj.sample_data, schema=obj.schema)
     except ValidationError:
         assert False
 

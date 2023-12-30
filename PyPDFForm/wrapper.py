@@ -50,7 +50,7 @@ class PdfWrapper:
 
     @property
     def elements(self) -> dict:
-        """About to be deprecated."""
+        """ToDo: deprecate this."""
 
         warn(
             DEPRECATION_NOTICE.format(
@@ -197,7 +197,8 @@ class PdfWrapper:
 
         return self
 
-    def generate_schema(self) -> dict:
+    @property
+    def schema(self) -> dict:
         """Generates a json schema for the PDF form template."""
 
         result = {
@@ -208,6 +209,20 @@ class PdfWrapper:
         }
 
         return result
+
+    def generate_schema(self) -> dict:
+        """ToDo: deprecate this."""
+
+        warn(
+            DEPRECATION_NOTICE.format(
+                f"{self.__class__.__name__}.generate_schema()",
+                f"{self.__class__.__name__}.schema",
+            ),
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+        return self.schema
 
     @classmethod
     def register_font(
@@ -221,7 +236,7 @@ class PdfWrapper:
 
 
 class PyPDFForm(PdfWrapper):
-    """About to be deprecated."""
+    """ToDo: deprecate this."""
 
     def __init__(
         self,

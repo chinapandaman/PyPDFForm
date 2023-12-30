@@ -360,9 +360,9 @@ with open(PATH_TO_OUTPUT_PDF_FORM, "wb+") as output:
     output.write(filled_pdf.read())
 ```
 
-## Generate JSON schema
+## Retrieve JSON schema
 
-This example demos how to generate a JSON schema for a PDF form.
+This example demos how to retrieve a JSON schema for the data used to fill a PDF form.
 
 ```python
 import json
@@ -377,7 +377,7 @@ PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM = os.path.join(
 print(
     json.dumps(PdfWrapper(
         PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM
-    ).generate_schema(), indent=4, sort_keys=True)
+    ).schema, indent=4, sort_keys=True)
 )
 ```
 
@@ -452,7 +452,7 @@ PATH_TO_FILLED_PDF_FORM = os.path.join(
 )  # Change this to where you wish to put your filled PDF form
 
 obj = PdfWrapper(PATH_TO_DOWNLOADED_SAMPLE_PDF_FORM)
-print(obj.pages[0].generate_schema())
+print(obj.pages[0].schema)
 
 with open(PATH_TO_FILLED_PDF_FORM, "wb+") as output:
     output.write(
