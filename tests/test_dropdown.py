@@ -5,8 +5,8 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_generate_schema(sample_template_with_dropdown):
-    schema = PdfWrapper(sample_template_with_dropdown).generate_schema()
+def test_schema(sample_template_with_dropdown):
+    schema = PdfWrapper(sample_template_with_dropdown).schema
 
     for key, value in schema["properties"].items():
         if key == "dropdown_1":
