@@ -123,14 +123,14 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     return result.read()
 
 
-def find_pattern_match(pattern: dict, widget: DictionaryObject) -> bool:
+def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> bool:
     """Checks if a PDF dict pattern exists in a PDF widget."""
 
     for key, value in widget.items():
         result = False
         if key in pattern:
             value = value.get_object()
-            if isinstance(pattern[key], dict) and isinstance(value, DictionaryObject):
+            if isinstance(pattern[key], dict) and isinstance(value, (dict, DictionaryObject)):
                 result = find_pattern_match(pattern[key], value)
             else:
                 result = pattern[key] == value
@@ -139,14 +139,14 @@ def find_pattern_match(pattern: dict, widget: DictionaryObject) -> bool:
     return False
 
 
-def traverse_pattern(pattern: dict, widget: DictionaryObject) -> Union[str, list, None]:
+def traverse_pattern(pattern: dict, widget: Union[dict, DictionaryObject]) -> Union[str, list, None]:
     """Traverses down a PDF dict pattern and find the value."""
 
     for key, value in widget.items():
         result = None
         if key in pattern:
             value = value.get_object()
-            if isinstance(pattern[key], dict) and isinstance(value, DictionaryObject):
+            if isinstance(pattern[key], dict) and isinstance(value, (dict, DictionaryObject)):
                 result = traverse_pattern(pattern[key], value)
             else:
                 if pattern[key] is True and value:

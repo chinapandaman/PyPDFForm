@@ -3,33 +3,33 @@
 
 from typing import Dict, List, Tuple, Union
 
-from pdfrw import PdfDict, PdfReader
+from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.constants import WIDGET_TYPES
 from ..middleware.text import Text
-from .constants import (ANNOTATION_KEY, ANNOTATION_RECTANGLE_KEY,
+from .constants import (ANNOTATION_RECTANGLE_KEY,
                         FIELD_FLAG_KEY, NEW_LINE_SYMBOL,
                         TEXT_FIELD_MAX_LENGTH_KEY)
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
                        WIDGET_ALIGNMENT_PATTERNS, WIDGET_KEY_PATTERNS,
                        WIDGET_TYPE_PATTERNS)
-from .utils import find_pattern_match, traverse_pattern
+from .utils import find_pattern_match, traverse_pattern, stream_to_io
 
 
-def get_widgets_by_page(pdf: Union[bytes, PdfReader]) -> Dict[int, List[PdfDict]]:
+def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
     """Iterates through a PDF and returns all widgets found grouped by page."""
 
-    if isinstance(pdf, bytes):
-        pdf = PdfReader(fdata=pdf)
+    pdf = PdfReader(stream_to_io(pdf))
 
     result = {}
 
     for i, page in enumerate(pdf.pages):
-        widgets = page[ANNOTATION_KEY]
+        widgets = page.annotations
         result[i + 1] = []
         if widgets:
             for widget in widgets:
+                widget = dict(widget.get_object())
                 for each in WIDGET_TYPE_PATTERNS:
                     patterns = each[0]
                     check = True
@@ -42,19 +42,19 @@ def get_widgets_by_page(pdf: Union[bytes, PdfReader]) -> Dict[int, List[PdfDict]
     return result
 
 
-def get_widget_key(widget: PdfDict) -> Union[str, None]:
+def get_widget_key(widget: dict) -> Union[str, None]:
     """Finds a PDF widget's annotated key by pattern matching."""
 
     result = None
     for pattern in WIDGET_KEY_PATTERNS:
         value = traverse_pattern(pattern, widget)
         if value:
-            result = value[1:-1]
+            result = value
             break
     return result
 
 
-def get_widget_alignment(widget: PdfDict) -> Union[str, None]:
+def get_widget_alignment(widget: dict) -> Union[str, None]:
     """Finds a PDF widget's alignment by pattern matching."""
 
     result = None
@@ -66,7 +66,7 @@ def get_widget_alignment(widget: PdfDict) -> Union[str, None]:
     return result
 
 
-def construct_widget(widget: PdfDict, key: str) -> Union[WIDGET_TYPES, None]:
+def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
     """Finds a PDF widget's annotated type by pattern matching."""
 
     result = None
@@ -81,7 +81,7 @@ def construct_widget(widget: PdfDict, key: str) -> Union[WIDGET_TYPES, None]:
     return result
 
 
-def get_text_field_max_length(widget: PdfDict) -> Union[int, None]:
+def get_text_field_max_length(widget: dict) -> Union[int, None]:
     """Returns the max length of the text field if presented or None."""
 
     return (
@@ -91,7 +91,7 @@ def get_text_field_max_length(widget: PdfDict) -> Union[int, None]:
     )
 
 
-def is_text_field_comb(widget: PdfDict) -> bool:
+def is_text_field_comb(widget: dict) -> bool:
     """Returns true if characters in a text field needs to be formatted into combs."""
 
     try:
@@ -100,7 +100,7 @@ def is_text_field_comb(widget: PdfDict) -> bool:
         return False
 
 
-def is_text_multiline(widget: PdfDict) -> bool:
+def is_text_multiline(widget: dict) -> bool:
     """Returns true if a text field is a paragraph field."""
 
     field_flag = None
@@ -118,7 +118,7 @@ def is_text_multiline(widget: PdfDict) -> bool:
         return False
 
 
-def get_dropdown_choices(widget: PdfDict) -> Union[Tuple[str], None]:
+def get_dropdown_choices(widget: dict) -> Union[Tuple[str], None]:
     """Returns string options of a dropdown field."""
 
     result = None
@@ -127,8 +127,6 @@ def get_dropdown_choices(widget: PdfDict) -> Union[Tuple[str], None]:
         if choices:
             result = tuple(
                 (each if isinstance(each, str) else str(each[1]))
-                .replace("(", "")
-                .replace(")", "")
                 for each in choices
             )
             break
@@ -136,7 +134,7 @@ def get_dropdown_choices(widget: PdfDict) -> Union[Tuple[str], None]:
     return result
 
 
-def get_char_rect_width(widget: PdfDict, widget_middleware: Text) -> float:
+def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:
     """Returns rectangular width of each character for combed text fields."""
 
     rect_width = abs(
@@ -146,7 +144,7 @@ def get_char_rect_width(widget: PdfDict, widget_middleware: Text) -> float:
     return rect_width / widget_middleware.max_length
 
 
-def get_character_x_paddings(widget: PdfDict, widget_middleware: Text) -> List[float]:
+def get_character_x_paddings(widget: dict, widget_middleware: Text) -> List[float]:
     """Returns paddings between characters for combed text fields."""
 
     length = min(len(widget_middleware.value or ""), widget_middleware.max_length)
@@ -166,7 +164,7 @@ def get_character_x_paddings(widget: PdfDict, widget_middleware: Text) -> List[f
     return result
 
 
-def calculate_wrap_length(widget: PdfDict, widget_middleware: Text, v: str) -> int:
+def calculate_wrap_length(widget: dict, widget_middleware: Text, v: str) -> int:
     """Increments the substring until reaching maximum horizontal width."""
 
     width = abs(
@@ -188,7 +186,7 @@ def calculate_wrap_length(widget: PdfDict, widget_middleware: Text, v: str) -> i
     return counter - 1
 
 
-def get_paragraph_lines(widget: PdfDict, widget_middleware: Text) -> List[str]:
+def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
     """Splits the paragraph field's text to a list of lines."""
 
     # pylint: disable=R0912
@@ -255,7 +253,7 @@ def get_paragraph_lines(widget: PdfDict, widget_middleware: Text) -> List[str]:
     return result
 
 
-def get_paragraph_auto_wrap_length(widget: PdfDict, widget_middleware: Text) -> int:
+def get_paragraph_auto_wrap_length(widget: dict, widget_middleware: Text) -> int:
     """Calculates the text wrap length of a paragraph field."""
 
     value = widget_middleware.value or ""
