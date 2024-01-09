@@ -63,7 +63,7 @@ def preview_widget_to_draw(widget: WIDGET_TYPES) -> Text:
 
 
 def remove_all_widgets(pdf: bytes) -> bytes:
-    """Removes all widgets from a pdfrw parsed PDF form."""
+    """Removes all widgets from a PDF form."""
 
     pdf = PdfReader(stream_to_io(pdf))
     result_stream = BytesIO()
