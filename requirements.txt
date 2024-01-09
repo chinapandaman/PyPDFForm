@@ -3,6 +3,7 @@ jsonschema
 pdfrw
 pillow
 pudb
+pypdf
 pylint
 pytest
 reportlab
