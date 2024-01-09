@@ -3,8 +3,6 @@
 
 from typing import Dict
 
-from pdfrw import PdfReader
-
 from ..middleware.checkbox import Checkbox
 from ..middleware.constants import WIDGET_TYPES
 from ..middleware.radio import Radio
@@ -13,7 +11,7 @@ from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_text_line_x_coordinates)
 from .font import checkbox_radio_font_size
 from .template import get_widget_key, get_widgets_by_page
-from .utils import checkbox_radio_to_draw, generate_stream
+from .utils import checkbox_radio_to_draw
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -23,14 +21,12 @@ def fill(
 ) -> bytes:
     """Fills a PDF using watermarks."""
 
-    template_pdf = PdfReader(fdata=template_stream)
-
     texts_to_draw = {}
     text_watermarks = []
 
     radio_button_tracker = {}
 
-    for page, _widgets in get_widgets_by_page(template_pdf).items():
+    for page, _widgets in get_widgets_by_page(template_stream).items():
         texts_to_draw[page] = []
         text_watermarks.append(b"")
         for _widget in _widgets:
@@ -72,4 +68,4 @@ def fill(
             if watermark:
                 text_watermarks[i] = watermark
 
-    return merge_watermarks_with_pdf(generate_stream(template_pdf), text_watermarks)
+    return merge_watermarks_with_pdf(template_stream, text_watermarks)
