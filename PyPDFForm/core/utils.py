@@ -16,20 +16,6 @@ from .constants import (CHECKBOX_TO_DRAW, DEFAULT_FONT,
                         PREVIEW_FONT_COLOR, RADIO_TO_DRAW)
 
 
-def generate_stream(pdf: PdfReader) -> bytes:
-    """Generates new stream for manipulated PDF form."""
-
-    result_stream = BytesIO()
-
-    writer = PdfWriter()
-    for page in pdf.pages:
-        writer.add_page(page)
-
-    writer.write(result_stream)
-    result_stream.seek(0)
-    return result_stream.read()
-
-
 def stream_to_io(stream: bytes) -> BinaryIO:
     """Converts a byte stream to a binary io object."""
 
@@ -80,12 +66,16 @@ def remove_all_widgets(pdf: bytes) -> bytes:
     """Removes all widgets from a pdfrw parsed PDF form."""
 
     pdf = PdfReader(stream_to_io(pdf))
-
+    result_stream = BytesIO()
+    writer = PdfWriter()
     for page in pdf.pages:
         if page.annotations:
             page.annotations.clear()
+        writer.add_page(page)
 
-    return generate_stream(pdf)
+    writer.write(result_stream)
+    result_stream.seek(0)
+    return result_stream.read()
 
 
 def get_page_streams(pdf: bytes) -> List[bytes]:
