@@ -6,7 +6,6 @@ from math import sqrt
 from re import findall
 from typing import Dict, Tuple, Union
 
-from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
@@ -18,7 +17,7 @@ from .constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .template import (get_paragraph_auto_wrap_length, get_paragraph_lines,
                        get_widget_key, get_widgets_by_page, is_text_multiline)
-from .utils import traverse_pattern, stream_to_io
+from .utils import traverse_pattern
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
