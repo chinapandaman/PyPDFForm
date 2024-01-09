@@ -6,7 +6,7 @@ from math import sqrt
 from re import findall
 from typing import Dict, Tuple, Union
 
-from pdfrw import PdfDict, PdfReader
+from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
@@ -18,7 +18,7 @@ from .constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .template import (get_paragraph_auto_wrap_length, get_paragraph_lines,
                        get_widget_key, get_widgets_by_page, is_text_multiline)
-from .utils import traverse_pattern
+from .utils import traverse_pattern, stream_to_io
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
@@ -38,7 +38,7 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
     return result
 
 
-def auto_detect_font(widget: PdfDict) -> str:
+def auto_detect_font(widget: dict) -> str:
     """Returns the font of the text field if it is one of the standard fonts."""
 
     result = DEFAULT_FONT
@@ -53,7 +53,7 @@ def auto_detect_font(widget: PdfDict) -> str:
     if not text_appearance:
         return result
 
-    text_appearance = text_appearance.replace("(", "").replace(")", "").split(" ")
+    text_appearance = text_appearance.split(" ")
 
     for each in text_appearance:
         if each.startswith("/"):
@@ -75,7 +75,7 @@ def auto_detect_font(widget: PdfDict) -> str:
     return result
 
 
-def text_field_font_size(widget: PdfDict) -> Union[float, int]:
+def text_field_font_size(widget: dict) -> Union[float, int]:
     """
     Calculates the font size it should be drawn with
     given a text field widget.
@@ -92,7 +92,7 @@ def text_field_font_size(widget: PdfDict) -> Union[float, int]:
     return height * 2 / 3
 
 
-def checkbox_radio_font_size(widget: PdfDict) -> Union[float, int]:
+def checkbox_radio_font_size(widget: dict) -> Union[float, int]:
     """
     Calculates the font size it should be drawn with
     given a checkbox/radio button widget.
@@ -109,14 +109,13 @@ def checkbox_radio_font_size(widget: PdfDict) -> Union[float, int]:
     return sqrt(area) * 72 / 96
 
 
-def get_text_field_font_size(widget: PdfDict) -> Union[float, int]:
+def get_text_field_font_size(widget: dict) -> Union[float, int]:
     """Returns the font size of the text field if presented or zero."""
 
     result = 0
     for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
         text_appearance = traverse_pattern(pattern, widget)
         if text_appearance:
-            text_appearance = text_appearance.replace("(", "").replace(")", "")
             properties = text_appearance.split(" ")
             for i, val in enumerate(properties):
                 if val == FONT_SIZE_IDENTIFIER:
@@ -126,7 +125,7 @@ def get_text_field_font_size(widget: PdfDict) -> Union[float, int]:
 
 
 def get_text_field_font_color(
-    widget: PdfDict,
+    widget: dict,
 ) -> Union[Tuple[float, float, float], None]:
     """Returns the font color tuple of the text field if presented or black."""
 
@@ -138,7 +137,7 @@ def get_text_field_font_color(
                 return result
 
             text_appearance = (
-                text_appearance.replace("(", "").replace(")", "").split(" ")
+                text_appearance.split(" ")
             )
             for i, val in enumerate(text_appearance):
                 if val == FONT_COLOR_IDENTIFIER.replace(" ", ""):
@@ -158,9 +157,7 @@ def update_text_field_attributes(
 ) -> None:
     """Auto updates text fields' attributes."""
 
-    template_pdf = PdfReader(fdata=template_stream)
-
-    for _, _widgets in get_widgets_by_page(template_pdf).items():
+    for _, _widgets in get_widgets_by_page(template_stream).items():
         for _widget in _widgets:
             key = get_widget_key(_widget)
 
