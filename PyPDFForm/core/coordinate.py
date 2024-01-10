@@ -4,7 +4,6 @@
 from copy import deepcopy
 from typing import List, Tuple, Union
 
-from pdfrw import PdfDict
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.text import Text
@@ -14,7 +13,7 @@ from .template import (get_char_rect_width, get_widget_alignment,
 
 
 def get_draw_checkbox_radio_coordinates(
-    widget: PdfDict,
+    widget: dict,
     widget_middleware: Text,
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw at given a PDF form checkbox/radio widget."""
@@ -42,7 +41,7 @@ def get_draw_checkbox_radio_coordinates(
 
 
 def get_draw_text_coordinates(
-    widget: PdfDict, widget_middleware: Text
+    widget: dict, widget_middleware: Text
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw text at given a PDF form text widget."""
 
@@ -129,7 +128,7 @@ def get_draw_text_coordinates(
 
 
 def get_text_line_x_coordinates(
-    widget: PdfDict, widget_middleware: Text
+    widget: dict, widget_middleware: Text
 ) -> Union[List[float], None]:
     """
     Returns the x coordinates to draw lines

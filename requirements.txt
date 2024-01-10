@@ -1,8 +1,9 @@
 coverage
+cryptography
 jsonschema
-pdfrw
 pillow
 pudb
 pylint
+pypdf
 pytest
 reportlab

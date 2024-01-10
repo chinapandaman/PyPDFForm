@@ -2,29 +2,26 @@
 """Contains utility helpers."""
 
 from io import BytesIO
-from typing import List, Union
+from typing import List, Union, BinaryIO
 
-from pdfrw import PdfDict, PdfReader, PdfWriter
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import DictionaryObject
 
 from ..middleware.checkbox import Checkbox
 from ..middleware.constants import WIDGET_TYPES
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from .constants import (ANNOTATION_KEY, CHECKBOX_TO_DRAW, DEFAULT_FONT,
+from .constants import (CHECKBOX_TO_DRAW, DEFAULT_FONT,
                         DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         PREVIEW_FONT_COLOR, RADIO_TO_DRAW)
 
 
-def generate_stream(pdf: PdfReader) -> bytes:
-    """Generates new stream for manipulated PDF form."""
+def stream_to_io(stream: bytes) -> BinaryIO:
+    """Converts a byte stream to a binary io object."""
 
-    result_stream = BytesIO()
-
-    PdfWriter().write(result_stream, pdf)
-    result_stream.seek(0)
-
-    result = result_stream.read()
-    result_stream.close()
+    result = BytesIO()
+    result.write(stream)
+    result.seek(0)
 
     return result
 
@@ -66,28 +63,30 @@ def preview_widget_to_draw(widget: WIDGET_TYPES) -> Text:
 
 
 def remove_all_widgets(pdf: bytes) -> bytes:
-    """Removes all widgets from a pdfrw parsed PDF form."""
+    """Removes all widgets from a PDF form."""
 
-    pdf = PdfReader(fdata=pdf)
-
+    pdf = PdfReader(stream_to_io(pdf))
+    result_stream = BytesIO()
+    writer = PdfWriter()
     for page in pdf.pages:
-        widgets = page[ANNOTATION_KEY]
-        if widgets:
-            for j in reversed(range(len(widgets))):
-                widgets.pop(j)
+        if page.annotations:
+            page.annotations.clear()
+        writer.add_page(page)
 
-    return generate_stream(pdf)
+    writer.write(result_stream)
+    result_stream.seek(0)
+    return result_stream.read()
 
 
 def get_page_streams(pdf: bytes) -> List[bytes]:
     """Returns a list of streams where each is a page of the input PDF."""
 
-    pdf = PdfReader(fdata=pdf)
+    pdf = PdfReader(stream_to_io(pdf))
     result = []
 
     for page in pdf.pages:
         writer = PdfWriter()
-        writer.addPage(page)
+        writer.add_page(page)
         with BytesIO() as f:
             writer.write(f)
             f.seek(0)
@@ -99,28 +98,29 @@ def get_page_streams(pdf: bytes) -> List[bytes]:
 def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     """Merges two PDFs into one PDF."""
 
-    writer = PdfWriter()
+    output = PdfWriter()
+    pdf = PdfReader(stream_to_io(pdf))
+    other = PdfReader(stream_to_io(other))
+    result = BytesIO()
 
-    writer.addpages(PdfReader(fdata=pdf).pages)
-    writer.addpages(PdfReader(fdata=other).pages)
+    for page in pdf.pages:
+        output.add_page(page)
+    for page in other.pages:
+        output.add_page(page)
 
-    result_stream = BytesIO()
-    writer.write(result_stream)
-    result_stream.seek(0)
-
-    result = result_stream.read()
-    result_stream.close()
-
-    return result
+    output.write(result)
+    result.seek(0)
+    return result.read()
 
 
-def find_pattern_match(pattern: dict, widget: PdfDict) -> bool:
+def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> bool:
     """Checks if a PDF dict pattern exists in a PDF widget."""
 
     for key, value in widget.items():
         result = False
         if key in pattern:
-            if isinstance(pattern[key], dict) and isinstance(value, PdfDict):
+            value = value.get_object()
+            if isinstance(pattern[key], dict) and isinstance(value, (dict, DictionaryObject)):
                 result = find_pattern_match(pattern[key], value)
             else:
                 result = pattern[key] == value
@@ -129,13 +129,16 @@ def find_pattern_match(pattern: dict, widget: PdfDict) -> bool:
     return False
 
 
-def traverse_pattern(pattern: dict, widget: PdfDict) -> Union[str, list, None]:
+def traverse_pattern(
+    pattern: dict, widget: Union[dict, DictionaryObject]
+) -> Union[str, list, None]:
     """Traverses down a PDF dict pattern and find the value."""
 
     for key, value in widget.items():
         result = None
         if key in pattern:
-            if isinstance(pattern[key], dict) and isinstance(value, PdfDict):
+            value = value.get_object()
+            if isinstance(pattern[key], dict) and isinstance(value, (dict, DictionaryObject)):
                 result = traverse_pattern(pattern[key], value)
             else:
                 if pattern[key] is True and value:

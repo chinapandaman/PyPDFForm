@@ -4,12 +4,12 @@
 from io import BytesIO
 from typing import List, Union
 
-from pdfrw import PageMerge, PdfReader
+from pypdf import PdfReader, PdfWriter
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
 from ..middleware.text import Text
-from .utils import generate_stream
+from .utils import stream_to_io
 
 
 def draw_text(
@@ -124,14 +124,14 @@ def create_watermarks_and_draw(
 ) -> List[bytes]:
     """Creates a canvas watermark and draw some stuffs on it."""
 
-    pdf_file = PdfReader(fdata=pdf)
+    pdf_file = PdfReader(stream_to_io(pdf))
     buff = BytesIO()
 
     canvas = Canvas(
         buff,
         pagesize=(
-            float(pdf_file.pages[page_number - 1].MediaBox[2]),
-            float(pdf_file.pages[page_number - 1].MediaBox[3]),
+            float(pdf_file.pages[page_number - 1].mediabox[2]),
+            float(pdf_file.pages[page_number - 1].mediabox[3]),
         ),
     )
 
@@ -158,17 +158,21 @@ def create_watermarks_and_draw(
 
 def merge_watermarks_with_pdf(
     pdf: bytes,
-    watermarks: List[bytes],
+    watermarks: list,
 ) -> bytes:
     """Merges watermarks with PDF."""
 
-    pdf_file = PdfReader(fdata=pdf)
+    result = BytesIO()
+    pdf = PdfReader(stream_to_io(pdf))
+    output = PdfWriter()
 
-    for i, page in enumerate(pdf_file.pages):
+    for i, page in enumerate(pdf.pages):
         if watermarks[i]:
-            watermark = PdfReader(fdata=watermarks[i])
+            watermark = PdfReader(stream_to_io(watermarks[i]))
             if watermark.pages:
-                merger = PageMerge(page)
-                merger.add(watermark.pages[0]).render()
+                page.merge_page(watermark.pages[0])
+        output.add_page(page)
 
-    return generate_stream(pdf_file)
+    output.write(result)
+    result.seek(0)
+    return result.read()
