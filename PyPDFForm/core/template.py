@@ -112,10 +112,7 @@ def is_text_multiline(widget: dict) -> bool:
     if field_flag is None:
         return False
 
-    try:
-        return "{0:b}".format(int(field_flag))[::-1][12] == "1"
-    except (IndexError, TypeError):
-        return False
+    return "{0:b}".format(int(field_flag))[::-1][12] == "1"
 
 
 def get_dropdown_choices(widget: dict) -> Union[Tuple[str], None]:

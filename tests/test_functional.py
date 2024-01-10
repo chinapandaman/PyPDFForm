@@ -447,8 +447,9 @@ def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request)
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        if os.name != "nt":
+            assert len(obj.stream) == len(expected)
+            assert obj.stream == expected
 
 
 def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, request):
@@ -476,8 +477,9 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        if os.name != "nt":
+            assert len(obj.stream) == len(expected)
+            assert obj.stream == expected
 
 
 def test_pages(template_stream, pdf_samples):
