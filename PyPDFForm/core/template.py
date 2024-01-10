@@ -8,13 +8,12 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.constants import WIDGET_TYPES
 from ..middleware.text import Text
-from .constants import (ANNOTATION_RECTANGLE_KEY,
-                        FIELD_FLAG_KEY, NEW_LINE_SYMBOL,
-                        TEXT_FIELD_MAX_LENGTH_KEY)
+from .constants import (ANNOTATION_RECTANGLE_KEY, FIELD_FLAG_KEY,
+                        NEW_LINE_SYMBOL, TEXT_FIELD_MAX_LENGTH_KEY)
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
                        WIDGET_ALIGNMENT_PATTERNS, WIDGET_KEY_PATTERNS,
                        WIDGET_TYPE_PATTERNS)
-from .utils import find_pattern_match, traverse_pattern, stream_to_io
+from .utils import find_pattern_match, stream_to_io, traverse_pattern
 
 
 def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
@@ -126,8 +125,7 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str], None]:
         choices = traverse_pattern(pattern, widget)
         if choices:
             result = tuple(
-                (each if isinstance(each, str) else str(each[1]))
-                for each in choices
+                (each if isinstance(each, str) else str(each[1])) for each in choices
             )
             break
 

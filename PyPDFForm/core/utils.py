@@ -2,7 +2,7 @@
 """Contains utility helpers."""
 
 from io import BytesIO
-from typing import List, Union, BinaryIO
+from typing import BinaryIO, List, Union
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
@@ -11,9 +11,8 @@ from ..middleware.checkbox import Checkbox
 from ..middleware.constants import WIDGET_TYPES
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from .constants import (CHECKBOX_TO_DRAW, DEFAULT_FONT,
-                        DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
-                        PREVIEW_FONT_COLOR, RADIO_TO_DRAW)
+from .constants import (CHECKBOX_TO_DRAW, DEFAULT_FONT, DEFAULT_FONT_COLOR,
+                        DEFAULT_FONT_SIZE, PREVIEW_FONT_COLOR, RADIO_TO_DRAW)
 
 
 def stream_to_io(stream: bytes) -> BinaryIO:
@@ -120,7 +119,9 @@ def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> 
         result = False
         if key in pattern:
             value = value.get_object()
-            if isinstance(pattern[key], dict) and isinstance(value, (dict, DictionaryObject)):
+            if isinstance(pattern[key], dict) and isinstance(
+                value, (dict, DictionaryObject)
+            ):
                 result = find_pattern_match(pattern[key], value)
             else:
                 result = pattern[key] == value
@@ -138,7 +139,9 @@ def traverse_pattern(
         result = None
         if key in pattern:
             value = value.get_object()
-            if isinstance(pattern[key], dict) and isinstance(value, (dict, DictionaryObject)):
+            if isinstance(pattern[key], dict) and isinstance(
+                value, (dict, DictionaryObject)
+            ):
                 result = traverse_pattern(pattern[key], value)
             else:
                 if pattern[key] is True and value:

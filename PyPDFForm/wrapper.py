@@ -114,10 +114,15 @@ class PdfWrapper:
     def preview(self) -> bytes:
         """Inspects all supported widgets' names for the PDF form."""
 
-        return remove_all_widgets(fill(
-            self.stream,
-            {key: preview_widget_to_draw(value) for key, value in self.widgets.items()},
-        ))
+        return remove_all_widgets(
+            fill(
+                self.stream,
+                {
+                    key: preview_widget_to_draw(value)
+                    for key, value in self.widgets.items()
+                },
+            )
+        )
 
     def fill(
         self,

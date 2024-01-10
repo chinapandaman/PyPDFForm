@@ -135,9 +135,7 @@ def get_text_field_font_color(
             if FONT_COLOR_IDENTIFIER not in text_appearance:
                 return result
 
-            text_appearance = (
-                text_appearance.split(" ")
-            )
+            text_appearance = text_appearance.split(" ")
             for i, val in enumerate(text_appearance):
                 if val == FONT_COLOR_IDENTIFIER.replace(" ", ""):
                     result = (
