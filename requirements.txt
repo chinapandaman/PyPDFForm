@@ -3,7 +3,7 @@ cryptography
 jsonschema
 pillow
 pudb
-pypdf
 pylint
+pypdf
 pytest
 reportlab
