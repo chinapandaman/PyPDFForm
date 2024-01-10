@@ -96,7 +96,7 @@ def is_text_field_comb(widget: dict) -> bool:
 
     try:
         return "{0:b}".format(int(widget[FIELD_FLAG_KEY]))[::-1][24] == "1"
-    except (IndexError, TypeError):
+    except (IndexError, TypeError, KeyError):
         return False
 
 
@@ -112,7 +112,10 @@ def is_text_multiline(widget: dict) -> bool:
     if field_flag is None:
         return False
 
-    return "{0:b}".format(int(field_flag))[::-1][12] == "1"
+    try:
+        return "{0:b}".format(int(field_flag))[::-1][12] == "1"
+    except (IndexError, TypeError):
+        return False
 
 
 def get_dropdown_choices(widget: dict) -> Union[Tuple[str], None]:

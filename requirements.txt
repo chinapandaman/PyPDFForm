@@ -1,6 +1,6 @@
 coverage
+cryptography
 jsonschema
-pdfrw
 pillow
 pudb
 pypdf
