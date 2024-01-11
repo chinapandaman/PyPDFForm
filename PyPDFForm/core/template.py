@@ -102,7 +102,7 @@ def check_field_flag_bit(widget: dict, bit: int) -> bool:
     if field_flag is None:
         return False
 
-    return True if int(field_flag) & bit else False
+    return bool(int(field_flag) & bit)
 
 
 def is_text_field_comb(widget: dict) -> bool:
