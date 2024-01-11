@@ -8,7 +8,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.constants import WIDGET_TYPES
 from ..middleware.text import Text
-from .constants import (ANNOTATION_RECTANGLE_KEY, FIELD_FLAG_KEY,
+from .constants import (ANNOTATION_RECTANGLE_KEY, MULTILINE, COMB,
                         NEW_LINE_SYMBOL, TEXT_FIELD_MAX_LENGTH_KEY)
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
                        WIDGET_ALIGNMENT_PATTERNS, WIDGET_KEY_PATTERNS,
@@ -90,17 +90,8 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
     )
 
 
-def is_text_field_comb(widget: dict) -> bool:
-    """Returns true if characters in a text field needs to be formatted into combs."""
-
-    try:
-        return "{0:b}".format(int(widget[FIELD_FLAG_KEY]))[::-1][24] == "1"
-    except (IndexError, TypeError, KeyError):
-        return False
-
-
-def is_text_multiline(widget: dict) -> bool:
-    """Returns true if a text field is a paragraph field."""
+def check_field_flag_bit(widget: dict, bit: int) -> bool:
+    """Checks if a bit is set in a widget's field flag."""
 
     field_flag = None
     for pattern in TEXT_FIELD_FLAG_PATTERNS:
@@ -111,10 +102,19 @@ def is_text_multiline(widget: dict) -> bool:
     if field_flag is None:
         return False
 
-    try:
-        return "{0:b}".format(int(field_flag))[::-1][12] == "1"
-    except (IndexError, TypeError):
-        return False
+    return True if int(field_flag) & bit else False
+
+
+def is_text_field_comb(widget: dict) -> bool:
+    """Returns true if characters in a text field needs to be formatted into combs."""
+
+    return check_field_flag_bit(widget, COMB)
+
+
+def is_text_multiline(widget: dict) -> bool:
+    """Returns true if a text field is a paragraph field."""
+
+    return check_field_flag_bit(widget, MULTILINE)
 
 
 def get_dropdown_choices(widget: dict) -> Union[Tuple[str], None]:
