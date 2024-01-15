@@ -4,8 +4,16 @@ fi
 
 pytest -v -s --regenerate=1
 
+BEFORE=()
+
 for f in $(git diff --name-only ./pdf_samples); do
-  python ./scripts/create_compare.py "$PWD/${f}"
+  BEFORE+=("$PWD/${f}")
+  python ./scripts/create_pdf_diff.py "$PWD/${f}"
 done
 
 git restore --source=HEAD --staged --worktree -- ./pdf_samples
+
+for i in "${BEFORE[@]}"; do
+  python ./scripts/open_pdf_diff.py "$i"
+  read -p "Press any key to continue..." -n1 -s -r
+done

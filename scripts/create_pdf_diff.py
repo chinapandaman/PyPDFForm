@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Creates compare of PDFs between changes."""
+"""Creates a diff of a PDF between changes."""
 
 import os
 import sys

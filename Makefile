@@ -13,5 +13,5 @@ check-imports:
 generate-new-pdf-samples:
 	bash ./scripts/new_pdf_samples.sh
 
-compare-pdf-samples:
-	bash ./scripts/create_compare.sh
+compare-pdf-diffs:
+	bash ./scripts/pdf_diffs.sh
