@@ -10,5 +10,7 @@ if __name__ == "__main__":
     with open(os.path.abspath(path), "rb+") as f:
         file_name = os.path.basename(os.path.abspath(path))
 
-        with open(os.path.join(os.path.dirname(__file__), "..", "temp", file_name), "wb+") as o:
+        with open(
+            os.path.join(os.path.dirname(__file__), "..", "temp", file_name), "wb+"
+        ) as o:
             o.write(f.read())
