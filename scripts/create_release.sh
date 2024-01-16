@@ -3,5 +3,5 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
 fi
 
 echo "Fetching deployed versions..."
-pip index versions PyPDFForm
-python ./scripts/create_release.py
+LATEST=$(pip index versions PyPDFForm | grep -oP '\(.*?\)')
+python ./scripts/create_release.py "$LATEST"
