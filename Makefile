@@ -15,3 +15,6 @@ generate-new-pdf-samples:
 
 compare-pdf-diffs:
 	bash ./scripts/pdf_diffs.sh
+
+deploy:
+	bash ./scripts/create_release.sh

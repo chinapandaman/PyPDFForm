@@ -7,3 +7,4 @@ pylint
 pypdf
 pytest
 reportlab
+requests
