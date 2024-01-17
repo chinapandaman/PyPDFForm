@@ -22,6 +22,7 @@ from .middleware.dropdown import Dropdown
 from .middleware.template import (build_widgets, dropdown_to_text,
                                   set_character_x_paddings)
 from .middleware.text import Text
+from .widgets.text import TextWidget
 
 
 class PdfWrapper:
@@ -37,11 +38,15 @@ class PdfWrapper:
         self.stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = build_widgets(self.stream) if self.stream else {}
 
+        self.global_font = kwargs.get("global_font")
+        self.global_font_size = kwargs.get("global_font_size")
+        self.global_font_color = kwargs.get("global_font_color")
+
         for each in self.widgets.values():
             if isinstance(each, Text):
-                each.font = kwargs.get("global_font")
-                each.font_size = kwargs.get("global_font_size")
-                each.font_color = kwargs.get("global_font_color")
+                each.font = self.global_font
+                each.font_size = self.global_font_size
+                each.font_color = self.global_font_color
 
     def read(self) -> bytes:
         """Reads the file stream of a PDF form."""
@@ -144,6 +149,43 @@ class PdfWrapper:
 
         self.stream = remove_all_widgets(fill(self.stream, self.widgets))
 
+        return self
+
+    def create_widget(
+        self,
+        widget_type: str,
+        name: str,
+        page_number: int,
+        width: float,
+        height: float,
+        x: float,
+        y: float,
+        **kwargs,
+    ) -> PdfWrapper:
+        """Creates a new widget on a PDF form."""
+
+        _class = None
+        if widget_type == "text":
+            _class = TextWidget
+        if _class is None:
+            return self
+
+        watermarks = _class(
+            name=name,
+            page_number=page_number,
+            width=width,
+            height=height,
+            x=x,
+            y=y,
+            kwargs=kwargs
+        ).watermarks(self.read())
+
+        self.__init__(
+            merge_watermarks_with_pdf(self.read(), watermarks),
+            global_font=self.global_font,
+            global_font_size=self.global_font_size,
+            global_font_color=self.global_font_color,
+        )
         return self
 
     def draw_text(

@@ -18,6 +18,8 @@ class Widget:
         self,
         name: str,
         page_number: int,
+        width: float,
+        height: float,
         x: float,
         y: float,
         **kwargs,
@@ -27,6 +29,8 @@ class Widget:
         self.page_number = page_number
         self.acro_form_params = {
             "name": name,
+            "width": width,
+            "height": height,
             "x": x,
             "y": y,
         }
@@ -39,6 +43,7 @@ class Widget:
         """Returns a list of watermarks after creating the widget."""
 
         pdf = PdfReader(stream_to_io(stream))
+        page_count = len(pdf.pages)
         watermark = BytesIO()
 
         canvas = Canvas(
@@ -51,11 +56,12 @@ class Widget:
 
         getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**self.acro_form_params)
 
+        canvas.showPage()
         canvas.save()
         watermark.seek(0)
 
         result = []
-        for i, _ in enumerate(pdf.pages):
+        for i in range(page_count):
             result.append(watermark.read() if i == self.page_number - 1 else b"")
 
         return result
