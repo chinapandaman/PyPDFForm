@@ -7,5 +7,5 @@ from .base import Widget
 class TextWidget(Widget):
     """Text field widget to create."""
 
-    USER_PARAMS = []
+    USER_PARAMS = ["maxlen"]
     ACRO_FORM_FUNC = "textfield"

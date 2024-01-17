@@ -36,8 +36,7 @@ class Widget:
         }
 
         for each in self.USER_PARAMS:
-            if each in kwargs:
-                self.acro_form_params[each] = kwargs[each]
+            self.acro_form_params[each] = kwargs.get(each)
 
     def watermarks(self, stream: bytes) -> List[bytes]:
         """Returns a list of watermarks after creating the widget."""
