@@ -7,7 +7,8 @@ from .base import Widget
 class TextWidget(Widget):
     """Text field widget to create."""
 
-    USER_PARAMS = [("width", "width"), ("height", "height"), ("max_length", "maxlen"), ("font", "fontName"),
+    USER_PARAMS = [("width", "width"), ("height", "height"),
+                   ("max_length", "maxlen"), ("font", "fontName"),
                    ("font_size", "fontSize"), ("font_color", "textColor")]
     COLOR_PARAMS = ["font_color"]
     NONE_DEFAULTS = ["max_length"]
