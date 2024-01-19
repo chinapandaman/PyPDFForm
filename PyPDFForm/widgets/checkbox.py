@@ -7,5 +7,5 @@ from .base import Widget
 class CheckBoxWidget(Widget):
     """Checkbox widget to create."""
 
-    USER_PARAMS = ["size"]
+    USER_PARAMS = [("size", "size")]
     ACRO_FORM_FUNC = "checkbox"

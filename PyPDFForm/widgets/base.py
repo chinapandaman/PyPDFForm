@@ -37,17 +37,18 @@ class Widget:
         }
 
         for each in self.USER_PARAMS:
-            if each in kwargs:
-                value = kwargs[each]
-                if each in self.COLOR_PARAMS:
+            user_input, param = each
+            if user_input in kwargs:
+                value = kwargs[user_input]
+                if user_input in self.COLOR_PARAMS:
                     value = Color(
                         value[0],
                         value[1],
                         value[2],
                     )
-                self.acro_form_params[each] = value
-            elif each in self.NONE_DEFAULTS:
-                self.acro_form_params[each] = None
+                self.acro_form_params[param] = value
+            elif user_input in self.NONE_DEFAULTS:
+                self.acro_form_params[param] = None
 
     def watermarks(self, stream: bytes) -> List[bytes]:
         """Returns a list of watermarks after creating the widget."""
