@@ -12,14 +12,13 @@ class Widget:
     """Base class for all widgets to create."""
 
     USER_PARAMS = []
+    NONE_DEFAULTS = []
     ACRO_FORM_FUNC = ""
 
     def __init__(
         self,
         name: str,
         page_number: int,
-        width: float,
-        height: float,
         x: float,
         y: float,
         **kwargs,
@@ -29,14 +28,15 @@ class Widget:
         self.page_number = page_number
         self.acro_form_params = {
             "name": name,
-            "width": width,
-            "height": height,
             "x": x,
             "y": y,
         }
 
         for each in self.USER_PARAMS:
-            self.acro_form_params[each] = kwargs.get(each)
+            if each in kwargs:
+                self.acro_form_params[each] = kwargs[each]
+            elif each in self.NONE_DEFAULTS:
+                self.acro_form_params[each] = None
 
     def watermarks(self, stream: bytes) -> List[bytes]:
         """Returns a list of watermarks after creating the widget."""

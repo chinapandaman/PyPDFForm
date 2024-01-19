@@ -23,6 +23,7 @@ from .middleware.template import (build_widgets, dropdown_to_text,
                                   set_character_x_paddings)
 from .middleware.text import Text
 from .widgets.text import TextWidget
+from .widgets.checkbox import CheckBoxWidget
 
 
 class PdfWrapper:
@@ -156,8 +157,6 @@ class PdfWrapper:
         widget_type: str,
         name: str,
         page_number: int,
-        width: float,
-        height: float,
         x: float,
         y: float,
         **kwargs,
@@ -167,25 +166,26 @@ class PdfWrapper:
         _class = None
         if widget_type == "text":
             _class = TextWidget
+        if widget_type == "checkbox":
+            _class = CheckBoxWidget
         if _class is None:
             return self
 
         watermarks = _class(
             name=name,
             page_number=page_number,
-            width=width,
-            height=height,
             x=x,
             y=y,
-            kwargs=kwargs
+            **kwargs
         ).watermarks(self.read())
 
-        self.__init__(
-            merge_watermarks_with_pdf(self.read(), watermarks),
-            global_font=self.global_font,
-            global_font_size=self.global_font_size,
-            global_font_color=self.global_font_color,
-        )
+        self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
+        self.widgets[name] = build_widgets(self.read())[name]
+        if widget_type == "text":
+            self.widgets[name].font = self.global_font
+            self.widgets[name].font_size = self.global_font_size
+            self.widgets[name].font_color = self.global_font_color
+
         return self
 
     def draw_text(
