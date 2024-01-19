@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """Contains base class for all widgets to create."""
 
-from typing import List
-from reportlab.pdfgen.canvas import Canvas
 from io import BytesIO
+from typing import List
+
 from pypdf import PdfReader
+from reportlab.pdfgen.canvas import Canvas
+
 from ..core.utils import stream_to_io
 
 
