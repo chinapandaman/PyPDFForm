@@ -6,6 +6,7 @@ from math import sqrt
 from re import findall
 from typing import Dict, Tuple, Union
 
+from reportlab.pdfbase.acroform import AcroForm
 from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
@@ -57,6 +58,11 @@ def auto_detect_font(widget: dict) -> str:
     for each in text_appearance:
         if each.startswith("/"):
             text_segments = findall("[A-Z][^A-Z]*", each.replace("/", ""))
+
+            if len(text_segments) == 1:
+                for k, v in AcroForm.formFontNames.items():
+                    if v == text_segments[0]:
+                        return k
 
             for font in standardFonts:
                 font_segments = findall("[A-Z][^A-Z]*", font.replace("-", ""))
