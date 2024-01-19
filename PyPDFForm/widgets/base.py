@@ -5,6 +5,7 @@ from io import BytesIO
 from typing import List
 
 from pypdf import PdfReader
+from reportlab.lib.colors import Color
 from reportlab.pdfgen.canvas import Canvas
 
 from ..core.utils import stream_to_io
@@ -14,6 +15,7 @@ class Widget:
     """Base class for all widgets to create."""
 
     USER_PARAMS = []
+    COLOR_PARAMS = []
     NONE_DEFAULTS = []
     ACRO_FORM_FUNC = ""
 
@@ -36,7 +38,14 @@ class Widget:
 
         for each in self.USER_PARAMS:
             if each in kwargs:
-                self.acro_form_params[each] = kwargs[each]
+                value = kwargs[each]
+                if each in self.COLOR_PARAMS:
+                    value = Color(
+                        value[0],
+                        value[1],
+                        value[2],
+                    )
+                self.acro_form_params[each] = value
             elif each in self.NONE_DEFAULTS:
                 self.acro_form_params[each] = None
 
