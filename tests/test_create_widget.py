@@ -8,13 +8,16 @@ from PyPDFForm import PdfWrapper
 def test_create_radio_not_working(template_stream):
     obj = PdfWrapper(template_stream)
     stream = obj.stream
-    assert obj.create_widget(
-        "radio",
-        "foo",
-        1,
-        100,
-        100,
-    ).stream == stream
+    assert (
+        obj.create_widget(
+            "radio",
+            "foo",
+            1,
+            100,
+            100,
+        ).stream
+        == stream
+    )
 
 
 def test_create_checkbox_default(template_stream, pdf_samples, request):
@@ -39,7 +42,9 @@ def test_create_checkbox_default(template_stream, pdf_samples, request):
 
 
 def test_create_checkbox_default_filled(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_default_filled.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "create_checkbox_default_filled.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -63,12 +68,7 @@ def test_create_checkbox_complex(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_complex.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
-            "checkbox",
-            "foo",
-            1,
-            100,
-            100,
-            size=100
+            "checkbox", "foo", 1, 100, 100, size=100
         )
         assert obj.schema["properties"]["foo"]["type"] == "boolean"
 
@@ -82,15 +82,12 @@ def test_create_checkbox_complex(template_stream, pdf_samples, request):
 
 
 def test_create_checkbox_complex_filled(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_complex_filled.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "create_checkbox_complex_filled.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
-            "checkbox",
-            "foo",
-            1,
-            100,
-            100,
-            size=100
+            "checkbox", "foo", 1, 100, 100, size=100
         )
         obj.fill(obj.sample_data)
 
@@ -125,7 +122,9 @@ def test_create_text_default(template_stream, pdf_samples, request):
 
 
 def test_create_text_default_filled(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "create_text_default_filled.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "create_text_default_filled.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "text",
@@ -159,7 +158,7 @@ def test_create_text_complex(template_stream, pdf_samples, request):
             max_length=2,
             font="Times-Roman",
             font_size=50,
-            font_color=(1, 0.5, 1)
+            font_color=(1, 0.5, 1),
         )
         assert obj.schema["properties"]["foo"]["type"] == "string"
         assert obj.schema["properties"]["foo"]["maxLength"] == 2
@@ -174,7 +173,9 @@ def test_create_text_complex(template_stream, pdf_samples, request):
 
 
 def test_create_text_complex_filled(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "create_text_complex_filled.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "create_text_complex_filled.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "text",
@@ -187,7 +188,7 @@ def test_create_text_complex_filled(template_stream, pdf_samples, request):
             max_length=2,
             font="Times-Roman",
             font_size=50,
-            font_color=(1, 0.5, 1)
+            font_color=(1, 0.5, 1),
         )
         obj.fill(obj.sample_data)
 

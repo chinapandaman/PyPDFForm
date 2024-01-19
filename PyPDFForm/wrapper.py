@@ -22,8 +22,8 @@ from .middleware.dropdown import Dropdown
 from .middleware.template import (build_widgets, dropdown_to_text,
                                   set_character_x_paddings)
 from .middleware.text import Text
-from .widgets.text import TextWidget
 from .widgets.checkbox import CheckBoxWidget
+from .widgets.text import TextWidget
 
 
 class PdfWrapper:
@@ -172,11 +172,7 @@ class PdfWrapper:
             return self
 
         watermarks = _class(
-            name=name,
-            page_number=page_number,
-            x=x,
-            y=y,
-            **kwargs
+            name=name, page_number=page_number, x=x, y=y, **kwargs
         ).watermarks(self.read())
 
         self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
