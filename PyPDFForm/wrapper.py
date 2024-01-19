@@ -22,6 +22,8 @@ from .middleware.dropdown import Dropdown
 from .middleware.template import (build_widgets, dropdown_to_text,
                                   set_character_x_paddings)
 from .middleware.text import Text
+from .widgets.text import TextWidget
+from .widgets.checkbox import CheckBoxWidget
 
 
 class PdfWrapper:
@@ -37,11 +39,15 @@ class PdfWrapper:
         self.stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = build_widgets(self.stream) if self.stream else {}
 
+        self.global_font = kwargs.get("global_font")
+        self.global_font_size = kwargs.get("global_font_size")
+        self.global_font_color = kwargs.get("global_font_color")
+
         for each in self.widgets.values():
             if isinstance(each, Text):
-                each.font = kwargs.get("global_font")
-                each.font_size = kwargs.get("global_font_size")
-                each.font_color = kwargs.get("global_font_color")
+                each.font = self.global_font
+                each.font_size = self.global_font_size
+                each.font_color = self.global_font_color
 
     def read(self) -> bytes:
         """Reads the file stream of a PDF form."""
@@ -143,6 +149,42 @@ class PdfWrapper:
             self.widgets = set_character_x_paddings(self.stream, self.widgets)
 
         self.stream = remove_all_widgets(fill(self.stream, self.widgets))
+
+        return self
+
+    def create_widget(
+        self,
+        widget_type: str,
+        name: str,
+        page_number: int,
+        x: float,
+        y: float,
+        **kwargs,
+    ) -> PdfWrapper:
+        """Creates a new widget on a PDF form."""
+
+        _class = None
+        if widget_type == "text":
+            _class = TextWidget
+        if widget_type == "checkbox":
+            _class = CheckBoxWidget
+        if _class is None:
+            return self
+
+        watermarks = _class(
+            name=name,
+            page_number=page_number,
+            x=x,
+            y=y,
+            **kwargs
+        ).watermarks(self.read())
+
+        self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
+        self.widgets[name] = build_widgets(self.read())[name]
+        if widget_type == "text":
+            self.widgets[name].font = self.global_font
+            self.widgets[name].font_size = self.global_font_size
+            self.widgets[name].font_color = self.global_font_color
 
         return self
 
