@@ -12,10 +12,7 @@ with open("README.md", mode="r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 with open("prod_requirements.txt", mode="r", encoding="utf-8") as requirements:
-    dependencies = [
-        each.replace("\n", "")
-        for each in requirements.readlines()
-    ]
+    dependencies = [each.replace("\n", "") for each in requirements.readlines()]
 
 setuptools.setup(
     name="PyPDFForm",
