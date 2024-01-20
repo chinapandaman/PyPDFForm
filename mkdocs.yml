@@ -4,6 +4,7 @@ nav:
     - install.md
     - prepare.md
     - inspect.md
+    - fill.md
 theme:
   name: readthedocs
   logo: img/logo.png
