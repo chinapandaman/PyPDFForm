@@ -6,6 +6,7 @@ nav:
     - inspect.md
     - fill.md
     - style.md
+    - draw.md
 theme:
   name: readthedocs
   logo: img/logo.png

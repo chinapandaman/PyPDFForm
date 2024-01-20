@@ -11,3 +11,4 @@ supports other functionalities such as drawing image and merging multiple PDFs t
 * [Inspect a PDF form](inspect.md)
 * [Fill a PDF form](fill.md)
 * [Change text field styles](style.md)
+* [Draw stuffs](draw.md)
