@@ -1,0 +1,24 @@
+name: Deploy Docs
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.BLACK_ISORT_TOKEN }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install mkdocs
+        run: pip install mkdocs
+      - name: Deploy docs to GitHub page
+        run: |
+          mkdocs build
+          mkdocs gh-deploy
