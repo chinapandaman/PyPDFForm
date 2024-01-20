@@ -9,8 +9,6 @@ functionalities needed to interact with PDF forms:
 
 It also supports other common utilities such as extracting pages and merging multiple PDFs together.
 
-![Check out the GitHub repository for a live demo if you can't see it here.](https://github.com/chinapandaman/PyPDFForm/raw/master/demo.gif)
-
 ## User Guide
 
 * [Installation and setup](install.md)
