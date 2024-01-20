@@ -6,7 +6,7 @@ supports other functionalities such as drawing image and merging multiple PDFs t
 
 ## User Guide
 
-* [Installation](install.md)
+* [Installation and setup](install.md)
 * [Prepare a PDF form](prepare.md)
 * [Inspect a PDF form](inspect.md)
 * [Fill a PDF form](fill.md)
