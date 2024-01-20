@@ -10,8 +10,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.BLACK_ISORT_TOKEN }}
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -20,5 +18,4 @@ jobs:
         run: pip install mkdocs
       - name: Deploy docs to GitHub page
         run: |
-          mkdocs build
-          mkdocs gh-deploy --no-history
+          mkdocs gh-deploy --force --clean --verbose
