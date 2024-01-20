@@ -20,5 +20,6 @@ jobs:
         run: pip install mkdocs
       - name: Deploy docs to GitHub page
         run: |
+          git fetch
           mkdocs build
           mkdocs gh-deploy --force
