@@ -1,0 +1,4 @@
+cryptography
+pillow
+pypdf
+reportlab

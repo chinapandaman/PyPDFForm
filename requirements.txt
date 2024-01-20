@@ -1,6 +1,7 @@
 coverage
 cryptography
 jsonschema
+mkdocs
 pillow
 pudb
 pylint
