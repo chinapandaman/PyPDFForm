@@ -1,13 +1,13 @@
 # Installation and setup
 
-PyPDFForm is hosted on PyPI and any tool that supports downloading from it can be a choice. 
+PyPDFForm is hosted on PyPI and any tool that supports downloading from it can be used. 
 The most common option is to use pip.
 
 ## Install using pip
 
 PyPDFForm requires Python 3.7+.
 
-It is advised that a virtual environment is always created beforehand. Then you can run the following command:
+It is advised that a virtual environment is always created beforehand. Then you can run the following command to install:
 
 ```shell
 pip install PyPDFForm

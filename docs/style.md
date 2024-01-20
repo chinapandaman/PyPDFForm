@@ -1,6 +1,6 @@
 # Change text field styles
 
-PyPDFForm gives you the ability to modify certain styles for text fields through code. This allows you to manipulate 
+PyPDFForm gives you the ability to modify certain styles of text fields through code. This allows you to manipulate 
 appearances of the texts without having to make changes to your PDF form template.
 
 All these style changes can be done both globally upon instantiating a `PdfWrapper` object and individually for each 

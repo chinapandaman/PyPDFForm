@@ -18,8 +18,8 @@ A text field widget can be created by downloading the PDF and running the follow
 from PyPDFForm import PdfWrapper
 
 new_form = PdfWrapper("dummy.pdf").create_widget(
-    "text",
-    "new_text_field_widget",
+    widget_type="text",
+    name="new_text_field_widget",
     page_number=1,
     x=57,
     y=700,
@@ -43,8 +43,8 @@ A checkbox widget can be created using the same method with some changes to the 
 from PyPDFForm import PdfWrapper
 
 new_form = PdfWrapper("dummy.pdf").create_widget(
-    "checkbox",
-    "new_checkbox_widget",
+    widget_type="checkbox",
+    name="new_checkbox_widget",
     page_number=1,
     x=57,
     y=700,
