@@ -11,13 +11,10 @@ with open("PyPDFForm/__init__.py", encoding="utf8") as f:
 with open("README.md", mode="r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-dev_dependencies = ["coverage", "jsonschema", "pylint", "pytest", "pudb", "requests"]
-
-with open("requirements.txt", mode="r", encoding="utf-8") as requirements:
+with open("prod_requirements.txt", mode="r", encoding="utf-8") as requirements:
     dependencies = [
         each.replace("\n", "")
         for each in requirements.readlines()
-        if each.replace("\n", "") not in dev_dependencies
     ]
 
 setuptools.setup(

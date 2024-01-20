@@ -71,7 +71,7 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/ma
 
 ## Documentation
 
-[Examples](https://github.com/chinapandaman/PyPDFForm/blob/master/docs/examples.md)
+The official documentation can be found on [the GitHub page](https://chinapandaman.github.io/PyPDFForm/) of this repository.
 
 ## Public Speak
 
