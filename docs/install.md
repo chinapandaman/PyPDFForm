@@ -7,7 +7,7 @@ The most common option is to use pip.
 
 PyPDFForm requires Python 3.7+.
 
-It is advised that a virtual environment is always created beforehand. Then install using the following command:
+It is advised that a virtual environment is always created beforehand. Then you can run the following command:
 
 ```shell
 pip install PyPDFForm

@@ -1,4 +1,4 @@
-# Preparing a PDF Form
+# Prepare a PDF form
 
 The most common tool to create a PDF form is Adobe Acrobat. A tutorial can be found 
 [here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html). 
@@ -10,7 +10,7 @@ creating a subset of PDF form widgets on it through coding.
 This section of the documentation will use 
 [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
 
-## Creating a textfield widget
+## Create a text field widget
 
 A text field widget can be created by downloading the PDF and running the following snippet:
 
@@ -35,7 +35,7 @@ with open("output.pdf", "wb+") as output:
     output.write(new_form.read())
 ```
 
-## Creating a checkbox widget
+## Create a checkbox widget
 
 A checkbox widget can be created using the same method with some changes to the parameters:
 

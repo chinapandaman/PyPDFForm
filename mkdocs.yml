@@ -3,6 +3,7 @@ nav:
   - 'User Guide':
     - install.md
     - prepare.md
+    - inspect.md
 theme:
   name: readthedocs
   logo: img/logo.png
