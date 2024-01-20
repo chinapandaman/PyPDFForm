@@ -9,7 +9,7 @@ This section of the documentation will use
 
 ## Generate a preview PDF
 
-The first method of previewing a PDF form is to generate a preview document. Each `PdfWrapper` object contains an 
+The first method of inspecting a PDF form is to generate a preview document. Each `PdfWrapper` object contains an 
 attribute `.preview` which is a file stream that can be written to any disk file or memory buffer. Consider the 
 following snippet:
 
