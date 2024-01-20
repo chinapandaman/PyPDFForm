@@ -2,6 +2,7 @@ site_name: PyPDFForm
 nav:
   - 'User Guide':
     - install.md
+    - prepare.md
 theme:
   name: readthedocs
   logo: img/logo.png
