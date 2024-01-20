@@ -5,6 +5,7 @@ nav:
     - prepare.md
     - inspect.md
     - fill.md
+    - style.md
 theme:
   name: readthedocs
   logo: img/logo.png

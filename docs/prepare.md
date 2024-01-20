@@ -19,7 +19,7 @@ from PyPDFForm import PdfWrapper
 
 new_form = PdfWrapper("dummy.pdf").create_widget(
     "text",
-    "new_textfield_widget",
+    "new_text_field_widget",
     page_number=1,
     x=57,
     y=700,
