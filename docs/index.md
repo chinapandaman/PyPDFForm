@@ -12,3 +12,4 @@ supports other functionalities such as drawing image and merging multiple PDFs t
 * [Fill a PDF form](fill.md)
 * [Change text field styles](style.md)
 * [Draw stuffs](draw.md)
+* [Other utilities](utils.md)

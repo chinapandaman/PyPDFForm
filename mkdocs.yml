@@ -7,6 +7,7 @@ nav:
     - fill.md
     - style.md
     - draw.md
+    - utils.md
 theme:
   name: readthedocs
   logo: img/logo.png
