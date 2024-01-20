@@ -1,5 +1,5 @@
 site_name: Welcome to PyPDFForm - PyPDFForm Documentation
-repo_url: https://github.com/chinapandaman/PyPDFForm/tree/master/docs
+repo_url: https://github.com/chinapandaman/PyPDFForm
 nav:
   - 'User Guide':
     - install.md
