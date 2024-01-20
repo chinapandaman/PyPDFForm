@@ -21,4 +21,4 @@ jobs:
       - name: Deploy docs to GitHub page
         run: |
           mkdocs build
-          mkdocs gh-deploy
+          mkdocs gh-deploy --force
