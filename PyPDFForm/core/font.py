@@ -124,7 +124,7 @@ def get_text_field_font_size(widget: dict) -> Union[float, int]:
         if text_appearance:
             properties = text_appearance.split(" ")
             for i, val in enumerate(properties):
-                if val == FONT_SIZE_IDENTIFIER:
+                if val.startswith(FONT_SIZE_IDENTIFIER):
                     return float(properties[i - 1])
 
     return result
@@ -144,7 +144,7 @@ def get_text_field_font_color(
 
             text_appearance = text_appearance.split(" ")
             for i, val in enumerate(text_appearance):
-                if val == FONT_COLOR_IDENTIFIER.replace(" ", ""):
+                if val.startswith(FONT_COLOR_IDENTIFIER.replace(" ", "")):
                     result = (
                         float(text_appearance[i - 3]),
                         float(text_appearance[i - 2]),
