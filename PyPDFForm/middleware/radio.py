@@ -16,6 +16,7 @@ class Radio(Widget):
 
         super().__init__(name, value)
 
+        self.button_style = None
         self.number_of_options = 0
 
     @property

@@ -16,6 +16,8 @@ class Checkbox(Widget):
 
         super().__init__(name, value)
 
+        self.button_style = None
+
     @property
     def schema_definition(self) -> dict:
         """Json schema definition of the checkbox."""
