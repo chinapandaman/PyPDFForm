@@ -10,9 +10,9 @@ from ..middleware.constants import WIDGET_TYPES
 from ..middleware.text import Text
 from .constants import (ANNOTATION_RECTANGLE_KEY, COMB, MULTILINE,
                         NEW_LINE_SYMBOL, TEXT_FIELD_MAX_LENGTH_KEY)
-from .patterns import (DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
-                       WIDGET_ALIGNMENT_PATTERNS, WIDGET_KEY_PATTERNS,
-                       WIDGET_TYPE_PATTERNS, BUTTON_STYLE_PATTERNS)
+from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
+                       TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
+                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS)
 from .utils import find_pattern_match, stream_to_io, traverse_pattern
 
 

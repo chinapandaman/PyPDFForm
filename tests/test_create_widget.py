@@ -82,9 +82,7 @@ def test_create_checkbox_complex(template_stream, pdf_samples, request):
 
 
 def test_create_checkbox_check(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "create_checkbox_check.pdf"
-    )
+    expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_check.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -106,9 +104,7 @@ def test_create_checkbox_check(template_stream, pdf_samples, request):
 
 
 def test_create_checkbox_circle(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "create_checkbox_circle.pdf"
-    )
+    expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_circle.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -130,9 +126,7 @@ def test_create_checkbox_circle(template_stream, pdf_samples, request):
 
 
 def test_create_checkbox_cross(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "create_checkbox_cross.pdf"
-    )
+    expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_cross.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",

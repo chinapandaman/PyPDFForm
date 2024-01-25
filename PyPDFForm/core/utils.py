@@ -11,8 +11,9 @@ from ..middleware.checkbox import Checkbox
 from ..middleware.constants import WIDGET_TYPES
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from .constants import (DEFAULT_CHECKBOX_STYLE, BUTTON_STYLES, DEFAULT_FONT, DEFAULT_FONT_COLOR,
-                        DEFAULT_FONT_SIZE, PREVIEW_FONT_COLOR, DEFAULT_RADIO_STYLE)
+from .constants import (BUTTON_STYLES, DEFAULT_CHECKBOX_STYLE, DEFAULT_FONT,
+                        DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
+                        DEFAULT_RADIO_STYLE, PREVIEW_FONT_COLOR)
 
 
 def stream_to_io(stream: bytes) -> BinaryIO:

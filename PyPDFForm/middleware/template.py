@@ -3,12 +3,12 @@
 
 from typing import Dict
 
-from ..core.template import (construct_widget, get_character_x_paddings,
-                             get_dropdown_choices, get_text_field_max_length,
-                             get_widget_key, get_widgets_by_page,
-                             is_text_field_comb, get_button_style)
-from .constants import WIDGET_TYPES
+from ..core.template import (construct_widget, get_button_style,
+                             get_character_x_paddings, get_dropdown_choices,
+                             get_text_field_max_length, get_widget_key,
+                             get_widgets_by_page, is_text_field_comb)
 from .checkbox import Checkbox
+from .constants import WIDGET_TYPES
 from .dropdown import Dropdown
 from .radio import Radio
 from .text import Text

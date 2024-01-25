@@ -5,13 +5,14 @@ from ..middleware.checkbox import Checkbox
 from ..middleware.dropdown import Dropdown
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from .constants import (ANNOTATION_FIELD_KEY, CHOICE_FIELD_IDENTIFIER,
+from .constants import (ANNOTATION_FIELD_KEY, BUTTON_IDENTIFIER,
+                        BUTTON_STYLE_IDENTIFIER, CHOICE_FIELD_IDENTIFIER,
                         CHOICES_IDENTIFIER, FIELD_FLAG_KEY, PARENT_KEY,
                         SELECTABLE_IDENTIFIER, SUBTYPE_KEY,
                         TEXT_FIELD_ALIGNMENT_IDENTIFIER,
                         TEXT_FIELD_APPEARANCE_IDENTIFIER,
                         TEXT_FIELD_IDENTIFIER, WIDGET_SUBTYPE_KEY,
-                        WIDGET_TYPE_KEY, BUTTON_STYLE_IDENTIFIER, BUTTON_IDENTIFIER)
+                        WIDGET_TYPE_KEY)
 
 WIDGET_TYPE_PATTERNS = [
     (
@@ -74,5 +75,5 @@ TEXT_FIELD_APPEARANCE_PATTERNS = [
 
 BUTTON_STYLE_PATTERNS = [
     {BUTTON_IDENTIFIER: {BUTTON_STYLE_IDENTIFIER: True}},
-    {PARENT_KEY: {BUTTON_IDENTIFIER: {BUTTON_STYLE_IDENTIFIER: True}}}
+    {PARENT_KEY: {BUTTON_IDENTIFIER: {BUTTON_STYLE_IDENTIFIER: True}}},
 ]
