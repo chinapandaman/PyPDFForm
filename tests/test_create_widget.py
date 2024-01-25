@@ -81,6 +81,78 @@ def test_create_checkbox_complex(template_stream, pdf_samples, request):
         assert obj.stream == expected
 
 
+def test_create_checkbox_check(template_stream, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "create_checkbox_check.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "checkbox",
+            "foo",
+            1,
+            100,
+            100,
+            button_style="check",
+        )
+        obj.fill(obj.sample_data)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
+def test_create_checkbox_circle(template_stream, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "create_checkbox_circle.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "checkbox",
+            "foo",
+            1,
+            100,
+            100,
+            button_style="circle",
+        )
+        obj.fill(obj.sample_data)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
+def test_create_checkbox_cross(template_stream, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "create_checkbox_cross.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "checkbox",
+            "foo",
+            1,
+            100,
+            100,
+            button_style="cross",
+        )
+        obj.fill(obj.sample_data)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
 def test_create_checkbox_complex_filled(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "create_checkbox_complex_filled.pdf"

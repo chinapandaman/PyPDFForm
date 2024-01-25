@@ -11,8 +11,8 @@ from ..middleware.checkbox import Checkbox
 from ..middleware.constants import WIDGET_TYPES
 from ..middleware.radio import Radio
 from ..middleware.text import Text
-from .constants import (CHECKBOX_TO_DRAW, DEFAULT_FONT, DEFAULT_FONT_COLOR,
-                        DEFAULT_FONT_SIZE, PREVIEW_FONT_COLOR, RADIO_TO_DRAW)
+from .constants import (DEFAULT_CHECKBOX_STYLE, BUTTON_STYLES, DEFAULT_FONT, DEFAULT_FONT_COLOR,
+                        DEFAULT_FONT_SIZE, PREVIEW_FONT_COLOR, DEFAULT_RADIO_STYLE)
 
 
 def stream_to_io(stream: bytes) -> BinaryIO:
@@ -37,11 +37,9 @@ def checkbox_radio_to_draw(
     new_widget.font = DEFAULT_FONT
     new_widget.font_size = font_size
     new_widget.font_color = DEFAULT_FONT_COLOR
-
-    if isinstance(widget, Checkbox):
-        new_widget.value = CHECKBOX_TO_DRAW
-    elif isinstance(widget, Radio):
-        new_widget.value = RADIO_TO_DRAW
+    new_widget.value = BUTTON_STYLES.get(widget.button_style) or (
+        DEFAULT_CHECKBOX_STYLE if isinstance(widget, Checkbox) else DEFAULT_RADIO_STYLE
+    )
 
     return new_widget
 

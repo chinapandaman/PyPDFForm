@@ -12,7 +12,7 @@ from .constants import (ANNOTATION_RECTANGLE_KEY, COMB, MULTILINE,
                         NEW_LINE_SYMBOL, TEXT_FIELD_MAX_LENGTH_KEY)
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
                        WIDGET_ALIGNMENT_PATTERNS, WIDGET_KEY_PATTERNS,
-                       WIDGET_TYPE_PATTERNS)
+                       WIDGET_TYPE_PATTERNS, BUTTON_STYLE_PATTERNS)
 from .utils import find_pattern_match, stream_to_io, traverse_pattern
 
 
@@ -130,6 +130,17 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str], None]:
             break
 
     return result
+
+
+def get_button_style(widget: dict) -> Union[str, None]:
+    """Returns the button style of a checkbox or radiobutton."""
+
+    for pattern in BUTTON_STYLE_PATTERNS:
+        style = traverse_pattern(pattern, widget)
+        if style is not None:
+            return str(style)
+
+    return None
 
 
 def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:
