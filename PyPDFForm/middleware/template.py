@@ -43,7 +43,7 @@ def build_widgets(pdf_stream: bytes) -> Dict[str, WIDGET_TYPES]:
 
             if _widget is not None:
                 if isinstance(_widget, Text):
-                    _widget.max_length = get_text_field_max_length(widget)
+                    _widget.max_length = get_text_field_max_length(widget) or None
                     if _widget.max_length is not None and is_text_field_comb(widget):
                         _widget.comb = True
 
