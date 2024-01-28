@@ -194,7 +194,12 @@ def generate_coordinate_grid(pdf: bytes, color: Tuple[float, float, float]) -> b
                 text.font_size = DEFAULT_FONT_SIZE
                 text.font_color = color
                 texts_by_page[i + 1].append(
-                    [text, x - stringWidth(value, DEFAULT_FONT, DEFAULT_FONT_SIZE), y - DEFAULT_FONT_SIZE])
+                    [
+                        text,
+                        x - stringWidth(value, DEFAULT_FONT, DEFAULT_FONT_SIZE),
+                        y - DEFAULT_FONT_SIZE
+                    ]
+                )
                 y += COORDINATE_GRID_MARGIN
             x += COORDINATE_GRID_MARGIN
 
