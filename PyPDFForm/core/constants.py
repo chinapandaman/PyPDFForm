@@ -38,3 +38,5 @@ BUTTON_STYLES = {
     "5": "\u00D7",
     "l": "\u25CF",
 }
+
+COORDINATE_GRID_MARGIN = 100

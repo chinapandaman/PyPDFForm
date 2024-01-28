@@ -4,12 +4,16 @@
 from copy import deepcopy
 from typing import List, Tuple, Union
 
+from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from ..middleware.text import Text
-from .constants import ANNOTATION_RECTANGLE_KEY
+from .constants import (ANNOTATION_RECTANGLE_KEY, COORDINATE_GRID_MARGIN,
+                        DEFAULT_FONT, DEFAULT_FONT_SIZE)
 from .template import (get_char_rect_width, get_widget_alignment,
                        is_text_multiline)
+from .utils import stream_to_io
+from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
+from ..middleware.text import Text
 
 
 def get_draw_checkbox_radio_coordinates(
@@ -152,3 +156,68 @@ def get_text_line_x_coordinates(
         return result
 
     return None
+
+
+def generate_coordinate_grid(pdf: bytes, color: Tuple[float, float, float]) -> bytes:
+    """Creates a grid view for the coordinates of a PDF."""
+
+    pdf_file = PdfReader(stream_to_io(pdf))
+    lines_by_page = {}
+    texts_by_page = {}
+    watermarks = []
+
+    for i, page in enumerate(pdf_file.pages):
+        lines_by_page[i + 1] = []
+        texts_by_page[i + 1] = []
+        width = float(page.mediabox[2])
+        height = float(page.mediabox[3])
+
+        r, g, b = color
+
+        current = COORDINATE_GRID_MARGIN
+        while current < width:
+            lines_by_page[i + 1].append([current, 0, current, height, r, g, b])
+            current += COORDINATE_GRID_MARGIN
+
+        current = COORDINATE_GRID_MARGIN
+        while current < height:
+            lines_by_page[i + 1].append([0, current, width, current, r, g, b])
+            current += COORDINATE_GRID_MARGIN
+
+        x = COORDINATE_GRID_MARGIN
+        while x < width:
+            y = COORDINATE_GRID_MARGIN
+            while y < height:
+                value = f"({x}, {y})"
+                text = Text("new_coordinate", value)
+                text.font = DEFAULT_FONT
+                text.font_size = DEFAULT_FONT_SIZE
+                text.font_color = color
+                texts_by_page[i + 1].append(
+                    [text, x - stringWidth(value, DEFAULT_FONT, DEFAULT_FONT_SIZE), y - DEFAULT_FONT_SIZE])
+                y += COORDINATE_GRID_MARGIN
+            x += COORDINATE_GRID_MARGIN
+
+    for page, lines in lines_by_page.items():
+        watermarks.append(
+            create_watermarks_and_draw(
+                pdf,
+                page,
+                "line",
+                lines
+            )[page - 1]
+        )
+
+    result = merge_watermarks_with_pdf(pdf, watermarks)
+    watermarks = []
+    for page, texts in texts_by_page.items():
+        watermarks.append(
+            create_watermarks_and_draw(
+                pdf,
+                page,
+                "text",
+                texts
+            )[page - 1]
+        )
+
+    return merge_watermarks_with_pdf(result, watermarks)

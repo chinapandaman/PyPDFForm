@@ -81,6 +81,24 @@ def draw_text(
         canvas.restoreState()
 
 
+def draw_line(*args: Union[Canvas, bytes, float, int]) -> None:
+    """Draws a line on the watermark."""
+
+    canvas = args[0]
+    src_x = args[1]
+    src_y = args[2]
+    dest_x = args[3]
+    dest_y = args[4]
+    r = args[5]
+    g = args[6]
+    b = args[7]
+
+    canvas.saveState()
+    canvas.setStrokeColorRGB(r, g, b)
+    canvas.line(src_x, src_y, dest_x, dest_y)
+    canvas.restoreState()
+
+
 def draw_image(*args: Union[Canvas, bytes, float, int]) -> None:
     """Draws an image on the watermark."""
 
@@ -141,6 +159,9 @@ def create_watermarks_and_draw(
     elif action_type == "text":
         for each in actions:
             draw_text(*([canvas, *each]))
+    elif action_type == "line":
+        for each in actions:
+            draw_line(*([canvas, *each]))
 
     canvas.save()
     buff.seek(0)
