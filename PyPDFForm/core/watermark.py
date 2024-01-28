@@ -12,15 +12,7 @@ from ..middleware.text import Text
 from .utils import stream_to_io
 
 
-def draw_text(
-    *args: Union[
-        Canvas,
-        Text,
-        float,
-        int,
-        str,
-    ]
-) -> None:
+def draw_text(*args) -> None:
     """Draws a text on the watermark."""
 
     canvas = args[0]
@@ -81,7 +73,7 @@ def draw_text(
         canvas.restoreState()
 
 
-def draw_line(*args: Union[Canvas, bytes, float, int]) -> None:
+def draw_line(*args) -> None:
     """Draws a line on the watermark."""
 
     canvas = args[0]
@@ -99,7 +91,7 @@ def draw_line(*args: Union[Canvas, bytes, float, int]) -> None:
     canvas.restoreState()
 
 
-def draw_image(*args: Union[Canvas, bytes, float, int]) -> None:
+def draw_image(*args) -> None:
     """Draws an image on the watermark."""
 
     canvas = args[0]
@@ -128,17 +120,7 @@ def create_watermarks_and_draw(
     pdf: bytes,
     page_number: int,
     action_type: str,
-    actions: List[
-        List[
-            Union[
-                bytes,
-                float,
-                int,
-                Text,
-                str,
-            ]
-        ]
-    ],
+    actions: List[list],
 ) -> List[bytes]:
     """Creates a canvas watermark and draw some stuffs on it."""
 
