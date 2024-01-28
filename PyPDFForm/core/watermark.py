@@ -2,13 +2,12 @@
 """Contains helpers for watermark."""
 
 from io import BytesIO
-from typing import List, Union
+from typing import List
 
 from pypdf import PdfReader, PdfWriter
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
-from ..middleware.text import Text
 from .utils import stream_to_io
 
 
