@@ -6,6 +6,8 @@ form, and you need to put certain texts on it, or if you need to draw images.
 This section of the documentation will use 
 [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
 
+This section of the documentation requires a basic understanding of [the PDF coordinate system](coordinate.md).
+
 ## Draw text
 
 ```python
