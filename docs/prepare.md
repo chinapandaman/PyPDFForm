@@ -48,9 +48,12 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     page_number=1,
     x=57,
     y=700,
-    size=30
+    size=30,
+    button_style="check"
 )
 
 with open("output.pdf", "wb+") as output:
     output.write(new_form.read())
 ```
+
+The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
