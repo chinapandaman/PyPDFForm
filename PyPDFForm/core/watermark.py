@@ -2,25 +2,16 @@
 """Contains helpers for watermark."""
 
 from io import BytesIO
-from typing import List, Union
+from typing import List
 
 from pypdf import PdfReader, PdfWriter
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
-from ..middleware.text import Text
 from .utils import stream_to_io
 
 
-def draw_text(
-    *args: Union[
-        Canvas,
-        Text,
-        float,
-        int,
-        str,
-    ]
-) -> None:
+def draw_text(*args) -> None:
     """Draws a text on the watermark."""
 
     canvas = args[0]
@@ -81,7 +72,25 @@ def draw_text(
         canvas.restoreState()
 
 
-def draw_image(*args: Union[Canvas, bytes, float, int]) -> None:
+def draw_line(*args) -> None:
+    """Draws a line on the watermark."""
+
+    canvas = args[0]
+    src_x = args[1]
+    src_y = args[2]
+    dest_x = args[3]
+    dest_y = args[4]
+    r = args[5]
+    g = args[6]
+    b = args[7]
+
+    canvas.saveState()
+    canvas.setStrokeColorRGB(r, g, b)
+    canvas.line(src_x, src_y, dest_x, dest_y)
+    canvas.restoreState()
+
+
+def draw_image(*args) -> None:
     """Draws an image on the watermark."""
 
     canvas = args[0]
@@ -110,17 +119,7 @@ def create_watermarks_and_draw(
     pdf: bytes,
     page_number: int,
     action_type: str,
-    actions: List[
-        List[
-            Union[
-                bytes,
-                float,
-                int,
-                Text,
-                str,
-            ]
-        ]
-    ],
+    actions: List[list],
 ) -> List[bytes]:
     """Creates a canvas watermark and draw some stuffs on it."""
 
@@ -141,6 +140,9 @@ def create_watermarks_and_draw(
     elif action_type == "text":
         for each in actions:
             draw_text(*([canvas, *each]))
+    elif action_type == "line":
+        for each in actions:
+            draw_line(*([canvas, *each]))
 
     canvas.save()
     buff.seek(0)

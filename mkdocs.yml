@@ -3,6 +3,7 @@ repo_url: https://github.com/chinapandaman/PyPDFForm
 nav:
   - 'User Guide':
     - install.md
+    - coordinate.md
     - prepare.md
     - inspect.md
     - fill.md

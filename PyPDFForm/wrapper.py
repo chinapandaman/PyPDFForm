@@ -3,10 +3,11 @@
 
 from __future__ import annotations
 
-from typing import BinaryIO, Dict, List, Union
+from typing import BinaryIO, Dict, List, Union, Tuple
 from warnings import warn
 
 from .core.constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE
+from .core.coordinate import generate_coordinate_grid
 from .core.filler import fill
 from .core.font import register_font, update_text_field_attributes
 from .core.image import any_image_to_jpg, rotate_image
@@ -129,6 +130,14 @@ class PdfWrapper:
                 },
             )
         )
+
+    def generate_coordinate_grid(self, color: Tuple[float, float, float] = (1, 0, 0)) -> PdfWrapper:
+        """Inspects a coordinate grid of the PDF."""
+
+        self.stream = remove_all_widgets(
+            generate_coordinate_grid(self.read(), color)
+        )
+        return self
 
     def fill(
         self,

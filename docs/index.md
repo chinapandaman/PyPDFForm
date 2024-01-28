@@ -12,6 +12,7 @@ It also supports other common utilities such as extracting pages and merging mul
 ## User Guide
 
 * [Installation and setup](install.md)
+* [PDF coordinates](coordinate.md)
 * [Prepare a PDF form](prepare.md)
 * [Inspect a PDF form](inspect.md)
 * [Fill a PDF form](fill.md)

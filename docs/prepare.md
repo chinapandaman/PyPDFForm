@@ -10,6 +10,8 @@ creating a subset of PDF form widgets on it through coding.
 This section of the documentation will use 
 [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
 
+This section of the documentation requires a basic understanding of [the PDF coordinate system](coordinate.md).
+
 ## Create a text field widget
 
 A text field widget can be created by downloading the PDF and running the following snippet:

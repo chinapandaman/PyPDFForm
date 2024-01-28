@@ -84,7 +84,7 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
     """Returns the max length of the text field if presented or None."""
 
     return (
-        int(widget[TEXT_FIELD_MAX_LENGTH_KEY])
+        int(widget[TEXT_FIELD_MAX_LENGTH_KEY]) or None
         if TEXT_FIELD_MAX_LENGTH_KEY in widget
         else None
     )
