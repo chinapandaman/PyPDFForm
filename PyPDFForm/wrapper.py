@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import BinaryIO, Dict, List, Union, Tuple
+from typing import BinaryIO, Dict, List, Tuple, Union
 from warnings import warn
 
 from .core.constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE
@@ -131,12 +131,12 @@ class PdfWrapper:
             )
         )
 
-    def generate_coordinate_grid(self, color: Tuple[float, float, float] = (1, 0, 0)) -> PdfWrapper:
+    def generate_coordinate_grid(
+        self, color: Tuple[float, float, float] = (1, 0, 0)
+    ) -> PdfWrapper:
         """Inspects a coordinate grid of the PDF."""
 
-        self.stream = remove_all_widgets(
-            generate_coordinate_grid(self.read(), color)
-        )
+        self.stream = remove_all_widgets(generate_coordinate_grid(self.read(), color))
         return self
 
     def fill(
