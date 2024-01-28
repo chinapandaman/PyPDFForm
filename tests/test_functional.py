@@ -499,3 +499,17 @@ def test_pages(template_stream, pdf_samples):
         os.path.join(pdf_samples, "pages", "sample_template_page_3.pdf"), "rb+"
     ) as f:
         assert obj.pages[2].read() == f.read()
+
+
+def test_generate_coordinate_grid(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_generate_coordinate_grid.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).generate_coordinate_grid((1, 0, 1))
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
