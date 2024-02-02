@@ -269,8 +269,8 @@ def test_create_text_complex_filled(template_stream, pdf_samples, request):
 
 def test_create_checkbox_persist_old_widgets(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_persist_old_widgets.pdf")
-    with (open(expected_path, "rb+") as f):
-        obj = PdfWrapper(template_stream)
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream, global_font="Courier")
         obj.widgets["test"].font_size = 30
         obj.widgets["test"].font_color = (0, 1, 0)
         obj.create_widget(
@@ -293,7 +293,7 @@ def test_create_checkbox_persist_old_widgets(template_stream, pdf_samples, reque
 
 def test_create_widget_sejda(sejda_template, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_widget_sejda.pdf")
-    with (open(expected_path, "rb+") as f):
+    with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sejda_template)
         obj.fill(obj.sample_data).create_widget(
             widget_type="text",
