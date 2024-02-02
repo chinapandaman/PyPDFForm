@@ -265,3 +265,50 @@ def test_create_text_complex_filled(template_stream, pdf_samples, request):
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_create_widget_sejda(sejda_template, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "create_widget_sejda.pdf")
+    with (open(expected_path, "rb+") as f):
+        obj = PdfWrapper(sejda_template)
+        obj.fill(obj.sample_data).create_widget(
+            widget_type="text",
+            name="new_text_field_widget",
+            page_number=1,
+            x=72,
+            y=730,
+            width=120,
+            height=40,
+            max_length=6,
+            font="Times-Roman",
+            font_size=20,
+            font_color=(0, 0, 1)
+        ).fill(obj.sample_data)
+        assert obj.schema["properties"]["new_text_field_widget"]["type"] == "string"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
+def test_create_widget_sejda_schema(sejda_template):
+    schema = PdfWrapper(sejda_template).create_widget(
+        widget_type="text",
+        name="new_text_field_widget",
+        page_number=1,
+        x=72,
+        y=730,
+        width=120,
+        height=40,
+        max_length=6,
+        font="Times-Roman",
+        font_size=20,
+        font_color=(0, 0, 1)
+    ).schema
+
+    assert schema["properties"]["new_text_field_widget"]
+    assert len(schema["properties"]) == 1
