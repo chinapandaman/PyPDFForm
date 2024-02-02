@@ -267,6 +267,30 @@ def test_create_text_complex_filled(template_stream, pdf_samples, request):
         assert obj.stream == expected
 
 
+def test_create_checkbox_persist_old_widgets(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_persist_old_widgets.pdf")
+    with (open(expected_path, "rb+") as f):
+        obj = PdfWrapper(template_stream)
+        obj.widgets["test"].font_size = 30
+        obj.widgets["test"].font_color = (0, 1, 0)
+        obj.create_widget(
+            "checkbox",
+            "foo",
+            1,
+            100,
+            100,
+        ).fill(obj.sample_data)
+        assert obj.schema["properties"]["foo"]["type"] == "boolean"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
 def test_create_widget_sejda(sejda_template, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_widget_sejda.pdf")
     with (open(expected_path, "rb+") as f):
