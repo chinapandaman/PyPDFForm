@@ -185,7 +185,11 @@ class PdfWrapper:
         ).watermarks(self.read())
 
         self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
-        self.widgets[name] = build_widgets(self.read())[name]
+        new_widgets = build_widgets(self.read())
+        for k, v in self.widgets.items():
+            if k in new_widgets:
+                new_widgets[k] = v
+        self.widgets = new_widgets
         if widget_type == "text":
             self.widgets[name].font = self.global_font
             self.widgets[name].font_size = self.global_font_size
