@@ -21,7 +21,8 @@ from .middleware.constants import (DEPRECATION_NOTICE,
                                    VERSION_IDENTIFIERS)
 from .middleware.dropdown import Dropdown
 from .middleware.template import (build_widgets, dropdown_to_text,
-                                  set_character_x_paddings, widget_rect_watermarks)
+                                  set_character_x_paddings,
+                                  widget_rect_watermarks)
 from .middleware.text import Text
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.text import TextWidget
@@ -129,7 +130,8 @@ class PdfWrapper:
                         key: preview_widget_to_draw(value)
                         for key, value in self.widgets.items()
                     },
-                ), widget_rect_watermarks(self.read())
+                ),
+                widget_rect_watermarks(self.read()),
             )
         )
 
@@ -140,9 +142,9 @@ class PdfWrapper:
 
         self.stream = generate_coordinate_grid(
             merge_watermarks_with_pdf(
-                remove_all_widgets(self.read()),
-                widget_rect_watermarks(self.read())
-            ), color
+                remove_all_widgets(self.read()), widget_rect_watermarks(self.read())
+            ),
+            color,
         )
 
         return self
