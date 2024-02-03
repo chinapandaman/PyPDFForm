@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for template middleware."""
 
-from typing import Dict
+from typing import Dict, List
 
+from ..core.constants import ANNOTATION_RECTANGLE_KEY
 from ..core.template import (construct_widget, get_button_style,
                              get_character_x_paddings, get_dropdown_choices,
                              get_text_field_max_length, get_widget_key,
                              get_widgets_by_page, is_text_field_comb)
+from ..core.watermark import create_watermarks_and_draw
 from .checkbox import Checkbox
 from .constants import WIDGET_TYPES
 from .dropdown import Dropdown
@@ -63,6 +65,30 @@ def build_widgets(pdf_stream: bytes) -> Dict[str, WIDGET_TYPES]:
                 results[key] = _widget
 
     return results
+
+
+def widget_rect_watermarks(pdf: bytes) -> List[bytes]:
+    """Draws the rectangular border of each widget and returns watermarks."""
+
+    watermarks = []
+
+    for page, widgets in get_widgets_by_page(pdf).items():
+        to_draw = []
+        for widget in widgets:
+            rect = widget[ANNOTATION_RECTANGLE_KEY]
+            x = rect[0]
+            y = rect[1]
+            width = abs(rect[0] - rect[2])
+            height = abs(rect[1] - rect[3])
+
+            to_draw.append(
+                [x, y, width, height]
+            )
+        watermarks.append(create_watermarks_and_draw(
+            pdf, page, "rect", to_draw
+        )[page - 1])
+
+    return watermarks
 
 
 def dropdown_to_text(dropdown: Dropdown) -> Text:

@@ -90,6 +90,18 @@ def draw_line(*args) -> None:
     canvas.restoreState()
 
 
+def draw_rect(*args) -> None:
+    """Draws a rectangle on the watermark."""
+
+    canvas = args[0]
+    x = args[1]
+    y = args[2]
+    width = args[3]
+    height = args[4]
+
+    canvas.rect(x, y, width, height)
+
+
 def draw_image(*args) -> None:
     """Draws an image on the watermark."""
 
@@ -143,6 +155,9 @@ def create_watermarks_and_draw(
     elif action_type == "line":
         for each in actions:
             draw_line(*([canvas, *each]))
+    elif action_type == "rect":
+        for each in actions:
+            draw_rect(*([canvas, *each]))
 
     canvas.save()
     buff.seek(0)
