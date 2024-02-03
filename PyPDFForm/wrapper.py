@@ -21,7 +21,7 @@ from .middleware.constants import (DEPRECATION_NOTICE,
                                    VERSION_IDENTIFIERS)
 from .middleware.dropdown import Dropdown
 from .middleware.template import (build_widgets, dropdown_to_text,
-                                  set_character_x_paddings)
+                                  set_character_x_paddings, draw_widget_rects)
 from .middleware.text import Text
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.text import TextWidget
@@ -122,13 +122,13 @@ class PdfWrapper:
         """Inspects all supported widgets' names for the PDF form."""
 
         return remove_all_widgets(
-            fill(
+            draw_widget_rects(fill(
                 self.stream,
                 {
                     key: preview_widget_to_draw(value)
                     for key, value in self.widgets.items()
                 },
-            )
+            ))
         )
 
     def generate_coordinate_grid(
@@ -136,7 +136,9 @@ class PdfWrapper:
     ) -> PdfWrapper:
         """Inspects a coordinate grid of the PDF."""
 
-        self.stream = remove_all_widgets(generate_coordinate_grid(self.read(), color))
+        self.stream = remove_all_widgets(
+            draw_widget_rects(generate_coordinate_grid(self.read(), color))
+        )
         return self
 
     def fill(
