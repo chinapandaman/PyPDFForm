@@ -14,7 +14,7 @@ This section of the documentation requires a basic understanding of [the PDF coo
 
 **NOTE:** For some PDF prep tools, creating widgets on their PDF forms may result in their original widgets getting 
 flattened (e.g., [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_sejda.pdf) 
-which was created prepared [Sejda](https://www.sejda.com/)). So it is advised that you fill them first 
+which was prepared using [Sejda](https://www.sejda.com/)). So it is advised that you fill them first 
 before creating any widget using PyPDFForm.
 
 ## Create a text field widget
