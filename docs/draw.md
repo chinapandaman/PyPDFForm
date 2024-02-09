@@ -8,6 +8,10 @@ This section of the documentation will use
 
 This section of the documentation requires a basic understanding of [the PDF coordinate system](coordinate.md).
 
+**NOTE:** Due to a known bug in a dependency, it is advised that these draw methods are called after 
+a PDF form is filled. Otherwise, part (most noticeably radio buttons) or even all widgets of the PDF form might 
+get removed after drawing things on it.
+
 ## Draw text
 
 ```python
