@@ -4,14 +4,14 @@
 from typing import Dict, List
 
 from ..core.constants import ANNOTATION_RECTANGLE_KEY
-from ..core.font import (auto_detect_font, get_text_field_font_size, text_field_font_size,
-                         get_text_field_font_color)
+from ..core.font import (auto_detect_font, get_text_field_font_color,
+                         get_text_field_font_size, text_field_font_size)
 from ..core.template import (construct_widget, get_button_style,
                              get_character_x_paddings, get_dropdown_choices,
-                             get_text_field_max_length, get_widget_key,
-                             get_widgets_by_page, is_text_field_comb, is_text_multiline,
                              get_paragraph_auto_wrap_length,
-                             get_paragraph_lines)
+                             get_paragraph_lines, get_text_field_max_length,
+                             get_widget_key, get_widgets_by_page,
+                             is_text_field_comb, is_text_multiline)
 from ..core.watermark import create_watermarks_and_draw
 from .checkbox import Checkbox
 from .constants import WIDGET_TYPES
