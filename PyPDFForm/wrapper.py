@@ -9,7 +9,7 @@ from warnings import warn
 from .core.constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE
 from .core.coordinate import generate_coordinate_grid
 from .core.filler import fill
-from .core.font import register_font, update_text_field_attributes
+from .core.font import register_font
 from .core.image import any_image_to_jpg, rotate_image
 from .core.utils import (get_page_streams, merge_two_pdfs,
                          preview_widget_to_draw, remove_all_widgets)
@@ -22,7 +22,7 @@ from .middleware.constants import (DEPRECATION_NOTICE,
 from .middleware.dropdown import Dropdown
 from .middleware.template import (build_widgets, dropdown_to_text,
                                   set_character_x_paddings,
-                                  widget_rect_watermarks)
+                                  widget_rect_watermarks, update_text_field_attributes)
 from .middleware.text import Text
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.text import TextWidget

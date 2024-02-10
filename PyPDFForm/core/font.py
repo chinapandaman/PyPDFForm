@@ -4,20 +4,17 @@
 from io import BytesIO
 from math import sqrt
 from re import findall
-from typing import Dict, Tuple, Union
+from typing import Tuple, Union
 
 from reportlab.pdfbase.acroform import AcroForm
 from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
-from ..middleware.constants import WIDGET_TYPES
-from ..middleware.text import Text
 from .constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
                         DEFAULT_FONT_SIZE, FONT_COLOR_IDENTIFIER,
                         FONT_SIZE_IDENTIFIER)
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .template import (get_paragraph_auto_wrap_length, get_paragraph_lines,
-                       get_widget_key, get_widgets_by_page, is_text_multiline)
+from .template import is_text_multiline
 from .utils import traverse_pattern
 
 
@@ -153,29 +150,3 @@ def get_text_field_font_color(
                     break
 
     return result
-
-
-def update_text_field_attributes(
-    template_stream: bytes,
-    widgets: Dict[str, WIDGET_TYPES],
-) -> None:
-    """Auto updates text fields' attributes."""
-
-    for _, _widgets in get_widgets_by_page(template_stream).items():
-        for _widget in _widgets:
-            key = get_widget_key(_widget)
-
-            if isinstance(widgets[key], Text):
-                if widgets[key].font is None:
-                    widgets[key].font = auto_detect_font(_widget)
-                if widgets[key].font_size is None:
-                    widgets[key].font_size = get_text_field_font_size(
-                        _widget
-                    ) or text_field_font_size(_widget)
-                if widgets[key].font_color is None:
-                    widgets[key].font_color = get_text_field_font_color(_widget)
-                if is_text_multiline(_widget) and widgets[key].text_wrap_length is None:
-                    widgets[key].text_wrap_length = get_paragraph_auto_wrap_length(
-                        _widget, widgets[key]
-                    )
-                    widgets[key].text_lines = get_paragraph_lines(_widget, widgets[key])
