@@ -4,10 +4,14 @@
 from typing import Dict, List
 
 from ..core.constants import ANNOTATION_RECTANGLE_KEY
+from ..core.font import (auto_detect_font, get_text_field_font_size, text_field_font_size,
+                         get_text_field_font_color)
 from ..core.template import (construct_widget, get_button_style,
                              get_character_x_paddings, get_dropdown_choices,
                              get_text_field_max_length, get_widget_key,
-                             get_widgets_by_page, is_text_field_comb)
+                             get_widgets_by_page, is_text_field_comb, is_text_multiline,
+                             get_paragraph_auto_wrap_length,
+                             get_paragraph_lines)
 from ..core.watermark import create_watermarks_and_draw
 from .checkbox import Checkbox
 from .constants import WIDGET_TYPES
@@ -102,3 +106,29 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
         )
 
     return result
+
+
+def update_text_field_attributes(
+    template_stream: bytes,
+    widgets: Dict[str, WIDGET_TYPES],
+) -> None:
+    """Auto updates text fields' attributes."""
+
+    for _, _widgets in get_widgets_by_page(template_stream).items():
+        for _widget in _widgets:
+            key = get_widget_key(_widget)
+
+            if isinstance(widgets[key], Text):
+                if widgets[key].font is None:
+                    widgets[key].font = auto_detect_font(_widget)
+                if widgets[key].font_size is None:
+                    widgets[key].font_size = get_text_field_font_size(
+                        _widget
+                    ) or text_field_font_size(_widget)
+                if widgets[key].font_color is None:
+                    widgets[key].font_color = get_text_field_font_color(_widget)
+                if is_text_multiline(_widget) and widgets[key].text_wrap_length is None:
+                    widgets[key].text_wrap_length = get_paragraph_auto_wrap_length(
+                        _widget, widgets[key]
+                    )
+                    widgets[key].text_lines = get_paragraph_lines(_widget, widgets[key])
