@@ -8,8 +8,8 @@ from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.text import Text
-from .constants import (ANNOTATION_RECTANGLE_KEY, COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO,
-                        DEFAULT_FONT)
+from .constants import (ANNOTATION_RECTANGLE_KEY,
+                        COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT)
 from .template import (get_char_rect_width, get_widget_alignment,
                        is_text_multiline)
 from .utils import stream_to_io
@@ -158,7 +158,9 @@ def get_text_line_x_coordinates(
     return None
 
 
-def generate_coordinate_grid(pdf: bytes, color: Tuple[float, float, float], margin: float) -> bytes:
+def generate_coordinate_grid(
+    pdf: bytes, color: Tuple[float, float, float], margin: float
+) -> bytes:
     """Creates a grid view for the coordinates of a PDF."""
 
     pdf_file = PdfReader(stream_to_io(pdf))
