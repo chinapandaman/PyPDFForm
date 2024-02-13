@@ -17,11 +17,12 @@ from PyPDFForm import PdfWrapper
 
 grid_view_pdf = PdfWrapper(
     "sample_template.pdf"
-).generate_coordinate_grid(color=(1, 0, 0))
+).generate_coordinate_grid(color=(1, 0, 0), margin=100)
 
 with open("output.pdf", "wb+") as output:
     output.write(grid_view_pdf.read())
 ```
 
-The `generate_coordinate_grid` method takes one optional parameter `color` which allows you to pick a color for 
-the grid view. The default color is red.
+The `generate_coordinate_grid` method takes two optional parameters. The first one is `color` which allows you to pick 
+a color for the grid view. The default color is red. The second one is `margin` which allows you to change the 
+coordinate grid view's margin in points. The default margin is 100 points.
