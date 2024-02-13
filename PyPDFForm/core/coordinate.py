@@ -8,8 +8,8 @@ from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.text import Text
-from .constants import (ANNOTATION_RECTANGLE_KEY, COORDINATE_GRID_MARGIN,
-                        DEFAULT_FONT, DEFAULT_FONT_SIZE)
+from .constants import (ANNOTATION_RECTANGLE_KEY, COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO,
+                        DEFAULT_FONT)
 from .template import (get_char_rect_width, get_widget_alignment,
                        is_text_multiline)
 from .utils import stream_to_io
@@ -158,7 +158,7 @@ def get_text_line_x_coordinates(
     return None
 
 
-def generate_coordinate_grid(pdf: bytes, color: Tuple[float, float, float]) -> bytes:
+def generate_coordinate_grid(pdf: bytes, color: Tuple[float, float, float], margin: float) -> bytes:
     """Creates a grid view for the coordinates of a PDF."""
 
     pdf_file = PdfReader(stream_to_io(pdf))
@@ -174,34 +174,35 @@ def generate_coordinate_grid(pdf: bytes, color: Tuple[float, float, float]) -> b
 
         r, g, b = color
 
-        current = COORDINATE_GRID_MARGIN
+        current = margin
         while current < width:
             lines_by_page[i + 1].append([current, 0, current, height, r, g, b])
-            current += COORDINATE_GRID_MARGIN
+            current += margin
 
-        current = COORDINATE_GRID_MARGIN
+        current = margin
         while current < height:
             lines_by_page[i + 1].append([0, current, width, current, r, g, b])
-            current += COORDINATE_GRID_MARGIN
+            current += margin
 
-        x = COORDINATE_GRID_MARGIN
+        x = margin
         while x < width:
-            y = COORDINATE_GRID_MARGIN
+            y = margin
             while y < height:
                 value = f"({x}, {y})"
+                font_size = margin * COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO
                 text = Text("new_coordinate", value)
                 text.font = DEFAULT_FONT
-                text.font_size = DEFAULT_FONT_SIZE
+                text.font_size = font_size
                 text.font_color = color
                 texts_by_page[i + 1].append(
                     [
                         text,
-                        x - stringWidth(value, DEFAULT_FONT, DEFAULT_FONT_SIZE),
-                        y - DEFAULT_FONT_SIZE,
+                        x - stringWidth(value, DEFAULT_FONT, font_size),
+                        y - font_size,
                     ]
                 )
-                y += COORDINATE_GRID_MARGIN
-            x += COORDINATE_GRID_MARGIN
+                y += margin
+            x += margin
 
     for page, lines in lines_by_page.items():
         watermarks.append(

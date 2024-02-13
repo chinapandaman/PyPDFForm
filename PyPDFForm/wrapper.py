@@ -137,7 +137,7 @@ class PdfWrapper:
         )
 
     def generate_coordinate_grid(
-        self, color: Tuple[float, float, float] = (1, 0, 0)
+        self, color: Tuple[float, float, float] = (1, 0, 0), margin: float = 100
     ) -> PdfWrapper:
         """Inspects a coordinate grid of the PDF."""
 
@@ -146,6 +146,7 @@ class PdfWrapper:
                 remove_all_widgets(self.read()), widget_rect_watermarks(self.read())
             ),
             color,
+            margin,
         )
 
         return self
