@@ -41,7 +41,9 @@ def any_image_to_jpg(image_stream: bytes) -> bytes:
         buff.close()
         return image_stream
 
-    rgb_image = image.convert("RGB")
+    rgb_image = Image.new("RGB", image.size, (255, 255, 255))
+    rgb_image.paste(image, mask=image.split()[3])
+
     with BytesIO() as _file:
         rgb_image.save(_file, format="JPEG")
         _file.seek(0)
