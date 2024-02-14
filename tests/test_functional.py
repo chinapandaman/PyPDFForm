@@ -294,6 +294,29 @@ def test_draw_png_image_on_one_page(
             assert obj.stream == expected
 
 
+def test_draw_transparent_png_image_on_one_page(
+    template_stream, image_samples, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "sample_pdf_with_transparent_png.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).draw_image(
+            os.path.join(image_samples, "sample_transparent_png.png"),
+            1,
+            100,
+            100,
+            400,
+            225,
+        )
+
+        expected = f.read()
+
+        if os.name == "nt":
+            request.config.results["expected_path"] = expected_path
+            request.config.results["stream"] = obj.read()
+            assert len(obj.stream) == len(expected)
+            assert obj.stream == expected
+
+
 def test_addition_operator_3_times(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "sample_added_3_copies.pdf")
     with open(expected_path, "rb+") as f:
