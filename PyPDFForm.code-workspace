@@ -4,5 +4,9 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"githubPullRequests.ignoredPullRequestBranches": [
+			"master"
+		]
+	}
 }
