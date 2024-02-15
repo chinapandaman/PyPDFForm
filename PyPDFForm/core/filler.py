@@ -12,6 +12,7 @@ from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_text_line_x_coordinates,
                          get_draw_sig_coordinates_resolutions)
 from .font import checkbox_radio_font_size
+from .image import any_image_to_jpg
 from .template import get_widget_key, get_widgets_by_page
 from .utils import checkbox_radio_to_draw
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
@@ -57,6 +58,7 @@ def fill(
                 stream = widgets[key].stream
                 if stream is not None:
                     any_image_to_draw = True
+                    stream = any_image_to_jpg(stream, 255)
                     x, y, width, height = get_draw_sig_coordinates_resolutions(_widget)
                     images_to_draw[page].append(
                             [
