@@ -7,6 +7,7 @@ from .checkbox import Checkbox
 from .dropdown import Dropdown
 from .radio import Radio
 from .text import Text
+from .signature import Signature
 
 VERSION_IDENTIFIERS = [
     b"%PDF-1.0",
@@ -21,6 +22,6 @@ VERSION_IDENTIFIERS = [
 ]
 VERSION_IDENTIFIER_PREFIX = b"%PDF-"
 
-WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown]
+WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown, Signature]
 
 DEPRECATION_NOTICE = "{} will be deprecated soon. Use {} instead."
