@@ -3,6 +3,7 @@
 
 from os.path import expanduser
 
+from .adapter import fp_or_f_obj_or_stream_to_stream
 from .widget import Widget
 
 
@@ -29,3 +30,13 @@ class Signature(Widget):
         """Sample value of the signature field."""
 
         return expanduser("~/Downloads/sample_image.jpg")
+
+    @property
+    def stream(self) -> bytes:
+        """Converts the value of the signature field image to a stream."""
+
+        return (
+                fp_or_f_obj_or_stream_to_stream(self.value)
+                if self.value is not None
+                else None
+                )
