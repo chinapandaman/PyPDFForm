@@ -41,6 +41,7 @@ def fill(
         for _widget in _widgets:
             key = get_widget_key(_widget)
             text_needs_to_be_drawn = False
+            _to_draw = x = y = None
 
             if isinstance(widgets[key], (Checkbox, Radio)):
                 font_size = checkbox_radio_font_size(_widget)
@@ -69,7 +70,6 @@ def fill(
                             height,
                         ]
                     )
-                    text_needs_to_be_drawn = False
             else:
                 widgets[key].text_line_x_coordinates = get_text_line_x_coordinates(
                     _widget, widgets[key]
@@ -78,7 +78,14 @@ def fill(
                 _to_draw = widgets[key]
                 text_needs_to_be_drawn = True
 
-            if text_needs_to_be_drawn:
+            if all(
+                [
+                    text_needs_to_be_drawn,
+                    _to_draw is not None,
+                    x is not None,
+                    y is not None,
+                ]
+            ):
                 texts_to_draw[page].append(
                     [
                         _to_draw,
