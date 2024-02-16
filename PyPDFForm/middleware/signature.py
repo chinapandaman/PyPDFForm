@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Contains signature middleware."""
 
-from typing import BinaryIO, Union
 from os.path import expanduser
+from typing import BinaryIO, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .widget import Widget
@@ -37,7 +37,7 @@ class Signature(Widget):
         """Converts the value of the signature field image to a stream."""
 
         return (
-                fp_or_f_obj_or_stream_to_stream(self.value)
-                if self.value is not None
-                else None
-                )
+            fp_or_f_obj_or_stream_to_stream(self.value)
+            if self.value is not None
+            else None
+        )

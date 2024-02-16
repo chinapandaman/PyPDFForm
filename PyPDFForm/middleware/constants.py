@@ -6,8 +6,8 @@ from typing import Union
 from .checkbox import Checkbox
 from .dropdown import Dropdown
 from .radio import Radio
-from .text import Text
 from .signature import Signature
+from .text import Text
 
 VERSION_IDENTIFIERS = [
     b"%PDF-1.0",

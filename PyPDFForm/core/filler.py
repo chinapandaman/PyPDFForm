@@ -8,9 +8,9 @@ from ..middleware.constants import WIDGET_TYPES
 from ..middleware.radio import Radio
 from ..middleware.signature import Signature
 from .coordinate import (get_draw_checkbox_radio_coordinates,
+                         get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
-                         get_text_line_x_coordinates,
-                         get_draw_sig_coordinates_resolutions)
+                         get_text_line_x_coordinates)
 from .font import checkbox_radio_font_size
 from .image import any_image_to_jpg
 from .template import get_widget_key, get_widgets_by_page
@@ -61,14 +61,14 @@ def fill(
                     stream = any_image_to_jpg(stream)
                     x, y, width, height = get_draw_sig_coordinates_resolutions(_widget)
                     images_to_draw[page].append(
-                            [
-                                stream,
-                                x,
-                                y,
-                                width,
-                                height,
-                                ]
-                            )
+                        [
+                            stream,
+                            x,
+                            y,
+                            width,
+                            height,
+                        ]
+                    )
                     text_needs_to_be_drawn = False
             else:
                 widgets[key].text_line_x_coordinates = get_text_line_x_coordinates(
@@ -97,7 +97,9 @@ def fill(
 
     if any_image_to_draw:
         for page, images in images_to_draw.items():
-            _watermarks = create_watermarks_and_draw(template_stream, page, "image", images)
+            _watermarks = create_watermarks_and_draw(
+                template_stream, page, "image", images
+            )
             for i, watermark in enumerate(_watermarks):
                 if watermark:
                     image_watermarks[i] = watermark
