@@ -28,7 +28,7 @@ def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
     return result
 
 
-def any_image_to_jpg(image_stream: bytes, alpha: float = 255) -> bytes:
+def any_image_to_jpg(image_stream: bytes) -> bytes:
     """Converts an image of any type to jpg."""
 
     buff = BytesIO()
@@ -41,7 +41,7 @@ def any_image_to_jpg(image_stream: bytes, alpha: float = 255) -> bytes:
         buff.close()
         return image_stream
 
-    rgb_image = Image.new("RGB", image.size, (255, 255, 255, alpha))
+    rgb_image = Image.new("RGB", image.size, (255, 255, 255))
     rgb_image.paste(image, mask=image.split()[3])
 
     with BytesIO() as _file:

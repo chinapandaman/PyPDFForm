@@ -58,7 +58,7 @@ def fill(
                 stream = widgets[key].stream
                 if stream is not None:
                     any_image_to_draw = True
-                    stream = any_image_to_jpg(stream, 255)
+                    stream = any_image_to_jpg(stream)
                     x, y, width, height = get_draw_sig_coordinates_resolutions(_widget)
                     images_to_draw[page].append(
                             [
