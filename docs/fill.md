@@ -68,3 +68,27 @@ filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
 with open("output.pdf", "wb+") as output:
     output.write(filled.read())
 ```
+
+## Fill signature widgets
+
+A signature field widget allows you to sign a PDF form in a handwritten format. PyPDFForm lets you use a signature image to populate 
+any signature field widget.
+
+Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/signature/sample_template_with_signature.pdf) 
+and [this signature image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png):
+
+```python
+from PyPDFForm import PdfWrapper
+
+signed = PdfWrapper("sample_template_with_signature.pdf").fill(
+    {
+        "signature": "sample_signature.png"
+    },
+)
+
+with open("output.pdf", "wb+") as output:
+    output.write(signed.read())
+```
+
+**NOTE:** As described [here](install.md/#create-a-pdf-wrapper), the value of the signature in your dictionary can be a file path shown above, but also an open file object and a file stream 
+that's in `bytes`.
