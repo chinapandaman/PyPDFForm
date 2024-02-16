@@ -90,5 +90,5 @@ with open("output.pdf", "wb+") as output:
     output.write(signed.read())
 ```
 
-**NOTE:** As described [here](install.md/#create-a-pdf-wrapper), the value of the signature in your dictionary can be a file path shown above, but also an open file object and a file stream 
-that's in `bytes`.
+**NOTE:** As described [here](install.md/#create-a-pdf-wrapper), the value of the signature in your dictionary can be 
+a file path shown above, but also an open file object and a file stream that's in `bytes`.
