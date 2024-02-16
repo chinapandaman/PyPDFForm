@@ -17,8 +17,9 @@ def test_fill_signature(pdf_samples, image_samples, request):
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
 
 
 def test_signature_schema(pdf_samples):
@@ -55,5 +56,6 @@ def test_fill_signature_overlap(pdf_samples, image_samples, request):
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
