@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains signature middleware."""
 
+from typing import Union
 from os.path import expanduser
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
@@ -32,7 +33,7 @@ class Signature(Widget):
         return expanduser("~/Downloads/sample_image.jpg")
 
     @property
-    def stream(self) -> bytes:
+    def stream(self) -> Union[bytes, None]:
         """Converts the value of the signature field image to a stream."""
 
         return (
