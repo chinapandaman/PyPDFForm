@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains signature middleware."""
 
-from typing import Union
+from typing import BinaryIO, Union
 from os.path import expanduser
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
@@ -14,7 +14,7 @@ class Signature(Widget):
     def __init__(
         self,
         name: str,
-        value: str = None,
+        value: Union[bytes, str, BinaryIO] = None,
     ) -> None:
         """Constructs all attributes for the signature field."""
 

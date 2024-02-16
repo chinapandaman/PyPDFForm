@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains widget middleware."""
 
-from typing import Any, Union
+from typing import Any
 
 
 class Widget:
@@ -10,7 +10,7 @@ class Widget:
     def __init__(
         self,
         name: str,
-        value: Union[str, bool, int] = None,
+        value: Any = None,
     ) -> None:
         """Constructs basic attributes for the object."""
 
