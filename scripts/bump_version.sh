@@ -3,3 +3,8 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
 fi
 
 python ./scripts/bump_version.py
+
+git add ./PyPDFForm/__init__.py mkdocs.yml
+BRANCH=$(git symbolic-ref HEAD 2>/dev/null)
+BRANCH=${BRANCH##refs/heads/}
+git commit -m "${BRANCH}: bump version"
