@@ -12,19 +12,19 @@ from .constants import (DEPRECATION_NOTICE,
                         VERSION_IDENTIFIER_PREFIX,
                         VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
+from .core.utils import (get_page_streams, merge_two_pdfs,
+                         preview_widget_to_draw, remove_all_widgets)
 from .filler import fill
 from .font import register_font
 from .image import any_image_to_jpg, rotate_image
-from .core.utils import (get_page_streams, merge_two_pdfs,
-                         preview_widget_to_draw, remove_all_widgets)
-from .core.watermark import (create_watermarks_and_draw,
-                             merge_watermarks_with_pdf)
 from .middleware.dropdown import Dropdown
 from .middleware.text import Text
 from .template import (build_widgets, dropdown_to_text,
                        set_character_x_paddings,
                        update_text_field_attributes,
                        widget_rect_watermarks)
+from .watermark import (create_watermarks_and_draw,
+                        merge_watermarks_with_pdf)
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.text import TextWidget
 

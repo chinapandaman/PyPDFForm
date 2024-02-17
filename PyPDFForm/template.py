@@ -11,7 +11,7 @@ from .core.template import (construct_widget, get_button_style,
                             get_paragraph_lines, get_text_field_max_length,
                             get_widget_key, get_widgets_by_page,
                             is_text_field_comb, is_text_multiline)
-from .core.watermark import create_watermarks_and_draw
+from .watermark import create_watermarks_and_draw
 from .font import (auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
 from .middleware.checkbox import Checkbox

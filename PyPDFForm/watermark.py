@@ -8,7 +8,7 @@ from pypdf import PdfReader, PdfWriter
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
-from .utils import stream_to_io
+from .core.utils import stream_to_io
 
 
 def draw_text(*args) -> None:
