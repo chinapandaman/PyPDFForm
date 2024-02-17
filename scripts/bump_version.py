@@ -3,8 +3,14 @@
 
 import os
 import re
+import sys
 
 if __name__ == "__main__":
+    branch = sys.argv[1]
+    if not branch.startswith("PPF-"):
+        print("Bump version cannot be done on a non-issue branch.")
+        sys.exit(1)
+
     with open("PyPDFForm/__init__.py", encoding="utf8") as f:
         version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
 
