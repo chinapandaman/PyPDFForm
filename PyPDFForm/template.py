@@ -14,7 +14,7 @@ from .core.template import (construct_widget, get_button_style,
                             is_text_field_comb, is_text_multiline)
 from .core.watermark import create_watermarks_and_draw
 from .middleware.checkbox import Checkbox
-from .middleware.constants import WIDGET_TYPES
+from .constants import WIDGET_TYPES
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text

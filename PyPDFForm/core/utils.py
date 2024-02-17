@@ -8,7 +8,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
 from ..middleware.checkbox import Checkbox
-from ..middleware.constants import WIDGET_TYPES
+from ..constants import WIDGET_TYPES
 from ..middleware.radio import Radio
 from ..middleware.text import Text
 from .constants import (BUTTON_STYLES, DEFAULT_CHECKBOX_STYLE, DEFAULT_FONT,

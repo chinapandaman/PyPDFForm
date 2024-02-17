@@ -3,11 +3,11 @@
 
 from typing import Union
 
-from .checkbox import Checkbox
-from .dropdown import Dropdown
-from .radio import Radio
-from .signature import Signature
-from .text import Text
+from .middleware.checkbox import Checkbox
+from .middleware.dropdown import Dropdown
+from .middleware.radio import Radio
+from .middleware.signature import Signature
+from .middleware.text import Text
 
 VERSION_IDENTIFIERS = [
     b"%PDF-1.0",

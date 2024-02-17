@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple, Union
 from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from ..middleware.constants import WIDGET_TYPES
+from ..constants import WIDGET_TYPES
 from ..middleware.text import Text
 from .constants import (ANNOTATION_RECTANGLE_KEY, COMB, MULTILINE,
                         NEW_LINE_SYMBOL, TEXT_FIELD_MAX_LENGTH_KEY)

@@ -4,7 +4,7 @@
 from typing import Dict
 
 from ..middleware.checkbox import Checkbox
-from ..middleware.constants import WIDGET_TYPES
+from ..constants import WIDGET_TYPES
 from ..middleware.radio import Radio
 from ..middleware.signature import Signature
 from .coordinate import (get_draw_checkbox_radio_coordinates,
