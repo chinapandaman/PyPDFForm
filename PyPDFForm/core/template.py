@@ -6,14 +6,14 @@ from typing import Dict, List, Tuple, Union
 from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
-                       TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
-                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS)
 from .utils import find_pattern_match, stream_to_io, traverse_pattern
 from ..constants import (ANNOTATION_RECTANGLE_KEY, COMB, MULTILINE,
                          NEW_LINE_SYMBOL, TEXT_FIELD_MAX_LENGTH_KEY)
 from ..constants import WIDGET_TYPES
 from ..middleware.text import Text
+from ..patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
+                        TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
+                        WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS)
 
 
 def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:

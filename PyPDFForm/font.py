@@ -13,7 +13,7 @@ from reportlab.pdfbase.ttfonts import TTFError, TTFont
 from .constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
                         DEFAULT_FONT_SIZE, FONT_COLOR_IDENTIFIER,
                         FONT_SIZE_IDENTIFIER)
-from .core.patterns import TEXT_FIELD_APPEARANCE_PATTERNS
+from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .core.template import is_text_multiline
 from .core.utils import traverse_pattern
 
