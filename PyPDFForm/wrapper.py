@@ -20,10 +20,10 @@ from .middleware.constants import (DEPRECATION_NOTICE,
                                    VERSION_IDENTIFIER_PREFIX,
                                    VERSION_IDENTIFIERS)
 from .middleware.dropdown import Dropdown
-from .middleware.template import (build_widgets, dropdown_to_text,
-                                  set_character_x_paddings,
-                                  update_text_field_attributes,
-                                  widget_rect_watermarks)
+from .template import (build_widgets, dropdown_to_text,
+                       set_character_x_paddings,
+                       update_text_field_attributes,
+                       widget_rect_watermarks)
 from .middleware.text import Text
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.text import TextWidget
