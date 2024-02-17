@@ -7,7 +7,7 @@ from jsonschema import ValidationError, validate
 
 from PyPDFForm import PdfWrapper, PyPDFForm
 from PyPDFForm import constants
-from PyPDFForm.core import template as template_core
+from PyPDFForm import template
 from PyPDFForm.middleware.text import Text
 from PyPDFForm.middleware.base import Widget
 
@@ -61,7 +61,7 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
-        for _, widgets in template_core.get_widgets_by_page(obj.read()).items():
+        for _, widgets in template.get_widgets_by_page(obj.read()).items():
             assert not widgets
 
 
@@ -435,7 +435,7 @@ def test_fill_right_aligned(
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
-        for _, widgets in template_core.get_widgets_by_page(obj.read()).items():
+        for _, widgets in template.get_widgets_by_page(obj.read()).items():
             assert not widgets
 
 

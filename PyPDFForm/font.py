@@ -11,10 +11,9 @@ from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from .constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
-                        DEFAULT_FONT_SIZE, FONT_COLOR_IDENTIFIER,
+                        FONT_COLOR_IDENTIFIER,
                         FONT_SIZE_IDENTIFIER)
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .core.template import is_text_multiline
 from .utils import traverse_pattern
 
 
@@ -83,9 +82,6 @@ def text_field_font_size(widget: dict) -> Union[float, int]:
     Calculates the font size it should be drawn with
     given a text field widget.
     """
-
-    if is_text_multiline(widget):
-        return DEFAULT_FONT_SIZE
 
     height = abs(
         float(widget[ANNOTATION_RECTANGLE_KEY][1])
