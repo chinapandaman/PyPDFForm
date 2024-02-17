@@ -3,7 +3,7 @@
 
 from typing import Dict, List
 
-from .core.constants import ANNOTATION_RECTANGLE_KEY
+from .constants import ANNOTATION_RECTANGLE_KEY
 from .core.font import (auto_detect_font, get_text_field_font_color,
                         get_text_field_font_size, text_field_font_size)
 from .core.template import (construct_widget, get_button_style,

@@ -25,3 +25,6 @@ VERSION_IDENTIFIER_PREFIX = b"%PDF-"
 WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown, Signature]
 
 DEPRECATION_NOTICE = "{} will be deprecated soon. Use {} instead."
+
+ANNOTATION_FIELD_KEY = "/T"
+ANNOTATION_RECTANGLE_KEY = "/Rect"

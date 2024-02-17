@@ -8,8 +8,8 @@ from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..middleware.text import Text
-from .constants import (ANNOTATION_RECTANGLE_KEY,
-                        COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT)
+from ..constants import ANNOTATION_RECTANGLE_KEY
+from .constants import (COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT)
 from .template import (get_char_rect_width, get_widget_alignment,
                        is_text_multiline)
 from .utils import stream_to_io

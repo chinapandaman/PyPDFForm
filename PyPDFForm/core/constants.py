@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Contains constants used for core layer."""
 
-ANNOTATION_FIELD_KEY = "/T"
-ANNOTATION_RECTANGLE_KEY = "/Rect"
 SUBTYPE_KEY = "/Subtype"
 WIDGET_SUBTYPE_KEY = "/Widget"
 WIDGET_TYPE_KEY = "/FT"

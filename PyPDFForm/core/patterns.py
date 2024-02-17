@@ -6,7 +6,8 @@ from ..middleware.dropdown import Dropdown
 from ..middleware.radio import Radio
 from ..middleware.signature import Signature
 from ..middleware.text import Text
-from .constants import (ANNOTATION_FIELD_KEY, BUTTON_IDENTIFIER,
+from ..constants import ANNOTATION_FIELD_KEY
+from .constants import (BUTTON_IDENTIFIER,
                         BUTTON_STYLE_IDENTIFIER, CHOICE_FIELD_IDENTIFIER,
                         CHOICES_IDENTIFIER, FIELD_FLAG_KEY, PARENT_KEY,
                         SELECTABLE_IDENTIFIER, SIGNATURE_FIELD_IDENTIFIER,

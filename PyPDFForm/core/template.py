@@ -8,7 +8,8 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from ..constants import WIDGET_TYPES
 from ..middleware.text import Text
-from .constants import (ANNOTATION_RECTANGLE_KEY, COMB, MULTILINE,
+from ..constants import ANNOTATION_RECTANGLE_KEY
+from .constants import (COMB, MULTILINE,
                         NEW_LINE_SYMBOL, TEXT_FIELD_MAX_LENGTH_KEY)
 from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
