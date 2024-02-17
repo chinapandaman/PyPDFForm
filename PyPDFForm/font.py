@@ -15,7 +15,7 @@ from .constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
                         FONT_SIZE_IDENTIFIER)
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .core.template import is_text_multiline
-from .core.utils import traverse_pattern
+from .utils import traverse_pattern
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:

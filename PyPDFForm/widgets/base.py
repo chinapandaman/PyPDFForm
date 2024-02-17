@@ -8,7 +8,7 @@ from pypdf import PdfReader
 from reportlab.lib.colors import Color
 from reportlab.pdfgen.canvas import Canvas
 
-from ..core.utils import stream_to_io
+from ..utils import stream_to_io
 
 
 class Widget:

@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple, Union
 from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .utils import find_pattern_match, stream_to_io, traverse_pattern
+from ..utils import find_pattern_match, stream_to_io, traverse_pattern
 from ..constants import (ANNOTATION_RECTANGLE_KEY, COMB, MULTILINE,
                          NEW_LINE_SYMBOL, TEXT_FIELD_MAX_LENGTH_KEY)
 from ..constants import WIDGET_TYPES

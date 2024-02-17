@@ -11,7 +11,7 @@ from .constants import (ANNOTATION_RECTANGLE_KEY,
                         COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT)
 from .core.template import (get_char_rect_width, get_widget_alignment,
                             is_text_multiline)
-from .core.utils import stream_to_io
+from .utils import stream_to_io
 from .middleware.text import Text
 from .watermark import (create_watermarks_and_draw,
                         merge_watermarks_with_pdf)

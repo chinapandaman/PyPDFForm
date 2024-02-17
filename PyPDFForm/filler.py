@@ -11,7 +11,7 @@ from .coordinate import (get_draw_checkbox_radio_coordinates,
 from .font import checkbox_radio_font_size
 from .image import any_image_to_jpg
 from .core.template import get_widget_key, get_widgets_by_page
-from .core.utils import checkbox_radio_to_draw
+from .utils import checkbox_radio_to_draw
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 from .middleware.checkbox import Checkbox
 from .middleware.radio import Radio
