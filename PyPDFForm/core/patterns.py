@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 """Contains patterns used for identifying properties of widgets."""
 
+from ..constants import (ANNOTATION_FIELD_KEY, BUTTON_IDENTIFIER,
+                         BUTTON_STYLE_IDENTIFIER, CHOICE_FIELD_IDENTIFIER,
+                         CHOICES_IDENTIFIER, FIELD_FLAG_KEY, PARENT_KEY,
+                         SELECTABLE_IDENTIFIER, SIGNATURE_FIELD_IDENTIFIER,
+                         SUBTYPE_KEY, TEXT_FIELD_ALIGNMENT_IDENTIFIER,
+                         TEXT_FIELD_APPEARANCE_IDENTIFIER,
+                         TEXT_FIELD_IDENTIFIER, WIDGET_SUBTYPE_KEY,
+                         WIDGET_TYPE_KEY)
 from ..middleware.checkbox import Checkbox
 from ..middleware.dropdown import Dropdown
 from ..middleware.radio import Radio
 from ..middleware.signature import Signature
 from ..middleware.text import Text
-from ..constants import ANNOTATION_FIELD_KEY
-from .constants import (BUTTON_IDENTIFIER,
-                        BUTTON_STYLE_IDENTIFIER, CHOICE_FIELD_IDENTIFIER,
-                        CHOICES_IDENTIFIER, FIELD_FLAG_KEY, PARENT_KEY,
-                        SELECTABLE_IDENTIFIER, SIGNATURE_FIELD_IDENTIFIER,
-                        SUBTYPE_KEY, TEXT_FIELD_ALIGNMENT_IDENTIFIER,
-                        TEXT_FIELD_APPEARANCE_IDENTIFIER,
-                        TEXT_FIELD_IDENTIFIER, WIDGET_SUBTYPE_KEY,
-                        WIDGET_TYPE_KEY)
 
 WIDGET_TYPE_PATTERNS = [
     (

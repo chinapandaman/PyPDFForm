@@ -6,7 +6,7 @@ import pytest
 from jsonschema import ValidationError, validate
 
 from PyPDFForm import PdfWrapper, PyPDFForm
-from PyPDFForm.core import constants
+from PyPDFForm import constants
 from PyPDFForm.core import template as template_core
 from PyPDFForm.middleware.text import Text
 from PyPDFForm.middleware.base import Widget

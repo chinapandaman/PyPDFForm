@@ -10,13 +10,12 @@ from reportlab.pdfbase.acroform import AcroForm
 from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
-from ..constants import ANNOTATION_RECTANGLE_KEY
-from .constants import (DEFAULT_FONT,
-                        DEFAULT_FONT_SIZE, FONT_COLOR_IDENTIFIER,
-                        FONT_SIZE_IDENTIFIER)
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .template import is_text_multiline
 from .utils import traverse_pattern
+from ..constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
+                         DEFAULT_FONT_SIZE, FONT_COLOR_IDENTIFIER,
+                         FONT_SIZE_IDENTIFIER)
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
