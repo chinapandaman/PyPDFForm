@@ -11,7 +11,7 @@ from .constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE
 from .constants import (DEPRECATION_NOTICE,
                         VERSION_IDENTIFIER_PREFIX,
                         VERSION_IDENTIFIERS)
-from .core.coordinate import generate_coordinate_grid
+from .coordinate import generate_coordinate_grid
 from .core.filler import fill
 from .core.font import register_font
 from .core.image import any_image_to_jpg, rotate_image

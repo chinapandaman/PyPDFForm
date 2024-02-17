@@ -7,10 +7,10 @@ from ..middleware.checkbox import Checkbox
 from ..constants import WIDGET_TYPES
 from ..middleware.radio import Radio
 from ..middleware.signature import Signature
-from .coordinate import (get_draw_checkbox_radio_coordinates,
-                         get_draw_sig_coordinates_resolutions,
-                         get_draw_text_coordinates,
-                         get_text_line_x_coordinates)
+from ..coordinate import (get_draw_checkbox_radio_coordinates,
+                          get_draw_sig_coordinates_resolutions,
+                          get_draw_text_coordinates,
+                          get_text_line_x_coordinates)
 from .font import checkbox_radio_font_size
 from .image import any_image_to_jpg
 from .template import get_widget_key, get_widgets_by_page
