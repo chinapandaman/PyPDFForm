@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Contains constants for middleware layer."""
+"""Contains library constants."""
 
 from typing import Union
 

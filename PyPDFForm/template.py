@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Contains helpers for template middleware."""
+"""Contains helpers for generic template related processing."""
 
 from typing import Dict, List, Tuple, Union
 
