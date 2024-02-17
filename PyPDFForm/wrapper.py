@@ -6,25 +6,25 @@ from __future__ import annotations
 from typing import BinaryIO, Dict, List, Tuple, Union
 from warnings import warn
 
-from .core.constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE
-from .core.coordinate import generate_coordinate_grid
-from .core.filler import fill
-from .core.font import register_font
-from .core.image import any_image_to_jpg, rotate_image
-from .core.utils import (get_page_streams, merge_two_pdfs,
-                         preview_widget_to_draw, remove_all_widgets)
-from .core.watermark import (create_watermarks_and_draw,
-                             merge_watermarks_with_pdf)
-from .middleware.adapter import fp_or_f_obj_or_stream_to_stream
-from .middleware.constants import (DEPRECATION_NOTICE,
-                                   VERSION_IDENTIFIER_PREFIX,
-                                   VERSION_IDENTIFIERS)
+from .adapter import fp_or_f_obj_or_stream_to_stream
+from .constants import DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE
+from .constants import (DEPRECATION_NOTICE,
+                        VERSION_IDENTIFIER_PREFIX,
+                        VERSION_IDENTIFIERS)
+from .coordinate import generate_coordinate_grid
+from .filler import fill
+from .font import register_font
+from .image import any_image_to_jpg, rotate_image
 from .middleware.dropdown import Dropdown
-from .middleware.template import (build_widgets, dropdown_to_text,
-                                  set_character_x_paddings,
-                                  update_text_field_attributes,
-                                  widget_rect_watermarks)
 from .middleware.text import Text
+from .template import (build_widgets, dropdown_to_text,
+                       set_character_x_paddings,
+                       update_text_field_attributes,
+                       widget_rect_watermarks)
+from .utils import (get_page_streams, merge_two_pdfs,
+                    preview_widget_to_draw, remove_all_widgets)
+from .watermark import (create_watermarks_and_draw,
+                        merge_watermarks_with_pdf)
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.text import TextWidget
 

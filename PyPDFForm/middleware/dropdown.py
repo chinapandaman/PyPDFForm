@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains dropdown middleware."""
 
-from .widget import Widget
+from .base import Widget
 
 
 class Dropdown(Widget):

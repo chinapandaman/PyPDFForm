@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains checkbox middleware."""
 
-from .widget import Widget
+from .base import Widget
 
 
 class Checkbox(Widget):
