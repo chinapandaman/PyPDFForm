@@ -4,8 +4,7 @@
 from typing import Dict, List
 
 from .constants import ANNOTATION_RECTANGLE_KEY
-from .core.font import (auto_detect_font, get_text_field_font_color,
-                        get_text_field_font_size, text_field_font_size)
+from .constants import WIDGET_TYPES
 from .core.template import (construct_widget, get_button_style,
                             get_character_x_paddings, get_dropdown_choices,
                             get_paragraph_auto_wrap_length,
@@ -13,8 +12,9 @@ from .core.template import (construct_widget, get_button_style,
                             get_widget_key, get_widgets_by_page,
                             is_text_field_comb, is_text_multiline)
 from .core.watermark import create_watermarks_and_draw
+from .font import (auto_detect_font, get_text_field_font_color,
+                   get_text_field_font_size, text_field_font_size)
 from .middleware.checkbox import Checkbox
-from .constants import WIDGET_TYPES
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text

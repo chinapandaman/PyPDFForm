@@ -13,7 +13,7 @@ from .constants import (DEPRECATION_NOTICE,
                         VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
 from .filler import fill
-from .core.font import register_font
+from .font import register_font
 from .core.image import any_image_to_jpg, rotate_image
 from .core.utils import (get_page_streams, merge_two_pdfs,
                          preview_widget_to_draw, remove_all_widgets)

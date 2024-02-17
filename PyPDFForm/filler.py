@@ -8,7 +8,7 @@ from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
                          get_text_line_x_coordinates)
-from .core.font import checkbox_radio_font_size
+from .font import checkbox_radio_font_size
 from .core.image import any_image_to_jpg
 from .core.template import get_widget_key, get_widgets_by_page
 from .core.utils import checkbox_radio_to_draw
