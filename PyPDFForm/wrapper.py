@@ -14,7 +14,7 @@ from .constants import (DEPRECATION_NOTICE,
 from .coordinate import generate_coordinate_grid
 from .filler import fill
 from .font import register_font
-from .core.image import any_image_to_jpg, rotate_image
+from .image import any_image_to_jpg, rotate_image
 from .core.utils import (get_page_streams, merge_two_pdfs,
                          preview_widget_to_draw, remove_all_widgets)
 from .core.watermark import (create_watermarks_and_draw,
