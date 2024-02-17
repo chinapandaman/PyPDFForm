@@ -13,8 +13,7 @@ from .middleware.text import Text
 from .template import (get_char_rect_width, get_widget_alignment,
                        is_text_multiline)
 from .utils import stream_to_io
-from .watermark import (create_watermarks_and_draw,
-                        merge_watermarks_with_pdf)
+from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def get_draw_checkbox_radio_coordinates(

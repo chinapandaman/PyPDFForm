@@ -10,12 +10,12 @@ from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_text_line_x_coordinates)
 from .font import checkbox_radio_font_size
 from .image import any_image_to_jpg
-from .template import get_widget_key, get_widgets_by_page
-from .utils import checkbox_radio_to_draw
-from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 from .middleware.checkbox import Checkbox
 from .middleware.radio import Radio
 from .middleware.signature import Signature
+from .template import get_widget_key, get_widgets_by_page
+from .utils import checkbox_radio_to_draw
+from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def fill(

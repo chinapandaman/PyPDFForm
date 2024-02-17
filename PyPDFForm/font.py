@@ -11,8 +11,7 @@ from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from .constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
-                        FONT_COLOR_IDENTIFIER,
-                        FONT_SIZE_IDENTIFIER)
+                        FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER)
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .utils import traverse_pattern
 

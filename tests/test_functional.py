@@ -5,11 +5,9 @@ import os
 import pytest
 from jsonschema import ValidationError, validate
 
-from PyPDFForm import PdfWrapper, PyPDFForm
-from PyPDFForm import constants
-from PyPDFForm import template
-from PyPDFForm.middleware.text import Text
+from PyPDFForm import PdfWrapper, PyPDFForm, constants, template
 from PyPDFForm.middleware.base import Widget
+from PyPDFForm.middleware.text import Text
 
 
 def test_base_schema_definition():

@@ -9,8 +9,7 @@ from pypdf.generic import DictionaryObject
 
 from .constants import (BUTTON_STYLES, DEFAULT_CHECKBOX_STYLE, DEFAULT_FONT,
                         DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
-                        DEFAULT_RADIO_STYLE, PREVIEW_FONT_COLOR)
-from .constants import WIDGET_TYPES
+                        DEFAULT_RADIO_STYLE, PREVIEW_FONT_COLOR, WIDGET_TYPES)
 from .middleware.checkbox import Checkbox
 from .middleware.radio import Radio
 from .middleware.text import Text

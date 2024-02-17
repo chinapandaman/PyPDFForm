@@ -6,9 +6,9 @@ from typing import Dict, List, Tuple, Union
 from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .constants import (ANNOTATION_RECTANGLE_KEY, COMB, MULTILINE,
-                        NEW_LINE_SYMBOL, TEXT_FIELD_MAX_LENGTH_KEY,
-                        WIDGET_TYPES, DEFAULT_FONT_SIZE)
+from .constants import (ANNOTATION_RECTANGLE_KEY, COMB, DEFAULT_FONT_SIZE,
+                        MULTILINE, NEW_LINE_SYMBOL, TEXT_FIELD_MAX_LENGTH_KEY,
+                        WIDGET_TYPES)
 from .font import (auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
 from .middleware.checkbox import Checkbox
@@ -124,9 +124,7 @@ def update_text_field_attributes(
                 if widgets[key].font is None:
                     widgets[key].font = auto_detect_font(_widget)
                 if widgets[key].font_size is None:
-                    widgets[key].font_size = get_text_field_font_size(
-                        _widget
-                    ) or (
+                    widgets[key].font_size = get_text_field_font_size(_widget) or (
                         text_field_font_size(_widget)
                         if not is_text_multiline(_widget)
                         else DEFAULT_FONT_SIZE
