@@ -9,7 +9,7 @@ from PyPDFForm import PdfWrapper, PyPDFForm
 from PyPDFForm.core import constants
 from PyPDFForm.core import template as template_core
 from PyPDFForm.middleware.text import Text
-from PyPDFForm.middleware.widget import Widget
+from PyPDFForm.middleware.base import Widget
 
 
 def test_base_schema_definition():

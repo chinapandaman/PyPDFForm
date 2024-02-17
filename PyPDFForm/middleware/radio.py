@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains radio middleware."""
 
-from .widget import Widget
+from .base import Widget
 
 
 class Radio(Widget):
