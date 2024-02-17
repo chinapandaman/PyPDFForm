@@ -4,7 +4,7 @@
 from os.path import expanduser
 from typing import BinaryIO, Union
 
-from .adapter import fp_or_f_obj_or_stream_to_stream
+from ..adapter import fp_or_f_obj_or_stream_to_stream
 from .widget import Widget
 
 

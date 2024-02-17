@@ -15,7 +15,7 @@ from .core.utils import (get_page_streams, merge_two_pdfs,
                          preview_widget_to_draw, remove_all_widgets)
 from .core.watermark import (create_watermarks_and_draw,
                              merge_watermarks_with_pdf)
-from .middleware.adapter import fp_or_f_obj_or_stream_to_stream
+from .adapter import fp_or_f_obj_or_stream_to_stream
 from .middleware.constants import (DEPRECATION_NOTICE,
                                    VERSION_IDENTIFIER_PREFIX,
                                    VERSION_IDENTIFIERS)
