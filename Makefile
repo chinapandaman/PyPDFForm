@@ -19,5 +19,8 @@ compare-pdf-diffs:
 deploy:
 	bash ./scripts/create_release.sh
 
+bump-version:
+	bash ./scripts/bump_version.sh
+
 serve-docs:
 	bash ./scripts/serve_docs.sh
