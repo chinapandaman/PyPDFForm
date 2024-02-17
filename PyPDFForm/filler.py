@@ -3,19 +3,19 @@
 
 from typing import Dict
 
-from ..middleware.checkbox import Checkbox
-from ..constants import WIDGET_TYPES
-from ..middleware.radio import Radio
-from ..middleware.signature import Signature
-from ..coordinate import (get_draw_checkbox_radio_coordinates,
-                          get_draw_sig_coordinates_resolutions,
-                          get_draw_text_coordinates,
-                          get_text_line_x_coordinates)
-from .font import checkbox_radio_font_size
-from .image import any_image_to_jpg
-from .template import get_widget_key, get_widgets_by_page
-from .utils import checkbox_radio_to_draw
-from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
+from .constants import WIDGET_TYPES
+from .coordinate import (get_draw_checkbox_radio_coordinates,
+                         get_draw_sig_coordinates_resolutions,
+                         get_draw_text_coordinates,
+                         get_text_line_x_coordinates)
+from .core.font import checkbox_radio_font_size
+from .core.image import any_image_to_jpg
+from .core.template import get_widget_key, get_widgets_by_page
+from .core.utils import checkbox_radio_to_draw
+from .core.watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
+from .middleware.checkbox import Checkbox
+from .middleware.radio import Radio
+from .middleware.signature import Signature
 
 
 def fill(
