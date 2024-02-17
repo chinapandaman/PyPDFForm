@@ -3,21 +3,21 @@
 
 from typing import Dict, List
 
-from PyPDFForm.core.constants import ANNOTATION_RECTANGLE_KEY
-from PyPDFForm.core.font import (auto_detect_font, get_text_field_font_color,
-                                 get_text_field_font_size, text_field_font_size)
-from PyPDFForm.core.template import (construct_widget, get_button_style,
-                                     get_character_x_paddings, get_dropdown_choices,
-                                     get_paragraph_auto_wrap_length,
-                                     get_paragraph_lines, get_text_field_max_length,
-                                     get_widget_key, get_widgets_by_page,
-                                     is_text_field_comb, is_text_multiline)
-from PyPDFForm.core.watermark import create_watermarks_and_draw
-from PyPDFForm.middleware.checkbox import Checkbox
-from PyPDFForm.middleware.constants import WIDGET_TYPES
-from PyPDFForm.middleware.dropdown import Dropdown
-from PyPDFForm.middleware.radio import Radio
-from PyPDFForm.middleware.text import Text
+from .core.constants import ANNOTATION_RECTANGLE_KEY
+from .core.font import (auto_detect_font, get_text_field_font_color,
+                        get_text_field_font_size, text_field_font_size)
+from .core.template import (construct_widget, get_button_style,
+                            get_character_x_paddings, get_dropdown_choices,
+                            get_paragraph_auto_wrap_length,
+                            get_paragraph_lines, get_text_field_max_length,
+                            get_widget_key, get_widgets_by_page,
+                            is_text_field_comb, is_text_multiline)
+from .core.watermark import create_watermarks_and_draw
+from .middleware.checkbox import Checkbox
+from .middleware.constants import WIDGET_TYPES
+from .middleware.dropdown import Dropdown
+from .middleware.radio import Radio
+from .middleware.text import Text
 
 
 def set_character_x_paddings(
