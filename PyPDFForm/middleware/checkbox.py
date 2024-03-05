@@ -24,6 +24,7 @@ class Checkbox(Widget):
 
         super().__init__(name, value)
 
+        self.size = None
         self._button_style = None
 
     @property
