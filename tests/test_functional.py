@@ -581,7 +581,9 @@ def test_checkbox_change_size_and_button_style(template_stream, pdf_samples, req
         assert obj.stream == expected
 
 
-def test_radio_change_size_and_button_style(template_with_radiobutton_stream, pdf_samples, request):
+def test_radio_change_size_and_button_style(
+    template_with_radiobutton_stream, pdf_samples, request
+):
     expected_path = os.path.join(
         pdf_samples, "test_radio_change_size_and_button_style.pdf"
     )
