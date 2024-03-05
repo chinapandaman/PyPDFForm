@@ -550,3 +550,61 @@ def test_generate_coordinate_grid_margin_50(template_stream, pdf_samples, reques
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
+
+
+def test_checkbox_change_size_and_button_style(template_stream, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "test_checkbox_change_size_and_button_style.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream)
+        obj.widgets["check"].size = 50
+        obj.widgets["check"].button_style = "cross"
+        obj.widgets["check_2"].size = 40
+        obj.widgets["check_2"].button_style = "circle"
+        obj.widgets["check_3"].size = 60
+        obj.widgets["check_3"].button_style = "check"
+        obj = obj.fill(
+            {
+                "check": True,
+                "check_2": True,
+                "check_3": True,
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
+
+
+def test_radio_change_size_and_button_style(template_with_radiobutton_stream, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "test_radio_change_size_and_button_style.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_with_radiobutton_stream)
+        obj.widgets["radio_1"].size = 50
+        obj.widgets["radio_1"].button_style = "cross"
+        obj.widgets["radio_2"].size = 40
+        obj.widgets["radio_2"].button_style = "circle"
+        obj.widgets["radio_3"].size = 60
+        obj.widgets["radio_3"].button_style = "check"
+        obj = obj.fill(
+            {
+                "radio_1": 0,
+                "radio_2": 1,
+                "radio_3": 2,
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected

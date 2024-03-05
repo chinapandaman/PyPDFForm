@@ -44,10 +44,14 @@ def fill(
             _to_draw = x = y = None
 
             if isinstance(widgets[key], (Checkbox, Radio)):
-                font_size = checkbox_radio_font_size(_widget)
+                font_size = (
+                    checkbox_radio_font_size(_widget)
+                    if widgets[key].size is None
+                    else widgets[key].size
+                )
                 _to_draw = checkbox_radio_to_draw(widgets[key], font_size)
                 x, y = get_draw_checkbox_radio_coordinates(_widget, _to_draw)
-                if isinstance(widgets[key], Checkbox) and widgets[key].value:
+                if type(widgets[key]) is Checkbox and widgets[key].value:
                     text_needs_to_be_drawn = True
                 elif isinstance(widgets[key], Radio):
                     if key not in radio_button_tracker:

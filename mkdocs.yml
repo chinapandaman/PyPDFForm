@@ -8,6 +8,7 @@ nav:
     - inspect.md
     - fill.md
     - style.md
+    - button_style.md
     - draw.md
     - utils.md
 theme:

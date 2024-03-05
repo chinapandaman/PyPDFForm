@@ -60,9 +60,9 @@ NEW_LINE_SYMBOL = "\n"
 DEFAULT_CHECKBOX_STYLE = "\u2713"
 DEFAULT_RADIO_STYLE = "\u25CF"
 BUTTON_STYLES = {
-    "4": "\u2713",
-    "5": "\u00D7",
-    "l": "\u25CF",
+    "4": "\u2713",  # check
+    "5": "\u00D7",  # cross
+    "l": "\u25CF",  # circle
 }
 
 COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO = DEFAULT_FONT_SIZE / 100

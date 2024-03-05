@@ -38,7 +38,7 @@ def checkbox_radio_to_draw(
     new_widget.font_size = font_size
     new_widget.font_color = DEFAULT_FONT_COLOR
     new_widget.value = BUTTON_STYLES.get(widget.button_style) or (
-        DEFAULT_CHECKBOX_STYLE if isinstance(widget, Checkbox) else DEFAULT_RADIO_STYLE
+        DEFAULT_CHECKBOX_STYLE if type(widget) is Checkbox else DEFAULT_RADIO_STYLE
     )
 
     return new_widget

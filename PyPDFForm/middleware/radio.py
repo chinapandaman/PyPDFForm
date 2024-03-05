@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Contains radio middleware."""
 
-from .base import Widget
+from .checkbox import Checkbox
 
 
-class Radio(Widget):
+class Radio(Checkbox):
     """A class to represent a radiobutton widget."""
 
     def __init__(
@@ -16,7 +16,6 @@ class Radio(Widget):
 
         super().__init__(name, value)
 
-        self.button_style = None
         self.number_of_options = 0
 
     @property
