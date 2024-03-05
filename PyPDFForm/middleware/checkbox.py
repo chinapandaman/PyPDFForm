@@ -49,6 +49,7 @@ class Checkbox(Widget):
     def button_style(self, value) -> None:
         """Converts user specified button styles to acroform values."""
 
-        self._button_style = value
         if value in self.BUTTON_STYLE_MAPPING:
             self._button_style = self.BUTTON_STYLE_MAPPING[value]
+        elif value in self.BUTTON_STYLE_MAPPING.values():
+            self._button_style = value
