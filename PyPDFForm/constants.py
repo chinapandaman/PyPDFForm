@@ -26,6 +26,7 @@ WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown, Signature]
 
 DEPRECATION_NOTICE = "{} will be deprecated soon. Use {} instead."
 
+ANNOTATION_KEY = "/Annots"
 ANNOTATION_FIELD_KEY = "/T"
 ANNOTATION_RECTANGLE_KEY = "/Rect"
 SUBTYPE_KEY = "/Subtype"
@@ -43,6 +44,7 @@ CHOICE_FIELD_IDENTIFIER = "/Ch"
 CHOICES_IDENTIFIER = "/Opt"
 BUTTON_IDENTIFIER = "/MK"
 BUTTON_STYLE_IDENTIFIER = "/CA"
+RADIO_SELECT_IDENTIFIER = "/AS"
 
 # Field flag bits
 MULTILINE = 1 << 12
@@ -64,5 +66,8 @@ BUTTON_STYLES = {
     "5": "\u00D7",  # cross
     "l": "\u25CF",  # circle
 }
+
+CHECKBOX_SELECT = "/Yes"
+RADIO_SELECT = "/0"
 
 COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO = DEFAULT_FONT_SIZE / 100

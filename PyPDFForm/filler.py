@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for filling a PDF form."""
 
-from typing import Dict
+from io import BytesIO
+from typing import cast, Dict
 
-from .constants import WIDGET_TYPES
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import DictionaryObject, NameObject
+
+from .constants import (CHECKBOX_SELECT, RADIO_SELECT, WIDGET_TYPES,
+                        ANNOTATION_KEY, RADIO_SELECT_IDENTIFIER)
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -13,8 +18,9 @@ from .image import any_image_to_jpg
 from .middleware.checkbox import Checkbox
 from .middleware.radio import Radio
 from .middleware.signature import Signature
+from .middleware.text import Text
 from .template import get_widget_key, get_widgets_by_page
-from .utils import checkbox_radio_to_draw
+from .utils import checkbox_radio_to_draw, stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -117,3 +123,47 @@ def fill(
         result = merge_watermarks_with_pdf(result, image_watermarks)
 
     return result
+
+
+def simple_fill(
+    template: bytes,
+    widgets: Dict[str, WIDGET_TYPES],
+) -> bytes:
+    """Fills a PDF form in place."""
+
+    pdf = PdfReader(stream_to_io(template))
+    out = PdfWriter()
+    out.append(pdf)
+
+    radio_button_tracker = {}
+
+    for page in out.pages:
+        update_dict = {}
+        for annot in page[ANNOTATION_KEY]:   # noqa
+            annot = cast(DictionaryObject, annot.get_object())
+            key = get_widget_key(annot.get_object())
+
+            widget = widgets.get(key)
+            if widget is None:
+                continue
+
+            if isinstance(widget, Checkbox) and widget.value is True:
+                update_dict[key] = CHECKBOX_SELECT
+            elif isinstance(widget, Radio):
+                if key not in radio_button_tracker:
+                    radio_button_tracker[key] = 0
+                radio_button_tracker[key] += 1
+                if widget.value == radio_button_tracker[key] - 1:
+                    annot[NameObject(RADIO_SELECT_IDENTIFIER)] = NameObject(RADIO_SELECT)
+            elif isinstance(widget, Text):
+                update_dict[key] = widget.value
+
+        if update_dict:
+            out.update_page_form_field_values(
+                page, update_dict, auto_regenerate=False
+            )
+
+    with BytesIO() as f:
+        out.write(f)
+        f.seek(0)
+        return f.read()
