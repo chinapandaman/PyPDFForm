@@ -8,7 +8,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject, NameObject, TextStringObject
 
 from .constants import (CHECKBOX_SELECT, WIDGET_TYPES,
-                        ANNOTATION_KEY, SELECT_IDENTIFIER, TEXT_VALUE_IDENTIFIER)
+                        ANNOTATION_KEY, SELECTED_IDENTIFIER, TEXT_VALUE_IDENTIFIER)
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -147,13 +147,13 @@ def simple_fill(
                 continue
 
             if isinstance(widget, Checkbox) and widget.value is True:
-                annot[NameObject(SELECT_IDENTIFIER)] = NameObject(CHECKBOX_SELECT)
+                annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(CHECKBOX_SELECT)
             elif isinstance(widget, Radio):
                 if key not in radio_button_tracker:
                     radio_button_tracker[key] = 0
                 radio_button_tracker[key] += 1
                 if widget.value == radio_button_tracker[key] - 1:
-                    annot[NameObject(SELECT_IDENTIFIER)] = NameObject(f"/{widget.value}")
+                    annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(f"/{widget.value}")
             elif isinstance(widget, Text):
                 annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(widget.value)
 
