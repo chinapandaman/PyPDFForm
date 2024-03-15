@@ -5,10 +5,10 @@ from io import BytesIO
 from typing import cast, Dict
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject, NameObject
+from pypdf.generic import DictionaryObject, NameObject, TextStringObject
 
-from .constants import (CHECKBOX_SELECT, RADIO_SELECT, WIDGET_TYPES,
-                        ANNOTATION_KEY, RADIO_SELECT_IDENTIFIER)
+from .constants import (CHECKBOX_SELECT, WIDGET_TYPES,
+                        ANNOTATION_KEY, SELECT_IDENTIFIER, TEXT_VALUE_IDENTIFIER)
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -138,7 +138,6 @@ def simple_fill(
     radio_button_tracker = {}
 
     for page in out.pages:
-        update_dict = {}
         for annot in page[ANNOTATION_KEY]:   # noqa
             annot = cast(DictionaryObject, annot.get_object())
             key = get_widget_key(annot.get_object())
@@ -148,20 +147,15 @@ def simple_fill(
                 continue
 
             if isinstance(widget, Checkbox) and widget.value is True:
-                update_dict[key] = CHECKBOX_SELECT
+                annot[NameObject(SELECT_IDENTIFIER)] = NameObject(CHECKBOX_SELECT)
             elif isinstance(widget, Radio):
                 if key not in radio_button_tracker:
                     radio_button_tracker[key] = 0
                 radio_button_tracker[key] += 1
                 if widget.value == radio_button_tracker[key] - 1:
-                    annot[NameObject(RADIO_SELECT_IDENTIFIER)] = NameObject(RADIO_SELECT)
+                    annot[NameObject(SELECT_IDENTIFIER)] = NameObject(f"/{widget.value}")
             elif isinstance(widget, Text):
-                update_dict[key] = widget.value
-
-        if update_dict:
-            out.update_page_form_field_values(
-                page, update_dict, auto_regenerate=False
-            )
+                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(widget.value)
 
     with BytesIO() as f:
         out.write(f)
