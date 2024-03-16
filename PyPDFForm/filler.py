@@ -154,7 +154,7 @@ def simple_fill(
                 radio_button_tracker[key] += 1
                 if widget.value == radio_button_tracker[key] - 1:
                     annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(f"/{widget.value}")
-            elif isinstance(widget, Text):
+            elif isinstance(widget, Text) and widget.value:
                 annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(widget.value)
 
     with BytesIO() as f:
