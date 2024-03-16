@@ -139,9 +139,7 @@ def simple_fill(
     radio_button_tracker = {}
 
     for page in out.pages:
-        if ANNOTATION_KEY not in page:
-            continue
-        for annot in page[ANNOTATION_KEY]:   # noqa
+        for annot in page.get(ANNOTATION_KEY, []):   # noqa
             annot = cast(DictionaryObject, annot.get_object())
             key = get_widget_key(annot.get_object())
 
