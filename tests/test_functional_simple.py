@@ -8,9 +8,7 @@ from PyPDFForm import FormWrapper
 def test_fill(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "simple", "sample_filled.pdf")
     with open(expected_path, "rb+") as f:
-        obj = FormWrapper(template_stream).fill(
-            data_dict
-        )
+        obj = FormWrapper(template_stream).fill(data_dict)
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
@@ -44,7 +42,9 @@ def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream, request
 def test_fill_right_aligned(
     sample_template_with_right_aligned_text_field, pdf_samples, request
 ):
-    expected_path = os.path.join(pdf_samples, "simple", "sample_filled_right_aligned.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "sample_filled_right_aligned.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_right_aligned_text_field).fill(
             {

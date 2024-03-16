@@ -2,14 +2,14 @@
 """Contains helpers for filling a PDF form."""
 
 from io import BytesIO
-from typing import cast, Dict
+from typing import Dict, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject, NameObject, TextStringObject
 
-from .constants import (CHECKBOX_SELECT, WIDGET_TYPES,
-                        ANNOTATION_KEY, SELECTED_IDENTIFIER, TEXT_VALUE_IDENTIFIER,
-                        TEXT_VALUE_SHOW_UP_IDENTIFIER)
+from .constants import (ANNOTATION_KEY, CHECKBOX_SELECT, SELECTED_IDENTIFIER,
+                        TEXT_VALUE_IDENTIFIER, TEXT_VALUE_SHOW_UP_IDENTIFIER,
+                        WIDGET_TYPES)
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -140,7 +140,7 @@ def simple_fill(
     radio_button_tracker = {}
 
     for page in out.pages:
-        for annot in page.get(ANNOTATION_KEY, []):   # noqa
+        for annot in page.get(ANNOTATION_KEY, []):  # noqa
             annot = cast(DictionaryObject, annot.get_object())
             key = get_widget_key(annot.get_object())
 
@@ -155,15 +155,23 @@ def simple_fill(
                     radio_button_tracker[key] = 0
                 radio_button_tracker[key] += 1
                 if widget.value == radio_button_tracker[key] - 1:
-                    annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(f"/{widget.value}")
+                    annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(
+                        f"/{widget.value}"
+                    )
             elif isinstance(widget, Dropdown) and widget.value is not None:
-                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = (
-                    TextStringObject(widget.choices[widget.value]))
-                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = (
-                    TextStringObject(widget.choices[widget.value]))
+                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(
+                    widget.choices[widget.value]
+                )
+                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(
+                    widget.choices[widget.value]
+                )
             elif isinstance(widget, Text) and widget.value:
-                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(widget.value)
-                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(widget.value)
+                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(
+                    widget.value
+                )
+                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(
+                    widget.value
+                )
 
     with BytesIO() as f:
         out.write(f)

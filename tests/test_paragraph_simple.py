@@ -7,7 +7,9 @@ from PyPDFForm import FormWrapper
 
 
 def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "paragraph", "test_paragraph_y_coordinate.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "paragraph", "test_paragraph_y_coordinate.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_paragraph).fill(
             {"paragraph_1": "test paragraph"}
@@ -23,7 +25,9 @@ def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples, req
 
 
 def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "paragraph", "test_paragraph_auto_wrap.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "paragraph", "test_paragraph_auto_wrap.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_paragraph).fill(
             {
@@ -43,7 +47,9 @@ def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, reques
 def test_paragraph_auto_font(
     sample_template_with_paragraph_auto_font, pdf_samples, request
 ):
-    expected_path = os.path.join(pdf_samples, "simple", "paragraph", "test_paragraph_auto_font.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "paragraph", "test_paragraph_auto_font.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_paragraph_auto_font).fill(
             {"paragraph": "test paragraph"}
@@ -62,7 +68,9 @@ def test_paragraph_auto_font(
 def test_paragraph_auto_font_auto_wrap(
     sample_template_with_paragraph_auto_font, pdf_samples, request
 ):
-    expected_path = os.path.join(pdf_samples, "simple", "paragraph", "test_paragraph_auto_font_auto_wrap.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "paragraph", "test_paragraph_auto_font_auto_wrap.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_paragraph_auto_font).fill(
             {
@@ -81,7 +89,9 @@ def test_paragraph_auto_font_auto_wrap(
 
 
 def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "paragraph", "test_paragraph_complex.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "paragraph", "test_paragraph_complex.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_paragraph_complex).fill(
             {
@@ -107,7 +117,9 @@ def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, reque
 def test_paragraph_max_length(
     sample_template_with_paragraph_max_length, pdf_samples, request
 ):
-    expected_path = os.path.join(pdf_samples, "simple", "paragraph", "test_paragraph_max_length.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "paragraph", "test_paragraph_max_length.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_paragraph_max_length).fill(
             {

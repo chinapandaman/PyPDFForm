@@ -6,7 +6,9 @@ from PyPDFForm import FormWrapper
 
 
 def test_filling_pdf_escape_pdf_form(tool_pdf_directory, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "scenario", "tools", "pdf_escape_expected.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "tools", "pdf_escape_expected.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(tool_pdf_directory, "pdf_escape.pdf")).fill(
             {
@@ -30,7 +32,9 @@ def test_filling_pdf_escape_pdf_form(tool_pdf_directory, pdf_samples, request):
 
 
 def test_filling_docfly_pdf_form(tool_pdf_directory, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "scenario", "tools", "docfly_expected.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "tools", "docfly_expected.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(tool_pdf_directory, "docfly.pdf")).fill(
             {
@@ -54,7 +58,9 @@ def test_filling_docfly_pdf_form(tool_pdf_directory, pdf_samples, request):
 
 
 def test_filling_soda_pdf_form(tool_pdf_directory, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "scenario", "tools", "soda_expected.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "tools", "soda_expected.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(tool_pdf_directory, "soda.pdf")).fill(
             {

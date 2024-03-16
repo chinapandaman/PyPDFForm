@@ -74,7 +74,9 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
 
 
 def test_dropdown_three(sample_template_with_dropdown, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "dropdown", "dropdown_three.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "dropdown", "dropdown_three.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_dropdown).fill(
             {
@@ -124,7 +126,9 @@ def test_dropdown_four(sample_template_with_dropdown, pdf_samples, request):
 
 
 def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "dropdown", "dropdown_alignment_expected.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "dropdown", "dropdown_alignment_expected.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(dropdown_alignment).fill(
             {

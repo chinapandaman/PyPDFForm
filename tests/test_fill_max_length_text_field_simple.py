@@ -8,8 +8,12 @@ from PyPDFForm import FormWrapper
 def test_fill_max_length_text_field_all_chars(
     sample_template_with_max_length_text_field, pdf_samples, request
 ):
-    expected_path = os.path.join(pdf_samples, "simple", "max_length_text_field_related",
-                                 "max_length_text_field_all_chars.pdf")
+    expected_path = os.path.join(
+        pdf_samples,
+        "simple",
+        "max_length_text_field_related",
+        "max_length_text_field_all_chars.pdf",
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_max_length_text_field).fill(
             {
@@ -33,8 +37,12 @@ def test_fill_max_length_text_field_all_chars(
 def test_fill_max_length_text_field_odd_chars(
     sample_template_with_max_length_text_field, pdf_samples, request
 ):
-    expected_path = os.path.join(pdf_samples, "simple", "max_length_text_field_related",
-                                 "max_length_text_field_odd_chars.pdf")
+    expected_path = os.path.join(
+        pdf_samples,
+        "simple",
+        "max_length_text_field_related",
+        "max_length_text_field_odd_chars.pdf",
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_max_length_text_field).fill(
             {
@@ -58,8 +66,12 @@ def test_fill_max_length_text_field_odd_chars(
 def test_fill_max_length_text_field_even_chars(
     sample_template_with_max_length_text_field, pdf_samples, request
 ):
-    expected_path = os.path.join(pdf_samples, "simple", "max_length_text_field_related",
-                                 "max_length_text_field_even_chars.pdf")
+    expected_path = os.path.join(
+        pdf_samples,
+        "simple",
+        "max_length_text_field_related",
+        "max_length_text_field_even_chars.pdf",
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_max_length_text_field).fill(
             {

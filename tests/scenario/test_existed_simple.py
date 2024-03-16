@@ -6,7 +6,9 @@ from PyPDFForm import FormWrapper
 
 
 def test_ds82(existed_pdf_directory, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "scenario", "existed", "DS82_expected.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "existed", "DS82_expected.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
             {
@@ -24,7 +26,13 @@ def test_ds82(existed_pdf_directory, pdf_samples, request):
 
 
 def test_ds82_all_chars_lowercase(existed_pdf_directory, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "scenario", "existed", "DS82_expected_all_chars_lowercase.pdf")
+    expected_path = os.path.join(
+        pdf_samples,
+        "simple",
+        "scenario",
+        "existed",
+        "DS82_expected_all_chars_lowercase.pdf",
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
             {
@@ -42,7 +50,13 @@ def test_ds82_all_chars_lowercase(existed_pdf_directory, pdf_samples, request):
 
 
 def test_ds82_all_chars_uppercase(existed_pdf_directory, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "scenario", "existed", "DS82_expected_all_chars_uppercase.pdf")
+    expected_path = os.path.join(
+        pdf_samples,
+        "simple",
+        "scenario",
+        "existed",
+        "DS82_expected_all_chars_uppercase.pdf",
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
             {
@@ -60,7 +74,9 @@ def test_ds82_all_chars_uppercase(existed_pdf_directory, pdf_samples, request):
 
 
 def test_ds82_mixed_case(existed_pdf_directory, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "scenario", "existed", "DS82_expected_mixed_case.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "existed", "DS82_expected_mixed_case.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
             {
@@ -77,11 +93,22 @@ def test_ds82_mixed_case(existed_pdf_directory, pdf_samples, request):
         assert obj.stream == expected
 
 
-def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "scenario", "existed",
-                                 "illinois-real-estate-power-of-attorney-form_expected.pdf")
+def test_illinois_real_estate_power_of_attorney_form(
+    existed_pdf_directory, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples,
+        "simple",
+        "scenario",
+        "existed",
+        "illinois-real-estate-power-of-attorney-form_expected.pdf",
+    )
     with open(expected_path, "rb+") as f:
-        obj = FormWrapper(os.path.join(existed_pdf_directory, "illinois-real-estate-power-of-attorney-form.pdf")).fill(
+        obj = FormWrapper(
+            os.path.join(
+                existed_pdf_directory, "illinois-real-estate-power-of-attorney-form.pdf"
+            )
+        ).fill(
             {
                 "undefined": "John Doe",
                 "State of": "Chicago",
