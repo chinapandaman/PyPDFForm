@@ -21,6 +21,10 @@ pip install -U PyPDFForm
 
 ## Create a PDF wrapper
 
+There are two classes provided by the library that abstract a PDF form. The `FormWrapper` class allows you to fill a 
+PDF form if you don't need any other API. More info about `FormWrapper` can be found 
+[here](simple_fill.md).
+
 The class that implements most of PyPDFForm's APIs is `PdfWrapper`. It takes various optional parameters to instantiate, 
 with the most important one being the PDF form "template".
 
