@@ -37,3 +37,41 @@ def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, reques
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
+
+
+def test_paragraph_auto_font(
+    sample_template_with_paragraph_auto_font, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "simple", "paragraph", "test_paragraph_auto_font.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(sample_template_with_paragraph_auto_font).fill(
+            {"paragraph": "test paragraph"}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
+
+
+def test_paragraph_auto_font_auto_wrap(
+    sample_template_with_paragraph_auto_font, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "simple", "paragraph", "test_paragraph_auto_font_auto_wrap.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(sample_template_with_paragraph_auto_font).fill(
+            {
+                "paragraph": "t xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx t"
+            }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
