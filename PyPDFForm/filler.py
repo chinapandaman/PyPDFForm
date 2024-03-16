@@ -8,7 +8,8 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject, NameObject, TextStringObject
 
 from .constants import (CHECKBOX_SELECT, WIDGET_TYPES,
-                        ANNOTATION_KEY, SELECTED_IDENTIFIER, TEXT_VALUE_IDENTIFIER, TEXT_VALUE_SHOW_UP_IDENTIFIER)
+                        ANNOTATION_KEY, SELECTED_IDENTIFIER, TEXT_VALUE_IDENTIFIER,
+                        TEXT_VALUE_SHOW_UP_IDENTIFIER)
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -156,8 +157,10 @@ def simple_fill(
                 if widget.value == radio_button_tracker[key] - 1:
                     annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(f"/{widget.value}")
             elif isinstance(widget, Dropdown) and widget.value is not None:
-                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(widget.choices[widget.value])
-                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(widget.choices[widget.value])
+                annot[NameObject(TEXT_VALUE_IDENTIFIER)] =(
+                    TextStringObject(widget.choices[widget.value]))
+                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] =(
+                    TextStringObject(widget.choices[widget.value]))
             elif isinstance(widget, Text) and widget.value:
                 annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(widget.value)
                 annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(widget.value)
