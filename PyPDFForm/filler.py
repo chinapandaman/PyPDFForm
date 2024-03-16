@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for filling a PDF form."""
 
-from typing import Dict
+from io import BytesIO
+from typing import cast, Dict
 
-from .constants import WIDGET_TYPES
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import DictionaryObject, NameObject, TextStringObject
+
+from .constants import (CHECKBOX_SELECT, WIDGET_TYPES,
+                        ANNOTATION_KEY, SELECTED_IDENTIFIER, TEXT_VALUE_IDENTIFIER,
+                        TEXT_VALUE_SHOW_UP_IDENTIFIER)
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -11,10 +17,12 @@ from .coordinate import (get_draw_checkbox_radio_coordinates,
 from .font import checkbox_radio_font_size
 from .image import any_image_to_jpg
 from .middleware.checkbox import Checkbox
+from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.signature import Signature
+from .middleware.text import Text
 from .template import get_widget_key, get_widgets_by_page
-from .utils import checkbox_radio_to_draw
+from .utils import checkbox_radio_to_draw, stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -117,3 +125,47 @@ def fill(
         result = merge_watermarks_with_pdf(result, image_watermarks)
 
     return result
+
+
+def simple_fill(
+    template: bytes,
+    widgets: Dict[str, WIDGET_TYPES],
+) -> bytes:
+    """Fills a PDF form in place."""
+
+    pdf = PdfReader(stream_to_io(template))
+    out = PdfWriter()
+    out.append(pdf)
+
+    radio_button_tracker = {}
+
+    for page in out.pages:
+        for annot in page.get(ANNOTATION_KEY, []):   # noqa
+            annot = cast(DictionaryObject, annot.get_object())
+            key = get_widget_key(annot.get_object())
+
+            widget = widgets.get(key)
+            if widget is None:
+                continue
+
+            if isinstance(widget, Checkbox) and widget.value is True:
+                annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(CHECKBOX_SELECT)
+            elif isinstance(widget, Radio):
+                if key not in radio_button_tracker:
+                    radio_button_tracker[key] = 0
+                radio_button_tracker[key] += 1
+                if widget.value == radio_button_tracker[key] - 1:
+                    annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(f"/{widget.value}")
+            elif isinstance(widget, Dropdown) and widget.value is not None:
+                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = (
+                    TextStringObject(widget.choices[widget.value]))
+                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = (
+                    TextStringObject(widget.choices[widget.value]))
+            elif isinstance(widget, Text) and widget.value:
+                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(widget.value)
+                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(widget.value)
+
+    with BytesIO() as f:
+        out.write(f)
+        f.seek(0)
+        return f.read()

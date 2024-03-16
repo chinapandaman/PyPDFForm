@@ -11,7 +11,7 @@ from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         DEPRECATION_NOTICE, VERSION_IDENTIFIER_PREFIX,
                         VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
-from .filler import fill
+from .filler import fill, simple_fill
 from .font import register_font
 from .image import any_image_to_jpg, rotate_image
 from .middleware.dropdown import Dropdown
@@ -26,7 +26,40 @@ from .widgets.checkbox import CheckBoxWidget
 from .widgets.text import TextWidget
 
 
-class PdfWrapper:
+class FormWrapper:
+    """A simple base wrapper for just filling a PDF form."""
+
+    def __init__(
+        self,
+        template: Union[bytes, str, BinaryIO] = b"",
+    ) -> None:
+        """Constructs all attributes for the object."""
+
+        self.stream = fp_or_f_obj_or_stream_to_stream(template)
+
+    def read(self) -> bytes:
+        """Reads the file stream of a PDF form."""
+
+        return self.stream
+
+    def fill(
+        self,
+        data: Dict[str, Union[str, bool, int]],
+    ) -> FormWrapper:
+        """Fills a PDF form."""
+
+        widgets = build_widgets(self.stream) if self.stream else {}
+
+        for key, value in data.items():
+            if key in widgets:
+                widgets[key].value = value
+
+        self.stream = simple_fill(self.read(), widgets)
+
+        return self
+
+
+class PdfWrapper(FormWrapper):
     """A class to represent a PDF form."""
 
     def __init__(
@@ -36,7 +69,7 @@ class PdfWrapper:
     ) -> None:
         """Constructs all attributes for the object."""
 
-        self.stream = fp_or_f_obj_or_stream_to_stream(template)
+        super().__init__(template)
         self.widgets = build_widgets(self.stream) if self.stream else {}
 
         self.global_font = kwargs.get("global_font")
@@ -48,11 +81,6 @@ class PdfWrapper:
                 each.font = self.global_font
                 each.font_size = self.global_font_size
                 each.font_color = self.global_font_color
-
-    def read(self) -> bytes:
-        """Reads the file stream of a PDF form."""
-
-        return self.stream
 
     @property
     def elements(self) -> dict:
