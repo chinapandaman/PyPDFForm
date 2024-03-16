@@ -99,3 +99,23 @@ def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, reque
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
+
+
+def test_paragraph_max_length(
+    sample_template_with_paragraph_max_length, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "simple", "paragraph", "test_paragraph_max_length.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(sample_template_with_paragraph_max_length).fill(
+            {
+                "paragraph": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+            }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
