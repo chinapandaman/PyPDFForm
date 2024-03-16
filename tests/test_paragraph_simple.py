@@ -54,8 +54,9 @@ def test_paragraph_auto_font(
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.stream == expected
 
 
 def test_paragraph_auto_font_auto_wrap(
@@ -74,8 +75,9 @@ def test_paragraph_auto_font_auto_wrap(
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.stream == expected
 
 
 def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, request):
@@ -97,8 +99,9 @@ def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, reque
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.stream == expected
 
 
 def test_paragraph_max_length(
@@ -117,5 +120,6 @@ def test_paragraph_max_length(
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.stream == expected

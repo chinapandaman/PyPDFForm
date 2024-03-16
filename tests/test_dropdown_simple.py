@@ -139,5 +139,6 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.stream == expected

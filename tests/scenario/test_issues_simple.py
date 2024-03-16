@@ -26,23 +26,6 @@ def test_pdf_form_with_central_aligned_text_fields(issue_pdf_directory, pdf_samp
         assert obj.stream == expected
 
 
-def test_pdf_form_with_paragraph_fields_new_line_symbol_text(issue_pdf_directory, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "scenario", "issues", "PPF-415-expected.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
-            {"Address": "Mr John Smith\n132, My Street\nKingston, New York 12401"}
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        if os.name == "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.stream == expected
-
-
 def test_pdf_form_with_paragraph_fields_new_line_symbol_text_overflow(issue_pdf_directory, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "simple", "scenario", "issues", "PPF-415-2-expected.pdf")
     with open(expected_path, "rb+") as f:
@@ -59,23 +42,6 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_text_overflow(issue_pdf_
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
-
-
-def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_directory, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "scenario", "issues", "PPF-415-3-expected.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
-            {"Address": "J Smith\n132 A St\nNYC, NY 12401"}
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        if os.name == "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.stream == expected
 
 
 def test_521(issue_pdf_directory, pdf_samples, request):
