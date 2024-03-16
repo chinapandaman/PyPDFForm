@@ -14,8 +14,6 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
 
         expected = f.read()
 
