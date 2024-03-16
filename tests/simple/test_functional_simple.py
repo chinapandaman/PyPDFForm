@@ -1,0 +1,23 @@
+# -*- coding: utf-8 -*-
+
+import os
+
+from PyPDFForm import FormWrapper
+
+
+def test_fill(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "simple", "sample_filled.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(template_stream).fill(
+            data_dict
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(obj.stream)
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
