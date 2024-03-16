@@ -157,9 +157,9 @@ def simple_fill(
                 if widget.value == radio_button_tracker[key] - 1:
                     annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(f"/{widget.value}")
             elif isinstance(widget, Dropdown) and widget.value is not None:
-                annot[NameObject(TEXT_VALUE_IDENTIFIER)] =(
+                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = (
                     TextStringObject(widget.choices[widget.value]))
-                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] =(
+                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = (
                     TextStringObject(widget.choices[widget.value]))
             elif isinstance(widget, Text) and widget.value:
                 annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(widget.value)
