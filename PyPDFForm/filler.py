@@ -16,6 +16,7 @@ from .coordinate import (get_draw_checkbox_radio_coordinates,
 from .font import checkbox_radio_font_size
 from .image import any_image_to_jpg
 from .middleware.checkbox import Checkbox
+from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
@@ -154,6 +155,9 @@ def simple_fill(
                 radio_button_tracker[key] += 1
                 if widget.value == radio_button_tracker[key] - 1:
                     annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(f"/{widget.value}")
+            elif isinstance(widget, Dropdown) and widget.value is not None:
+                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(widget.choices[widget.value])
+                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(widget.choices[widget.value])
             elif isinstance(widget, Text) and widget.value:
                 annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(widget.value)
                 annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(widget.value)
