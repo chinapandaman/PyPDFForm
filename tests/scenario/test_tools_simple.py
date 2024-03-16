@@ -51,3 +51,29 @@ def test_filling_docfly_pdf_form(tool_pdf_directory, pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
+
+
+def test_filling_soda_pdf_form(tool_pdf_directory, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "simple", "scenario", "tools", "soda_expected.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(tool_pdf_directory, "soda.pdf")).fill(
+            {
+                "Text1": "Helvetica 8",
+                "Text2": "Helvetica 12",
+                "Text3": "Helvetica 24",
+                "Text4": "Helvetica 8",
+                "Text5": "Helvetica 12",
+                "Text6": "Helvetica 24",
+                "Text7": "Helvetica 8",
+                "Text8": "Helvetica 12",
+                "Text9": "Helvetica 24",
+            }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
