@@ -180,6 +180,7 @@ class PdfWrapper(FormWrapper):
     def fill(
         self,
         data: Dict[str, Union[str, bool, int]],
+        **kwargs,
     ) -> PdfWrapper:
         """Fills a PDF form."""
 
