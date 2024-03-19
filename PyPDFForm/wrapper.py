@@ -45,6 +45,7 @@ class FormWrapper:
     def fill(
         self,
         data: Dict[str, Union[str, bool, int]],
+        **kwargs,
     ) -> FormWrapper:
         """Fills a PDF form."""
 
@@ -54,7 +55,7 @@ class FormWrapper:
             if key in widgets:
                 widgets[key].value = value
 
-        self.stream = simple_fill(self.read(), widgets)
+        self.stream = simple_fill(self.read(), widgets, flatten=kwargs.get("flatten", False))
 
         return self
 

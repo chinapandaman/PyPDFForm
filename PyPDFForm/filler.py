@@ -5,11 +5,11 @@ from io import BytesIO
 from typing import Dict, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject, NameObject, TextStringObject
+from pypdf.generic import DictionaryObject, NameObject, TextStringObject, NumberObject
 
 from .constants import (ANNOTATION_KEY, CHECKBOX_SELECT, SELECTED_IDENTIFIER,
                         TEXT_VALUE_IDENTIFIER, TEXT_VALUE_SHOW_UP_IDENTIFIER,
-                        WIDGET_TYPES)
+                        WIDGET_TYPES, FIELD_FLAG_KEY, READ_ONLY)
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -130,6 +130,7 @@ def fill(
 def simple_fill(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
+    flatten: bool = False,
 ) -> bytes:
     """Fills a PDF form in place."""
 
@@ -148,7 +149,7 @@ def simple_fill(
             if widget is None:
                 continue
 
-            if isinstance(widget, Checkbox) and widget.value is True:
+            if type(widget) is Checkbox and widget.value is True:
                 annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(CHECKBOX_SELECT)
             elif isinstance(widget, Radio):
                 if key not in radio_button_tracker:
@@ -171,6 +172,11 @@ def simple_fill(
                 )
                 annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(
                     widget.value
+                )
+
+            if flatten:
+                annot[NameObject(FIELD_FLAG_KEY)] = NumberObject(
+                    int(annot[NameObject(FIELD_FLAG_KEY)]) | READ_ONLY  # noqa
                 )
 
     with BytesIO() as f:
