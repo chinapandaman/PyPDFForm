@@ -5,11 +5,13 @@ from io import BytesIO
 from typing import Dict, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject, NameObject, TextStringObject, NumberObject
+from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
+                           TextStringObject)
 
-from .constants import (ANNOTATION_KEY, CHECKBOX_SELECT, SELECTED_IDENTIFIER,
+from .constants import (ANNOTATION_KEY, CHECKBOX_SELECT, FIELD_FLAG_KEY,
+                        PARENT_KEY, READ_ONLY, SELECTED_IDENTIFIER,
                         TEXT_VALUE_IDENTIFIER, TEXT_VALUE_SHOW_UP_IDENTIFIER,
-                        WIDGET_TYPES, FIELD_FLAG_KEY, READ_ONLY, PARENT_KEY)
+                        WIDGET_TYPES)
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -176,12 +178,20 @@ def simple_fill(
 
             if flatten:
                 if isinstance(widget, Radio):
-                    annot[NameObject(PARENT_KEY)][NameObject(FIELD_FLAG_KEY)] = NumberObject(   # noqa
-                        int(annot[NameObject(PARENT_KEY)].get(NameObject(FIELD_FLAG_KEY), 0)) | READ_ONLY  # noqa
+                    annot[NameObject(PARENT_KEY)][  # noqa
+                        NameObject(FIELD_FLAG_KEY)
+                    ] = NumberObject(
+                        int(
+                            annot[NameObject(PARENT_KEY)].get(  # noqa
+                                NameObject(FIELD_FLAG_KEY), 0
+                            )
+                        )
+                        | READ_ONLY
                     )
                 else:
                     annot[NameObject(FIELD_FLAG_KEY)] = NumberObject(
-                        int(annot.get(NameObject(FIELD_FLAG_KEY), 0)) | READ_ONLY  # noqa
+                        int(annot.get(NameObject(FIELD_FLAG_KEY), 0))
+                        | READ_ONLY  # noqa
                     )
 
     with BytesIO() as f:
