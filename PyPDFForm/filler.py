@@ -5,9 +5,11 @@ from io import BytesIO
 from typing import Dict, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject, NameObject, TextStringObject
+from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
+                           TextStringObject)
 
-from .constants import (ANNOTATION_KEY, CHECKBOX_SELECT, SELECTED_IDENTIFIER,
+from .constants import (ANNOTATION_KEY, CHECKBOX_SELECT, FIELD_FLAG_KEY,
+                        PARENT_KEY, READ_ONLY, SELECTED_IDENTIFIER,
                         TEXT_VALUE_IDENTIFIER, TEXT_VALUE_SHOW_UP_IDENTIFIER,
                         WIDGET_TYPES)
 from .coordinate import (get_draw_checkbox_radio_coordinates,
@@ -130,6 +132,7 @@ def fill(
 def simple_fill(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
+    flatten: bool = False,
 ) -> bytes:
     """Fills a PDF form in place."""
 
@@ -148,7 +151,7 @@ def simple_fill(
             if widget is None:
                 continue
 
-            if isinstance(widget, Checkbox) and widget.value is True:
+            if type(widget) is Checkbox and widget.value is True:
                 annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(CHECKBOX_SELECT)
             elif isinstance(widget, Radio):
                 if key not in radio_button_tracker:
@@ -172,6 +175,24 @@ def simple_fill(
                 annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(
                     widget.value
                 )
+
+            if flatten:
+                if isinstance(widget, Radio):
+                    annot[NameObject(PARENT_KEY)][  # noqa
+                        NameObject(FIELD_FLAG_KEY)
+                    ] = NumberObject(
+                        int(
+                            annot[NameObject(PARENT_KEY)].get(  # noqa
+                                NameObject(FIELD_FLAG_KEY), 0
+                            )
+                        )
+                        | READ_ONLY
+                    )
+                else:
+                    annot[NameObject(FIELD_FLAG_KEY)] = NumberObject(
+                        int(annot.get(NameObject(FIELD_FLAG_KEY), 0))
+                        | READ_ONLY  # noqa
+                    )
 
     with BytesIO() as f:
         out.write(f)

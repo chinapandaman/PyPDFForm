@@ -49,6 +49,7 @@ BUTTON_STYLE_IDENTIFIER = "/CA"
 SELECTED_IDENTIFIER = "/AS"
 
 # Field flag bits
+READ_ONLY = 1 << 0
 MULTILINE = 1 << 12
 COMB = 1 << 24
 
