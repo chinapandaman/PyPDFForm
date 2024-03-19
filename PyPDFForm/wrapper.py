@@ -55,7 +55,9 @@ class FormWrapper:
             if key in widgets:
                 widgets[key].value = value
 
-        self.stream = simple_fill(self.read(), widgets, flatten=kwargs.get("flatten", False))
+        self.stream = simple_fill(
+            self.read(), widgets, flatten=kwargs.get("flatten", False)
+        )
 
         return self
 
