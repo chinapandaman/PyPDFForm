@@ -9,7 +9,7 @@ from pypdf.generic import DictionaryObject, NameObject, TextStringObject, Number
 
 from .constants import (ANNOTATION_KEY, CHECKBOX_SELECT, SELECTED_IDENTIFIER,
                         TEXT_VALUE_IDENTIFIER, TEXT_VALUE_SHOW_UP_IDENTIFIER,
-                        WIDGET_TYPES, FIELD_FLAG_KEY, READ_ONLY)
+                        WIDGET_TYPES, FIELD_FLAG_KEY, READ_ONLY, PARENT_KEY)
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -175,9 +175,14 @@ def simple_fill(
                 )
 
             if flatten:
-                annot[NameObject(FIELD_FLAG_KEY)] = NumberObject(
-                    int(annot[NameObject(FIELD_FLAG_KEY)]) | READ_ONLY  # noqa
-                )
+                if isinstance(widget, Radio):
+                    annot[NameObject(PARENT_KEY)][NameObject(FIELD_FLAG_KEY)] = NumberObject(   # noqa
+                        int(annot[NameObject(PARENT_KEY)].get(NameObject(FIELD_FLAG_KEY), 0)) | READ_ONLY  # noqa
+                    )
+                else:
+                    annot[NameObject(FIELD_FLAG_KEY)] = NumberObject(
+                        int(annot.get(NameObject(FIELD_FLAG_KEY), 0)) | READ_ONLY  # noqa
+                    )
 
     with BytesIO() as f:
         out.write(f)
