@@ -296,28 +296,6 @@ def get_character_x_paddings(widget: dict, widget_middleware: Text) -> List[floa
     return result
 
 
-def calculate_wrap_length(widget: dict, widget_middleware: Text, v: str) -> int:
-    """Increments the substring until reaching maximum horizontal width."""
-
-    width = abs(
-        float(widget[ANNOTATION_RECTANGLE_KEY][0])
-        - float(widget[ANNOTATION_RECTANGLE_KEY][2])
-    )
-    value = widget_middleware.value or ""
-    value = value.replace(NEW_LINE_SYMBOL, " ")
-
-    counter = 0
-    _width = 0
-    while _width <= width and counter < len(value):
-        counter += 1
-        _width = stringWidth(
-            v[:counter],
-            widget_middleware.font,
-            widget_middleware.font_size,
-        )
-    return counter - 1
-
-
 def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
     """Splits the paragraph field's text to a list of lines."""
 
