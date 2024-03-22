@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for generic template related processing."""
 
+from sys import maxsize
 from typing import Dict, List, Tuple, Union
 
 from pypdf import PdfReader
@@ -132,10 +133,10 @@ def update_text_field_attributes(
                 if widgets[key].font_color is None:
                     widgets[key].font_color = get_text_field_font_color(_widget)
                 if is_text_multiline(_widget) and widgets[key].text_wrap_length is None:
-                    widgets[key].text_wrap_length = get_paragraph_auto_wrap_length(
-                        _widget, widgets[key]
-                    )
                     widgets[key].text_lines = get_paragraph_lines(_widget, widgets[key])
+                    widgets[key].text_wrap_length = get_paragraph_auto_wrap_length(
+                        widgets[key]
+                    )
 
 
 def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
@@ -323,7 +324,6 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
     # pylint: disable=R0912
     lines = []
     result = []
-    text_wrap_length = widget_middleware.text_wrap_length
     value = widget_middleware.value or ""
     if widget_middleware.max_length is not None:
         value = value[: widget_middleware.max_length]
@@ -339,7 +339,9 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
         current_line = ""
         for each in characters:
             line_extended = f"{current_line} {each}" if current_line else each
-            if len(line_extended) <= text_wrap_length:
+            if stringWidth(line_extended,
+                           widget_middleware.font,
+                           widget_middleware.font_size) <= width:
                 current_line = line_extended
             else:
                 lines.append(current_line)
@@ -350,25 +352,25 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
             else current_line
         )
 
-    for line in lines:
-        while (
-            stringWidth(
-                line[:text_wrap_length],
-                widget_middleware.font,
-                widget_middleware.font_size,
-            )
-            > width
-        ):
-            text_wrap_length -= 1
-
     for each in lines:
-        while len(each) > text_wrap_length:
-            result.append(each[:text_wrap_length])
-            each = each[text_wrap_length:]
+        tracker = ""
+        for char in each:
+            check = tracker + char
+            if stringWidth(check,
+                           widget_middleware.font,
+                           widget_middleware.font_size) > width:
+                result.append(tracker)
+                tracker = char
+            else:
+                tracker = check
+
+        each = tracker
         if each:
             if (
                 result
-                and len(each) + 1 + len(result[-1]) <= text_wrap_length
+                and stringWidth(f"{each} {result[-1]}",
+                                widget_middleware.font,
+                                widget_middleware.font_size) <= width
                 and NEW_LINE_SYMBOL not in result[-1]
             ):
                 result[-1] = f"{result[-1]}{each} "
@@ -384,31 +386,12 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
     return result
 
 
-def get_paragraph_auto_wrap_length(widget: dict, widget_middleware: Text) -> int:
+def get_paragraph_auto_wrap_length(widget_middleware: Text) -> int:
     """Calculates the text wrap length of a paragraph field."""
 
-    value = widget_middleware.value or ""
-    value = value.replace(NEW_LINE_SYMBOL, " ")
-    width = abs(
-        float(widget[ANNOTATION_RECTANGLE_KEY][0])
-        - float(widget[ANNOTATION_RECTANGLE_KEY][2])
-    )
-    text_width = stringWidth(
-        value,
-        widget_middleware.font,
-        widget_middleware.font_size,
-    )
+    result = maxsize
+    for line in widget_middleware.text_lines:
+        if len(line) < result:
+            result = len(line)
 
-    lines = text_width / width
-    if lines > 1:
-        current_min = 0
-        while len(value) and current_min < len(value):
-            result = calculate_wrap_length(widget, widget_middleware, value)
-            value = value[result:]
-            if current_min == 0:
-                current_min = result
-            elif result < current_min:
-                current_min = result
-        return current_min
-
-    return len(value) + 1
+    return result
