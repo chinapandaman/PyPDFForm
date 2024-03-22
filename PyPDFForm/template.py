@@ -369,7 +369,6 @@ def get_paragraph_auto_wrap_length(widget_middleware: Text) -> int:
 
     result = maxsize
     for line in widget_middleware.text_lines:
-        if len(line) < result:
-            result = len(line)
+        result = min(result, len(line))
 
     return result
