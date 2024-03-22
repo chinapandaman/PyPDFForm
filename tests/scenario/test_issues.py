@@ -77,9 +77,7 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_text_overflow(
 
 
 def test_521(issue_pdf_directory, request):
-    expected_path = os.path.join(
-        issue_pdf_directory, "521-expected.pdf"
-    )
+    expected_path = os.path.join(issue_pdf_directory, "521-expected.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(os.path.join(issue_pdf_directory, "521.pdf")).fill(
             {

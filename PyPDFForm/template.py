@@ -317,9 +317,12 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
         current_line = ""
         for each in characters:
             line_extended = f"{current_line} {each}" if current_line else each
-            if stringWidth(line_extended,
-                           widget_middleware.font,
-                           widget_middleware.font_size) <= width:
+            if (
+                stringWidth(
+                    line_extended, widget_middleware.font, widget_middleware.font_size
+                )
+                <= width
+            ):
                 current_line = line_extended
             else:
                 lines.append(current_line)
@@ -334,9 +337,10 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
         tracker = ""
         for char in each:
             check = tracker + char
-            if stringWidth(check,
-                           widget_middleware.font,
-                           widget_middleware.font_size) > width:
+            if (
+                stringWidth(check, widget_middleware.font, widget_middleware.font_size)
+                > width
+            ):
                 result.append(tracker)
                 tracker = char
             else:
@@ -346,9 +350,12 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
         if each:
             if (
                 result
-                and stringWidth(f"{each} {result[-1]}",
-                                widget_middleware.font,
-                                widget_middleware.font_size) <= width
+                and stringWidth(
+                    f"{each} {result[-1]}",
+                    widget_middleware.font,
+                    widget_middleware.font_size,
+                )
+                <= width
                 and NEW_LINE_SYMBOL not in result[-1]
             ):
                 result[-1] = f"{result[-1]}{each} "
