@@ -81,30 +81,42 @@ BUTTON_STYLE_PATTERNS = [
 
 
 def simple_update_checkbox_value(annot: DictionaryObject) -> None:
+    """Patterns to update values for checkbox annotations."""
+
     annot[NameObject(AS)] = NameObject(Yes)
 
 
 def simple_update_radio_value(annot: DictionaryObject, widget: Radio) -> None:
+    """Patterns to update values for radio annotations."""
+
     annot[NameObject(AS)] = NameObject(f"/{widget.value}")
 
 
 def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
+    """Patterns to update values for dropdown annotations."""
+
     annot[NameObject(V)] = TextStringObject(widget.choices[widget.value])
     annot[NameObject(AP)] = TextStringObject(widget.choices[widget.value])
 
 
 def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
+    """Patterns to update values for text annotations."""
+
     annot[NameObject(V)] = TextStringObject(widget.value)
     annot[NameObject(AP)] = TextStringObject(widget.value)
 
 
 def simple_flatten_radio(annot: DictionaryObject) -> None:
+    """Patterns to flatten checkbox annotations."""
+
     annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(  # noqa
         int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY  # noqa
     )
 
 
 def simple_flatten_generic(annot: DictionaryObject) -> None:
+    """Patterns to flatten generic annotations."""
+
     annot[NameObject(Ff)] = NumberObject(
         int(annot.get(NameObject(Ff), 0)) | READ_ONLY  # noqa
     )
