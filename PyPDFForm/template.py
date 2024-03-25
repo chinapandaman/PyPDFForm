@@ -7,9 +7,8 @@ from typing import Dict, List, Tuple, Union
 from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .constants import (Rect, COMB, DEFAULT_FONT_SIZE,
-                        MULTILINE, NEW_LINE_SYMBOL, MaxLen,
-                        WIDGET_TYPES)
+from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
+                        WIDGET_TYPES, MaxLen, Rect)
 from .font import (auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
 from .middleware.checkbox import Checkbox
@@ -206,11 +205,7 @@ def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
 def get_text_field_max_length(widget: dict) -> Union[int, None]:
     """Returns the max length of the text field if presented or None."""
 
-    return (
-        int(widget[MaxLen]) or None
-        if MaxLen in widget
-        else None
-    )
+    return int(widget[MaxLen]) or None if MaxLen in widget else None
 
 
 def check_field_flag_bit(widget: dict, bit: int) -> bool:
@@ -269,10 +264,7 @@ def get_button_style(widget: dict) -> Union[str, None]:
 def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:
     """Returns rectangular width of each character for combed text fields."""
 
-    rect_width = abs(
-        float(widget[Rect][0])
-        - float(widget[Rect][2])
-    )
+    rect_width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
     return rect_width / widget_middleware.max_length
 
 
@@ -306,10 +298,7 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
     if widget_middleware.max_length is not None:
         value = value[: widget_middleware.max_length]
 
-    width = abs(
-        float(widget[Rect][0])
-        - float(widget[Rect][2])
-    )
+    width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
 
     split_by_new_line_symbol = value.split(NEW_LINE_SYMBOL)
     for line in split_by_new_line_symbol:

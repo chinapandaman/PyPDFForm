@@ -7,8 +7,8 @@ from typing import List, Tuple, Union
 from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .constants import (Rect,
-                        COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT)
+from .constants import (COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT,
+                        Rect)
 from .middleware.text import Text
 from .template import (get_char_rect_width, get_widget_alignment,
                        is_text_multiline)
@@ -23,14 +23,8 @@ def get_draw_checkbox_radio_coordinates(
     """Returns coordinates to draw at given a PDF form checkbox/radio widget."""
 
     string_height = widget_middleware.font_size * 96 / 72
-    width_mid_point = (
-        float(widget[Rect][0])
-        + float(widget[Rect][2])
-    ) / 2
-    height_mid_point = (
-        float(widget[Rect][1])
-        + float(widget[Rect][3])
-    ) / 2
+    width_mid_point = (float(widget[Rect][0]) + float(widget[Rect][2])) / 2
+    height_mid_point = (float(widget[Rect][1]) + float(widget[Rect][3])) / 2
 
     return (
         width_mid_point
@@ -53,14 +47,8 @@ def get_draw_sig_coordinates_resolutions(
 
     x = float(widget[Rect][0])
     y = float(widget[Rect][1])
-    width = abs(
-        float(widget[Rect][0])
-        - float(widget[Rect][2])
-    )
-    height = abs(
-        float(widget[Rect][1])
-        - float(widget[Rect][3])
-    )
+    width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
+    height = abs(float(widget[Rect][1]) - float(widget[Rect][3]))
 
     return x, y, width, height
 
@@ -97,10 +85,7 @@ def get_draw_text_coordinates(
     x = float(widget[Rect][0])
 
     if int(alignment) != 0:
-        width_mid_point = (
-            float(widget[Rect][0])
-            + float(widget[Rect][2])
-        ) / 2
+        width_mid_point = (float(widget[Rect][0]) + float(widget[Rect][2])) / 2
         string_width = stringWidth(
             text_value,
             widget_middleware.font,
@@ -128,10 +113,7 @@ def get_draw_text_coordinates(
                 ) / 2
 
     string_height = widget_middleware.font_size * 96 / 72
-    height_mid_point = (
-        float(widget[Rect][1])
-        + float(widget[Rect][3])
-    ) / 2
+    height_mid_point = (float(widget[Rect][1]) + float(widget[Rect][3])) / 2
     y = (height_mid_point - string_height / 2 + height_mid_point) / 2
     if is_text_multiline(widget):
         y = float(widget[Rect][3]) - string_height / 1.5
