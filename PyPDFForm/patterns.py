@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Contains patterns used for identifying properties of widgets."""
 
+from pypdf.generic import DictionaryObject, NameObject, TextStringObject, NumberObject
+
 from .constants import (ANNOTATION_FIELD_KEY, BUTTON_IDENTIFIER,
                         BUTTON_STYLE_IDENTIFIER, CHOICE_FIELD_IDENTIFIER,
                         CHOICES_IDENTIFIER, FIELD_FLAG_KEY, PARENT_KEY,
@@ -8,7 +10,8 @@ from .constants import (ANNOTATION_FIELD_KEY, BUTTON_IDENTIFIER,
                         SUBTYPE_KEY, TEXT_FIELD_ALIGNMENT_IDENTIFIER,
                         TEXT_FIELD_APPEARANCE_IDENTIFIER,
                         TEXT_FIELD_IDENTIFIER, WIDGET_SUBTYPE_KEY,
-                        WIDGET_TYPE_KEY)
+                        WIDGET_TYPE_KEY, CHECKBOX_SELECT, SELECTED_IDENTIFIER, TEXT_VALUE_IDENTIFIER,
+                        TEXT_VALUE_SHOW_UP_IDENTIFIER, READ_ONLY)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -81,3 +84,51 @@ TEXT_FIELD_APPEARANCE_PATTERNS = [
 BUTTON_STYLE_PATTERNS = [
     {BUTTON_IDENTIFIER: {BUTTON_STYLE_IDENTIFIER: True}},
 ]
+
+
+def simple_update_checkbox_value(annot: DictionaryObject) -> None:
+    annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(CHECKBOX_SELECT)
+
+
+def simple_update_radio_value(annot: DictionaryObject, widget: Radio) -> None:
+    annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(
+        f"/{widget.value}"
+    )
+
+
+def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
+    annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(
+        widget.choices[widget.value]
+    )
+    annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(
+        widget.choices[widget.value]
+    )
+
+
+def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
+    annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(
+        widget.value
+    )
+    annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(
+        widget.value
+    )
+
+
+def simple_flatten_radio(annot: DictionaryObject) -> None:
+    annot[NameObject(PARENT_KEY)][  # noqa
+        NameObject(FIELD_FLAG_KEY)
+    ] = NumberObject(
+        int(
+            annot[NameObject(PARENT_KEY)].get(  # noqa
+                NameObject(FIELD_FLAG_KEY), 0
+            )
+        )
+        | READ_ONLY
+    )
+
+
+def simple_flatten_generic(annot: DictionaryObject) -> None:
+    annot[NameObject(FIELD_FLAG_KEY)] = NumberObject(
+        int(annot.get(NameObject(FIELD_FLAG_KEY), 0))
+        | READ_ONLY  # noqa
+    )
