@@ -5,13 +5,9 @@ from io import BytesIO
 from typing import Dict, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
-                           TextStringObject)
+from pypdf.generic import DictionaryObject
 
-from .constants import (ANNOTATION_KEY, CHECKBOX_SELECT, FIELD_FLAG_KEY,
-                        PARENT_KEY, READ_ONLY, SELECTED_IDENTIFIER,
-                        TEXT_VALUE_IDENTIFIER, TEXT_VALUE_SHOW_UP_IDENTIFIER,
-                        WIDGET_TYPES)
+from .constants import WIDGET_TYPES, Annots
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -23,6 +19,10 @@ from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
+from .patterns import (simple_flatten_generic, simple_flatten_radio,
+                       simple_update_checkbox_value,
+                       simple_update_dropdown_value, simple_update_radio_value,
+                       simple_update_text_value)
 from .template import get_widget_key, get_widgets_by_page
 from .utils import checkbox_radio_to_draw, stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
@@ -143,7 +143,7 @@ def simple_fill(
     radio_button_tracker = {}
 
     for page in out.pages:
-        for annot in page.get(ANNOTATION_KEY, []):  # noqa
+        for annot in page.get(Annots, []):  # noqa
             annot = cast(DictionaryObject, annot.get_object())
             key = get_widget_key(annot.get_object())
 
@@ -152,47 +152,23 @@ def simple_fill(
                 continue
 
             if type(widget) is Checkbox and widget.value is True:
-                annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(CHECKBOX_SELECT)
+                simple_update_checkbox_value(annot)
             elif isinstance(widget, Radio):
                 if key not in radio_button_tracker:
                     radio_button_tracker[key] = 0
                 radio_button_tracker[key] += 1
                 if widget.value == radio_button_tracker[key] - 1:
-                    annot[NameObject(SELECTED_IDENTIFIER)] = NameObject(
-                        f"/{widget.value}"
-                    )
+                    simple_update_radio_value(annot, widget)
             elif isinstance(widget, Dropdown) and widget.value is not None:
-                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(
-                    widget.choices[widget.value]
-                )
-                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(
-                    widget.choices[widget.value]
-                )
+                simple_update_dropdown_value(annot, widget)
             elif isinstance(widget, Text) and widget.value:
-                annot[NameObject(TEXT_VALUE_IDENTIFIER)] = TextStringObject(
-                    widget.value
-                )
-                annot[NameObject(TEXT_VALUE_SHOW_UP_IDENTIFIER)] = TextStringObject(
-                    widget.value
-                )
+                simple_update_text_value(annot, widget)
 
             if flatten:
                 if isinstance(widget, Radio):
-                    annot[NameObject(PARENT_KEY)][  # noqa
-                        NameObject(FIELD_FLAG_KEY)
-                    ] = NumberObject(
-                        int(
-                            annot[NameObject(PARENT_KEY)].get(  # noqa
-                                NameObject(FIELD_FLAG_KEY), 0
-                            )
-                        )
-                        | READ_ONLY
-                    )
+                    simple_flatten_radio(annot)
                 else:
-                    annot[NameObject(FIELD_FLAG_KEY)] = NumberObject(
-                        int(annot.get(NameObject(FIELD_FLAG_KEY), 0))
-                        | READ_ONLY  # noqa
-                    )
+                    simple_flatten_generic(annot)
 
     with BytesIO() as f:
         out.write(f)

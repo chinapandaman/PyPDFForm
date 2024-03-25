@@ -10,7 +10,7 @@ from reportlab.pdfbase.acroform import AcroForm
 from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
-from .constants import (ANNOTATION_RECTANGLE_KEY, DEFAULT_FONT,
+from .constants import (Rect, DEFAULT_FONT,
                         FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER)
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .utils import traverse_pattern
@@ -83,8 +83,8 @@ def text_field_font_size(widget: dict) -> Union[float, int]:
     """
 
     height = abs(
-        float(widget[ANNOTATION_RECTANGLE_KEY][1])
-        - float(widget[ANNOTATION_RECTANGLE_KEY][3])
+        float(widget[Rect][1])
+        - float(widget[Rect][3])
     )
 
     return height * 2 / 3
@@ -97,11 +97,11 @@ def checkbox_radio_font_size(widget: dict) -> Union[float, int]:
     """
 
     area = abs(
-        float(widget[ANNOTATION_RECTANGLE_KEY][0])
-        - float(widget[ANNOTATION_RECTANGLE_KEY][2])
+        float(widget[Rect][0])
+        - float(widget[Rect][2])
     ) * abs(
-        float(widget[ANNOTATION_RECTANGLE_KEY][1])
-        - float(widget[ANNOTATION_RECTANGLE_KEY][3])
+        float(widget[Rect][1])
+        - float(widget[Rect][3])
     )
 
     return sqrt(area) * 72 / 96
