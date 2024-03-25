@@ -7,7 +7,7 @@ from typing import Dict, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
-from .constants import ANNOTATION_KEY, WIDGET_TYPES
+from .constants import WIDGET_TYPES, Annots
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_sig_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -19,9 +19,10 @@ from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .patterns import (simple_update_checkbox_value, simple_update_radio_value,
-                       simple_update_dropdown_value, simple_update_text_value,
-                       simple_flatten_radio, simple_flatten_generic)
+from .patterns import (simple_flatten_generic, simple_flatten_radio,
+                       simple_update_checkbox_value,
+                       simple_update_dropdown_value, simple_update_radio_value,
+                       simple_update_text_value)
 from .template import get_widget_key, get_widgets_by_page
 from .utils import checkbox_radio_to_draw, stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
@@ -142,7 +143,7 @@ def simple_fill(
     radio_button_tracker = {}
 
     for page in out.pages:
-        for annot in page.get(ANNOTATION_KEY, []):  # noqa
+        for annot in page.get(Annots, []):  # noqa
             annot = cast(DictionaryObject, annot.get_object())
             key = get_widget_key(annot.get_object())
 

@@ -26,27 +26,27 @@ WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown, Signature]
 
 DEPRECATION_NOTICE = "{} will be deprecated soon. Use {} instead."
 
-ANNOTATION_KEY = "/Annots"
-ANNOTATION_FIELD_KEY = "/T"
-ANNOTATION_RECTANGLE_KEY = "/Rect"
-SUBTYPE_KEY = "/Subtype"
-WIDGET_SUBTYPE_KEY = "/Widget"
-WIDGET_TYPE_KEY = "/FT"
-PARENT_KEY = "/Parent"
-FIELD_FLAG_KEY = "/Ff"
-TEXT_FIELD_IDENTIFIER = "/Tx"
-TEXT_VALUE_IDENTIFIER = "/V"
-TEXT_VALUE_SHOW_UP_IDENTIFIER = "/AP"
-SIGNATURE_FIELD_IDENTIFIER = "/Sig"
-TEXT_FIELD_APPEARANCE_IDENTIFIER = "/DA"
-SELECTABLE_IDENTIFIER = "/Btn"
-TEXT_FIELD_MAX_LENGTH_KEY = "/MaxLen"
-TEXT_FIELD_ALIGNMENT_IDENTIFIER = "/Q"
-CHOICE_FIELD_IDENTIFIER = "/Ch"
-CHOICES_IDENTIFIER = "/Opt"
-BUTTON_IDENTIFIER = "/MK"
-BUTTON_STYLE_IDENTIFIER = "/CA"
-SELECTED_IDENTIFIER = "/AS"
+Annots = "/Annots"
+T = "/T"
+Rect = "/Rect"
+Subtype = "/Subtype"
+Widget = "/Widget"
+FT = "/FT"
+Parent = "/Parent"
+Ff = "/Ff"
+Tx = "/Tx"
+V = "/V"
+AP = "/AP"
+Sig = "/Sig"
+DA = "/DA"
+Btn = "/Btn"
+MaxLen = "/MaxLen"
+Q = "/Q"
+Ch = "/Ch"
+Opt = "/Opt"
+MK = "/MK"
+CA = "/CA"
+AS = "/AS"
 
 # Field flag bits
 READ_ONLY = 1 << 0
@@ -70,6 +70,6 @@ BUTTON_STYLES = {
     "l": "\u25CF",  # circle
 }
 
-CHECKBOX_SELECT = "/Yes"
+Yes = "/Yes"
 
 COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO = DEFAULT_FONT_SIZE / 100
