@@ -4,8 +4,8 @@
 from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
                            TextStringObject)
 
-from .constants import (AP, AS, CA, DA, FT, MK, READ_ONLY, Btn, Ch, Ff, Opt,
-                        Parent, Q, Sig, Subtype, T, Tx, V, Widget, Yes)
+from .constants import (AP, AS, CA, D, DA, FT, MK, READ_ONLY, Btn, Ch, Ff, Opt,
+                        Parent, Q, Sig, Subtype, T, Tx, V, Widget, Yes, Off)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -89,7 +89,13 @@ def simple_update_checkbox_value(annot: DictionaryObject) -> None:
 def simple_update_radio_value(annot: DictionaryObject, widget: Radio) -> None:
     """Patterns to update values for radio annotations."""
 
-    annot[NameObject(AS)] = NameObject(f"/{widget.value}")
+    if AP in annot and D in annot[AP]:
+        for each in annot[AP][D]:   # noqa
+            if str(each) != Off:
+                annot[NameObject(AS)] = NameObject(each)
+                break
+    else:
+        annot[NameObject(AS)] = NameObject(f"/{widget.value}")
 
 
 def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
