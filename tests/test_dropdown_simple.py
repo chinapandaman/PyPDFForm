@@ -73,7 +73,7 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
         assert obj.stream == expected
 
 
-def test_dropdown_two_simple(sample_template_with_dropdown, pdf_samples, request):
+def test_dropdown_two_flatten(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "simple", "dropdown", "dropdown_two_simple.pdf"
     )

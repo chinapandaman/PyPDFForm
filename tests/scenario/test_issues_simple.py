@@ -133,3 +133,51 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_dir
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
+
+
+def test_encrypted_edit_pdf_form(issue_pdf_directory, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "issues", "437_expected.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(issue_pdf_directory, "437.pdf")).fill(
+            {'AlienNumber[0]': 'AlienNumber[0]',
+             'S1_DateOfBirth[0]': 'S1_DateOfBirth[0]',
+             'S1_FamilyName[0]': 'S1_FamilyName[0]',
+             'S1_GivenName[0]': 'S1_GivenName[0]',
+             'S1_MiddleName[0]': 'S1_MiddleName[0]',
+             'S2A_AptSteFlrNumber[0]': 'S2A_AptSteFlrNumber[0]',
+             'S2A_CityOrTown[0]': 'S2A_CityOrTown[0]',
+             'S2A_State[0]': 0,
+             'S2A_StreetNumberName[0]': 'S2A_StreetNumberName[0]',
+             'S2A_Unit[0]': True,
+             'S2A_Unit[1]': True,
+             'S2A_Unit[2]': True,
+             'S2A_ZipCode[0]': 'S2A_ZipCode[0]',
+             'S2B_AptSteFlrNumber[0]': 'S2B_AptSteFlrNumber[0]',
+             'S2B_CityOrTown[0]': 'S2B_CityOrTown[0]',
+             'S2B_State[0]': 0,
+             'S2B_StreetNumberName[0]': 'S2B_StreetNumberName[0]',
+             'S2B_ZipCode[0]': 'S2B_ZipCode[0]',
+             'S2B__Unit[0]': True,
+             'S2B__Unit[1]': True,
+             'S2B__Unit[2]': True,
+             'S2C_AptSteFlrNumber[0]': 'S2C_AptSteFlrNumber[0]',
+             'S2C_CityOrTown[0]': 'S2C_CityOrTown[0]',
+             'S2C_State[0]': 0,
+             'S2C_StreetNumberName[0]': 'S2C_StreetNumberName[0]',
+             'S2C_Unit[0]': True,
+             'S2C_Unit[1]': True,
+             'S2C_Unit[2]': True,
+             'S2C_ZipCode[0]': 'S2C_ZipCode[0]',
+             'S3_DateofSignature[0]': 'S3_DateofSignature[0]',
+             'S3_SignatureApplicant[0]': 'S3_SignatureApplicant[0]'}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
