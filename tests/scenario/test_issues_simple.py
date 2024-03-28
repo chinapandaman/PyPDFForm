@@ -6,6 +6,26 @@ import os
 from PyPDFForm import FormWrapper
 
 
+def test_pdf_form_with_pages_without_widgets(
+    issue_pdf_directory, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "issues", "PPF-246-expected.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-246.pdf")).fill(
+            {"QCredit": "5000.63"}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
+
+
 def test_pdf_form_with_central_aligned_text_fields(
     issue_pdf_directory, pdf_samples, request
 ):
