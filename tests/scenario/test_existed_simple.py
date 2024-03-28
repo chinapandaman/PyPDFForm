@@ -7,10 +7,16 @@ from PyPDFForm import FormWrapper
 
 def test_illinois_gun_bill_of_sale(existed_pdf_directory, pdf_samples, request):
     expected_path = os.path.join(
-        pdf_samples, "simple", "scenario", "existed", "illinois-gun-bill-of-sale_expected.pdf"
+        pdf_samples,
+        "simple",
+        "scenario",
+        "existed",
+        "illinois-gun-bill-of-sale_expected.pdf",
     )
     with open(expected_path, "rb+") as f:
-        obj = FormWrapper(os.path.join(existed_pdf_directory, "illinois-gun-bill-of-sale.pdf")).fill(
+        obj = FormWrapper(
+            os.path.join(existed_pdf_directory, "illinois-gun-bill-of-sale.pdf")
+        ).fill(
             {
                 "Date": "01-01",
                 "20": "22",
