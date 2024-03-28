@@ -48,7 +48,6 @@ Opt = "/Opt"
 MK = "/MK"
 CA = "/CA"
 AS = "/AS"
-Yes = "/Yes"
 Off = "/Off"
 
 # Field flag bits
