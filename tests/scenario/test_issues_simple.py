@@ -4,6 +4,28 @@
 import os
 
 from PyPDFForm import FormWrapper
+from PyPDFForm.constants import V
+from PyPDFForm.template import get_widgets_by_page, get_widget_key
+
+
+def test_pdf_form_with_pages_without_widgets(
+    issue_pdf_directory, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "issues", "PPF-246-expected.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-246.pdf")).fill(
+            {"QCredit": "5000.63"}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
 
 
 def test_pdf_form_with_central_aligned_text_fields(
@@ -28,6 +50,26 @@ def test_pdf_form_with_central_aligned_text_fields(
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
+
+
+def test_pdf_form_with_paragraph_fields_new_line_symbol_text(
+    issue_pdf_directory, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "issues", "PPF-415-expected.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
+            {"Address": "Mr John Smith\n132, My Street\nKingston, New York 12401"}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        for _, widgets in get_widgets_by_page(obj.read()).items():
+            for widget in widgets:
+                if get_widget_key(widget) == 'Address':
+                    assert widget[V] == "Mr John Smith\n132, My Street\nKingston, New York 12401"
 
 
 def test_pdf_form_with_paragraph_fields_new_line_symbol_text_overflow(
@@ -86,6 +128,72 @@ def test_521_flattened(issue_pdf_directory, pdf_samples, request):
                 "Text3": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",  # noqa
             },
             flatten=True,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
+
+
+def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_directory, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "issues", "PPF-415-3-expected.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
+            {"Address": "J Smith\n132 A St\nNYC, NY 12401"}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        for _, widgets in get_widgets_by_page(obj.read()).items():
+            for widget in widgets:
+                if get_widget_key(widget) == 'Address':
+                    assert widget[V] == "J Smith\n132 A St\nNYC, NY 12401"
+
+
+def test_encrypted_edit_pdf_form(issue_pdf_directory, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "issues", "437_expected.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(issue_pdf_directory, "437.pdf")).fill(
+            {'AlienNumber[0]': 'AlienNumber[0]',
+             'S1_DateOfBirth[0]': 'S1_DateOfBirth[0]',
+             'S1_FamilyName[0]': 'S1_FamilyName[0]',
+             'S1_GivenName[0]': 'S1_GivenName[0]',
+             'S1_MiddleName[0]': 'S1_MiddleName[0]',
+             'S2A_AptSteFlrNumber[0]': 'S2A_AptSteFlrNumber[0]',
+             'S2A_CityOrTown[0]': 'S2A_CityOrTown[0]',
+             'S2A_State[0]': 0,
+             'S2A_StreetNumberName[0]': 'S2A_StreetNumberName[0]',
+             'S2A_Unit[0]': True,
+             'S2A_Unit[1]': True,
+             'S2A_Unit[2]': True,
+             'S2A_ZipCode[0]': 'S2A_ZipCode[0]',
+             'S2B_AptSteFlrNumber[0]': 'S2B_AptSteFlrNumber[0]',
+             'S2B_CityOrTown[0]': 'S2B_CityOrTown[0]',
+             'S2B_State[0]': 0,
+             'S2B_StreetNumberName[0]': 'S2B_StreetNumberName[0]',
+             'S2B_ZipCode[0]': 'S2B_ZipCode[0]',
+             'S2B__Unit[0]': True,
+             'S2B__Unit[1]': True,
+             'S2B__Unit[2]': True,
+             'S2C_AptSteFlrNumber[0]': 'S2C_AptSteFlrNumber[0]',
+             'S2C_CityOrTown[0]': 'S2C_CityOrTown[0]',
+             'S2C_State[0]': 0,
+             'S2C_StreetNumberName[0]': 'S2C_StreetNumberName[0]',
+             'S2C_Unit[0]': True,
+             'S2C_Unit[1]': True,
+             'S2C_Unit[2]': True,
+             'S2C_ZipCode[0]': 'S2C_ZipCode[0]',
+             'S3_DateofSignature[0]': 'S3_DateofSignature[0]',
+             'S3_SignatureApplicant[0]': 'S3_SignatureApplicant[0]'}
         )
 
         request.config.results["expected_path"] = expected_path

@@ -108,8 +108,14 @@ def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> N
 def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
     """Patterns to update values for text annotations."""
 
-    annot[NameObject(V)] = TextStringObject(widget.value)
-    annot[NameObject(AP)] = TextStringObject(widget.value)
+    if Parent in annot and T in annot[Parent] and T not in annot:
+        annot[NameObject(Parent)][NameObject(V)] = (    # noqa
+            TextStringObject(widget.value))
+        annot[NameObject(Parent)][NameObject(AP)] = (   # noqa
+            TextStringObject(widget.value))
+    else:
+        annot[NameObject(V)] = TextStringObject(widget.value)
+        annot[NameObject(AP)] = TextStringObject(widget.value)
 
 
 def simple_flatten_radio(annot: DictionaryObject) -> None:
