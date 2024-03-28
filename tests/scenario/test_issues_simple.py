@@ -5,12 +5,10 @@ import os
 
 from PyPDFForm import FormWrapper
 from PyPDFForm.constants import V
-from PyPDFForm.template import get_widgets_by_page, get_widget_key
+from PyPDFForm.template import get_widget_key, get_widgets_by_page
 
 
-def test_pdf_form_with_pages_without_widgets(
-    issue_pdf_directory, pdf_samples, request
-):
+def test_pdf_form_with_pages_without_widgets(issue_pdf_directory, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "simple", "scenario", "issues", "PPF-246-expected.pdf"
     )
@@ -68,8 +66,11 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_text(
 
         for _, widgets in get_widgets_by_page(obj.read()).items():
             for widget in widgets:
-                if get_widget_key(widget) == 'Address':
-                    assert widget[V] == "Mr John Smith\n132, My Street\nKingston, New York 12401"
+                if get_widget_key(widget) == "Address":
+                    assert (
+                        widget[V]
+                        == "Mr John Smith\n132, My Street\nKingston, New York 12401"
+                    )
 
 
 def test_pdf_form_with_paragraph_fields_new_line_symbol_text_overflow(
@@ -139,7 +140,9 @@ def test_521_flattened(issue_pdf_directory, pdf_samples, request):
         assert obj.stream == expected
 
 
-def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_directory, pdf_samples, request):
+def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(
+    issue_pdf_directory, pdf_samples, request
+):
     expected_path = os.path.join(
         pdf_samples, "simple", "scenario", "issues", "PPF-415-3-expected.pdf"
     )
@@ -153,7 +156,7 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_dir
 
         for _, widgets in get_widgets_by_page(obj.read()).items():
             for widget in widgets:
-                if get_widget_key(widget) == 'Address':
+                if get_widget_key(widget) == "Address":
                     assert widget[V] == "J Smith\n132 A St\nNYC, NY 12401"
 
 
@@ -163,37 +166,39 @@ def test_encrypted_edit_pdf_form(issue_pdf_directory, pdf_samples, request):
     )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(issue_pdf_directory, "437.pdf")).fill(
-            {'AlienNumber[0]': 'AlienNumber[0]',
-             'S1_DateOfBirth[0]': 'S1_DateOfBirth[0]',
-             'S1_FamilyName[0]': 'S1_FamilyName[0]',
-             'S1_GivenName[0]': 'S1_GivenName[0]',
-             'S1_MiddleName[0]': 'S1_MiddleName[0]',
-             'S2A_AptSteFlrNumber[0]': 'S2A_AptSteFlrNumber[0]',
-             'S2A_CityOrTown[0]': 'S2A_CityOrTown[0]',
-             'S2A_State[0]': 0,
-             'S2A_StreetNumberName[0]': 'S2A_StreetNumberName[0]',
-             'S2A_Unit[0]': True,
-             'S2A_Unit[1]': True,
-             'S2A_Unit[2]': True,
-             'S2A_ZipCode[0]': 'S2A_ZipCode[0]',
-             'S2B_AptSteFlrNumber[0]': 'S2B_AptSteFlrNumber[0]',
-             'S2B_CityOrTown[0]': 'S2B_CityOrTown[0]',
-             'S2B_State[0]': 0,
-             'S2B_StreetNumberName[0]': 'S2B_StreetNumberName[0]',
-             'S2B_ZipCode[0]': 'S2B_ZipCode[0]',
-             'S2B__Unit[0]': True,
-             'S2B__Unit[1]': True,
-             'S2B__Unit[2]': True,
-             'S2C_AptSteFlrNumber[0]': 'S2C_AptSteFlrNumber[0]',
-             'S2C_CityOrTown[0]': 'S2C_CityOrTown[0]',
-             'S2C_State[0]': 0,
-             'S2C_StreetNumberName[0]': 'S2C_StreetNumberName[0]',
-             'S2C_Unit[0]': True,
-             'S2C_Unit[1]': True,
-             'S2C_Unit[2]': True,
-             'S2C_ZipCode[0]': 'S2C_ZipCode[0]',
-             'S3_DateofSignature[0]': 'S3_DateofSignature[0]',
-             'S3_SignatureApplicant[0]': 'S3_SignatureApplicant[0]'}
+            {
+                "AlienNumber[0]": "AlienNumber[0]",
+                "S1_DateOfBirth[0]": "S1_DateOfBirth[0]",
+                "S1_FamilyName[0]": "S1_FamilyName[0]",
+                "S1_GivenName[0]": "S1_GivenName[0]",
+                "S1_MiddleName[0]": "S1_MiddleName[0]",
+                "S2A_AptSteFlrNumber[0]": "S2A_AptSteFlrNumber[0]",
+                "S2A_CityOrTown[0]": "S2A_CityOrTown[0]",
+                "S2A_State[0]": 0,
+                "S2A_StreetNumberName[0]": "S2A_StreetNumberName[0]",
+                "S2A_Unit[0]": True,
+                "S2A_Unit[1]": True,
+                "S2A_Unit[2]": True,
+                "S2A_ZipCode[0]": "S2A_ZipCode[0]",
+                "S2B_AptSteFlrNumber[0]": "S2B_AptSteFlrNumber[0]",
+                "S2B_CityOrTown[0]": "S2B_CityOrTown[0]",
+                "S2B_State[0]": 0,
+                "S2B_StreetNumberName[0]": "S2B_StreetNumberName[0]",
+                "S2B_ZipCode[0]": "S2B_ZipCode[0]",
+                "S2B__Unit[0]": True,
+                "S2B__Unit[1]": True,
+                "S2B__Unit[2]": True,
+                "S2C_AptSteFlrNumber[0]": "S2C_AptSteFlrNumber[0]",
+                "S2C_CityOrTown[0]": "S2C_CityOrTown[0]",
+                "S2C_State[0]": 0,
+                "S2C_StreetNumberName[0]": "S2C_StreetNumberName[0]",
+                "S2C_Unit[0]": True,
+                "S2C_Unit[1]": True,
+                "S2C_Unit[2]": True,
+                "S2C_ZipCode[0]": "S2C_ZipCode[0]",
+                "S3_DateofSignature[0]": "S3_DateofSignature[0]",
+                "S3_SignatureApplicant[0]": "S3_SignatureApplicant[0]",
+            }
         )
 
         request.config.results["expected_path"] = expected_path
