@@ -30,6 +30,26 @@ def test_pdf_form_with_central_aligned_text_fields(
         assert obj.stream == expected
 
 
+def test_pdf_form_with_paragraph_fields_new_line_symbol_text(
+    issue_pdf_directory, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "issues", "PPF-415-expected.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
+            {"Address": "Mr John Smith\n132, My Street\nKingston, New York 12401"}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
+
+
 def test_pdf_form_with_paragraph_fields_new_line_symbol_text_overflow(
     issue_pdf_directory, pdf_samples, request
 ):
