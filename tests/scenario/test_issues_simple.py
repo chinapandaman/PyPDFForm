@@ -4,6 +4,8 @@
 import os
 
 from PyPDFForm import FormWrapper
+from PyPDFForm.constants import V
+from PyPDFForm.template import get_widgets_by_page, get_widget_key
 
 
 def test_pdf_form_with_pages_without_widgets(
@@ -64,11 +66,10 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_text(
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
 
-        expected = f.read()
-
-        if os.name == "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.stream == expected
+        for _, widgets in get_widgets_by_page(obj.read()).items():
+            for widget in widgets:
+                if get_widget_key(widget) == 'Address':
+                    assert widget[V] == "Mr John Smith\n132, My Street\nKingston, New York 12401"
 
 
 def test_pdf_form_with_paragraph_fields_new_line_symbol_text_overflow(
@@ -150,11 +151,10 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_dir
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
 
-        expected = f.read()
-
-        if os.name == "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.stream == expected
+        for _, widgets in get_widgets_by_page(obj.read()).items():
+            for widget in widgets:
+                if get_widget_key(widget) == 'Address':
+                    assert widget[V] == "J Smith\n132 A St\nNYC, NY 12401"
 
 
 def test_encrypted_edit_pdf_form(issue_pdf_directory, pdf_samples, request):
