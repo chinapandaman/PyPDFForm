@@ -37,6 +37,7 @@ Ff = "/Ff"
 Tx = "/Tx"
 V = "/V"
 AP = "/AP"
+D = "/D"
 Sig = "/Sig"
 DA = "/DA"
 Btn = "/Btn"
@@ -47,6 +48,8 @@ Opt = "/Opt"
 MK = "/MK"
 CA = "/CA"
 AS = "/AS"
+Yes = "/Yes"
+Off = "/Off"
 
 # Field flag bits
 READ_ONLY = 1 << 0
@@ -69,7 +72,5 @@ BUTTON_STYLES = {
     "5": "\u00D7",  # cross
     "l": "\u25CF",  # circle
 }
-
-Yes = "/Yes"
 
 COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO = DEFAULT_FONT_SIZE / 100

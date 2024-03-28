@@ -158,7 +158,7 @@ def simple_fill(
                     radio_button_tracker[key] = 0
                 radio_button_tracker[key] += 1
                 if widget.value == radio_button_tracker[key] - 1:
-                    simple_update_radio_value(annot, widget)
+                    simple_update_radio_value(annot)
             elif isinstance(widget, Dropdown) and widget.value is not None:
                 simple_update_dropdown_value(annot, widget)
             elif isinstance(widget, Text) and widget.value:
