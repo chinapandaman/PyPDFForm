@@ -86,16 +86,13 @@ def simple_update_checkbox_value(annot: DictionaryObject) -> None:
     annot[NameObject(AS)] = NameObject(Yes)
 
 
-def simple_update_radio_value(annot: DictionaryObject, widget: Radio) -> None:
+def simple_update_radio_value(annot: DictionaryObject) -> None:
     """Patterns to update values for radio annotations."""
 
-    if AP in annot and D in annot[AP]:
-        for each in annot[AP][D]:   # noqa
-            if str(each) != Off:
-                annot[NameObject(AS)] = NameObject(each)
-                break
-    else:
-        annot[NameObject(AS)] = NameObject(f"/{widget.value}")
+    for each in annot[AP][D]:   # noqa
+        if str(each) != Off:
+            annot[NameObject(AS)] = NameObject(each)
+            break
 
 
 def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
