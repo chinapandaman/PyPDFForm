@@ -42,9 +42,7 @@ def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream, request
 def test_fill_sejda_and_read(pdf_samples, sejda_template, sejda_data, request):
     expected_path = os.path.join(pdf_samples, "simple", "sample_filled_sejda.pdf")
     with open(expected_path, "rb+") as f:
-        obj = FormWrapper(sejda_template).fill(
-            sejda_data
-        )
+        obj = FormWrapper(sejda_template).fill(sejda_data)
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()

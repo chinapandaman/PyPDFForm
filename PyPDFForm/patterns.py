@@ -118,9 +118,7 @@ def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
         annot[NameObject(Parent)][NameObject(V)] = TextStringObject(  # noqa
             widget.value
         )
-        annot[NameObject(AP)] = TextStringObject(
-            widget.value
-        )
+        annot[NameObject(AP)] = TextStringObject(widget.value)
     else:
         annot[NameObject(V)] = TextStringObject(widget.value)
         annot[NameObject(AP)] = TextStringObject(widget.value)
@@ -138,7 +136,7 @@ def simple_flatten_generic(annot: DictionaryObject) -> None:
     """Patterns to flatten generic annotations."""
 
     if Parent in annot and Ff not in annot:
-        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(   # noqa
+        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(  # noqa
             int(annot.get(NameObject(Ff), 0)) | READ_ONLY  # noqa
         )
     else:

@@ -50,9 +50,7 @@ def test_pdf_form_with_central_aligned_text_fields(
         assert obj.stream == expected
 
 
-def test_pdf_form_with_paragraph_fields_new_line_symbol_text(
-    issue_pdf_directory
-):
+def test_pdf_form_with_paragraph_fields_new_line_symbol_text(issue_pdf_directory):
     obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
         {"Address": "Mr John Smith\n132, My Street\nKingston, New York 12401"}
     )
@@ -133,9 +131,7 @@ def test_521_flattened(issue_pdf_directory, pdf_samples, request):
         assert obj.stream == expected
 
 
-def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(
-    issue_pdf_directory
-):
+def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_directory):
     obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
         {"Address": "J Smith\n132 A St\nNYC, NY 12401"}
     )
