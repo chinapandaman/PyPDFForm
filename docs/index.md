@@ -16,7 +16,7 @@ It also supports other common utilities such as extracting pages and merging mul
 * [Prepare a PDF form](prepare.md)
 * [Inspect a PDF form](inspect.md)
 * [Fill a PDF form](fill.md)
-* [Fill a PDF form in place (beta)](simple_fill.md)
+* [Fill a PDF form in place](simple_fill.md)
 * [Change text field styles](style.md)
 * [Change checkbox and radio button styles](button_style.md)
 * [Draw stuffs](draw.md)

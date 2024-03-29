@@ -1,7 +1,4 @@
-# Fill a PDF form in place (beta)
-
-**NOTE:** This page contains beta features, meaning it's known that these features do not support some PDF forms but 
-currently there are no plans and/or solutions to fix them.
+# Fill a PDF form in place
 
 The `FormWrapper` class allows you to fill a PDF form in place as if you were filling it manually.
 
