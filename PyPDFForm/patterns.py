@@ -101,18 +101,24 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
 def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
     """Patterns to update values for dropdown annotations."""
 
-    annot[NameObject(V)] = TextStringObject(widget.choices[widget.value])
-    annot[NameObject(AP)] = TextStringObject(widget.choices[widget.value])
+    if Parent in annot and T not in annot:
+        annot[NameObject(Parent)][NameObject(V)] = TextStringObject(  # noqa
+            widget.choices[widget.value]
+        )
+        annot[NameObject(AP)] = TextStringObject(widget.choices[widget.value])
+    else:
+        annot[NameObject(V)] = TextStringObject(widget.choices[widget.value])
+        annot[NameObject(AP)] = TextStringObject(widget.choices[widget.value])
 
 
 def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
     """Patterns to update values for text annotations."""
 
-    if Parent in annot and T in annot[Parent] and T not in annot:
+    if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(V)] = TextStringObject(  # noqa
             widget.value
         )
-        annot[NameObject(Parent)][NameObject(AP)] = TextStringObject(  # noqa
+        annot[NameObject(AP)] = TextStringObject(
             widget.value
         )
     else:
@@ -131,6 +137,11 @@ def simple_flatten_radio(annot: DictionaryObject) -> None:
 def simple_flatten_generic(annot: DictionaryObject) -> None:
     """Patterns to flatten generic annotations."""
 
-    annot[NameObject(Ff)] = NumberObject(
-        int(annot.get(NameObject(Ff), 0)) | READ_ONLY  # noqa
-    )
+    if Parent in annot and Ff not in annot:
+        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(   # noqa
+            int(annot.get(NameObject(Ff), 0)) | READ_ONLY  # noqa
+        )
+    else:
+        annot[NameObject(Ff)] = NumberObject(
+            int(annot.get(NameObject(Ff), 0)) | READ_ONLY  # noqa
+        )
