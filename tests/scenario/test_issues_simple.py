@@ -51,17 +51,11 @@ def test_pdf_form_with_central_aligned_text_fields(
 
 
 def test_pdf_form_with_paragraph_fields_new_line_symbol_text(
-    issue_pdf_directory, pdf_samples, request
+    issue_pdf_directory
 ):
-    expected_path = os.path.join(
-        pdf_samples, "simple", "scenario", "issues", "PPF-415-expected.pdf"
-    )
     obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
         {"Address": "Mr John Smith\n132, My Street\nKingston, New York 12401"}
     )
-
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
 
     for _, widgets in get_widgets_by_page(obj.read()).items():
         for widget in widgets:
@@ -140,17 +134,11 @@ def test_521_flattened(issue_pdf_directory, pdf_samples, request):
 
 
 def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(
-    issue_pdf_directory, pdf_samples, request
+    issue_pdf_directory
 ):
-    expected_path = os.path.join(
-        pdf_samples, "simple", "scenario", "issues", "PPF-415-3-expected.pdf"
-    )
     obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
         {"Address": "J Smith\n132 A St\nNYC, NY 12401"}
     )
-
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
 
     for _, widgets in get_widgets_by_page(obj.read()).items():
         for widget in widgets:
