@@ -67,8 +67,8 @@ The `button_style` parameter currently supports three options: `check`, `circle`
 
 ## Create a dropdown widget
 
-A dropdown widget shares a similar set of parameter as a text field, except a list of `options` needs to be 
-specified:
+A dropdown widget shares a similar set of parameters as a text field, with the only significant difference being
+a list of `options` needs to be specified:
 
 ```python
 from PyPDFForm import PdfWrapper
