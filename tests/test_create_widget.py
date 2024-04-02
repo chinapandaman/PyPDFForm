@@ -342,3 +342,34 @@ def test_create_widget_sejda_schema(sejda_template):
 
     assert schema["properties"]["new_text_field_widget"]
     assert len(schema["properties"]) == 1
+
+
+def test_create_dropdown(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "create_dropdown.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            widget_type="dropdown",
+            name="new_dropdown_widget",
+            page_number=1,
+            x=57,
+            y=700,
+            options=[
+                "foo",
+                "bar",
+                "foobar",
+            ],
+            width=120,
+            height=40,
+            font="Courier",
+            font_size=15,
+            font_color=(1, 0, 0)
+        )
+        assert obj.schema["properties"]["new_dropdown_widget"]["type"] == "integer"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected

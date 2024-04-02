@@ -64,3 +64,33 @@ with open("output.pdf", "wb+") as output:
 ```
 
 The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
+
+## Create a dropdown widget
+
+A dropdown widget shares a similar set of parameters as a text field, with the only significant difference being
+a list of `options` needs to be specified:
+
+```python
+from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper("dummy.pdf").create_widget(
+    widget_type="dropdown",
+    name="new_dropdown_widget",
+    page_number=1,
+    x=57,
+    y=700,
+    options=[
+        "foo",
+        "bar",
+        "foobar",
+    ],
+    width=120,
+    height=40,
+    font="Courier",
+    font_size=15,
+    font_color=(1, 0, 0)
+)
+
+with open("output.pdf", "wb+") as output:
+    output.write(new_form.read())
+```

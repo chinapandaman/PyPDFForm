@@ -23,6 +23,7 @@ from .utils import (get_page_streams, merge_two_pdfs, preview_widget_to_draw,
                     remove_all_widgets)
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 from .widgets.checkbox import CheckBoxWidget
+from .widgets.dropdown import DropdownWidget
 from .widgets.text import TextWidget
 
 
@@ -218,6 +219,8 @@ class PdfWrapper(FormWrapper):
             _class = TextWidget
         if widget_type == "checkbox":
             _class = CheckBoxWidget
+        if widget_type == "dropdown":
+            _class = DropdownWidget
         if _class is None:
             return self
 
@@ -231,7 +234,7 @@ class PdfWrapper(FormWrapper):
             if k in new_widgets:
                 new_widgets[k] = v
         self.widgets = new_widgets
-        if widget_type == "text":
+        if widget_type in ("text", "dropdown"):
             self.widgets[name].font = self.global_font
             self.widgets[name].font_size = self.global_font_size
             self.widgets[name].font_color = self.global_font_color
