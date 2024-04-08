@@ -1,11 +1,31 @@
 # -*- coding: utf-8 -*-
 """Contains patterns used for identifying properties of widgets."""
 
-from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
-                           TextStringObject)
+from pypdf.generic import DictionaryObject, NameObject, NumberObject, TextStringObject
 
-from .constants import (AP, AS, CA, DA, FT, MK, READ_ONLY, Btn, Ch, D, Ff, Off,
-                        Opt, Parent, Q, Sig, Subtype, T, Tx, V, Widget)
+from .constants import (
+    AP,
+    AS,
+    CA,
+    DA,
+    FT,
+    MK,
+    READ_ONLY,
+    Btn,
+    Ch,
+    D,
+    Ff,
+    Off,
+    Opt,
+    Parent,
+    Q,
+    Sig,
+    Subtype,
+    T,
+    Tx,
+    V,
+    Widget,
+)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -86,6 +106,7 @@ def simple_update_checkbox_value(annot: DictionaryObject) -> None:
     for each in annot[AP][D]:  # noqa
         if str(each) != Off:
             annot[NameObject(AS)] = NameObject(each)
+            annot[NameObject(V)] = NameObject(each)
             break
 
 
