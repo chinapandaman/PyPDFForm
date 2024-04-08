@@ -8,10 +8,12 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
 from .constants import WIDGET_TYPES, Annots
-from .coordinate import (get_draw_checkbox_radio_coordinates,
-                         get_draw_sig_coordinates_resolutions,
-                         get_draw_text_coordinates,
-                         get_text_line_x_coordinates)
+from .coordinate import (
+    get_draw_checkbox_radio_coordinates,
+    get_draw_sig_coordinates_resolutions,
+    get_draw_text_coordinates,
+    get_text_line_x_coordinates,
+)
 from .font import checkbox_radio_font_size
 from .image import any_image_to_jpg
 from .middleware.checkbox import Checkbox
@@ -19,10 +21,14 @@ from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .patterns import (simple_flatten_generic, simple_flatten_radio,
-                       simple_update_checkbox_value,
-                       simple_update_dropdown_value, simple_update_radio_value,
-                       simple_update_text_value)
+from .patterns import (
+    simple_flatten_generic,
+    simple_flatten_radio,
+    simple_update_checkbox_value,
+    simple_update_dropdown_value,
+    simple_update_radio_value,
+    simple_update_text_value,
+)
 from .template import get_widget_key, get_widgets_by_page
 from .utils import checkbox_radio_to_draw, stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
@@ -151,8 +157,8 @@ def simple_fill(
             if widget is None:
                 continue
 
-            if type(widget) is Checkbox and widget.value is True:
-                simple_update_checkbox_value(annot)
+            if type(widget) is Checkbox:
+                simple_update_checkbox_value(annot, widget.value)
             elif isinstance(widget, Radio):
                 if key not in radio_button_tracker:
                     radio_button_tracker[key] = 0
