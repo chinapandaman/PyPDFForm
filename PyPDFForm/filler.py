@@ -154,7 +154,7 @@ def simple_fill(
             key = get_widget_key(annot.get_object())
 
             widget = widgets.get(key)
-            if widget is None:
+            if widget is None or widget.value is None:
                 continue
 
             if isinstance(widget, Checkbox):
@@ -165,9 +165,9 @@ def simple_fill(
                 radio_button_tracker[key] += 1
                 if widget.value == radio_button_tracker[key] - 1:
                     simple_update_radio_value(annot)
-            elif isinstance(widget, Dropdown) and widget.value is not None:
+            elif isinstance(widget, Dropdown):
                 simple_update_dropdown_value(annot, widget)
-            elif isinstance(widget, Text) and widget.value:
+            elif isinstance(widget, Text):
                 simple_update_text_value(annot, widget)
 
             if flatten:
