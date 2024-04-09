@@ -157,7 +157,7 @@ def simple_fill(
             if widget is None:
                 continue
 
-            if type(widget) is Checkbox:
+            if isinstance(widget, Checkbox):
                 simple_update_checkbox_value(annot, widget.value)
             elif isinstance(widget, Radio):
                 if key not in radio_button_tracker:
