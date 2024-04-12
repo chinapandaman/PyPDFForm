@@ -127,3 +127,25 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
         if os.name != "nt":
             assert len(obj.read()) == len(expected)
             assert obj.stream == expected
+
+
+def test_undo_checkbox(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "simple", "undo", "test_undo_checkbox.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(
+            os.path.join(pdf_samples, "simple", "undo", "sample_template_filled.pdf")
+        ).fill(
+            {
+                "check": False,
+                "check_2": False,
+                "check_3": False,
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
