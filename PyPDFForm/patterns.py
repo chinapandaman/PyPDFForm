@@ -86,6 +86,7 @@ def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -
     for each in annot[AP][D]:  # noqa
         if (check and str(each) != Off) or (not check and str(each) == Off):
             annot[NameObject(AS)] = NameObject(each)
+            annot[NameObject(V)] = NameObject(each)
             break
 
 
@@ -95,7 +96,6 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
     for each in annot[AP][D]:  # noqa
         if str(each) != Off:
             annot[NameObject(AS)] = NameObject(each)
-            annot[NameObject(V)] = NameObject(each)
             break
 
 
