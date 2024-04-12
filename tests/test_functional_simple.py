@@ -130,7 +130,9 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
 
 
 def test_undo_checkbox(pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "simple", "undo", "test_undo_checkbox.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "simple", "undo", "test_undo_checkbox.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(
             os.path.join(pdf_samples, "simple", "undo", "sample_template_filled.pdf")
