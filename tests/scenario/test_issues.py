@@ -42,6 +42,22 @@ def test_pdf_form_with_central_aligned_text_fields_void(issue_pdf_directory):
     assert PdfWrapper(os.path.join(issue_pdf_directory, "PPF-285.pdf")).fill({}).read()
 
 
+def test_pdf_form_with_paragraph_fields_new_line_symbol_text(
+    issue_pdf_directory, request
+):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
+        {"Address": "Mr John Smith\n132, My Street\nKingston, New York 12401"}
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-415-expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        if os.name != "nt":
+            assert abs(len(obj.read()) - len(expected)) <= 1
+
+
 def test_pdf_form_with_paragraph_fields_new_line_symbol_text_overflow(
     issue_pdf_directory, request
 ):
@@ -78,6 +94,22 @@ def test_521(issue_pdf_directory, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
+
+
+def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(
+    issue_pdf_directory, request
+):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
+        {"Address": "J Smith\n132 A St\nNYC, NY 12401"}
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-415-3-expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        if os.name != "nt":
+            assert abs(len(obj.read()) - len(expected)) <= 1
 
 
 def test_encrypted_edit_pdf_form(issue_pdf_directory, request):

@@ -96,6 +96,7 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
     for each in annot[AP][D]:  # noqa
         if str(each) != Off:
             annot[NameObject(AS)] = NameObject(each)
+            annot[NameObject(Parent)][NameObject(V)] = NameObject(each) # noqa
             break
 
 
