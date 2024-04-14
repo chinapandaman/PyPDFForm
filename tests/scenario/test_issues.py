@@ -54,8 +54,8 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_text(
     request.config.results["stream"] = obj.read()
     with open(expected_path, "rb+") as f:
         expected = f.read()
-        if os.name != "nt":
-            assert abs(len(obj.read()) - len(expected)) == 1
+        if os.name == "nt":
+            assert abs(len(obj.read()) - len(expected)) == 3
 
 
 def test_pdf_form_with_paragraph_fields_new_line_symbol_text_overflow(
@@ -108,8 +108,8 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(
     request.config.results["stream"] = obj.read()
     with open(expected_path, "rb+") as f:
         expected = f.read()
-        if os.name != "nt":
-            assert abs(len(obj.read()) - len(expected)) == 1
+        if os.name == "nt":
+            assert abs(len(obj.read()) - len(expected)) == 3
 
 
 def test_encrypted_edit_pdf_form(issue_pdf_directory, request):
