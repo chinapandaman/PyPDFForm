@@ -225,6 +225,9 @@ def test_create_text_complex(template_stream, pdf_samples, request):
             font="Times-Roman",
             font_size=50,
             font_color=(1, 0.5, 1),
+            bg_color=(0, 0, 1),
+            border_color=(1, 0, 0),
+            border_width=5,
         )
         assert obj.schema["properties"]["foo"]["type"] == "string"
         assert obj.schema["properties"]["foo"]["maxLength"] == 2
