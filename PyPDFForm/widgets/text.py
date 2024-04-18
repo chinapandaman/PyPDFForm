@@ -14,7 +14,10 @@ class TextWidget(Widget):
         ("font", "fontName"),
         ("font_size", "fontSize"),
         ("font_color", "textColor"),
+        ("fill_color", "fillColor"),
+        ("border_color", "borderColor"),
+        ("border_width", "borderWidth"),
     ]
-    COLOR_PARAMS = ["font_color"]
+    COLOR_PARAMS = ["font_color", "fill_color", "border_color"]
     NONE_DEFAULTS = ["max_length"]
     ACRO_FORM_FUNC = "textfield"
