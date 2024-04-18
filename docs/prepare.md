@@ -35,7 +35,10 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     max_length=5,   # optional
     font="Courier", # optional
     font_size=15,   # optional
-    font_color=(1, 0, 0)    # optional
+    font_color=(1, 0, 0),    # optional
+    bg_color=(0, 0, 1), # optional
+    border_color=(1, 0, 0), # optional
+    border_width=5  # optional
 )
 
 with open("output.pdf", "wb+") as output:
