@@ -6,6 +6,7 @@ from .base import Widget
 
 class DropdownWidget(Widget):
     """Dropdown widget to create."""
+    # pylint: disable=R0801
 
     USER_PARAMS = [
         ("width", "width"),
@@ -14,8 +15,11 @@ class DropdownWidget(Widget):
         ("font", "fontName"),
         ("font_size", "fontSize"),
         ("font_color", "textColor"),
+        ("bg_color", "fillColor"),
+        ("border_color", "borderColor"),
+        ("border_width", "borderWidth"),
     ]
-    COLOR_PARAMS = ["font_color"]
+    COLOR_PARAMS = ["font_color", "bg_color", "border_color"]
     ACRO_FORM_FUNC = "_textfield"
 
     def __init__(
