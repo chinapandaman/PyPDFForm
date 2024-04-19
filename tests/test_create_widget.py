@@ -68,8 +68,19 @@ def test_create_checkbox_complex(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_complex.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
-            "checkbox", "foo", 1, 100, 100, size=100
+            "checkbox",
+            "foo",
+            1,
+            100,
+            100,
+            size=100,
+            button_style="check",
+            tick_color=(0, 1, 0),
+            bg_color=(0, 0, 1),
+            border_color=(1, 0, 0),
+            border_width=5,
         )
+
         assert obj.schema["properties"]["foo"]["type"] == "boolean"
 
         request.config.results["expected_path"] = expected_path
