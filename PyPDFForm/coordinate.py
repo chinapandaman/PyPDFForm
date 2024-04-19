@@ -161,12 +161,6 @@ def get_text_line_x_coordinates(
     return None
 
 
-def foo():
-    """Dummp func."""
-
-    return True
-
-
 def generate_coordinate_grid(
     pdf: bytes, color: Tuple[float, float, float], margin: float
 ) -> bytes:
