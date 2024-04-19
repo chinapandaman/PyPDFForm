@@ -6,6 +6,7 @@ from .base import Widget
 
 class DropdownWidget(Widget):
     """Dropdown widget to create."""
+    # pylint: disable=R0801
 
     USER_PARAMS = [
         ("width", "width"),
