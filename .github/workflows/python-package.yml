@@ -28,7 +28,7 @@ jobs:
     - name: Test with pytest
       run: |
         coverage run -m pytest
-        - name: Upload coverage to Codecov
+    - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
