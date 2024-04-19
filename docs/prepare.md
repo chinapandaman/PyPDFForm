@@ -58,8 +58,8 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     page_number=1,
     x=57,
     y=700,
-    size=30,
-    button_style="check"
+    size=30,    # optional
+    button_style="check"    # optional
 )
 
 with open("output.pdf", "wb+") as output:
