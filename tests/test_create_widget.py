@@ -377,6 +377,9 @@ def test_create_dropdown(template_stream, pdf_samples, request):
             font="Courier",
             font_size=15,
             font_color=(1, 0, 0),
+            bg_color=(0, 0, 1),
+            border_color=(1, 0, 0),
+            border_width=5,
         )
         assert obj.schema["properties"]["new_dropdown_widget"]["type"] == "integer"
 
