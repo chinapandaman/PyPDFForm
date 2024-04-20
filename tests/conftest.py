@@ -183,7 +183,9 @@ def sample_template_with_dropdown(pdf_samples):
 
 @pytest.fixture
 def sample_template_with_image_field(pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+") as f:
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+"
+    ) as f:
         return f.read()
 
 

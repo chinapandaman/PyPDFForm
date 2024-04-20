@@ -16,10 +16,10 @@ from .font import checkbox_radio_font_size
 from .image import any_image_to_jpg
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
+from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .middleware.image import Image
 from .patterns import (simple_flatten_generic, simple_flatten_radio,
                        simple_update_checkbox_value,
                        simple_update_dropdown_value, simple_update_radio_value,
@@ -75,7 +75,9 @@ def fill(
                 if stream is not None:
                     any_image_to_draw = True
                     stream = any_image_to_jpg(stream)
-                    x, y, width, height = get_draw_image_coordinates_resolutions(_widget)
+                    x, y, width, height = get_draw_image_coordinates_resolutions(
+                        _widget
+                    )
                     images_to_draw[page].append(
                         [
                             stream,

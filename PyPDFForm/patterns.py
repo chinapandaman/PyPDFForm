@@ -4,14 +4,14 @@
 from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
                            TextStringObject)
 
-from .constants import (A, AP, AS, CA, DA, FT, MK, READ_ONLY, Btn, Ch, D, Ff, Off,
-                        Opt, Parent, Q, Sig, Subtype, T, Tx, V, Widget, JS,
-                        IMAGE_FIELD_IDENTIFIER)
+from .constants import (AP, AS, CA, DA, FT, IMAGE_FIELD_IDENTIFIER, JS, MK,
+                        READ_ONLY, A, Btn, Ch, D, Ff, Off, Opt, Parent, Q, Sig,
+                        Subtype, T, Tx, V, Widget)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
+from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
-from .middleware.image import Image
 from .middleware.text import Text
 
 WIDGET_TYPE_PATTERNS = [
