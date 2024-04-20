@@ -98,7 +98,7 @@ a file path shown above, but also an open file object and a file stream that's i
 **NOTE:** This is a beta feature, meaning it still needs to be tested against more PDF forms and may not work for 
 some of them.
 
-An image field widget can be filled similar to a signature field, by providing a value of file path, file object, or 
+An image field widget can be filled similarly to a signature field, by providing a value of file path, file object, or 
 file stream.
 
 Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_image_field.pdf) 
