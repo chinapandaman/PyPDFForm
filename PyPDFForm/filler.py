@@ -9,7 +9,7 @@ from pypdf.generic import DictionaryObject
 
 from .constants import WIDGET_TYPES, Annots
 from .coordinate import (get_draw_checkbox_radio_coordinates,
-                         get_draw_sig_coordinates_resolutions,
+                         get_draw_image_coordinates_resolutions,
                          get_draw_text_coordinates,
                          get_text_line_x_coordinates)
 from .font import checkbox_radio_font_size
@@ -75,7 +75,7 @@ def fill(
                 if stream is not None:
                     any_image_to_draw = True
                     stream = any_image_to_jpg(stream)
-                    x, y, width, height = get_draw_sig_coordinates_resolutions(_widget)
+                    x, y, width, height = get_draw_image_coordinates_resolutions(_widget)
                     images_to_draw[page].append(
                         [
                             stream,
