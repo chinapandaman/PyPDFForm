@@ -9,7 +9,7 @@ from pypdf.generic import DictionaryObject
 
 from .constants import WIDGET_TYPES, Annots
 from .coordinate import (get_draw_checkbox_radio_coordinates,
-                         get_draw_sig_coordinates_resolutions,
+                         get_draw_image_coordinates_resolutions,
                          get_draw_text_coordinates,
                          get_text_line_x_coordinates)
 from .font import checkbox_radio_font_size
@@ -19,6 +19,7 @@ from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
+from .middleware.image import Image
 from .patterns import (simple_flatten_generic, simple_flatten_radio,
                        simple_update_checkbox_value,
                        simple_update_dropdown_value, simple_update_radio_value,
@@ -69,12 +70,12 @@ def fill(
                     radio_button_tracker[key] += 1
                     if widgets[key].value == radio_button_tracker[key] - 1:
                         text_needs_to_be_drawn = True
-            elif isinstance(widgets[key], Signature):
+            elif isinstance(widgets[key], (Signature, Image)):
                 stream = widgets[key].stream
                 if stream is not None:
                     any_image_to_draw = True
                     stream = any_image_to_jpg(stream)
-                    x, y, width, height = get_draw_sig_coordinates_resolutions(_widget)
+                    x, y, width, height = get_draw_image_coordinates_resolutions(_widget)
                     images_to_draw[page].append(
                         [
                             stream,

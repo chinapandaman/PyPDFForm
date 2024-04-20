@@ -38,11 +38,11 @@ def get_draw_checkbox_radio_coordinates(
     )
 
 
-def get_draw_sig_coordinates_resolutions(
+def get_draw_image_coordinates_resolutions(
     widget: dict,
 ) -> Tuple[float, float, float, float]:
     """
-    Returns coordinates and resolutions to draw signature at given a PDF form signature widget.
+    Returns coordinates and resolutions to draw image at given a PDF form signature/image widget.
     """
 
     x = float(widget[Rect][0])

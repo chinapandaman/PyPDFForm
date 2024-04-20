@@ -182,6 +182,12 @@ def sample_template_with_dropdown(pdf_samples):
 
 
 @pytest.fixture
+def sample_template_with_image_field(pdf_samples):
+    with open(os.path.join(pdf_samples, "sample_template_with_image_field.pdf"), "rb+") as f:
+        return f.read()
+
+
+@pytest.fixture
 def dropdown_alignment(pdf_samples):
     with open(
         os.path.join(pdf_samples, "dropdown", "dropdown_alignment.pdf"),

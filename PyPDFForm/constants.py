@@ -27,6 +27,8 @@ WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown, Signature]
 DEPRECATION_NOTICE = "{} will be deprecated soon. Use {} instead."
 
 Annots = "/Annots"
+A = "/A"
+JS = "/JS"
 T = "/T"
 Rect = "/Rect"
 Subtype = "/Subtype"
@@ -63,6 +65,8 @@ DEFAULT_FONT_COLOR = (0, 0, 0)
 PREVIEW_FONT_COLOR = (1, 0, 0)
 
 NEW_LINE_SYMBOL = "\n"
+
+IMAGE_FIELD_IDENTIFIER = "event.target.buttonImportIcon();"
 
 DEFAULT_CHECKBOX_STYLE = "\u2713"
 DEFAULT_RADIO_STYLE = "\u25CF"

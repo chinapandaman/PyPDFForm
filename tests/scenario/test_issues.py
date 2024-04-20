@@ -122,3 +122,19 @@ def test_encrypted_edit_pdf_form(issue_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_fill_image(issue_pdf_directory, image_samples, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "560.pdf"))
+    obj = obj.fill(
+        {
+            "ImageSign": os.path.join(image_samples, "sample_image.jpg")
+        }
+    )
+    expected_path = os.path.join(issue_pdf_directory, "560_expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
