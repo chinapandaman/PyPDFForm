@@ -19,6 +19,7 @@ from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
+from .middleware.image import Image
 from .patterns import (simple_flatten_generic, simple_flatten_radio,
                        simple_update_checkbox_value,
                        simple_update_dropdown_value, simple_update_radio_value,
@@ -69,7 +70,7 @@ def fill(
                     radio_button_tracker[key] += 1
                     if widgets[key].value == radio_button_tracker[key] - 1:
                         text_needs_to_be_drawn = True
-            elif isinstance(widgets[key], Signature):
+            elif isinstance(widgets[key], (Signature, Image)):
                 stream = widgets[key].stream
                 if stream is not None:
                     any_image_to_draw = True
