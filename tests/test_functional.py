@@ -610,3 +610,21 @@ def test_radio_change_size_and_button_style(
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
+
+
+def test_fill_image(sample_template_with_image_field, image_samples, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "sample_filled_image.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_image_field).fill(
+            {
+                "image_1": os.path.join(image_samples, "sample_image.jpg")
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
