@@ -6,5 +6,3 @@ from .signature import Signature
 
 class Image(Signature):
     """A class to represent a image field widget."""
-
-    pass
