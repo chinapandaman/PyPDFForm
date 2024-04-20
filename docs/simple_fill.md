@@ -3,7 +3,7 @@
 The `FormWrapper` class allows you to fill a PDF form in place as if you were filling it manually.
 
 Similar to the `PdfWrapper` class, the `FormWrapper` also supports widgets including text fields, checkboxes, radio 
-buttons, dropdowns, and paragraphs. However, it does NOT support signature widgets.
+buttons, dropdowns, and paragraphs. However, it does NOT support signature or image widgets.
 
 Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf):
 
