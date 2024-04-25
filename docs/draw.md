@@ -8,6 +8,8 @@ This section of the documentation will use
 
 This section of the documentation requires a basic understanding of [the PDF coordinate system](coordinate.md).
 
+All optional parameters will have a comment `# optional` after each of them.
+
 **NOTE:** Due to a known bug in a dependency, it is advised that these draw methods are called after 
 a PDF form is filled. Otherwise, part (most noticeably radio buttons) or even all widgets of the PDF form might 
 get removed after drawing things on it.
@@ -21,7 +23,10 @@ pdf = PdfWrapper("sample_template.pdf").draw_text(
     text="random text",
     page_number=1,
     x=300,
-    y=225
+    y=225,
+    font="your_registered_font",    # optional
+    font_size=12,   # optional
+    font_color=(1, 0, 0)    # optional
 )
 
 with open("output.pdf", "wb+") as output:
@@ -40,7 +45,7 @@ pdf = PdfWrapper("sample_template.pdf").draw_image(
     y=100,
     width=400,
     height=225,
-    rotation=0
+    rotation=0  # optional
 )
 
 with open("output.pdf", "wb+") as output:
