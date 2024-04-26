@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from functools import cached_property
 from typing import BinaryIO, Dict, List, Tuple, Union
 from warnings import warn
 
@@ -117,7 +118,7 @@ class PdfWrapper(FormWrapper):
 
         return None
 
-    @property
+    @cached_property
     def pages(self) -> List[PdfWrapper]:
         """Returns a list of pdf wrapper objects where each is a page of the PDF form."""
 
