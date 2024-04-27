@@ -1,7 +1,7 @@
 # PDF coordinates
 
-The coordinate system on a single page of a PDF starts at the bottom left of the page as the origin. The units of 
-the coordinates are called "points" and there are 72 points/inch.  PyPDFForm utilizes this coordinate system in 
+The coordinate system on a single page of a PDF starts at the bottom left of the page as the origin. The unit of 
+the coordinates is called "points" and there are 72 points/inch.  PyPDFForm utilizes this coordinate system in 
 some of its APIs so that widgets, texts, or images can be created on a PDF.
 
 ## Generate a coordinate grid view
