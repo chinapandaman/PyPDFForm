@@ -21,7 +21,7 @@ filled = FormWrapper("sample_template_with_dropdown.pdf").fill(
         "radio_1": 1,
         "dropdown_1": 1,
     },
-    flatten=False,
+    flatten=False,  # optional
 )
 
 with open("output.pdf", "wb+") as output:
