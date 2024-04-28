@@ -291,7 +291,6 @@ def get_character_x_paddings(widget: dict, widget_middleware: Text) -> List[floa
 def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
     """Splits the paragraph field's text to a list of lines."""
 
-    # pylint: disable=R0912
     lines = []
     result = []
     value = widget_middleware.value or ""
