@@ -35,7 +35,6 @@ def fill(
 ) -> bytes:
     """Fills a PDF using watermarks."""
 
-    # pylint: disable=too-many-branches
     texts_to_draw = {}
     images_to_draw = {}
     any_image_to_draw = False

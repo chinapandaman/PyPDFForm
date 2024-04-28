@@ -36,7 +36,6 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
 def auto_detect_font(widget: dict) -> str:
     """Returns the font of the text field if it is one of the standard fonts."""
 
-    # pylint: disable=R0912
     result = DEFAULT_FONT
 
     text_appearance = None
