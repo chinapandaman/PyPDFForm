@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Creates a GitHub release."""
 
-from getpass import getpass
 import re
 import sys
+from getpass import getpass
 
 import requests
 
