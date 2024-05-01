@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Creates a GitHub release."""
 
+from getpass import getpass
 import re
 import sys
 
@@ -16,7 +17,7 @@ if __name__ == "__main__":
         sys.exit(f"v{latest_version} is already deployed.")
 
     print(f"Bumping to: v{version}")
-    token = input("Enter GitHub Token: ")
+    token = getpass("Enter GitHub Token: ")
 
     url = "https://api.github.com/repos/chinapandaman/PyPDFForm/releases"
     headers = {
