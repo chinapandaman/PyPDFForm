@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for generic template related processing."""
 
+from functools import lru_cache
 from sys import maxsize
 from typing import Dict, List, Tuple, Union
 
@@ -138,6 +139,7 @@ def update_text_field_attributes(
                     )
 
 
+@lru_cache()
 def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
     """Iterates through a PDF and returns all widgets found grouped by page."""
 
