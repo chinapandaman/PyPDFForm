@@ -43,24 +43,24 @@ def fill(
 
     radio_button_tracker = {}
 
-    for page, _widgets in get_widgets_by_page(template_stream).items():
+    for page, widget_dicts in get_widgets_by_page(template_stream).items():
         texts_to_draw[page] = []
         images_to_draw[page] = []
         text_watermarks.append(b"")
         image_watermarks.append(b"")
-        for _widget in _widgets:
-            key = get_widget_key(_widget)
+        for widget_dict in widget_dicts:
+            key = get_widget_key(widget_dict)
             text_needs_to_be_drawn = False
-            _to_draw = x = y = None
+            to_draw = x = y = None
 
             if isinstance(widgets[key], (Checkbox, Radio)):
                 font_size = (
-                    checkbox_radio_font_size(_widget)
+                    checkbox_radio_font_size(widget_dict)
                     if widgets[key].size is None
                     else widgets[key].size
                 )
-                _to_draw = checkbox_radio_to_draw(widgets[key], font_size)
-                x, y = get_draw_checkbox_radio_coordinates(_widget, _to_draw)
+                to_draw = checkbox_radio_to_draw(widgets[key], font_size)
+                x, y = get_draw_checkbox_radio_coordinates(widget_dict, to_draw)
                 if type(widgets[key]) is Checkbox and widgets[key].value:
                     text_needs_to_be_drawn = True
                 elif isinstance(widgets[key], Radio):
@@ -75,7 +75,7 @@ def fill(
                     any_image_to_draw = True
                     stream = any_image_to_jpg(stream)
                     x, y, width, height = get_draw_image_coordinates_resolutions(
-                        _widget
+                        widget_dict
                     )
                     images_to_draw[page].append(
                         [
@@ -88,23 +88,23 @@ def fill(
                     )
             else:
                 widgets[key].text_line_x_coordinates = get_text_line_x_coordinates(
-                    _widget, widgets[key]
+                    widget_dict, widgets[key]
                 )
-                x, y = get_draw_text_coordinates(_widget, widgets[key])
-                _to_draw = widgets[key]
+                x, y = get_draw_text_coordinates(widget_dict, widgets[key])
+                to_draw = widgets[key]
                 text_needs_to_be_drawn = True
 
             if all(
                 [
                     text_needs_to_be_drawn,
-                    _to_draw is not None,
+                    to_draw is not None,
                     x is not None,
                     y is not None,
                 ]
             ):
                 texts_to_draw[page].append(
                     [
-                        _to_draw,
+                        to_draw,
                         x,
                         y,
                     ]
