@@ -104,6 +104,20 @@ def text_handler(
     return to_draw, x, y, text_needs_to_be_drawn
 
 
+def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
+    """Generates a stream of an input PDF stream with stuff drawn on it."""
+
+    watermark_list = []
+    for page, stuffs in to_draw.items():
+        watermark_list.append(b"")
+        watermarks = create_watermarks_and_draw(stream, page, action, stuffs)
+        for i, watermark in enumerate(watermarks):
+            if watermark:
+                watermark_list[i] = watermark
+
+    return merge_watermarks_with_pdf(stream, watermark_list)
+
+
 def fill(
     template_stream: bytes,
     widgets: Dict[str, WIDGET_TYPES],
@@ -113,16 +127,12 @@ def fill(
     texts_to_draw = {}
     images_to_draw = {}
     any_image_to_draw = False
-    text_watermarks = []
-    image_watermarks = []
 
     radio_button_tracker = {}
 
     for page, widget_dicts in get_widgets_by_page(template_stream).items():
         texts_to_draw[page] = []
         images_to_draw[page] = []
-        text_watermarks.append(b"")
-        image_watermarks.append(b"")
         for widget_dict in widget_dicts:
             key = get_widget_key(widget_dict)
             text_needs_to_be_drawn = False
@@ -155,23 +165,10 @@ def fill(
                     ]
                 )
 
-    for page, texts in texts_to_draw.items():
-        _watermarks = create_watermarks_and_draw(template_stream, page, "text", texts)
-        for i, watermark in enumerate(_watermarks):
-            if watermark:
-                text_watermarks[i] = watermark
-
-    result = merge_watermarks_with_pdf(template_stream, text_watermarks)
+    result = get_drawn_stream(texts_to_draw, template_stream, "text")
 
     if any_image_to_draw:
-        for page, images in images_to_draw.items():
-            _watermarks = create_watermarks_and_draw(
-                template_stream, page, "image", images
-            )
-            for i, watermark in enumerate(_watermarks):
-                if watermark:
-                    image_watermarks[i] = watermark
-        result = merge_watermarks_with_pdf(result, image_watermarks)
+        result = get_drawn_stream(images_to_draw, result, "image")
 
     return result
 
