@@ -86,6 +86,24 @@ def signature_image_handler(
     return any_image_to_draw
 
 
+def text_handler(
+    widget: dict,
+    middleware: Text
+) -> Tuple[
+    Text, Union[float, int], Union[float, int], bool
+]:
+    """Handles draw parameters for text field widgets."""
+
+    middleware.text_line_x_coordinates = get_text_line_x_coordinates(
+        widget, middleware
+    )
+    x, y = get_draw_text_coordinates(widget, middleware)
+    to_draw = middleware
+    text_needs_to_be_drawn = True
+
+    return to_draw, x, y, text_needs_to_be_drawn
+
+
 def fill(
     template_stream: bytes,
     widgets: Dict[str, WIDGET_TYPES],
@@ -119,12 +137,7 @@ def fill(
                     widget_dict, widgets[key], images_to_draw[page]
                 )
             else:
-                widgets[key].text_line_x_coordinates = get_text_line_x_coordinates(
-                    widget_dict, widgets[key]
-                )
-                x, y = get_draw_text_coordinates(widget_dict, widgets[key])
-                to_draw = widgets[key]
-                text_needs_to_be_drawn = True
+                to_draw, x, y, text_needs_to_be_drawn = text_handler(widget_dict, widgets[key])
 
             if all(
                 [
