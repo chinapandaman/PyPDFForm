@@ -2,7 +2,7 @@
 """Contains helpers for filling a PDF form."""
 
 from io import BytesIO
-from typing import Dict, cast
+from typing import Dict, cast, Union, Tuple
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
@@ -27,6 +27,35 @@ from .patterns import (simple_flatten_generic, simple_flatten_radio,
 from .template import get_widget_key, get_widgets_by_page
 from .utils import checkbox_radio_to_draw, stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
+
+
+def check_radio_handler(
+    widget: dict,
+    middleware: Union[Checkbox, Radio],
+    radio_button_tracker: dict
+) -> Tuple[
+    Text, Union[float, int], Union[float, int], bool
+]:
+    """Handles draw parameters for checkbox and radio button widgets."""
+
+    font_size = (
+        checkbox_radio_font_size(widget)
+        if middleware.size is None
+        else middleware.size
+    )
+    to_draw = checkbox_radio_to_draw(middleware, font_size)
+    x, y = get_draw_checkbox_radio_coordinates(widget, to_draw)
+    text_needs_to_be_drawn = False
+    if type(middleware) is Checkbox and middleware.value:
+        text_needs_to_be_drawn = True
+    elif isinstance(middleware, Radio):
+        if middleware.name not in radio_button_tracker:
+            radio_button_tracker[middleware.name] = 0
+        radio_button_tracker[middleware.name] += 1
+        if middleware.value == radio_button_tracker[middleware.name] - 1:
+            text_needs_to_be_drawn = True
+
+    return to_draw, x, y, text_needs_to_be_drawn
 
 
 def fill(
@@ -54,21 +83,9 @@ def fill(
             to_draw = x = y = None
 
             if isinstance(widgets[key], (Checkbox, Radio)):
-                font_size = (
-                    checkbox_radio_font_size(widget_dict)
-                    if widgets[key].size is None
-                    else widgets[key].size
+                to_draw, x, y, text_needs_to_be_drawn = check_radio_handler(
+                    widget_dict, widgets[key], radio_button_tracker
                 )
-                to_draw = checkbox_radio_to_draw(widgets[key], font_size)
-                x, y = get_draw_checkbox_radio_coordinates(widget_dict, to_draw)
-                if type(widgets[key]) is Checkbox and widgets[key].value:
-                    text_needs_to_be_drawn = True
-                elif isinstance(widgets[key], Radio):
-                    if key not in radio_button_tracker:
-                        radio_button_tracker[key] = 0
-                    radio_button_tracker[key] += 1
-                    if widgets[key].value == radio_button_tracker[key] - 1:
-                        text_needs_to_be_drawn = True
             elif isinstance(widgets[key], (Signature, Image)):
                 stream = widgets[key].stream
                 if stream is not None:
