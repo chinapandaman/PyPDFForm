@@ -36,6 +36,33 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
 def auto_detect_font(widget: dict) -> str:
     """Returns the font of the text field if it is one of the standard fonts."""
 
+    def extract_font_from_text_appearance(t: str) -> Union[str, None]:
+        t = t.split(" ")
+
+        for each in t:
+            if each.startswith("/"):
+                text_segments = findall("[A-Z][^A-Z]*", each.replace("/", ""))
+
+                if len(text_segments) == 1:
+                    for k, v in AcroForm.formFontNames.items():
+                        if v == text_segments[0]:
+                            return k
+
+                for font in standardFonts:
+                    font_segments = findall("[A-Z][^A-Z]*", font.replace("-", ""))
+                    if len(font_segments) != len(text_segments):
+                        continue
+
+                    found = True
+                    for i, val in enumerate(font_segments):
+                        if not val.startswith(text_segments[i]):
+                            found = False
+
+                    if found:
+                        return font
+
+        return None
+
     result = DEFAULT_FONT
 
     text_appearance = None
@@ -48,31 +75,7 @@ def auto_detect_font(widget: dict) -> str:
     if not text_appearance:
         return result
 
-    text_appearance = text_appearance.split(" ")
-
-    for each in text_appearance:
-        if each.startswith("/"):
-            text_segments = findall("[A-Z][^A-Z]*", each.replace("/", ""))
-
-            if len(text_segments) == 1:
-                for k, v in AcroForm.formFontNames.items():
-                    if v == text_segments[0]:
-                        return k
-
-            for font in standardFonts:
-                font_segments = findall("[A-Z][^A-Z]*", font.replace("-", ""))
-                if len(font_segments) != len(text_segments):
-                    continue
-
-                found = True
-                for i, val in enumerate(font_segments):
-                    if not val.startswith(text_segments[i]):
-                        found = False
-
-                if found:
-                    return font
-
-    return result
+    return extract_font_from_text_appearance(text_appearance) or result
 
 
 def text_field_font_size(widget: dict) -> Union[float, int]:
