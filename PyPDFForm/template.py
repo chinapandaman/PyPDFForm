@@ -293,7 +293,11 @@ def get_character_x_paddings(widget: dict, widget_middleware: Text) -> List[floa
 def split_characters_into_lines(
     split_by_new_line_symbol: List[str], middleware: Text, width: float
 ) -> List[str]:
-    """Splits a list of strings into lines of strings based on a text widget's properties."""
+    """
+    Given a long string meant to be filled for a paragraph widget
+    splitted by the new line symbol already, splits it further into lines
+    where each line would fit into the widget's width.
+    """
 
     lines = []
     for line in split_by_new_line_symbol:
@@ -323,7 +327,12 @@ def split_characters_into_lines(
 def adjust_each_line(
     lines: List[str], middleware: Text, width: float
 ) -> List[str]:
-    """Adjusts each line of strings so that there is no overflow."""
+    """
+    Given a list of strings which is the return value of
+    `split_characters_into_lines`, further adjusts each line
+    so that there is neither overflow nor over-splitting into
+    unnecessary lines.
+    """
 
     result = []
     for each in lines:
