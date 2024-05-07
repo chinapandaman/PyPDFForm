@@ -290,18 +290,12 @@ def get_character_x_paddings(widget: dict, widget_middleware: Text) -> List[floa
     return result
 
 
-def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
-    """Splits the paragraph field's text to a list of lines."""
+def split_characters_into_lines(
+    split_by_new_line_symbol: List[str], middleware: Text, width: float
+) -> List[str]:
+    """Splits a list of strings into lines of strings based on a text widget's properties."""
 
     lines = []
-    result = []
-    value = widget_middleware.value or ""
-    if widget_middleware.max_length is not None:
-        value = value[: widget_middleware.max_length]
-
-    width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
-
-    split_by_new_line_symbol = value.split(NEW_LINE_SYMBOL)
     for line in split_by_new_line_symbol:
         characters = line.split(" ")
         current_line = ""
@@ -309,7 +303,7 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
             line_extended = f"{current_line} {each}" if current_line else each
             if (
                 stringWidth(
-                    line_extended, widget_middleware.font, widget_middleware.font_size
+                    line_extended, middleware.font, middleware.font_size
                 )
                 <= width
             ):
@@ -323,12 +317,21 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
             else current_line
         )
 
+    return lines
+
+
+def adjust_each_line(
+    lines: List[str], middleware: Text, width: float
+) -> List[str]:
+    """Adjusts each line of strings so that there is no overflow."""
+
+    result = []
     for each in lines:
         tracker = ""
         for char in each:
             check = tracker + char
             if (
-                stringWidth(check, widget_middleware.font, widget_middleware.font_size)
+                stringWidth(check, middleware.font, middleware.font_size)
                 > width
             ):
                 result.append(tracker)
@@ -342,8 +345,8 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
                 result
                 and stringWidth(
                     f"{each} {result[-1]}",
-                    widget_middleware.font,
-                    widget_middleware.font_size,
+                    middleware.font,
+                    middleware.font_size,
                 )
                 <= width
                 and NEW_LINE_SYMBOL not in result[-1]
@@ -359,6 +362,21 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
         result[-1] = result[-1][:-1]
 
     return result
+
+
+def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
+    """Splits the paragraph field's text to a list of lines."""
+
+    value = widget_middleware.value or ""
+    if widget_middleware.max_length is not None:
+        value = value[: widget_middleware.max_length]
+
+    width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
+
+    split_by_new_line_symbol = value.split(NEW_LINE_SYMBOL)
+    lines = split_characters_into_lines(split_by_new_line_symbol, widget_middleware, width)
+
+    return adjust_each_line(lines, widget_middleware, width)
 
 
 def get_paragraph_auto_wrap_length(widget_middleware: Text) -> int:
