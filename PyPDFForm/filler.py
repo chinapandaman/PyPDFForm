@@ -58,6 +58,34 @@ def check_radio_handler(
     return to_draw, x, y, text_needs_to_be_drawn
 
 
+def signature_image_handler(
+    widget: dict,
+    middleware: Union[Signature, Image],
+    images_to_draw: list
+) -> bool:
+    """Handles draw parameters for signature and image widgets."""
+
+    stream = middleware.stream
+    any_image_to_draw = False
+    if stream is not None:
+        any_image_to_draw = True
+        stream = any_image_to_jpg(stream)
+        x, y, width, height = get_draw_image_coordinates_resolutions(
+            widget
+        )
+        images_to_draw.append(
+            [
+                stream,
+                x,
+                y,
+                width,
+                height,
+            ]
+        )
+
+    return any_image_to_draw
+
+
 def fill(
     template_stream: bytes,
     widgets: Dict[str, WIDGET_TYPES],
@@ -87,22 +115,9 @@ def fill(
                     widget_dict, widgets[key], radio_button_tracker
                 )
             elif isinstance(widgets[key], (Signature, Image)):
-                stream = widgets[key].stream
-                if stream is not None:
-                    any_image_to_draw = True
-                    stream = any_image_to_jpg(stream)
-                    x, y, width, height = get_draw_image_coordinates_resolutions(
-                        widget_dict
-                    )
-                    images_to_draw[page].append(
-                        [
-                            stream,
-                            x,
-                            y,
-                            width,
-                            height,
-                        ]
-                    )
+                any_image_to_draw = signature_image_handler(
+                    widget_dict, widgets[key], images_to_draw[page]
+                )
             else:
                 widgets[key].text_line_x_coordinates = get_text_line_x_coordinates(
                     widget_dict, widgets[key]
