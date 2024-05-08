@@ -184,3 +184,11 @@ def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory, requ
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_clear_form_button_not_checkbox(existed_pdf_directory):
+    obj = PdfWrapper(
+        os.path.join(existed_pdf_directory, "ds11_pdf.pdf")
+    )
+
+    assert "Clear" not in obj.widgets
