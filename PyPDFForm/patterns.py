@@ -6,7 +6,7 @@ from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
 
 from .constants import (AP, AS, CA, DA, FT, IMAGE_FIELD_IDENTIFIER, JS, MK,
                         READ_ONLY, A, Btn, Ch, D, Ff, Off, Opt, Parent, Q, Sig,
-                        Subtype, T, Tx, V, Widget)
+                        Subtype, T, Tx, V, Widget, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -28,7 +28,10 @@ WIDGET_TYPE_PATTERNS = [
         Text,
     ),
     (
-        ({FT: Btn},),
+        (
+            {FT: Btn},
+            {AS: (Yes, Off)},
+        ),
         Checkbox,
     ),
     (
@@ -47,11 +50,15 @@ WIDGET_TYPE_PATTERNS = [
         (
             {Parent: {FT: Btn}},
             {Parent: {Subtype: Widget}},
+            {AS: (Yes, Off)},
         ),
         Checkbox,
     ),
     (
-        ({Parent: {FT: Btn}},),
+        (
+            {Parent: {FT: Btn}},
+            {AS: (Yes, Off)},
+        ),
         Radio,
     ),
 ]

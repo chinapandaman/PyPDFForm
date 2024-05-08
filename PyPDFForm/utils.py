@@ -122,7 +122,10 @@ def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> 
             ):
                 result = find_pattern_match(pattern[key], value)
             else:
-                result = pattern[key] == value
+                if isinstance(pattern[key], tuple):
+                    result = value in pattern[key]
+                else:
+                    result = pattern[key] == value
         if result:
             return result
     return False
