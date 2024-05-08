@@ -306,9 +306,7 @@ def split_characters_into_lines(
         for each in characters:
             line_extended = f"{current_line} {each}" if current_line else each
             if (
-                stringWidth(
-                    line_extended, middleware.font, middleware.font_size
-                )
+                stringWidth(line_extended, middleware.font, middleware.font_size)
                 <= width
             ):
                 current_line = line_extended
@@ -324,9 +322,7 @@ def split_characters_into_lines(
     return lines
 
 
-def adjust_each_line(
-    lines: List[str], middleware: Text, width: float
-) -> List[str]:
+def adjust_each_line(lines: List[str], middleware: Text, width: float) -> List[str]:
     """
     Given a list of strings which is the return value of
     `split_characters_into_lines`, further adjusts each line
@@ -339,10 +335,7 @@ def adjust_each_line(
         tracker = ""
         for char in each:
             check = tracker + char
-            if (
-                stringWidth(check, middleware.font, middleware.font_size)
-                > width
-            ):
+            if stringWidth(check, middleware.font, middleware.font_size) > width:
                 result.append(tracker)
                 tracker = char
             else:
@@ -383,7 +376,9 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
     width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
 
     split_by_new_line_symbol = value.split(NEW_LINE_SYMBOL)
-    lines = split_characters_into_lines(split_by_new_line_symbol, widget_middleware, width)
+    lines = split_characters_into_lines(
+        split_by_new_line_symbol, widget_middleware, width
+    )
 
     return adjust_each_line(lines, widget_middleware, width)
 

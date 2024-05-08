@@ -2,7 +2,7 @@
 """Contains helpers for filling a PDF form."""
 
 from io import BytesIO
-from typing import Dict, cast, Union, Tuple
+from typing import Dict, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
@@ -30,18 +30,12 @@ from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def check_radio_handler(
-    widget: dict,
-    middleware: Union[Checkbox, Radio],
-    radio_button_tracker: dict
-) -> Tuple[
-    Text, Union[float, int], Union[float, int], bool
-]:
+    widget: dict, middleware: Union[Checkbox, Radio], radio_button_tracker: dict
+) -> Tuple[Text, Union[float, int], Union[float, int], bool]:
     """Handles draw parameters for checkbox and radio button widgets."""
 
     font_size = (
-        checkbox_radio_font_size(widget)
-        if middleware.size is None
-        else middleware.size
+        checkbox_radio_font_size(widget) if middleware.size is None else middleware.size
     )
     to_draw = checkbox_radio_to_draw(middleware, font_size)
     x, y = get_draw_checkbox_radio_coordinates(widget, to_draw)
@@ -59,9 +53,7 @@ def check_radio_handler(
 
 
 def signature_image_handler(
-    widget: dict,
-    middleware: Union[Signature, Image],
-    images_to_draw: list
+    widget: dict, middleware: Union[Signature, Image], images_to_draw: list
 ) -> bool:
     """Handles draw parameters for signature and image widgets."""
 
@@ -70,9 +62,7 @@ def signature_image_handler(
     if stream is not None:
         any_image_to_draw = True
         stream = any_image_to_jpg(stream)
-        x, y, width, height = get_draw_image_coordinates_resolutions(
-            widget
-        )
+        x, y, width, height = get_draw_image_coordinates_resolutions(widget)
         images_to_draw.append(
             [
                 stream,
@@ -87,16 +77,11 @@ def signature_image_handler(
 
 
 def text_handler(
-    widget: dict,
-    middleware: Text
-) -> Tuple[
-    Text, Union[float, int], Union[float, int], bool
-]:
+    widget: dict, middleware: Text
+) -> Tuple[Text, Union[float, int], Union[float, int], bool]:
     """Handles draw parameters for text field widgets."""
 
-    middleware.text_line_x_coordinates = get_text_line_x_coordinates(
-        widget, middleware
-    )
+    middleware.text_line_x_coordinates = get_text_line_x_coordinates(widget, middleware)
     x, y = get_draw_text_coordinates(widget, middleware)
     to_draw = middleware
     text_needs_to_be_drawn = True
@@ -147,7 +132,9 @@ def fill(
                     widget_dict, widgets[key], images_to_draw[page]
                 )
             else:
-                to_draw, x, y, text_needs_to_be_drawn = text_handler(widget_dict, widgets[key])
+                to_draw, x, y, text_needs_to_be_drawn = text_handler(
+                    widget_dict, widgets[key]
+                )
 
             if all(
                 [
