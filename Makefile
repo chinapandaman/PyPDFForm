@@ -24,3 +24,6 @@ bump-version:
 
 serve-docs:
 	bash ./scripts/serve_docs.sh
+
+serve-files:
+	bash ./scripts/http_server.sh
