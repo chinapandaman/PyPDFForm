@@ -295,7 +295,7 @@ def split_characters_into_lines(
 ) -> List[str]:
     """
     Given a long string meant to be filled for a paragraph widget
-    splitted by the new line symbol already, splits it further into lines
+    split by the new line symbol already, splits it further into lines
     where each line would fit into the widget's width.
     """
 
