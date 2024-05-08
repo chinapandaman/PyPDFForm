@@ -2,7 +2,7 @@
 """Contains helpers for filling a PDF form."""
 
 from io import BytesIO
-from typing import Dict, cast
+from typing import Dict, cast, Union, Tuple
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
@@ -29,6 +29,95 @@ from .utils import checkbox_radio_to_draw, stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
+def check_radio_handler(
+    widget: dict,
+    middleware: Union[Checkbox, Radio],
+    radio_button_tracker: dict
+) -> Tuple[
+    Text, Union[float, int], Union[float, int], bool
+]:
+    """Handles draw parameters for checkbox and radio button widgets."""
+
+    font_size = (
+        checkbox_radio_font_size(widget)
+        if middleware.size is None
+        else middleware.size
+    )
+    to_draw = checkbox_radio_to_draw(middleware, font_size)
+    x, y = get_draw_checkbox_radio_coordinates(widget, to_draw)
+    text_needs_to_be_drawn = False
+    if type(middleware) is Checkbox and middleware.value:
+        text_needs_to_be_drawn = True
+    elif isinstance(middleware, Radio):
+        if middleware.name not in radio_button_tracker:
+            radio_button_tracker[middleware.name] = 0
+        radio_button_tracker[middleware.name] += 1
+        if middleware.value == radio_button_tracker[middleware.name] - 1:
+            text_needs_to_be_drawn = True
+
+    return to_draw, x, y, text_needs_to_be_drawn
+
+
+def signature_image_handler(
+    widget: dict,
+    middleware: Union[Signature, Image],
+    images_to_draw: list
+) -> bool:
+    """Handles draw parameters for signature and image widgets."""
+
+    stream = middleware.stream
+    any_image_to_draw = False
+    if stream is not None:
+        any_image_to_draw = True
+        stream = any_image_to_jpg(stream)
+        x, y, width, height = get_draw_image_coordinates_resolutions(
+            widget
+        )
+        images_to_draw.append(
+            [
+                stream,
+                x,
+                y,
+                width,
+                height,
+            ]
+        )
+
+    return any_image_to_draw
+
+
+def text_handler(
+    widget: dict,
+    middleware: Text
+) -> Tuple[
+    Text, Union[float, int], Union[float, int], bool
+]:
+    """Handles draw parameters for text field widgets."""
+
+    middleware.text_line_x_coordinates = get_text_line_x_coordinates(
+        widget, middleware
+    )
+    x, y = get_draw_text_coordinates(widget, middleware)
+    to_draw = middleware
+    text_needs_to_be_drawn = True
+
+    return to_draw, x, y, text_needs_to_be_drawn
+
+
+def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
+    """Generates a stream of an input PDF stream with stuff drawn on it."""
+
+    watermark_list = []
+    for page, stuffs in to_draw.items():
+        watermark_list.append(b"")
+        watermarks = create_watermarks_and_draw(stream, page, action, stuffs)
+        for i, watermark in enumerate(watermarks):
+            if watermark:
+                watermark_list[i] = watermark
+
+    return merge_watermarks_with_pdf(stream, watermark_list)
+
+
 def fill(
     template_stream: bytes,
     widgets: Dict[str, WIDGET_TYPES],
@@ -38,95 +127,48 @@ def fill(
     texts_to_draw = {}
     images_to_draw = {}
     any_image_to_draw = False
-    text_watermarks = []
-    image_watermarks = []
 
     radio_button_tracker = {}
 
-    for page, _widgets in get_widgets_by_page(template_stream).items():
+    for page, widget_dicts in get_widgets_by_page(template_stream).items():
         texts_to_draw[page] = []
         images_to_draw[page] = []
-        text_watermarks.append(b"")
-        image_watermarks.append(b"")
-        for _widget in _widgets:
-            key = get_widget_key(_widget)
+        for widget_dict in widget_dicts:
+            key = get_widget_key(widget_dict)
             text_needs_to_be_drawn = False
-            _to_draw = x = y = None
+            to_draw = x = y = None
 
             if isinstance(widgets[key], (Checkbox, Radio)):
-                font_size = (
-                    checkbox_radio_font_size(_widget)
-                    if widgets[key].size is None
-                    else widgets[key].size
+                to_draw, x, y, text_needs_to_be_drawn = check_radio_handler(
+                    widget_dict, widgets[key], radio_button_tracker
                 )
-                _to_draw = checkbox_radio_to_draw(widgets[key], font_size)
-                x, y = get_draw_checkbox_radio_coordinates(_widget, _to_draw)
-                if type(widgets[key]) is Checkbox and widgets[key].value:
-                    text_needs_to_be_drawn = True
-                elif isinstance(widgets[key], Radio):
-                    if key not in radio_button_tracker:
-                        radio_button_tracker[key] = 0
-                    radio_button_tracker[key] += 1
-                    if widgets[key].value == radio_button_tracker[key] - 1:
-                        text_needs_to_be_drawn = True
             elif isinstance(widgets[key], (Signature, Image)):
-                stream = widgets[key].stream
-                if stream is not None:
-                    any_image_to_draw = True
-                    stream = any_image_to_jpg(stream)
-                    x, y, width, height = get_draw_image_coordinates_resolutions(
-                        _widget
-                    )
-                    images_to_draw[page].append(
-                        [
-                            stream,
-                            x,
-                            y,
-                            width,
-                            height,
-                        ]
-                    )
-            else:
-                widgets[key].text_line_x_coordinates = get_text_line_x_coordinates(
-                    _widget, widgets[key]
+                any_image_to_draw = signature_image_handler(
+                    widget_dict, widgets[key], images_to_draw[page]
                 )
-                x, y = get_draw_text_coordinates(_widget, widgets[key])
-                _to_draw = widgets[key]
-                text_needs_to_be_drawn = True
+            else:
+                to_draw, x, y, text_needs_to_be_drawn = text_handler(widget_dict, widgets[key])
 
             if all(
                 [
                     text_needs_to_be_drawn,
-                    _to_draw is not None,
+                    to_draw is not None,
                     x is not None,
                     y is not None,
                 ]
             ):
                 texts_to_draw[page].append(
                     [
-                        _to_draw,
+                        to_draw,
                         x,
                         y,
                     ]
                 )
 
-    for page, texts in texts_to_draw.items():
-        _watermarks = create_watermarks_and_draw(template_stream, page, "text", texts)
-        for i, watermark in enumerate(_watermarks):
-            if watermark:
-                text_watermarks[i] = watermark
-
-    result = merge_watermarks_with_pdf(template_stream, text_watermarks)
+    result = get_drawn_stream(texts_to_draw, template_stream, "text")
 
     if any_image_to_draw:
-        for page, images in images_to_draw.items():
-            _watermarks = create_watermarks_and_draw(
-                template_stream, page, "image", images
-            )
-            for i, watermark in enumerate(_watermarks):
-                if watermark:
-                    image_watermarks[i] = watermark
-        result = merge_watermarks_with_pdf(result, image_watermarks)
+        result = get_drawn_stream(images_to_draw, result, "image")
 
     return result
 

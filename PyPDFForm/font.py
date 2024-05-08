@@ -33,20 +33,11 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
     return result
 
 
-def auto_detect_font(widget: dict) -> str:
-    """Returns the font of the text field if it is one of the standard fonts."""
-
-    result = DEFAULT_FONT
-
-    text_appearance = None
-    for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
-        text_appearance = traverse_pattern(pattern, widget)
-
-        if text_appearance:
-            break
-
-    if not text_appearance:
-        return result
+def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
+    """
+    Uses regex to pattern match out the font from the text
+    appearance string of a text field widget.
+    """
 
     text_appearance = text_appearance.split(" ")
 
@@ -72,7 +63,25 @@ def auto_detect_font(widget: dict) -> str:
                 if found:
                     return font
 
-    return result
+    return None
+
+
+def auto_detect_font(widget: dict) -> str:
+    """Returns the font of the text field if it is one of the standard fonts."""
+
+    result = DEFAULT_FONT
+
+    text_appearance = None
+    for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
+        text_appearance = traverse_pattern(pattern, widget)
+
+        if text_appearance:
+            break
+
+    if not text_appearance:
+        return result
+
+    return extract_font_from_text_appearance(text_appearance) or result
 
 
 def text_field_font_size(widget: dict) -> Union[float, int]:
