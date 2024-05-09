@@ -123,19 +123,20 @@ def update_text_field_attributes(
 
             if isinstance(widgets[key], Text):
                 should_adjust_font_size = False
+                is_paragraph = is_text_multiline(_widget)
                 if widgets[key].font is None:
                     widgets[key].font = auto_detect_font(_widget)
                 if widgets[key].font_size is None:
                     template_font_size = get_text_field_font_size(_widget)
                     widgets[key].font_size = template_font_size or (
                         text_field_font_size(_widget)
-                        if not is_text_multiline(_widget)
+                        if not is_paragraph
                         else DEFAULT_FONT_SIZE
                     )
-                    should_adjust_font_size = is_text_multiline(_widget) and not template_font_size
+                    should_adjust_font_size = is_paragraph and not template_font_size
                 if widgets[key].font_color is None:
                     widgets[key].font_color = get_text_field_font_color(_widget)
-                if is_text_multiline(_widget) and widgets[key].text_wrap_length is None:
+                if is_paragraph and widgets[key].text_wrap_length is None:
                     widgets[key].text_lines = get_paragraph_lines(_widget, widgets[key])
                     widgets[key].text_wrap_length = get_paragraph_auto_wrap_length(
                         widgets[key]
