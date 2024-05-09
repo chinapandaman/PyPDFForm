@@ -9,7 +9,7 @@ from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
-                        WIDGET_TYPES, MaxLen, Rect)
+                        WIDGET_TYPES, MaxLen, Rect, FONT_SIZE_REDUCE_STEP, MARGIN_BETWEEN_LINES)
 from .font import (auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
 from .middleware.checkbox import Checkbox
@@ -122,14 +122,17 @@ def update_text_field_attributes(
             key = get_widget_key(_widget)
 
             if isinstance(widgets[key], Text):
+                should_adjust_font_size = False
                 if widgets[key].font is None:
                     widgets[key].font = auto_detect_font(_widget)
                 if widgets[key].font_size is None:
-                    widgets[key].font_size = get_text_field_font_size(_widget) or (
+                    template_font_size = get_text_field_font_size(_widget)
+                    widgets[key].font_size = template_font_size or (
                         text_field_font_size(_widget)
                         if not is_text_multiline(_widget)
                         else DEFAULT_FONT_SIZE
                     )
+                    should_adjust_font_size = is_text_multiline(_widget) and not template_font_size
                 if widgets[key].font_color is None:
                     widgets[key].font_color = get_text_field_font_color(_widget)
                 if is_text_multiline(_widget) and widgets[key].text_wrap_length is None:
@@ -137,6 +140,8 @@ def update_text_field_attributes(
                     widgets[key].text_wrap_length = get_paragraph_auto_wrap_length(
                         widgets[key]
                     )
+                    if widgets[key].value and should_adjust_font_size:
+                        adjust_paragraph_font_size(_widget, widgets[key])
 
 
 @lru_cache()
@@ -391,3 +396,18 @@ def get_paragraph_auto_wrap_length(widget_middleware: Text) -> int:
         result = min(result, len(line))
 
     return result
+
+
+def adjust_paragraph_font_size(widget: dict, widget_middleware: Text) -> None:
+    """Reduces the font size of a paragraph field until texts fits."""
+
+    height = abs(float(widget[Rect][1]) - float(widget[Rect][3]))
+
+    while (
+            widget_middleware.font_size > FONT_SIZE_REDUCE_STEP
+            and len(widget_middleware.text_lines) * (
+                    widget_middleware.font_size + MARGIN_BETWEEN_LINES
+            ) > height
+    ):
+        widget_middleware.font_size -= FONT_SIZE_REDUCE_STEP
+        widget_middleware.text_lines = get_paragraph_lines(widget, widget_middleware)
