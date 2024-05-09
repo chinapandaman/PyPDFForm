@@ -8,8 +8,9 @@ from typing import Dict, List, Tuple, Union
 from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
-                        WIDGET_TYPES, MaxLen, Rect, FONT_SIZE_REDUCE_STEP, MARGIN_BETWEEN_LINES)
+from .constants import (COMB, DEFAULT_FONT_SIZE, FONT_SIZE_REDUCE_STEP,
+                        MARGIN_BETWEEN_LINES, MULTILINE, NEW_LINE_SYMBOL,
+                        WIDGET_TYPES, MaxLen, Rect)
 from .font import (auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
 from .middleware.checkbox import Checkbox
@@ -405,10 +406,10 @@ def adjust_paragraph_font_size(widget: dict, widget_middleware: Text) -> None:
     height = abs(float(widget[Rect][1]) - float(widget[Rect][3]))
 
     while (
-            widget_middleware.font_size > FONT_SIZE_REDUCE_STEP
-            and len(widget_middleware.text_lines) * (
-                    widget_middleware.font_size + MARGIN_BETWEEN_LINES
-            ) > height
+        widget_middleware.font_size > FONT_SIZE_REDUCE_STEP
+        and len(widget_middleware.text_lines)
+        * (widget_middleware.font_size + MARGIN_BETWEEN_LINES)
+        > height
     ):
         widget_middleware.font_size -= FONT_SIZE_REDUCE_STEP
         widget_middleware.text_lines = get_paragraph_lines(widget, widget_middleware)
