@@ -192,16 +192,13 @@ def test_encrypted_edit_pdf_form(issue_pdf_directory, pdf_samples, request):
         assert obj.stream == expected
 
 
-
 def test_PPF_627_fill_0(issue_pdf_directory, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "simple", "scenario", "issues", "PPF-627-expected-0.pdf"
     )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
-            {
-                "S1 GF 7": 0
-            },
+            {"S1 GF 7": 0},
         )
 
         request.config.results["expected_path"] = expected_path
@@ -219,9 +216,7 @@ def test_PPF_627_fill_1(issue_pdf_directory, pdf_samples, request):
     )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
-            {
-                "S1 GF 7": 1
-            },
+            {"S1 GF 7": 1},
         )
 
         request.config.results["expected_path"] = expected_path
@@ -239,9 +234,7 @@ def test_PPF_627_fill_2(issue_pdf_directory, pdf_samples, request):
     )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
-            {
-                "S1 GF 7": 2
-            },
+            {"S1 GF 7": 2},
         )
 
         request.config.results["expected_path"] = expected_path
@@ -259,9 +252,7 @@ def test_PPF_627_fill_3(issue_pdf_directory, pdf_samples, request):
     )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
-            {
-                "S1 GF 7": 3
-            },
+            {"S1 GF 7": 3},
         )
 
         request.config.results["expected_path"] = expected_path

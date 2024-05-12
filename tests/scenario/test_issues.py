@@ -160,9 +160,7 @@ def test_PPF_627_schema(issue_pdf_directory):
 
 def test_PPF_627_fill_0(issue_pdf_directory, request):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
-        {
-            "S1 GF 7": 0
-        }
+        {"S1 GF 7": 0}
     )
 
     expected_path = os.path.join(issue_pdf_directory, "PPF-627-expected-0.pdf")
@@ -176,9 +174,7 @@ def test_PPF_627_fill_0(issue_pdf_directory, request):
 
 def test_PPF_627_fill_1(issue_pdf_directory, request):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
-        {
-            "S1 GF 7": 1
-        }
+        {"S1 GF 7": 1}
     )
 
     expected_path = os.path.join(issue_pdf_directory, "PPF-627-expected-1.pdf")
@@ -192,9 +188,7 @@ def test_PPF_627_fill_1(issue_pdf_directory, request):
 
 def test_PPF_627_fill_2(issue_pdf_directory, request):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
-        {
-            "S1 GF 7": 2
-        }
+        {"S1 GF 7": 2}
     )
 
     expected_path = os.path.join(issue_pdf_directory, "PPF-627-expected-2.pdf")
@@ -208,9 +202,7 @@ def test_PPF_627_fill_2(issue_pdf_directory, request):
 
 def test_PPF_627_fill_3(issue_pdf_directory, request):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
-        {
-            "S1 GF 7": 3
-        }
+        {"S1 GF 7": 3}
     )
 
     expected_path = os.path.join(issue_pdf_directory, "PPF-627-expected-3.pdf")

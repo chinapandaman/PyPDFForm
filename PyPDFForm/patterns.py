@@ -5,7 +5,7 @@ from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
                            TextStringObject)
 
 from .constants import (AP, AS, CA, DA, FT, IMAGE_FIELD_IDENTIFIER, JS, MK,
-                        READ_ONLY, A, Btn, Ch, N, Ff, Off, Opt, Parent, Q, Sig,
+                        READ_ONLY, A, Btn, Ch, Ff, N, Off, Opt, Parent, Q, Sig,
                         Subtype, T, Tx, V, Widget, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
