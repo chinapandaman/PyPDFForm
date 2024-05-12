@@ -5,7 +5,7 @@ from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
                            TextStringObject)
 
 from .constants import (AP, AS, CA, DA, FT, IMAGE_FIELD_IDENTIFIER, JS, MK,
-                        READ_ONLY, A, Btn, Ch, D, Ff, Off, Opt, Parent, Q, Sig,
+                        READ_ONLY, A, Btn, Ch, N, Ff, Off, Opt, Parent, Q, Sig,
                         Subtype, T, Tx, V, Widget, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
@@ -96,7 +96,7 @@ BUTTON_STYLE_PATTERNS = [
 def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
     """Patterns to update values for checkbox annotations."""
 
-    for each in annot[AP][D]:  # noqa
+    for each in annot[AP][N]:  # noqa
         if (check and str(each) != Off) or (not check and str(each) == Off):
             annot[NameObject(AS)] = NameObject(each)
             annot[NameObject(V)] = NameObject(each)
@@ -106,7 +106,7 @@ def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -
 def simple_update_radio_value(annot: DictionaryObject) -> None:
     """Patterns to update values for radio annotations."""
 
-    for each in annot[AP][D]:  # noqa
+    for each in annot[AP][N]:  # noqa
         if str(each) != Off:
             annot[NameObject(AS)] = NameObject(each)
             annot[NameObject(Parent)][NameObject(V)] = NameObject(each)  # noqa
