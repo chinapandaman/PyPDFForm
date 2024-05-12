@@ -150,3 +150,73 @@ def test_reduce_paragraph_overflow_text_font_size(issue_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_PPF_627_schema(issue_pdf_directory):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf"))
+
+    assert obj.schema["properties"]["S1 GF 7"]["maximum"] == 3
+
+
+def test_PPF_627_fill_0(issue_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
+        {
+            "S1 GF 7": 0
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-627-expected-0.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_PPF_627_fill_1(issue_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
+        {
+            "S1 GF 7": 1
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-627-expected-1.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_PPF_627_fill_2(issue_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
+        {
+            "S1 GF 7": 2
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-627-expected-2.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_PPF_627_fill_3(issue_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
+        {
+            "S1 GF 7": 3
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-627-expected-3.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
