@@ -190,3 +190,84 @@ def test_encrypted_edit_pdf_form(issue_pdf_directory, pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
+
+
+
+def test_PPF_221_fill_0(issue_pdf_directory, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "issues", "PPF-627-expected-0.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
+            {
+                "S1 GF 7": 0
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
+
+
+def test_PPF_221_fill_1(issue_pdf_directory, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "issues", "PPF-627-expected-1.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
+            {
+                "S1 GF 7": 1
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
+
+
+def test_PPF_221_fill_2(issue_pdf_directory, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "issues", "PPF-627-expected-2.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
+            {
+                "S1 GF 7": 2
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
+
+
+def test_PPF_221_fill_3(issue_pdf_directory, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "simple", "scenario", "issues", "PPF-627-expected-3.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
+            {
+                "S1 GF 7": 3
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
