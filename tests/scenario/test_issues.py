@@ -152,13 +152,13 @@ def test_reduce_paragraph_overflow_text_font_size(issue_pdf_directory, request):
         assert obj.read() == expected
 
 
-def test_PPF_627_schema(issue_pdf_directory):
+def test_ppf_627_schema(issue_pdf_directory):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf"))
 
     assert obj.schema["properties"]["S1 GF 7"]["maximum"] == 3
 
 
-def test_PPF_627_fill_0(issue_pdf_directory, request):
+def test_ppf_627_fill_0(issue_pdf_directory, request):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
         {"S1 GF 7": 0}
     )
@@ -172,7 +172,7 @@ def test_PPF_627_fill_0(issue_pdf_directory, request):
         assert obj.read() == expected
 
 
-def test_PPF_627_fill_1(issue_pdf_directory, request):
+def test_ppf_627_fill_1(issue_pdf_directory, request):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
         {"S1 GF 7": 1}
     )
@@ -186,7 +186,7 @@ def test_PPF_627_fill_1(issue_pdf_directory, request):
         assert obj.read() == expected
 
 
-def test_PPF_627_fill_2(issue_pdf_directory, request):
+def test_ppf_627_fill_2(issue_pdf_directory, request):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
         {"S1 GF 7": 2}
     )
@@ -200,7 +200,7 @@ def test_PPF_627_fill_2(issue_pdf_directory, request):
         assert obj.read() == expected
 
 
-def test_PPF_627_fill_3(issue_pdf_directory, request):
+def test_ppf_627_fill_3(issue_pdf_directory, request):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
         {"S1 GF 7": 3}
     )
