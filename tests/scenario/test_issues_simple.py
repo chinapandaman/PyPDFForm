@@ -192,7 +192,7 @@ def test_encrypted_edit_pdf_form(issue_pdf_directory, pdf_samples, request):
         assert obj.stream == expected
 
 
-def test_PPF_627_fill_0(issue_pdf_directory, pdf_samples, request):
+def test_ppf_627_fill_0(issue_pdf_directory, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "simple", "scenario", "issues", "PPF-627-expected-0.pdf"
     )
@@ -210,7 +210,7 @@ def test_PPF_627_fill_0(issue_pdf_directory, pdf_samples, request):
         assert obj.stream == expected
 
 
-def test_PPF_627_fill_1(issue_pdf_directory, pdf_samples, request):
+def test_ppf_627_fill_1(issue_pdf_directory, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "simple", "scenario", "issues", "PPF-627-expected-1.pdf"
     )
@@ -228,7 +228,7 @@ def test_PPF_627_fill_1(issue_pdf_directory, pdf_samples, request):
         assert obj.stream == expected
 
 
-def test_PPF_627_fill_2(issue_pdf_directory, pdf_samples, request):
+def test_ppf_627_fill_2(issue_pdf_directory, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "simple", "scenario", "issues", "PPF-627-expected-2.pdf"
     )
@@ -246,7 +246,7 @@ def test_PPF_627_fill_2(issue_pdf_directory, pdf_samples, request):
         assert obj.stream == expected
 
 
-def test_PPF_627_fill_3(issue_pdf_directory, pdf_samples, request):
+def test_ppf_627_fill_3(issue_pdf_directory, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "simple", "scenario", "issues", "PPF-627-expected-3.pdf"
     )
