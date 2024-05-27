@@ -15,5 +15,5 @@ git restore --source=HEAD --staged --worktree -- ./pdf_samples
 
 for i in "${BEFORE[@]}"; do
   python ./scripts/open_pdf_diff.py "$i"
-  read -p "Press any key to continue..." -n1 -s -r
+  read -p "Press any key to continue..."$'\n' -n1 -s -r
 done
