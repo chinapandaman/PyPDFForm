@@ -30,3 +30,11 @@ with open("output.pdf", "wb+") as output:
 
 The optional parameter `flatten` has a default value of `False`, meaning PDF forms filled using `FormWrapper` will by 
 default remain editable. Setting it to `True` will flatten the PDF after it's filled, making all widgets read only.
+
+**NOTE:** Currently there are some known issues with Adobe Acrobat displaying PDF forms filled using this method. 
+Specifically the text content that gets filled into a text field widget will only appear when the text field is clicked 
+and selected. This is not an issue in browsers like Chrome or other PDF viewing apps like Document Viewer 
+(the default PDF app on Ubuntu). It is not 100% clear why such behavior exists for Adobe Acrobat but the speculated reason 
+is that Adobe Acrobat seems to require way more complex metadata than browsers like Chrome for a text field widget to be 
+rendered properly. If you have to use Adobe Acrobat, consider using `PdfWrapper` instead to fill your PDF forms as this is 
+not something that can be fixed right now.
