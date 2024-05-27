@@ -134,8 +134,9 @@ def update_text_field_attributes(
                         if not is_paragraph
                         else DEFAULT_FONT_SIZE
                     )
-                    should_adjust_font_size = (not template_font_size
-                                               and widgets[key].max_length is None)
+                    should_adjust_font_size = (
+                        not template_font_size and widgets[key].max_length is None
+                    )
                 if widgets[key].font_color is None:
                     widgets[key].font_color = get_text_field_font_color(_widget)
                 if is_paragraph and widgets[key].text_wrap_length is None:
@@ -424,12 +425,11 @@ def adjust_text_field_font_size(widget: dict, widget_middleware: Text) -> None:
 
     width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
 
-    while(
+    while (
         widget_middleware.font_size > FONT_SIZE_REDUCE_STEP
         and stringWidth(
-            widget_middleware.value,
-            widget_middleware.font,
-            widget_middleware.font_size
-        ) > width
+            widget_middleware.value, widget_middleware.font, widget_middleware.font_size
+        )
+        > width
     ):
         widget_middleware.font_size -= FONT_SIZE_REDUCE_STEP
