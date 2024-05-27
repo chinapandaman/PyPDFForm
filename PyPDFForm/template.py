@@ -134,7 +134,8 @@ def update_text_field_attributes(
                         if not is_paragraph
                         else DEFAULT_FONT_SIZE
                     )
-                    should_adjust_font_size = is_paragraph and not template_font_size
+                    should_adjust_font_size = (not template_font_size
+                                               and widgets[key].max_length is None)
                 if widgets[key].font_color is None:
                     widgets[key].font_color = get_text_field_font_color(_widget)
                 if is_paragraph and widgets[key].text_wrap_length is None:
@@ -142,8 +143,11 @@ def update_text_field_attributes(
                     widgets[key].text_wrap_length = get_paragraph_auto_wrap_length(
                         widgets[key]
                     )
-                    if widgets[key].value and should_adjust_font_size:
+                if widgets[key].value and should_adjust_font_size:
+                    if is_paragraph:
                         adjust_paragraph_font_size(_widget, widgets[key])
+                    else:
+                        adjust_text_field_font_size(_widget, widgets[key])
 
 
 @lru_cache()
@@ -413,3 +417,19 @@ def adjust_paragraph_font_size(widget: dict, widget_middleware: Text) -> None:
     ):
         widget_middleware.font_size -= FONT_SIZE_REDUCE_STEP
         widget_middleware.text_lines = get_paragraph_lines(widget, widget_middleware)
+
+
+def adjust_text_field_font_size(widget: dict, widget_middleware: Text) -> None:
+    """Reduces the font size of a text field until texts fits."""
+
+    width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
+
+    while(
+        widget_middleware.font_size > FONT_SIZE_REDUCE_STEP
+        and stringWidth(
+            widget_middleware.value,
+            widget_middleware.font,
+            widget_middleware.font_size
+        ) > width
+    ):
+        widget_middleware.font_size -= FONT_SIZE_REDUCE_STEP
