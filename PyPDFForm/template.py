@@ -10,9 +10,9 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
                         WIDGET_TYPES, MaxLen, Rect)
-from .font import (auto_detect_font, get_text_field_font_color,
-                   get_text_field_font_size, text_field_font_size,
-                   adjust_paragraph_font_size, adjust_text_field_font_size)
+from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
+                   auto_detect_font, get_text_field_font_color,
+                   get_text_field_font_size, text_field_font_size)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio

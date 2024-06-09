@@ -7,14 +7,16 @@ from re import findall
 from typing import Tuple, Union
 
 from reportlab.pdfbase.acroform import AcroForm
-from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts, stringWidth
+from reportlab.pdfbase.pdfmetrics import (registerFont, standardFonts,
+                                          stringWidth)
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from .constants import (DEFAULT_FONT, FONT_COLOR_IDENTIFIER,
-                        FONT_SIZE_IDENTIFIER, Rect, FONT_SIZE_REDUCE_STEP, MARGIN_BETWEEN_LINES)
+                        FONT_SIZE_IDENTIFIER, FONT_SIZE_REDUCE_STEP,
+                        MARGIN_BETWEEN_LINES, Rect)
+from .middleware.text import Text
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .utils import traverse_pattern
-from .middleware.text import Text
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
