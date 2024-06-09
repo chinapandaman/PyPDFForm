@@ -165,11 +165,12 @@ def simple_fill(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
     flatten: bool = False,
+    adobe_mode: bool = False,
 ) -> bytes:
     """Fills a PDF form in place."""
 
     pdf = PdfReader(stream_to_io(template))
-    if AcroForm in pdf.trailer[Root]:
+    if adobe_mode and AcroForm in pdf.trailer[Root]:
         pdf.trailer[Root][AcroForm].update(
             {NameObject(NeedAppearances): BooleanObject(True)}
         )
