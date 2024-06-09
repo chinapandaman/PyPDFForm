@@ -8,11 +8,11 @@ from typing import Dict, List, Tuple, Union
 from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .constants import (COMB, DEFAULT_FONT_SIZE, FONT_SIZE_REDUCE_STEP,
-                        MARGIN_BETWEEN_LINES, MULTILINE, NEW_LINE_SYMBOL,
+from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
                         WIDGET_TYPES, MaxLen, Rect)
 from .font import (auto_detect_font, get_text_field_font_color,
-                   get_text_field_font_size, text_field_font_size)
+                   get_text_field_font_size, text_field_font_size,
+                   adjust_paragraph_font_size, adjust_text_field_font_size)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -403,33 +403,3 @@ def get_paragraph_auto_wrap_length(widget_middleware: Text) -> int:
         result = min(result, len(line))
 
     return result
-
-
-def adjust_paragraph_font_size(widget: dict, widget_middleware: Text) -> None:
-    """Reduces the font size of a paragraph field until texts fits."""
-
-    height = abs(float(widget[Rect][1]) - float(widget[Rect][3]))
-
-    while (
-        widget_middleware.font_size > FONT_SIZE_REDUCE_STEP
-        and len(widget_middleware.text_lines)
-        * (widget_middleware.font_size + MARGIN_BETWEEN_LINES)
-        > height
-    ):
-        widget_middleware.font_size -= FONT_SIZE_REDUCE_STEP
-        widget_middleware.text_lines = get_paragraph_lines(widget, widget_middleware)
-
-
-def adjust_text_field_font_size(widget: dict, widget_middleware: Text) -> None:
-    """Reduces the font size of a text field until texts fits."""
-
-    width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
-
-    while (
-        widget_middleware.font_size > FONT_SIZE_REDUCE_STEP
-        and stringWidth(
-            widget_middleware.value, widget_middleware.font, widget_middleware.font_size
-        )
-        > width
-    ):
-        widget_middleware.font_size -= FONT_SIZE_REDUCE_STEP
