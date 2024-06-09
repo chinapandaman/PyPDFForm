@@ -7,13 +7,14 @@ from re import findall
 from typing import Tuple, Union
 
 from reportlab.pdfbase.acroform import AcroForm
-from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
+from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts, stringWidth
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from .constants import (DEFAULT_FONT, FONT_COLOR_IDENTIFIER,
-                        FONT_SIZE_IDENTIFIER, Rect)
+                        FONT_SIZE_IDENTIFIER, Rect, FONT_SIZE_REDUCE_STEP, MARGIN_BETWEEN_LINES)
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
 from .utils import traverse_pattern
+from .middleware.text import Text
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
@@ -146,3 +147,36 @@ def get_text_field_font_color(
                     break
 
     return result
+
+
+def adjust_paragraph_font_size(widget: dict, widget_middleware: Text) -> None:
+    """Reduces the font size of a paragraph field until texts fits."""
+
+    # pylint: disable=C0415, R0401
+    from .template import get_paragraph_lines
+
+    height = abs(float(widget[Rect][1]) - float(widget[Rect][3]))
+
+    while (
+        widget_middleware.font_size > FONT_SIZE_REDUCE_STEP
+        and len(widget_middleware.text_lines)
+        * (widget_middleware.font_size + MARGIN_BETWEEN_LINES)
+        > height
+    ):
+        widget_middleware.font_size -= FONT_SIZE_REDUCE_STEP
+        widget_middleware.text_lines = get_paragraph_lines(widget, widget_middleware)
+
+
+def adjust_text_field_font_size(widget: dict, widget_middleware: Text) -> None:
+    """Reduces the font size of a text field until texts fits."""
+
+    width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
+
+    while (
+        widget_middleware.font_size > FONT_SIZE_REDUCE_STEP
+        and stringWidth(
+            widget_middleware.value, widget_middleware.font, widget_middleware.font_size
+        )
+        > width
+    ):
+        widget_middleware.font_size -= FONT_SIZE_REDUCE_STEP
