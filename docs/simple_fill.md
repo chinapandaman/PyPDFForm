@@ -70,4 +70,5 @@ with open("output.pdf", "wb+") as output:
 
 **NOTE:** However, enabling Adobe mode may result in some unexpected style changes for checkboxes and radio buttons. It 
 may even result in selected radio button not displaying correctly when opened using Adobe Acrobat. It's currently 
-unclear why such behaviors exist.
+unclear why such behaviors exist. If you have trouble with these behaviors, consider using `PdfWrapper` instead to 
+fill your PDF forms.
