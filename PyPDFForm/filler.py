@@ -5,7 +5,7 @@ from io import BytesIO
 from typing import Dict, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (BooleanObject, DictionaryObject, IndirectObject,
+from pypdf.generic import (BooleanObject, DictionaryObject,
                            NameObject)
 
 from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root
@@ -169,6 +169,7 @@ def simple_fill(
 ) -> bytes:
     """Fills a PDF form in place."""
 
+    # pylint: disable=too-many-branches
     pdf = PdfReader(stream_to_io(template))
     if adobe_mode and AcroForm in pdf.trailer[Root]:
         pdf.trailer[Root][AcroForm].update(
