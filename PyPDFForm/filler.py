@@ -5,9 +5,10 @@ from io import BytesIO
 from typing import Dict, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject
+from pypdf.generic import (BooleanObject, DictionaryObject,
+                           NameObject)
 
-from .constants import WIDGET_TYPES, Annots
+from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_image_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -164,10 +165,17 @@ def simple_fill(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
     flatten: bool = False,
+    adobe_mode: bool = False,
 ) -> bytes:
     """Fills a PDF form in place."""
 
+    # pylint: disable=too-many-branches
     pdf = PdfReader(stream_to_io(template))
+    if adobe_mode and AcroForm in pdf.trailer[Root]:
+        pdf.trailer[Root][AcroForm].update(
+            {NameObject(NeedAppearances): BooleanObject(True)}
+        )
+
     out = PdfWriter()
     out.append(pdf)
 

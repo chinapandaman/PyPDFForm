@@ -54,6 +54,11 @@ AS = "/AS"
 Yes = "/Yes"
 Off = "/Off"
 
+# For Adobe Acrobat
+AcroForm = "/AcroForm"
+Root = "/Root"
+NeedAppearances = "/NeedAppearances"
+
 # Field flag bits
 READ_ONLY = 1 << 0
 MULTILINE = 1 << 12
