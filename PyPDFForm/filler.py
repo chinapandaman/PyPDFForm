@@ -5,8 +5,7 @@ from io import BytesIO
 from typing import Dict, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (BooleanObject, DictionaryObject,
-                           NameObject)
+from pypdf.generic import BooleanObject, DictionaryObject, NameObject
 
 from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root
 from .coordinate import (get_draw_checkbox_radio_coordinates,
