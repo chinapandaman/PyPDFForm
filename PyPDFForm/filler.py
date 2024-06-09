@@ -160,6 +160,15 @@ def fill(
     return result
 
 
+def enable_adobe_mode(pdf: PdfReader, adobe_mode: bool) -> None:
+    """Enables Adobe mode so that texts filled can show up in Acrobat."""
+
+    if adobe_mode and AcroForm in pdf.trailer[Root]:
+        pdf.trailer[Root][AcroForm].update(
+            {NameObject(NeedAppearances): BooleanObject(True)}
+        )
+
+
 def simple_fill(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
@@ -170,11 +179,7 @@ def simple_fill(
 
     # pylint: disable=too-many-branches
     pdf = PdfReader(stream_to_io(template))
-    if adobe_mode and AcroForm in pdf.trailer[Root]:
-        pdf.trailer[Root][AcroForm].update(
-            {NameObject(NeedAppearances): BooleanObject(True)}
-        )
-
+    enable_adobe_mode(pdf, adobe_mode)
     out = PdfWriter()
     out.append(pdf)
 
