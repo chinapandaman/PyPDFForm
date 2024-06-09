@@ -5,9 +5,10 @@ from io import BytesIO
 from typing import Dict, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject
+from pypdf.generic import (BooleanObject, DictionaryObject, IndirectObject,
+                           NameObject)
 
-from .constants import WIDGET_TYPES, Annots
+from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_image_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -168,6 +169,11 @@ def simple_fill(
     """Fills a PDF form in place."""
 
     pdf = PdfReader(stream_to_io(template))
+    if AcroForm in pdf.trailer[Root]:
+        pdf.trailer[Root][AcroForm].update(
+            {NameObject(NeedAppearances): BooleanObject(True)}
+        )
+
     out = PdfWriter()
     out.append(pdf)
 
