@@ -177,7 +177,6 @@ def simple_fill(
 ) -> bytes:
     """Fills a PDF form in place."""
 
-    # pylint: disable=too-many-branches
     pdf = PdfReader(stream_to_io(template))
     enable_adobe_mode(pdf, adobe_mode)
     out = PdfWriter()
