@@ -6,7 +6,9 @@ from PyPDFForm import FormWrapper
 
 
 def test_dropdown_one(sample_template_with_dropdown, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "adobe_mode", "dropdown", "dropdown_one.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "adobe_mode", "dropdown", "dropdown_one.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_dropdown).fill(
             {
@@ -72,7 +74,9 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
 
 
 def test_issue_613(pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "adobe_mode", "issues", "613_expected.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "adobe_mode", "issues", "613_expected.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(
             os.path.join(pdf_samples, "scenario", "issues", "613.pdf")
