@@ -8,22 +8,6 @@
     <a href="https://pypistats.org/packages/pypdfform"><img src="https://img.shields.io/pypi/dm/pypdfform?logo=pypi&logoColor=white&label=downloads&labelColor=black&color=blue&style=for-the-badge"></a>
 </p>
 
-## Important API Changes
-
-Happy new year fellow developers! We start the year 2024 with a new release of v1.4.0 and 
-there are some important changes I'm making to the APIs of the library.
-
-* The PDF object that gets instantiated is now `PyPDFForm.PdfWrapper`, changed from `PyPDFForm.PyPDFForm`.
-* Form widgets are now accessed via the `PdfWrapper.widgets` attribute, changed from `PdfWrapper.elements`.
-* The JSON schema of the form data is now accessed via a new attribute called `PdfWrapper.schema`, 
-changed from the old method of `PdfWrapper.generate_schema()`.
-
-All the old APIs will be persisted for half a year and then fully deprecated. Each of them 
-will emit a `DeprecationWarning` when invoked, so it is advised that you make the switch before they are 
-removed and start breaking your code.
-
-Happy hacking!
-
 ## Introduction
 
 PyPDFForm is a free and open source pure-Python 3 library for PDF form processing. It contains the essential 

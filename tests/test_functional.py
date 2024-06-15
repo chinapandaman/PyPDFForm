@@ -2,10 +2,9 @@
 
 import os
 
-import pytest
 from jsonschema import ValidationError, validate
 
-from PyPDFForm import PdfWrapper, PyPDFForm, constants, template
+from PyPDFForm import PdfWrapper, constants, template
 from PyPDFForm.middleware.base import Widget
 from PyPDFForm.middleware.text import Text
 
@@ -16,30 +15,6 @@ def test_base_schema_definition():
         assert False
     except NotImplementedError:
         pass
-
-
-def test_elements_deprecation_notice(template_stream):
-    with pytest.warns(DeprecationWarning) as r:
-        obj = PdfWrapper(template_stream)
-        assert not r
-        assert obj.elements is obj.widgets
-        obj.elements["test"].font_size = 20
-        assert obj.widgets["test"].font_size == 20
-        assert r
-
-
-def test_generate_schema_deprecation_notice(template_stream):
-    with pytest.warns(DeprecationWarning) as r:
-        obj = PdfWrapper(template_stream)
-        assert not r
-        assert obj.generate_schema() == obj.schema
-        assert r
-
-
-def test_pypdfform_deprecation_notice(template_stream):
-    with pytest.warns(DeprecationWarning) as r:
-        assert PyPDFForm(template_stream)
-        assert r
 
 
 def test_fill(template_stream, pdf_samples, data_dict, request):

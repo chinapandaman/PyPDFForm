@@ -5,12 +5,10 @@ from __future__ import annotations
 
 from functools import cached_property
 from typing import BinaryIO, Dict, List, Tuple, Union
-from warnings import warn
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
-                        DEPRECATION_NOTICE, VERSION_IDENTIFIER_PREFIX,
-                        VERSION_IDENTIFIERS)
+                        VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
 from .filler import fill, simple_fill
 from .font import register_font
@@ -89,21 +87,6 @@ class PdfWrapper(FormWrapper):
                 each.font = self.global_font
                 each.font_size = self.global_font_size
                 each.font_color = self.global_font_color
-
-    @property
-    def elements(self) -> dict:
-        """ToDo: deprecate this."""
-
-        warn(
-            DEPRECATION_NOTICE.format(
-                f"{self.__class__.__name__}.elements",
-                f"{self.__class__.__name__}.widgets",
-            ),
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        return self.widgets
 
     @property
     def sample_data(self) -> dict:
@@ -314,20 +297,6 @@ class PdfWrapper(FormWrapper):
 
         return result
 
-    def generate_schema(self) -> dict:
-        """ToDo: deprecate this."""
-
-        warn(
-            DEPRECATION_NOTICE.format(
-                f"{self.__class__.__name__}.generate_schema()",
-                f"{self.__class__.__name__}.schema",
-            ),
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        return self.schema
-
     @classmethod
     def register_font(
         cls, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
@@ -337,22 +306,3 @@ class PdfWrapper(FormWrapper):
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         return register_font(font_name, ttf_file) if ttf_file is not None else False
-
-
-class PyPDFForm(PdfWrapper):
-    """ToDo: deprecate this."""
-
-    def __init__(
-        self,
-        template: Union[bytes, str, BinaryIO] = b"",
-        **kwargs,
-    ):
-        """Only extra thing is the deprecation notice."""
-
-        warn(
-            DEPRECATION_NOTICE.format("PyPDFForm.PyPDFForm", "PyPDFForm.PdfWrapper"),
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        super().__init__(template, **kwargs)
