@@ -3,4 +3,4 @@
 
 __version__ = "1.4.27"
 
-from .wrapper import FormWrapper, PdfWrapper, PyPDFForm
+from .wrapper import FormWrapper, PdfWrapper
