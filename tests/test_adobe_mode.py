@@ -69,3 +69,25 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.stream == expected
+
+
+def test_issue_613(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "adobe_mode", "issues", "613_expected.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = FormWrapper(
+            os.path.join(pdf_samples, "scenario", "issues", "613.pdf")
+        ).fill(
+            {
+                "301 Full name": "John Smith",
+                "301 Address Street": "1234 road number 6",
+            },
+            adobe_mode=True,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.stream == expected
