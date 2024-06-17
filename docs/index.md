@@ -21,3 +21,11 @@ It also supports other common utilities such as extracting pages and merging mul
 * [Change checkbox and radio button styles](button_style.md)
 * [Draw stuffs](draw.md)
 * [Other utilities](utils.md)
+
+## Developer Guide
+
+* [Developer Intro](dev_intro.md)
+* [Pull Request Requirements](dev_changes.md)
+* [Hosting Docs Locally](dev_doc.md)
+* [Testing](dev_test.md)
+* [Releasing](dev_release.md)
