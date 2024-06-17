@@ -25,3 +25,7 @@ It also supports other common utilities such as extracting pages and merging mul
 ## Developer Guide
 
 * [Developer Intro](dev_intro.md)
+* [Change Requirements](dev_changes.md)
+* [Changing Documentations](dev_doc.md)
+* [Testing](dev_test.md)
+* [Releasing](dev_release.md)

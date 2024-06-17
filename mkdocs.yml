@@ -14,6 +14,10 @@ nav:
     - utils.md
   - 'Developer Guide':
     - dev_intro.md
+    - dev_changes.md
+    - dev_doc.md
+    - dev_test.md
+    - dev_release.md
 theme:
   name: readthedocs
   logo: img/logo.png
