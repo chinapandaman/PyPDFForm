@@ -25,10 +25,10 @@ When you create an issue on GitHub, try your best to follow these conventions:
     * A PDF form template used by the code snippet.
     * Screenshots that can help visualize the issue.
 
-## Openning pull requests
+## Opening pull requests
 
-Please create an issue before making a pull request. Try your best to follow these conventions when do so:
+Please create an issue before making a pull request. Try your best to follow these conventions when doing so:
 
 * The PR title should be the same as its respective issue, so `PPF-<issue number>: <title of the issue>`.
-* The PR description should contain a brief explanation on the changes.
+* The PR description should contain a brief explanation of the changes.
 * Once opened, the PR should be linked to its respective issue.
