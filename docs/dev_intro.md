@@ -13,19 +13,7 @@ pip install -r requirements.txt
 
 ## Running tests
 
-PyPDFForm uses [pytest](https://pytest.org/) to run all its tests. Tests can be run by simply executing:
-
-```shell
-pytest
-```
-
-To generate a coverage report, run:
-
-```shell
-coverage run -m pytest && coverage html
-```
-
-And the coverage report can be viewed by openning `htmlcov/index.html` in a browser.
+See [testing PyPDFForm with pytest](dev_test.md)
 
 ## Creating issues
 
