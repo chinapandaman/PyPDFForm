@@ -13,7 +13,7 @@ pip install -r requirements.txt
 
 ## Running tests
 
-See [testing PyPDFForm with pytest](dev_test.md)
+See [testing PyPDFForm with pytest](dev_test.md).
 
 ## Creating issues
 
