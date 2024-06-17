@@ -26,6 +26,6 @@ It also supports other common utilities such as extracting pages and merging mul
 
 * [Developer Intro](dev_intro.md)
 * [Pull Request Requirements](dev_changes.md)
-* [Updating Documentations](dev_doc.md)
+* [Hosting Docs Locally](dev_doc.md)
 * [Testing](dev_test.md)
 * [Releasing](dev_release.md)

@@ -2,7 +2,7 @@
 
 PyPDFForm uses a single depth, non-nested dictionary to fill a PDF form. As a result of this process, the filled 
 PDF form will be flattened and no longer editable. This is to prevent future encoding issues, especially when 
-multiple PDF forms with overlaps on widget names are combined together.
+multiple PDF forms with overlaps on widget names are combined.
 
 ## Fill text field and checkbox widgets
 
