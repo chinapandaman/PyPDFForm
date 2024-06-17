@@ -12,6 +12,8 @@ nav:
     - button_style.md
     - draw.md
     - utils.md
+  - 'Developer Guide':
+    - dev_intro.md
 theme:
   name: readthedocs
   logo: img/logo.png
