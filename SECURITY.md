@@ -16,5 +16,5 @@ If you believe you have identified a vulnerability with PyPDFForm, do NOT open a
 To responsibly report a vulnerability, use GitHub's [security advisory system](https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/creating-a-repository-security-advisory).
 
 Be sure to include as much detail as necessary in your report. As with reporting normal issues, 
-a minimal reproducible example will help the maintainers address the issue faster. 
+a minimal reproducible example will help address the issue faster. 
 Information about why the issue is a vulnerability is also helpful.
