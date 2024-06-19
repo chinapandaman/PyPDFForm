@@ -2,8 +2,8 @@
 
 ## Supported Versions
 
-PyPDFForm only fixes security issues in the latest version of the library. If you believe you have identified a 
-security issue, please consider upgrading your version before reporting.
+PyPDFForm only fixes vulnerabilities in the latest version of the library. If you believe you have identified a 
+vulnerability, please consider upgrading your version before reporting.
 
 | Version  | Supported          |
 |----------| ------------------ |
@@ -12,9 +12,9 @@ security issue, please consider upgrading your version before reporting.
 
 ## Reporting a Vulnerability
 
-If you believe you have identified a security issue with PyPDFForm, do NOT open a public issue. 
-To responsibly report a security issue, use GitHub's [security advisory system](https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/creating-a-repository-security-advisory).
+If you believe you have identified a vulnerability with PyPDFForm, do NOT open a public issue. 
+To responsibly report a vulnerability, use GitHub's [security advisory system](https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/creating-a-repository-security-advisory).
 
 Be sure to include as much detail as necessary in your report. As with reporting normal issues, 
 a minimal reproducible example will help the maintainers address the issue faster. 
-Information about why the issue is a security issue is also helpful.
+Information about why the issue is a vulnerability is also helpful.
