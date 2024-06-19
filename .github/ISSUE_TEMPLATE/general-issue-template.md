@@ -1,6 +1,6 @@
 ---
 name: General Issue Template
-about: Please report generic issues using this template.
+about: Please report any generic issues using this template.
 title: ''
 labels: ''
 assignees: ''
