@@ -1,7 +1,7 @@
 ---
 name: General Issue Template
 about: Please report any generic issues using this template.
-title: ''
+title: 'PPF-<issue number>: <issue title>'
 labels: ''
 assignees: ''
 
@@ -11,6 +11,10 @@ assignees: ''
 
 <!-- Replace X.X.X with the corresponding PyPDFForm version. -->
 PyPDFForm=X.X.X
+
+### Issue Description
+
+<!-- Please provide a concise description of the issue you run into. -->
 
 ### Code Snippet
 
