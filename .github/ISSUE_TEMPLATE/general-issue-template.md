@@ -12,6 +12,10 @@ assignees: ''
 <!-- Replace X.X.X with the corresponding PyPDFForm version. -->
 PyPDFForm=X.X.X
 
+### Issue Description
+
+<!-- Please provide a concise description of the issue you run into. -->
+
 ### Code Snippet
 
 <!-- Please provide a code snippet related to the issue. -->
