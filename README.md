@@ -57,12 +57,6 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/ma
 
 The official documentation can be found on [the GitHub page](https://chinapandaman.github.io/PyPDFForm/) of this repository.
 
-## Public Speak
+## Other Resources
 
 [Chicago Python User Group - Dec 14, 2023](https://youtu.be/8t1RdAKwr9w?si=TLgumBNXv9H8szSn)
-
-## How to Contribute
-
-It is difficult to make sure that the library supports all the PDF form creating tools out 
-there. So if you run into a case where the library does not work for certain PDF forms created by certain tools, feel free to open an issue with the problematic PDF form attached. I will seek 
-to make the library support the attached PDF form as well as the tool used to create it.
