@@ -1,7 +1,7 @@
 ---
 name: General Issue Template
-about: Please report any general purpose issue using this template.
-title: 'PPF-<issue number>: <issue title>'
+about: Please report any generic issues using this template.
+title: ''
 labels: ''
 assignees: ''
 
