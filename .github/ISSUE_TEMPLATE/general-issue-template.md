@@ -1,3 +1,12 @@
+---
+name: General Issue Template
+about: Please report any general purpose issue using this template.
+title: 'PPF-<issue number>: <issue title>'
+labels: ''
+assignees: ''
+
+---
+
 ### Version
 
 <!-- Replace X.X.X with the corresponding PyPDFForm version. -->
