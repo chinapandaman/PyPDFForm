@@ -57,6 +57,6 @@ and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/ma
 
 The official documentation can be found on [the GitHub page](https://chinapandaman.github.io/PyPDFForm/) of this repository.
 
-## Public Speak
+## Other Resources
 
 [Chicago Python User Group - Dec 14, 2023](https://youtu.be/8t1RdAKwr9w?si=TLgumBNXv9H8szSn)
