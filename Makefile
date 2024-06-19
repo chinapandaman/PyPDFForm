@@ -27,3 +27,6 @@ serve-docs:
 
 serve-files:
 	bash ./scripts/http_server.sh
+
+clean-temp:
+	rm ./temp/*.pdf
