@@ -31,3 +31,10 @@ if __name__ == "__main__":
     os.remove("mkdocs.yml")
     with open("mkdocs.yml", mode="w", encoding="utf8") as f:
         f.write(content)
+
+    with open("SECURITY.md", encoding="utf8") as f:
+        content = f.read().replace(version, new_version)
+
+    os.remove("SECURITY.md")
+    with open("SECURITY.md", mode="w", encoding="utf8") as f:
+        f.write(content)
