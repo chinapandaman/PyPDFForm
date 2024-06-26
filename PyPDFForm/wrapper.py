@@ -8,7 +8,7 @@ from typing import BinaryIO, Dict, List, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
-                        VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS)
+                        VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS, NEW_LINE_SYMBOL)
 from .coordinate import generate_coordinate_grid
 from .filler import fill, simple_fill
 from .font import register_font
@@ -243,6 +243,9 @@ class PdfWrapper(FormWrapper):
         new_widget.font = kwargs.get("font", DEFAULT_FONT)
         new_widget.font_size = kwargs.get("font_size", DEFAULT_FONT_SIZE)
         new_widget.font_color = kwargs.get("font_color", DEFAULT_FONT_COLOR)
+
+        if NEW_LINE_SYMBOL in text:
+            new_widget.text_lines = text.split(NEW_LINE_SYMBOL)
 
         watermarks = create_watermarks_and_draw(
             self.stream,
