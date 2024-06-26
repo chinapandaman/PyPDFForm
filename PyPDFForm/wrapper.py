@@ -8,7 +8,8 @@ from typing import BinaryIO, Dict, List, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
-                        VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS, NEW_LINE_SYMBOL)
+                        NEW_LINE_SYMBOL, VERSION_IDENTIFIER_PREFIX,
+                        VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
 from .filler import fill, simple_fill
 from .font import register_font

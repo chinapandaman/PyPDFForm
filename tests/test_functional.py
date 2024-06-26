@@ -223,7 +223,9 @@ def test_draw_text_on_one_page(template_stream, pdf_samples, request):
 
 
 def test_draw_text_new_line_symbol(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "sample_pdf_with_drawn_text_new_line_symbol.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "sample_pdf_with_drawn_text_new_line_symbol.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).draw_text(
             "test\ntest\ntest",
