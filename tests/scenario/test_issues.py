@@ -212,3 +212,17 @@ def test_ppf_627_fill_3(issue_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_sejda_checkbox(issue_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "683.pdf")).fill(
+        {"test_checkbox": True}
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "683_expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
