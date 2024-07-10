@@ -10,5 +10,6 @@
     "reportGeneralTypeIssues": "none",
     "reportOptionalMemberAccess": "none",
     // custom configs
-    "reportPossiblyUnboundVariable": true,
+    "reportPossiblyUnboundVariable": "error",
+    "reportUnusedImport": "error"
 }

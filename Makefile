@@ -7,9 +7,6 @@ test-all:
 coverage-all:
 	bash ./scripts/coverage.sh
 
-check-imports:
-	bash ./scripts/check_imports.sh
-
 linting:
 	bash ./scripts/linting.sh
 
