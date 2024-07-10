@@ -11,5 +11,6 @@
     "reportOptionalMemberAccess": "none",
     // custom configs
     "reportPossiblyUnboundVariable": "error",
-    "reportUnusedImport": "error"
+    "reportUnusedImport": "error",
+    "reportIncompatibleMethodOverride": "error",
 }
