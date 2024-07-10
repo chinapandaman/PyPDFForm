@@ -6,6 +6,7 @@ pillow
 pudb
 pylint
 pypdf
+pyright
 pytest
 reportlab
 requests

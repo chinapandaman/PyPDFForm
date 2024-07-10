@@ -1,0 +1,14 @@
+{
+    "typeCheckingMode": "basic",
+    "reportArgumentType": "none",
+    "reportAssignmentType": "none",
+    "reportAttributeAccessIssue": "none",
+    "reportReturnType": "none",
+    "reportOptionalSubscript": "none",
+    "reportIndexIssue": "none",
+    "reportOperatorIssue": "none",
+    "reportGeneralTypeIssues": "none",
+    "reportOptionalMemberAccess": "none",
+    // custom configs
+    "reportPossiblyUnboundVariable": true,
+}
