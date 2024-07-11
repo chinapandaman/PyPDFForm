@@ -34,7 +34,7 @@ class Checkbox(Widget):
         return {"type": "boolean"}
 
     @property
-    def sample_value(self) -> bool:
+    def sample_value(self) -> bool | int:
         """Sample value of the checkbox."""
 
         return True
