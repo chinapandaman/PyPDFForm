@@ -1,2 +1,3 @@
 [lint]
-select = ["E4", "E7", "E9", "F", "N802", "PLW2901", "C405"]
+select = ["A", "E4", "E7", "E9", "F", "N802", "C405", "PLE0101", "PLR6301", "B006"]
+preview = true
