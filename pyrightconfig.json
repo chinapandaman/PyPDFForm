@@ -13,4 +13,5 @@
     "reportPossiblyUnboundVariable": "error",
     "reportUnusedImport": "error",
     "reportIncompatibleMethodOverride": "error",
+    "reportMissingSuperCall": "error"
 }

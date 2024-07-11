@@ -36,6 +36,7 @@ class FormWrapper:
     ) -> None:
         """Constructs all attributes for the object."""
 
+        super().__init__()
         self.stream = fp_or_f_obj_or_stream_to_stream(template)
 
     def read(self) -> bytes:
