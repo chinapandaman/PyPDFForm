@@ -4,3 +4,4 @@ fi
 
 pylint PyPDFForm/
 pyright .
+ruff check .

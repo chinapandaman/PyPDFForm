@@ -10,3 +10,4 @@ pyright
 pytest
 reportlab
 requests
+ruff
