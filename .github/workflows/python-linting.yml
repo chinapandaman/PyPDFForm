@@ -24,3 +24,9 @@ jobs:
     - name: Analyze code with pylint
       run: |
         pylint PyPDFForm
+    - name: Analyze code with pyright
+      run: |
+        pyright .
+    - name: Analyze code with ruff
+      run: |
+        ruff check .

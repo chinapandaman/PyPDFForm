@@ -29,6 +29,7 @@ class Widget:
     ) -> None:
         """Sets acro form parameters."""
 
+        super().__init__()
         self.page_number = page_number
         self.acro_form_params = {
             "name": name,

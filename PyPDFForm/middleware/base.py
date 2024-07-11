@@ -14,6 +14,7 @@ class Widget:
     ) -> None:
         """Constructs basic attributes for the object."""
 
+        super().__init__()
         self._name = name
         self.value = value
 

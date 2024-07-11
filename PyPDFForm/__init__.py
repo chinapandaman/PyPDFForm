@@ -4,3 +4,5 @@
 __version__ = "1.4.30"
 
 from .wrapper import FormWrapper, PdfWrapper
+
+__all__ = ["FormWrapper", "PdfWrapper"]
