@@ -9,9 +9,10 @@
     "reportOperatorIssue": "none",
     "reportGeneralTypeIssues": "none",
     "reportOptionalMemberAccess": "none",
-    // custom configs
     "reportPossiblyUnboundVariable": "error",
     "reportUnusedImport": "error",
     "reportIncompatibleMethodOverride": "error",
-    "reportMissingSuperCall": "error"
+    "reportMissingSuperCall": "error",
+    "reportPrivateUsage": "error",
+    "reportSelfClsParameterName": "error"
 }
