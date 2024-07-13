@@ -1,4 +1,25 @@
 [lint]
-select = ["A", "ASYNC", "B", "BLE", "E", "F", "N", "C405", "PLE0101", "PLR6301", "B006", "YTT", "W"]
+select = [
+    "A",
+    "ASYNC",
+    "B",
+    "BLE",
+    "C4",
+    "DTZ",
+    "E",
+    "EM",
+    "F",
+    "G",
+    "ISC",
+    "ICN",
+    "LOG",
+    "N",
+    "PIE",
+    "PLE0101",
+    "PLR6301",
+    "T10",
+    "YTT",
+    "W"
+]
 ignore = ["E501", "N999"]
 preview = true
