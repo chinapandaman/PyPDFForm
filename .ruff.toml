@@ -1,0 +1,35 @@
+[lint]
+select = [
+    "A",
+    "ASYNC",
+    "B",
+    "BLE",
+    "C4",
+    "DTZ",
+    "E",
+    "EM",
+    "F",
+    "FLY",
+    "G",
+    "ISC",
+    "ICN",
+    "INT",
+    "LOG",
+    "N",
+    "PIE",
+    "PT",
+    "PERF",
+    "Q",
+    "R",
+    "RSE",
+    "SLF",
+    "SLOT",
+    "SIM",
+    "T10",
+    "TRY",
+    "TCH",
+    "YTT",
+    "W"
+]
+ignore = ["E501", "N999"]
+preview = true

@@ -15,27 +15,16 @@ if __name__ == "__main__":
     with open("PyPDFForm/__init__.py", encoding="utf8") as f:
         version = re.search(r'__version__ = "(.*?)"', f.read())
         if version:
-            v = v.group(1)
+            v = version.group(1)
 
     new_version = ".".join(v.split(".")[:-1] + [str(int(v.split(".")[-1]) + 1)])
 
-    with open("PyPDFForm/__init__.py", encoding="utf8") as f:
-        content = f.read().replace(version, new_version)
+    files_to_update = ["PyPDFForm/__init__.py", "mkdocs.yml", "SECURITY.md"]
 
-    os.remove("PyPDFForm/__init__.py")
-    with open("PyPDFForm/__init__.py", mode="w", encoding="utf8") as f:
-        f.write(content)
+    for each in files_to_update:
+        with open(each, encoding="utf8") as f:
+            content = f.read().replace(v, new_version)
 
-    with open("mkdocs.yml", encoding="utf8") as f:
-        content = f.read().replace(version, new_version)
-
-    os.remove("mkdocs.yml")
-    with open("mkdocs.yml", mode="w", encoding="utf8") as f:
-        f.write(content)
-
-    with open("SECURITY.md", encoding="utf8") as f:
-        content = f.read().replace(version, new_version)
-
-    os.remove("SECURITY.md")
-    with open("SECURITY.md", mode="w", encoding="utf8") as f:
-        f.write(content)
+        os.remove(each)
+        with open(each, mode="w", encoding="utf8") as f:
+            f.write(content)

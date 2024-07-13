@@ -12,7 +12,7 @@ from PyPDFForm.middleware.text import Text
 def test_base_schema_definition():
     try:
         assert Widget("foo").schema_definition
-        assert False
+        raise AssertionError
     except NotImplementedError:
         pass
 
@@ -34,7 +34,7 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
-        for _, widgets in template.get_widgets_by_page(obj.read()).items():
+        for widgets in template.get_widgets_by_page(obj.read()).values():
             assert not widgets
 
 
@@ -375,7 +375,7 @@ def test_schema(sample_template_with_comb_text_field):
     data["LastName"] = "XXXXXXXX"
     try:
         validate(instance=data, schema=schema)
-        assert False
+        raise AssertionError
     except ValidationError:
         pass
 
@@ -386,7 +386,7 @@ def test_schema(sample_template_with_comb_text_field):
     data["Gender"] = 2
     try:
         validate(instance=data, schema=schema)
-        assert False
+        raise AssertionError
     except ValidationError:
         pass
 
@@ -396,12 +396,12 @@ def test_sample_data(sejda_template_complex):
     try:
         validate(instance=obj.sample_data, schema=obj.schema)
     except ValidationError:
-        assert False
+        raise AssertionError from ValidationError
 
     widget = Widget("foo")
     try:
         widget.sample_value()
-        assert False
+        raise AssertionError
     except NotImplementedError:
         pass
 
@@ -429,7 +429,7 @@ def test_fill_right_aligned(
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
-        for _, widgets in template.get_widgets_by_page(obj.read()).items():
+        for widgets in template.get_widgets_by_page(obj.read()).values():
             assert not widgets
 
 

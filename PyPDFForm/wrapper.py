@@ -293,14 +293,12 @@ class PdfWrapper(FormWrapper):
     def schema(self) -> dict:
         """Generates a json schema for the PDF form template."""
 
-        result = {
+        return {
             "type": "object",
             "properties": {
                 key: value.schema_definition for key, value in self.widgets.items()
             },
         }
-
-        return result
 
     @classmethod
     def register_font(

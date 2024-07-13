@@ -165,12 +165,7 @@ def create_watermarks_and_draw(
     watermark = buff.read()
     buff.close()
 
-    results = []
-
-    for i in range(len(pdf_file.pages)):
-        results.append(watermark if i == page_number - 1 else b"")
-
-    return results
+    return [watermark if i == page_number - 1 else b"" for i in range(len(pdf_file.pages))]
 
 
 def merge_watermarks_with_pdf(

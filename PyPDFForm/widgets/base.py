@@ -72,8 +72,4 @@ class Widget:
         canvas.save()
         watermark.seek(0)
 
-        result = []
-        for i in range(page_count):
-            result.append(watermark.read() if i == self.page_number - 1 else b"")
-
-        return result
+        return [watermark.read() if i == self.page_number - 1 else b"" for i in range(page_count)]
