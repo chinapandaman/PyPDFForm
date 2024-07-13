@@ -177,7 +177,7 @@ def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
     return result
 
 
-def get_widget_key(widget: dict) -> Union[str, None]:
+def get_widget_key(widget: dict) -> Union[str, list, None]:
     """Finds a PDF widget's annotated key by pattern matching."""
 
     result = None
@@ -189,7 +189,7 @@ def get_widget_key(widget: dict) -> Union[str, None]:
     return result
 
 
-def get_widget_alignment(widget: dict) -> Union[str, None]:
+def get_widget_alignment(widget: dict) -> Union[str, list, None]:
     """Finds a PDF widget's alignment by pattern matching."""
 
     result = None
