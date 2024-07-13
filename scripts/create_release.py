@@ -10,7 +10,9 @@ import requests
 
 if __name__ == "__main__":
     with open("PyPDFForm/__init__.py", encoding="utf8") as f:
-        version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
+        version = re.search(r'__version__ = "(.*?)"', f.read())
+        if version:
+            version = version.group(1)
 
     latest_version = sys.argv[1].replace("(", "").replace(")", "")
     print(f"Latest deployed version: v{latest_version}.")

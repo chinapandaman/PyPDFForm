@@ -16,7 +16,7 @@ class Dropdown(Widget):
 
         super().__init__(name, value)
 
-        self.choices = None
+        self.choices = []
 
     @property
     def schema_definition(self) -> dict:

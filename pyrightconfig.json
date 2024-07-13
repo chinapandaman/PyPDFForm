@@ -2,11 +2,10 @@
     "typeCheckingMode": "basic",
     "reportArgumentType": "none",
     "reportAttributeAccessIssue": "none",
-    "reportOptionalSubscript": "none",
     "reportIndexIssue": "none",
     "reportOperatorIssue": "none",
     "reportGeneralTypeIssues": "none",
-    "reportOptionalMemberAccess": "none",
+    "reportOptionalMemberAccess": "error",
     "reportPossiblyUnboundVariable": "error",
     "reportUnusedImport": "error",
     "reportIncompatibleMethodOverride": "error",
@@ -14,5 +13,6 @@
     "reportPrivateUsage": "error",
     "reportSelfClsParameterName": "error",
     "reportReturnType": "error",
-    "reportAssignmentType": "error"
+    "reportAssignmentType": "error",
+    "reportOptionalSubscript": "error"
 }

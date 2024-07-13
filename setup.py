@@ -6,7 +6,9 @@ import re
 import setuptools
 
 with open("PyPDFForm/__init__.py", encoding="utf8") as f:
-    version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
+    version = re.search(r'__version__ = "(.*?)"', f.read())
+    if version:
+        version = version.group(1)
 
 with open("README.md", mode="r", encoding="utf-8") as fh:
     long_description = fh.read()
