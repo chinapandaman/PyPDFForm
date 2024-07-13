@@ -17,9 +17,7 @@ if __name__ == "__main__":
         if version:
             v = v.group(1)
 
-    new_version = ".".join(
-        v.split(".")[:-1] + [str(int(v.split(".")[-1]) + 1)]
-    )
+    new_version = ".".join(v.split(".")[:-1] + [str(int(v.split(".")[-1]) + 1)])
 
     with open("PyPDFForm/__init__.py", encoding="utf8") as f:
         content = f.read().replace(version, new_version)
