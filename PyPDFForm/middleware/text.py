@@ -22,7 +22,7 @@ class Text(Widget):
         self.text_wrap_length = None
         self.max_length = None
         self.comb = None
-        self.character_paddings = None
+        self.character_paddings = []
         self.text_lines = None
         self.text_line_x_coordinates = None
         self.preview = False

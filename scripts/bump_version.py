@@ -11,11 +11,14 @@ if __name__ == "__main__":
         print("Bump version cannot be done on a non-issue branch.")
         sys.exit(1)
 
+    v = ""
     with open("PyPDFForm/__init__.py", encoding="utf8") as f:
-        version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
+        version = re.search(r'__version__ = "(.*?)"', f.read())
+        if version:
+            v = v.group(1)
 
     new_version = ".".join(
-        version.split(".")[:-1] + [str(int(version.split(".")[-1]) + 1)]
+        v.split(".")[:-1] + [str(int(v.split(".")[-1]) + 1)]
     )
 
     with open("PyPDFForm/__init__.py", encoding="utf8") as f:
