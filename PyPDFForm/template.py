@@ -155,11 +155,11 @@ def update_text_field_attributes(
 def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
     """Iterates through a PDF and returns all widgets found grouped by page."""
 
-    pdf = PdfReader(stream_to_io(pdf))
+    pdf_file = PdfReader(stream_to_io(pdf))
 
     result = {}
 
-    for i, page in enumerate(pdf.pages):
+    for i, page in enumerate(pdf_file.pages):
         widgets = page.annotations
         result[i + 1] = []
         if widgets:
