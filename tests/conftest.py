@@ -14,13 +14,12 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(autouse=True)
-def generate_new_pdf_samples(request):
+def _generate_new_pdf_samples(request):
     request.config.results = {}
     yield
-    if request.config.getoption("--regenerate") == "1":
-        if request.config.results:
-            with open(request.config.results["expected_path"], "wb+") as f:
-                f.write(request.config.results["stream"])
+    if request.config.getoption("--regenerate") == "1" and request.config.results:
+        with open(request.config.results["expected_path"], "wb+") as f:
+            f.write(request.config.results["stream"])
 
 
 @pytest.fixture

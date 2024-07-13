@@ -12,7 +12,7 @@ from PyPDFForm.middleware.text import Text
 def test_base_schema_definition():
     try:
         assert Widget("foo").schema_definition
-        raise AssertionError()
+        raise AssertionError
     except NotImplementedError:
         pass
 
@@ -375,7 +375,7 @@ def test_schema(sample_template_with_comb_text_field):
     data["LastName"] = "XXXXXXXX"
     try:
         validate(instance=data, schema=schema)
-        raise AssertionError()
+        raise AssertionError
     except ValidationError:
         pass
 
@@ -386,7 +386,7 @@ def test_schema(sample_template_with_comb_text_field):
     data["Gender"] = 2
     try:
         validate(instance=data, schema=schema)
-        raise AssertionError()
+        raise AssertionError
     except ValidationError:
         pass
 
@@ -396,12 +396,12 @@ def test_sample_data(sejda_template_complex):
     try:
         validate(instance=obj.sample_data, schema=obj.schema)
     except ValidationError:
-        raise AssertionError() from ValidationError
+        raise AssertionError from ValidationError
 
     widget = Widget("foo")
     try:
         widget.sample_value()
-        raise AssertionError()
+        raise AssertionError
     except NotImplementedError:
         pass
 
