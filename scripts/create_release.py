@@ -22,7 +22,9 @@ if __name__ == "__main__":
     if not token:
         token = getpass("Enter GitHub Token: ")
     else:
-        input("Press Enter to continue...")
+        cont = input("Enter Yes to continue: ")
+        if cont != "Yes":
+            sys.exit("Aborted.")
 
     url = "https://api.github.com/repos/chinapandaman/PyPDFForm/releases"
     headers = {
