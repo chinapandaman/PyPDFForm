@@ -2,7 +2,7 @@
 
 A PyPDFForm release starts with the following steps:
 
-* A release [issue](https://github.com/chinapandaman/PyPDFForm/issues/646) and [PR](https://github.com/chinapandaman/PyPDFForm/pull/647).
+* A release [issue](https://github.com/chinapandaman/PyPDFForm/issues/686) and [PR](https://github.com/chinapandaman/PyPDFForm/pull/687).
 * A new [GitHub release](https://github.com/chinapandaman/PyPDFForm/releases) with auto-generated changelogs.
 
 Once these steps are done, the CI for deployment will be triggered.
