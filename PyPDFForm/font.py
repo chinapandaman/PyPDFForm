@@ -42,9 +42,9 @@ def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
     appearance string of a text field widget.
     """
 
-    text_appearance = text_appearance.split(" ")
+    text_appearances = text_appearance.split(" ")
 
-    for each in text_appearance:
+    for each in text_appearances:
         if each.startswith("/"):
             text_segments = findall("[A-Z][^A-Z]*", each.replace("/", ""))
 

@@ -62,10 +62,10 @@ def preview_widget_to_draw(widget: WIDGET_TYPES) -> Text:
 def remove_all_widgets(pdf: bytes) -> bytes:
     """Removes all widgets from a PDF form."""
 
-    pdf = PdfReader(stream_to_io(pdf))
+    pdf_file = PdfReader(stream_to_io(pdf))
     result_stream = BytesIO()
     writer = PdfWriter()
-    for page in pdf.pages:
+    for page in pdf_file.pages:
         if page.annotations:
             page.annotations.clear()
         writer.add_page(page)
@@ -78,10 +78,10 @@ def remove_all_widgets(pdf: bytes) -> bytes:
 def get_page_streams(pdf: bytes) -> List[bytes]:
     """Returns a list of streams where each is a page of the input PDF."""
 
-    pdf = PdfReader(stream_to_io(pdf))
+    pdf_file = PdfReader(stream_to_io(pdf))
     result = []
 
-    for page in pdf.pages:
+    for page in pdf_file.pages:
         writer = PdfWriter()
         writer.add_page(page)
         with BytesIO() as f:
@@ -96,13 +96,13 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     """Merges two PDFs into one PDF."""
 
     output = PdfWriter()
-    pdf = PdfReader(stream_to_io(pdf))
-    other = PdfReader(stream_to_io(other))
+    pdf_file = PdfReader(stream_to_io(pdf))
+    other_file = PdfReader(stream_to_io(other))
     result = BytesIO()
 
-    for page in pdf.pages:
+    for page in pdf_file.pages:
         output.add_page(page)
-    for page in other.pages:
+    for page in other_file.pages:
         output.add_page(page)
 
     output.write(result)

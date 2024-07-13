@@ -1,7 +1,6 @@
 {
     "typeCheckingMode": "basic",
     "reportArgumentType": "none",
-    "reportAssignmentType": "none",
     "reportAttributeAccessIssue": "none",
     "reportOptionalSubscript": "none",
     "reportIndexIssue": "none",
@@ -14,5 +13,6 @@
     "reportMissingSuperCall": "error",
     "reportPrivateUsage": "error",
     "reportSelfClsParameterName": "error",
-    "reportReturnType": "error"
+    "reportReturnType": "error",
+    "reportAssignmentType": "error"
 }
