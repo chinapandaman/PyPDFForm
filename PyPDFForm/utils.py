@@ -133,7 +133,7 @@ def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> 
 
 def traverse_pattern(
     pattern: dict, widget: Union[dict, DictionaryObject]
-) -> Union[str, list, None]:
+) -> Union[str, None]:
     """Traverses down a PDF dict pattern and find the value."""
 
     for key, value in widget.items():

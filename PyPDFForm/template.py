@@ -3,7 +3,7 @@
 
 from functools import lru_cache
 from sys import maxsize
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Union
 
 from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
@@ -249,7 +249,7 @@ def is_text_multiline(widget: dict) -> bool:
     return check_field_flag_bit(widget, MULTILINE)
 
 
-def get_dropdown_choices(widget: dict) -> Union[Tuple[str], None]:
+def get_dropdown_choices(widget: dict) -> Union[tuple[str, ...], None]:
     """Returns string options of a dropdown field."""
 
     result = None

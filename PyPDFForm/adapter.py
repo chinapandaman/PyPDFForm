@@ -13,10 +13,10 @@ def readable(obj: Any) -> bool:
 
 def fp_or_f_obj_or_stream_to_stream(
     fp_or_f_obj_or_stream: Union[bytes, str, BinaryIO]
-) -> Union[bytes, None]:
+) -> bytes:
     """Converts a file path or a file object to a stream."""
 
-    result = None
+    result = b""
     if isinstance(fp_or_f_obj_or_stream, bytes):
         result = fp_or_f_obj_or_stream
 
@@ -25,8 +25,7 @@ def fp_or_f_obj_or_stream_to_stream(
 
     elif isinstance(fp_or_f_obj_or_stream, str):
         if not isfile(fp_or_f_obj_or_stream):
-            result = None
-
+            pass
         else:
             with open(fp_or_f_obj_or_stream, "rb+") as _file:
                 result = _file.read()
