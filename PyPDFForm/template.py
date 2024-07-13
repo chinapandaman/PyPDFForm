@@ -118,7 +118,7 @@ def update_text_field_attributes(
 ) -> None:
     """Auto updates text fields' attributes."""
 
-    for _, _widgets in get_widgets_by_page(template_stream).items():
+    for _widgets in get_widgets_by_page(template_stream).values():
         for _widget in _widgets:
             key = get_widget_key(_widget)
 

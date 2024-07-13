@@ -55,7 +55,7 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_text(issue_pdf_directory
         {"Address": "Mr John Smith\n132, My Street\nKingston, New York 12401"}
     )
 
-    for _, widgets in get_widgets_by_page(obj.read()).items():
+    for widgets in get_widgets_by_page(obj.read()).values():
         for widget in widgets:
             if get_widget_key(widget) == "Address":
                 assert (
@@ -136,7 +136,7 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_dir
         {"Address": "J Smith\n132 A St\nNYC, NY 12401"}
     )
 
-    for _, widgets in get_widgets_by_page(obj.read()).items():
+    for widgets in get_widgets_by_page(obj.read()).values():
         for widget in widgets:
             if get_widget_key(widget) == "Address":
                 assert widget[V] == "J Smith\n132 A St\nNYC, NY 12401"

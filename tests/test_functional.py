@@ -34,7 +34,7 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
-        for _, widgets in template.get_widgets_by_page(obj.read()).items():
+        for widgets in template.get_widgets_by_page(obj.read()).values():
             assert not widgets
 
 
@@ -429,7 +429,7 @@ def test_fill_right_aligned(
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
 
-        for _, widgets in template.get_widgets_by_page(obj.read()).items():
+        for widgets in template.get_widgets_by_page(obj.read()).values():
             assert not widgets
 
 
