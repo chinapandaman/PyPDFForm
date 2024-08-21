@@ -88,8 +88,8 @@ class Widget:
         ]
 
 
-def handle_non_acroform_params(pdf: bytes, key: str, params: list) -> bytes:
-    """Handles non acroform parameters when creating a widget."""
+def handle_non_acro_form_params(pdf: bytes, key: str, params: list) -> bytes:
+    """Handles non acro form parameters when creating a widget."""
 
     param_to_func = {
         "alignment": update_created_text_field_alignment
