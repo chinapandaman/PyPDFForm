@@ -220,6 +220,28 @@ def test_create_text_align_center(template_stream, pdf_samples, request):
         assert obj.stream == expected
 
 
+def test_create_text_align_right(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "create_text_align_right.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "text",
+            "foo",
+            1,
+            100,
+            100,
+            alignment=2,
+        )
+        assert obj.schema["properties"]["foo"]["type"] == "string"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
 def test_create_text_default_filled(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "create_text_default_filled.pdf"
