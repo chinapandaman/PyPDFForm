@@ -22,6 +22,7 @@ from .template import (build_widgets, dropdown_to_text,
 from .utils import (get_page_streams, merge_two_pdfs, preview_widget_to_draw,
                     remove_all_widgets)
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
+from .widgets.base import handle_non_acroform_params
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
 from .widgets.text import TextWidget
@@ -218,6 +219,9 @@ class PdfWrapper(FormWrapper):
         ).watermarks(self.read())
 
         self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
+        if _class.NON_ACRO_FORM_PARAMS:
+            self.stream = handle_non_acroform_params(self.stream, name, _class.NON_ACRO_FORM_PARAMS)
+
         new_widgets = build_widgets(self.read())
         for k, v in self.widgets.items():
             if k in new_widgets:
