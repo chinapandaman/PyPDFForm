@@ -220,7 +220,9 @@ class PdfWrapper(FormWrapper):
 
         self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
         if _class.NON_ACRO_FORM_PARAMS:
-            self.stream = handle_non_acro_form_params(self.stream, name, _class.NON_ACRO_FORM_PARAMS)
+            self.stream = handle_non_acro_form_params(self.stream,
+                                                      name,
+                                                      _class.NON_ACRO_FORM_PARAMS)
 
         new_widgets = build_widgets(self.read())
         for k, v in self.widgets.items():

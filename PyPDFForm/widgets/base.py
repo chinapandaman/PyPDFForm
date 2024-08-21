@@ -11,7 +11,7 @@ from reportlab.pdfgen.canvas import Canvas
 
 from ..constants import Annots
 from ..template import get_widget_key
-from ..patterns import update_created_text_field_alignment
+from ..patterns import NON_ACRO_FORM_PARAM_TO_FUNC
 from ..utils import stream_to_io
 
 
@@ -91,10 +91,6 @@ class Widget:
 def handle_non_acro_form_params(pdf: bytes, key: str, params: list) -> bytes:
     """Handles non acro form parameters when creating a widget."""
 
-    param_to_func = {
-        "alignment": update_created_text_field_alignment
-    }
-
     pdf_file = PdfReader(stream_to_io(pdf))
     out = PdfWriter()
     out.append(pdf_file)
@@ -106,8 +102,8 @@ def handle_non_acro_form_params(pdf: bytes, key: str, params: list) -> bytes:
 
             if _key == key:
                 for param in params:
-                    if param[0] in param_to_func:
-                        param_to_func[param[0]](annot, param[1])
+                    if param[0] in NON_ACRO_FORM_PARAM_TO_FUNC:
+                        NON_ACRO_FORM_PARAM_TO_FUNC[param[0]](annot, param[1])
 
     with BytesIO() as f:
         out.write(f)

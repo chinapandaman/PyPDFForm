@@ -164,3 +164,8 @@ def update_created_text_field_alignment(annot: DictionaryObject, val: int) -> No
     """Patterns to update text alignment for text annotations created by the library."""
 
     annot[NameObject(Q)] = NumberObject(val)
+
+
+NON_ACRO_FORM_PARAM_TO_FUNC = {
+    "alignment": update_created_text_field_alignment
+}
