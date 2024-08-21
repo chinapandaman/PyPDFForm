@@ -10,8 +10,8 @@ from reportlab.lib.colors import Color
 from reportlab.pdfgen.canvas import Canvas
 
 from ..constants import Annots
-from ..template import get_widget_key
 from ..patterns import NON_ACRO_FORM_PARAM_TO_FUNC
+from ..template import get_widget_key
 from ..utils import stream_to_io
 
 

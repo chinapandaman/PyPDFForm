@@ -214,16 +214,14 @@ class PdfWrapper(FormWrapper):
         if _class is None:
             return self
 
-        obj = _class(
-            name=name, page_number=page_number, x=x, y=y, **kwargs
-        )
+        obj = _class(name=name, page_number=page_number, x=x, y=y, **kwargs)
         watermarks = obj.watermarks(self.read())
 
         self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
         if obj.non_acro_form_params:
-            self.stream = handle_non_acro_form_params(self.stream,
-                                                      name,
-                                                      obj.non_acro_form_params)
+            self.stream = handle_non_acro_form_params(
+                self.stream, name, obj.non_acro_form_params
+            )
 
         new_widgets = build_widgets(self.read())
         for k, v in self.widgets.items():
