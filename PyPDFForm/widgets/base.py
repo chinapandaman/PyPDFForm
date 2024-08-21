@@ -21,7 +21,6 @@ class Widget:
     USER_PARAMS = []
     COLOR_PARAMS = []
     ALLOWED_NON_ACRO_FORM_PARAMS = []
-    NON_ACRO_FORM_PARAMS = []
     NONE_DEFAULTS = []
     ACRO_FORM_FUNC = ""
 
@@ -42,6 +41,7 @@ class Widget:
             "x": x,
             "y": y,
         }
+        self.NON_ACRO_FORM_PARAMS = []
 
         for each in self.USER_PARAMS:
             user_input, param = each
