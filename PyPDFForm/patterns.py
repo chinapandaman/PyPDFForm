@@ -4,7 +4,7 @@
 from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
                            TextStringObject)
 
-from .constants import (AP, AS, CA, DA, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, MK,
+from .constants import (AP, AS, CA, DA, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, MK, MULTILINE,
                         READ_ONLY, A, Btn, Ch, Ff, N, Off, Opt, Parent, Q, Sig,
                         T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
@@ -166,4 +166,16 @@ def update_created_text_field_alignment(annot: DictionaryObject, val: int) -> No
     annot[NameObject(Q)] = NumberObject(val)
 
 
-NON_ACRO_FORM_PARAM_TO_FUNC = {"alignment": update_created_text_field_alignment}
+def update_created_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
+    """Patterns to update to multiline for text annotations created by the library."""
+
+    if val:
+        annot[NameObject(Ff)] = NumberObject(
+            int(annot[NameObject(Ff)]) | MULTILINE  # noqa
+        )
+
+
+NON_ACRO_FORM_PARAM_TO_FUNC = {
+    ("TextWidget", "alignment"): update_created_text_field_alignment,
+    ("TextWidget", "multiline"): update_created_text_field_multiline,
+}
