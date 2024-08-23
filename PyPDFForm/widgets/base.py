@@ -59,7 +59,7 @@ class Widget:
 
         for each in self.ALLOWED_NON_ACRO_FORM_PARAMS:
             if each in kwargs:
-                self.non_acro_form_params.append((each, kwargs.get(each)))
+                self.non_acro_form_params.append(((type(self).__name__, each), kwargs.get(each)))
 
     def watermarks(self, stream: bytes) -> List[bytes]:
         """Returns a list of watermarks after creating the widget."""
