@@ -243,7 +243,9 @@ def test_create_text_align_right(template_stream, pdf_samples, request):
 
 
 def test_create_text_align_multiline(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "create_text_align_multiline.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "create_text_align_multiline.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "text",
