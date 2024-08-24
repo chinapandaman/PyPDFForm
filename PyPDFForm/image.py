@@ -43,10 +43,10 @@ def any_image_to_jpg(image_stream: bytes) -> bytes:
 
     rgb_image = Image.new("RGB", image.size, (255, 255, 255))
     if len(image.split()) == 4:
-      rgb_image.paste(image, mask=image.split()[3])
+        rgb_image.paste(image, mask=image.split()[3])
     else:
-      rgb_image.paste(image)
-        
+        rgb_image.paste(image)
+
     with BytesIO() as _file:
         rgb_image.save(_file, format="JPEG")
         _file.seek(0)
