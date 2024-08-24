@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains any object users might need."""
 
-__version__ = "1.4.32"
+__version__ = "1.4.33"
 
 from .wrapper import FormWrapper, PdfWrapper
 
