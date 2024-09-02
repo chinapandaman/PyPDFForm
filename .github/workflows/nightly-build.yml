@@ -1,0 +1,24 @@
+name: Nightly Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Set up environment
+        run: |
+          rm -rf PyPDFForm
+          python -m pip install --upgrade pip
+          pip install PyPDFForm
+          pip install -r requirements.txt
+      - name: Run nightly tests
+        run: |
+          pytest
