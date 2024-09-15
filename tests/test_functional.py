@@ -406,6 +406,17 @@ def test_sample_data(sejda_template_complex):
         pass
 
 
+def test_sample_data_max_boundary(sample_template_with_comb_text_field):
+    obj = PdfWrapper(sample_template_with_comb_text_field)
+    try:
+        validate(instance=obj.sample_data, schema=obj.schema)
+    except ValidationError:
+        raise AssertionError from ValidationError
+
+    assert obj.sample_data["LastName"] == "LastNam"
+    assert obj.sample_data["Gender"] == 1
+
+
 def test_fill_right_aligned(
     sample_template_with_right_aligned_text_field, pdf_samples, request
 ):
