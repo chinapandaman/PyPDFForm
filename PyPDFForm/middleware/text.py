@@ -42,4 +42,4 @@ class Text(Widget):
     def sample_value(self) -> str:
         """Sample value of the text field."""
 
-        return self.name
+        return self.name[:self.max_length] if self.max_length is not None else self.name

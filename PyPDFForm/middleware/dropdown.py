@@ -28,4 +28,4 @@ class Dropdown(Widget):
     def sample_value(self) -> int:
         """Sample value of the dropdown."""
 
-        return 0
+        return len(self.choices) - 1

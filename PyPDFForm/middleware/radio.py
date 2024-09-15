@@ -28,4 +28,4 @@ class Radio(Checkbox):
     def sample_value(self) -> int:
         """Sample value of the radiobutton."""
 
-        return 0
+        return self.number_of_options - 1
