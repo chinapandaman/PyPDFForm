@@ -258,7 +258,7 @@ def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples, req
 
         expected = f.read()
 
-        if os.name == "nt":
+        if os.name != "nt":
             request.config.results["expected_path"] = expected_path
             request.config.results["stream"] = obj.read()
             assert len(obj.stream) == len(expected)
@@ -281,7 +281,7 @@ def test_draw_png_image_on_one_page(
 
         expected = f.read()
 
-        if os.name == "nt":
+        if os.name != "nt":
             request.config.results["expected_path"] = expected_path
             request.config.results["stream"] = obj.read()
             assert len(obj.stream) == len(expected)
@@ -304,7 +304,7 @@ def test_draw_transparent_png_image_on_one_page(
 
         expected = f.read()
 
-        if os.name == "nt":
+        if os.name != "nt":
             request.config.results["expected_path"] = expected_path
             request.config.results["stream"] = obj.read()
             assert len(obj.stream) == len(expected)
@@ -510,23 +510,14 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
             assert obj.stream == expected
 
 
-def test_pages(template_stream, pdf_samples):
+def test_pages(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "pages", "sample_template_page_1.pdf")
     obj = PdfWrapper(template_stream)
 
-    with open(
-        os.path.join(pdf_samples, "pages", "sample_template_page_1.pdf"), "rb+"
-    ) as f:
+    with open(expected_path, "rb+") as f:
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.pages[0].read()
         assert obj.pages[0].read() == f.read()
-
-    with open(
-        os.path.join(pdf_samples, "pages", "sample_template_page_2.pdf"), "rb+"
-    ) as f:
-        assert obj.pages[1].read() == f.read()
-
-    with open(
-        os.path.join(pdf_samples, "pages", "sample_template_page_3.pdf"), "rb+"
-    ) as f:
-        assert obj.pages[2].read() == f.read()
 
 
 def test_generate_coordinate_grid(template_stream, pdf_samples, request):

@@ -2,20 +2,20 @@
 %‚„œ”
 1 0 obj
 <<
+/Producer (pypdf)
+>>
+endobj
+2 0 obj
+<<
 /Type /Pages
 /Count 1
 /Kids [ 4 0 R ]
 >>
 endobj
-2 0 obj
-<<
-/Producer (pypdf)
->>
-endobj
 3 0 obj
 <<
 /Type /Catalog
-/Pages 1 0 R
+/Pages 2 0 R
 >>
 endobj
 4 0 obj
@@ -31,7 +31,7 @@ endobj
 /ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
 >>
 /Contents 7 0 R
-/Parent 1 0 R
+/Parent 2 0 R
 >>
 endobj
 5 0 obj
@@ -54,7 +54,7 @@ endobj
 endobj
 7 0 obj
 <<
-/Length 997
+/Length 961
 >>
 stream
 q
@@ -74,7 +74,7 @@ ET
 1 0 0 rg
 BT
 1 0 0 1 71.5 780 Tm
-(\173\040paragraph\137font\137auto\137left\040\175) Tj
+(\173 paragraph\137font\137auto\137left \175) Tj
 T*
 ET
 BT
@@ -84,7 +84,7 @@ ET
 1 0 0 rg
 BT
 1 0 0 1 72.5 633 Tm
-(\173\040paragraph\137font\137auto\137center\040\175) Tj
+(\173 paragraph\137font\137auto\137center \175) Tj
 T*
 ET
 BT
@@ -94,7 +94,7 @@ ET
 1 0 0 rg
 BT
 1 0 0 1 74.5 486 Tm
-(\173\040paragraph\137font\137auto\137right\040\175) Tj
+(\173 paragraph\137font\137auto\137right \175) Tj
 T*
 ET
 BT
@@ -104,7 +104,7 @@ ET
 1 0 0 rg
 BT
 1 0 0 1 324.5 778 Tm
-(\173\040paragraph\137font\137ten\137left\040\175) Tj
+(\173 paragraph\137font\137ten\137left \175) Tj
 T*
 ET
 BT
@@ -114,7 +114,7 @@ ET
 1 0 0 rg
 BT
 1 0 0 1 325.5 624 Tm
-(\173\040paragraph\137font\137ten\137center\040\175) Tj
+(\173 paragraph\137font\137ten\137center \175) Tj
 T*
 ET
 BT
@@ -124,7 +124,7 @@ ET
 1 0 0 rg
 BT
 1 0 0 1 326.5 481 Tm
-(\173\040paragraph\137font\137ten\137right\040\175) Tj
+(\173 paragraph\137font\137ten\137right \175) Tj
 T*
 ET
 Q
@@ -168,7 +168,7 @@ xref
 0 8
 0000000000 65535 f 
 0000000015 00000 n 
-0000000074 00000 n 
+0000000054 00000 n 
 0000000113 00000 n 
 0000000162 00000 n 
 0000000362 00000 n 
@@ -178,8 +178,8 @@ trailer
 <<
 /Size 8
 /Root 3 0 R
-/Info 2 0 R
+/Info 1 0 R
 >>
 startxref
-1624
+1588
 %%EOF

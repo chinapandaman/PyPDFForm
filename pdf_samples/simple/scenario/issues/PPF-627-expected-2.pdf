@@ -2,20 +2,20 @@
 %‚„œ”
 1 0 obj
 <<
+/Producer (pypdf)
+>>
+endobj
+2 0 obj
+<<
 /Type /Pages
 /Count 6
 /Kids [ 4 0 R 54 0 R 65 0 R 72 0 R 75 0 R 79 0 R ]
 >>
 endobj
-2 0 obj
-<<
-/Producer (pypdf)
->>
-endobj
 3 0 obj
 <<
 /Type /Catalog
-/Pages 1 0 R
+/Pages 2 0 R
 /Outlines 82 0 R
 /AcroForm 861 0 R
 >>
@@ -31,11 +31,11 @@ endobj
 /MediaBox [ 0.0 0.0 612 792 ]
 /PieceInfo <<
 /InDesign <<
-/DocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
-/LastModified (˛ˇ\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0005\000Z)
+/DocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
+/LastModified (\376\377\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0005\000Z)
 /NumberOfPageItemsInPage 126
 /NumberofPages 1
-/OriginalDocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
+/OriginalDocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
 /PageItemUIDToLocationDataMap <<
 /0 [ 598 121 4 47.34 304.579 275.24 371.31 1 0.0 0.0 1 36.34 295.119 ]
 /1 [ 603 86 0.0 47.34 304.579 275.24 371.31 1 0.0 0.0 1 161.29 337.945 ]
@@ -202,7 +202,7 @@ endobj
 /Tabs /S
 /TrimBox [ 0.0 0.0 612 792 ]
 /Type /Page
-/Parent 1 0 R
+/Parent 2 0 R
 /Annots [ 87 0 R 91 0 R 94 0 R 97 0 R 100 0 R 104 0 R 107 0 R 112 0 R 116 0 R 120 0 R 124 0 R 127 0 R 130 0 R 133 0 R 136 0 R 140 0 R 144 0 R 148 0 R 152 0 R 156 0 R 160 0 R 164 0 R 168 0 R 172 0 R 175 0 R 179 0 R 182 0 R 186 0 R 189 0 R 193 0 R 196 0 R 199 0 R 202 0 R ]
 >>
 endobj
@@ -462,7 +462,7 @@ endobj
 /Descent -250
 /Flags 32
 /FontBBox [ -46 -250 1126 881 ]
-/FontFamily (Myriad\040Pro)
+/FontFamily (Myriad Pro)
 /FontFile3 20 0 R
 /FontName /MPEZZK+MyriadPro-Regular
 /FontStretch /Normal
@@ -532,7 +532,7 @@ endobj
 /Descent -250
 /Flags 32
 /FontBBox [ -133 -250 1161 894 ]
-/FontFamily (Myriad\040Pro\040SemiCond)
+/FontFamily (Myriad Pro SemiCond)
 /FontFile3 24 0 R
 /FontName /TXRKTW+MyriadPro-BoldSemiCn
 /FontStretch /SemiCondensed
@@ -592,7 +592,7 @@ endobj
 /Descent -250
 /Flags 32
 /FontBBox [ -71 -250 1198 889 ]
-/FontFamily (Myriad\040Pro\040Light)
+/FontFamily (Myriad Pro Light)
 /FontFile3 28 0 R
 /FontName /BRQGBG+MyriadPro-Semibold
 /FontStretch /Normal
@@ -675,7 +675,7 @@ endobj
 /Descent -250
 /Flags 32
 /FontBBox [ -131 -250 1115 886 ]
-/FontFamily (Myriad\040Pro\040Light\040SemiCond)
+/FontFamily (Myriad Pro Light SemiCond)
 /FontFile3 32 0 R
 /FontName /UMCLHU+MyriadPro-SemiboldSemiCn
 /FontStretch /SemiCondensed
@@ -749,7 +749,7 @@ endobj
 /Descent -250
 /Flags 32
 /FontBBox [ -128 -250 1059 876 ]
-/FontFamily (Myriad\040Pro\040SemiCond)
+/FontFamily (Myriad Pro SemiCond)
 /FontFile3 37 0 R
 /FontName /OLYWBG+MyriadPro-SemiCn
 /FontStretch /SemiCondensed
@@ -833,7 +833,7 @@ endobj
 /Descent -143
 /Flags 4
 /FontBBox [ -1 -143 981 820 ]
-/FontFamily (ITC\040Zapf\040Dingbats\040Std)
+/FontFamily (ITC Zapf Dingbats Std)
 /FontFile3 42 0 R
 /FontName /XWKTXO+ZapfDingbatsStd
 /FontStretch /Normal
@@ -886,7 +886,7 @@ endobj
 /Descent -250
 /Flags 96
 /FontBBox [ -151 -250 1036 870 ]
-/FontFamily (Myriad\040Pro\040SemiCond)
+/FontFamily (Myriad Pro SemiCond)
 /FontFile3 46 0 R
 /FontName /SMXPFY+MyriadPro-SemiCnIt
 /FontStretch /SemiCondensed
@@ -944,7 +944,7 @@ endobj
 /Descent -250
 /Flags 96
 /FontBBox [ -161 -250 1146 882 ]
-/FontFamily (Myriad\040Pro\040SemiCond)
+/FontFamily (Myriad Pro SemiCond)
 /FontFile3 50 0 R
 /FontName /ZHHFZK+MyriadPro-BoldSemiCnIt
 /FontStretch /SemiCondensed
@@ -1616,11 +1616,11 @@ endobj
 /MediaBox [ 0.0 0.0 612 792 ]
 /PieceInfo <<
 /InDesign <<
-/DocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
-/LastModified (˛ˇ\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0005\000Z)
+/DocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
+/LastModified (\376\377\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0005\000Z)
 /NumberOfPageItemsInPage 66
 /NumberofPages 1
-/OriginalDocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
+/OriginalDocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
 /PageItemUIDToLocationDataMap <<
 /0 [ 623 8 3 -276.48 371.88 277.92 387.72 1 0.0 0.0 1 0.720001 379.8 ]
 /1 [ 17040 0.0 2 -274.5 -364.5 274.5 207.36 1 0.0 0.0 1 0.0 -9 ]
@@ -1723,7 +1723,7 @@ endobj
 /Tabs /S
 /TrimBox [ 0.0 0.0 612 792 ]
 /Type /Page
-/Parent 1 0 R
+/Parent 2 0 R
 /Annots [ 205 0 R 210 0 R 214 0 R 218 0 R 222 0 R 225 0 R 228 0 R 231 0 R 236 0 R 240 0 R 244 0 R 248 0 R 251 0 R 254 0 R 257 0 R 262 0 R 266 0 R 270 0 R 274 0 R ]
 >>
 endobj
@@ -1770,7 +1770,7 @@ endobj
 /Descent -250
 /Flags 96
 /FontBBox [ -193 -250 1164 972 ]
-/FontFamily (Myriad\040Pro\040Light)
+/FontFamily (Myriad Pro Light)
 /FontFile3 59 0 R
 /FontName /BSJRBG+MyriadPro-SemiboldIt
 /FontStretch /Normal
@@ -1831,7 +1831,7 @@ endobj
 /Descent -250
 /Flags 32
 /FontBBox [ -92 -250 1256 897 ]
-/FontFamily (Myriad\040Pro)
+/FontFamily (Myriad Pro)
 /FontFile3 63 0 R
 /FontName /LUHULM+MyriadPro-Bold
 /FontStretch /Normal
@@ -1882,11 +1882,11 @@ endobj
 /MediaBox [ 0.0 0.0 612 792 ]
 /PieceInfo <<
 /InDesign <<
-/DocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
-/LastModified (˛ˇ\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0005\000Z)
+/DocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
+/LastModified (\376\377\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0005\000Z)
 /NumberOfPageItemsInPage 101
 /NumberofPages 1
-/OriginalDocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
+/OriginalDocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
 /PageItemUIDToLocationDataMap <<
 /0 [ 623 4 3 -276.48 371.88 277.92 387.72 1 0.0 0.0 1 0.720001 379.8 ]
 /1 [ 17047 0.0 2 -274.5 -364.5 274.5 226.08 1 0.0 0.0 1 0.0 -9 ]
@@ -2023,7 +2023,7 @@ endobj
 /Tabs /S
 /TrimBox [ 0.0 0.0 612 792 ]
 /Type /Page
-/Parent 1 0 R
+/Parent 2 0 R
 /Annots [ 277 0 R 281 0 R 285 0 R 289 0 R 293 0 R 297 0 R 301 0 R 305 0 R 308 0 R 311 0 R 316 0 R 320 0 R 324 0 R 328 0 R 333 0 R 337 0 R 341 0 R 345 0 R 350 0 R 354 0 R 358 0 R 362 0 R 367 0 R 371 0 R 375 0 R 379 0 R 383 0 R 387 0 R 391 0 R 395 0 R 399 0 R 403 0 R ]
 >>
 endobj
@@ -2217,11 +2217,11 @@ endobj
 /MediaBox [ 0.0 0.0 612 792 ]
 /PieceInfo <<
 /InDesign <<
-/DocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
-/LastModified (˛ˇ\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0006\000Z)
+/DocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
+/LastModified (\376\377\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0006\000Z)
 /NumberOfPageItemsInPage 79
 /NumberofPages 1
-/OriginalDocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
+/OriginalDocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
 /PageItemUIDToLocationDataMap <<
 /0 [ 623 6 3 -276.48 371.88 277.92 387.72 1 0.0 0.0 1 0.720001 379.8 ]
 /1 [ 17054 0.0 2 -274.5 -364.5 274.5 319.68 1 0.0 0.0 1 0.0 -9 ]
@@ -2337,7 +2337,7 @@ endobj
 /Tabs /S
 /TrimBox [ 0.0 0.0 612 792 ]
 /Type /Page
-/Parent 1 0 R
+/Parent 2 0 R
 /Annots [ 406 0 R 411 0 R 415 0 R 419 0 R 423 0 R 426 0 R 429 0 R 434 0 R 438 0 R 442 0 R 446 0 R 450 0 R 454 0 R 458 0 R 462 0 R 466 0 R 470 0 R 473 0 R 477 0 R 481 0 R 485 0 R 489 0 R 493 0 R 496 0 R ]
 >>
 endobj
@@ -2376,11 +2376,11 @@ endobj
 /MediaBox [ 0.0 0.0 612 792 ]
 /PieceInfo <<
 /InDesign <<
-/DocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
-/LastModified (˛ˇ\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0006\000Z)
+/DocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
+/LastModified (\376\377\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0006\000Z)
 /NumberOfPageItemsInPage 105
 /NumberofPages 1
-/OriginalDocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
+/OriginalDocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
 /PageItemUIDToLocationDataMap <<
 /0 [ 623 8 3 -276.48 371.88 277.92 387.72 1 0.0 0.0 1 0.720001 379.8 ]
 /1 [ 17085 0.0 2 -274.5 -364.76 274.5 320.4 1 0.0 0.0 1 -274 -364.26 ]
@@ -2521,7 +2521,7 @@ endobj
 /Tabs /S
 /TrimBox [ 0.0 0.0 612 792 ]
 /Type /Page
-/Parent 1 0 R
+/Parent 2 0 R
 /Annots [ 499 0 R 502 0 R 505 0 R 508 0 R 511 0 R 532 0 R 549 0 R 566 0 R 569 0 R 573 0 R 577 0 R 581 0 R 585 0 R 589 0 R 592 0 R 595 0 R 598 0 R 601 0 R 604 0 R 607 0 R 610 0 R 613 0 R 616 0 R 619 0 R 622 0 R 625 0 R 628 0 R 631 0 R 634 0 R 637 0 R 640 0 R 643 0 R 646 0 R 649 0 R 652 0 R 655 0 R 658 0 R 661 0 R 664 0 R 667 0 R 670 0 R 673 0 R 676 0 R 679 0 R 682 0 R 685 0 R 688 0 R 691 0 R 694 0 R 697 0 R 700 0 R 703 0 R 706 0 R 554 0 R 558 0 R 562 0 R 537 0 R 541 0 R 545 0 R 516 0 R 520 0 R 524 0 R 528 0 R 709 0 R 714 0 R 718 0 R 723 0 R 727 0 R 732 0 R 736 0 R 740 0 R ]
 >>
 endobj
@@ -2581,11 +2581,11 @@ endobj
 /MediaBox [ 0.0 0.0 612 792 ]
 /PieceInfo <<
 /InDesign <<
-/DocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
-/LastModified (˛ˇ\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0006\000Z)
+/DocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0009\0008\0001\0007\0002\0009\0003\000c\000\055\0004\0003\0008\0008\000\055\0002\0009\0004\0006\000\055\0009\0004\000a\0002\000\055\0001\000f\0007\0001\0001\0001\0007\0000\000c\000f\0007\000b)
+/LastModified (\376\377\000D\000\072\0002\0000\0002\0002\0001\0002\0001\0004\0001\0007\0003\0005\0000\0006\000Z)
 /NumberOfPageItemsInPage 92
 /NumberofPages 1
-/OriginalDocumentID (˛ˇ\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
+/OriginalDocumentID (\376\377\000x\000m\000p\000\056\000d\000i\000d\000\072\0001\0008\0009\0007\0007\0001\0005\0005\000\055\0003\0003\0003\000c\000\055\0003\0006\0004\0001\000\055\0008\000e\000d\000b\000\055\000b\0002\0001\0000\000a\0001\0006\000f\0002\000e\000a\0002)
 /PageItemUIDToLocationDataMap <<
 /0 [ 623 10 3 -276.48 371.88 277.92 387.72 1 0.0 0.0 1 0.720001 379.8 ]
 /1 [ 19112 42 4 -27.84 -115.299 20.4 -102.339 1 0.0 0.0 1 144.84 -108.819 ]
@@ -2717,7 +2717,7 @@ endobj
 /Tabs /S
 /TrimBox [ 0.0 0.0 612 792 ]
 /Type /Page
-/Parent 1 0 R
+/Parent 2 0 R
 /Annots [ 743 0 R 747 0 R 751 0 R 755 0 R 759 0 R 763 0 R 766 0 R 770 0 R 774 0 R 778 0 R 782 0 R 786 0 R 790 0 R 794 0 R 798 0 R 801 0 R 806 0 R 810 0 R 813 0 R 816 0 R 821 0 R 825 0 R 830 0 R 834 0 R 843 0 R 839 0 R 846 0 R 849 0 R 852 0 R 855 0 R 858 0 R ]
 >>
 endobj
@@ -2764,7 +2764,7 @@ endobj
 endobj
 83 0 obj
 <<
-/Title (Section\0401\072\040Facility\040Demographics\040and\040Infection\040Prevention\040and\040Control\040\050IPC\051\040Infrastructure\040Long\055Term\040Care)
+/Title (Section 1\072 Facility Demographics and Infection Prevention and Control \050IPC\051 Infrastructure Long\055Term Care)
 /F 0
 /C [ 0.0 0.0 0.0 ]
 /Parent 82 0 R
@@ -2775,7 +2775,7 @@ endobj
 endobj
 84 0 obj
 <<
-/Title (General\040Facility\040Demographics\040and\040IPC\040Infrastructure\040)
+/Title (General Facility Demographics and IPC Infrastructure )
 /Dest [ 4 0 R /XYZ 31 676 null ]
 /F 0
 /C [ 0.0 0.0 0.0 ]
@@ -2785,7 +2785,7 @@ endobj
 endobj
 85 0 obj
 <<
-/Title (Facility\040Demographics\072\040Long\205Term\040Care)
+/Title (Facility Demographics\072 Long\205Term Care)
 /Dest [ 75 0 R /XYZ 32 762 null ]
 /F 0
 /C [ 0.0 0.0 0.0 ]
@@ -2798,7 +2798,7 @@ endobj
 endobj
 86 0 obj
 <<
-/Title (Ventilator\040Unit)
+/Title (Ventilator Unit)
 /Dest [ 79 0 R /XYZ 32 603 null ]
 /F 0
 /C [ 0.0 0.0 0.0 ]
@@ -2815,7 +2815,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -2825,8 +2825,8 @@ endobj
 /Rect [ 113.372 635.2 161.613 648.16 ]
 /StructParent 6
 /Subtype /Widget
-/T (S1\040GF\0401)
-/TU (Date\040of\040Assessment\040\050mm\057dd\057yyyy\051)
+/T (S1 GF 1)
+/TU (Date of Assessment \050mm\057dd\057yyyy\051)
 /Type /Annot
 >>
 endobj
@@ -2857,7 +2857,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -2867,8 +2867,8 @@ endobj
 /Rect [ 89.74 616 580.23 628.96 ]
 /StructParent 7
 /Subtype /Widget
-/T (S1\040GF\0402)
-/TU (Facility\040Name)
+/T (S1 GF 2)
+/TU (Facility Name)
 /Type /Annot
 >>
 endobj
@@ -2901,7 +2901,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -2911,7 +2911,7 @@ endobj
 /Rect [ 92.88 596.04 329.76 609 ]
 /StructParent 8
 /Subtype /Widget
-/T (S1\040GF\0403)
+/T (S1 GF 3)
 /TU (State\057Territory)
 /Type /Annot
 >>
@@ -2945,7 +2945,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -2955,7 +2955,7 @@ endobj
 /Rect [ 369.525 596.04 580.5 609 ]
 /StructParent 9
 /Subtype /Widget
-/T (S1\040GF\0404)
+/T (S1 GF 4)
 /TU (County)
 /Type /Annot
 >>
@@ -2990,7 +2990,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -3000,8 +3000,8 @@ endobj
 /Rect [ 71 576.08 119.24 589.04 ]
 /StructParent 10
 /Subtype /Widget
-/T (S1\040GF\0405)
-/TU (Zip\040Code)
+/T (S1 GF 5)
+/TU (Zip Code)
 /Type /Annot
 >>
 endobj
@@ -3032,7 +3032,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -3042,8 +3042,8 @@ endobj
 /Rect [ 333.765 575.08 429.525 588.04 ]
 /StructParent 11
 /Subtype /Widget
-/T (S1\040GF\0406)
-/TU (State\057Territory\055assigned\040Unique\040ID\040\050if\040applicable\051)
+/T (S1 GF 6)
+/TU (State\057Territory\055assigned Unique ID \050if applicable\051)
 /Type /Annot
 >>
 endobj
@@ -3145,8 +3145,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 107 0 R 112 0 R 116 0 R 120 0 R ]
-/T (S1\040GF\0407)
-/TU (Facility\040type\040\050Complete\040the\040demographic\040form\040that\040corresponds\040to\040the\040type\040of\040facility\051)
+/T (S1 GF 7)
+/TU (Facility type \050Complete the demographic form that corresponds to the type of facility\051)
 /V /Outpatient#2FAmbulatory#20Care
 >>
 endobj
@@ -3378,7 +3378,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -3388,8 +3388,8 @@ endobj
 /Rect [ 51.12 475.77 580.5 488.73 ]
 /StructParent 16
 /Subtype /Widget
-/T (S1\040GF\0408)
-/TU (Facility\040type\040\050Complete\040the\040demographic\040form\040that\040corresponds\040to\040the\040type\040of\040facility\051\072\040Other\040\050specify\051)
+/T (S1 GF 8)
+/TU (Facility type \050Complete the demographic form that corresponds to the type of facility\051\072 Other \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -3422,7 +3422,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -3432,8 +3432,8 @@ endobj
 /Rect [ 456.35 553.88 552.11 566.84 ]
 /StructParent 216
 /Subtype /Widget
-/T (S1\040GF\0409)
-/TU (NHSN\040Facility\040Organization\040ID\040\050if\040applicable\051)
+/T (S1 GF 9)
+/TU (NHSN Facility Organization ID \050if applicable\051)
 /Type /Annot
 >>
 endobj
@@ -3466,7 +3466,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -3476,8 +3476,8 @@ endobj
 /Rect [ 396 533.383 491.76 546.342 ]
 /StructParent 18
 /Subtype /Widget
-/T (S1\040GF\04010)
-/TU (CMS\040Facility\040ID\040\050if\040applicable\051)
+/T (S1 GF 10)
+/TU (CMS Facility ID \050if applicable\051)
 /Type /Annot
 >>
 endobj
@@ -3510,7 +3510,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -3520,8 +3520,8 @@ endobj
 /Rect [ 31.23 417.6 579.96 446.4 ]
 /StructParent 218
 /Subtype /Widget
-/T (S1\040GF\04011)
-/TU (Facility\040Respondent\040Name\050s\051\040and\040Job\040Title\050s\051)
+/T (S1 GF 11)
+/TU (Facility Respondent Name\050s\051 and Job Title\050s\051)
 /Type /Annot
 >>
 endobj
@@ -3567,8 +3567,8 @@ endobj
 /Rect [ 35.825 388.4 45.185 397.76 ]
 /StructParent 20
 /Subtype /Widget
-/T (S1\040GF\04012)
-/TU (Rationale\040for\040assessment\072\040Requested\040by\040facility)
+/T (S1 GF 12)
+/TU (Rationale for assessment\072 Requested by facility)
 /Type /Annot
 /V /Off
 >>
@@ -3643,8 +3643,8 @@ endobj
 /Rect [ 35.825 376.34 45.185 385.7 ]
 /StructParent 21
 /Subtype /Widget
-/T (S1\040GF\04013)
-/TU (Rationale\040for\040assessment\072\040Requested\040by\040accrediting\040agency\057\040licensing\040organization)
+/T (S1 GF 13)
+/TU (Rationale for assessment\072 Requested by accrediting agency\057 licensing organization)
 /Type /Annot
 /V /Off
 >>
@@ -3719,8 +3719,8 @@ endobj
 /Rect [ 35.825 364.28 45.185 373.64 ]
 /StructParent 22
 /Subtype /Widget
-/T (S1\040GF\04014)
-/TU (Rationale\040for\040assessment\072\040Requested\040by\040state\040or\040local\040health\040department)
+/T (S1 GF 14)
+/TU (Rationale for assessment\072 Requested by state or local health department)
 /Type /Annot
 /V /Off
 >>
@@ -3795,8 +3795,8 @@ endobj
 /Rect [ 35.825 352.22 45.185 361.58 ]
 /StructParent 23
 /Subtype /Widget
-/T (S1\040GF\04015)
-/TU (Rationale\040for\040assessment\072\040HAI\040prevention\040focused)
+/T (S1 GF 15)
+/TU (Rationale for assessment\072 HAI prevention focused)
 /Type /Annot
 /V /Off
 >>
@@ -3871,8 +3871,8 @@ endobj
 /Rect [ 50.825 340.16 60.185 349.52 ]
 /StructParent 24
 /Subtype /Widget
-/T (S1\040GF\04016)
-/TU (Rationale\040for\040assessment\072\040HAI\040prevention\040focused\072\040CAUTI)
+/T (S1 GF 16)
+/TU (Rationale for assessment\072 HAI prevention focused\072 CAUTI)
 /Type /Annot
 /V /Off
 >>
@@ -3947,8 +3947,8 @@ endobj
 /Rect [ 50.825 328.1 60.185 337.46 ]
 /StructParent 25
 /Subtype /Widget
-/T (S1\040GF\04017)
-/TU (Rationale\040for\040assessment\072\040HAI\040prevention\040focused\072\040CLABSI)
+/T (S1 GF 17)
+/TU (Rationale for assessment\072 HAI prevention focused\072 CLABSI)
 /Type /Annot
 /V /Off
 >>
@@ -4023,8 +4023,8 @@ endobj
 /Rect [ 50.825 317.04 60.185 326.4 ]
 /StructParent 26
 /Subtype /Widget
-/T (S1\040GF\04018)
-/TU (Rationale\040for\040assessment\072\040HAI\040prevention\040focused\072\040SSI)
+/T (S1 GF 18)
+/TU (Rationale for assessment\072 HAI prevention focused\072 SSI)
 /Type /Annot
 /V /Off
 >>
@@ -4099,8 +4099,8 @@ endobj
 /Rect [ 50.825 305.26 60.185 314.62 ]
 /StructParent 27
 /Subtype /Widget
-/T (S1\040GF\04019)
-/TU (Rationale\040for\040assessment\072\040HAI\040prevention\040focused\072\040CDI)
+/T (S1 GF 19)
+/TU (Rationale for assessment\072 HAI prevention focused\072 CDI)
 /Type /Annot
 /V /Off
 >>
@@ -4175,8 +4175,8 @@ endobj
 /Rect [ 50.825 293.05 60.185 302.41 ]
 /StructParent 28
 /Subtype /Widget
-/T (S1\040GF\04020)
-/TU (Rationale\040for\040assessment\072\040HAI\040prevention\040focused\072\040Other)
+/T (S1 GF 20)
+/TU (Rationale for assessment\072 HAI prevention focused\072 Other)
 /Type /Annot
 /V /Off
 >>
@@ -4238,7 +4238,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -4248,8 +4248,8 @@ endobj
 /Rect [ 122.4 293.3 580.5 306.26 ]
 /StructParent 29
 /Subtype /Widget
-/T (S1\040GF\04021)
-/TU (Rationale\040for\040assessment\072\040HAI\040prevention\040focused\072\040Other\040\050specify\051)
+/T (S1 GF 21)
+/TU (Rationale for assessment\072 HAI prevention focused\072 Other \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -4295,8 +4295,8 @@ endobj
 /Rect [ 35.825 275.88 45.185 285.24 ]
 /StructParent 30
 /Subtype /Widget
-/T (S1\040GF\04022)
-/TU (Rationale\040for\040assessment\072\040Prevention\040collaborative)
+/T (S1 GF 22)
+/TU (Rationale for assessment\072 Prevention collaborative)
 /Type /Annot
 /V /Off
 >>
@@ -4358,7 +4358,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -4368,8 +4368,8 @@ endobj
 /Rect [ 214.56 276.4 580.5 289.36 ]
 /StructParent 31
 /Subtype /Widget
-/T (S1\040GF\04023)
-/TU (Rationale\040for\040assessment\072\040Prevention\040collaborative\040\050specify\040partners\051)
+/T (S1 GF 23)
+/TU (Rationale for assessment\072 Prevention collaborative \050specify partners\051)
 /Type /Annot
 >>
 endobj
@@ -4415,8 +4415,8 @@ endobj
 /Rect [ 35.825 258.82 45.185 268.18 ]
 /StructParent 32
 /Subtype /Widget
-/T (S1\040GF\04024)
-/TU (Rationale\040for\040assessment\072\040Outbreak)
+/T (S1 GF 24)
+/TU (Rationale for assessment\072 Outbreak)
 /Type /Annot
 /V /Off
 >>
@@ -4478,7 +4478,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -4488,8 +4488,8 @@ endobj
 /Rect [ 120.96 258.44 580.5 271.4 ]
 /StructParent 33
 /Subtype /Widget
-/T (S1\040GF\04025)
-/TU (Rationale\040for\040assessment\072\040Outbreak\040\050specify\051)
+/T (S1 GF 25)
+/TU (Rationale for assessment\072 Outbreak \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -4535,8 +4535,8 @@ endobj
 /Rect [ 35.825 240.76 45.185 250.12 ]
 /StructParent 34
 /Subtype /Widget
-/T (S1\040GF\04026)
-/TU (Rationale\040for\040assessment\072\040Other)
+/T (S1 GF 26)
+/TU (Rationale for assessment\072 Other)
 /Type /Annot
 /V /Off
 >>
@@ -4598,7 +4598,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -4608,8 +4608,8 @@ endobj
 /Rect [ 108 240.73 579.96 253.69 ]
 /StructParent 35
 /Subtype /Widget
-/T (S1\040GF\04027\040)
-/TU (Rationale\040for\040assessment\072\040Other\040\050specify\051)
+/T (S1 GF 27 )
+/TU (Rationale for assessment\072 Other \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -4642,7 +4642,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -4652,8 +4652,8 @@ endobj
 /Rect [ 31.23 165.581 580.5 178.541 ]
 /StructParent 36
 /Subtype /Widget
-/T (S1\040GF\04028)
-/TU (EPA\040registration\040number\050s\051\040for\040products\040used\040in\040patient\057resident\040rooms)
+/T (S1 GF 28)
+/TU (EPA registration number\050s\051 for products used in patient\057resident rooms)
 /Type /Annot
 >>
 endobj
@@ -4686,7 +4686,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -4696,8 +4696,8 @@ endobj
 /Rect [ 31.23 136.11 580.5 149.07 ]
 /StructParent 37
 /Subtype /Widget
-/T (S1\040GF\04029)
-/TU (EPA\040registration\040number\050s\051\040for\040products\040used\040in\040common\040areas)
+/T (S1 GF 29)
+/TU (EPA registration number\050s\051 for products used in common areas)
 /Type /Annot
 >>
 endobj
@@ -4730,7 +4730,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -4740,8 +4740,8 @@ endobj
 /Rect [ 31.23 106.639 580.5 119.6 ]
 /StructParent 38
 /Subtype /Widget
-/T (S1\040GF\04030)
-/TU (EPA\040registration\040number\050s\051\040for\040products\040used\040on\040non\055critical\040patient\057resident\040care\040equipment\040\050e\056g\056\054\040blood\040glucose\040meters\051)
+/T (S1 GF 30)
+/TU (EPA registration number\050s\051 for products used on non\055critical patient\057resident care equipment \050e\056g\056\054 blood glucose meters\051)
 /Type /Annot
 >>
 endobj
@@ -4843,8 +4843,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 205 0 R 210 0 R 214 0 R 218 0 R ]
-/T (S1\0401a)
-/TU (1\056\040Does\040the\040facility\040have\040access\040to\040onsite\040IPC\040expertise\077)
+/T (S1 1a)
+/TU (1\056 Does the facility have access to onsite IPC expertise\077)
 >>
 endobj
 210 0 obj
@@ -5075,7 +5075,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -5085,8 +5085,8 @@ endobj
 /Rect [ 31.5 650.2 580.5 663.16 ]
 /StructParent 43
 /Subtype /Widget
-/T (S1\0401b)
-/TU (Healthcare\040epidemiologist\040\050number\040of\040full\055time\040equivalents\040dedicated\040to\040IPC\040activities\051)
+/T (S1 1b)
+/TU (Healthcare epidemiologist \050number of full\055time equivalents dedicated to IPC activities\051)
 /Type /Annot
 >>
 endobj
@@ -5119,7 +5119,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -5129,8 +5129,8 @@ endobj
 /Rect [ 31.5 621.04 580.5 634 ]
 /StructParent 44
 /Subtype /Widget
-/T (S1\0401c)
-/TU (Infection\040preventionist\040\050number\040of\040full\055time\040equivalents\040dedicated\040to\040IPC\040activities\051)
+/T (S1 1c)
+/TU (Infection preventionist \050number of full\055time equivalents dedicated to IPC activities\051)
 /Type /Annot
 >>
 endobj
@@ -5163,7 +5163,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -5173,8 +5173,8 @@ endobj
 /Rect [ 31.5 591.92 580.5 604.88 ]
 /StructParent 45
 /Subtype /Widget
-/T (S1\0401d)
-/TU (Other\040\050specify\054\040including\040number\040of\040full\055time\040equivalents\040dedicated\040to\040IPC\040activities\051)
+/T (S1 1d)
+/TU (Other \050specify\054 including number of full\055time equivalents dedicated to IPC activities\051)
 /Type /Annot
 >>
 endobj
@@ -5276,8 +5276,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 231 0 R 236 0 R 240 0 R 244 0 R ]
-/T (S1\0402a)
-/TU (2\056\040Does\040the\040facility\040have\040access\040to\040offsite\040IPC\040expertise\077)
+/T (S1 2a)
+/TU (2\056 Does the facility have access to offsite IPC expertise\077)
 >>
 endobj
 236 0 obj
@@ -5508,7 +5508,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -5518,8 +5518,8 @@ endobj
 /Rect [ 31.92 412.32 580.92 425.28 ]
 /StructParent 50
 /Subtype /Widget
-/T (S1\0402b)
-/TU (Healthcare\040epidemiologist\040\050number\040of\040full\055time\040equivalents\040dedicated\040to\040IPC\040activities\040at\040the\040facility\051)
+/T (S1 2b)
+/TU (Healthcare epidemiologist \050number of full\055time equivalents dedicated to IPC activities at the facility\051)
 /Type /Annot
 >>
 endobj
@@ -5552,7 +5552,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -5562,8 +5562,8 @@ endobj
 /Rect [ 31.92 383.16 580.92 396.12 ]
 /StructParent 51
 /Subtype /Widget
-/T (S1\0402c)
-/TU (Infection\040preventionist\040\050number\040of\040full\055time\040equivalents\040dedicated\040to\040IPC\040activities\040at\040the\040facility\051)
+/T (S1 2c)
+/TU (Infection preventionist \050number of full\055time equivalents dedicated to IPC activities at the facility\051)
 /Type /Annot
 >>
 endobj
@@ -5596,7 +5596,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -5606,8 +5606,8 @@ endobj
 /Rect [ 31.92 354.04 580.92 367 ]
 /StructParent 52
 /Subtype /Widget
-/T (S1\0402d)
-/TU (Other\040\050specify\054\040including\040number\040of\040full\055time\040equivalents\040dedicated\040to\040IPC\040activities\040at\040the\040facility\051)
+/T (S1 2d)
+/TU (Other \050specify\054 including number of full\055time equivalents dedicated to IPC activities at the facility\051)
 /Type /Annot
 >>
 endobj
@@ -5709,8 +5709,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 257 0 R 262 0 R 266 0 R 270 0 R ]
-/T (S1\0403a)
-/TU (3\056\040Does\040the\040person\050s\051\040charged\040with\040directing\040the\040IPC\040program\040at\040the\040facility\040hold\040a\040nationally\040recognized\040credential\040in\040infection\040control\040\050e\056g\056\054\040a\055IPC\054\040CIC\054\040LTC\055CIP\054\040BCIDP\051\077)
+/T (S1 3a)
+/TU (3\056 Does the person\050s\051 charged with directing the IPC program at the facility hold a nationally recognized credential in infection control \050e\056g\056\054 a\055IPC\054 CIC\054 LTC\055CIP\054 BCIDP\051\077)
 >>
 endobj
 262 0 obj
@@ -5941,7 +5941,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -5951,8 +5951,8 @@ endobj
 /Rect [ 31.52 85.52 580.25 192.64 ]
 /StructParent 57
 /Subtype /Widget
-/T (S1\0403b)
-/TU (Lack\040of\040certification\040does\040not\040mean\040that\040an\040individual\040is\040not\040qualified\040to\040direct\040the\040IPC\040program\056\040Describe\040their\040qualification\050s\051\040\050e\056g\056\054\040other\040certifications\054\040specialized\040training\051)
+/T (S1 3b)
+/TU (Lack of certification does not mean that an individual is not qualified to direct the IPC program\056 Describe their qualification\050s\051 \050e\056g\056\054 other certifications\054 specialized training\051)
 /Type /Annot
 >>
 endobj
@@ -5998,8 +5998,8 @@ endobj
 /Rect [ 49.825 738.4 59.185 747.76 ]
 /StructParent 220
 /Subtype /Widget
-/T (S1\0404a)
-/TU (4\056\040What\040additional\040duties\040are\040performed\040by\040personnel\040within\040the\040IPC\040program\077\040\050select\040all\040that\040apply\051\072\040Occupational\040Health)
+/T (S1 4a)
+/TU (4\056 What additional duties are performed by personnel within the IPC program\077 \050select all that apply\051\072 Occupational Health)
 /Type /Annot
 /V /Off
 >>
@@ -6074,8 +6074,8 @@ endobj
 /Rect [ 49.825 726.537 59.185 735.897 ]
 /StructParent 221
 /Subtype /Widget
-/T (S1\0404b)
-/TU (4\056\040What\040additional\040duties\040are\040performed\040by\040personnel\040within\040the\040IPC\040program\077\040\050select\040all\040that\040apply\051\072\040Education\040of\040personnel)
+/T (S1 4b)
+/TU (4\056 What additional duties are performed by personnel within the IPC program\077 \050select all that apply\051\072 Education of personnel)
 /Type /Annot
 /V /Off
 >>
@@ -6150,8 +6150,8 @@ endobj
 /Rect [ 49.825 714.673 59.185 724.033 ]
 /StructParent 60
 /Subtype /Widget
-/T (S1\0404c)
-/TU (4\056\040What\040additional\040duties\040are\040performed\040by\040personnel\040within\040the\040IPC\040program\077\040\050select\040all\040that\040apply\051\072\040Safety\040officer)
+/T (S1 4c)
+/TU (4\056 What additional duties are performed by personnel within the IPC program\077 \050select all that apply\051\072 Safety officer)
 /Type /Annot
 /V /Off
 >>
@@ -6226,8 +6226,8 @@ endobj
 /Rect [ 49.825 702.81 59.185 712.17 ]
 /StructParent 61
 /Subtype /Widget
-/T (S1\0404d)
-/TU (4\056\040What\040additional\040duties\040are\040performed\040by\040personnel\040within\040the\040IPC\040program\077\040\050select\040all\040that\040apply\051\072\040Administrative\040\050e\056g\056\054\040Director\040of\040Nursing\051)
+/T (S1 4d)
+/TU (4\056 What additional duties are performed by personnel within the IPC program\077 \050select all that apply\051\072 Administrative \050e\056g\056\054 Director of Nursing\051)
 /Type /Annot
 /V /Off
 >>
@@ -6302,8 +6302,8 @@ endobj
 /Rect [ 49.825 690.947 59.185 700.307 ]
 /StructParent 62
 /Subtype /Widget
-/T (S1\0404e)
-/TU (4\056\040What\040additional\040duties\040are\040performed\040by\040personnel\040within\040the\040IPC\040program\077\040\050select\040all\040that\040apply\051\072\040None)
+/T (S1 4e)
+/TU (4\056 What additional duties are performed by personnel within the IPC program\077 \050select all that apply\051\072 None)
 /Type /Annot
 /V /Off
 >>
@@ -6378,8 +6378,8 @@ endobj
 /Rect [ 49.825 679.083 59.185 688.443 ]
 /StructParent 63
 /Subtype /Widget
-/T (S1\0404f)
-/TU (4\056\040What\040additional\040duties\040are\040performed\040by\040personnel\040within\040the\040IPC\040program\077\040\050select\040all\040that\040apply\051\072\040Not\040assessed)
+/T (S1 4f)
+/TU (4\056 What additional duties are performed by personnel within the IPC program\077 \050select all that apply\051\072 Not assessed)
 /Type /Annot
 /V /Off
 >>
@@ -6454,8 +6454,8 @@ endobj
 /Rect [ 49.825 667.22 59.185 676.58 ]
 /StructParent 64
 /Subtype /Widget
-/T (S1\0404g)
-/TU (4\056\040What\040additional\040duties\040are\040performed\040by\040personnel\040within\040the\040IPC\040program\077\040\050select\040all\040that\040apply\051\072\040Other)
+/T (S1 4g)
+/TU (4\056 What additional duties are performed by personnel within the IPC program\077 \050select all that apply\051\072 Other)
 /Type /Annot
 /V /Off
 >>
@@ -6517,7 +6517,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -6527,8 +6527,8 @@ endobj
 /Rect [ 123.75 665.6 580.5 678.56 ]
 /StructParent 65
 /Subtype /Widget
-/T (S1\0404h)
-/TU (4\056\040What\040additional\040duties\040are\040performed\040by\040personnel\040within\040the\040IPC\040program\077\040\050select\040all\040that\040apply\051\072\040Other\040\050specify\051)
+/T (S1 4h)
+/TU (4\056 What additional duties are performed by personnel within the IPC program\077 \050select all that apply\051\072 Other \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -6561,7 +6561,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -6571,8 +6571,8 @@ endobj
 /Rect [ 49.68 604.5 580.5 648 ]
 /StructParent 66
 /Subtype /Widget
-/T (S1\0405)
-/TU (5\056\040What\040does\040the\040director\040of\040the\040IPC\040program\040believe\040are\040the\040current\040strengths\040and\040weaknesses\040in\040the\040IPC\040program\077)
+/T (S1 5)
+/TU (5\056 What does the director of the IPC program believe are the current strengths and weaknesses in the IPC program\077)
 /Type /Annot
 >>
 endobj
@@ -6674,8 +6674,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 311 0 R 316 0 R 320 0 R 324 0 R ]
-/T (S1\0406)
-/TU (6\056\040Does\040the\040IPC\040program\040have\040access\040to\040electronic\040medical\040records\040of\040patients\057residents\077)
+/T (S1 6)
+/TU (6\056 Does the IPC program have access to electronic medical records of patients\057residents\077)
 >>
 endobj
 316 0 obj
@@ -6975,8 +6975,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 328 0 R 333 0 R 337 0 R 341 0 R ]
-/T (S1\0407)
-/TU (7\056\040Does\040the\040IPC\040program\040utilize\040data\040mining\057reporting\040software\077)
+/T (S1 7)
+/TU (7\056 Does the IPC program utilize data mining\057reporting software\077)
 >>
 endobj
 333 0 obj
@@ -7276,8 +7276,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 345 0 R 350 0 R 354 0 R 358 0 R ]
-/T (S1\0408)
-/TU (8\056\040Does\040the\040IPC\040program\040perform\040an\040annual\040facility\040infection\040risk\040assessment\040that\040evaluates\040and\040prioritizes\040potential\040risks\040for\040infections\054\040contamination\054\040and\040exposures\040and\040the\040program\220s\040preparedness\040to\040eliminate\040or\040mitigate\040such\040risks\077)
+/T (S1 8)
+/TU (8\056 Does the IPC program perform an annual facility infection risk assessment that evaluates and prioritizes potential risks for infections\054 contamination\054 and exposures and the program\220s preparedness to eliminate or mitigate such risks\077)
 >>
 endobj
 350 0 obj
@@ -7577,8 +7577,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 362 0 R 367 0 R 371 0 R 375 0 R ]
-/T (S1\0409)
-/TU (9\056\040Are\040written\040infection\040control\040policies\040and\040procedures\040available\054\040current\054\040and\040based\040on\040evidence\055based\040guidelines\040\050e\056g\056\054\040CDC\057HICPAC\051\054\040regulations\054\040or\040standards\077)
+/T (S1 9)
+/TU (9\056 Are written infection control policies and procedures available\054 current\054 and based on evidence\055based guidelines \050e\056g\056\054 CDC\057HICPAC\051\054 regulations\054 or standards\077)
 >>
 endobj
 367 0 obj
@@ -7822,8 +7822,8 @@ endobj
 /Rect [ 71.825 283.4 81.185 292.76 ]
 /StructParent 83
 /Subtype /Widget
-/T (S1\0409a\0401)
-/TU (9a\056\040How\040frequently\040are\040policies\040and\040procedures\040reviewed\040and\040updated\077\040\050select\040all\040that\040apply\051\072\040Annually)
+/T (S1 9a 1)
+/TU (9a\056 How frequently are policies and procedures reviewed and updated\077 \050select all that apply\051\072 Annually)
 /Type /Annot
 /V /Off
 >>
@@ -7898,8 +7898,8 @@ endobj
 /Rect [ 71.825 271.537 81.185 280.897 ]
 /StructParent 84
 /Subtype /Widget
-/T (S1\0409a\0402)
-/TU (9a\056\040How\040frequently\040are\040policies\040and\040procedures\040reviewed\040and\040updated\077\040\050select\040all\040that\040apply\051\072\040Every\040three\040years)
+/T (S1 9a 2)
+/TU (9a\056 How frequently are policies and procedures reviewed and updated\077 \050select all that apply\051\072 Every three years)
 /Type /Annot
 /V /Off
 >>
@@ -7974,8 +7974,8 @@ endobj
 /Rect [ 71.825 259.673 81.185 269.033 ]
 /StructParent 85
 /Subtype /Widget
-/T (S1\0409a\0403)
-/TU (9a\056\040How\040frequently\040are\040policies\040and\040procedures\040reviewed\040and\040updated\077\040\050select\040all\040that\040apply\051\072\040As\040needed\040when\040new\040guidelines\040or\040evidence\040is\040published\040\050e\056g\056\054\040via\040subscription\040with\040a\040publisher\051)
+/T (S1 9a 3)
+/TU (9a\056 How frequently are policies and procedures reviewed and updated\077 \050select all that apply\051\072 As needed when new guidelines or evidence is published \050e\056g\056\054 via subscription with a publisher\051)
 /Type /Annot
 /V /Off
 >>
@@ -8050,8 +8050,8 @@ endobj
 /Rect [ 71.825 247.81 81.185 257.17 ]
 /StructParent 86
 /Subtype /Widget
-/T (S1\0409a\0404)
-/TU (9a\056\040How\040frequently\040are\040policies\040and\040procedures\040reviewed\040and\040updated\077\040\050select\040all\040that\040apply\051\072\040Unknown)
+/T (S1 9a 4)
+/TU (9a\056 How frequently are policies and procedures reviewed and updated\077 \050select all that apply\051\072 Unknown)
 /Type /Annot
 /V /Off
 >>
@@ -8126,8 +8126,8 @@ endobj
 /Rect [ 71.825 235.947 81.185 245.307 ]
 /StructParent 87
 /Subtype /Widget
-/T (S1\0409a\0405)
-/TU (9a\056\040How\040frequently\040are\040policies\040and\040procedures\040reviewed\040and\040updated\077\040\050select\040all\040that\040apply\051\072\040Not\040assessed)
+/T (S1 9a 5)
+/TU (9a\056 How frequently are policies and procedures reviewed and updated\077 \050select all that apply\051\072 Not assessed)
 /Type /Annot
 /V /Off
 >>
@@ -8202,8 +8202,8 @@ endobj
 /Rect [ 71.825 224.083 81.185 233.443 ]
 /StructParent 88
 /Subtype /Widget
-/T (S1\0409a\0406)
-/TU (9a\056\040How\040frequently\040are\040policies\040and\040procedures\040reviewed\040and\040updated\077\040\050select\040all\040that\040apply\051\072\040Other)
+/T (S1 9a 6)
+/TU (9a\056 How frequently are policies and procedures reviewed and updated\077 \050select all that apply\051\072 Other)
 /Type /Annot
 /V /Off
 >>
@@ -8265,7 +8265,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -8275,8 +8275,8 @@ endobj
 /Rect [ 142.92 223.67 580.5 236.63 ]
 /StructParent 89
 /Subtype /Widget
-/T (S1\0409a\0407)
-/TU (9a\056\040How\040frequently\040are\040policies\040and\040procedures\040reviewed\040and\040updated\077\040\050select\040all\040that\040apply\051\072\040Other\040\050specify\051)
+/T (S1 9a 7)
+/TU (9a\056 How frequently are policies and procedures reviewed and updated\077 \050select all that apply\051\072 Other \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -8378,8 +8378,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 406 0 R 411 0 R 415 0 R 419 0 R ]
-/T (S1\04010)
-/TU (10\056Does\040the\040IPC\040program\040provide\040infection\040prevention\040education\040to\040patients\054\040family\040members\054\040and\040other\040caregivers\077)
+/T (S1 10)
+/TU (10\056Does the IPC program provide infection prevention education to patients\054 family members\054 and other caregivers\077)
 >>
 endobj
 411 0 obj
@@ -8610,7 +8610,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -8620,8 +8620,8 @@ endobj
 /Rect [ 69.84 621.34 579.96 664.84 ]
 /StructParent 94
 /Subtype /Widget
-/T (S1\04010a)
-/TU (10a\056\040What\040topics\040are\040covered\077\040\050specify\051)
+/T (S1 10a)
+/TU (10a\056 What topics are covered\077 \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -8654,7 +8654,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -8664,8 +8664,8 @@ endobj
 /Rect [ 69.57 543.88 580.23 587.38 ]
 /StructParent 95
 /Subtype /Widget
-/T (S1\04010b)
-/TU (10b\056\040How\040is\040this\040education\040provided\040\050e\056g\056\054\040information\040included\040in\040the\040admission\040or\040discharge\040packet\054\040videos\054\040signage\054\040in\055person\040training\051\077\040\050specify\051)
+/T (S1 10b)
+/TU (10b\056 How is this education provided \050e\056g\056\054 information included in the admission or discharge packet\054 videos\054 signage\054 in\055person training\051\077 \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -8767,8 +8767,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 429 0 R 434 0 R 438 0 R 442 0 R ]
-/T (S1\04011)
-/TU (11\056\040Does\040the\040facility\040have\040an\040interdisciplinary\040infection\040control\040committee\040to\040address\040issues\040identified\040by\040the\040IPC\040program\077)
+/T (S1 11)
+/TU (11\056 Does the facility have an interdisciplinary infection control committee to address issues identified by the IPC program\077)
 >>
 endobj
 434 0 obj
@@ -9012,8 +9012,8 @@ endobj
 /Rect [ 71.825 383.4 81.185 392.76 ]
 /StructParent 100
 /Subtype /Widget
-/T (S1\04011a\0401)
-/TU (11a\056\040Who\040is\040part\040of\040the\040infection\040control\040committee\077\040\050select\040all\040that\040apply\051\072\040Chief\040Medical\040Officer)
+/T (S1 11a 1)
+/TU (11a\056 Who is part of the infection control committee\077 \050select all that apply\051\072 Chief Medical Officer)
 /Type /Annot
 /V /Off
 >>
@@ -9088,8 +9088,8 @@ endobj
 /Rect [ 71.825 371.537 81.185 380.897 ]
 /StructParent 101
 /Subtype /Widget
-/T (S1\04011a\0402)
-/TU (11a\056\040Who\040is\040part\040of\040the\040infection\040control\040committee\077\040\050select\040all\040that\040apply\051\072\040Director\040of\040Nursing)
+/T (S1 11a 2)
+/TU (11a\056 Who is part of the infection control committee\077 \050select all that apply\051\072 Director of Nursing)
 /Type /Annot
 /V /Off
 >>
@@ -9164,8 +9164,8 @@ endobj
 /Rect [ 71.825 359.673 81.185 369.033 ]
 /StructParent 102
 /Subtype /Widget
-/T (S1\04011a\0403)
-/TU (11a\056\040Who\040is\040part\040of\040the\040infection\040control\040committee\077\040\050select\040all\040that\040apply\051\072\040Environmental\040Services)
+/T (S1 11a 3)
+/TU (11a\056 Who is part of the infection control committee\077 \050select all that apply\051\072 Environmental Services)
 /Type /Annot
 /V /Off
 >>
@@ -9240,8 +9240,8 @@ endobj
 /Rect [ 71.825 347.81 81.185 357.17 ]
 /StructParent 103
 /Subtype /Widget
-/T (S1\04011a\0404)
-/TU (11a\056\040Who\040is\040part\040of\040the\040infection\040control\040committee\077\040\050select\040all\040that\040apply\051\072\040Unknown)
+/T (S1 11a 4)
+/TU (11a\056 Who is part of the infection control committee\077 \050select all that apply\051\072 Unknown)
 /Type /Annot
 /V /Off
 >>
@@ -9316,8 +9316,8 @@ endobj
 /Rect [ 71.825 335.947 81.185 345.307 ]
 /StructParent 104
 /Subtype /Widget
-/T (S1\04011a\0405)
-/TU (11a\056\040Who\040is\040part\040of\040the\040infection\040control\040committee\077\040\050select\040all\040that\040apply\051\072\040Not\040Assessed)
+/T (S1 11a 5)
+/TU (11a\056 Who is part of the infection control committee\077 \050select all that apply\051\072 Not Assessed)
 /Type /Annot
 /V /Off
 >>
@@ -9392,8 +9392,8 @@ endobj
 /Rect [ 71.825 324.083 81.185 333.443 ]
 /StructParent 105
 /Subtype /Widget
-/T (S1\04011a\0406)
-/TU (11a\056\040Who\040is\040part\040of\040the\040infection\040control\040committee\077\040\050select\040all\040that\040apply\051\072\040Other)
+/T (S1 11a 6)
+/TU (11a\056 Who is part of the infection control committee\077 \050select all that apply\051\072 Other)
 /Type /Annot
 /V /Off
 >>
@@ -9455,7 +9455,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -9465,8 +9465,8 @@ endobj
 /Rect [ 143.72 323.04 580.5 336 ]
 /StructParent 106
 /Subtype /Widget
-/T (S1\04011a\0407)
-/TU (11a\056\040Who\040is\040part\040of\040the\040infection\040control\040committee\077\040\050select\040all\040that\040apply\051\072\040Other\040\050specify\051)
+/T (S1 11a 7)
+/TU (11a\056 Who is part of the infection control committee\077 \050select all that apply\051\072 Other \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -9512,8 +9512,8 @@ endobj
 /Rect [ 71.825 289.537 81.185 298.897 ]
 /StructParent 107
 /Subtype /Widget
-/T (S1\04011b\0401)
-/TU (11b\056\040How\040often\040does\040the\040infection\040control\040committee\040meet\077\040Monthly)
+/T (S1 11b 1)
+/TU (11b\056 How often does the infection control committee meet\077 Monthly)
 /Type /Annot
 /V /Off
 >>
@@ -9588,8 +9588,8 @@ endobj
 /Rect [ 71.825 277.673 81.185 287.033 ]
 /StructParent 108
 /Subtype /Widget
-/T (S1\04011b\0402)
-/TU (11b\056\040How\040often\040does\040the\040infection\040control\040committee\040meet\077\040Quarterly)
+/T (S1 11b 2)
+/TU (11b\056 How often does the infection control committee meet\077 Quarterly)
 /Type /Annot
 /V /Off
 >>
@@ -9664,8 +9664,8 @@ endobj
 /Rect [ 71.825 265.81 81.185 275.17 ]
 /StructParent 109
 /Subtype /Widget
-/T (S1\04011b\0403)
-/TU (11b\056\040How\040often\040does\040the\040infection\040control\040committee\040meet\077\040Unknown)
+/T (S1 11b 3)
+/TU (11b\056 How often does the infection control committee meet\077 Unknown)
 /Type /Annot
 /V /Off
 >>
@@ -9740,8 +9740,8 @@ endobj
 /Rect [ 71.825 253.947 81.185 263.307 ]
 /StructParent 110
 /Subtype /Widget
-/T (S1\04011b\0404)
-/TU (11b\056\040How\040often\040does\040the\040infection\040control\040committee\040meet\077\040Not\040Assessed)
+/T (S1 11b 4)
+/TU (11b\056 How often does the infection control committee meet\077 Not Assessed)
 /Type /Annot
 /V /Off
 >>
@@ -9816,8 +9816,8 @@ endobj
 /Rect [ 71.825 242.083 81.185 251.443 ]
 /StructParent 111
 /Subtype /Widget
-/T (S1\04011b\0405)
-/TU (11b\056\040How\040often\040does\040the\040infection\040control\040committee\040meet\077\040Other)
+/T (S1 11b 5)
+/TU (11b\056 How often does the infection control committee meet\077 Other)
 /Type /Annot
 /V /Off
 >>
@@ -9879,7 +9879,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -9889,8 +9889,8 @@ endobj
 /Rect [ 143.72 241.88 580.5 254.84 ]
 /StructParent 112
 /Subtype /Widget
-/T (S1\04011b\0406)
-/TU (11b\056\040How\040often\040does\040the\040infection\040control\040committee\040meet\077\040Other\040\050specify\051)
+/T (S1 11b 6)
+/TU (11b\056 How often does the infection control committee meet\077 Other \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -9923,7 +9923,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -9934,7 +9934,7 @@ endobj
 /StructParent 223
 /Subtype /Widget
 /T (Notes1)
-/TU (General\040Facility\040Demographics\040and\040IPC\040Infrastructure\040Notes)
+/TU (General Facility Demographics and IPC Infrastructure Notes)
 /Type /Annot
 >>
 endobj
@@ -9967,7 +9967,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -9977,8 +9977,8 @@ endobj
 /Rect [ 180 405.01 216.47 417.97 ]
 /StructParent 264
 /Subtype /Widget
-/T (LTC\0406a)
-/TU (6\056\040Total\040Number\040of\040Licensed\040Beds)
+/T (LTC 6a)
+/TU (6\056 Total Number of Licensed Beds)
 /Type /Annot
 >>
 endobj
@@ -10011,7 +10011,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -10021,8 +10021,8 @@ endobj
 /Rect [ 387.53 405.01 424 417.97 ]
 /StructParent 263
 /Subtype /Widget
-/T (LTC\0406b)
-/TU (Number\040of\040Pediatric\040Beds\040\050age\040\07421\051)
+/T (LTC 6b)
+/TU (Number of Pediatric Beds \050age \07421\051)
 /Type /Annot
 >>
 endobj
@@ -10055,7 +10055,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -10065,8 +10065,8 @@ endobj
 /Rect [ 387.53 424.035 424 436.995 ]
 /StructParent 262
 /Subtype /Widget
-/T (LTC\0405b)
-/TU (Number\040of\040Units\040or\040Wings)
+/T (LTC 5b)
+/TU (Number of Units or Wings)
 /Type /Annot
 >>
 endobj
@@ -10099,7 +10099,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -10109,8 +10109,8 @@ endobj
 /Rect [ 222.76 424.035 259.23 436.995 ]
 /StructParent 258
 /Subtype /Widget
-/T (LTC\0405a)
-/TU (Number\040of\040Floors)
+/T (LTC 5a)
+/TU (Number of Floors)
 /Type /Annot
 >>
 endobj
@@ -10212,8 +10212,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 511 0 R 516 0 R 520 0 R 524 0 R 528 0 R ]
-/T (LTC\0404)
-/TU (4\056\040Affiliation)
+/T (LTC 4)
+/TU (4\056 Affiliation)
 >>
 endobj
 516 0 obj
@@ -10586,7 +10586,7 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 532 0 R 537 0 R 541 0 R 545 0 R ]
-/T (LTC\0403)
+/T (LTC 3)
 /TU (3\056Ownership)
 >>
 endobj
@@ -10887,8 +10887,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 549 0 R 554 0 R 558 0 R 562 0 R ]
-/T (LTC\0402)
-/TU (2\056\040Certification)
+/T (LTC 2)
+/TU (2\056 Certification)
 >>
 endobj
 554 0 obj
@@ -11119,7 +11119,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -11129,8 +11129,8 @@ endobj
 /Rect [ 125.72 666.136 476.98 679.096 ]
 /StructParent 254
 /Subtype /Widget
-/T (LTC\0401f)
-/TU (1\056\040Facility\040type\040\050select\040all\040that\040apply\051\072\040Other\040\050specify\051)
+/T (LTC 1f)
+/TU (1\056 Facility type \050select all that apply\051\072 Other \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -11176,8 +11176,8 @@ endobj
 /Rect [ 48.92 666.44 58.28 675.8 ]
 /StructParent 253
 /Subtype /Widget
-/T (LTC\0401e)
-/TU (1\056\040Facility\040type\040\050select\040all\040that\040apply\051\072\040Other)
+/T (LTC 1e)
+/TU (1\056 Facility type \050select all that apply\051\072 Other)
 /Type /Annot
 /V /Off
 >>
@@ -11252,8 +11252,8 @@ endobj
 /Rect [ 48.92 681.5 58.28 690.86 ]
 /StructParent 252
 /Subtype /Widget
-/T (LTC\0401d)
-/TU (1\056\040Facility\040type\040\050select\040all\040that\040apply\051\072\040Inpatient\040Rehabilitation\040Facility)
+/T (LTC 1d)
+/TU (1\056 Facility type \050select all that apply\051\072 Inpatient Rehabilitation Facility)
 /Type /Annot
 /V /Off
 >>
@@ -11328,8 +11328,8 @@ endobj
 /Rect [ 48.92 693.227 58.28 702.587 ]
 /StructParent 251
 /Subtype /Widget
-/T (LTC\0401c)
-/TU (1\056\040Facility\040type\040\050select\040all\040that\040apply\051\072\040Assisted\040living\040facility)
+/T (LTC 1c)
+/TU (1\056 Facility type \050select all that apply\051\072 Assisted living facility)
 /Type /Annot
 /V /Off
 >>
@@ -11404,8 +11404,8 @@ endobj
 /Rect [ 48.92 704.953 58.28 714.313 ]
 /StructParent 246
 /Subtype /Widget
-/T (LTC\0401b)
-/TU (1\056\040Facility\040type\040\050select\040all\040that\040apply\051\072\040Intermediate\040care\040facility)
+/T (LTC 1b)
+/TU (1\056 Facility type \050select all that apply\051\072 Intermediate care facility)
 /Type /Annot
 /V /Off
 >>
@@ -11480,8 +11480,8 @@ endobj
 /Rect [ 48.92 716.68 58.28 726.04 ]
 /StructParent 237
 /Subtype /Widget
-/T (LTC\0401a)
-/TU (1\056\040Facility\040type\040\050select\040all\040that\040apply\051\072\040Nursing\040home)
+/T (LTC 1a)
+/TU (1\056 Facility type \050select all that apply\051\072 Nursing home)
 /Type /Annot
 /V /Off
 >>
@@ -11543,7 +11543,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -11553,8 +11553,8 @@ endobj
 /Rect [ 114 389.52 162.24 402.48 ]
 /StructParent 173
 /Subtype /Widget
-/T (LTC\0407a)
-/TU (7\056Current\040Census)
+/T (LTC 7a)
+/TU (7\056Current Census)
 /Type /Annot
 >>
 endobj
@@ -11587,7 +11587,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -11597,8 +11597,8 @@ endobj
 /Rect [ 224.89 331.952 279.556 344.912 ]
 /StructParent 114
 /Subtype /Widget
-/T (LTC\0407b)
-/TU (Subacute\057Skilled\040Number\040of\040Rooms)
+/T (LTC 7b)
+/TU (Subacute\057Skilled Number of Rooms)
 /Type /Annot
 >>
 endobj
@@ -11631,7 +11631,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -11641,8 +11641,8 @@ endobj
 /Rect [ 280.056 331.952 334.723 344.912 ]
 /StructParent 115
 /Subtype /Widget
-/T (LTC\0407c)
-/TU (Subacute\057Skilled\040Current\040Census)
+/T (LTC 7c)
+/TU (Subacute\057Skilled Current Census)
 /Type /Annot
 >>
 endobj
@@ -11675,7 +11675,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -11685,8 +11685,8 @@ endobj
 /Rect [ 335.223 331.952 402.223 344.912 ]
 /StructParent 116
 /Subtype /Widget
-/T (LTC\0407d)
-/TU (Subacute\057Skilled\040Number\040of\040single\057private\040rooms)
+/T (LTC 7d)
+/TU (Subacute\057Skilled Number of single\057private rooms)
 /Type /Annot
 >>
 endobj
@@ -11719,7 +11719,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -11729,8 +11729,8 @@ endobj
 /Rect [ 402.723 331.952 469.723 344.912 ]
 /StructParent 117
 /Subtype /Widget
-/T (LTC\0407e)
-/TU (Subacute\057Skilled\040Number\040of\040doubles\057semi\055privates)
+/T (LTC 7e)
+/TU (Subacute\057Skilled Number of doubles\057semi\055privates)
 /Type /Annot
 >>
 endobj
@@ -11763,7 +11763,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -11773,8 +11773,8 @@ endobj
 /Rect [ 470.223 331.952 524.889 344.912 ]
 /StructParent 118
 /Subtype /Widget
-/T (LTC\0407f)
-/TU (Subacute\057Skilled\040Number\040of\040triples)
+/T (LTC 7f)
+/TU (Subacute\057Skilled Number of triples)
 /Type /Annot
 >>
 endobj
@@ -11807,7 +11807,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -11817,8 +11817,8 @@ endobj
 /Rect [ 525.389 331.952 579.929 344.912 ]
 /StructParent 119
 /Subtype /Widget
-/T (LTC\0407g)
-/TU (Subacute\057Skilled\040Number\040of\040quads)
+/T (LTC 7g)
+/TU (Subacute\057Skilled Number of quads)
 /Type /Annot
 >>
 endobj
@@ -11851,7 +11851,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -11861,8 +11861,8 @@ endobj
 /Rect [ 224.89 316.976 279.556 329.936 ]
 /StructParent 120
 /Subtype /Widget
-/T (LTC\0407h)
-/TU (Long\055term\040general\040nursing\040Number\040of\040Rooms)
+/T (LTC 7h)
+/TU (Long\055term general nursing Number of Rooms)
 /Type /Annot
 >>
 endobj
@@ -11895,7 +11895,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -11905,8 +11905,8 @@ endobj
 /Rect [ 280.056 316.976 334.723 329.936 ]
 /StructParent 121
 /Subtype /Widget
-/T (LTC\0407i)
-/TU (Long\055term\040general\040nursing\040Current\040Census)
+/T (LTC 7i)
+/TU (Long\055term general nursing Current Census)
 /Type /Annot
 >>
 endobj
@@ -11939,7 +11939,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -11949,8 +11949,8 @@ endobj
 /Rect [ 335.223 316.976 402.223 329.936 ]
 /StructParent 122
 /Subtype /Widget
-/T (LTC\0407j)
-/TU (Long\055term\040general\040nursing\040Number\040of\040single\057private\040rooms)
+/T (LTC 7j)
+/TU (Long\055term general nursing Number of single\057private rooms)
 /Type /Annot
 >>
 endobj
@@ -11983,7 +11983,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -11993,8 +11993,8 @@ endobj
 /Rect [ 403.247 316.976 470.247 329.936 ]
 /StructParent 123
 /Subtype /Widget
-/T (LTC\0407k)
-/TU (Long\055term\040general\040nursing\040of\040doubles\057semi\055privates)
+/T (LTC 7k)
+/TU (Long\055term general nursing of doubles\057semi\055privates)
 /Type /Annot
 >>
 endobj
@@ -12027,7 +12027,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12037,8 +12037,8 @@ endobj
 /Rect [ 470.223 316.976 524.889 329.936 ]
 /StructParent 124
 /Subtype /Widget
-/T (LTC\0407l)
-/TU (Long\055term\040general\040nursing\040Number\040of\040triples)
+/T (LTC 7l)
+/TU (Long\055term general nursing Number of triples)
 /Type /Annot
 >>
 endobj
@@ -12071,7 +12071,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12081,8 +12081,8 @@ endobj
 /Rect [ 525.389 316.976 579.929 329.936 ]
 /StructParent 125
 /Subtype /Widget
-/T (LTC\0407m)
-/TU (Long\055term\040general\040nursing\040Number\040of\040quads)
+/T (LTC 7m)
+/TU (Long\055term general nursing Number of quads)
 /Type /Annot
 >>
 endobj
@@ -12115,7 +12115,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12125,8 +12125,8 @@ endobj
 /Rect [ 224.89 302 279.556 314.96 ]
 /StructParent 126
 /Subtype /Widget
-/T (LTC\0407n)
-/TU (Memory\040Care\040Number\040of\040Rooms)
+/T (LTC 7n)
+/TU (Memory Care Number of Rooms)
 /Type /Annot
 >>
 endobj
@@ -12159,7 +12159,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12169,8 +12169,8 @@ endobj
 /Rect [ 280.056 302 334.723 314.96 ]
 /StructParent 127
 /Subtype /Widget
-/T (LTC\0407o)
-/TU (Memory\040Care\040Current\040Census)
+/T (LTC 7o)
+/TU (Memory Care Current Census)
 /Type /Annot
 >>
 endobj
@@ -12203,7 +12203,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12213,8 +12213,8 @@ endobj
 /Rect [ 335.747 301.476 402.747 314.436 ]
 /StructParent 128
 /Subtype /Widget
-/T (LTC\0407p)
-/TU (Memory\040Care\040Number\040of\040single\057private\040rooms)
+/T (LTC 7p)
+/TU (Memory Care Number of single\057private rooms)
 /Type /Annot
 >>
 endobj
@@ -12247,7 +12247,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12257,8 +12257,8 @@ endobj
 /Rect [ 402.723 302 469.723 314.96 ]
 /StructParent 129
 /Subtype /Widget
-/T (LTC\0407q)
-/TU (Memory\040Care\040Number\040of\040doubles\057semi\055privates)
+/T (LTC 7q)
+/TU (Memory Care Number of doubles\057semi\055privates)
 /Type /Annot
 >>
 endobj
@@ -12291,7 +12291,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12301,8 +12301,8 @@ endobj
 /Rect [ 470.223 302 524.889 314.96 ]
 /StructParent 130
 /Subtype /Widget
-/T (LTC\0407r)
-/TU (Memory\040Care\040Number\040of\040triples)
+/T (LTC 7r)
+/TU (Memory Care Number of triples)
 /Type /Annot
 >>
 endobj
@@ -12335,7 +12335,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12345,8 +12345,8 @@ endobj
 /Rect [ 525.389 302 579.929 314.96 ]
 /StructParent 131
 /Subtype /Widget
-/T (LTC\0407s)
-/TU (Memory\040Care\040Number\040of\040quads)
+/T (LTC 7s)
+/TU (Memory Care Number of quads)
 /Type /Annot
 >>
 endobj
@@ -12379,7 +12379,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -12389,8 +12389,8 @@ endobj
 /Rect [ 44.68 273.4 223.92 286.36 ]
 /StructParent 243
 /Subtype /Widget
-/T (LTC\0407t)
-/TU (Other\040Unit\040Type\0401\040\050specify\051\040)
+/T (LTC 7t)
+/TU (Other Unit Type 1 \050specify\051 )
 /Type /Annot
 >>
 endobj
@@ -12423,7 +12423,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12433,8 +12433,8 @@ endobj
 /Rect [ 224.89 273.32 279.556 286.28 ]
 /StructParent 132
 /Subtype /Widget
-/T (LTC\0407u)
-/TU (Other\040Unit\040Type\0401\040Number\040of\040Rooms)
+/T (LTC 7u)
+/TU (Other Unit Type 1 Number of Rooms)
 /Type /Annot
 >>
 endobj
@@ -12467,7 +12467,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12477,8 +12477,8 @@ endobj
 /Rect [ 280.056 273.32 334.723 286.28 ]
 /StructParent 133
 /Subtype /Widget
-/T (LTC\0407v)
-/TU (Other\040Unit\040Type\0401\040Current\040Census)
+/T (LTC 7v)
+/TU (Other Unit Type 1 Current Census)
 /Type /Annot
 >>
 endobj
@@ -12511,7 +12511,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12521,8 +12521,8 @@ endobj
 /Rect [ 335.223 273.32 402.223 286.28 ]
 /StructParent 134
 /Subtype /Widget
-/T (LTC\0407w)
-/TU (Other\040Unit\040Type\0401\040Number\040of\040single\057private\040rooms)
+/T (LTC 7w)
+/TU (Other Unit Type 1 Number of single\057private rooms)
 /Type /Annot
 >>
 endobj
@@ -12555,7 +12555,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12565,8 +12565,8 @@ endobj
 /Rect [ 402.723 273.32 469.723 286.28 ]
 /StructParent 135
 /Subtype /Widget
-/T (LTC\0407x)
-/TU (Other\040Unit\040Type\0401\040Number\040of\040doubles\057semi\055privates)
+/T (LTC 7x)
+/TU (Other Unit Type 1 Number of doubles\057semi\055privates)
 /Type /Annot
 >>
 endobj
@@ -12599,7 +12599,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12609,8 +12609,8 @@ endobj
 /Rect [ 470.223 273.32 524.889 286.28 ]
 /StructParent 136
 /Subtype /Widget
-/T (LTC\0407y)
-/TU (Other\040Unit\040Type\0401\040Number\040of\040triples)
+/T (LTC 7y)
+/TU (Other Unit Type 1 Number of triples)
 /Type /Annot
 >>
 endobj
@@ -12643,7 +12643,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12653,8 +12653,8 @@ endobj
 /Rect [ 525.389 273.32 579.929 286.28 ]
 /StructParent 137
 /Subtype /Widget
-/T (LTC\0407z)
-/TU (Other\040Unit\040Type\0401\040Number\040of\040quads)
+/T (LTC 7z)
+/TU (Other Unit Type 1 Number of quads)
 /Type /Annot
 >>
 endobj
@@ -12687,7 +12687,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -12697,8 +12697,8 @@ endobj
 /Rect [ 44.68 258.4 223.92 271.36 ]
 /StructParent 244
 /Subtype /Widget
-/T (LTC\0407aa)
-/TU (Other\040Unit\040Type\0402\040\050specify\051\040)
+/T (LTC 7aa)
+/TU (Other Unit Type 2 \050specify\051 )
 /Type /Annot
 >>
 endobj
@@ -12731,7 +12731,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12741,8 +12741,8 @@ endobj
 /Rect [ 224.89 258.404 279.556 271.364 ]
 /StructParent 138
 /Subtype /Widget
-/T (LTC\0407bb)
-/TU (Other\040Unit\040Type\0402\040Number\040of\040Rooms)
+/T (LTC 7bb)
+/TU (Other Unit Type 2 Number of Rooms)
 /Type /Annot
 >>
 endobj
@@ -12775,7 +12775,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12785,8 +12785,8 @@ endobj
 /Rect [ 280.056 258.404 334.723 271.364 ]
 /StructParent 139
 /Subtype /Widget
-/T (LTC\0407cc)
-/TU (Other\040Unit\040Type\0402\040Current\040Census)
+/T (LTC 7cc)
+/TU (Other Unit Type 2 Current Census)
 /Type /Annot
 >>
 endobj
@@ -12819,7 +12819,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12829,8 +12829,8 @@ endobj
 /Rect [ 335.223 258.404 402.223 271.364 ]
 /StructParent 140
 /Subtype /Widget
-/T (LTC\0407dd)
-/TU (Other\040Unit\040Type\0402\040Number\040of\040single\057private\040rooms)
+/T (LTC 7dd)
+/TU (Other Unit Type 2 Number of single\057private rooms)
 /Type /Annot
 >>
 endobj
@@ -12863,7 +12863,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12873,8 +12873,8 @@ endobj
 /Rect [ 402.723 258.404 469.723 271.364 ]
 /StructParent 141
 /Subtype /Widget
-/T (LTC\0407ee)
-/TU (Other\040Unit\040Type\0402\040Number\040of\040doubles\057semi\055privates)
+/T (LTC 7ee)
+/TU (Other Unit Type 2 Number of doubles\057semi\055privates)
 /Type /Annot
 >>
 endobj
@@ -12907,7 +12907,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12917,8 +12917,8 @@ endobj
 /Rect [ 470.223 258.404 524.889 271.364 ]
 /StructParent 142
 /Subtype /Widget
-/T (LTC\0407ff)
-/TU (Other\040Unit\040Type\0402\040Number\040of\040triples)
+/T (LTC 7ff)
+/TU (Other Unit Type 2 Number of triples)
 /Type /Annot
 >>
 endobj
@@ -12951,7 +12951,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -12961,8 +12961,8 @@ endobj
 /Rect [ 525.389 258.404 579.929 271.364 ]
 /StructParent 143
 /Subtype /Widget
-/T (LTC\0407gg)
-/TU (Other\040Unit\040Type\0402\040Number\040of\040quads)
+/T (LTC 7gg)
+/TU (Other Unit Type 2 Number of quads)
 /Type /Annot
 >>
 endobj
@@ -12995,7 +12995,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -13005,8 +13005,8 @@ endobj
 /Rect [ 44.68 243.4 223.92 256.36 ]
 /StructParent 245
 /Subtype /Widget
-/T (LTC\0407hh)
-/TU (Other\040Unit\040Type\0403\040\050specify\051\040)
+/T (LTC 7hh)
+/TU (Other Unit Type 3 \050specify\051 )
 /Type /Annot
 >>
 endobj
@@ -13039,7 +13039,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -13049,8 +13049,8 @@ endobj
 /Rect [ 224.89 243.39 279.556 256.35 ]
 /StructParent 144
 /Subtype /Widget
-/T (LTC\0407ii)
-/TU (Other\040Unit\040Type\0403\040Number\040of\040Rooms)
+/T (LTC 7ii)
+/TU (Other Unit Type 3 Number of Rooms)
 /Type /Annot
 >>
 endobj
@@ -13083,7 +13083,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -13093,8 +13093,8 @@ endobj
 /Rect [ 280.056 243.39 334.723 256.35 ]
 /StructParent 145
 /Subtype /Widget
-/T (LTC\0407jj)
-/TU (Other\040Unit\040Type\0403\040Current\040Census)
+/T (LTC 7jj)
+/TU (Other Unit Type 3 Current Census)
 /Type /Annot
 >>
 endobj
@@ -13127,7 +13127,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -13137,8 +13137,8 @@ endobj
 /Rect [ 335.223 243.39 402.223 256.35 ]
 /StructParent 146
 /Subtype /Widget
-/T (LTC\0407kk)
-/TU (Other\040Unit\040Type\0403\040Number\040of\040single\057private\040rooms)
+/T (LTC 7kk)
+/TU (Other Unit Type 3 Number of single\057private rooms)
 /Type /Annot
 >>
 endobj
@@ -13171,7 +13171,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -13181,8 +13181,8 @@ endobj
 /Rect [ 402.723 243.39 469.723 256.35 ]
 /StructParent 147
 /Subtype /Widget
-/T (LTC\0407ll)
-/TU (Other\040Unit\040Type\0403\040Number\040of\040doubles\057semi\055privates)
+/T (LTC 7ll)
+/TU (Other Unit Type 3 Number of doubles\057semi\055privates)
 /Type /Annot
 >>
 endobj
@@ -13215,7 +13215,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -13225,8 +13225,8 @@ endobj
 /Rect [ 470.223 243.39 524.889 256.35 ]
 /StructParent 148
 /Subtype /Widget
-/T (LTC\0407mm)
-/TU (Other\040Unit\040Type\0403\040Number\040of\040triples)
+/T (LTC 7mm)
+/TU (Other Unit Type 3 Number of triples)
 /Type /Annot
 >>
 endobj
@@ -13259,7 +13259,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -13269,8 +13269,8 @@ endobj
 /Rect [ 525.389 243.39 579.929 256.35 ]
 /StructParent 149
 /Subtype /Widget
-/T (LTC\0407nn)
-/TU (Other\040Unit\040Type\0403\040Number\040of\040quads)
+/T (LTC 7nn)
+/TU (Other Unit Type 3 Number of quads)
 /Type /Annot
 >>
 endobj
@@ -13372,8 +13372,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 709 0 R 714 0 R ]
-/T (LTC\0408)
-/TU (8\056\040Does\040the\040facility\040have\040communal\040bathing\040areas\077)
+/T (LTC 8)
+/TU (8\056 Does the facility have communal bathing areas\077)
 >>
 endobj
 714 0 obj
@@ -13527,8 +13527,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 718 0 R 723 0 R ]
-/T (LTC\0409)
-/TU (9\056\040Does\040the\040facility\040provide\040onsite\040hemodialysis\040for\040residents\077)
+/T (LTC 9)
+/TU (9\056 Does the facility provide onsite hemodialysis for residents\077)
 >>
 endobj
 723 0 obj
@@ -13682,8 +13682,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 727 0 R 732 0 R 736 0 R ]
-/T (LTC\0409a\0401)
-/TU (9a\056\040If\040yes\054\040where\040is\040hemodialysis\040performed\077)
+/T (LTC 9a 1)
+/TU (9a\056 If yes\054 where is hemodialysis performed\077)
 >>
 endobj
 732 0 obj
@@ -13841,7 +13841,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -13851,8 +13851,8 @@ endobj
 /Rect [ 148.015 82.5 422.771 96.18 ]
 /StructParent 184
 /Subtype /Widget
-/T (LTC\0409a\0402)
-/TU (Where\040is\040hemodialysis\040performed\077\040Other\040\050specify\051)
+/T (LTC 9a 2)
+/TU (Where is hemodialysis performed\077 Other \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -13898,8 +13898,8 @@ endobj
 /Rect [ 49.4 738.11 58.76 747.47 ]
 /StructParent 185
 /Subtype /Widget
-/T (LTC\04010a)
-/TU (10\056\040What\040laboratory\040support\040is\040available\077\040\050select\040all\040that\040apply\051\072\040Onsite)
+/T (LTC 10a)
+/TU (10\056 What laboratory support is available\077 \050select all that apply\051\072 Onsite)
 /Type /Annot
 /V /Off
 >>
@@ -13974,8 +13974,8 @@ endobj
 /Rect [ 49.4 726.217 58.76 735.577 ]
 /StructParent 186
 /Subtype /Widget
-/T (LTC\04010b)
-/TU (10\056\040What\040laboratory\040support\040is\040available\077\040\050select\040all\040that\040apply\051\072\040Affiliated\040medical\040center\054\040within\040same\040health\040system)
+/T (LTC 10b)
+/TU (10\056 What laboratory support is available\077 \050select all that apply\051\072 Affiliated medical center\054 within same health system)
 /Type /Annot
 /V /Off
 >>
@@ -14050,8 +14050,8 @@ endobj
 /Rect [ 49.4 714.323 58.76 723.683 ]
 /StructParent 187
 /Subtype /Widget
-/T (LTC\04010c)
-/TU (10\056\040What\040laboratory\040support\040is\040available\077\040\050select\040all\040that\040apply\051\072\040Medical\040center\054\040contracted\040locally)
+/T (LTC 10c)
+/TU (10\056 What laboratory support is available\077 \050select all that apply\051\072 Medical center\054 contracted locally)
 /Type /Annot
 /V /Off
 >>
@@ -14126,8 +14126,8 @@ endobj
 /Rect [ 49.4 702.43 58.76 711.79 ]
 /StructParent 265
 /Subtype /Widget
-/T (LTC\04010d)
-/TU (10\056\040What\040laboratory\040support\040is\040available\077\040\050select\040all\040that\040apply\051\072\040Commercial\040referral\040laboratory)
+/T (LTC 10d)
+/TU (10\056 What laboratory support is available\077 \050select all that apply\051\072 Commercial referral laboratory)
 /Type /Annot
 /V /Off
 >>
@@ -14202,8 +14202,8 @@ endobj
 /Rect [ 49.4 687.37 58.76 696.73 ]
 /StructParent 189
 /Subtype /Widget
-/T (LTC\04010e)
-/TU (10\056\040What\040laboratory\040support\040is\040available\077\040\050select\040all\040that\040apply\051\072\040Other\040)
+/T (LTC 10e)
+/TU (10\056 What laboratory support is available\077 \050select all that apply\051\072 Other )
 /Type /Annot
 /V /Off
 >>
@@ -14265,7 +14265,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -14275,8 +14275,8 @@ endobj
 /Rect [ 130.346 687 424 700.68 ]
 /StructParent 190
 /Subtype /Widget
-/T (LTC\04010f)
-/TU (10\056\040What\040laboratory\040support\040is\040available\077\040\050select\040all\040that\040apply\051\072\040Other\040\050specify\051)
+/T (LTC 10f)
+/TU (10\056 What laboratory support is available\077 \050select all that apply\051\072 Other \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -14322,8 +14322,8 @@ endobj
 /Rect [ 49.4 650.92 58.76 660.28 ]
 /StructParent 191
 /Subtype /Widget
-/T (LTC\04011a)
-/TU (11\056\040Which\040services\040are\040provided\040by\040contracted\040vendors\077\040\050select\040all\040that\040apply\051\072\040No\040services\040are\040contracted)
+/T (LTC 11a)
+/TU (11\056 Which services are provided by contracted vendors\077 \050select all that apply\051\072 No services are contracted)
 /Type /Annot
 /V /Off
 >>
@@ -14398,8 +14398,8 @@ endobj
 /Rect [ 49.4 639.14 58.76 648.5 ]
 /StructParent 192
 /Subtype /Widget
-/T (LTC\04011b)
-/TU (11\056\040Which\040services\040are\040provided\040by\040contracted\040vendors\077\040\050select\040all\040that\040apply\051\072\040Environmental\040Services\057Housekeeping\040supervisors)
+/T (LTC 11b)
+/TU (11\056 Which services are provided by contracted vendors\077 \050select all that apply\051\072 Environmental Services\057Housekeeping supervisors)
 /Type /Annot
 /V /Off
 >>
@@ -14474,8 +14474,8 @@ endobj
 /Rect [ 49.4 627.3 58.76 636.66 ]
 /StructParent 193
 /Subtype /Widget
-/T (LTC\04011c)
-/TU (11\056\040Which\040services\040are\040provided\040by\040contracted\040vendors\077\040\050select\040all\040that\040apply\051\072\040Environmental\040services\057Housekeeping\040frontline\040personnel)
+/T (LTC 11c)
+/TU (11\056 Which services are provided by contracted vendors\077 \050select all that apply\051\072 Environmental services\057Housekeeping frontline personnel)
 /Type /Annot
 /V /Off
 >>
@@ -14550,8 +14550,8 @@ endobj
 /Rect [ 49.4 615.24 58.76 624.6 ]
 /StructParent 194
 /Subtype /Widget
-/T (LTC\04011d)
-/TU (11\056\040Which\040services\040are\040provided\040by\040contracted\040vendors\077\040\050select\040all\040that\040apply\051\072\040Linen\057Laundry)
+/T (LTC 11d)
+/TU (11\056 Which services are provided by contracted vendors\077 \050select all that apply\051\072 Linen\057Laundry)
 /Type /Annot
 /V /Off
 >>
@@ -14626,8 +14626,8 @@ endobj
 /Rect [ 332.36 651.431 341.72 660.791 ]
 /StructParent 195
 /Subtype /Widget
-/T (LTC\04011e)
-/TU (11\056\040Which\040services\040are\040provided\040by\040contracted\040vendors\077\040\050select\040all\040that\040apply\051\072\040Wound\040Care)
+/T (LTC 11e)
+/TU (11\056 Which services are provided by contracted vendors\077 \050select all that apply\051\072 Wound Care)
 /Type /Annot
 /V /Off
 >>
@@ -14702,8 +14702,8 @@ endobj
 /Rect [ 332.36 639.651 341.72 649.011 ]
 /StructParent 196
 /Subtype /Widget
-/T (LTC\04011f)
-/TU (11\056\040Which\040services\040are\040provided\040by\040contracted\040vendors\077\040\050select\040all\040that\040apply\051\072\040Podiatry)
+/T (LTC 11f)
+/TU (11\056 Which services are provided by contracted vendors\077 \050select all that apply\051\072 Podiatry)
 /Type /Annot
 /V /Off
 >>
@@ -14778,8 +14778,8 @@ endobj
 /Rect [ 332.36 627.811 341.72 637.171 ]
 /StructParent 197
 /Subtype /Widget
-/T (LTC\04011g)
-/TU (11\056\040Which\040services\040are\040provided\040by\040contracted\040vendors\077\040\050select\040all\040that\040apply\051\072\040Dental)
+/T (LTC 11g)
+/TU (11\056 Which services are provided by contracted vendors\077 \050select all that apply\051\072 Dental)
 /Type /Annot
 /V /Off
 >>
@@ -14854,8 +14854,8 @@ endobj
 /Rect [ 332.36 615.751 341.72 625.111 ]
 /StructParent 198
 /Subtype /Widget
-/T (LTC\04011h)
-/TU (11\056\040Which\040services\040are\040provided\040by\040contracted\040vendors\077\040\050select\040all\040that\040apply\051\072\040Other)
+/T (LTC 11h)
+/TU (11\056 Which services are provided by contracted vendors\077 \050select all that apply\051\072 Other)
 /Type /Annot
 /V /Off
 >>
@@ -14917,7 +14917,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -14927,8 +14927,8 @@ endobj
 /Rect [ 347.206 600.77 580.526 614.45 ]
 /StructParent 199
 /Subtype /Widget
-/T (LTC\04011i)
-/TU (11\056\040Which\040services\040are\040provided\040by\040contracted\040vendors\077\040\050select\040all\040that\040apply\051\072\040Other\040\050specify\051)
+/T (LTC 11i)
+/TU (11\056 Which services are provided by contracted vendors\077 \050select all that apply\051\072 Other \050specify\051)
 /Type /Annot
 >>
 endobj
@@ -15030,8 +15030,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 801 0 R 806 0 R ]
-/T (LTC\04012)
-/TU (12\056\040Does\040the\040facility\040have\040ventilator\055dependent\040residents\040or\040residents\040with\040tracheostomies\040NOT\040on\040a\040ventilator\077\040\050If\040no\054\040skip\040remainder\040of\040this\040section\051)
+/T (LTC 12)
+/TU (12\056 Does the facility have ventilator\055dependent residents or residents with tracheostomies NOT on a ventilator\077 \050If no\054 skip remainder of this section\051)
 >>
 endobj
 806 0 obj
@@ -15116,7 +15116,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -15126,8 +15126,8 @@ endobj
 /Rect [ 353.04 518.829 401.28 531.789 ]
 /StructParent 206
 /Subtype /Widget
-/T (LTC\04012a)
-/TU (12a\056\040Current\040census\040of\040residents\040with\040tracheostomies\040NOT\040on\040ventilators)
+/T (LTC 12a)
+/TU (12a\056 Current census of residents with tracheostomies NOT on ventilators)
 /Type /Annot
 >>
 endobj
@@ -15160,7 +15160,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -15170,8 +15170,8 @@ endobj
 /Rect [ 278.16 498.339 326.4 511.299 ]
 /StructParent 207
 /Subtype /Widget
-/T (LTC\04012b\040)
-/TU (12b\056\040Current\040census\040of\040ventilator\055dependent\040residents)
+/T (LTC 12b )
+/TU (12b\056 Current census of ventilator\055dependent residents)
 /Type /Annot
 >>
 endobj
@@ -15273,8 +15273,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 816 0 R 821 0 R ]
-/T (LTC\04012c)
-/TU (12c\056\040Do\040ventilator\055dependent\040residents\040or\040those\040with\040tracheostomies\040participate\040in\040communal\040services\057group\040activities\040with\040residents\040who\040are\040not\040ventilator\055dependent\040and\040do\040not\040have\040tracheostomies\077)
+/T (LTC 12c)
+/TU (12c\056 Do ventilator\055dependent residents or those with tracheostomies participate in communal services\057group activities with residents who are not ventilator\055dependent and do not have tracheostomies\077)
 >>
 endobj
 821 0 obj
@@ -15428,8 +15428,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 825 0 R 830 0 R ]
-/T (LTC\04012d\040)
-/TU (12d\056\040Is\040there\040a\040dedicated\040ventilator\040unit\077)
+/T (LTC 12d )
+/TU (12d\056 Is there a dedicated ventilator unit\077)
 >>
 endobj
 830 0 obj
@@ -15583,8 +15583,8 @@ endobj
 /FT /Btn
 /Ff 49152
 /Kids [ 839 0 R 834 0 R ]
-/T (LTC\04012f)
-/TU (12f\056\040Are\040residents\040not\040on\040ventilators\040\050e\056g\056\054\040patients\040with\040a\040trach\040or\040other\040device\051\040ever\040roomed\040on\040the\040vent\040unit\077)
+/T (LTC 12f)
+/TU (12f\056 Are residents not on ventilators \050e\056g\056\054 patients with a trach or other device\051 ever roomed on the vent unit\077)
 >>
 endobj
 839 0 obj
@@ -15669,7 +15669,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 8388608
@@ -15679,8 +15679,8 @@ endobj
 /Rect [ 377.2 313.2 580.5 326.16 ]
 /StructParent 212
 /Subtype /Widget
-/T (LTC\04012\040e)
-/TU (12e\056\040On\040which\040units\040are\040ventilator\055dependent\040residents\040roomed\077\040\050specify\040units\051)
+/T (LTC 12 e)
+/TU (12e\056 On which units are ventilator\055dependent residents roomed\077 \050specify units\051)
 /Type /Annot
 >>
 endobj
@@ -15713,7 +15713,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -15723,8 +15723,8 @@ endobj
 /Rect [ 160.49 193.59 251.65 206.55 ]
 /StructParent 276
 /Subtype /Widget
-/T (LTC\04012g\0401)
-/TU (Single\040rooms\040Number\040per\040unit)
+/T (LTC 12g 1)
+/TU (Single rooms Number per unit)
 /Type /Annot
 >>
 endobj
@@ -15757,7 +15757,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -15767,8 +15767,8 @@ endobj
 /Rect [ 160.49 180.02 251.65 192.98 ]
 /StructParent 277
 /Subtype /Widget
-/T (LTC\04012g\0402)
-/TU (Double\040rooms\040Number\040per\040unit)
+/T (LTC 12g 2)
+/TU (Double rooms Number per unit)
 /Type /Annot
 >>
 endobj
@@ -15801,7 +15801,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -15811,8 +15811,8 @@ endobj
 /Rect [ 160.49 166.34 251.65 179.3 ]
 /StructParent 278
 /Subtype /Widget
-/T (LTC\04012g\0403)
-/TU (Triple\040rooms\040Number\040per\040unit)
+/T (LTC 12g 3)
+/TU (Triple rooms Number per unit)
 /Type /Annot
 >>
 endobj
@@ -15845,7 +15845,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -15855,8 +15855,8 @@ endobj
 /Rect [ 160.49 152.723 251.65 165.682 ]
 /StructParent 279
 /Subtype /Widget
-/T (LTC\04012g\0404)
-/TU (Quad\040rooms\040Number\040per\040unit)
+/T (LTC 12g 4)
+/TU (Quad rooms Number per unit)
 /Type /Annot
 >>
 endobj
@@ -15889,7 +15889,7 @@ endobj
 /S /S
 /W 1
 >>
-/DA (\057ArialMT\0408\040Tf\0400\040g)
+/DA (\057ArialMT 8 Tf 0 g)
 /F 4
 /FT /Tx
 /Ff 4096
@@ -15900,7 +15900,7 @@ endobj
 /StructParent 272
 /Subtype /Widget
 /T (Notes2)
-/TU (Facility\040Demographics\072\040Long\205Term\040Care\040Notes)
+/TU (Facility Demographics\072 Long\205Term Care Notes)
 /Type /Annot
 >>
 endobj
@@ -15926,7 +15926,7 @@ endobj
 endobj
 861 0 obj
 <<
-/DA (\057Helv\0400\040Tf\0400\040g\040)
+/DA (\057Helv 0 Tf 0 g )
 /DR <<
 /Encoding <<
 /PDFDocEncoding 862 0 R
@@ -15996,877 +15996,877 @@ xref
 0 867
 0000000000 65535 f 
 0000000015 00000 n 
-0000000109 00000 n 
+0000000054 00000 n 
 0000000148 00000 n 
 0000000232 00000 n 
-0000011469 00000 n 
-0000014675 00000 n 
-0000017973 00000 n 
-0000020989 00000 n 
-0000024771 00000 n 
-0000028443 00000 n 
-0000032223 00000 n 
-0000035783 00000 n 
-0000037924 00000 n 
-0000037987 00000 n 
-0000038024 00000 n 
-0000040677 00000 n 
-0000040800 00000 n 
-0000040921 00000 n 
-0000041475 00000 n 
-0000042185 00000 n 
-0000047010 00000 n 
-0000047604 00000 n 
-0000048017 00000 n 
-0000048437 00000 n 
-0000050196 00000 n 
-0000050584 00000 n 
-0000051127 00000 n 
-0000051783 00000 n 
-0000056151 00000 n 
-0000056699 00000 n 
-0000057166 00000 n 
-0000057743 00000 n 
-0000061097 00000 n 
-0000061592 00000 n 
-0000062135 00000 n 
-0000062233 00000 n 
-0000062951 00000 n 
-0000067700 00000 n 
-0000068296 00000 n 
-0000068485 00000 n 
-0000068592 00000 n 
-0000068922 00000 n 
-0000069426 00000 n 
-0000069740 00000 n 
-0000070149 00000 n 
-0000070578 00000 n 
-0000072260 00000 n 
-0000072642 00000 n 
-0000073071 00000 n 
-0000073533 00000 n 
-0000075904 00000 n 
-0000076317 00000 n 
-0000076356 00000 n 
-0000111625 00000 n 
-0000118103 00000 n 
-0000121054 00000 n 
-0000121117 00000 n 
-0000121526 00000 n 
-0000121930 00000 n 
-0000123531 00000 n 
-0000123910 00000 n 
-0000124339 00000 n 
-0000124807 00000 n 
-0000127305 00000 n 
-0000127738 00000 n 
-0000137303 00000 n 
-0000140261 00000 n 
-0000140324 00000 n 
-0000140753 00000 n 
-0000141024 00000 n 
-0000172257 00000 n 
-0000172702 00000 n 
-0000180436 00000 n 
-0000182801 00000 n 
-0000182864 00000 n 
-0000193003 00000 n 
-0000196937 00000 n 
-0000197000 00000 n 
-0000197122 00000 n 
-0000205699 00000 n 
-0000209170 00000 n 
-0000209233 00000 n 
-0000209291 00000 n 
-0000209551 00000 n 
-0000209739 00000 n 
-0000209945 00000 n 
-0000210068 00000 n 
-0000210393 00000 n 
-0000210491 00000 n 
-0000210592 00000 n 
-0000210630 00000 n 
-0000210901 00000 n 
-0000211090 00000 n 
-0000211128 00000 n 
-0000211401 00000 n 
-0000211590 00000 n 
-0000211628 00000 n 
-0000211890 00000 n 
-0000212080 00000 n 
-0000212118 00000 n 
-0000212399 00000 n 
-0000212476 00000 n 
-0000212556 00000 n 
-0000212595 00000 n 
-0000212934 00000 n 
-0000213123 00000 n 
-0000213162 00000 n 
-0000213440 00000 n 
-0000213886 00000 n 
-0000214275 00000 n 
-0000214332 00000 n 
-0000214605 00000 n 
-0000214841 00000 n 
-0000215287 00000 n 
-0000215676 00000 n 
-0000215733 00000 n 
-0000216010 00000 n 
-0000216399 00000 n 
-0000216845 00000 n 
-0000216902 00000 n 
-0000217125 00000 n 
-0000217514 00000 n 
-0000217960 00000 n 
-0000218017 00000 n 
-0000218438 00000 n 
-0000218628 00000 n 
-0000218667 00000 n 
-0000218997 00000 n 
-0000219186 00000 n 
-0000219225 00000 n 
-0000219537 00000 n 
-0000219726 00000 n 
-0000219765 00000 n 
-0000220098 00000 n 
-0000220287 00000 n 
-0000220326 00000 n 
-0000220655 00000 n 
-0000220974 00000 n 
-0000221468 00000 n 
-0000221525 00000 n 
-0000221900 00000 n 
-0000222219 00000 n 
-0000222713 00000 n 
-0000222770 00000 n 
-0000223136 00000 n 
-0000223455 00000 n 
-0000223949 00000 n 
-0000224006 00000 n 
-0000224337 00000 n 
-0000224656 00000 n 
-0000225150 00000 n 
-0000225207 00000 n 
-0000225551 00000 n 
-0000225870 00000 n 
-0000226364 00000 n 
-0000226421 00000 n 
-0000226765 00000 n 
-0000227084 00000 n 
-0000227578 00000 n 
-0000227635 00000 n 
-0000227976 00000 n 
-0000228295 00000 n 
-0000228789 00000 n 
-0000228846 00000 n 
-0000229188 00000 n 
-0000229507 00000 n 
-0000230001 00000 n 
-0000230058 00000 n 
-0000230402 00000 n 
-0000230721 00000 n 
-0000231215 00000 n 
-0000231272 00000 n 
-0000231631 00000 n 
-0000231820 00000 n 
-0000231859 00000 n 
-0000232189 00000 n 
-0000232508 00000 n 
-0000233002 00000 n 
-0000233059 00000 n 
-0000233417 00000 n 
-0000233607 00000 n 
-0000233646 00000 n 
-0000233957 00000 n 
-0000234276 00000 n 
-0000234770 00000 n 
-0000234827 00000 n 
-0000235154 00000 n 
-0000235344 00000 n 
-0000235383 00000 n 
-0000235691 00000 n 
-0000236010 00000 n 
-0000236504 00000 n 
-0000236561 00000 n 
-0000236888 00000 n 
-0000237078 00000 n 
-0000237117 00000 n 
-0000237484 00000 n 
-0000237674 00000 n 
-0000237713 00000 n 
-0000238065 00000 n 
-0000238255 00000 n 
+0000011487 00000 n 
+0000014693 00000 n 
+0000017991 00000 n 
+0000021007 00000 n 
+0000024789 00000 n 
+0000028461 00000 n 
+0000032241 00000 n 
+0000035801 00000 n 
+0000037942 00000 n 
+0000038005 00000 n 
+0000038042 00000 n 
+0000040695 00000 n 
+0000040818 00000 n 
+0000040939 00000 n 
+0000041493 00000 n 
+0000042200 00000 n 
+0000047025 00000 n 
+0000047619 00000 n 
+0000048032 00000 n 
+0000048446 00000 n 
+0000050205 00000 n 
+0000050593 00000 n 
+0000051136 00000 n 
+0000051786 00000 n 
+0000056154 00000 n 
+0000056702 00000 n 
+0000057169 00000 n 
+0000057737 00000 n 
+0000061091 00000 n 
+0000061586 00000 n 
+0000062129 00000 n 
+0000062227 00000 n 
+0000062939 00000 n 
+0000067688 00000 n 
+0000068284 00000 n 
+0000068473 00000 n 
+0000068580 00000 n 
+0000068901 00000 n 
+0000069405 00000 n 
+0000069719 00000 n 
+0000070128 00000 n 
+0000070551 00000 n 
+0000072233 00000 n 
+0000072615 00000 n 
+0000073044 00000 n 
+0000073500 00000 n 
+0000075871 00000 n 
+0000076284 00000 n 
+0000076323 00000 n 
+0000111592 00000 n 
+0000118088 00000 n 
+0000121039 00000 n 
+0000121102 00000 n 
+0000121511 00000 n 
+0000121909 00000 n 
+0000123510 00000 n 
+0000123889 00000 n 
+0000124318 00000 n 
+0000124783 00000 n 
+0000127281 00000 n 
+0000127714 00000 n 
+0000137297 00000 n 
+0000140255 00000 n 
+0000140318 00000 n 
+0000140747 00000 n 
+0000141018 00000 n 
+0000172251 00000 n 
+0000172696 00000 n 
+0000180448 00000 n 
+0000182813 00000 n 
+0000182876 00000 n 
+0000193033 00000 n 
+0000196967 00000 n 
+0000197030 00000 n 
+0000197152 00000 n 
+0000205747 00000 n 
+0000209218 00000 n 
+0000209281 00000 n 
+0000209339 00000 n 
+0000209563 00000 n 
+0000209733 00000 n 
+0000209930 00000 n 
+0000210050 00000 n 
+0000210348 00000 n 
+0000210446 00000 n 
+0000210547 00000 n 
+0000210585 00000 n 
+0000210835 00000 n 
+0000211024 00000 n 
+0000211062 00000 n 
+0000211317 00000 n 
+0000211506 00000 n 
+0000211544 00000 n 
+0000211788 00000 n 
+0000211978 00000 n 
+0000212016 00000 n 
+0000212276 00000 n 
+0000212353 00000 n 
+0000212433 00000 n 
+0000212472 00000 n 
+0000212781 00000 n 
+0000212970 00000 n 
+0000213009 00000 n 
+0000213287 00000 n 
+0000213733 00000 n 
+0000214122 00000 n 
+0000214179 00000 n 
+0000214410 00000 n 
+0000214646 00000 n 
+0000215092 00000 n 
+0000215481 00000 n 
+0000215538 00000 n 
+0000215815 00000 n 
+0000216204 00000 n 
+0000216650 00000 n 
+0000216707 00000 n 
+0000216930 00000 n 
+0000217319 00000 n 
+0000217765 00000 n 
+0000217822 00000 n 
+0000218183 00000 n 
+0000218373 00000 n 
+0000218412 00000 n 
+0000218709 00000 n 
+0000218898 00000 n 
+0000218937 00000 n 
+0000219219 00000 n 
+0000219408 00000 n 
+0000219447 00000 n 
+0000219747 00000 n 
+0000219936 00000 n 
+0000219975 00000 n 
+0000220283 00000 n 
+0000220602 00000 n 
+0000221096 00000 n 
+0000221153 00000 n 
+0000221498 00000 n 
+0000221817 00000 n 
+0000222311 00000 n 
+0000222368 00000 n 
+0000222701 00000 n 
+0000223020 00000 n 
+0000223514 00000 n 
+0000223571 00000 n 
+0000223881 00000 n 
+0000224200 00000 n 
+0000224694 00000 n 
+0000224751 00000 n 
+0000225071 00000 n 
+0000225390 00000 n 
+0000225884 00000 n 
+0000225941 00000 n 
+0000226261 00000 n 
+0000226580 00000 n 
+0000227074 00000 n 
+0000227131 00000 n 
+0000227448 00000 n 
+0000227767 00000 n 
+0000228261 00000 n 
+0000228318 00000 n 
+0000228636 00000 n 
+0000228955 00000 n 
+0000229449 00000 n 
+0000229506 00000 n 
+0000229826 00000 n 
+0000230145 00000 n 
+0000230639 00000 n 
+0000230696 00000 n 
+0000231016 00000 n 
+0000231205 00000 n 
+0000231244 00000 n 
+0000231556 00000 n 
+0000231875 00000 n 
+0000232369 00000 n 
+0000232426 00000 n 
+0000232748 00000 n 
+0000232938 00000 n 
+0000232977 00000 n 
+0000233273 00000 n 
+0000233592 00000 n 
+0000234086 00000 n 
+0000234143 00000 n 
+0000234440 00000 n 
+0000234630 00000 n 
+0000234669 00000 n 
+0000234962 00000 n 
+0000235281 00000 n 
+0000235775 00000 n 
+0000235832 00000 n 
+0000236126 00000 n 
+0000236316 00000 n 
+0000236355 00000 n 
+0000236680 00000 n 
+0000236870 00000 n 
+0000236909 00000 n 
+0000237219 00000 n 
+0000237409 00000 n 
+0000237448 00000 n 
+0000237840 00000 n 
+0000238030 00000 n 
+0000238069 00000 n 
 0000238294 00000 n 
-0000238746 00000 n 
-0000238936 00000 n 
-0000238975 00000 n 
-0000239200 00000 n 
-0000239589 00000 n 
-0000240035 00000 n 
-0000240092 00000 n 
-0000240287 00000 n 
-0000240511 00000 n 
-0000240957 00000 n 
-0000241346 00000 n 
-0000241403 00000 n 
-0000241631 00000 n 
-0000242020 00000 n 
-0000242466 00000 n 
-0000242523 00000 n 
-0000242758 00000 n 
-0000243204 00000 n 
-0000243593 00000 n 
-0000243650 00000 n 
-0000244028 00000 n 
-0000244215 00000 n 
-0000244254 00000 n 
-0000244628 00000 n 
-0000244815 00000 n 
-0000244854 00000 n 
-0000245238 00000 n 
-0000245425 00000 n 
-0000245464 00000 n 
-0000245684 00000 n 
-0000246073 00000 n 
-0000246519 00000 n 
-0000246576 00000 n 
-0000246772 00000 n 
-0000246993 00000 n 
-0000247439 00000 n 
-0000247828 00000 n 
-0000247885 00000 n 
-0000248109 00000 n 
-0000248498 00000 n 
-0000248944 00000 n 
-0000249001 00000 n 
-0000249234 00000 n 
-0000249680 00000 n 
-0000250069 00000 n 
-0000250126 00000 n 
-0000250532 00000 n 
-0000250719 00000 n 
-0000250758 00000 n 
-0000251162 00000 n 
-0000251349 00000 n 
-0000251388 00000 n 
-0000251796 00000 n 
-0000251983 00000 n 
-0000252022 00000 n 
-0000252246 00000 n 
-0000252635 00000 n 
-0000253081 00000 n 
-0000253138 00000 n 
-0000253533 00000 n 
-0000253756 00000 n 
-0000254202 00000 n 
-0000254591 00000 n 
-0000254648 00000 n 
-0000254876 00000 n 
-0000255265 00000 n 
-0000255711 00000 n 
-0000255768 00000 n 
-0000256003 00000 n 
-0000256449 00000 n 
-0000256838 00000 n 
-0000256895 00000 n 
-0000257432 00000 n 
-0000257623 00000 n 
-0000257662 00000 n 
-0000258109 00000 n 
-0000258428 00000 n 
-0000258922 00000 n 
-0000258979 00000 n 
-0000259435 00000 n 
-0000259754 00000 n 
-0000260248 00000 n 
-0000260305 00000 n 
-0000260749 00000 n 
-0000261068 00000 n 
-0000261562 00000 n 
-0000261619 00000 n 
-0000262113 00000 n 
-0000262432 00000 n 
-0000262926 00000 n 
-0000262983 00000 n 
-0000263414 00000 n 
-0000263733 00000 n 
-0000264227 00000 n 
-0000264284 00000 n 
-0000264726 00000 n 
-0000265045 00000 n 
-0000265539 00000 n 
-0000265596 00000 n 
-0000266026 00000 n 
-0000266345 00000 n 
-0000266839 00000 n 
-0000266896 00000 n 
-0000267342 00000 n 
-0000267532 00000 n 
-0000267571 00000 n 
-0000267999 00000 n 
-0000268188 00000 n 
-0000268227 00000 n 
-0000268451 00000 n 
-0000268840 00000 n 
-0000269286 00000 n 
-0000269343 00000 n 
-0000269580 00000 n 
-0000269803 00000 n 
-0000270249 00000 n 
-0000270638 00000 n 
-0000270695 00000 n 
-0000270923 00000 n 
-0000271312 00000 n 
-0000271758 00000 n 
-0000271815 00000 n 
-0000272050 00000 n 
-0000272496 00000 n 
-0000272885 00000 n 
-0000272942 00000 n 
-0000273166 00000 n 
-0000273555 00000 n 
-0000274001 00000 n 
-0000274058 00000 n 
-0000274258 00000 n 
-0000274481 00000 n 
-0000274927 00000 n 
-0000275316 00000 n 
-0000275373 00000 n 
-0000275601 00000 n 
-0000275990 00000 n 
-0000276436 00000 n 
-0000276493 00000 n 
-0000276728 00000 n 
-0000277174 00000 n 
-0000277563 00000 n 
-0000277620 00000 n 
-0000277844 00000 n 
-0000278233 00000 n 
-0000278679 00000 n 
-0000278736 00000 n 
-0000279187 00000 n 
-0000279410 00000 n 
-0000279856 00000 n 
-0000280245 00000 n 
-0000280302 00000 n 
-0000280530 00000 n 
-0000280919 00000 n 
-0000281365 00000 n 
-0000281422 00000 n 
-0000281657 00000 n 
-0000282103 00000 n 
-0000282492 00000 n 
-0000282549 00000 n 
-0000282773 00000 n 
-0000283162 00000 n 
-0000283608 00000 n 
-0000283665 00000 n 
-0000284027 00000 n 
-0000284250 00000 n 
-0000284696 00000 n 
-0000285085 00000 n 
-0000285142 00000 n 
-0000285370 00000 n 
-0000285759 00000 n 
-0000286205 00000 n 
-0000286262 00000 n 
-0000286497 00000 n 
-0000286943 00000 n 
-0000287332 00000 n 
-0000287389 00000 n 
-0000287812 00000 n 
-0000288131 00000 n 
-0000288625 00000 n 
-0000288682 00000 n 
-0000289123 00000 n 
-0000289442 00000 n 
-0000289936 00000 n 
-0000289993 00000 n 
-0000290564 00000 n 
-0000290883 00000 n 
-0000291377 00000 n 
-0000291434 00000 n 
-0000291857 00000 n 
-0000292176 00000 n 
-0000292670 00000 n 
-0000292727 00000 n 
-0000293160 00000 n 
-0000293479 00000 n 
-0000293973 00000 n 
-0000294030 00000 n 
-0000294453 00000 n 
-0000294772 00000 n 
-0000295266 00000 n 
-0000295323 00000 n 
-0000295761 00000 n 
-0000295951 00000 n 
-0000295990 00000 n 
-0000296215 00000 n 
-0000296604 00000 n 
-0000297050 00000 n 
-0000297107 00000 n 
-0000297379 00000 n 
-0000297602 00000 n 
-0000298048 00000 n 
-0000298437 00000 n 
-0000298494 00000 n 
-0000298722 00000 n 
-0000299111 00000 n 
-0000299557 00000 n 
-0000299614 00000 n 
-0000299849 00000 n 
-0000300295 00000 n 
-0000300684 00000 n 
-0000300741 00000 n 
-0000301066 00000 n 
-0000301255 00000 n 
-0000301294 00000 n 
-0000301798 00000 n 
-0000301987 00000 n 
-0000302026 00000 n 
-0000302250 00000 n 
-0000302639 00000 n 
-0000303085 00000 n 
-0000303142 00000 n 
-0000303428 00000 n 
-0000303651 00000 n 
-0000304097 00000 n 
-0000304486 00000 n 
-0000304543 00000 n 
-0000304771 00000 n 
-0000305160 00000 n 
-0000305606 00000 n 
-0000305663 00000 n 
-0000305898 00000 n 
-0000306344 00000 n 
-0000306733 00000 n 
-0000306790 00000 n 
-0000307215 00000 n 
-0000307534 00000 n 
-0000308028 00000 n 
-0000308085 00000 n 
-0000308511 00000 n 
-0000308830 00000 n 
-0000309324 00000 n 
-0000309381 00000 n 
-0000309807 00000 n 
-0000310126 00000 n 
-0000310620 00000 n 
-0000310677 00000 n 
-0000311083 00000 n 
-0000311402 00000 n 
-0000311896 00000 n 
-0000311953 00000 n 
-0000312369 00000 n 
-0000312688 00000 n 
-0000313182 00000 n 
-0000313239 00000 n 
-0000313645 00000 n 
-0000313964 00000 n 
+0000238683 00000 n 
+0000239129 00000 n 
+0000239186 00000 n 
+0000239351 00000 n 
+0000239575 00000 n 
+0000240021 00000 n 
+0000240410 00000 n 
+0000240467 00000 n 
+0000240695 00000 n 
+0000241084 00000 n 
+0000241530 00000 n 
+0000241587 00000 n 
+0000241822 00000 n 
+0000242268 00000 n 
+0000242657 00000 n 
+0000242714 00000 n 
+0000243050 00000 n 
+0000243237 00000 n 
+0000243276 00000 n 
+0000243608 00000 n 
+0000243795 00000 n 
+0000243834 00000 n 
+0000244173 00000 n 
+0000244360 00000 n 
+0000244399 00000 n 
+0000244619 00000 n 
+0000245008 00000 n 
+0000245454 00000 n 
+0000245511 00000 n 
+0000245677 00000 n 
+0000245898 00000 n 
+0000246344 00000 n 
+0000246733 00000 n 
+0000246790 00000 n 
+0000247014 00000 n 
+0000247403 00000 n 
+0000247849 00000 n 
+0000247906 00000 n 
+0000248139 00000 n 
+0000248585 00000 n 
+0000248974 00000 n 
+0000249031 00000 n 
+0000249386 00000 n 
+0000249573 00000 n 
+0000249612 00000 n 
+0000249965 00000 n 
+0000250152 00000 n 
+0000250191 00000 n 
+0000250545 00000 n 
+0000250732 00000 n 
+0000250771 00000 n 
+0000250995 00000 n 
+0000251384 00000 n 
+0000251830 00000 n 
+0000251887 00000 n 
+0000252204 00000 n 
+0000252427 00000 n 
+0000252873 00000 n 
+0000253262 00000 n 
+0000253319 00000 n 
+0000253547 00000 n 
+0000253936 00000 n 
+0000254382 00000 n 
+0000254439 00000 n 
+0000254674 00000 n 
+0000255120 00000 n 
+0000255509 00000 n 
+0000255566 00000 n 
+0000256016 00000 n 
+0000256207 00000 n 
+0000256246 00000 n 
+0000256639 00000 n 
+0000256958 00000 n 
+0000257452 00000 n 
+0000257509 00000 n 
+0000257908 00000 n 
+0000258227 00000 n 
+0000258721 00000 n 
+0000258778 00000 n 
+0000259168 00000 n 
+0000259487 00000 n 
+0000259981 00000 n 
+0000260038 00000 n 
+0000260469 00000 n 
+0000260788 00000 n 
+0000261282 00000 n 
+0000261339 00000 n 
+0000261719 00000 n 
+0000262038 00000 n 
+0000262532 00000 n 
+0000262589 00000 n 
+0000262977 00000 n 
+0000263296 00000 n 
+0000263790 00000 n 
+0000263847 00000 n 
+0000264226 00000 n 
+0000264545 00000 n 
+0000265039 00000 n 
+0000265096 00000 n 
+0000265476 00000 n 
+0000265666 00000 n 
+0000265705 00000 n 
+0000266061 00000 n 
+0000266250 00000 n 
+0000266289 00000 n 
+0000266513 00000 n 
+0000266902 00000 n 
+0000267348 00000 n 
+0000267405 00000 n 
+0000267603 00000 n 
+0000267826 00000 n 
+0000268272 00000 n 
+0000268661 00000 n 
+0000268718 00000 n 
+0000268946 00000 n 
+0000269335 00000 n 
+0000269781 00000 n 
+0000269838 00000 n 
+0000270073 00000 n 
+0000270519 00000 n 
+0000270908 00000 n 
+0000270965 00000 n 
+0000271189 00000 n 
+0000271578 00000 n 
+0000272024 00000 n 
+0000272081 00000 n 
+0000272254 00000 n 
+0000272477 00000 n 
+0000272923 00000 n 
+0000273312 00000 n 
+0000273369 00000 n 
+0000273597 00000 n 
+0000273986 00000 n 
+0000274432 00000 n 
+0000274489 00000 n 
+0000274724 00000 n 
+0000275170 00000 n 
+0000275559 00000 n 
+0000275616 00000 n 
+0000275840 00000 n 
+0000276229 00000 n 
+0000276675 00000 n 
+0000276732 00000 n 
+0000277084 00000 n 
+0000277307 00000 n 
+0000277753 00000 n 
+0000278142 00000 n 
+0000278199 00000 n 
+0000278427 00000 n 
+0000278816 00000 n 
+0000279262 00000 n 
+0000279319 00000 n 
+0000279554 00000 n 
+0000280000 00000 n 
+0000280389 00000 n 
+0000280446 00000 n 
+0000280670 00000 n 
+0000281059 00000 n 
+0000281505 00000 n 
+0000281562 00000 n 
+0000281864 00000 n 
+0000282087 00000 n 
+0000282533 00000 n 
+0000282922 00000 n 
+0000282979 00000 n 
+0000283207 00000 n 
+0000283596 00000 n 
+0000284042 00000 n 
+0000284099 00000 n 
+0000284334 00000 n 
+0000284780 00000 n 
+0000285169 00000 n 
+0000285226 00000 n 
+0000285601 00000 n 
+0000285920 00000 n 
+0000286414 00000 n 
+0000286471 00000 n 
+0000286858 00000 n 
+0000287177 00000 n 
+0000287671 00000 n 
+0000287728 00000 n 
+0000288209 00000 n 
+0000288528 00000 n 
+0000289022 00000 n 
+0000289079 00000 n 
+0000289454 00000 n 
+0000289773 00000 n 
+0000290267 00000 n 
+0000290324 00000 n 
+0000290706 00000 n 
+0000291025 00000 n 
+0000291519 00000 n 
+0000291576 00000 n 
+0000291951 00000 n 
+0000292270 00000 n 
+0000292764 00000 n 
+0000292821 00000 n 
+0000293196 00000 n 
+0000293386 00000 n 
+0000293425 00000 n 
+0000293650 00000 n 
+0000294039 00000 n 
+0000294485 00000 n 
+0000294542 00000 n 
+0000294769 00000 n 
+0000294992 00000 n 
+0000295438 00000 n 
+0000295827 00000 n 
+0000295884 00000 n 
+0000296112 00000 n 
+0000296501 00000 n 
+0000296947 00000 n 
+0000297004 00000 n 
+0000297239 00000 n 
+0000297685 00000 n 
+0000298074 00000 n 
+0000298131 00000 n 
+0000298426 00000 n 
+0000298615 00000 n 
+0000298654 00000 n 
+0000299086 00000 n 
+0000299275 00000 n 
+0000299314 00000 n 
+0000299538 00000 n 
+0000299927 00000 n 
+0000300373 00000 n 
+0000300430 00000 n 
+0000300662 00000 n 
+0000300885 00000 n 
+0000301331 00000 n 
+0000301720 00000 n 
+0000301777 00000 n 
+0000302005 00000 n 
+0000302394 00000 n 
+0000302840 00000 n 
+0000302897 00000 n 
+0000303132 00000 n 
+0000303578 00000 n 
+0000303967 00000 n 
+0000304024 00000 n 
+0000304398 00000 n 
+0000304717 00000 n 
+0000305211 00000 n 
+0000305268 00000 n 
+0000305643 00000 n 
+0000305962 00000 n 
+0000306456 00000 n 
+0000306513 00000 n 
+0000306891 00000 n 
+0000307210 00000 n 
+0000307704 00000 n 
+0000307761 00000 n 
+0000308122 00000 n 
+0000308441 00000 n 
+0000308935 00000 n 
+0000308992 00000 n 
+0000309360 00000 n 
+0000309679 00000 n 
+0000310173 00000 n 
+0000310230 00000 n 
+0000310591 00000 n 
+0000310910 00000 n 
+0000311404 00000 n 
+0000311461 00000 n 
+0000311819 00000 n 
+0000312009 00000 n 
+0000312048 00000 n 
+0000312382 00000 n 
+0000312701 00000 n 
+0000313195 00000 n 
+0000313252 00000 n 
+0000313588 00000 n 
+0000313907 00000 n 
+0000314401 00000 n 
 0000314458 00000 n 
-0000314515 00000 n 
-0000314933 00000 n 
-0000315123 00000 n 
-0000315162 00000 n 
-0000315529 00000 n 
-0000315848 00000 n 
-0000316342 00000 n 
-0000316399 00000 n 
-0000316768 00000 n 
-0000317087 00000 n 
-0000317581 00000 n 
-0000317638 00000 n 
-0000318003 00000 n 
-0000318322 00000 n 
-0000318816 00000 n 
-0000318873 00000 n 
-0000319248 00000 n 
-0000319567 00000 n 
-0000320061 00000 n 
-0000320118 00000 n 
-0000320483 00000 n 
-0000320802 00000 n 
-0000321296 00000 n 
-0000321353 00000 n 
-0000321733 00000 n 
-0000321923 00000 n 
-0000321962 00000 n 
-0000322295 00000 n 
-0000322486 00000 n 
-0000322525 00000 n 
-0000322836 00000 n 
-0000323025 00000 n 
-0000323064 00000 n 
-0000323383 00000 n 
-0000323572 00000 n 
-0000323611 00000 n 
-0000323910 00000 n 
-0000324099 00000 n 
-0000324138 00000 n 
-0000324426 00000 n 
-0000324615 00000 n 
-0000324654 00000 n 
-0000324906 00000 n 
-0000325352 00000 n 
-0000325741 00000 n 
-0000325798 00000 n 
-0000325931 00000 n 
-0000326212 00000 n 
-0000326658 00000 n 
-0000327047 00000 n 
-0000327104 00000 n 
-0000327371 00000 n 
-0000327817 00000 n 
-0000328206 00000 n 
-0000328263 00000 n 
-0000328516 00000 n 
-0000328962 00000 n 
-0000329351 00000 n 
-0000329408 00000 n 
-0000329664 00000 n 
-0000330110 00000 n 
-0000330499 00000 n 
-0000330556 00000 n 
-0000330792 00000 n 
-0000331238 00000 n 
-0000331627 00000 n 
-0000331684 00000 n 
-0000331803 00000 n 
-0000332067 00000 n 
-0000332513 00000 n 
-0000332902 00000 n 
-0000332959 00000 n 
-0000333210 00000 n 
-0000333656 00000 n 
-0000334045 00000 n 
-0000334102 00000 n 
-0000334344 00000 n 
-0000334733 00000 n 
-0000335179 00000 n 
-0000335236 00000 n 
-0000335486 00000 n 
-0000335932 00000 n 
-0000336321 00000 n 
-0000336378 00000 n 
-0000336505 00000 n 
-0000336744 00000 n 
-0000337190 00000 n 
-0000337579 00000 n 
-0000337636 00000 n 
-0000337875 00000 n 
-0000338321 00000 n 
-0000338710 00000 n 
-0000338767 00000 n 
-0000339003 00000 n 
-0000339392 00000 n 
-0000339838 00000 n 
-0000339895 00000 n 
-0000340257 00000 n 
-0000340447 00000 n 
-0000340486 00000 n 
-0000340825 00000 n 
-0000341144 00000 n 
-0000341638 00000 n 
-0000341695 00000 n 
-0000342068 00000 n 
-0000342387 00000 n 
-0000342881 00000 n 
-0000342938 00000 n 
-0000343305 00000 n 
-0000343624 00000 n 
-0000344118 00000 n 
-0000344175 00000 n 
-0000344544 00000 n 
-0000344863 00000 n 
-0000345357 00000 n 
-0000345414 00000 n 
-0000345764 00000 n 
-0000346083 00000 n 
-0000346577 00000 n 
-0000346634 00000 n 
-0000346917 00000 n 
-0000347106 00000 n 
-0000347145 00000 n 
-0000347456 00000 n 
-0000347647 00000 n 
-0000347686 00000 n 
-0000347994 00000 n 
-0000348185 00000 n 
-0000348224 00000 n 
-0000348557 00000 n 
-0000348743 00000 n 
-0000348782 00000 n 
-0000349116 00000 n 
-0000349302 00000 n 
-0000349341 00000 n 
-0000349655 00000 n 
-0000349846 00000 n 
-0000349885 00000 n 
-0000350197 00000 n 
-0000350386 00000 n 
-0000350425 00000 n 
-0000350751 00000 n 
-0000350942 00000 n 
-0000350981 00000 n 
-0000351304 00000 n 
-0000351495 00000 n 
-0000351534 00000 n 
-0000351882 00000 n 
-0000352068 00000 n 
-0000352107 00000 n 
-0000352446 00000 n 
-0000352632 00000 n 
-0000352671 00000 n 
-0000353000 00000 n 
-0000353191 00000 n 
-0000353230 00000 n 
-0000353557 00000 n 
-0000353746 00000 n 
-0000353785 00000 n 
-0000354086 00000 n 
-0000354277 00000 n 
-0000354316 00000 n 
-0000354614 00000 n 
-0000354805 00000 n 
-0000354844 00000 n 
-0000355172 00000 n 
-0000355358 00000 n 
-0000355397 00000 n 
-0000355721 00000 n 
-0000355907 00000 n 
-0000355946 00000 n 
-0000356250 00000 n 
-0000356441 00000 n 
-0000356480 00000 n 
-0000356782 00000 n 
-0000356971 00000 n 
-0000357010 00000 n 
-0000357318 00000 n 
-0000357508 00000 n 
-0000357547 00000 n 
-0000357863 00000 n 
-0000358054 00000 n 
-0000358093 00000 n 
-0000358406 00000 n 
-0000358597 00000 n 
-0000358636 00000 n 
-0000358974 00000 n 
-0000359160 00000 n 
-0000359199 00000 n 
-0000359538 00000 n 
-0000359724 00000 n 
-0000359763 00000 n 
-0000360082 00000 n 
-0000360273 00000 n 
-0000360312 00000 n 
-0000360629 00000 n 
-0000360818 00000 n 
-0000360857 00000 n 
-0000361166 00000 n 
-0000361356 00000 n 
-0000361395 00000 n 
-0000361714 00000 n 
-0000361905 00000 n 
-0000361944 00000 n 
-0000362260 00000 n 
-0000362451 00000 n 
-0000362490 00000 n 
-0000362831 00000 n 
-0000363017 00000 n 
-0000363056 00000 n 
-0000363398 00000 n 
-0000363584 00000 n 
-0000363623 00000 n 
-0000363945 00000 n 
-0000364136 00000 n 
-0000364175 00000 n 
-0000364495 00000 n 
-0000364684 00000 n 
-0000364723 00000 n 
-0000365032 00000 n 
-0000365222 00000 n 
-0000365261 00000 n 
-0000365578 00000 n 
-0000365769 00000 n 
-0000365808 00000 n 
-0000366122 00000 n 
-0000366313 00000 n 
-0000366352 00000 n 
-0000366691 00000 n 
-0000366877 00000 n 
-0000366916 00000 n 
+0000314790 00000 n 
+0000315109 00000 n 
+0000315603 00000 n 
+0000315660 00000 n 
+0000315999 00000 n 
+0000316318 00000 n 
+0000316812 00000 n 
+0000316869 00000 n 
+0000317201 00000 n 
+0000317520 00000 n 
+0000318014 00000 n 
+0000318071 00000 n 
+0000318403 00000 n 
+0000318593 00000 n 
+0000318632 00000 n 
+0000318935 00000 n 
+0000319126 00000 n 
+0000319165 00000 n 
+0000319446 00000 n 
+0000319635 00000 n 
+0000319674 00000 n 
+0000319963 00000 n 
+0000320152 00000 n 
+0000320191 00000 n 
+0000320463 00000 n 
+0000320652 00000 n 
+0000320691 00000 n 
+0000320958 00000 n 
+0000321147 00000 n 
+0000321186 00000 n 
+0000321438 00000 n 
+0000321884 00000 n 
+0000322273 00000 n 
+0000322330 00000 n 
+0000322457 00000 n 
+0000322738 00000 n 
+0000323184 00000 n 
+0000323573 00000 n 
+0000323630 00000 n 
+0000323897 00000 n 
+0000324343 00000 n 
+0000324732 00000 n 
+0000324789 00000 n 
+0000325042 00000 n 
+0000325488 00000 n 
+0000325877 00000 n 
+0000325934 00000 n 
+0000326190 00000 n 
+0000326636 00000 n 
+0000327025 00000 n 
+0000327082 00000 n 
+0000327318 00000 n 
+0000327764 00000 n 
+0000328153 00000 n 
+0000328210 00000 n 
+0000328326 00000 n 
+0000328590 00000 n 
+0000329036 00000 n 
+0000329425 00000 n 
+0000329482 00000 n 
+0000329733 00000 n 
+0000330179 00000 n 
+0000330568 00000 n 
+0000330625 00000 n 
+0000330867 00000 n 
+0000331256 00000 n 
+0000331702 00000 n 
+0000331759 00000 n 
+0000332009 00000 n 
+0000332455 00000 n 
+0000332844 00000 n 
+0000332901 00000 n 
+0000333022 00000 n 
+0000333261 00000 n 
+0000333707 00000 n 
+0000334096 00000 n 
+0000334153 00000 n 
+0000334392 00000 n 
+0000334838 00000 n 
+0000335227 00000 n 
+0000335284 00000 n 
+0000335520 00000 n 
+0000335909 00000 n 
+0000336355 00000 n 
+0000336412 00000 n 
+0000336735 00000 n 
+0000336925 00000 n 
+0000336964 00000 n 
+0000337279 00000 n 
+0000337598 00000 n 
+0000338092 00000 n 
+0000338149 00000 n 
+0000338492 00000 n 
+0000338811 00000 n 
+0000339305 00000 n 
+0000339362 00000 n 
+0000339699 00000 n 
+0000340018 00000 n 
+0000340512 00000 n 
+0000340569 00000 n 
+0000340908 00000 n 
+0000341227 00000 n 
+0000341721 00000 n 
+0000341778 00000 n 
+0000342101 00000 n 
+0000342420 00000 n 
+0000342914 00000 n 
+0000342971 00000 n 
+0000343236 00000 n 
+0000343425 00000 n 
+0000343464 00000 n 
+0000343751 00000 n 
+0000343942 00000 n 
+0000343981 00000 n 
+0000344268 00000 n 
+0000344459 00000 n 
+0000344498 00000 n 
+0000344804 00000 n 
+0000344990 00000 n 
+0000345029 00000 n 
+0000345339 00000 n 
+0000345525 00000 n 
+0000345564 00000 n 
+0000345854 00000 n 
+0000346045 00000 n 
+0000346084 00000 n 
+0000346372 00000 n 
+0000346561 00000 n 
+0000346600 00000 n 
+0000346896 00000 n 
+0000347087 00000 n 
+0000347126 00000 n 
+0000347422 00000 n 
+0000347613 00000 n 
+0000347652 00000 n 
+0000347967 00000 n 
+0000348153 00000 n 
+0000348192 00000 n 
+0000348504 00000 n 
+0000348690 00000 n 
+0000348729 00000 n 
+0000349028 00000 n 
+0000349219 00000 n 
+0000349258 00000 n 
+0000349555 00000 n 
+0000349744 00000 n 
+0000349783 00000 n 
+0000350057 00000 n 
+0000350248 00000 n 
+0000350287 00000 n 
+0000350561 00000 n 
+0000350752 00000 n 
+0000350791 00000 n 
+0000351089 00000 n 
+0000351275 00000 n 
+0000351314 00000 n 
+0000351611 00000 n 
+0000351797 00000 n 
+0000351836 00000 n 
+0000352113 00000 n 
+0000352304 00000 n 
+0000352343 00000 n 
+0000352618 00000 n 
+0000352807 00000 n 
+0000352846 00000 n 
+0000353124 00000 n 
+0000353314 00000 n 
+0000353353 00000 n 
+0000353636 00000 n 
+0000353827 00000 n 
+0000353866 00000 n 
+0000354149 00000 n 
+0000354340 00000 n 
+0000354379 00000 n 
+0000354681 00000 n 
+0000354867 00000 n 
+0000354906 00000 n 
+0000355212 00000 n 
+0000355398 00000 n 
+0000355437 00000 n 
+0000355723 00000 n 
+0000355914 00000 n 
+0000355953 00000 n 
+0000356237 00000 n 
+0000356426 00000 n 
+0000356465 00000 n 
+0000356744 00000 n 
+0000356934 00000 n 
+0000356973 00000 n 
+0000357259 00000 n 
+0000357450 00000 n 
+0000357489 00000 n 
+0000357775 00000 n 
+0000357966 00000 n 
+0000358005 00000 n 
+0000358310 00000 n 
+0000358496 00000 n 
+0000358535 00000 n 
+0000358844 00000 n 
+0000359030 00000 n 
+0000359069 00000 n 
+0000359358 00000 n 
+0000359549 00000 n 
+0000359588 00000 n 
+0000359875 00000 n 
+0000360064 00000 n 
+0000360103 00000 n 
+0000360382 00000 n 
+0000360572 00000 n 
+0000360611 00000 n 
+0000360895 00000 n 
+0000361086 00000 n 
+0000361125 00000 n 
+0000361409 00000 n 
+0000361600 00000 n 
+0000361639 00000 n 
+0000361942 00000 n 
+0000362128 00000 n 
+0000362167 00000 n 
+0000362474 00000 n 
+0000362660 00000 n 
+0000362699 00000 n 
+0000362986 00000 n 
+0000363177 00000 n 
+0000363216 00000 n 
+0000363501 00000 n 
+0000363690 00000 n 
+0000363729 00000 n 
+0000364006 00000 n 
+0000364395 00000 n 
+0000364841 00000 n 
+0000364898 00000 n 
+0000365039 00000 n 
+0000365304 00000 n 
+0000365750 00000 n 
+0000366139 00000 n 
+0000366196 00000 n 
+0000366421 00000 n 
+0000366810 00000 n 
 0000367256 00000 n 
-0000367442 00000 n 
-0000367481 00000 n 
-0000367801 00000 n 
-0000367992 00000 n 
-0000368031 00000 n 
-0000368349 00000 n 
-0000368538 00000 n 
-0000368577 00000 n 
-0000368854 00000 n 
-0000369243 00000 n 
-0000369689 00000 n 
-0000369746 00000 n 
-0000369911 00000 n 
-0000370176 00000 n 
-0000370622 00000 n 
-0000371011 00000 n 
-0000371068 00000 n 
-0000371293 00000 n 
-0000371682 00000 n 
-0000372128 00000 n 
-0000372185 00000 n 
-0000372367 00000 n 
-0000372591 00000 n 
-0000373037 00000 n 
-0000373426 00000 n 
-0000373483 00000 n 
-0000373729 00000 n 
-0000374118 00000 n 
-0000374564 00000 n 
-0000374621 00000 n 
-0000374795 00000 n 
-0000375075 00000 n 
-0000375464 00000 n 
-0000375910 00000 n 
-0000375967 00000 n 
-0000376192 00000 n 
-0000376581 00000 n 
-0000377027 00000 n 
-0000377084 00000 n 
-0000377421 00000 n 
-0000377612 00000 n 
-0000377651 00000 n 
-0000378029 00000 n 
-0000378348 00000 n 
-0000378842 00000 n 
-0000378899 00000 n 
-0000379346 00000 n 
-0000379665 00000 n 
-0000380159 00000 n 
-0000380216 00000 n 
-0000380636 00000 n 
-0000380955 00000 n 
-0000381449 00000 n 
-0000381506 00000 n 
-0000381914 00000 n 
-0000382233 00000 n 
-0000382727 00000 n 
-0000382784 00000 n 
-0000383165 00000 n 
-0000383484 00000 n 
-0000383978 00000 n 
-0000384035 00000 n 
-0000384428 00000 n 
-0000384619 00000 n 
-0000384658 00000 n 
-0000385084 00000 n 
-0000385403 00000 n 
-0000385897 00000 n 
-0000385954 00000 n 
-0000386400 00000 n 
-0000386719 00000 n 
-0000387213 00000 n 
-0000387270 00000 n 
-0000387727 00000 n 
-0000388046 00000 n 
-0000388540 00000 n 
-0000388597 00000 n 
-0000389003 00000 n 
-0000389322 00000 n 
-0000389816 00000 n 
-0000389873 00000 n 
-0000390282 00000 n 
-0000390601 00000 n 
-0000391095 00000 n 
-0000391152 00000 n 
-0000391556 00000 n 
-0000391875 00000 n 
-0000392369 00000 n 
-0000392426 00000 n 
-0000392828 00000 n 
-0000393147 00000 n 
-0000393641 00000 n 
-0000393698 00000 n 
-0000394099 00000 n 
-0000394418 00000 n 
-0000394912 00000 n 
-0000394969 00000 n 
-0000395388 00000 n 
-0000395578 00000 n 
-0000395617 00000 n 
-0000395840 00000 n 
-0000396229 00000 n 
-0000396675 00000 n 
-0000396732 00000 n 
-0000397054 00000 n 
-0000397276 00000 n 
-0000397722 00000 n 
-0000398111 00000 n 
-0000398168 00000 n 
-0000398536 00000 n 
-0000398725 00000 n 
-0000398764 00000 n 
-0000399108 00000 n 
-0000399297 00000 n 
-0000399336 00000 n 
-0000399553 00000 n 
-0000399942 00000 n 
-0000400388 00000 n 
-0000400445 00000 n 
-0000400817 00000 n 
-0000401035 00000 n 
-0000401481 00000 n 
-0000401870 00000 n 
-0000401927 00000 n 
-0000402148 00000 n 
-0000402537 00000 n 
-0000402983 00000 n 
-0000403040 00000 n 
-0000403201 00000 n 
-0000403421 00000 n 
-0000403867 00000 n 
-0000404256 00000 n 
-0000404313 00000 n 
-0000404533 00000 n 
-0000404979 00000 n 
-0000405368 00000 n 
-0000405425 00000 n 
-0000405707 00000 n 
-0000405928 00000 n 
-0000406317 00000 n 
-0000406763 00000 n 
-0000406820 00000 n 
-0000407206 00000 n 
-0000407395 00000 n 
-0000407434 00000 n 
-0000407741 00000 n 
-0000407930 00000 n 
-0000407969 00000 n 
-0000408276 00000 n 
-0000408465 00000 n 
-0000408504 00000 n 
-0000408810 00000 n 
-0000408999 00000 n 
-0000409038 00000 n 
-0000409345 00000 n 
-0000409534 00000 n 
-0000409573 00000 n 
-0000409890 00000 n 
-0000410081 00000 n 
-0000410120 00000 n 
-0000411594 00000 n 
-0000412922 00000 n 
-0000414116 00000 n 
-0000414361 00000 n 
-0000414463 00000 n 
+0000367313 00000 n 
+0000367468 00000 n 
+0000367692 00000 n 
+0000368138 00000 n 
+0000368527 00000 n 
+0000368584 00000 n 
+0000368830 00000 n 
+0000369219 00000 n 
+0000369665 00000 n 
+0000369722 00000 n 
+0000369872 00000 n 
+0000370152 00000 n 
+0000370541 00000 n 
+0000370987 00000 n 
+0000371044 00000 n 
+0000371269 00000 n 
+0000371658 00000 n 
+0000372104 00000 n 
+0000372161 00000 n 
+0000372465 00000 n 
+0000372656 00000 n 
+0000372695 00000 n 
+0000373040 00000 n 
+0000373359 00000 n 
+0000373853 00000 n 
+0000373910 00000 n 
+0000374306 00000 n 
+0000374625 00000 n 
+0000375119 00000 n 
+0000375176 00000 n 
+0000375554 00000 n 
+0000375873 00000 n 
+0000376367 00000 n 
+0000376424 00000 n 
+0000376793 00000 n 
+0000377112 00000 n 
+0000377606 00000 n 
+0000377663 00000 n 
+0000378008 00000 n 
+0000378327 00000 n 
+0000378821 00000 n 
+0000378878 00000 n 
+0000379223 00000 n 
+0000379414 00000 n 
+0000379453 00000 n 
+0000379831 00000 n 
+0000380150 00000 n 
+0000380644 00000 n 
+0000380701 00000 n 
+0000381102 00000 n 
+0000381421 00000 n 
+0000381915 00000 n 
+0000381972 00000 n 
+0000382381 00000 n 
+0000382700 00000 n 
+0000383194 00000 n 
+0000383251 00000 n 
+0000383618 00000 n 
+0000383937 00000 n 
+0000384431 00000 n 
+0000384488 00000 n 
+0000384855 00000 n 
+0000385174 00000 n 
+0000385668 00000 n 
+0000385725 00000 n 
+0000386090 00000 n 
+0000386409 00000 n 
+0000386903 00000 n 
+0000386960 00000 n 
+0000387323 00000 n 
+0000387642 00000 n 
+0000388136 00000 n 
+0000388193 00000 n 
+0000388555 00000 n 
+0000388874 00000 n 
+0000389368 00000 n 
+0000389425 00000 n 
+0000389790 00000 n 
+0000389980 00000 n 
+0000390019 00000 n 
+0000390242 00000 n 
+0000390631 00000 n 
+0000391077 00000 n 
+0000391134 00000 n 
+0000391390 00000 n 
+0000391612 00000 n 
+0000392058 00000 n 
+0000392447 00000 n 
+0000392504 00000 n 
+0000392830 00000 n 
+0000393019 00000 n 
+0000393058 00000 n 
+0000393369 00000 n 
+0000393558 00000 n 
+0000393597 00000 n 
+0000393814 00000 n 
+0000394203 00000 n 
+0000394649 00000 n 
+0000394706 00000 n 
+0000395006 00000 n 
+0000395224 00000 n 
+0000395670 00000 n 
+0000396059 00000 n 
+0000396116 00000 n 
+0000396337 00000 n 
+0000396726 00000 n 
+0000397172 00000 n 
+0000397229 00000 n 
+0000397366 00000 n 
+0000397586 00000 n 
+0000398032 00000 n 
+0000398421 00000 n 
+0000398478 00000 n 
+0000398698 00000 n 
+0000399144 00000 n 
+0000399533 00000 n 
+0000399590 00000 n 
+0000399812 00000 n 
+0000400033 00000 n 
+0000400422 00000 n 
+0000400868 00000 n 
+0000400925 00000 n 
+0000401266 00000 n 
+0000401455 00000 n 
+0000401494 00000 n 
+0000401771 00000 n 
+0000401960 00000 n 
+0000401999 00000 n 
+0000402276 00000 n 
+0000402465 00000 n 
+0000402504 00000 n 
+0000402780 00000 n 
+0000402969 00000 n 
+0000403008 00000 n 
+0000403285 00000 n 
+0000403474 00000 n 
+0000403513 00000 n 
+0000403806 00000 n 
+0000403997 00000 n 
+0000404036 00000 n 
+0000405495 00000 n 
+0000406823 00000 n 
+0000408017 00000 n 
+0000408262 00000 n 
+0000408364 00000 n 
 trailer
 <<
 /Size 867
 /Root 3 0 R
-/Info 2 0 R
+/Info 1 0 R
 >>
 startxref
-414550
+408451
 %%EOF

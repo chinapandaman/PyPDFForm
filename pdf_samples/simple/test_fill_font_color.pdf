@@ -2,20 +2,20 @@
 %‚„œ”
 1 0 obj
 <<
+/Producer (pypdf)
+>>
+endobj
+2 0 obj
+<<
 /Type /Pages
 /Count 1
 /Kids [ 4 0 R ]
 >>
 endobj
-2 0 obj
-<<
-/Producer (pypdf)
->>
-endobj
 3 0 obj
 <<
 /Type /Catalog
-/Pages 1 0 R
+/Pages 2 0 R
 /Outlines 5 0 R
 /AcroForm 14 0 R
 >>
@@ -26,7 +26,7 @@ endobj
 /MediaBox [ 0 0 595 842 ]
 /Resources <<
 >>
-/Parent 1 0 R
+/Parent 2 0 R
 /Annots [ 6 0 R 8 0 R 10 0 R 12 0 R ]
 >>
 endobj
@@ -39,7 +39,7 @@ endobj
 /Subtype /Widget
 /Rect [ 99.5 720 281.5 773 ]
 /AP (red)
-/DA (\057Helv\04012\040Tf\0401\0400\0400\040rg)
+/DA (\057Helv 12 Tf 1 0 0 rg)
 /F 4
 /Ff 4194304
 /FT /Tx
@@ -69,7 +69,7 @@ endobj
 /Subtype /Widget
 /Rect [ 100.5 620 282.5 673 ]
 /AP (green)
-/DA (\057Helv\04014\040Tf\0400\0401\0400\040rg)
+/DA (\057Helv 14 Tf 0 1 0 rg)
 /F 4
 /Ff 4194304
 /FT /Tx
@@ -99,7 +99,7 @@ endobj
 /Subtype /Widget
 /Rect [ 101.5 513 283.5 566 ]
 /AP (blue)
-/DA (\057Helv\04016\040Tf\0400\0400\0401\040rg)
+/DA (\057Helv 16 Tf 0 0 1 rg)
 /F 4
 /Ff 4194304
 /FT /Tx
@@ -129,7 +129,7 @@ endobj
 /Subtype /Widget
 /Rect [ 101.5 327 410.5 440 ]
 /AP (mixed)
-/DA (\057Helv\0400\040Tf\040\05652941\040\05643137\040\05635294\040rg)
+/DA (\057Helv 0 Tf \05652941 \05643137 \05635294 rg)
 /F 4
 /Ff 4194304
 /FT /Tx
@@ -183,27 +183,27 @@ xref
 0 17
 0000000000 65535 f 
 0000000015 00000 n 
-0000000074 00000 n 
+0000000054 00000 n 
 0000000113 00000 n 
 0000000195 00000 n 
 0000000323 00000 n 
 0000000344 00000 n 
-0000000558 00000 n 
-0000000659 00000 n 
-0000000880 00000 n 
-0000000981 00000 n 
-0000001200 00000 n 
-0000001302 00000 n 
-0000001549 00000 n 
-0000001652 00000 n 
-0000001747 00000 n 
-0000001847 00000 n 
+0000000540 00000 n 
+0000000641 00000 n 
+0000000844 00000 n 
+0000000945 00000 n 
+0000001146 00000 n 
+0000001248 00000 n 
+0000001477 00000 n 
+0000001580 00000 n 
+0000001675 00000 n 
+0000001775 00000 n 
 trailer
 <<
 /Size 17
 /Root 3 0 R
-/Info 2 0 R
+/Info 1 0 R
 >>
 startxref
-3174
+3102
 %%EOF
