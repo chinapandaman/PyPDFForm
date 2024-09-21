@@ -199,7 +199,9 @@ def test_create_text_default(template_stream, pdf_samples, request):
 
 
 def test_create_text_alpha_bg_color(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "create_text_alpha_bg_color.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "create_text_alpha_bg_color.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "text",
