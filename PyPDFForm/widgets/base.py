@@ -52,6 +52,7 @@ class Widget:
                         value[0],
                         value[1],
                         value[2],
+                        value[3] if len(value) == 4 else 1,
                     )
                 self.acro_form_params[param] = value
             elif user_input in self.NONE_DEFAULTS:
