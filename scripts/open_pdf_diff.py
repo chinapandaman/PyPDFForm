@@ -7,7 +7,7 @@ import webbrowser
 
 if __name__ == "__main__":
     before_path = sys.argv[1]
-    file_name = os.path.basename(os.path.abspath(before_path))
+    file_name = "_".join(before_path.split("/"))
     after_path = os.path.join(os.path.dirname(__file__), "..", "temp", file_name)
 
     if os.environ.get("CODESPACES") == "true":
