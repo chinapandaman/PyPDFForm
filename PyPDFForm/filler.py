@@ -128,7 +128,7 @@ def fill(
                     widget_dict, widgets[key], radio_button_tracker
                 )
             elif isinstance(widgets[key], (Signature, Image)):
-                any_image_to_draw = signature_image_handler(
+                any_image_to_draw |= signature_image_handler(
                     widget_dict, widgets[key], images_to_draw[page]
                 )
             else:
