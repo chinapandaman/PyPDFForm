@@ -160,7 +160,7 @@ def simple_flatten_generic(annot: DictionaryObject) -> None:
         )
 
 
-def update_annotation_name(annot: DictionaryObject, key) -> None:
+def update_annotation_name(annot: DictionaryObject, key: str) -> None:
     """Patterns to update the name of an annotation."""
 
     if Parent in annot and T not in annot:

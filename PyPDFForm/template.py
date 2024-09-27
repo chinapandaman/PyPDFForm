@@ -438,6 +438,7 @@ def update_widget_key(
                 continue
 
             update_annotation_name(annot, new_key)
+            tracker += 1
 
     with BytesIO() as f:
         out.write(f)
