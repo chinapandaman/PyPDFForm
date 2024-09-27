@@ -9,7 +9,7 @@ from pypdf.generic import DictionaryObject
 
 from .constants import (BUTTON_STYLES, DEFAULT_CHECKBOX_STYLE, DEFAULT_FONT,
                         DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
-                        DEFAULT_RADIO_STYLE, PREVIEW_FONT_COLOR, WIDGET_TYPES)
+                        DEFAULT_RADIO_STYLE, PREVIEW_FONT_COLOR, WIDGET_TYPES, Ff)
 from .middleware.checkbox import Checkbox
 from .middleware.radio import Radio
 from .middleware.text import Text
@@ -122,7 +122,9 @@ def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> 
             ):
                 result = find_pattern_match(pattern[key], value)
             else:
-                if isinstance(pattern[key], tuple):
+                if key == Ff:
+                    result = check_feature_flags(value, pattern[key])
+                elif isinstance(pattern[key], tuple):
                     result = value in pattern[key]
                 else:
                     result = pattern[key] == value
@@ -130,6 +132,17 @@ def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> 
             return result
     return False
 
+def check_feature_flags(value: int, bits: int|tuple) -> bool:
+    """Checks if a int value has a bit set """
+
+    if not isinstance(bits, tuple):
+        bits = (bits,)
+
+    for bit in bits:
+        if value << (bit - 1):
+            return True
+
+    return False
 
 def traverse_pattern(
     pattern: dict, widget: Union[dict, DictionaryObject]

@@ -16,7 +16,7 @@ from .font import checkbox_radio_font_size
 from .image import any_image_to_jpg
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
-from .middleware.image import Image
+from .middleware.pushbutton import Pushbutton
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
@@ -53,7 +53,7 @@ def check_radio_handler(
 
 
 def signature_image_handler(
-    widget: dict, middleware: Union[Signature, Image], images_to_draw: list
+    widget: dict, middleware: Union[Signature, Pushbutton], images_to_draw: list
 ) -> bool:
     """Handles draw parameters for signature and image widgets."""
 
@@ -127,8 +127,8 @@ def fill(
                 to_draw, x, y, text_needs_to_be_drawn = check_radio_handler(
                     widget_dict, widgets[key], radio_button_tracker
                 )
-            elif isinstance(widgets[key], (Signature, Image)):
-                any_image_to_draw |= signature_image_handler(
+            elif isinstance(widgets[key], (Signature, Pushbutton)):
+                any_image_to_draw = signature_image_handler(
                     widget_dict, widgets[key], images_to_draw[page]
                 )
             else:
