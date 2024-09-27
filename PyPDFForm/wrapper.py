@@ -11,7 +11,7 @@ from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         NEW_LINE_SYMBOL, VERSION_IDENTIFIER_PREFIX,
                         VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
-from .filler import fill, simple_fill
+from .filler import fill, simple_fill, update_widget_key
 from .font import register_font
 from .image import any_image_to_jpg, rotate_image
 from .middleware.dropdown import Dropdown
@@ -232,6 +232,18 @@ class PdfWrapper(FormWrapper):
             self.widgets[name].font = self.global_font
             self.widgets[name].font_size = self.global_font_size
             self.widgets[name].font_color = self.global_font_color
+
+        return self
+
+    def update_widget_key(self, old_key: str, new_key: str, index: int = 0) -> PdfWrapper:
+        """Updates the key of an existed widget on a PDF form."""
+
+        self.__init__(
+            template=update_widget_key(self.read(), self.widgets, old_key, new_key, index),
+            global_font=self.global_font,
+            global_font_size=self.global_font_size,
+            global_font_color=self.global_font_color,
+        )
 
         return self
 
