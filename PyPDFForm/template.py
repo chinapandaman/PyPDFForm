@@ -420,7 +420,7 @@ def update_widget_key(
     out = PdfWriter()
     out.append(pdf)
 
-    tracker = 0
+    tracker = -1
 
     for page in out.pages:
         for annot in page.get(Annots, []):  # noqa
@@ -434,11 +434,11 @@ def update_widget_key(
             if old_key != key:
                 continue
 
+            tracker += 1
             if not isinstance(widget, Radio) and tracker != index:
                 continue
 
             update_annotation_name(annot, new_key)
-            tracker += 1
 
     with BytesIO() as f:
         out.write(f)
