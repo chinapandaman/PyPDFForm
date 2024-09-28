@@ -160,16 +160,16 @@ def simple_flatten_generic(annot: DictionaryObject) -> None:
         )
 
 
-def update_annotation_name(annot: DictionaryObject, key: str) -> None:
+def update_annotation_name(annot: DictionaryObject, val: str) -> None:
     """Patterns to update the name of an annotation."""
 
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(T)] = TextStringObject(   # noqa
-            key
+            val
         )
     else:
         annot[NameObject(T)] = TextStringObject(  # noqa
-            key
+            val
         )
 
 
