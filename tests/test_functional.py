@@ -643,3 +643,23 @@ def test_update_radio_key(
 
         assert len(obj.preview) == len(expected)
         assert obj.preview == expected
+
+
+def test_update_sejda_key(
+    sejda_template, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "test_update_sejda_key.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template)
+        obj.update_widget_key("year", "YEAR")
+        obj.update_widget_key("at_future_date", "FUTURE_DATE")
+        obj.update_widget_key("purchase_option", "PURCHASE_OPTION")
+        obj.update_widget_key("buyer_signed_date", "BUYER_SIGNED_DATE")
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.preview) == len(expected)
+        assert obj.preview == expected
