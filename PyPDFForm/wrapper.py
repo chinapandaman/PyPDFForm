@@ -18,7 +18,7 @@ from .middleware.dropdown import Dropdown
 from .middleware.text import Text
 from .template import (build_widgets, dropdown_to_text,
                        set_character_x_paddings, update_text_field_attributes,
-                       widget_rect_watermarks, update_widget_key)
+                       update_widget_key, widget_rect_watermarks)
 from .utils import (get_page_streams, merge_two_pdfs, preview_widget_to_draw,
                     remove_all_widgets)
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
@@ -235,11 +235,15 @@ class PdfWrapper(FormWrapper):
 
         return self
 
-    def update_widget_key(self, old_key: str, new_key: str, index: int = 0) -> PdfWrapper:
+    def update_widget_key(
+        self, old_key: str, new_key: str, index: int = 0
+    ) -> PdfWrapper:
         """Updates the key of an existed widget on a PDF form."""
 
         self.__init__(
-            template=update_widget_key(self.read(), self.widgets, old_key, new_key, index),
+            template=update_widget_key(
+                self.read(), self.widgets, old_key, new_key, index
+            ),
             global_font=self.global_font,
             global_font_size=self.global_font_size,
             global_font_color=self.global_font_color,

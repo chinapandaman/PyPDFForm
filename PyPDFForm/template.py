@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for generic template related processing."""
 
-from io import BytesIO
 from functools import lru_cache
+from io import BytesIO
 from sys import maxsize
 from typing import Dict, List, Tuple, Union, cast
 
@@ -11,7 +11,7 @@ from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
-                        WIDGET_TYPES, MaxLen, Rect, Annots)
+                        WIDGET_TYPES, Annots, MaxLen, Rect)
 from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
                    auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
@@ -21,7 +21,8 @@ from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
-                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS, update_annotation_name)
+                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
+                       update_annotation_name)
 from .utils import find_pattern_match, stream_to_io, traverse_pattern
 from .watermark import create_watermarks_and_draw
 

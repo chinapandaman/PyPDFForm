@@ -164,13 +164,9 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
     """Patterns to update the name of an annotation."""
 
     if Parent in annot and T not in annot:
-        annot[NameObject(Parent)][NameObject(T)] = TextStringObject(   # noqa
-            val
-        )
+        annot[NameObject(Parent)][NameObject(T)] = TextStringObject(val)  # noqa
     else:
-        annot[NameObject(T)] = TextStringObject(  # noqa
-            val
-        )
+        annot[NameObject(T)] = TextStringObject(val)  # noqa
 
 
 def update_created_text_field_alignment(annot: DictionaryObject, val: int) -> None:

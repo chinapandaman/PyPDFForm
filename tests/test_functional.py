@@ -628,9 +628,7 @@ def test_fill_image(
         assert obj.stream == expected
 
 
-def test_update_radio_key(
-    template_with_radiobutton_stream, pdf_samples, request
-):
+def test_update_radio_key(template_with_radiobutton_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_update_radio_key.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_with_radiobutton_stream)
@@ -645,9 +643,7 @@ def test_update_radio_key(
         assert obj.preview == expected
 
 
-def test_update_sejda_key(
-    sejda_template, pdf_samples, request
-):
+def test_update_sejda_key(sejda_template, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_update_sejda_key.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sejda_template)
