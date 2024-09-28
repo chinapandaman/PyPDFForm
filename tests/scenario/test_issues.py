@@ -226,3 +226,24 @@ def test_sejda_checkbox(issue_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_update_key(issue_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "733.pdf"))
+
+    for i in range(1, 10):
+        obj.update_widget_key("Description[0]", f"Description[{i}]", 1)
+        obj.update_widget_key("symbol[0]", f"symbol[{i}]", 1)
+        obj.update_widget_key("tradedate[0]", f"tradedate[{i}]", 1)
+        obj.update_widget_key("settlementdate[0]", f"settlementdate[{i}]", 1)
+        obj.update_widget_key("quantity[0]", f"quantity[{i}]", 1)
+        obj.update_widget_key("costperunit[0]", f"costperunit[{i}]", 1)
+        obj.update_widget_key("costabasis[0]", f"costabasis[{i}]", 1)
+
+    expected_path = os.path.join(issue_pdf_directory, "733_expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.preview) == len(expected)
+        assert obj.preview == expected

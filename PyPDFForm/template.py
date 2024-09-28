@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """Contains helpers for generic template related processing."""
 
+from io import BytesIO
 from functools import lru_cache
 from sys import maxsize
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union, cast
 
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
-                        WIDGET_TYPES, MaxLen, Rect)
+                        WIDGET_TYPES, MaxLen, Rect, Annots)
 from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
                    auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
@@ -19,7 +21,7 @@ from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
-                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS)
+                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS, update_annotation_name)
 from .utils import find_pattern_match, stream_to_io, traverse_pattern
 from .watermark import create_watermarks_and_draw
 
@@ -403,3 +405,43 @@ def get_paragraph_auto_wrap_length(widget_middleware: Text) -> int:
         result = min(result, len(line))
 
     return result
+
+
+def update_widget_key(
+    template: bytes,
+    widgets: Dict[str, WIDGET_TYPES],
+    old_key: str,
+    new_key: str,
+    index: int,
+) -> bytes:
+    """Updates the key of a widget."""
+    # pylint: disable=R0801
+
+    pdf = PdfReader(stream_to_io(template))
+    out = PdfWriter()
+    out.append(pdf)
+
+    tracker = -1
+
+    for page in out.pages:
+        for annot in page.get(Annots, []):  # noqa
+            annot = cast(DictionaryObject, annot.get_object())
+            key = get_widget_key(annot.get_object())
+
+            widget = widgets.get(key)
+            if widget is None:
+                continue
+
+            if old_key != key:
+                continue
+
+            tracker += 1
+            if not isinstance(widget, Radio) and tracker != index:
+                continue
+
+            update_annotation_name(annot, new_key)
+
+    with BytesIO() as f:
+        out.write(f)
+        f.seek(0)
+        return f.read()

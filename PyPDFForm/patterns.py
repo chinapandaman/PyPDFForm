@@ -160,6 +160,19 @@ def simple_flatten_generic(annot: DictionaryObject) -> None:
         )
 
 
+def update_annotation_name(annot: DictionaryObject, val: str) -> None:
+    """Patterns to update the name of an annotation."""
+
+    if Parent in annot and T not in annot:
+        annot[NameObject(Parent)][NameObject(T)] = TextStringObject(   # noqa
+            val
+        )
+    else:
+        annot[NameObject(T)] = TextStringObject(  # noqa
+            val
+        )
+
+
 def update_created_text_field_alignment(annot: DictionaryObject, val: int) -> None:
     """Patterns to update text alignment for text annotations created by the library."""
 
