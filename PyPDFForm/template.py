@@ -415,6 +415,7 @@ def update_widget_key(
     index: int,
 ) -> bytes:
     """Updates the key of a widget."""
+    # pylint: disable=R0801
 
     pdf = PdfReader(stream_to_io(template))
     out = PdfWriter()
