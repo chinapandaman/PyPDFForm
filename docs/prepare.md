@@ -7,7 +7,7 @@ There are other free alternatives like [DocFly](https://www.docfly.com/) that su
 Given a PDF that's not a form yet, PyPDFForm also supports 
 creating a subset of PDF form widgets on it through coding.
 
-This section of the documentation will use 
+This section of the documentation will mostly use 
 [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
 
 This section of the documentation requires a basic understanding of [the PDF coordinate system](coordinate.md).
@@ -103,6 +103,41 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
     border_color=(1, 0, 0), # optional
     border_width=5  # optional
+)
+
+with open("output.pdf", "wb+") as output:
+    output.write(new_form.read())
+```
+
+## Modify the key of a widget (beta)
+
+**NOTE:** This is a beta feature, meaning it still needs to be tested against more PDF forms and may not work for 
+some of them.
+
+For existing widgets, PyPDFForm supports modifying their keys. 
+Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf), 
+the below snippet will change the key of the first text field `test` to `test_text`:
+
+```python
+from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper("sample_template.pdf").update_widget_key(
+    "test", "test_text"
+)
+
+with open("output.pdf", "wb+") as output:
+    output.write(new_form.read())
+```
+
+If there is more than one widget with the same key, the third `index` parameter can be used to pick which one 
+to update. Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf), 
+the below snippet will change the key of the second row's text field with the key `Description[0]` to `Description[1]`:
+
+```python
+from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper("733.pdf").update_widget_key(
+    "Description[0]", "Description[1]", index=1
 )
 
 with open("output.pdf", "wb+") as output:
