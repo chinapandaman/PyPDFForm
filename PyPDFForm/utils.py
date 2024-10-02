@@ -139,7 +139,7 @@ def check_feature_flags(value: int, bits: int|tuple) -> bool:
         bits = (bits,)
 
     for bit in bits:
-        if value << (bit - 1):
+        if value & 2**(bit - 1):
             return True
 
     return False
