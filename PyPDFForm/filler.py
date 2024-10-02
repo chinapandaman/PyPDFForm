@@ -130,7 +130,7 @@ def fill(
             elif isinstance(widgets[key], (Signature, Pushbutton)):
                 any_image_to_draw = signature_image_handler(
                     widget_dict, widgets[key], images_to_draw[page]
-                )
+                ) or any_image_to_draw
             else:
                 to_draw, x, y, text_needs_to_be_drawn = text_handler(
                     widget_dict, widgets[key]

@@ -3,6 +3,7 @@
 import os
 
 from PyPDFForm import PdfWrapper
+from PyPDFForm.middleware import pushbutton
 
 
 def test_illinois_gun_bill_of_sale(existed_pdf_directory, request):
@@ -189,4 +190,4 @@ def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory, requ
 def test_clear_form_button_not_checkbox(existed_pdf_directory):
     obj = PdfWrapper(os.path.join(existed_pdf_directory, "ds11_pdf.pdf"))
 
-    assert "Clear" not in obj.widgets
+    assert "Clear" in obj.widgets and isinstance(obj.widgets["Clear"], pushbutton.Pushbutton)
