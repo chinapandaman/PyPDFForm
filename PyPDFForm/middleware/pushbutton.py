@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Contains Pushbutton middleware."""
 
-from .signature import Signature
+from .base import Widget
 
 
-class Pushbutton(Signature):
+class Pushbutton(Widget):
     """A class to represent a pushbutton widget."""

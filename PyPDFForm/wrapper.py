@@ -11,12 +11,12 @@ from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         NEW_LINE_SYMBOL, VERSION_IDENTIFIER_PREFIX,
                         VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
-from .filler import fill, simple_fill
+from .filler import fill, simple_fill, pushbutton_to_image_handler
 from .font import register_font
 from .image import any_image_to_jpg, rotate_image
 from .middleware.dropdown import Dropdown
 from .middleware.text import Text
-from .template import (build_widgets, dropdown_to_text,
+from .template import (build_widgets, dropdown_to_text, pushbutton_to_image,
                        set_character_x_paddings, update_text_field_attributes,
                        widget_rect_watermarks)
 from .utils import (get_page_streams, merge_two_pdfs, preview_widget_to_draw,
@@ -39,11 +39,16 @@ class FormWrapper:
 
         super().__init__()
         self.stream = fp_or_f_obj_or_stream_to_stream(template)
+        self.widgets = build_widgets(self.stream) if self.stream else {}
 
     def read(self) -> bytes:
         """Reads the file stream of a PDF form."""
 
         return self.stream
+
+    def pushbutton_field_to_image_field(self, widget_name: str):
+        self.widgets[widget_name] = pushbutton_to_image(self.widgets[widget_name])
+        self.stream = pushbutton_to_image_handler(self.read(), widget_name)
 
     def fill(
         self,
@@ -52,15 +57,13 @@ class FormWrapper:
     ) -> FormWrapper:
         """Fills a PDF form."""
 
-        widgets = build_widgets(self.stream) if self.stream else {}
-
         for key, value in data.items():
-            if key in widgets:
-                widgets[key].value = value
+            if key in self.widgets:
+                self.widgets[key].value = value
 
         self.stream = simple_fill(
             self.read(),
-            widgets,
+            self.widgets,
             flatten=kwargs.get("flatten", False),
             adobe_mode=kwargs.get("adobe_mode", False),
         )
@@ -79,7 +82,6 @@ class PdfWrapper(FormWrapper):
         """Constructs all attributes for the object."""
 
         super().__init__(template)
-        self.widgets = build_widgets(self.stream) if self.stream else {}
 
         self.global_font = kwargs.get("global_font")
         self.global_font_size = kwargs.get("global_font_size")

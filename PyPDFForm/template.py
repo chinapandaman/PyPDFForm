@@ -14,6 +14,8 @@ from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
                    auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
 from .middleware.checkbox import Checkbox
+from .middleware.pushbutton import Pushbutton
+from .middleware.image import Image
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
@@ -108,6 +110,13 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
             if dropdown.value < len(dropdown.choices)
             else ""
         )
+
+    return result
+
+def pushbutton_to_image(pushbutton: Pushbutton) -> Image:
+    """Converts a dropdown widget to a text widget."""
+
+    result = Image(pushbutton.name)
 
     return result
 

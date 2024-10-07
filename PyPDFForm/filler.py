@@ -17,13 +17,14 @@ from .image import any_image_to_jpg
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.pushbutton import Pushbutton
+from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .patterns import (simple_flatten_generic, simple_flatten_radio,
                        simple_update_checkbox_value,
                        simple_update_dropdown_value, simple_update_radio_value,
-                       simple_update_text_value)
+                       simple_update_text_value, simple_set_image_field)
 from .template import get_widget_key, get_widgets_by_page
 from .utils import checkbox_radio_to_draw, stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
@@ -53,7 +54,7 @@ def check_radio_handler(
 
 
 def signature_image_handler(
-    widget: dict, middleware: Union[Signature, Pushbutton], images_to_draw: list
+    widget: dict, middleware: Union[Signature, Image], images_to_draw: list
 ) -> bool:
     """Handles draw parameters for signature and image widgets."""
 
@@ -75,6 +76,23 @@ def signature_image_handler(
 
     return any_image_to_draw
 
+def pushbutton_to_image_handler(template: bytes, widget_name: str) -> bytes:
+    pdf = PdfReader(stream_to_io(template))
+    out = PdfWriter()
+    out.append(pdf)
+
+    for page in out.pages:
+        for annot in page.get(Annots, []):  # noqa
+            annot = cast(DictionaryObject, annot.get_object())
+            key = get_widget_key(annot.get_object())
+            if key != widget_name:
+                continue
+            simple_set_image_field(annot)
+
+    with BytesIO() as f:
+        out.write(f)
+        f.seek(0)
+        return f.read()
 
 def text_handler(
     widget: dict, middleware: Text
@@ -127,10 +145,12 @@ def fill(
                 to_draw, x, y, text_needs_to_be_drawn = check_radio_handler(
                     widget_dict, widgets[key], radio_button_tracker
                 )
-            elif isinstance(widgets[key], (Signature, Pushbutton)):
+            elif isinstance(widgets[key], (Signature, Image)):
                 any_image_to_draw = signature_image_handler(
                     widget_dict, widgets[key], images_to_draw[page]
                 ) or any_image_to_draw
+            elif isinstance(widgets[key], (Pushbutton,)):
+                pass
             else:
                 to_draw, x, y, text_needs_to_be_drawn = text_handler(
                     widget_dict, widgets[key]
