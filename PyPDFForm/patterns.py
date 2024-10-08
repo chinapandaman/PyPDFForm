@@ -6,10 +6,11 @@ from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
 
 from .constants import (AP, AS, CA, DA, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, MK,
                         MULTILINE, READ_ONLY, A, Btn, Ch, Ff, N, Off, Opt,
-                        Parent, Q, Sig, T, Tx, V, Yes)
+                        Parent, Q, Sig, T, Tx, V, Yes, Type, Action, S, JavaScript)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
+from .middleware.pushbutton import Pushbutton
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
@@ -18,6 +19,13 @@ WIDGET_TYPE_PATTERNS = [
     (
         ({A: {JS: IMAGE_FIELD_IDENTIFIER}},),
         Image,
+    ),
+    (
+        (
+            {FT: Btn},
+            {Ff: 17},
+        ),
+        Pushbutton,
     ),
     (
         ({FT: Sig},),
@@ -138,6 +146,15 @@ def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
         annot[NameObject(V)] = TextStringObject(widget.value)
         annot[NameObject(AP)] = TextStringObject(widget.value)
 
+
+def simple_set_image_field(annot: DictionaryObject) -> None:
+    """Patterns to set for an image field."""
+
+    annot[NameObject(A)] = DictionaryObject({
+        NameObject(Type): NameObject(Action),
+        NameObject(S): NameObject(JavaScript),
+        NameObject(JS): TextStringObject(IMAGE_FIELD_IDENTIFIER),
+    })
 
 def simple_flatten_radio(annot: DictionaryObject) -> None:
     """Patterns to flatten checkbox annotations."""
