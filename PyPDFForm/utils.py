@@ -139,10 +139,10 @@ def check_feature_flags(value: int, bits: int|tuple) -> bool:
         bits = (bits,)
 
     for bit in bits:
-        if value & 2**(bit - 1):
-            return True
+        if not (value & 2**(bit - 1)):
+            return False
 
-    return False
+    return True
 
 def traverse_pattern(
     pattern: dict, widget: Union[dict, DictionaryObject]
