@@ -6,6 +6,7 @@ from typing import Union
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
+from .middleware.pushbutton import Pushbutton
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
@@ -23,13 +24,17 @@ VERSION_IDENTIFIERS = [
 ]
 VERSION_IDENTIFIER_PREFIX = b"%PDF-"
 
-WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown, Signature, Image]
+WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown, Signature, Image, Pushbutton]
 
 DEPRECATION_NOTICE = "{} will be deprecated soon. Use {} instead."
 
 Annots = "/Annots"
 A = "/A"
 JS = "/JS"
+Type = "/Type"
+Action = "/Action"
+S = "/S"
+JavaScript = "/JavaScript"
 T = "/T"
 Rect = "/Rect"
 FT = "/FT"
