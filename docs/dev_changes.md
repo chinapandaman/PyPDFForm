@@ -18,7 +18,10 @@ and open your PR against that branch, as your changes will likely need to be rev
 
 ## Merge process
 
-Your PR will be reviewed before merging into the master branch. On top of that, it needs to run through some CI checks:
+Your PR will be reviewed before merging into the master branch. In the case where your changes are too large to leave review comments, 
+you will likely be asked to reopen your PR against a new feature branch so that your changes can be revised/refactored to the appropriate code structure.
+
+On top of that, your PR needs to run through some CI checks:
 
 * Pylint on the source code.
 * Tests will be run on three mainstream operating systems: `ubuntu`, `windows`, and `macos`, and across all Python versions the library supports on each OS.
