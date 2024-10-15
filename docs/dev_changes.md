@@ -10,13 +10,18 @@ anyone with any level of expertise.
 
 With that said, there are some conventions that are expected to be followed by your PR:
 
+* Small changes are preferred over lengthy changes. If your changes are large, please request a feature branch in your issue 
+and open your PR against that branch, as your changes will likely need to be revised before merging into master.
 * Your changes must pass [Pylint](https://www.pylint.org/). To check if this is true, simply run `pylint PyPDFForm`.
 * Your changes must pass all tests and have 100% coverage. You can read more about testing [here](dev_test.md).
 * If you are changing the user APIs or any other parts of the code that are relevant, please update the appropriate documentation too.
 
 ## Merge process
 
-Your PR will be reviewed before merging into the master branch. On top of that, it needs to run through some CI checks:
+Your PR will be reviewed before merging into the master branch. In the case where your changes are too large to leave review comments, 
+you will likely be asked to reopen your PR against a new feature branch so that your changes can be revised/refactored to the appropriate code structure.
+
+On top of that, your PR needs to run through some CI checks:
 
 * Pylint on the source code.
 * Tests will be run on three mainstream operating systems: `ubuntu`, `windows`, and `macos`, and across all Python versions the library supports on each OS.
