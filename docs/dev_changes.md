@@ -10,6 +10,8 @@ anyone with any level of expertise.
 
 With that said, there are some conventions that are expected to be followed by your PR:
 
+* Small changes are preferred over lengthy changes. If your changes are large, please request a feature branch in your issue 
+and open your PR against that branch, as your changes will likely need to be revised before merging into master.
 * Your changes must pass [Pylint](https://www.pylint.org/). To check if this is true, simply run `pylint PyPDFForm`.
 * Your changes must pass all tests and have 100% coverage. You can read more about testing [here](dev_test.md).
 * If you are changing the user APIs or any other parts of the code that are relevant, please update the appropriate documentation too.
