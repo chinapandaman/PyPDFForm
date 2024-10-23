@@ -181,10 +181,6 @@ class PdfWrapper(FormWrapper):
             if key in self.widgets:
                 self.widgets[key].value = value
 
-        for key, widget in self.widgets.items():
-            if isinstance(widget, Text) and isinstance(widget.value, (int, float)):
-                self.widgets[key].value = str(widget.value)
-
         for key, value in self.widgets.items():
             if isinstance(value, Dropdown):
                 self.widgets[key] = dropdown_to_text(value)

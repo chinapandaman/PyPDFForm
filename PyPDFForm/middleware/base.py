@@ -16,13 +16,25 @@ class Widget:
 
         super().__init__()
         self._name = name
-        self.value = value
+        self._value = value
 
     @property
     def name(self) -> str:
         """Name of the widget."""
 
         return self._name
+
+    @property
+    def value(self) -> Any:
+        """Value to fill for the widget."""
+
+        return self._value
+
+    @value.setter
+    def value(self, value: Any) -> None:
+        """Sets value to fill for the widget."""
+
+        self._value = value
 
     @property
     def schema_definition(self) -> dict:
