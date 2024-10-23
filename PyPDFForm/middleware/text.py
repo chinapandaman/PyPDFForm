@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Contains text middleware."""
 
-from typing import Union
+from typing import Any
 
 from .base import Widget
 
@@ -30,7 +30,7 @@ class Text(Widget):
         self.preview = False
 
     @property
-    def value(self) -> Union[str, None]:
+    def value(self) -> Any:
         """Value to fill for the text field."""
 
         if isinstance(self._value, (int, float)):
