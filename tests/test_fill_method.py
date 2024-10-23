@@ -1,4 +1,5 @@
 import os
+
 from PyPDFForm import PdfWrapper
 
 
@@ -43,7 +44,9 @@ def test_fill_with_boolean_and_int_values(pdf_samples, request):
 
 
 def test_fill_with_empty_string_and_int(pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "sample_filled_with_empty_string_and_int.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "sample_filled_with_empty_string_and_int.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(os.path.join(pdf_samples, "sample_template.pdf")).fill(
             {
@@ -103,7 +106,9 @@ def test_fill_with_varied_float_values(pdf_samples, request):
 
 
 def test_fill_with_negative_and_positive_floats_and_int(pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "sample_filled_negative_and_positive_floats_and_int.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "sample_filled_negative_and_positive_floats_and_int.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(os.path.join(pdf_samples, "sample_template.pdf")).fill(
             {
