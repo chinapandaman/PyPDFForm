@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Testing - Welcome to PyPDFForm - PyPDFForm Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Testing";
+        var mkdocs_page_input_path = "dev_test.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="..">
+          <img src="../img/logo.png" class="logo" alt="Logo"/>
+        </a>
+        <div class="version">
+          v1.4.37
+        </div><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../install/">Installation and setup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../coordinate/">PDF coordinates</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../prepare/">Prepare a PDF form</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inspect/">Inspect a PDF form</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../fill/">Fill a PDF form</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../simple_fill/">Fill a PDF form in place</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../style/">Change text field styles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../button_style/">Change checkbox and radio button styles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Draw stuffs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../utils/">Other utilities</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_intro/">Developer Intro</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_changes/">Pull Request Requirements</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_doc/">Hosting Docs Locally</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Testing</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#generate-coverage-report">Generate coverage report</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#test-breakdown">Test breakdown</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_release/">Releasing</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Welcome to PyPDFForm - PyPDFForm Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer Guide</li>
+      <li class="breadcrumb-item active">Testing</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/chinapandaman/PyPDFForm/edit/master/docs/dev_test.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="testing">Testing</h1>
+<p>PyPDFForm uses <a href="https://pytest.org/">pytest</a> for testing and <a href="https://coverage.readthedocs.io/">coverage.py</a> 
+for test coverages. Tests can be run by simply executing:</p>
+<pre><code class="language-shell">coverage run -m pytest &amp;&amp; coverage report --fail-under=100
+</code></pre>
+<h2 id="generate-coverage-report">Generate coverage report</h2>
+<p>To generate a coverage report, run:</p>
+<pre><code class="language-shell">coverage run -m pytest &amp;&amp; coverage html
+</code></pre>
+<p>And the coverage report can be viewed by opening <code>htmlcov/index.html</code> in a browser.</p>
+<h2 id="test-breakdown">Test breakdown</h2>
+<p>Each PyPDFForm test is different. However, there is a general paradigm that almost all tests follow.</p>
+<p>In most cases, a test can be verbally summed up into three steps:</p>
+<ul>
+<li>Define an expected PDF file that the outcome of the test should look like.</li>
+<li>Execute a sequence of code using PyPDFForm to generate a PDF that should look like the expected PDF file.</li>
+<li>Compare the PDF generated by the test with the expected PDF file.</li>
+</ul>
+<p>Consider this example test:</p>
+<pre><code class="language-python">def test_fill(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, &quot;sample_filled.pdf&quot;)
+    with open(expected_path, &quot;rb+&quot;) as f:
+        obj = PdfWrapper(
+            os.path.join(pdf_samples, &quot;sample_template.pdf&quot;)
+        ).fill(
+            {
+                &quot;test&quot;: &quot;test_1&quot;,
+                &quot;check&quot;: True,
+                &quot;test_2&quot;: &quot;test_2&quot;,
+                &quot;check_2&quot;: False,
+                &quot;test_3&quot;: &quot;test_3&quot;,
+                &quot;check_3&quot;: True,
+            },
+        )
+
+        request.config.results[&quot;expected_path&quot;] = expected_path
+        request.config.results[&quot;stream&quot;] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+</code></pre>
+<p>The test starts by defining an expected PDF <code>sample_filled.pdf</code>:</p>
+<pre><code class="language-python">expected_path = os.path.join(pdf_samples, &quot;sample_filled.pdf&quot;)
+</code></pre>
+<p>The test then fills <code>sample_template.pdf</code> with a data dictionary using <code>PdfWrapper</code>:</p>
+<pre><code class="language-python">obj = PdfWrapper(
+    os.path.join(pdf_samples, &quot;sample_template.pdf&quot;)
+).fill(
+    {
+        &quot;test&quot;: &quot;test_1&quot;,
+        &quot;check&quot;: True,
+        &quot;test_2&quot;: &quot;test_2&quot;,
+        &quot;check_2&quot;: False,
+        &quot;test_3&quot;: &quot;test_3&quot;,
+        &quot;check_3&quot;: True,
+    },
+)
+</code></pre>
+<p>These two lines should almost always be included in every test to make updating old tests easier:</p>
+<pre><code class="language-python">request.config.results[&quot;expected_path&quot;] = expected_path
+request.config.results[&quot;stream&quot;] = obj.read()
+</code></pre>
+<p>Finally, the test compares the resulted stream from the test with the expected file stream:</p>
+<pre><code class="language-python">expected = f.read()
+
+assert len(obj.read()) == len(expected)
+assert obj.read() == expected
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../dev_doc/" class="btn btn-neutral float-left" title="Hosting Docs Locally"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../dev_release/" class="btn btn-neutral float-right" title="Releasing">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/chinapandaman/PyPDFForm" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../dev_doc/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../dev_release/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
