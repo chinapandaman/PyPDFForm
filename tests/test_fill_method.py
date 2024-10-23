@@ -6,7 +6,9 @@ from PyPDFForm import PdfWrapper
 
 
 def test_fill_with_varied_int_values(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "fill_method", "sample_filled_varied_ints.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "fill_method", "sample_filled_varied_ints.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).fill(
             {
@@ -26,7 +28,9 @@ def test_fill_with_varied_int_values(template_stream, pdf_samples, request):
 
 
 def test_fill_with_boolean_and_int_values(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "fill_method", "sample_filled_boolean_and_ints.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "fill_method", "sample_filled_boolean_and_ints.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).fill(
             {
@@ -68,7 +72,9 @@ def test_fill_with_empty_string_and_int(template_stream, pdf_samples, request):
 
 
 def test_fill_with_large_and_small_ints(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "fill_method", "sample_filled_large_and_small_ints.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "fill_method", "sample_filled_large_and_small_ints.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).fill(
             {
@@ -88,7 +94,9 @@ def test_fill_with_large_and_small_ints(template_stream, pdf_samples, request):
 
 
 def test_fill_with_varied_float_values(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "fill_method", "sample_filled_varied_float_values.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "fill_method", "sample_filled_varied_float_values.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).fill(
             {
@@ -107,9 +115,13 @@ def test_fill_with_varied_float_values(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_fill_with_negative_and_positive_floats_and_int(template_stream, pdf_samples, request):
+def test_fill_with_negative_and_positive_floats_and_int(
+    template_stream, pdf_samples, request
+):
     expected_path = os.path.join(
-        pdf_samples, "fill_method", "sample_filled_negative_and_positive_floats_and_int.pdf"
+        pdf_samples,
+        "fill_method",
+        "sample_filled_negative_and_positive_floats_and_int.pdf",
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).fill(
