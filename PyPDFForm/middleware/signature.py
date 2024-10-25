@@ -36,8 +36,14 @@ class Signature(Widget):
     def stream(self) -> Union[bytes, None]:
         """Converts the value of the signature field image to a stream."""
 
-        return (
+        stream = (
             fp_or_f_obj_or_stream_to_stream(self.value)
             if self.value is not None
+            else None
+        )
+
+        return (
+            stream
+            if stream != b''
             else None
         )
