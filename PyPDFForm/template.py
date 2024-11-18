@@ -11,7 +11,7 @@ from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
-                        WIDGET_TYPES, Annots, MaxLen, Rect)
+                        WIDGET_TYPES, Annots, MaxLen, Rect, TU)
 from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
                    auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
@@ -50,21 +50,24 @@ def build_widgets(pdf_stream: bytes) -> Dict[str, WIDGET_TYPES]:
 
     for widgets in get_widgets_by_page(pdf_stream).values():
         for widget in widgets:
+            # widget has it
             key = get_widget_key(widget)
-
+            #Gone here
             _widget = construct_widget(widget, key)
-
             if _widget is not None:
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
+                    _widget.desc = get_widget_description(widget)
                     if _widget.max_length is not None and is_text_field_comb(widget):
                         _widget.comb = True
 
                 if isinstance(_widget, (Checkbox, Radio)):
                     _widget.button_style = get_button_style(widget)
+                    _widget.desc = get_widget_description(widget)
 
                 if isinstance(_widget, Dropdown):
                     _widget.choices = get_dropdown_choices(widget)
+                    _widget.desc = get_widget_description(widget)
 
                 if isinstance(_widget, Radio):
                     if key not in results:
@@ -74,7 +77,6 @@ def build_widgets(pdf_stream: bytes) -> Dict[str, WIDGET_TYPES]:
                     continue
 
                 results[key] = _widget
-
     return results
 
 
@@ -224,6 +226,10 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
 
     return int(widget[MaxLen]) or None if MaxLen in widget else None
 
+def get_widget_description(widget: dict) -> Union[str, None]:
+    """Returns the description of the widget if presented or None."""
+    
+    return widget.get(TU,None)
 
 def check_field_flag_bit(widget: dict, bit: int) -> bool:
     """Checks if a bit is set in a widget's field flag."""
