@@ -102,6 +102,19 @@ def widget_rect_watermarks(pdf: bytes) -> List[bytes]:
     return watermarks
 
 
+# def dropdown_to_text(dropdown: Dropdown) -> Text:
+#     """Converts a dropdown widget to a text widget."""
+
+#     result = Text(dropdown.name)
+
+#     if dropdown.value is not None:
+#         result.value = (
+#             dropdown.choices[dropdown.value]
+#             if dropdown.value < len(dropdown.choices)
+#             else ""
+#         )
+
+#     return result
 def dropdown_to_text(dropdown: Dropdown) -> Text:
     """Converts a dropdown widget to a text widget."""
 
@@ -109,13 +122,10 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
 
     if dropdown.value is not None:
         result.value = (
-            dropdown.choices[dropdown.value]
-            if dropdown.value < len(dropdown.choices)
-            else ""
+            dropdown.value
         )
 
     return result
-
 
 def update_text_field_attributes(
     template_stream: bytes,
