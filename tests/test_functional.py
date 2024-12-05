@@ -635,7 +635,7 @@ def test_update_radio_key(template_with_radiobutton_stream, pdf_samples, request
         obj.update_widget_key("radio_3", "RADIO")
 
         request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
+        request.config.results["stream"] = obj.preview
 
         expected = f.read()
 
@@ -653,7 +653,7 @@ def test_update_sejda_key(sejda_template, pdf_samples, request):
         obj.update_widget_key("buyer_signed_date", "BUYER_SIGNED_DATE")
 
         request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
+        request.config.results["stream"] = obj.preview
 
         expected = f.read()
 
