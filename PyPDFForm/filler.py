@@ -186,7 +186,7 @@ def simple_fill(
 
     for page in out.pages:
         for annot in page.get(Annots, []):  # noqa
-            annot = cast("DictionaryObject", annot.get_object())
+            annot = cast(DictionaryObject, annot.get_object())
             key = get_widget_key(annot.get_object())
 
             widget = widgets.get(key)

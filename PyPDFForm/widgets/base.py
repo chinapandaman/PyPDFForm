@@ -5,6 +5,7 @@ from io import BytesIO
 from typing import List, cast
 
 from pypdf import PdfReader, PdfWriter
+from pypdf.generic import DictionaryObject
 from reportlab.lib.colors import Color
 from reportlab.pdfgen.canvas import Canvas
 
@@ -99,7 +100,7 @@ def handle_non_acro_form_params(pdf: bytes, key: str, params: list) -> bytes:
 
     for page in out.pages:
         for annot in page.get(Annots, []):  # noqa
-            annot = cast("DictionaryObject", annot.get_object())
+            annot = cast(DictionaryObject, annot.get_object())
             _key = get_widget_key(annot.get_object())
 
             if _key == key:
