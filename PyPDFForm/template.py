@@ -7,7 +7,6 @@ from sys import maxsize
 from typing import Dict, List, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
@@ -426,7 +425,7 @@ def update_widget_key(
 
     for page in out.pages:
         for annot in page.get(Annots, []):  # noqa
-            annot = cast(DictionaryObject, annot.get_object())
+            annot = cast("DictionaryObject", annot.get_object())
             key = get_widget_key(annot.get_object())
 
             widget = widgets.get(key)
