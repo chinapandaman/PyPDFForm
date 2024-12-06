@@ -242,13 +242,7 @@ class PdfWrapper(FormWrapper):
         """Updates the key of an existed widget on a PDF form."""
 
         if defer:
-            self._keys_to_update.append(
-                (
-                    old_key,
-                    new_key,
-                    index
-                )
-            )
+            self._keys_to_update.append((old_key, new_key, index))
             return self
 
         self.__init__(

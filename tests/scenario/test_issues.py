@@ -258,7 +258,9 @@ def test_bulk_update_key(issue_pdf_directory, request):
         obj.update_widget_key("Description[0]", f"Description[{i}]", 1, defer=True)
         obj.update_widget_key("symbol[0]", f"symbol[{i}]", 1, defer=True)
         obj.update_widget_key("tradedate[0]", f"tradedate[{i}]", 1, defer=True)
-        obj.update_widget_key("settlementdate[0]", f"settlementdate[{i}]", 1, defer=True)
+        obj.update_widget_key(
+            "settlementdate[0]", f"settlementdate[{i}]", 1, defer=True
+        )
         obj.update_widget_key("quantity[0]", f"quantity[{i}]", 1, defer=True)
         obj.update_widget_key("costperunit[0]", f"costperunit[{i}]", 1, defer=True)
         obj.update_widget_key("costabasis[0]", f"costabasis[{i}]", 1, defer=True)
