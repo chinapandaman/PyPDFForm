@@ -129,7 +129,7 @@ with open("output.pdf", "wb+") as output:
     output.write(new_form.read())
 ```
 
-If there is more than one widget with the same key, the third `index` parameter can be used to pick which one 
+If there is more than one widget with the same key, the optional parameter `index` can be used to pick which one 
 to update. Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf), 
 the below snippet will change the key of the second row's text field with the key `Description[0]` to `Description[1]`:
 
@@ -139,6 +139,30 @@ from PyPDFForm import PdfWrapper
 new_form = PdfWrapper("733.pdf").update_widget_key(
     "Description[0]", "Description[1]", index=1
 )
+
+with open("output.pdf", "wb+") as output:
+    output.write(new_form.read())
+```
+
+Finally, if there are multiple widgets that need to be bulk updated, the performance optimal way of doing it is to set 
+the optional parameter `defer` to `True` when updating each key and at the very end call `commit_widget_key_updates()` 
+to commit all the updates.
+
+Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf), 
+the below snippet will change the key of each row's text field with the key `Description[0]` to `Description[i]` 
+where `i` is the index of each row:
+
+```python
+from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper("733.pdf")
+
+for i in range(1, 10):
+    new_form.update_widget_key(
+        "Description[0]", f"Description[{i}]", index=1, defer=True
+    )
+
+new_form.commit_widget_key_updates()
 
 with open("output.pdf", "wb+") as output:
     output.write(new_form.read())
