@@ -408,14 +408,14 @@ def get_paragraph_auto_wrap_length(widget_middleware: Text) -> int:
     return result
 
 
-def update_widget_key(
+def update_widget_keys(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
     old_keys: List[str],
     new_keys: List[str],
     indices: List[int],
 ) -> bytes:
-    """Updates the key of a widget."""
+    """Updates a list of keys of widgets."""
     # pylint: disable=R0801
 
     pdf = PdfReader(stream_to_io(template))
