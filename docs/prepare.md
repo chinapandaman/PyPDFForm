@@ -145,8 +145,8 @@ with open("output.pdf", "wb+") as output:
 ```
 
 Finally, if there are multiple widgets that need to be bulk updated, the performance optimal way of doing it is to set 
-the optional parameter `defer` to `True` when updating each key and at the very end call `commit_widget_key_updates` to 
-commit all the updates.
+the optional parameter `defer` to `True` when updating each key and at the very end call `commit_widget_key_updates()` 
+to commit all the updates.
 
 Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf), 
 the below snippet will change the key of each row's text field with the key `Description[0]` to `Description[i]` 
