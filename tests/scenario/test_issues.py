@@ -263,7 +263,7 @@ def test_bulk_update_key(issue_pdf_directory, request):
         obj.update_widget_key("costperunit[0]", f"costperunit[{i}]", 1, defer=True)
         obj.update_widget_key("costabasis[0]", f"costabasis[{i}]", 1, defer=True)
 
-    obj.bulk_update_widget_keys()
+    obj.commit_widget_key_updates()
 
     expected_path = os.path.join(issue_pdf_directory, "733_expected.pdf")
     request.config.results["expected_path"] = expected_path

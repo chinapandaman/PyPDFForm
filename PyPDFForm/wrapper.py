@@ -262,8 +262,8 @@ class PdfWrapper(FormWrapper):
 
         return self
 
-    def bulk_update_widget_keys(self) -> PdfWrapper:
-        """Bulk updates all deferred keys of widgets on a PDF form."""
+    def commit_widget_key_updates(self) -> PdfWrapper:
+        """Commits all deferred widget key updates on a PDF form."""
 
         old_keys = [each[0] for each in self._keys_to_update]
         new_keys = [each[1] for each in self._keys_to_update]
