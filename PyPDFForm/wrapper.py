@@ -80,6 +80,7 @@ class PdfWrapper(FormWrapper):
 
         super().__init__(template)
         self.widgets = build_widgets(self.stream) if self.stream else {}
+        self._keys_to_update = []
 
         self.global_font = kwargs.get("global_font")
         self.global_font_size = kwargs.get("global_font_size")
@@ -236,13 +237,41 @@ class PdfWrapper(FormWrapper):
         return self
 
     def update_widget_key(
-        self, old_key: str, new_key: str, index: int = 0
+        self, old_key: str, new_key: str, index: int = 0, defer: bool = False
     ) -> PdfWrapper:
         """Updates the key of an existed widget on a PDF form."""
 
+        if defer:
+            self._keys_to_update.append(
+                (
+                    old_key,
+                    new_key,
+                    index
+                )
+            )
+            return self
+
         self.__init__(
             template=update_widget_key(
-                self.read(), self.widgets, old_key, new_key, index
+                self.read(), self.widgets, [old_key], [new_key], [index]
+            ),
+            global_font=self.global_font,
+            global_font_size=self.global_font_size,
+            global_font_color=self.global_font_color,
+        )
+
+        return self
+
+    def bulk_update_widget_keys(self) -> PdfWrapper:
+        """Bulk updates all deferred keys of widgets on a PDF form."""
+
+        old_keys = [each[0] for each in self._keys_to_update]
+        new_keys = [each[1] for each in self._keys_to_update]
+        indices = [each[2] for each in self._keys_to_update]
+
+        self.__init__(
+            template=update_widget_key(
+                self.read(), self.widgets, old_keys, new_keys, indices
             ),
             global_font=self.global_font,
             global_font_size=self.global_font_size,

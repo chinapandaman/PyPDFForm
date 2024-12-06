@@ -411,9 +411,9 @@ def get_paragraph_auto_wrap_length(widget_middleware: Text) -> int:
 def update_widget_key(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
-    old_key: str,
-    new_key: str,
-    index: int,
+    old_keys: List[str],
+    new_keys: List[str],
+    indices: List[int],
 ) -> bytes:
     """Updates the key of a widget."""
     # pylint: disable=R0801
@@ -422,25 +422,27 @@ def update_widget_key(
     out = PdfWriter()
     out.append(pdf)
 
-    tracker = -1
+    for i, old_key in enumerate(old_keys):
+        index = indices[i]
+        new_key = new_keys[i]
+        tracker = -1
+        for page in out.pages:
+            for annot in page.get(Annots, []):  # noqa
+                annot = cast(DictionaryObject, annot.get_object())
+                key = get_widget_key(annot.get_object())
 
-    for page in out.pages:
-        for annot in page.get(Annots, []):  # noqa
-            annot = cast(DictionaryObject, annot.get_object())
-            key = get_widget_key(annot.get_object())
+                widget = widgets.get(key)
+                if widget is None:
+                    continue
 
-            widget = widgets.get(key)
-            if widget is None:
-                continue
+                if old_key != key:
+                    continue
 
-            if old_key != key:
-                continue
+                tracker += 1
+                if not isinstance(widget, Radio) and tracker != index:
+                    continue
 
-            tracker += 1
-            if not isinstance(widget, Radio) and tracker != index:
-                continue
-
-            update_annotation_name(annot, new_key)
+                update_annotation_name(annot, new_key)
 
     with BytesIO() as f:
         out.write(f)
