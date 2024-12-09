@@ -1,7 +1,6 @@
 name: Nightly Build
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: "00 00 * * *"
 
@@ -11,29 +10,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Checkout latest tag
-        run: |
-          echo checking out $(git describe --tags)
-          git checkout $(git describe --tags)
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Remove necessary directories
-        run: |
-          rm -rf PyPDFForm
-          rm -rf pdf_samples
-      - name: Re-checkout latest samples
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            pdf_samples
       - name: Set up environment
         run: |
+          rm -rf PyPDFForm
           python -m pip install --upgrade pip
           pip install PyPDFForm
           pip install -r requirements.txt
-          ls
       - name: Run nightly tests
         run: |
           pytest
