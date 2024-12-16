@@ -88,7 +88,7 @@ class PdfWrapper(FormWrapper):
 
         self._init_helper()
 
-    def _init_helper(self, key_to_update: str = None) -> None:
+    def _init_helper(self, key_to_refresh: str = None) -> None:
         """Updates all attributes when the state of the PDF stream changes."""
 
         new_widgets = build_widgets(self.read()) if self.read() else {}
@@ -98,8 +98,8 @@ class PdfWrapper(FormWrapper):
         self.widgets = new_widgets
 
         for key, value in self.widgets.items():
-            if (key_to_update and key == key_to_update) or (
-                key_to_update is None and isinstance(value, Text)
+            if (key_to_refresh and key == key_to_refresh) or (
+                key_to_refresh is None and isinstance(value, Text)
             ):
                 value.font = self.global_font
                 value.font_size = self.global_font_size
@@ -237,11 +237,11 @@ class PdfWrapper(FormWrapper):
                 self.stream, name, obj.non_acro_form_params
             )
 
-        key_to_update = ""
+        key_to_refresh = ""
         if widget_type in ("text", "dropdown"):
-            key_to_update = name
+            key_to_refresh = name
 
-        self._init_helper(key_to_update)
+        self._init_helper(key_to_refresh)
 
         return self
 
