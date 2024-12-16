@@ -79,18 +79,31 @@ class PdfWrapper(FormWrapper):
         """Constructs all attributes for the object."""
 
         super().__init__(template)
-        self.widgets = build_widgets(self.stream) if self.stream else {}
+        self.widgets = {}
         self._keys_to_update = []
 
         self.global_font = kwargs.get("global_font")
         self.global_font_size = kwargs.get("global_font_size")
         self.global_font_color = kwargs.get("global_font_color")
 
-        for each in self.widgets.values():
-            if isinstance(each, Text):
-                each.font = self.global_font
-                each.font_size = self.global_font_size
-                each.font_color = self.global_font_color
+        self._init_helper()
+
+    def _init_helper(self, key_to_refresh: str = None) -> None:
+        """Updates all attributes when the state of the PDF stream changes."""
+
+        new_widgets = build_widgets(self.read()) if self.read() else {}
+        for k, v in self.widgets.items():
+            if k in new_widgets:
+                new_widgets[k] = v
+        self.widgets = new_widgets
+
+        for key, value in self.widgets.items():
+            if (key_to_refresh and key == key_to_refresh) or (
+                key_to_refresh is None and isinstance(value, Text)
+            ):
+                value.font = self.global_font
+                value.font_size = self.global_font_size
+                value.font_color = self.global_font_color
 
     @property
     def sample_data(self) -> dict:
@@ -224,15 +237,11 @@ class PdfWrapper(FormWrapper):
                 self.stream, name, obj.non_acro_form_params
             )
 
-        new_widgets = build_widgets(self.read())
-        for k, v in self.widgets.items():
-            if k in new_widgets:
-                new_widgets[k] = v
-        self.widgets = new_widgets
+        key_to_refresh = ""
         if widget_type in ("text", "dropdown"):
-            self.widgets[name].font = self.global_font
-            self.widgets[name].font_size = self.global_font_size
-            self.widgets[name].font_color = self.global_font_color
+            key_to_refresh = name
+
+        self._init_helper(key_to_refresh)
 
         return self
 
@@ -245,14 +254,10 @@ class PdfWrapper(FormWrapper):
             self._keys_to_update.append((old_key, new_key, index))
             return self
 
-        self.__init__(
-            template=update_widget_keys(
-                self.read(), self.widgets, [old_key], [new_key], [index]
-            ),
-            global_font=self.global_font,
-            global_font_size=self.global_font_size,
-            global_font_color=self.global_font_color,
+        self.stream = update_widget_keys(
+            self.read(), self.widgets, [old_key], [new_key], [index]
         )
+        self._init_helper()
 
         return self
 
@@ -263,14 +268,10 @@ class PdfWrapper(FormWrapper):
         new_keys = [each[1] for each in self._keys_to_update]
         indices = [each[2] for each in self._keys_to_update]
 
-        self.__init__(
-            template=update_widget_keys(
-                self.read(), self.widgets, old_keys, new_keys, indices
-            ),
-            global_font=self.global_font,
-            global_font_size=self.global_font_size,
-            global_font_color=self.global_font_color,
+        self.stream = update_widget_keys(
+            self.read(), self.widgets, old_keys, new_keys, indices
         )
+        self._init_helper()
 
         return self
 
