@@ -91,15 +91,19 @@ class PdfWrapper(FormWrapper):
     def _init_helper(self, key_to_refresh: str = None) -> None:
         """Updates all attributes when the state of the PDF stream changes."""
 
+        refresh_not_needed = {}
         new_widgets = build_widgets(self.read()) if self.read() else {}
         for k, v in self.widgets.items():
             if k in new_widgets:
                 new_widgets[k] = v
+                refresh_not_needed[k] = True
         self.widgets = new_widgets
 
         for key, value in self.widgets.items():
             if (key_to_refresh and key == key_to_refresh) or (
-                key_to_refresh is None and isinstance(value, Text)
+                key_to_refresh is None
+                and isinstance(value, Text)
+                and not refresh_not_needed.get(key)
             ):
                 value.font = self.global_font
                 value.font_size = self.global_font_size
@@ -272,6 +276,7 @@ class PdfWrapper(FormWrapper):
             self.read(), self.widgets, old_keys, new_keys, indices
         )
         self._init_helper()
+        self._keys_to_update = []
 
         return self
 
