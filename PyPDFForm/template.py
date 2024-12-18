@@ -50,9 +50,7 @@ def build_widgets(pdf_stream: bytes) -> Dict[str, WIDGET_TYPES]:
 
     for widgets in get_widgets_by_page(pdf_stream).values():
         for widget in widgets:
-            # widget has it
             key = get_widget_key(widget)
-            #Gone here
             _widget = construct_widget(widget, key)
             if _widget is not None:
                 if isinstance(_widget, Text):
@@ -102,19 +100,6 @@ def widget_rect_watermarks(pdf: bytes) -> List[bytes]:
     return watermarks
 
 
-# def dropdown_to_text(dropdown: Dropdown) -> Text:
-#     """Converts a dropdown widget to a text widget."""
-
-#     result = Text(dropdown.name)
-
-#     if dropdown.value is not None:
-#         result.value = (
-#             dropdown.choices[dropdown.value]
-#             if dropdown.value < len(dropdown.choices)
-#             else ""
-#         )
-
-#     return result
 def dropdown_to_text(dropdown: Dropdown) -> Text:
     """Converts a dropdown widget to a text widget."""
 
@@ -122,10 +107,13 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
 
     if dropdown.value is not None:
         result.value = (
-            dropdown.value
+            dropdown.choices[dropdown.value]
+            if dropdown.value < len(dropdown.choices)
+            else ""
         )
 
     return result
+
 
 def update_text_field_attributes(
     template_stream: bytes,
