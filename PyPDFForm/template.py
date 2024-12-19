@@ -225,7 +225,7 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
 
 def get_widget_description(widget: dict) -> Union[str, None]:
     """Returns the description of the widget if presented or None."""
-    
+
     return widget.get(TU)
 
 
