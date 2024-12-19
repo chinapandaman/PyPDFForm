@@ -17,12 +17,12 @@ class Text(Widget):
         """Constructs all attributes for the text field."""
 
         super().__init__(name, value)
+
         self.font = None
         self.font_size = None
         self.font_color = None
         self.text_wrap_length = None
         self.max_length = None
-        self.desc = None
         self.comb = None
         self.character_paddings = []
         self.text_lines = None
@@ -49,12 +49,11 @@ class Text(Widget):
         """Json schema definition of the text field."""
 
         result = {"type": "string"}
+
         if self.max_length is not None:
             result["maxLength"] = self.max_length
-        if self.desc is not None:
-            result["description"] = self.desc
 
-        return result
+        return {**result, **super().schema_definition}
 
     @property
     def sample_value(self) -> str:

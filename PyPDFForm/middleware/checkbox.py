@@ -26,15 +26,12 @@ class Checkbox(Widget):
 
         self.size = None
         self._button_style = None
-        self.desc=None
 
     @property
     def schema_definition(self) -> dict:
         """Json schema definition of the checkbox."""
-        result={"type": "boolean"}
-        if self.desc is not None:
-            result["description"] = self.desc
-        return result
+
+        return {**{"type": "boolean"}, **super().schema_definition}
 
     @property
     def sample_value(self) -> Union[bool, int]:

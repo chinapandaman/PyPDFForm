@@ -17,6 +17,7 @@ class Widget:
         super().__init__()
         self._name = name
         self._value = value
+        self.desc = None
 
     @property
     def name(self) -> str:
@@ -40,7 +41,12 @@ class Widget:
     def schema_definition(self) -> dict:
         """Json schema definition of the widget."""
 
-        raise NotImplementedError
+        result = {}
+
+        if self.desc is not None:
+            result["description"] = self.desc
+
+        return result
 
     @property
     def sample_value(self) -> Any:

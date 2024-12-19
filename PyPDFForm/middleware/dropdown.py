@@ -22,10 +22,9 @@ class Dropdown(Widget):
     @property
     def schema_definition(self) -> dict:
         """Json schema definition of the dropdown."""
-        result = {"type": "integer", "maximum": len(self.choices) - 1}
-        if self.desc is not None:
-            result["description"] = self.desc
-        return result
+
+        return {**{"type": "integer", "maximum": len(self.choices) - 1},
+                **super().schema_definition}
 
     @property
     def sample_value(self) -> int:
