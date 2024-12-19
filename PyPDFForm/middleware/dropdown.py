@@ -17,12 +17,14 @@ class Dropdown(Widget):
         super().__init__(name, value)
 
         self.choices = []
+        self.desc = None
 
     @property
     def schema_definition(self) -> dict:
         """Json schema definition of the dropdown."""
 
-        return {"type": "integer", "maximum": len(self.choices) - 1}
+        return {"type": "integer", "maximum": len(self.choices) - 1,
+                **super().schema_definition}
 
     @property
     def sample_value(self) -> int:

@@ -10,11 +10,7 @@ from PyPDFForm.middleware.text import Text
 
 
 def test_base_schema_definition():
-    try:
-        assert Widget("foo").schema_definition
-        raise AssertionError
-    except NotImplementedError:
-        pass
+    assert Widget("foo").schema_definition == {}
 
 
 def test_fill(template_stream, pdf_samples, data_dict, request):

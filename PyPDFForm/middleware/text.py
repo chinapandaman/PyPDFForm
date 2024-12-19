@@ -53,7 +53,7 @@ class Text(Widget):
         if self.max_length is not None:
             result["maxLength"] = self.max_length
 
-        return result
+        return {**result, **super().schema_definition}
 
     @property
     def sample_value(self) -> str:
