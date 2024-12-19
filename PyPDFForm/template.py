@@ -53,19 +53,17 @@ def build_widgets(pdf_stream: bytes) -> Dict[str, WIDGET_TYPES]:
             key = get_widget_key(widget)
             _widget = construct_widget(widget, key)
             if _widget is not None:
+                _widget.desc = get_widget_description(widget)
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
-                    _widget.desc = get_widget_description(widget)
                     if _widget.max_length is not None and is_text_field_comb(widget):
                         _widget.comb = True
 
                 if isinstance(_widget, (Checkbox, Radio)):
                     _widget.button_style = get_button_style(widget)
-                    _widget.desc = get_widget_description(widget)
 
                 if isinstance(_widget, Dropdown):
                     _widget.choices = get_dropdown_choices(widget)
-                    _widget.desc = get_widget_description(widget)
 
                 if isinstance(_widget, Radio):
                     if key not in results:
@@ -224,10 +222,12 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
 
     return int(widget[MaxLen]) or None if MaxLen in widget else None
 
+
 def get_widget_description(widget: dict) -> Union[str, None]:
     """Returns the description of the widget if presented or None."""
     
-    return widget.get(TU,None)
+    return widget.get(TU)
+
 
 def check_field_flag_bit(widget: dict, bit: int) -> bool:
     """Checks if a bit is set in a widget's field flag."""
