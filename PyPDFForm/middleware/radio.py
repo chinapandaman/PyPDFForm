@@ -22,7 +22,10 @@ class Radio(Checkbox):
     def schema_definition(self) -> dict:
         """Json schema definition of the radiobutton."""
 
-        return {"type": "integer", "maximum": self.number_of_options - 1}
+        result = {"maximum": self.number_of_options - 1, **super().schema_definition}
+        result["type"] = "integer"
+
+        return result
 
     @property
     def sample_value(self) -> int:
