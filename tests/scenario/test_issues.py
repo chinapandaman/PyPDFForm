@@ -333,4 +333,4 @@ def test_get_desc_in_schema_radio(issue_pdf_directory):
             key = get_widget_key(widget)
 
             if key in keys_to_check:
-                assert widget[Parent][TU] == obj.schema["properties"][key]["description"]   # noqa
+                assert widget[Parent][TU] == obj.schema["properties"][key]["description"]
