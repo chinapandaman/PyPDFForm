@@ -21,8 +21,8 @@ from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
-                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
-                       update_annotation_name)
+                       WIDGET_DESCRIPTION_PATTERNS, WIDGET_KEY_PATTERNS,
+                       WIDGET_TYPE_PATTERNS, update_annotation_name)
 from .utils import find_pattern_match, stream_to_io, traverse_pattern
 from .watermark import create_watermarks_and_draw
 

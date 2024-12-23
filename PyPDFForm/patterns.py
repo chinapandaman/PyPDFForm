@@ -5,8 +5,8 @@ from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
                            TextStringObject)
 
 from .constants import (AP, AS, CA, DA, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, MK,
-                        MULTILINE, READ_ONLY, A, Btn, Ch, Ff, N, Off, Opt,
-                        Parent, Q, Sig, T, Tx, TU, V, Yes)
+                        MULTILINE, READ_ONLY, TU, A, Btn, Ch, Ff, N, Off, Opt,
+                        Parent, Q, Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -68,10 +68,7 @@ WIDGET_KEY_PATTERNS = [
     {Parent: {T: True}},
 ]
 
-WIDGET_DESCRIPTION_PATTERNS = [
-    {TU: True},
-    {Parent: {TU: True}}
-]
+WIDGET_DESCRIPTION_PATTERNS = [{TU: True}, {Parent: {TU: True}}]
 
 DROPDOWN_CHOICE_PATTERNS = [
     {Opt: True},
