@@ -308,16 +308,16 @@ def test_get_desc_in_schema(issue_pdf_directory):
 
     assert (
         obj.schema["properties"]["P1_checkbox4[0]"]["description"]
-        == "Part 1. Information About You. Your Full Name. 4. Has your name legally changed since the issuance of your Permanent Resident Card? Select Yes. (Proceed to Item Numbers 5. A. through 5. C.)."
-    )  # noqa
+        == "Part 1. Information About You. Your Full Name. 4. Has your name legally changed since the issuance of your Permanent Resident Card? Select Yes. (Proceed to Item Numbers 5. A. through 5. C.)." # noqa
+    )
     assert (
         obj.schema["properties"]["P1_checkbox4[1]"]["description"]
-        == "Part 1. Information About You. Your Full Name. 4. Has your name legally changed since the issuance of your Permanent Resident Card? Select No (Proceed to Item Numbers 6. A. through 6. I.)."
-    )  # noqa
+        == "Part 1. Information About You. Your Full Name. 4. Has your name legally changed since the issuance of your Permanent Resident Card? Select No (Proceed to Item Numbers 6. A. through 6. I.)."   # noqa
+    )
     assert (
         obj.schema["properties"]["P1_checkbox4[2]"]["description"]
-        == "Part 1. Information About You. Your Full Name. 4. Has your name legally changed since the issuance of your Permanent Resident Card? Select Not Applicable - I never received my previous card. (Proceed to Item Numbers 6. A. through 6. I.)."
-    )  # noqa
+        == "Part 1. Information About You. Your Full Name. 4. Has your name legally changed since the issuance of your Permanent Resident Card? Select Not Applicable - I never received my previous card. (Proceed to Item Numbers 6. A. through 6. I.)."  # noqa
+    )
 
 
 def test_get_desc_in_schema_radio(issue_pdf_directory):
