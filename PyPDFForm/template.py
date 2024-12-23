@@ -11,7 +11,7 @@ from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
-                        TU, WIDGET_TYPES, Annots, MaxLen, Rect)
+                        WIDGET_TYPES, Annots, MaxLen, Rect)
 from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
                    auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
@@ -21,7 +21,7 @@ from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
-                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
+                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
                        update_annotation_name)
 from .utils import find_pattern_match, stream_to_io, traverse_pattern
 from .watermark import create_watermarks_and_draw
@@ -226,7 +226,13 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
 def get_widget_description(widget: dict) -> Union[str, None]:
     """Returns the description of the widget if presented or None."""
 
-    return widget.get(TU)
+    result = None
+    for pattern in WIDGET_DESCRIPTION_PATTERNS:
+        value = traverse_pattern(pattern, widget)
+        if value:
+            result = str(value)
+            break
+    return result
 
 
 def check_field_flag_bit(widget: dict, bit: int) -> bool:
