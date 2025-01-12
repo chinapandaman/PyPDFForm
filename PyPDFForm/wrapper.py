@@ -256,6 +256,9 @@ class PdfWrapper(FormWrapper):
     ) -> PdfWrapper:
         """Updates the key of an existed widget on a PDF form."""
 
+        if self.use_full_widget_name:
+            raise NotImplementedError
+
         if defer:
             self._keys_to_update.append((old_key, new_key, index))
             return self
@@ -269,6 +272,9 @@ class PdfWrapper(FormWrapper):
 
     def commit_widget_key_updates(self) -> PdfWrapper:
         """Commits all deferred widget key updates on a PDF form."""
+
+        if self.use_full_widget_name:
+            raise NotImplementedError
 
         old_keys = [each[0] for each in self._keys_to_update]
         new_keys = [each[1] for each in self._keys_to_update]
