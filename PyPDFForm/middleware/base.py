@@ -16,6 +16,7 @@ class Widget:
 
         super().__init__()
         self._name = name
+        self.full_name = None
         self._value = value
         self.desc = None
 

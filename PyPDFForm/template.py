@@ -11,7 +11,7 @@ from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
-                        WIDGET_TYPES, Annots, MaxLen, Rect)
+                        WIDGET_TYPES, Annots, MaxLen, Rect, Parent, T)
 from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
                    auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
@@ -43,7 +43,7 @@ def set_character_x_paddings(
     return widgets
 
 
-def build_widgets(pdf_stream: bytes) -> Dict[str, WIDGET_TYPES]:
+def build_widgets(pdf_stream: bytes, use_full_widget_name: bool) -> Dict[str, WIDGET_TYPES]:
     """Builds a widget dict given a PDF form stream."""
 
     results = {}
@@ -53,6 +53,7 @@ def build_widgets(pdf_stream: bytes) -> Dict[str, WIDGET_TYPES]:
             key = get_widget_key(widget)
             _widget = construct_widget(widget, key)
             if _widget is not None:
+                _widget.full_name = get_widget_full_key(widget)
                 _widget.desc = get_widget_description(widget)
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
@@ -73,6 +74,8 @@ def build_widgets(pdf_stream: bytes) -> Dict[str, WIDGET_TYPES]:
                     continue
 
                 results[key] = _widget
+                if _widget.full_name is not None and use_full_widget_name:
+                    results[_widget.full_name] = results[key]
     return results
 
 
@@ -188,6 +191,20 @@ def get_widget_key(widget: dict) -> Union[str, list, None]:
             result = value
             break
     return result
+
+
+def get_widget_full_key(widget: dict) -> Union[str, None]:
+    """
+    Returns a PDF widget's full annotated key by prepending its
+    parent widget's key.
+    """
+
+    key = get_widget_key(widget)
+
+    if Parent in widget and T in widget[Parent].get_object() and widget[Parent][T] != key:
+        return f"{widget[Parent][T]}.{key}"
+
+    return None
 
 
 def get_widget_alignment(widget: dict) -> Union[str, list, None]:
