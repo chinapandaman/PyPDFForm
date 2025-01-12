@@ -86,7 +86,7 @@ class PdfWrapper(FormWrapper):
         self.global_font_size = kwargs.get("global_font_size")
         self.global_font_color = kwargs.get("global_font_color")
 
-        self.use_full_widget_name = kwargs.get("use_full_widget_name")
+        self.use_full_widget_name = kwargs.get("use_full_widget_name", False)
 
         self._init_helper()
 
