@@ -52,7 +52,7 @@ class FormWrapper:
     ) -> FormWrapper:
         """Fills a PDF form."""
 
-        widgets = build_widgets(self.stream) if self.stream else {}
+        widgets = build_widgets(self.stream, False) if self.stream else {}
 
         for key, value in data.items():
             if key in widgets:
@@ -86,13 +86,15 @@ class PdfWrapper(FormWrapper):
         self.global_font_size = kwargs.get("global_font_size")
         self.global_font_color = kwargs.get("global_font_color")
 
+        self.use_full_widget_name = kwargs.get("use_full_widget_name", False)
+
         self._init_helper()
 
     def _init_helper(self, key_to_refresh: str = None) -> None:
         """Updates all attributes when the state of the PDF stream changes."""
 
         refresh_not_needed = {}
-        new_widgets = build_widgets(self.read()) if self.read() else {}
+        new_widgets = build_widgets(self.read(), self.use_full_widget_name) if self.read() else {}
         for k, v in self.widgets.items():
             if k in new_widgets:
                 new_widgets[k] = v
@@ -254,6 +256,9 @@ class PdfWrapper(FormWrapper):
     ) -> PdfWrapper:
         """Updates the key of an existed widget on a PDF form."""
 
+        if self.use_full_widget_name:
+            raise NotImplementedError
+
         if defer:
             self._keys_to_update.append((old_key, new_key, index))
             return self
@@ -267,6 +272,9 @@ class PdfWrapper(FormWrapper):
 
     def commit_widget_key_updates(self) -> PdfWrapper:
         """Commits all deferred widget key updates on a PDF form."""
+
+        if self.use_full_widget_name:
+            raise NotImplementedError
 
         old_keys = [each[0] for each in self._keys_to_update]
         new_keys = [each[1] for each in self._keys_to_update]
