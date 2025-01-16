@@ -188,7 +188,6 @@ def sample_template_with_image_field(pdf_samples):
         return f.read()
 
 
-
 @pytest.fixture
 def sample_template_with_full_key(pdf_samples):
     with open(
