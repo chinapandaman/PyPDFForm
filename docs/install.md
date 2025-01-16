@@ -59,6 +59,25 @@ with open("sample_template.pdf", "rb+") as template:
 This adaptation is universal across all APIs of PyPDFForm. So in later sections of the documentation whenever you see 
 a function parameter that's a file path you can safely switch them for a file object or file stream.
 
+## Use full widget name in PDF wrapper (beta)
+
+**NOTE:** This is a beta feature, meaning it still needs to be tested against more PDF forms and may not work for 
+some of them.
+
+According to section 12.7.3.2 found on page 434 of [the PDF standard](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf), each PDF form widget can have a fully qualified name that is not explicitly defined but can be constructed following the pattern `<parent_widget_name>.<widget_name>`.
+
+PyPDFForm supports accessing widgets through their full names by simply setting the optional parameter `use_full_widget_name` to `True` when a `PdfWrapper` object is instantiated. Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_full_key.pdf):
+
+```python
+from PyPDFForm import PdfWrapper
+
+pdf = PdfWrapper("sample_template_with_full_key.pdf", use_full_widget_name=True)
+```
+
+The checkbox widget on the second page with texts `Gain de 2 classes` has a partial name of `0` and a full name of `Gain de 2 classes.0`. By constructing the object like above, you can access the same checkbox through both the partial name and the full name.
+
+**NOTE:** Because each full widget name involves both the widget itself and its parent widget, the methods `update_widget_key` and `commit_widget_key_updates` are disabled and will raise a `NotImplementedError` when invoked through an object that uses full widget names.
+
 ## Write to a file
 
 Lastly, `PdfWrapper` also implements itself similar to an open file object. So you can write the PDF it holds to another 
