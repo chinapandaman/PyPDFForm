@@ -11,7 +11,7 @@ from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
-                        WIDGET_TYPES, Annots, MaxLen, Rect, Parent, T)
+                        WIDGET_TYPES, Annots, MaxLen, Parent, Rect, T)
 from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
                    auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
@@ -43,7 +43,9 @@ def set_character_x_paddings(
     return widgets
 
 
-def build_widgets(pdf_stream: bytes, use_full_widget_name: bool) -> Dict[str, WIDGET_TYPES]:
+def build_widgets(
+    pdf_stream: bytes, use_full_widget_name: bool
+) -> Dict[str, WIDGET_TYPES]:
     """Builds a widget dict given a PDF form stream."""
 
     results = {}
@@ -201,7 +203,11 @@ def get_widget_full_key(widget: dict) -> Union[str, None]:
 
     key = get_widget_key(widget)
 
-    if Parent in widget and T in widget[Parent].get_object() and widget[Parent][T] != key:
+    if (
+        Parent in widget
+        and T in widget[Parent].get_object()
+        and widget[Parent][T] != key
+    ):
         return f"{widget[Parent][T]}.{key}"
 
     return None

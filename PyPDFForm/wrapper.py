@@ -94,7 +94,9 @@ class PdfWrapper(FormWrapper):
         """Updates all attributes when the state of the PDF stream changes."""
 
         refresh_not_needed = {}
-        new_widgets = build_widgets(self.read(), self.use_full_widget_name) if self.read() else {}
+        new_widgets = (
+            build_widgets(self.read(), self.use_full_widget_name) if self.read() else {}
+        )
         for k, v in self.widgets.items():
             if k in new_widgets:
                 new_widgets[k] = v
