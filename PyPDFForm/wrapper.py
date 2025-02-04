@@ -137,7 +137,11 @@ class PdfWrapper(FormWrapper):
     def pages(self) -> List[PdfWrapper]:
         """Returns a list of pdf wrapper objects where each is a page of the PDF form."""
 
-        return [self.__class__(each) for each in get_page_streams(self.stream)]
+        return [self.__class__(each,
+                               **{
+                                   each: getattr(self, each)
+                                   for each in self.USER_PARAMS
+                                   }) for each in get_page_streams(self.stream)]
 
     def change_version(self, version: str) -> PdfWrapper:
         """Changes the version of the PDF."""
