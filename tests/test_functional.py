@@ -516,6 +516,20 @@ def test_pages(template_stream, pdf_samples, request):
         assert obj.pages[0].read() == f.read()
 
 
+def test_pages_inherit_attributes(template_stream):
+    obj = PdfWrapper(template_stream,
+                     global_font="Courier",
+                     global_font_size=20,
+                     global_font_color=(1, 0, 0),
+                     use_full_widget_name=True)
+
+    for page in obj.pages:
+        assert page.global_font == "Courier"
+        assert page.global_font_size == 20
+        assert page.global_font_color == (1, 0, 0)
+        assert page.use_full_widget_name
+
+
 def test_generate_coordinate_grid(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_generate_coordinate_grid.pdf")
     with open(expected_path, "rb+") as f:
