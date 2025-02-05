@@ -517,11 +517,13 @@ def test_pages(template_stream, pdf_samples, request):
 
 
 def test_pages_inherit_attributes(template_stream):
-    obj = PdfWrapper(template_stream,
-                     global_font="Courier",
-                     global_font_size=20,
-                     global_font_color=(1, 0, 0),
-                     use_full_widget_name=True)
+    obj = PdfWrapper(
+        template_stream,
+        global_font="Courier",
+        global_font_size=20,
+        global_font_color=(1, 0, 0),
+        use_full_widget_name=True,
+    )
 
     for page in obj.pages:
         assert getattr(page, "global_font") == "Courier"

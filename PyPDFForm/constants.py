@@ -76,11 +76,11 @@ NEW_LINE_SYMBOL = "\n"
 IMAGE_FIELD_IDENTIFIER = "event.target.buttonImportIcon();"
 
 DEFAULT_CHECKBOX_STYLE = "\u2713"
-DEFAULT_RADIO_STYLE = "\u25CF"
+DEFAULT_RADIO_STYLE = "\u25cf"
 BUTTON_STYLES = {
     "4": "\u2713",  # check
-    "5": "\u00D7",  # cross
-    "l": "\u25CF",  # circle
+    "5": "\u00d7",  # cross
+    "l": "\u25cf",  # circle
 }
 
 COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO = DEFAULT_FONT_SIZE / 100

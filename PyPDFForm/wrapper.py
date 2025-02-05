@@ -72,11 +72,11 @@ class PdfWrapper(FormWrapper):
     """A class to represent a PDF form."""
 
     USER_PARAMS = [
-            "global_font",
-            "global_font_size",
-            "global_font_color",
-            "use_full_widget_name",
-            ]
+        "global_font",
+        "global_font_size",
+        "global_font_color",
+        "use_full_widget_name",
+    ]
 
     def __init__(
         self,
@@ -99,7 +99,9 @@ class PdfWrapper(FormWrapper):
 
         refresh_not_needed = {}
         new_widgets = (
-            build_widgets(self.read(), getattr(self, "use_full_widget_name")) if self.read() else {}
+            build_widgets(self.read(), getattr(self, "use_full_widget_name"))
+            if self.read()
+            else {}
         )
         for k, v in self.widgets.items():
             if k in new_widgets:
@@ -137,11 +139,12 @@ class PdfWrapper(FormWrapper):
     def pages(self) -> List[PdfWrapper]:
         """Returns a list of pdf wrapper objects where each is a page of the PDF form."""
 
-        return [self.__class__(each,
-                               **{
-                                   param: getattr(self, param)
-                                   for param in self.USER_PARAMS
-                                   }) for each in get_page_streams(self.stream)]
+        return [
+            self.__class__(
+                each, **{param: getattr(self, param) for param in self.USER_PARAMS}
+            )
+            for each in get_page_streams(self.stream)
+        ]
 
     def change_version(self, version: str) -> PdfWrapper:
         """Changes the version of the PDF."""
