@@ -31,5 +31,5 @@ select = [
     "YTT",
     "W"
 ]
-ignore = ["E501", "N999", "TC006"]
+ignore = ["B009", "E501", "N999", "TC006"]
 preview = true

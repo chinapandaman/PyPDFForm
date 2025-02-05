@@ -71,6 +71,13 @@ class FormWrapper:
 class PdfWrapper(FormWrapper):
     """A class to represent a PDF form."""
 
+    USER_PARAMS = [
+            "global_font",
+            "global_font_size",
+            "global_font_color",
+            "use_full_widget_name",
+            ]
+
     def __init__(
         self,
         template: Union[bytes, str, BinaryIO] = b"",
@@ -82,11 +89,8 @@ class PdfWrapper(FormWrapper):
         self.widgets = {}
         self._keys_to_update = []
 
-        self.global_font = kwargs.get("global_font")
-        self.global_font_size = kwargs.get("global_font_size")
-        self.global_font_color = kwargs.get("global_font_color")
-
-        self.use_full_widget_name = kwargs.get("use_full_widget_name", False)
+        for each in self.USER_PARAMS:
+            setattr(self, each, kwargs.get(each))
 
         self._init_helper()
 
@@ -95,7 +99,7 @@ class PdfWrapper(FormWrapper):
 
         refresh_not_needed = {}
         new_widgets = (
-            build_widgets(self.read(), self.use_full_widget_name) if self.read() else {}
+            build_widgets(self.read(), getattr(self, "use_full_widget_name")) if self.read() else {}
         )
         for k, v in self.widgets.items():
             if k in new_widgets:
@@ -109,9 +113,9 @@ class PdfWrapper(FormWrapper):
                 and isinstance(value, Text)
                 and not refresh_not_needed.get(key)
             ):
-                value.font = self.global_font
-                value.font_size = self.global_font_size
-                value.font_color = self.global_font_color
+                value.font = getattr(self, "global_font")
+                value.font_size = getattr(self, "global_font_size")
+                value.font_color = getattr(self, "global_font_color")
 
     @property
     def sample_data(self) -> dict:
@@ -133,7 +137,11 @@ class PdfWrapper(FormWrapper):
     def pages(self) -> List[PdfWrapper]:
         """Returns a list of pdf wrapper objects where each is a page of the PDF form."""
 
-        return [self.__class__(each) for each in get_page_streams(self.stream)]
+        return [self.__class__(each,
+                               **{
+                                   param: getattr(self, param)
+                                   for param in self.USER_PARAMS
+                                   }) for each in get_page_streams(self.stream)]
 
     def change_version(self, version: str) -> PdfWrapper:
         """Changes the version of the PDF."""
@@ -258,7 +266,7 @@ class PdfWrapper(FormWrapper):
     ) -> PdfWrapper:
         """Updates the key of an existed widget on a PDF form."""
 
-        if self.use_full_widget_name:
+        if getattr(self, "use_full_widget_name"):
             raise NotImplementedError
 
         if defer:
@@ -275,7 +283,7 @@ class PdfWrapper(FormWrapper):
     def commit_widget_key_updates(self) -> PdfWrapper:
         """Commits all deferred widget key updates on a PDF form."""
 
-        if self.use_full_widget_name:
+        if getattr(self, "use_full_widget_name"):
             raise NotImplementedError
 
         old_keys = [each[0] for each in self._keys_to_update]
