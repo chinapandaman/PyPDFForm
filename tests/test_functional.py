@@ -524,10 +524,10 @@ def test_pages_inherit_attributes(template_stream):
                      use_full_widget_name=True)
 
     for page in obj.pages:
-        assert page.global_font == "Courier"
-        assert page.global_font_size == 20
-        assert page.global_font_color == (1, 0, 0)
-        assert page.use_full_widget_name
+        assert getattr(page, "global_font") == "Courier"
+        assert getattr(page, "global_font_size") == 20
+        assert getattr(page, "global_font_color") == (1, 0, 0)
+        assert getattr(page, "use_full_widget_name")
 
 
 def test_generate_coordinate_grid(template_stream, pdf_samples, request):
