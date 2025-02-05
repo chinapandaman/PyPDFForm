@@ -139,8 +139,8 @@ class PdfWrapper(FormWrapper):
 
         return [self.__class__(each,
                                **{
-                                   each: getattr(self, each)
-                                   for each in self.USER_PARAMS
+                                   param: getattr(self, param)
+                                   for param in self.USER_PARAMS
                                    }) for each in get_page_streams(self.stream)]
 
     def change_version(self, version: str) -> PdfWrapper:
