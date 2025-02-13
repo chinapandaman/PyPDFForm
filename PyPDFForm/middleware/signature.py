@@ -20,7 +20,7 @@ class Signature(Widget):
 
         super().__init__(name, value)
 
-        self.keep_ratio = False
+        self.proportional = False
 
     @property
     def schema_definition(self) -> dict:

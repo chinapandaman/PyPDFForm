@@ -65,7 +65,7 @@ def signature_image_handler(
         image_width, image_height = get_image_dimensions(stream)
         x, y, width, height = get_draw_image_coordinates_resolutions(
             widget,
-            middleware.keep_ratio,
+            middleware.proportional,
             image_width,
             image_height
         )
