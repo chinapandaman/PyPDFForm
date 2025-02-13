@@ -40,7 +40,7 @@ def get_draw_checkbox_radio_coordinates(
 
 def get_draw_image_coordinates_resolutions(
     widget: dict,
-    scale_down_to_ratio: bool,
+    keep_ratio: bool,
     image_width: float,
     image_height: float,
 ) -> Tuple[float, float, float, float]:
@@ -53,13 +53,11 @@ def get_draw_image_coordinates_resolutions(
     width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
     height = abs(float(widget[Rect][1]) - float(widget[Rect][3]))
 
-    if scale_down_to_ratio:
-        x_ratio = image_width / width
-        y_ratio = image_height / height
-        ratio_to_scale_down = max(x_ratio, y_ratio)
+    if keep_ratio:
+        ratio = max(image_width / width, image_height / height)
 
-        new_width = image_width / ratio_to_scale_down
-        new_height = image_height / ratio_to_scale_down
+        new_width = image_width / ratio
+        new_height = image_height / ratio
 
         x += abs(new_width - width) / 2
         y += abs(new_height - height) / 2
