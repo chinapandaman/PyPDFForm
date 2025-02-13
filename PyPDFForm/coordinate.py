@@ -40,7 +40,7 @@ def get_draw_checkbox_radio_coordinates(
 
 def get_draw_image_coordinates_resolutions(
     widget: dict,
-    proportional: bool,
+    preserve_aspect_ratio: bool,
     image_width: float,
     image_height: float,
 ) -> Tuple[float, float, float, float]:
@@ -53,7 +53,7 @@ def get_draw_image_coordinates_resolutions(
     width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
     height = abs(float(widget[Rect][1]) - float(widget[Rect][3]))
 
-    if proportional:
+    if preserve_aspect_ratio:
         ratio = max(image_width / width, image_height / height)
 
         new_width = image_width / ratio
