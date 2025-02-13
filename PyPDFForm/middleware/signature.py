@@ -20,6 +20,8 @@ class Signature(Widget):
 
         super().__init__(name, value)
 
+        self.scale_down_to_ratio = False
+
     @property
     def schema_definition(self) -> dict:
         """Json schema definition of the signature field."""

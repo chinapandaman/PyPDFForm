@@ -28,6 +28,18 @@ def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
     return result
 
 
+def get_image_resolutions(image_stream: bytes) -> tuple:
+    """Gets the width and height of an image."""
+
+    buff = BytesIO()
+    buff.write(image_stream)
+    buff.seek(0)
+
+    image = Image.open(buff)
+
+    return image.size
+
+
 def any_image_to_jpg(image_stream: bytes) -> bytes:
     """Converts an image of any type to jpg."""
 
