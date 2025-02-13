@@ -2,7 +2,7 @@
 """Contains helpers for image."""
 
 from io import BytesIO
-from typing import Union
+from typing import Union, Tuple
 
 from PIL import Image
 
@@ -28,7 +28,7 @@ def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
     return result
 
 
-def get_image_dimensions(image_stream: bytes) -> tuple:
+def get_image_dimensions(image_stream: bytes) -> Tuple[float, float]:
     """Gets the width and height of an image."""
 
     buff = BytesIO()
