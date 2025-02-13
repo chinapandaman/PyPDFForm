@@ -28,7 +28,7 @@ def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
     return result
 
 
-def get_image_resolutions(image_stream: bytes) -> tuple:
+def get_image_dimensions(image_stream: bytes) -> tuple:
     """Gets the width and height of an image."""
 
     buff = BytesIO()
