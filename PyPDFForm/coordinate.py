@@ -40,6 +40,9 @@ def get_draw_checkbox_radio_coordinates(
 
 def get_draw_image_coordinates_resolutions(
     widget: dict,
+    preserve_aspect_ratio: bool,
+    image_width: float,
+    image_height: float,
 ) -> Tuple[float, float, float, float]:
     """
     Returns coordinates and resolutions to draw image at given a PDF form signature/image widget.
@@ -49,6 +52,18 @@ def get_draw_image_coordinates_resolutions(
     y = float(widget[Rect][1])
     width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
     height = abs(float(widget[Rect][1]) - float(widget[Rect][3]))
+
+    if preserve_aspect_ratio:
+        ratio = max(image_width / width, image_height / height)
+
+        new_width = image_width / ratio
+        new_height = image_height / ratio
+
+        x += abs(new_width - width) / 2
+        y += abs(new_height - height) / 2
+
+        width = new_width
+        height = new_height
 
     return x, y, width, height
 

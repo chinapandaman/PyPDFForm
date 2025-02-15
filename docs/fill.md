@@ -93,6 +93,24 @@ with open("output.pdf", "wb+") as output:
 **NOTE:** As described [here](install.md/#create-a-pdf-wrapper), the value of the signature in your dictionary can be 
 a file path shown above, but also an open file object and a file stream that's in `bytes`.
 
+By default, the library preserves the aspect ratio of the signature image when filling it. This can be turned off by setting 
+the `preserve_aspect_ratio` property to `False` on the signature widget:
+
+```python
+from PyPDFForm import PdfWrapper
+
+pdf = PdfWrapper("sample_template_with_signature.pdf")
+pdf.widgets["signature"].preserve_aspect_ratio = False
+pdf.fill(
+    {
+        "signature": "sample_signature.png"
+    },
+)
+
+with open("output.pdf", "wb+") as output:
+    output.write(pdf.read())
+```
+
 ## Fill image widgets (beta)
 
 **NOTE:** This is a beta feature, meaning it still needs to be tested against more PDF forms and may not work for 
@@ -115,4 +133,22 @@ filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
 
 with open("output.pdf", "wb+") as output:
     output.write(filled.read())
+```
+
+Unlike the signature field, the library does NOT preserve the aspect ratio of a regular image by default. It can be turned on by setting 
+the `preserve_aspect_ratio` property to `True` on the image widget:
+
+```python
+from PyPDFForm import PdfWrapper
+
+pdf = PdfWrapper("sample_template_with_image_field.pdf")
+pdf.widgets["image_1"].preserve_aspect_ratio = True
+pdf.fill(
+    {
+        "image_1": "sample_image.jpg"
+    },
+)
+
+with open("output.pdf", "wb+") as output:
+    output.write(pdf.read())
 ```
