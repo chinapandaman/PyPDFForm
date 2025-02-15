@@ -64,10 +64,7 @@ def signature_image_handler(
         stream = any_image_to_jpg(stream)
         image_width, image_height = get_image_dimensions(stream)
         x, y, width, height = get_draw_image_coordinates_resolutions(
-            widget,
-            middleware.preserve_aspect_ratio,
-            image_width,
-            image_height
+            widget, middleware.preserve_aspect_ratio, image_width, image_height
         )
         images_to_draw.append(
             [

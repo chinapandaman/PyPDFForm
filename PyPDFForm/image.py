@@ -2,7 +2,7 @@
 """Contains helpers for image."""
 
 from io import BytesIO
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 from PIL import Image
 

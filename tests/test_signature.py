@@ -61,9 +61,13 @@ def test_fill_signature_overlap(pdf_samples, image_samples, request):
             assert obj.read() == expected
 
 
-def test_fill_signature_overlap_not_preserve_aspect_ratio(pdf_samples, image_samples, request):
+def test_fill_signature_overlap_not_preserve_aspect_ratio(
+    pdf_samples, image_samples, request
+):
     expected_path = os.path.join(
-        pdf_samples, "signature", "test_fill_signature_overlap_not_preserve_aspect_ratio.pdf"
+        pdf_samples,
+        "signature",
+        "test_fill_signature_overlap_not_preserve_aspect_ratio.pdf",
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(
@@ -85,9 +89,7 @@ def test_fill_signature_overlap_not_preserve_aspect_ratio(pdf_samples, image_sam
 
 
 def test_fill_small_icon(pdf_samples, image_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "signature", "test_fill_small_icon.pdf"
-    )
+    expected_path = os.path.join(pdf_samples, "signature", "test_fill_small_icon.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(
             os.path.join(
@@ -151,9 +153,13 @@ def test_fill_vertical_image(pdf_samples, image_samples, request):
             assert obj.read() == expected
 
 
-def test_fill_vertical_image_not_preserve_aspect_ratio(pdf_samples, image_samples, request):
+def test_fill_vertical_image_not_preserve_aspect_ratio(
+    pdf_samples, image_samples, request
+):
     expected_path = os.path.join(
-        pdf_samples, "signature", "test_fill_vertical_image_not_preserve_aspect_ratio.pdf"
+        pdf_samples,
+        "signature",
+        "test_fill_vertical_image_not_preserve_aspect_ratio.pdf",
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(
