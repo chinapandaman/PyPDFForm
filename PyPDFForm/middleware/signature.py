@@ -11,6 +11,8 @@ from .base import Widget
 class Signature(Widget):
     """A class to represent a signature field widget."""
 
+    preserve_aspect_ratio = True
+
     def __init__(
         self,
         name: str,
@@ -19,8 +21,6 @@ class Signature(Widget):
         """Constructs all attributes for the signature field."""
 
         super().__init__(name, value)
-
-        self.preserve_aspect_ratio = True
 
     @property
     def schema_definition(self) -> dict:
