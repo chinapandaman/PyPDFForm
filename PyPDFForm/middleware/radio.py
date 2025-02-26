@@ -7,16 +7,7 @@ from .checkbox import Checkbox
 class Radio(Checkbox):
     """A class to represent a radiobutton widget."""
 
-    def __init__(
-        self,
-        name: str,
-        value: int = None,
-    ) -> None:
-        """Constructs all attributes for the radiobutton."""
-
-        super().__init__(name, value)
-
-        self.number_of_options = 0
+    number_of_options = 0
 
     @property
     def schema_definition(self) -> dict:
