@@ -174,8 +174,10 @@ def test_add_object_id(template_stream):
 
     for page, widgets in get_widgets_by_page(result.read()).items():
         for widget in widgets:
+            assert widget[T] in merged.widgets
             if widget[T] == "test":
                 assert widget[V] == "value-0"
             elif V in widget and "value-" in widget[V]:
                 assert widget[V] == f"value-{page // 3}"
-                assert int(widget[T].split("-")[1]) in ids
+                assert widget[T].split("-")[0] == "test"
+                assert int(widget[T].split("-")[1]) in ids[1:]
