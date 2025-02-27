@@ -161,8 +161,7 @@ def test_add_object_id(template_stream):
 
     for i in range(5):
         obj = PdfWrapper(
-            FormWrapper(template_stream)
-            .fill({"test": f"value-{i}"}).read()
+            FormWrapper(template_stream).fill({"test": f"value-{i}"}).read()
         )
         result += obj
         ids.append(id(obj))
