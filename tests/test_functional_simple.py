@@ -2,7 +2,9 @@
 
 import os
 
-from PyPDFForm import FormWrapper
+from PyPDFForm import FormWrapper, PdfWrapper
+from PyPDFForm.constants import T, V
+from PyPDFForm.template import get_widgets_by_page
 
 
 def test_fill(template_stream, pdf_samples, data_dict, request):
@@ -151,3 +153,31 @@ def test_undo_checkbox(pdf_samples, request):
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_add_object_id(template_stream):
+    result = PdfWrapper()
+    ids = []
+
+    for i in range(5):
+        obj = PdfWrapper(
+            FormWrapper(template_stream)
+            .fill({"test": f"value-{i}"}).read()
+        )
+        result += obj
+        ids.append(id(obj))
+
+    merged = PdfWrapper(result.read())
+
+    for each in ids[1:]:
+        assert f"test-{each}" in merged.widgets
+
+    for page, widgets in get_widgets_by_page(result.read()).items():
+        for widget in widgets:
+            assert widget[T] in merged.widgets
+            if widget[T] == "test":
+                assert widget[V] == "value-0"
+            elif V in widget and "value-" in widget[V]:
+                assert widget[V] == f"value-{page // 3}"
+                assert widget[T].split("-")[0] == "test"
+                assert int(widget[T].split("-")[1]) in ids[1:]

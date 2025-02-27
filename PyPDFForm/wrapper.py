@@ -166,10 +166,13 @@ class PdfWrapper(FormWrapper):
         if not other.stream:
             return self
 
-        new_obj = self.__class__()
-        new_obj.stream = merge_two_pdfs(self.stream, other.stream)
+        for k in self.widgets:
+            if k in other.widgets:
+                other.update_widget_key(k, f"{k}-{id(other)}", defer=True)
 
-        return new_obj
+        other.commit_widget_key_updates()
+
+        return self.__class__(merge_two_pdfs(self.stream, other.stream))
 
     @property
     def preview(self) -> bytes:
