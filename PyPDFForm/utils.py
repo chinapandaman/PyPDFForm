@@ -4,7 +4,7 @@
 from io import BytesIO
 from typing import BinaryIO, List, Union
 from secrets import choice
-from string import ascii_uppercase, digits
+from string import ascii_letters, digits, punctuation
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
@@ -158,4 +158,7 @@ def traverse_pattern(
 def generate_unique_suffix() -> str:
     """Generates a unique suffix string for widgets during form merging."""
 
-    return "".join([choice(ascii_uppercase + digits) for _ in range(UNIQUE_SUFFIX_LENGTH)])
+    return "".join([choice(ascii_letters +
+                           digits +
+                           punctuation.replace("-", ""))
+                    for _ in range(UNIQUE_SUFFIX_LENGTH)])
