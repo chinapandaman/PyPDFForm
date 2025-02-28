@@ -3,7 +3,7 @@
 import os
 
 from PyPDFForm import FormWrapper, PdfWrapper
-from PyPDFForm.constants import T, V, UNIQUE_SUFFIX_LENGTH
+from PyPDFForm.constants import UNIQUE_SUFFIX_LENGTH, T, V
 from PyPDFForm.template import get_widgets_by_page
 
 

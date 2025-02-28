@@ -19,8 +19,8 @@ from .middleware.text import Text
 from .template import (build_widgets, dropdown_to_text,
                        set_character_x_paddings, update_text_field_attributes,
                        update_widget_keys, widget_rect_watermarks)
-from .utils import (get_page_streams, merge_two_pdfs, preview_widget_to_draw,
-                    remove_all_widgets, generate_unique_suffix)
+from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
+                    preview_widget_to_draw, remove_all_widgets)
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 from .widgets.base import handle_non_acro_form_params
 from .widgets.checkbox import CheckBoxWidget

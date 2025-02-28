@@ -2,17 +2,17 @@
 """Contains utility helpers."""
 
 from io import BytesIO
-from typing import BinaryIO, List, Union
 from secrets import choice
 from string import ascii_letters, digits, punctuation
+from typing import BinaryIO, List, Union
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
 from .constants import (BUTTON_STYLES, DEFAULT_CHECKBOX_STYLE, DEFAULT_FONT,
                         DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
-                        DEFAULT_RADIO_STYLE, PREVIEW_FONT_COLOR, WIDGET_TYPES, UNIQUE_SUFFIX_LENGTH
-                        )
+                        DEFAULT_RADIO_STYLE, PREVIEW_FONT_COLOR,
+                        UNIQUE_SUFFIX_LENGTH, WIDGET_TYPES)
 from .middleware.checkbox import Checkbox
 from .middleware.radio import Radio
 from .middleware.text import Text
@@ -158,7 +158,9 @@ def traverse_pattern(
 def generate_unique_suffix() -> str:
     """Generates a unique suffix string for widgets during form merging."""
 
-    return "".join([choice(ascii_letters +
-                           digits +
-                           punctuation.replace("-", ""))
-                    for _ in range(UNIQUE_SUFFIX_LENGTH)])
+    return "".join(
+        [
+            choice(ascii_letters + digits + punctuation.replace("-", ""))
+            for _ in range(UNIQUE_SUFFIX_LENGTH)
+        ]
+    )
