@@ -154,7 +154,8 @@ def traverse_pattern(
             return result
     return None
 
+
 def generate_unique_suffix() -> str:
     """Generates a unique suffix string for widgets during form merging."""
 
-    return ''.join([choice(ascii_uppercase + digits) for _ in range(UNIQUE_SUFFIX_LENGTH)])
+    return "".join([choice(ascii_uppercase + digits) for _ in range(UNIQUE_SUFFIX_LENGTH)])
