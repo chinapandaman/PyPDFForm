@@ -122,6 +122,7 @@ def draw_image(*args) -> None:
         coordinate_y,
         width=width,
         height=height,
+        mask="auto",
     )
 
     image_buff.close()
