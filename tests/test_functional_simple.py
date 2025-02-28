@@ -158,7 +158,7 @@ def test_undo_checkbox(pdf_samples, request):
 def test_merging_unique_suffix(template_stream):
     result = PdfWrapper()
 
-    for i in range(5):
+    for i in range(10):
         obj = PdfWrapper(
             FormWrapper(template_stream).fill({"test": f"value-{i}"}).read()
         )
