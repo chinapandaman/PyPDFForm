@@ -13,7 +13,7 @@ from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
 from .coordinate import generate_coordinate_grid
 from .filler import fill, simple_fill
 from .font import register_font
-from .image import any_image_to_jpg, rotate_image
+from .image import rotate_image
 from .middleware.dropdown import Dropdown
 from .middleware.text import Text
 from .template import (build_widgets, dropdown_to_text,
@@ -354,7 +354,6 @@ class PdfWrapper(FormWrapper):
         """Draws an image on a PDF form."""
 
         image = fp_or_f_obj_or_stream_to_stream(image)
-        image = any_image_to_jpg(image)
         image = rotate_image(image, rotation)
         watermarks = create_watermarks_and_draw(
             self.stream, page_number, "image", [[image, x, y, width, height]]
