@@ -44,7 +44,7 @@ endobj
 endobj
 6 0 obj
 <<
-/Length 400
+/Length 476
 >>
 stream
 q
@@ -61,41 +61,53 @@ BT
 14.4 TL
 ET
 1 0 0 rg
+q
+1 0 0 1 99.5 742.5 cm
 BT
-1 0 0 1 99.5 742.5 Tm
+1 0 0 1 0 0 Tm
 (red) Tj
 T*
 ET
+Q
 BT
 /F1 14 Tf
 16.8 TL
 ET
 0 1 0 rg
+q
+1 0 0 1 100.5 641.8333 cm
 BT
-1 0 0 1 100.5 641.8333 Tm
+1 0 0 1 0 0 Tm
 (green) Tj
 T*
 ET
+Q
 BT
 /F1 16 Tf
 19.2 TL
 ET
 0 0 1 rg
+q
+1 0 0 1 101.5 534.1667 cm
 BT
-1 0 0 1 101.5 534.1667 Tm
+1 0 0 1 0 0 Tm
 (blue) Tj
 T*
 ET
+Q
 BT
 /F1 75.33333 Tf
 90.4 TL
 ET
 0.52941 0.43137 0.35294 rg
+q
+1 0 0 1 101.5 358.3889 cm
 BT
-1 0 0 1 101.5 358.3889 Tm
+1 0 0 1 0 0 Tm
 (mixed) Tj
 T*
 ET
+Q
 Q
 
 
@@ -117,5 +129,5 @@ trailer
 /Info 1 0 R
 >>
 startxref
-908
+984
 %%EOF
