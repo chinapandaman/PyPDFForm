@@ -2,13 +2,29 @@
 """Contains helpers for watermark."""
 
 from io import BytesIO
-from typing import List
+from typing import List, Union
 
 from pypdf import PdfReader, PdfWriter
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
+from reportlab.pdfgen.textobject import PDFTextObject
 
 from .utils import stream_to_io
+
+
+def translate_and_draw_text(canvas: Canvas, text: Union[str, PDFTextObject], x: float, y: float) -> None:
+    """Draws the text on the canvas by centering at the coordinates it should be drawn at."""
+
+    if isinstance(text, str):
+        text_obj = canvas.beginText(0, 0)
+        text_obj.textLine(text)
+    else:
+        text_obj = text
+
+    canvas.saveState()
+    canvas.translate(x, y)
+    canvas.drawText(text_obj)
+    canvas.restoreState()
 
 
 def draw_text(*args) -> None:
@@ -34,19 +50,11 @@ def draw_text(*args) -> None:
 
     if widget.comb is True:
         for i, char in enumerate(text_to_draw):
-            canvas.drawString(
-                coordinate_x + widget.character_paddings[i],
-                coordinate_y,
-                char,
-            )
+            translate_and_draw_text(canvas, char, coordinate_x + widget.character_paddings[i], coordinate_y)
     elif (
         widget.text_wrap_length is None or len(text_to_draw) < widget.text_wrap_length
     ) and widget.text_lines is None:
-        canvas.drawString(
-            coordinate_x,
-            coordinate_y,
-            text_to_draw,
-        )
+        translate_and_draw_text(canvas, text_to_draw, coordinate_x, coordinate_y)
     else:
         text_obj = canvas.beginText(0, 0)
         for i, line in enumerate(widget.text_lines):
@@ -63,13 +71,7 @@ def draw_text(*args) -> None:
                     -1 * (widget.text_line_x_coordinates[i] - coordinate_x), 0
                 )
 
-        canvas.saveState()
-        canvas.translate(
-            coordinate_x,
-            coordinate_y,
-        )
-        canvas.drawText(text_obj)
-        canvas.restoreState()
+        translate_and_draw_text(canvas, text_obj, coordinate_x, coordinate_y)
 
 
 def draw_line(*args) -> None:
