@@ -55,7 +55,8 @@ def build_widgets(
             key = get_widget_key(widget)
             _widget = construct_widget(widget, key)
             if _widget is not None:
-                _widget.full_name = get_widget_full_key(widget)
+                if use_full_widget_name:
+                    _widget.full_name = get_widget_full_key(widget)
                 _widget.desc = get_widget_description(widget)
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
@@ -206,9 +207,9 @@ def get_widget_full_key(widget: dict) -> Union[str, None]:
     if (
         Parent in widget
         and T in widget[Parent].get_object()
-        and widget[Parent][T] != key
+        and widget[Parent].get_object()[T] != key
     ):
-        return f"{widget[Parent][T]}.{key}"
+        return f"{widget[Parent].get_object()[T]}.{key}"
 
     return None
 
