@@ -7,7 +7,7 @@ from typing import Dict, Tuple, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import BooleanObject, DictionaryObject, NameObject
 
-from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root
+from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Rect, Root
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_image_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -113,6 +113,7 @@ def fill(
 
     texts_to_draw = {}
     images_to_draw = {}
+    borders_to_draw = {}
     any_image_to_draw = False
 
     radio_button_tracker = {}
@@ -120,10 +121,20 @@ def fill(
     for page, widget_dicts in get_widgets_by_page(template_stream).items():
         texts_to_draw[page] = []
         images_to_draw[page] = []
+        borders_to_draw[page] = []
         for widget_dict in widget_dicts:
             key = get_widget_key(widget_dict)
             text_needs_to_be_drawn = False
             to_draw = x = y = None
+
+            borders_to_draw[page].append(
+                [
+                    float(widget_dict[Rect][0]),
+                    float(widget_dict[Rect][1]),
+                    abs(float(widget_dict[Rect][0]) - float(widget_dict[Rect][2])),
+                    abs(float(widget_dict[Rect][1]) - float(widget_dict[Rect][3])),
+                ]
+            )
 
             if isinstance(widgets[key], (Checkbox, Radio)):
                 to_draw, x, y, text_needs_to_be_drawn = check_radio_handler(
@@ -155,6 +166,7 @@ def fill(
                 )
 
     result = get_drawn_stream(texts_to_draw, template_stream, "text")
+    result = get_drawn_stream(borders_to_draw, result, "rect")
 
     if any_image_to_draw:
         result = get_drawn_stream(images_to_draw, result, "image")
