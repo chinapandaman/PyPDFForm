@@ -102,6 +102,18 @@ def draw_rect(*args) -> None:
     canvas.rect(x, y, width, height)
 
 
+def draw_ellipse(*args) -> None:
+    """Draws an ellipse on the watermark."""
+
+    canvas = args[0]
+    x1 = args[1]
+    y1 = args[2]
+    x2 = args[3]
+    y2 = args[4]
+
+    canvas.ellipse(x1, y1, x2, y2)
+
+
 def draw_image(*args) -> None:
     """Draws an image on the watermark."""
 
@@ -159,6 +171,9 @@ def create_watermarks_and_draw(
     elif action_type == "rect":
         for each in actions:
             draw_rect(*([canvas, *each]))
+    elif action_type == "ellipse":
+        for each in actions:
+            draw_ellipse(*([canvas, *each]))
 
     canvas.save()
     buff.seek(0)
