@@ -7,7 +7,7 @@ from typing import Dict, Tuple, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import BooleanObject, DictionaryObject, NameObject
 
-from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root
+from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root, BUTTON_STYLES, DEFAULT_RADIO_STYLE
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_image_coordinates_resolutions,
                          get_draw_text_coordinates,
@@ -129,7 +129,7 @@ def fill(
             text_needs_to_be_drawn = False
             to_draw = x = y = None
 
-            if isinstance(widgets[key], Radio) and widgets[key].button_style == "l":
+            if isinstance(widgets[key], Radio) and BUTTON_STYLES.get(widgets[key].button_style) == DEFAULT_RADIO_STYLE:
                 ellipse_borders_to_draw[page].append(
                     get_draw_border_coordinates(widget_dict, "ellipse")
                 )
