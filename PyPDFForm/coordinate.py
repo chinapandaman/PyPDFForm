@@ -56,7 +56,11 @@ def get_draw_checkbox_radio_coordinates(
             widget_middleware.font_size,
         )
         / 2,
-        (height_mid_point - string_height / 2 + height_mid_point) / 2,
+        (height_mid_point - string_height / 2 + height_mid_point) / 2
+        - abs(  # offset to center vertically
+            (height_mid_point - string_height / 2 + height_mid_point) / 2
+            - int((height_mid_point - string_height / 2 + height_mid_point) / 2)
+        ) / 2,
     )
 
 
