@@ -19,6 +19,8 @@ class Widget:
         self.full_name = None
         self._value = value
         self.desc = None
+        self.border_color = None
+        self.background_color = None
 
     @property
     def name(self) -> str:

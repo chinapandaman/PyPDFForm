@@ -4,7 +4,7 @@
 from functools import lru_cache
 from io import BytesIO
 from sys import maxsize
-from typing import Dict, List, Tuple, Union, cast
+from typing import Any, Dict, List, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
@@ -22,7 +22,7 @@ from .middleware.text import Text
 from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
                        WIDGET_DESCRIPTION_PATTERNS, WIDGET_KEY_PATTERNS,
-                       WIDGET_TYPE_PATTERNS, update_annotation_name)
+                       WIDGET_TYPE_PATTERNS, update_annotation_name, BORDER_COLOR_PATTERNS, BACKGROUND_COLOR_PATTERNS)
 from .utils import find_pattern_match, stream_to_io, traverse_pattern
 from .watermark import create_watermarks_and_draw
 
@@ -58,6 +58,8 @@ def build_widgets(
                 if use_full_widget_name:
                     _widget.full_name = get_widget_full_key(widget)
                 _widget.desc = get_widget_description(widget)
+                _widget.border_color = get_border_color(widget)
+                _widget.background_color = get_background_color(widget)
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
                     if _widget.max_length is not None and is_text_field_comb(widget):
@@ -308,6 +310,28 @@ def get_button_style(widget: dict) -> Union[str, None]:
         style = traverse_pattern(pattern, widget)
         if style is not None:
             return str(style)
+
+    return None
+
+
+def get_border_color(widget: dict) -> Union[Any, None]:
+    """Returns the border color of a widget."""
+
+    for pattern in BORDER_COLOR_PATTERNS:
+        color = traverse_pattern(pattern, widget)
+        if color is not None:
+            return color
+
+    return None
+
+
+def get_background_color(widget: dict) -> Union[Any, None]:
+    """Returns the background color of a widget."""
+
+    for pattern in BACKGROUND_COLOR_PATTERNS:
+        color = traverse_pattern(pattern, widget)
+        if color is not None:
+            return color
 
     return None
 
