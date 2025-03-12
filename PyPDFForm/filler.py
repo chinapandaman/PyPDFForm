@@ -91,6 +91,21 @@ def text_handler(
     return to_draw, x, y, text_needs_to_be_drawn
 
 
+def border_handler(
+    widget: dict, middleware: WIDGET_TYPES, rect_borders_to_draw: list, ellipse_borders_to_draw: list,
+) -> None:
+    """Handles draw parameters for each widget's border."""
+
+    if isinstance(middleware, Radio) and BUTTON_STYLES.get(middleware.button_style) == DEFAULT_RADIO_STYLE:
+        ellipse_borders_to_draw.append(
+            get_draw_border_coordinates(widget, "ellipse")
+        )
+    else:
+        rect_borders_to_draw.append(
+            get_draw_border_coordinates(widget, "rect")
+        )
+
+
 def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
     """Generates a stream of an input PDF stream with stuff drawn on it."""
 
@@ -129,14 +144,7 @@ def fill(
             text_needs_to_be_drawn = False
             to_draw = x = y = None
 
-            if isinstance(widgets[key], Radio) and BUTTON_STYLES.get(widgets[key].button_style) == DEFAULT_RADIO_STYLE:
-                ellipse_borders_to_draw[page].append(
-                    get_draw_border_coordinates(widget_dict, "ellipse")
-                )
-            else:
-                rect_borders_to_draw[page].append(
-                    get_draw_border_coordinates(widget_dict, "rect")
-                )
+            border_handler(widget_dict, widgets[key], rect_borders_to_draw[page], ellipse_borders_to_draw[page])
 
             if isinstance(widgets[key], (Checkbox, Radio)):
                 to_draw, x, y, text_needs_to_be_drawn = check_radio_handler(
