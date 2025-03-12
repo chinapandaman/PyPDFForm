@@ -98,11 +98,11 @@ def border_handler(
 
     if isinstance(middleware, Radio) and BUTTON_STYLES.get(middleware.button_style) == DEFAULT_RADIO_STYLE:
         ellipse_borders_to_draw.append(
-            get_draw_border_coordinates(widget, "ellipse")
+            get_draw_border_coordinates(widget, "ellipse") + [middleware.border_color, middleware.background_color]
         )
     else:
         rect_borders_to_draw.append(
-            get_draw_border_coordinates(widget, "rect")
+            get_draw_border_coordinates(widget, "rect") + [middleware.border_color, middleware.background_color]
         )
 
 

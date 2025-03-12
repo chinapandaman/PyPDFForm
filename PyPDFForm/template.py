@@ -23,7 +23,7 @@ from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
                        WIDGET_DESCRIPTION_PATTERNS, WIDGET_KEY_PATTERNS,
                        WIDGET_TYPE_PATTERNS, update_annotation_name, BORDER_COLOR_PATTERNS, BACKGROUND_COLOR_PATTERNS)
-from .utils import find_pattern_match, stream_to_io, traverse_pattern
+from .utils import find_pattern_match, stream_to_io, traverse_pattern, handle_color
 from .watermark import create_watermarks_and_draw
 
 
@@ -98,7 +98,7 @@ def widget_rect_watermarks(pdf: bytes) -> List[bytes]:
             width = abs(rect[0] - rect[2])
             height = abs(rect[1] - rect[3])
 
-            to_draw.append([x, y, width, height])
+            to_draw.append([x, y, width, height, handle_color([0, 0, 0]), None])
         watermarks.append(
             create_watermarks_and_draw(pdf, page, "rect", to_draw)[page - 1]
         )
@@ -320,7 +320,7 @@ def get_border_color(widget: dict) -> Union[Any, None]:
     for pattern in BORDER_COLOR_PATTERNS:
         color = traverse_pattern(pattern, widget)
         if color is not None:
-            return color
+            return handle_color(color)
 
     return None
 
@@ -331,7 +331,7 @@ def get_background_color(widget: dict) -> Union[Any, None]:
     for pattern in BACKGROUND_COLOR_PATTERNS:
         color = traverse_pattern(pattern, widget)
         if color is not None:
-            return color
+            return handle_color(color)
 
     return None
 
