@@ -97,13 +97,15 @@ def border_handler(
     """Handles draw parameters for each widget's border."""
 
     if isinstance(middleware, Radio) and BUTTON_STYLES.get(middleware.button_style) == DEFAULT_RADIO_STYLE:
-        ellipse_borders_to_draw.append(
-            get_draw_border_coordinates(widget, "ellipse") + [middleware.border_color, middleware.background_color]
-        )
+        list_to_append = ellipse_borders_to_draw
+        shape = "ellipse"
     else:
-        rect_borders_to_draw.append(
-            get_draw_border_coordinates(widget, "rect") + [middleware.border_color, middleware.background_color]
-        )
+        list_to_append = rect_borders_to_draw
+        shape = "rect"
+
+    list_to_append.append(
+        get_draw_border_coordinates(widget, shape) + [middleware.border_color, middleware.background_color]
+    )
 
 
 def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:

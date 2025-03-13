@@ -29,7 +29,7 @@ def stream_to_io(stream: bytes) -> BinaryIO:
     return result
 
 
-def handle_color(color: ArrayObject) -> Union[Color, CMYKColor, None]:
+def handle_color(color: Union[list, ArrayObject]) -> Union[Color, CMYKColor, None]:
     """Converts a color array to an RGB or CMYK color."""
 
     result = None

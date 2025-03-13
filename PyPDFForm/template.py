@@ -4,11 +4,12 @@
 from functools import lru_cache
 from io import BytesIO
 from sys import maxsize
-from typing import Any, Dict, List, Tuple, Union, cast
+from typing import Dict, List, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
+from reportlab.lib.colors import Color, CMYKColor
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
                         WIDGET_TYPES, Annots, MaxLen, Parent, Rect, T)
@@ -314,7 +315,7 @@ def get_button_style(widget: dict) -> Union[str, None]:
     return None
 
 
-def get_border_color(widget: dict) -> Union[Any, None]:
+def get_border_color(widget: dict) -> Union[Color, CMYKColor, None]:
     """Returns the border color of a widget."""
 
     for pattern in BORDER_COLOR_PATTERNS:
@@ -325,7 +326,7 @@ def get_border_color(widget: dict) -> Union[Any, None]:
     return None
 
 
-def get_background_color(widget: dict) -> Union[Any, None]:
+def get_background_color(widget: dict) -> Union[Color, CMYKColor, None]:
     """Returns the background color of a widget."""
 
     for pattern in BACKGROUND_COLOR_PATTERNS:
