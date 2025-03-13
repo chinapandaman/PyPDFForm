@@ -104,7 +104,7 @@ def border_handler(
         shape = "rect"
 
     list_to_append.append(
-        get_draw_border_coordinates(widget, shape) + [middleware.border_color, middleware.background_color]
+        get_draw_border_coordinates(widget, shape) + [middleware.border_color, middleware.background_color, middleware.border_width]
     )
 
 

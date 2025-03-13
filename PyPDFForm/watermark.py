@@ -98,7 +98,7 @@ def draw_rect(*args) -> None:
     y = args[2]
     width = args[3]
     height = args[4]
-    stroke, fill = set_border_and_background_color(*args)
+    stroke, fill = set_border_and_background_styles(*args)
 
     canvas.rect(x, y, width, height, stroke=stroke, fill=fill)
 
@@ -111,22 +111,24 @@ def draw_ellipse(*args) -> None:
     y1 = args[2]
     x2 = args[3]
     y2 = args[4]
-    stroke, fill = set_border_and_background_color(*args)
+    stroke, fill = set_border_and_background_styles(*args)
 
     canvas.ellipse(x1, y1, x2, y2, stroke=stroke, fill=fill)
 
 
-def set_border_and_background_color(*args) -> tuple:
+def set_border_and_background_styles(*args) -> tuple:
     """Sets colors for both border and background before drawing."""
 
     canvas = args[0]
     border_color = args[5]
     background_color = args[6]
+    border_width = args[7]
 
     stroke = 0
     fill = 0
-    if border_color is not None:
+    if border_color is not None and border_width:
         canvas.setStrokeColor(border_color)
+        canvas.setLineWidth(border_width)
         stroke = 1
     if background_color is not None:
         canvas.setFillColor(background_color)

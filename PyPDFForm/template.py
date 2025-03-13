@@ -23,7 +23,7 @@ from .middleware.text import Text
 from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
                        WIDGET_DESCRIPTION_PATTERNS, WIDGET_KEY_PATTERNS,
-                       WIDGET_TYPE_PATTERNS, update_annotation_name, BORDER_COLOR_PATTERNS, BACKGROUND_COLOR_PATTERNS)
+                       WIDGET_TYPE_PATTERNS, update_annotation_name, BORDER_COLOR_PATTERNS, BACKGROUND_COLOR_PATTERNS, BORDER_WIDTH_PATTERNS)
 from .utils import find_pattern_match, stream_to_io, traverse_pattern, handle_color
 from .watermark import create_watermarks_and_draw
 
@@ -61,6 +61,7 @@ def build_widgets(
                 _widget.desc = get_widget_description(widget)
                 _widget.border_color = get_border_color(widget)
                 _widget.background_color = get_background_color(widget)
+                _widget.border_width = get_border_width(widget)
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
                     if _widget.max_length is not None and is_text_field_comb(widget):
@@ -335,6 +336,17 @@ def get_background_color(widget: dict) -> Union[Color, CMYKColor, None]:
             return handle_color(color)
 
     return None
+
+
+def get_border_width(widget: dict) -> int:
+    """Returns the border width of a widget."""
+
+    for pattern in BORDER_WIDTH_PATTERNS:
+        width = traverse_pattern(pattern, widget)
+        if width is not None:
+            return int(width)
+
+    return 1
 
 
 def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:
