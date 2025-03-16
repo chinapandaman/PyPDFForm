@@ -38,7 +38,7 @@ def check_radio_handler(
         checkbox_radio_font_size(widget) if middleware.size is None else middleware.size
     )
     to_draw = checkbox_radio_to_draw(middleware, font_size)
-    x, y = get_draw_checkbox_radio_coordinates(widget, to_draw)
+    x, y = get_draw_checkbox_radio_coordinates(widget, to_draw, border_width=middleware.border_width)
     text_needs_to_be_drawn = False
     if type(middleware) is Checkbox and middleware.value:
         text_needs_to_be_drawn = True
