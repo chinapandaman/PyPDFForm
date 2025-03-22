@@ -41,7 +41,7 @@ def get_draw_border_coordinates(widget: dict, shape: str) -> List[float]:
 def get_draw_checkbox_radio_coordinates(
     widget: dict,
     widget_middleware: Text,
-    border_width: int = 1,
+    border_width: int,
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw at given a PDF form checkbox/radio widget."""
 

@@ -12,7 +12,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.lib.colors import Color, CMYKColor
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
-                        WIDGET_TYPES, Annots, MaxLen, Parent, Rect, T)
+                        WIDGET_TYPES, Annots, MaxLen, Parent, Rect, T, DEFAULT_BORDER_WIDTH)
 from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
                    auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
@@ -349,7 +349,7 @@ def get_border_width(widget: dict) -> float:
         if width is not None:
             return float(width)
 
-    return 1
+    return DEFAULT_BORDER_WIDTH
 
 
 def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:
