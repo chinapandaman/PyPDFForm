@@ -338,13 +338,13 @@ def get_background_color(widget: dict) -> Union[Color, CMYKColor, None]:
     return None
 
 
-def get_border_width(widget: dict) -> int:
+def get_border_width(widget: dict) -> float:
     """Returns the border width of a widget."""
 
     for pattern in BORDER_WIDTH_PATTERNS:
         width = traverse_pattern(pattern, widget)
         if width is not None:
-            return int(width)
+            return float(width)
 
     return 1
 
