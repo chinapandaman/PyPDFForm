@@ -98,8 +98,43 @@ def draw_rect(*args) -> None:
     y = args[2]
     width = args[3]
     height = args[4]
+    stroke, fill = set_border_and_background_styles(*args)
 
-    canvas.rect(x, y, width, height)
+    canvas.rect(x, y, width, height, stroke=stroke, fill=fill)
+
+
+def draw_ellipse(*args) -> None:
+    """Draws an ellipse on the watermark."""
+
+    canvas = args[0]
+    x1 = args[1]
+    y1 = args[2]
+    x2 = args[3]
+    y2 = args[4]
+    stroke, fill = set_border_and_background_styles(*args)
+
+    canvas.ellipse(x1, y1, x2, y2, stroke=stroke, fill=fill)
+
+
+def set_border_and_background_styles(*args) -> tuple:
+    """Sets colors for both border and background before drawing."""
+
+    canvas = args[0]
+    border_color = args[5]
+    background_color = args[6]
+    border_width = args[7]
+
+    stroke = 0
+    fill = 0
+    if border_color is not None and border_width:
+        canvas.setStrokeColor(border_color)
+        canvas.setLineWidth(border_width)
+        stroke = 1
+    if background_color is not None:
+        canvas.setFillColor(background_color)
+        fill = 1
+
+    return stroke, fill
 
 
 def draw_image(*args) -> None:
@@ -159,6 +194,9 @@ def create_watermarks_and_draw(
     elif action_type == "rect":
         for each in actions:
             draw_rect(*([canvas, *each]))
+    elif action_type == "ellipse":
+        for each in actions:
+            draw_ellipse(*([canvas, *each]))
 
     canvas.save()
     buff.seek(0)

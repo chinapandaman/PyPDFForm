@@ -7,7 +7,8 @@ from string import ascii_letters, digits, punctuation
 from typing import BinaryIO, List, Union
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject
+from pypdf.generic import DictionaryObject, ArrayObject
+from reportlab.lib.colors import Color, CMYKColor
 
 from .constants import (BUTTON_STYLES, DEFAULT_CHECKBOX_STYLE, DEFAULT_FONT,
                         DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
@@ -24,6 +25,22 @@ def stream_to_io(stream: bytes) -> BinaryIO:
     result = BytesIO()
     result.write(stream)
     result.seek(0)
+
+    return result
+
+
+def handle_color(color: Union[list, ArrayObject]) -> Union[Color, CMYKColor, None]:
+    """Converts a color array to an RGB or CMYK color."""
+
+    result = None
+
+    if len(color) == 1:
+        result = CMYKColor(black=1 - color[0])
+    elif len(color) == 3:
+        result = Color(red=color[0], green=color[1], blue=color[2])
+    # write a test case for this
+    # elif len(color) == 4:
+    #     result = CMYKColor(cyan=color[0], magenta=color[1], yellow=color[2], black=color[3])
 
     return result
 

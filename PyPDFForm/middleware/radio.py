@@ -7,7 +7,18 @@ from .checkbox import Checkbox
 class Radio(Checkbox):
     """A class to represent a radiobutton widget."""
 
-    number_of_options = 0
+    def __init__(
+        self,
+        name: str,
+        value: int = None,
+    ) -> None:
+        """Constructs all attributes for the radiobutton."""
+
+        super().__init__(name, value)
+
+        self.size = None
+        self.number_of_options = 0
+        self._button_style = self.BUTTON_STYLE_MAPPING["circle"]
 
     @property
     def schema_definition(self) -> dict:

@@ -9,9 +9,10 @@ from typing import Dict, List, Tuple, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
+from reportlab.lib.colors import Color, CMYKColor
 
 from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
-                        WIDGET_TYPES, Annots, MaxLen, Parent, Rect, T)
+                        WIDGET_TYPES, Annots, MaxLen, Parent, Rect, T, DEFAULT_BORDER_WIDTH)
 from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
                    auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
@@ -22,8 +23,8 @@ from .middleware.text import Text
 from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
                        TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
                        WIDGET_DESCRIPTION_PATTERNS, WIDGET_KEY_PATTERNS,
-                       WIDGET_TYPE_PATTERNS, update_annotation_name)
-from .utils import find_pattern_match, stream_to_io, traverse_pattern
+                       WIDGET_TYPE_PATTERNS, update_annotation_name, BORDER_COLOR_PATTERNS, BACKGROUND_COLOR_PATTERNS, BORDER_WIDTH_PATTERNS)
+from .utils import find_pattern_match, stream_to_io, traverse_pattern, handle_color
 from .watermark import create_watermarks_and_draw
 
 
@@ -58,13 +59,16 @@ def build_widgets(
                 if use_full_widget_name:
                     _widget.full_name = get_widget_full_key(widget)
                 _widget.desc = get_widget_description(widget)
+                _widget.border_color = get_border_color(widget)
+                _widget.background_color = get_background_color(widget)
+                _widget.border_width = get_border_width(widget)
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
                     if _widget.max_length is not None and is_text_field_comb(widget):
                         _widget.comb = True
 
                 if isinstance(_widget, (Checkbox, Radio)):
-                    _widget.button_style = get_button_style(widget)
+                    _widget.button_style = get_button_style(widget) or _widget.button_style
 
                 if isinstance(_widget, Dropdown):
                     _widget.choices = get_dropdown_choices(widget)
@@ -96,7 +100,7 @@ def widget_rect_watermarks(pdf: bytes) -> List[bytes]:
             width = abs(rect[0] - rect[2])
             height = abs(rect[1] - rect[3])
 
-            to_draw.append([x, y, width, height])
+            to_draw.append([x, y, width, height, handle_color([0, 0, 0]), None, 1])
         watermarks.append(
             create_watermarks_and_draw(pdf, page, "rect", to_draw)[page - 1]
         )
@@ -108,6 +112,9 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
     """Converts a dropdown widget to a text widget."""
 
     result = Text(dropdown.name)
+    result.border_color = dropdown.border_color
+    result.background_color = dropdown.background_color
+    result.border_width = dropdown.border_width
 
     if dropdown.value is not None:
         result.value = (
@@ -310,6 +317,39 @@ def get_button_style(widget: dict) -> Union[str, None]:
             return str(style)
 
     return None
+
+
+def get_border_color(widget: dict) -> Union[Color, CMYKColor, None]:
+    """Returns the border color of a widget."""
+
+    for pattern in BORDER_COLOR_PATTERNS:
+        color = traverse_pattern(pattern, widget)
+        if color is not None:
+            return handle_color(color)
+
+    return None
+
+
+def get_background_color(widget: dict) -> Union[Color, CMYKColor, None]:
+    """Returns the background color of a widget."""
+
+    for pattern in BACKGROUND_COLOR_PATTERNS:
+        color = traverse_pattern(pattern, widget)
+        if color is not None:
+            return handle_color(color)
+
+    return None
+
+
+def get_border_width(widget: dict) -> float:
+    """Returns the border width of a widget."""
+
+    for pattern in BORDER_WIDTH_PATTERNS:
+        width = traverse_pattern(pattern, widget)
+        if width is not None:
+            return float(width)
+
+    return DEFAULT_BORDER_WIDTH
 
 
 def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:

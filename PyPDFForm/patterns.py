@@ -6,7 +6,7 @@ from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
 
 from .constants import (AP, AS, CA, DA, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, MK,
                         MULTILINE, READ_ONLY, TU, A, Btn, Ch, Ff, N, Off, Opt,
-                        Parent, Q, Sig, T, Tx, V, Yes)
+                        Parent, Q, Sig, T, Tx, V, Yes, BC, BG, BS, W)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -92,6 +92,18 @@ TEXT_FIELD_APPEARANCE_PATTERNS = [
 
 BUTTON_STYLE_PATTERNS = [
     {MK: {CA: True}},
+]
+
+BORDER_COLOR_PATTERNS = [
+    {MK: {BC: True}},
+]
+
+BACKGROUND_COLOR_PATTERNS = [
+    {MK: {BG: True}},
+]
+
+BORDER_WIDTH_PATTERNS = [
+    {BS: {W: True}}
 ]
 
 

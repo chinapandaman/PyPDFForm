@@ -7,11 +7,11 @@ from typing import Dict, Tuple, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import BooleanObject, DictionaryObject, NameObject
 
-from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root
+from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root, BUTTON_STYLES, DEFAULT_RADIO_STYLE
 from .coordinate import (get_draw_checkbox_radio_coordinates,
                          get_draw_image_coordinates_resolutions,
                          get_draw_text_coordinates,
-                         get_text_line_x_coordinates)
+                         get_text_line_x_coordinates, get_draw_border_coordinates)
 from .font import checkbox_radio_font_size
 from .image import get_image_dimensions
 from .middleware.checkbox import Checkbox
@@ -38,7 +38,7 @@ def check_radio_handler(
         checkbox_radio_font_size(widget) if middleware.size is None else middleware.size
     )
     to_draw = checkbox_radio_to_draw(middleware, font_size)
-    x, y = get_draw_checkbox_radio_coordinates(widget, to_draw)
+    x, y = get_draw_checkbox_radio_coordinates(widget, to_draw, border_width=middleware.border_width)
     text_needs_to_be_drawn = False
     if type(middleware) is Checkbox and middleware.value:
         text_needs_to_be_drawn = True
@@ -91,6 +91,23 @@ def text_handler(
     return to_draw, x, y, text_needs_to_be_drawn
 
 
+def border_handler(
+    widget: dict, middleware: WIDGET_TYPES, rect_borders_to_draw: list, ellipse_borders_to_draw: list,
+) -> None:
+    """Handles draw parameters for each widget's border."""
+
+    if isinstance(middleware, Radio) and BUTTON_STYLES.get(middleware.button_style) == DEFAULT_RADIO_STYLE:
+        list_to_append = ellipse_borders_to_draw
+        shape = "ellipse"
+    else:
+        list_to_append = rect_borders_to_draw
+        shape = "rect"
+
+    list_to_append.append(
+        get_draw_border_coordinates(widget, shape) + [middleware.border_color, middleware.background_color, middleware.border_width]
+    )
+
+
 def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
     """Generates a stream of an input PDF stream with stuff drawn on it."""
 
@@ -113,6 +130,8 @@ def fill(
 
     texts_to_draw = {}
     images_to_draw = {}
+    rect_borders_to_draw = {}
+    ellipse_borders_to_draw = {}
     any_image_to_draw = False
 
     radio_button_tracker = {}
@@ -120,10 +139,14 @@ def fill(
     for page, widget_dicts in get_widgets_by_page(template_stream).items():
         texts_to_draw[page] = []
         images_to_draw[page] = []
+        rect_borders_to_draw[page] = []
+        ellipse_borders_to_draw[page] = []
         for widget_dict in widget_dicts:
             key = get_widget_key(widget_dict)
             text_needs_to_be_drawn = False
             to_draw = x = y = None
+
+            border_handler(widget_dict, widgets[key], rect_borders_to_draw[page], ellipse_borders_to_draw[page])
 
             if isinstance(widgets[key], (Checkbox, Radio)):
                 to_draw, x, y, text_needs_to_be_drawn = check_radio_handler(
@@ -154,7 +177,10 @@ def fill(
                     ]
                 )
 
-    result = get_drawn_stream(texts_to_draw, template_stream, "text")
+    result = template_stream
+    result = get_drawn_stream(rect_borders_to_draw, result, "rect")
+    result = get_drawn_stream(ellipse_borders_to_draw, result, "ellipse")
+    result = get_drawn_stream(texts_to_draw, result, "text")
 
     if any_image_to_draw:
         result = get_drawn_stream(images_to_draw, result, "image")

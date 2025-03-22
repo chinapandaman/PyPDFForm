@@ -25,7 +25,7 @@ class Checkbox(Widget):
         super().__init__(name, value)
 
         self.size = None
-        self._button_style = None
+        self._button_style = self.BUTTON_STYLE_MAPPING["check"]
 
     @property
     def schema_definition(self) -> dict:

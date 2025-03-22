@@ -16,15 +16,38 @@ from .utils import stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
+def get_draw_border_coordinates(widget: dict, shape: str) -> List[float]:
+    """Returns coordinates to draw each widget's border."""
+
+    result = [
+        float(widget[Rect][0]),
+        float(widget[Rect][1]),
+    ]
+
+    if shape == "rect":
+        result += [
+            abs(float(widget[Rect][0]) - float(widget[Rect][2])),
+            abs(float(widget[Rect][1]) - float(widget[Rect][3])),
+        ]
+    elif shape == "ellipse":
+        result += [
+            float(widget[Rect][2]),
+            float(widget[Rect][3]),
+        ]
+
+    return result
+
+
 def get_draw_checkbox_radio_coordinates(
     widget: dict,
     widget_middleware: Text,
+    border_width: int,
 ) -> Tuple[Union[float, int], Union[float, int]]:
     """Returns coordinates to draw at given a PDF form checkbox/radio widget."""
 
-    string_height = widget_middleware.font_size * 96 / 72
+    string_height = widget_middleware.font_size * 72 / 96
     width_mid_point = (float(widget[Rect][0]) + float(widget[Rect][2])) / 2
-    height_mid_point = (float(widget[Rect][1]) + float(widget[Rect][3])) / 2
+    half_widget_height = abs(float(widget[Rect][1]) - float(widget[Rect][3])) / 2
 
     return (
         width_mid_point
@@ -34,7 +57,7 @@ def get_draw_checkbox_radio_coordinates(
             widget_middleware.font_size,
         )
         / 2,
-        (height_mid_point - string_height / 2 + height_mid_point) / 2,
+        float(widget[Rect][1]) + (half_widget_height - string_height / 2) + border_width / 2
     )
 
 
