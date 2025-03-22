@@ -112,6 +112,9 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
     """Converts a dropdown widget to a text widget."""
 
     result = Text(dropdown.name)
+    result.border_color = dropdown.border_color
+    result.background_color = dropdown.background_color
+    result.border_width = dropdown.border_width
 
     if dropdown.value is not None:
         result.value = (
