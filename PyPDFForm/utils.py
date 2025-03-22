@@ -7,8 +7,8 @@ from string import ascii_letters, digits, punctuation
 from typing import BinaryIO, List, Union
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject, ArrayObject
-from reportlab.lib.colors import Color, CMYKColor
+from pypdf.generic import ArrayObject, DictionaryObject
+from reportlab.lib.colors import CMYKColor, Color
 
 from .constants import (BUTTON_STYLES, DEFAULT_CHECKBOX_STYLE, DEFAULT_FONT,
                         DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,

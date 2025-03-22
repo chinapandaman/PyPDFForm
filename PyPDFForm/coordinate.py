@@ -57,7 +57,9 @@ def get_draw_checkbox_radio_coordinates(
             widget_middleware.font_size,
         )
         / 2,
-        float(widget[Rect][1]) + (half_widget_height - string_height / 2) + border_width / 2
+        float(widget[Rect][1])
+        + (half_widget_height - string_height / 2)
+        + border_width / 2,
     )
 
 

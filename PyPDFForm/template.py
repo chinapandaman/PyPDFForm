@@ -8,11 +8,12 @@ from typing import Dict, List, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
+from reportlab.lib.colors import CMYKColor, Color
 from reportlab.pdfbase.pdfmetrics import stringWidth
-from reportlab.lib.colors import Color, CMYKColor
 
-from .constants import (COMB, DEFAULT_FONT_SIZE, MULTILINE, NEW_LINE_SYMBOL,
-                        WIDGET_TYPES, Annots, MaxLen, Parent, Rect, T, DEFAULT_BORDER_WIDTH)
+from .constants import (COMB, DEFAULT_BORDER_WIDTH, DEFAULT_FONT_SIZE,
+                        MULTILINE, NEW_LINE_SYMBOL, WIDGET_TYPES, Annots,
+                        MaxLen, Parent, Rect, T)
 from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
                    auto_detect_font, get_text_field_font_color,
                    get_text_field_font_size, text_field_font_size)
@@ -20,11 +21,14 @@ from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
-from .patterns import (BUTTON_STYLE_PATTERNS, DROPDOWN_CHOICE_PATTERNS,
-                       TEXT_FIELD_FLAG_PATTERNS, WIDGET_ALIGNMENT_PATTERNS,
-                       WIDGET_DESCRIPTION_PATTERNS, WIDGET_KEY_PATTERNS,
-                       WIDGET_TYPE_PATTERNS, update_annotation_name, BORDER_COLOR_PATTERNS, BACKGROUND_COLOR_PATTERNS, BORDER_WIDTH_PATTERNS)
-from .utils import find_pattern_match, stream_to_io, traverse_pattern, handle_color
+from .patterns import (BACKGROUND_COLOR_PATTERNS, BORDER_COLOR_PATTERNS,
+                       BORDER_WIDTH_PATTERNS, BUTTON_STYLE_PATTERNS,
+                       DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
+                       WIDGET_ALIGNMENT_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
+                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
+                       update_annotation_name)
+from .utils import (find_pattern_match, handle_color, stream_to_io,
+                    traverse_pattern)
 from .watermark import create_watermarks_and_draw
 
 
@@ -68,7 +72,9 @@ def build_widgets(
                         _widget.comb = True
 
                 if isinstance(_widget, (Checkbox, Radio)):
-                    _widget.button_style = get_button_style(widget) or _widget.button_style
+                    _widget.button_style = (
+                        get_button_style(widget) or _widget.button_style
+                    )
 
                 if isinstance(_widget, Dropdown):
                     _widget.choices = get_dropdown_choices(widget)

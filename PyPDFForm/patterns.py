@@ -4,9 +4,10 @@
 from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
                            TextStringObject)
 
-from .constants import (AP, AS, CA, DA, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, MK,
-                        MULTILINE, READ_ONLY, TU, A, Btn, Ch, Ff, N, Off, Opt,
-                        Parent, Q, Sig, T, Tx, V, Yes, BC, BG, BS, W)
+from .constants import (AP, AS, BC, BG, BS, CA, DA, DV, FT,
+                        IMAGE_FIELD_IDENTIFIER, JS, MK, MULTILINE, READ_ONLY,
+                        TU, A, Btn, Ch, Ff, N, Off, Opt, Parent, Q, Sig, T, Tx,
+                        V, W, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -102,9 +103,7 @@ BACKGROUND_COLOR_PATTERNS = [
     {MK: {BG: True}},
 ]
 
-BORDER_WIDTH_PATTERNS = [
-    {BS: {W: True}}
-]
+BORDER_WIDTH_PATTERNS = [{BS: {W: True}}]
 
 
 def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:

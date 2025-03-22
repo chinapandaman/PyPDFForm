@@ -7,11 +7,13 @@ from typing import Dict, Tuple, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import BooleanObject, DictionaryObject, NameObject
 
-from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root, BUTTON_STYLES, DEFAULT_RADIO_STYLE
-from .coordinate import (get_draw_checkbox_radio_coordinates,
+from .constants import (BUTTON_STYLES, DEFAULT_RADIO_STYLE, WIDGET_TYPES,
+                        AcroForm, Annots, NeedAppearances, Root)
+from .coordinate import (get_draw_border_coordinates,
+                         get_draw_checkbox_radio_coordinates,
                          get_draw_image_coordinates_resolutions,
                          get_draw_text_coordinates,
-                         get_text_line_x_coordinates, get_draw_border_coordinates)
+                         get_text_line_x_coordinates)
 from .font import checkbox_radio_font_size
 from .image import get_image_dimensions
 from .middleware.checkbox import Checkbox
@@ -38,7 +40,9 @@ def check_radio_handler(
         checkbox_radio_font_size(widget) if middleware.size is None else middleware.size
     )
     to_draw = checkbox_radio_to_draw(middleware, font_size)
-    x, y = get_draw_checkbox_radio_coordinates(widget, to_draw, border_width=middleware.border_width)
+    x, y = get_draw_checkbox_radio_coordinates(
+        widget, to_draw, border_width=middleware.border_width
+    )
     text_needs_to_be_drawn = False
     if type(middleware) is Checkbox and middleware.value:
         text_needs_to_be_drawn = True
@@ -92,11 +96,17 @@ def text_handler(
 
 
 def border_handler(
-    widget: dict, middleware: WIDGET_TYPES, rect_borders_to_draw: list, ellipse_borders_to_draw: list,
+    widget: dict,
+    middleware: WIDGET_TYPES,
+    rect_borders_to_draw: list,
+    ellipse_borders_to_draw: list,
 ) -> None:
     """Handles draw parameters for each widget's border."""
 
-    if isinstance(middleware, Radio) and BUTTON_STYLES.get(middleware.button_style) == DEFAULT_RADIO_STYLE:
+    if (
+        isinstance(middleware, Radio)
+        and BUTTON_STYLES.get(middleware.button_style) == DEFAULT_RADIO_STYLE
+    ):
         list_to_append = ellipse_borders_to_draw
         shape = "ellipse"
     else:
@@ -104,7 +114,12 @@ def border_handler(
         shape = "rect"
 
     list_to_append.append(
-        get_draw_border_coordinates(widget, shape) + [middleware.border_color, middleware.background_color, middleware.border_width]
+        get_draw_border_coordinates(widget, shape)
+        + [
+            middleware.border_color,
+            middleware.background_color,
+            middleware.border_width,
+        ]
     )
 
 
@@ -146,7 +161,12 @@ def fill(
             text_needs_to_be_drawn = False
             to_draw = x = y = None
 
-            border_handler(widget_dict, widgets[key], rect_borders_to_draw[page], ellipse_borders_to_draw[page])
+            border_handler(
+                widget_dict,
+                widgets[key],
+                rect_borders_to_draw[page],
+                ellipse_borders_to_draw[page],
+            )
 
             if isinstance(widgets[key], (Checkbox, Radio)):
                 to_draw, x, y, text_needs_to_be_drawn = check_radio_handler(
