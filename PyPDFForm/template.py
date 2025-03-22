@@ -68,7 +68,7 @@ def build_widgets(
                         _widget.comb = True
 
                 if isinstance(_widget, (Checkbox, Radio)):
-                    _widget.button_style = get_button_style(widget)
+                    _widget.button_style = get_button_style(widget) or _widget.button_style
 
                 if isinstance(_widget, Dropdown):
                     _widget.choices = get_dropdown_choices(widget)
