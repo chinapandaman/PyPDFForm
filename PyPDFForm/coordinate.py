@@ -22,17 +22,24 @@ def get_draw_border_coordinates(widget: dict, shape: str) -> List[float]:
     result = [
         float(widget[Rect][0]),
         float(widget[Rect][1]),
+        abs(float(widget[Rect][0]) - float(widget[Rect][2])),
+        abs(float(widget[Rect][1]) - float(widget[Rect][3])),
     ]
 
-    if shape == "rect":
-        result += [
-            abs(float(widget[Rect][0]) - float(widget[Rect][2])),
-            abs(float(widget[Rect][1]) - float(widget[Rect][3])),
-        ]
-    elif shape == "ellipse":
-        result += [
-            float(widget[Rect][2]),
-            float(widget[Rect][3]),
+    if shape == "ellipse":
+        width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
+        height = abs(float(widget[Rect][1]) - float(widget[Rect][3]))
+
+        width_mid = (float(widget[Rect][0]) + float(widget[Rect][2])) / 2
+        height_mid = (float(widget[Rect][1]) + float(widget[Rect][3])) / 2
+
+        less = min(width, height)
+
+        result = [
+            width_mid - less / 2,
+            height_mid - less / 2,
+            width_mid + less / 2,
+            height_mid + less / 2,
         ]
 
     return result
