@@ -41,6 +41,13 @@ def get_draw_border_coordinates(widget: dict, shape: str) -> List[float]:
             width_mid + less / 2,
             height_mid + less / 2,
         ]
+    elif shape == "underline":
+        result = [
+            float(widget[Rect][0]),
+            float(widget[Rect][1]),
+            float(widget[Rect][2]),
+            float(widget[Rect][1]),
+        ]
 
     return result
 

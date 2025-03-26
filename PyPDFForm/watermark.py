@@ -116,6 +116,19 @@ def draw_ellipse(*args) -> None:
     canvas.ellipse(x1, y1, x2, y2, stroke=stroke, fill=fill)
 
 
+def draw_underline(*args) -> None:
+    """Draws an underline for a widget on the watermark."""
+
+    canvas = args[0]
+    src_x = args[1]
+    src_y = args[2]
+    dest_x = args[3]
+    dest_y = args[4]
+    set_border_and_background_styles(*args)
+
+    canvas.line(src_x, src_y, dest_x, dest_y)
+
+
 def set_border_and_background_styles(*args) -> tuple:
     """Sets colors for both border and background before drawing."""
 
@@ -202,6 +215,9 @@ def create_watermarks_and_draw(
     elif action_type == "ellipse":
         for each in actions:
             draw_ellipse(*([canvas, *each]))
+    elif action_type == "underline":
+        for each in actions:
+            draw_underline(*([canvas, *each]))
 
     canvas.save()
     buff.seek(0)
