@@ -123,6 +123,7 @@ def set_border_and_background_styles(*args) -> tuple:
     border_color = args[5]
     background_color = args[6]
     border_width = args[7]
+    dash_array = args[8]
 
     stroke = 0
     fill = 0
@@ -133,6 +134,9 @@ def set_border_and_background_styles(*args) -> tuple:
     if background_color is not None:
         canvas.setFillColor(background_color)
         fill = 1
+
+    if dash_array is not None:
+        canvas.setDash(array=dash_array)
 
     return stroke, fill
 
