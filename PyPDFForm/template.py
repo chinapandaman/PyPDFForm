@@ -25,7 +25,7 @@ from .patterns import (BACKGROUND_COLOR_PATTERNS, BORDER_COLOR_PATTERNS,
                        BORDER_WIDTH_PATTERNS, BUTTON_STYLE_PATTERNS,
                        DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
                        WIDGET_ALIGNMENT_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
-                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
+                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS, BORDER_STYLE_PATTERNS, BORDER_DASH_ARRAY_PATTERNS,
                        update_annotation_name)
 from .utils import (find_pattern_match, handle_color, stream_to_io,
                     traverse_pattern)
@@ -66,6 +66,8 @@ def build_widgets(
                 _widget.border_color = get_border_color(widget)
                 _widget.background_color = get_background_color(widget)
                 _widget.border_width = get_border_width(widget)
+                _widget.border_style = get_border_style(widget)
+                _widget.dash_array = get_border_dash_array(widget)
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
                     if _widget.max_length is not None and is_text_field_comb(widget):
@@ -356,6 +358,28 @@ def get_border_width(widget: dict) -> float:
             return float(width)
 
     return DEFAULT_BORDER_WIDTH
+
+
+def get_border_style(widget: dict) -> Union[str, None]:
+    """Returns the border style of a widget."""
+
+    for pattern in BORDER_STYLE_PATTERNS:
+        style = traverse_pattern(pattern, widget)
+        if style is not None:
+            return str(style)
+
+    return None
+
+
+def get_border_dash_array(widget: dict) -> Union[list, None]:
+    """Returns the border dash array of a widget if it has a dashed border."""
+
+    for pattern in BORDER_DASH_ARRAY_PATTERNS:
+        dash_arrary = traverse_pattern(pattern, widget)
+        if dash_arrary is not None:
+            return list(dash_arrary)
+
+    return None
 
 
 def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:
