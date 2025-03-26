@@ -135,6 +135,7 @@ def set_border_and_background_styles(*args) -> tuple:
         canvas.setFillColor(background_color)
         fill = 1
 
+    canvas.setDash()
     if dash_array is not None:
         canvas.setDash(array=dash_array)
 
