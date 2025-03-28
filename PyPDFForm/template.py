@@ -108,7 +108,7 @@ def widget_rect_watermarks(pdf: bytes) -> List[bytes]:
             width = abs(rect[0] - rect[2])
             height = abs(rect[1] - rect[3])
 
-            to_draw.append([x, y, width, height, handle_color([0, 0, 0]), None, 1])
+            to_draw.append([x, y, width, height, handle_color([0, 0, 0]), None, 1, None])
         watermarks.append(
             create_watermarks_and_draw(pdf, page, "rect", to_draw)[page - 1]
         )
