@@ -8,7 +8,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import BooleanObject, DictionaryObject, NameObject
 
 from .constants import (BUTTON_STYLES, DEFAULT_RADIO_STYLE, WIDGET_TYPES,
-                        AcroForm, Annots, NeedAppearances, Root)
+                        AcroForm, Annots, NeedAppearances, Root, U)
 from .coordinate import (get_draw_border_coordinates,
                          get_draw_checkbox_radio_coordinates,
                          get_draw_image_coordinates_resolutions,
@@ -100,6 +100,7 @@ def border_handler(
     middleware: WIDGET_TYPES,
     rect_borders_to_draw: list,
     ellipse_borders_to_draw: list,
+    underline_borders_to_draw: list,
 ) -> None:
     """Handles draw parameters for each widget's border."""
 
@@ -109,6 +110,9 @@ def border_handler(
     ):
         list_to_append = ellipse_borders_to_draw
         shape = "ellipse"
+    elif middleware.border_style == U:
+        list_to_append = underline_borders_to_draw
+        shape = "underline"
     else:
         list_to_append = rect_borders_to_draw
         shape = "rect"
@@ -119,8 +123,15 @@ def border_handler(
             middleware.border_color,
             middleware.background_color,
             middleware.border_width,
+            middleware.dash_array
         ]
     )
+
+    if shape == "underline":
+        rect_borders_to_draw.append(
+            get_draw_border_coordinates(widget, "rect")
+            + [None, middleware.background_color, 0, None]
+        )
 
 
 def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
@@ -147,6 +158,7 @@ def fill(
     images_to_draw = {}
     rect_borders_to_draw = {}
     ellipse_borders_to_draw = {}
+    underline_borders_to_draw = {}
     any_image_to_draw = False
 
     radio_button_tracker = {}
@@ -156,6 +168,7 @@ def fill(
         images_to_draw[page] = []
         rect_borders_to_draw[page] = []
         ellipse_borders_to_draw[page] = []
+        underline_borders_to_draw[page] = []
         for widget_dict in widget_dicts:
             key = get_widget_key(widget_dict)
             text_needs_to_be_drawn = False
@@ -166,6 +179,7 @@ def fill(
                 widgets[key],
                 rect_borders_to_draw[page],
                 ellipse_borders_to_draw[page],
+                underline_borders_to_draw[page],
             )
 
             if isinstance(widgets[key], (Checkbox, Radio)):
@@ -200,6 +214,7 @@ def fill(
     result = template_stream
     result = get_drawn_stream(rect_borders_to_draw, result, "rect")
     result = get_drawn_stream(ellipse_borders_to_draw, result, "ellipse")
+    result = get_drawn_stream(underline_borders_to_draw, result, "underline")
     result = get_drawn_stream(texts_to_draw, result, "text")
 
     if any_image_to_draw:

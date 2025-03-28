@@ -22,6 +22,8 @@ class Widget:
         self.border_color = None
         self.background_color = None
         self.border_width = None
+        self.border_style = None
+        self.dash_array = None
 
     @property
     def name(self) -> str:
