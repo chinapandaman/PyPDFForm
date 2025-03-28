@@ -6,8 +6,8 @@ from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
 
 from .constants import (AP, AS, BC, BG, BS, CA, DA, DV, FT,
                         IMAGE_FIELD_IDENTIFIER, JS, MK, MULTILINE, READ_ONLY,
-                        TU, A, Btn, Ch, Ff, N, Off, Opt, Parent, Q, Sig, T, Tx,
-                        V, W, Yes, S, D)
+                        TU, A, Btn, Ch, D, Ff, N, Off, Opt, Parent, Q, S, Sig,
+                        T, Tx, V, W, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image

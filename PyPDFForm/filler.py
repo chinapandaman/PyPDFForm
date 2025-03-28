@@ -123,7 +123,7 @@ def border_handler(
             middleware.border_color,
             middleware.background_color,
             middleware.border_width,
-            middleware.dash_array
+            middleware.dash_array,
         ]
     )
 

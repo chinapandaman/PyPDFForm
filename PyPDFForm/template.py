@@ -22,10 +22,11 @@ from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (BACKGROUND_COLOR_PATTERNS, BORDER_COLOR_PATTERNS,
+                       BORDER_DASH_ARRAY_PATTERNS, BORDER_STYLE_PATTERNS,
                        BORDER_WIDTH_PATTERNS, BUTTON_STYLE_PATTERNS,
                        DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
                        WIDGET_ALIGNMENT_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
-                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS, BORDER_STYLE_PATTERNS, BORDER_DASH_ARRAY_PATTERNS,
+                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
                        update_annotation_name)
 from .utils import (find_pattern_match, handle_color, stream_to_io,
                     traverse_pattern)
@@ -108,7 +109,9 @@ def widget_rect_watermarks(pdf: bytes) -> List[bytes]:
             width = abs(rect[0] - rect[2])
             height = abs(rect[1] - rect[3])
 
-            to_draw.append([x, y, width, height, handle_color([0, 0, 0]), None, 1, None])
+            to_draw.append(
+                [x, y, width, height, handle_color([0, 0, 0]), None, 1, None]
+            )
         watermarks.append(
             create_watermarks_and_draw(pdf, page, "rect", to_draw)[page - 1]
         )
