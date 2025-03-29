@@ -188,7 +188,7 @@ def extract_widget_property(
     for pattern in patterns:
         value = traverse_pattern(pattern, widget)
         if value:
-            result = func_before_return(value)
+            result = func_before_return(value) if func_before_return else value
             break
 
     return result

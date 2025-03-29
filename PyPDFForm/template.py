@@ -242,16 +242,11 @@ def is_text_multiline(widget: dict) -> bool:
 def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
     """Returns string options of a dropdown field."""
 
-    result = None
-    for pattern in DROPDOWN_CHOICE_PATTERNS:
-        choices = traverse_pattern(pattern, widget)
-        if choices:
-            result = tuple(
-                (each if isinstance(each, str) else str(each[1])) for each in choices
-            )
-            break
-
-    return result
+    return tuple(
+        (each if isinstance(each, str) else str(each[1])) for each in extract_widget_property(
+            widget, DROPDOWN_CHOICE_PATTERNS, None, None
+        )
+    )
 
 
 def get_button_style(widget: dict) -> Union[str, None]:
