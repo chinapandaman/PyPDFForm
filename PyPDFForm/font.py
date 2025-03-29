@@ -72,7 +72,7 @@ def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
 def auto_detect_font(widget: dict) -> str:
     """Returns the font of the text field if it is one of the standard fonts."""
 
-    text_appearance = extract_widget_property(widget, TEXT_FIELD_APPEARANCE_PATTERNS, DEFAULT_FONT, None)
+    text_appearance = extract_widget_property(widget, TEXT_FIELD_APPEARANCE_PATTERNS, None, None)
 
     if not text_appearance:
         return DEFAULT_FONT
