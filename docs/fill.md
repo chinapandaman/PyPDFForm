@@ -111,10 +111,7 @@ with open("output.pdf", "wb+") as output:
     output.write(pdf.read())
 ```
 
-## Fill image widgets (beta)
-
-**NOTE:** This is a beta feature, meaning it still needs to be tested against more PDF forms and may not work for 
-some of them.
+## Fill image widgets
 
 An image field widget can be filled similarly to a signature field, by providing a value of file path, file object, or 
 file stream.
