@@ -72,7 +72,9 @@ def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
 def auto_detect_font(widget: dict) -> str:
     """Returns the font of the text field if it is one of the standard fonts."""
 
-    text_appearance = extract_widget_property(widget, TEXT_FIELD_APPEARANCE_PATTERNS, None, None)
+    text_appearance = extract_widget_property(
+        widget, TEXT_FIELD_APPEARANCE_PATTERNS, None, None
+    )
 
     if not text_appearance:
         return DEFAULT_FONT
@@ -108,7 +110,9 @@ def get_text_field_font_size(widget: dict) -> Union[float, int]:
     """Returns the font size of the text field if presented or zero."""
 
     result = 0
-    text_appearance = extract_widget_property(widget, TEXT_FIELD_APPEARANCE_PATTERNS, None, None)
+    text_appearance = extract_widget_property(
+        widget, TEXT_FIELD_APPEARANCE_PATTERNS, None, None
+    )
     if text_appearance:
         properties = text_appearance.split(" ")
         for i, val in enumerate(properties):
@@ -124,7 +128,9 @@ def get_text_field_font_color(
     """Returns the font color tuple of the text field if presented or black."""
 
     result = (0, 0, 0)
-    text_appearance = extract_widget_property(widget, TEXT_FIELD_APPEARANCE_PATTERNS, None, None)
+    text_appearance = extract_widget_property(
+        widget, TEXT_FIELD_APPEARANCE_PATTERNS, None, None
+    )
     if text_appearance:
         if FONT_COLOR_IDENTIFIER not in text_appearance:
             return result

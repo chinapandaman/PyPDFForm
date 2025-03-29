@@ -24,11 +24,10 @@ from .patterns import (BACKGROUND_COLOR_PATTERNS, BORDER_COLOR_PATTERNS,
                        BORDER_DASH_ARRAY_PATTERNS, BORDER_STYLE_PATTERNS,
                        BORDER_WIDTH_PATTERNS, BUTTON_STYLE_PATTERNS,
                        DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
-                       WIDGET_DESCRIPTION_PATTERNS,
-                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
-                       update_annotation_name)
-from .utils import (find_pattern_match, handle_color, stream_to_io,
-                    extract_widget_property)
+                       WIDGET_DESCRIPTION_PATTERNS, WIDGET_KEY_PATTERNS,
+                       WIDGET_TYPE_PATTERNS, update_annotation_name)
+from .utils import (extract_widget_property, find_pattern_match, handle_color,
+                    stream_to_io)
 
 
 def set_character_x_paddings(
@@ -62,12 +61,24 @@ def build_widgets(
                 if use_full_widget_name:
                     _widget.full_name = get_widget_full_key(widget)
 
-                _widget.desc = extract_widget_property(widget, WIDGET_DESCRIPTION_PATTERNS, None, str)
-                _widget.border_color = extract_widget_property(widget, BORDER_COLOR_PATTERNS, None, handle_color)
-                _widget.background_color = extract_widget_property(widget, BACKGROUND_COLOR_PATTERNS, None, handle_color)
-                _widget.border_width = extract_widget_property(widget, BORDER_WIDTH_PATTERNS, DEFAULT_BORDER_WIDTH, float)
-                _widget.border_style = extract_widget_property(widget, BORDER_STYLE_PATTERNS, None, str)
-                _widget.dash_array = extract_widget_property(widget, BORDER_DASH_ARRAY_PATTERNS, None, list)
+                _widget.desc = extract_widget_property(
+                    widget, WIDGET_DESCRIPTION_PATTERNS, None, str
+                )
+                _widget.border_color = extract_widget_property(
+                    widget, BORDER_COLOR_PATTERNS, None, handle_color
+                )
+                _widget.background_color = extract_widget_property(
+                    widget, BACKGROUND_COLOR_PATTERNS, None, handle_color
+                )
+                _widget.border_width = extract_widget_property(
+                    widget, BORDER_WIDTH_PATTERNS, DEFAULT_BORDER_WIDTH, float
+                )
+                _widget.border_style = extract_widget_property(
+                    widget, BORDER_STYLE_PATTERNS, None, str
+                )
+                _widget.dash_array = extract_widget_property(
+                    widget, BORDER_DASH_ARRAY_PATTERNS, None, list
+                )
 
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
@@ -76,7 +87,10 @@ def build_widgets(
 
                 if isinstance(_widget, (Checkbox, Radio)):
                     _widget.button_style = (
-                        extract_widget_property(widget, BUTTON_STYLE_PATTERNS, None, str) or _widget.button_style
+                        extract_widget_property(
+                            widget, BUTTON_STYLE_PATTERNS, None, str
+                        )
+                        or _widget.button_style
                     )
 
                 if isinstance(_widget, Dropdown):
@@ -244,7 +258,8 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
     """Returns string options of a dropdown field."""
 
     return tuple(
-        (each if isinstance(each, str) else str(each[1])) for each in extract_widget_property(
+        (each if isinstance(each, str) else str(each[1]))
+        for each in extract_widget_property(
             widget, DROPDOWN_CHOICE_PATTERNS, None, None
         )
     )
@@ -401,7 +416,9 @@ def update_widget_keys(
         for page in out.pages:
             for annot in page.get(Annots, []):  # noqa
                 annot = cast(DictionaryObject, annot.get_object())
-                key = extract_widget_property(annot.get_object(), WIDGET_KEY_PATTERNS, None, str)
+                key = extract_widget_property(
+                    annot.get_object(), WIDGET_KEY_PATTERNS, None, str
+                )
 
                 widget = widgets.get(key)
                 if widget is None:

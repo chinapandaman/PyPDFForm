@@ -5,8 +5,8 @@ import os
 
 from PyPDFForm import PdfWrapper
 from PyPDFForm.constants import TU, Parent
-from PyPDFForm.patterns import WIDGET_KEY_PATTERNS
 from PyPDFForm.middleware.radio import Radio
+from PyPDFForm.patterns import WIDGET_KEY_PATTERNS
 from PyPDFForm.template import get_widgets_by_page
 from PyPDFForm.utils import extract_widget_property
 

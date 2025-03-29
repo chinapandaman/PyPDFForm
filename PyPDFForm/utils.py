@@ -179,7 +179,7 @@ def extract_widget_property(
     widget: Union[dict, DictionaryObject],
     patterns: list,
     default_value: Any,
-    func_before_return: Union[Callable, None]
+    func_before_return: Union[Callable, None],
 ) -> Any:
     """Returns a property value given a PDF widget dict and a pattern."""
 

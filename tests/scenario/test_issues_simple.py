@@ -59,7 +59,10 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_text(issue_pdf_directory
 
     for widgets in get_widgets_by_page(obj.read()).values():
         for widget in widgets:
-            if extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str) == "Address":
+            if (
+                extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+                == "Address"
+            ):
                 assert (
                     widget[V]
                     == "Mr John Smith\n132, My Street\nKingston, New York 12401"
@@ -140,7 +143,10 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_dir
 
     for widgets in get_widgets_by_page(obj.read()).values():
         for widget in widgets:
-            if extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str) == "Address":
+            if (
+                extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+                == "Address"
+            ):
                 assert widget[V] == "J Smith\n132 A St\nNYC, NY 12401"
 
 
