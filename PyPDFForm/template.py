@@ -29,7 +29,7 @@ from .patterns import (BACKGROUND_COLOR_PATTERNS, BORDER_COLOR_PATTERNS,
                        WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
                        update_annotation_name)
 from .utils import (find_pattern_match, handle_color, stream_to_io,
-                    traverse_pattern)
+                    traverse_pattern, extract_widget_property)
 
 
 def set_character_x_paddings(
@@ -57,7 +57,7 @@ def build_widgets(
 
     for widgets in get_widgets_by_page(pdf_stream).values():
         for widget in widgets:
-            key = get_widget_key(widget)
+            key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
             _widget = construct_widget(widget, key)
             if _widget is not None:
                 if use_full_widget_name:

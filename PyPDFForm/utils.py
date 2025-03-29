@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """Contains utility helpers."""
 
+from collections.abc import Callable
 from io import BytesIO
 from secrets import choice
 from string import ascii_letters, digits, punctuation
-from typing import BinaryIO, List, Union
+from typing import Any, BinaryIO, List, Union
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject
@@ -172,6 +173,25 @@ def traverse_pattern(
         if result:
             return result
     return None
+
+
+def extract_widget_property(
+    widget: dict,
+    pattern: list,
+    default_value: Any,
+    func_before_return: Callable
+) -> Any:
+    """Returns a property value given a PDF widget dict and a pattern."""
+
+    result = default_value
+
+    for p in pattern:
+        value = traverse_pattern(p, widget)
+        if value:
+            result = func_before_return(value)
+            break
+
+    return result
 
 
 def generate_unique_suffix() -> str:
