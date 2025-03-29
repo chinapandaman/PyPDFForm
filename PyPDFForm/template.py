@@ -25,7 +25,7 @@ from .patterns import (BACKGROUND_COLOR_PATTERNS, BORDER_COLOR_PATTERNS,
                        BORDER_DASH_ARRAY_PATTERNS, BORDER_STYLE_PATTERNS,
                        BORDER_WIDTH_PATTERNS, BUTTON_STYLE_PATTERNS,
                        DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
-                       WIDGET_ALIGNMENT_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
+                       WIDGET_DESCRIPTION_PATTERNS,
                        WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
                        update_annotation_name)
 from .utils import (find_pattern_match, handle_color, stream_to_io,
@@ -193,18 +193,6 @@ def get_widget_full_key(widget: dict) -> Union[str, None]:
         return f"{widget[Parent].get_object()[T]}.{key}"
 
     return None
-
-
-def get_widget_alignment(widget: dict) -> Union[str, list, None]:
-    """Finds a PDF widget's alignment by pattern matching."""
-
-    result = None
-    for pattern in WIDGET_ALIGNMENT_PATTERNS:
-        value = traverse_pattern(pattern, widget)
-        if value:
-            result = value
-            break
-    return result
 
 
 def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
