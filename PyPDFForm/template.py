@@ -75,7 +75,7 @@ def build_widgets(
 
                 if isinstance(_widget, (Checkbox, Radio)):
                     _widget.button_style = (
-                        get_button_style(widget) or _widget.button_style
+                        extract_widget_property(widget, BUTTON_STYLE_PATTERNS, None, str) or _widget.button_style
                     )
 
                 if isinstance(_widget, Dropdown):
@@ -247,17 +247,6 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
             widget, DROPDOWN_CHOICE_PATTERNS, None, None
         )
     )
-
-
-def get_button_style(widget: dict) -> Union[str, None]:
-    """Returns the button style of a checkbox or radiobutton."""
-
-    for pattern in BUTTON_STYLE_PATTERNS:
-        style = traverse_pattern(pattern, widget)
-        if style is not None:
-            return str(style)
-
-    return None
 
 
 def get_border_color(widget: dict) -> Union[Color, CMYKColor, None]:
