@@ -109,10 +109,7 @@ with open("output.pdf", "wb+") as output:
     output.write(new_form.read())
 ```
 
-## Modify the key of a widget (beta)
-
-**NOTE:** This is a beta feature, meaning it still needs to be tested against more PDF forms and may not work for 
-some of them.
+## Modify the key of a widget
 
 For existing widgets, PyPDFForm supports modifying their keys. 
 Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf), 
