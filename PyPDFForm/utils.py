@@ -78,6 +78,7 @@ def preview_widget_to_draw(widget: WIDGET_TYPES, with_preview_text: bool) -> Tex
     new_widget.preview = with_preview_text
     new_widget.border_color = handle_color([0, 0, 0])
     new_widget.border_width = 1
+    new_widget.render_widget = True
 
     return new_widget
 

@@ -47,7 +47,7 @@ def set_character_x_paddings(
 
 
 def build_widgets(
-    pdf_stream: bytes, use_full_widget_name: bool
+    pdf_stream: bytes, use_full_widget_name: bool, render_widgets: bool,
 ) -> Dict[str, WIDGET_TYPES]:
     """Builds a widget dict given a PDF form stream."""
 
@@ -61,6 +61,7 @@ def build_widgets(
                 if use_full_widget_name:
                     _widget.full_name = get_widget_full_key(widget)
 
+                _widget.render_widget = render_widgets
                 _widget.desc = extract_widget_property(
                     widget, WIDGET_DESCRIPTION_PATTERNS, None, str
                 )
@@ -116,6 +117,7 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
     result.border_color = dropdown.border_color
     result.background_color = dropdown.background_color
     result.border_width = dropdown.border_width
+    result.render_widget = dropdown.render_widget
 
     if dropdown.value is not None:
         result.value = (
