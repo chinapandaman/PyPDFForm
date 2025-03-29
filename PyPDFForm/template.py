@@ -39,7 +39,7 @@ def set_character_x_paddings(
 
     for _widgets in get_widgets_by_page(pdf_stream).values():
         for widget in _widgets:
-            key = get_widget_key(widget)
+            key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
             _widget = widgets[key]
 
             if isinstance(_widget, Text) and _widget.comb is True:
@@ -120,7 +120,7 @@ def update_text_field_attributes(
 
     for _widgets in get_widgets_by_page(template_stream).values():
         for _widget in _widgets:
-            key = get_widget_key(_widget)
+            key = extract_widget_property(_widget, WIDGET_KEY_PATTERNS, None, str)
 
             if isinstance(widgets[key], Text):
                 should_adjust_font_size = False
@@ -177,25 +177,13 @@ def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
     return result
 
 
-def get_widget_key(widget: dict) -> Union[str, list, None]:
-    """Finds a PDF widget's annotated key by pattern matching."""
-
-    result = None
-    for pattern in WIDGET_KEY_PATTERNS:
-        value = traverse_pattern(pattern, widget)
-        if value:
-            result = value
-            break
-    return result
-
-
 def get_widget_full_key(widget: dict) -> Union[str, None]:
     """
     Returns a PDF widget's full annotated key by prepending its
     parent widget's key.
     """
 
-    key = get_widget_key(widget)
+    key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
 
     if (
         Parent in widget
@@ -511,7 +499,7 @@ def update_widget_keys(
         for page in out.pages:
             for annot in page.get(Annots, []):  # noqa
                 annot = cast(DictionaryObject, annot.get_object())
-                key = get_widget_key(annot.get_object())
+                key = extract_widget_property(annot.get_object(), WIDGET_KEY_PATTERNS, None, str)
 
                 widget = widgets.get(key)
                 if widget is None:

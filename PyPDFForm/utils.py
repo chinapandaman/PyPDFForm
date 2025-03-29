@@ -176,8 +176,8 @@ def traverse_pattern(
 
 
 def extract_widget_property(
-    widget: dict,
-    pattern: list,
+    widget: Union[dict, DictionaryObject],
+    patterns: list,
     default_value: Any,
     func_before_return: Callable
 ) -> Any:
@@ -185,8 +185,8 @@ def extract_widget_property(
 
     result = default_value
 
-    for p in pattern:
-        value = traverse_pattern(p, widget)
+    for pattern in patterns:
+        value = traverse_pattern(pattern, widget)
         if value:
             result = func_before_return(value)
             break
