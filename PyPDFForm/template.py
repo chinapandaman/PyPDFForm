@@ -30,7 +30,6 @@ from .patterns import (BACKGROUND_COLOR_PATTERNS, BORDER_COLOR_PATTERNS,
                        update_annotation_name)
 from .utils import (find_pattern_match, handle_color, stream_to_io,
                     traverse_pattern)
-from .watermark import create_watermarks_and_draw
 
 
 def set_character_x_paddings(
@@ -93,30 +92,6 @@ def build_widgets(
                 if _widget.full_name is not None and use_full_widget_name:
                     results[_widget.full_name] = results[key]
     return results
-
-
-def widget_rect_watermarks(pdf: bytes) -> List[bytes]:
-    """Draws the rectangular border of each widget and returns watermarks."""
-
-    watermarks = []
-
-    for page, widgets in get_widgets_by_page(pdf).items():
-        to_draw = []
-        for widget in widgets:
-            rect = widget[Rect]
-            x = rect[0]
-            y = rect[1]
-            width = abs(rect[0] - rect[2])
-            height = abs(rect[1] - rect[3])
-
-            to_draw.append(
-                [x, y, width, height, handle_color([0, 0, 0]), None, 1, None]
-            )
-        watermarks.append(
-            create_watermarks_and_draw(pdf, page, "rect", to_draw)[page - 1]
-        )
-
-    return watermarks
 
 
 def dropdown_to_text(dropdown: Dropdown) -> Text:
