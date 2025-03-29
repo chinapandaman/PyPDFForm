@@ -8,7 +8,6 @@ from typing import Dict, List, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
-from reportlab.lib.colors import CMYKColor, Color
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COMB, DEFAULT_BORDER_WIDTH, DEFAULT_FONT_SIZE,
@@ -29,7 +28,7 @@ from .patterns import (BACKGROUND_COLOR_PATTERNS, BORDER_COLOR_PATTERNS,
                        WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
                        update_annotation_name)
 from .utils import (find_pattern_match, handle_color, stream_to_io,
-                    traverse_pattern, extract_widget_property)
+                    extract_widget_property)
 
 
 def set_character_x_paddings(
@@ -62,12 +61,14 @@ def build_widgets(
             if _widget is not None:
                 if use_full_widget_name:
                     _widget.full_name = get_widget_full_key(widget)
+
                 _widget.desc = extract_widget_property(widget, WIDGET_DESCRIPTION_PATTERNS, None, str)
-                _widget.border_color = get_border_color(widget)
-                _widget.background_color = get_background_color(widget)
-                _widget.border_width = get_border_width(widget)
-                _widget.border_style = get_border_style(widget)
-                _widget.dash_array = get_border_dash_array(widget)
+                _widget.border_color = extract_widget_property(widget, BORDER_COLOR_PATTERNS, None, handle_color)
+                _widget.background_color = extract_widget_property(widget, BACKGROUND_COLOR_PATTERNS, None, handle_color)
+                _widget.border_width = extract_widget_property(widget, BORDER_WIDTH_PATTERNS, DEFAULT_BORDER_WIDTH, float)
+                _widget.border_style = extract_widget_property(widget, BORDER_STYLE_PATTERNS, None, str)
+                _widget.dash_array = extract_widget_property(widget, BORDER_DASH_ARRAY_PATTERNS, None, list)
+
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
                     if _widget.max_length is not None and is_text_field_comb(widget):
@@ -247,61 +248,6 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
             widget, DROPDOWN_CHOICE_PATTERNS, None, None
         )
     )
-
-
-def get_border_color(widget: dict) -> Union[Color, CMYKColor, None]:
-    """Returns the border color of a widget."""
-
-    for pattern in BORDER_COLOR_PATTERNS:
-        color = traverse_pattern(pattern, widget)
-        if color is not None:
-            return handle_color(color)
-
-    return None
-
-
-def get_background_color(widget: dict) -> Union[Color, CMYKColor, None]:
-    """Returns the background color of a widget."""
-
-    for pattern in BACKGROUND_COLOR_PATTERNS:
-        color = traverse_pattern(pattern, widget)
-        if color is not None:
-            return handle_color(color)
-
-    return None
-
-
-def get_border_width(widget: dict) -> float:
-    """Returns the border width of a widget."""
-
-    for pattern in BORDER_WIDTH_PATTERNS:
-        width = traverse_pattern(pattern, widget)
-        if width is not None:
-            return float(width)
-
-    return DEFAULT_BORDER_WIDTH
-
-
-def get_border_style(widget: dict) -> Union[str, None]:
-    """Returns the border style of a widget."""
-
-    for pattern in BORDER_STYLE_PATTERNS:
-        style = traverse_pattern(pattern, widget)
-        if style is not None:
-            return str(style)
-
-    return None
-
-
-def get_border_dash_array(widget: dict) -> Union[list, None]:
-    """Returns the border dash array of a widget if it has a dashed border."""
-
-    for pattern in BORDER_DASH_ARRAY_PATTERNS:
-        dash_arrary = traverse_pattern(pattern, widget)
-        if dash_arrary is not None:
-            return list(dash_arrary)
-
-    return None
 
 
 def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:
