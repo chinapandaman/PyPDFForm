@@ -52,7 +52,7 @@ class FormWrapper:
     ) -> FormWrapper:
         """Fills a PDF form."""
 
-        widgets = build_widgets(self.stream, False) if self.stream else {}
+        widgets = build_widgets(self.stream, False, False) if self.stream else {}
 
         for key, value in data.items():
             if key in widgets:
@@ -72,10 +72,11 @@ class PdfWrapper(FormWrapper):
     """A class to represent a PDF form."""
 
     USER_PARAMS = [
-        "global_font",
-        "global_font_size",
-        "global_font_color",
-        "use_full_widget_name",
+        ("global_font", None),
+        ("global_font_size", None),
+        ("global_font_color", None),
+        ("use_full_widget_name", False),
+        ("render_widgets", True),
     ]
 
     def __init__(
@@ -89,8 +90,8 @@ class PdfWrapper(FormWrapper):
         self.widgets = {}
         self._keys_to_update = []
 
-        for each in self.USER_PARAMS:
-            setattr(self, each, kwargs.get(each))
+        for attr, default in self.USER_PARAMS:
+            setattr(self, attr, kwargs.get(attr, default))
 
         self._init_helper()
 
@@ -99,7 +100,7 @@ class PdfWrapper(FormWrapper):
 
         refresh_not_needed = {}
         new_widgets = (
-            build_widgets(self.read(), getattr(self, "use_full_widget_name"))
+            build_widgets(self.read(), getattr(self, "use_full_widget_name"), getattr(self, "render_widgets"))
             if self.read()
             else {}
         )
@@ -141,7 +142,7 @@ class PdfWrapper(FormWrapper):
 
         return [
             self.__class__(
-                each, **{param: getattr(self, param) for param in self.USER_PARAMS}
+                each, **{param: getattr(self, param) for param, _ in self.USER_PARAMS}
             )
             for each in get_page_streams(self.stream)
         ]

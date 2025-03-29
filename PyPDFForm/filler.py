@@ -175,13 +175,14 @@ def fill(
             text_needs_to_be_drawn = False
             to_draw = x = y = None
 
-            border_handler(
-                widget_dict,
-                widgets[key],
-                rect_borders_to_draw[page],
-                ellipse_borders_to_draw[page],
-                line_borders_to_draw[page],
-            )
+            if widgets[key].render_widget:
+                border_handler(
+                    widget_dict,
+                    widgets[key],
+                    rect_borders_to_draw[page],
+                    ellipse_borders_to_draw[page],
+                    line_borders_to_draw[page],
+                )
 
             if isinstance(widgets[key], (Checkbox, Radio)):
                 to_draw, x, y, text_needs_to_be_drawn = check_radio_handler(

@@ -24,6 +24,7 @@ class Widget:
         self.border_width = None
         self.border_style = None
         self.dash_array = None
+        self.render_widget = None
 
     @property
     def name(self) -> str:
