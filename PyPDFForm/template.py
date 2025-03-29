@@ -62,7 +62,7 @@ def build_widgets(
             if _widget is not None:
                 if use_full_widget_name:
                     _widget.full_name = get_widget_full_key(widget)
-                _widget.desc = get_widget_description(widget)
+                _widget.desc = extract_widget_property(widget, WIDGET_DESCRIPTION_PATTERNS, None, str)
                 _widget.border_color = get_border_color(widget)
                 _widget.background_color = get_background_color(widget)
                 _widget.border_width = get_border_width(widget)
@@ -214,18 +214,6 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
     """Returns the max length of the text field if presented or None."""
 
     return int(widget[MaxLen]) or None if MaxLen in widget else None
-
-
-def get_widget_description(widget: dict) -> Union[str, None]:
-    """Returns the description of the widget if presented or None."""
-
-    result = None
-    for pattern in WIDGET_DESCRIPTION_PATTERNS:
-        value = traverse_pattern(pattern, widget)
-        if value:
-            result = str(value)
-            break
-    return result
 
 
 def check_field_flag_bit(widget: dict, bit: int) -> bool:
