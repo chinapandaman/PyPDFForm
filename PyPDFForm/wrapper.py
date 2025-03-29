@@ -183,7 +183,7 @@ class PdfWrapper(FormWrapper):
             fill(
                 self.stream,
                 {
-                    key: preview_widget_to_draw(value)
+                    key: preview_widget_to_draw(value, True)
                     for key, value in self.widgets.items()
                 },
             )
@@ -194,16 +194,16 @@ class PdfWrapper(FormWrapper):
     ) -> PdfWrapper:
         """Inspects a coordinate grid of the PDF."""
 
-        widgets = {
-            key: preview_widget_to_draw(value)
-            for key, value in self.widgets.items()
-        }
-        for widget in widgets.values():
-            widget.preview = False
-            widget.value = None
-
         self.stream = generate_coordinate_grid(
-            remove_all_widgets(fill(self.stream, widgets)),
+            remove_all_widgets(
+                fill(
+                    self.stream,
+                    {
+                        key: preview_widget_to_draw(value, False)
+                        for key, value in self.widgets.items()
+                    },
+                )
+            ),
             color,
             margin,
         )

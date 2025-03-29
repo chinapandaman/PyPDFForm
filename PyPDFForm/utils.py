@@ -64,17 +64,17 @@ def checkbox_radio_to_draw(
     return new_widget
 
 
-def preview_widget_to_draw(widget: WIDGET_TYPES) -> Text:
+def preview_widget_to_draw(widget: WIDGET_TYPES, with_preview_text: bool) -> Text:
     """Converts a widget to a preview text widget."""
 
     new_widget = Text(
         name=widget.name,
-        value="{" + f" {widget.name} " + "}",
+        value="{" + f" {widget.name} " + "}" if with_preview_text else None,
     )
     new_widget.font = DEFAULT_FONT
     new_widget.font_size = DEFAULT_FONT_SIZE
     new_widget.font_color = PREVIEW_FONT_COLOR
-    new_widget.preview = True
+    new_widget.preview = with_preview_text
     new_widget.border_color = handle_color([0, 0, 0])
     new_widget.border_width = 1
 
