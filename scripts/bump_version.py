@@ -11,13 +11,27 @@ if __name__ == "__main__":
         print("Bump version cannot be done on a non-issue branch.")
         sys.exit(1)
 
+    to_bump = sys.argv[2]
+
     v = ""
     with open("PyPDFForm/__init__.py", encoding="utf8") as f:
         version = re.search(r'__version__ = "(.*?)"', f.read())
         if version:
             v = version.group(1)
 
-    new_version = ".".join(v.split(".")[:-1] + [str(int(v.split(".")[-1]) + 1)])
+    major, minor, patch = v.split(".")
+
+    if to_bump == "patch":
+        patch = str(int(patch) + 1)
+    elif to_bump == "minor":
+        patch = "0"
+        minor = str(int(minor) + 1)
+    elif to_bump == "major":
+        patch = "0"
+        minor = "0"
+        major = str(int(major) + 1)
+
+    new_version = f"{major}.{minor}.{patch}"
 
     files_to_update = ["PyPDFForm/__init__.py", "mkdocs.yml", "SECURITY.md"]
 
