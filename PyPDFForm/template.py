@@ -47,7 +47,9 @@ def set_character_x_paddings(
 
 
 def build_widgets(
-    pdf_stream: bytes, use_full_widget_name: bool, render_widgets: bool,
+    pdf_stream: bytes,
+    use_full_widget_name: bool,
+    render_widgets: bool,
 ) -> Dict[str, WIDGET_TYPES]:
     """Builds a widget dict given a PDF form stream."""
 

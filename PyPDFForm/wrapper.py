@@ -100,7 +100,11 @@ class PdfWrapper(FormWrapper):
 
         refresh_not_needed = {}
         new_widgets = (
-            build_widgets(self.read(), getattr(self, "use_full_widget_name"), getattr(self, "render_widgets"))
+            build_widgets(
+                self.read(),
+                getattr(self, "use_full_widget_name"),
+                getattr(self, "render_widgets"),
+            )
             if self.read()
             else {}
         )
