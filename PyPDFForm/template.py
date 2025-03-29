@@ -219,11 +219,7 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
 def check_field_flag_bit(widget: dict, bit: int) -> bool:
     """Checks if a bit is set in a widget's field flag."""
 
-    field_flag = None
-    for pattern in TEXT_FIELD_FLAG_PATTERNS:
-        field_flag = traverse_pattern(pattern, widget)
-        if field_flag is not None:
-            break
+    field_flag = extract_widget_property(widget, TEXT_FIELD_FLAG_PATTERNS, None, int)
 
     if field_flag is None:
         return False
