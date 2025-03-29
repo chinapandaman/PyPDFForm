@@ -136,7 +136,7 @@ def get_draw_text_coordinates(
         else widget_middleware.character_paddings
     )
 
-    alignment = extract_widget_property(widget, WIDGET_ALIGNMENT_PATTERNS, None, str) or 0
+    alignment = extract_widget_property(widget, WIDGET_ALIGNMENT_PATTERNS, None, int) or 0
     x = float(widget[Rect][0])
 
     if int(alignment) != 0:
