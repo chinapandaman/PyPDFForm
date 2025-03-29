@@ -12,7 +12,7 @@ from .constants import (COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT,
 from .middleware.text import Text
 from .template import (get_char_rect_width, get_widget_alignment,
                        is_text_multiline)
-from .utils import stream_to_io, handle_color
+from .utils import handle_color, stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -235,12 +235,16 @@ def generate_coordinate_grid(
 
         current = margin
         while current < width:
-            lines_by_page[i + 1].append([current, 0, current, height, handle_color([r, g, b]), None, 1, None])
+            lines_by_page[i + 1].append(
+                [current, 0, current, height, handle_color([r, g, b]), None, 1, None]
+            )
             current += margin
 
         current = margin
         while current < height:
-            lines_by_page[i + 1].append([0, current, width, current, handle_color([r, g, b]), None, 1, None])
+            lines_by_page[i + 1].append(
+                [0, current, width, current, handle_color([r, g, b]), None, 1, None]
+            )
             current += margin
 
         x = margin
