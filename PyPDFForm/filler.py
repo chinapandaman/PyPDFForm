@@ -100,7 +100,7 @@ def border_handler(
     middleware: WIDGET_TYPES,
     rect_borders_to_draw: list,
     ellipse_borders_to_draw: list,
-    underline_borders_to_draw: list,
+    line_borders_to_draw: list,
 ) -> None:
     """Handles draw parameters for each widget's border."""
 
@@ -111,8 +111,8 @@ def border_handler(
         list_to_append = ellipse_borders_to_draw
         shape = "ellipse"
     elif middleware.border_style == U:
-        list_to_append = underline_borders_to_draw
-        shape = "underline"
+        list_to_append = line_borders_to_draw
+        shape = "line"
     else:
         list_to_append = rect_borders_to_draw
         shape = "rect"
@@ -127,7 +127,7 @@ def border_handler(
         ]
     )
 
-    if shape == "underline":
+    if shape == "line":
         rect_borders_to_draw.append(
             get_draw_border_coordinates(widget, "rect")
             + [None, middleware.background_color, 0, None]
@@ -158,7 +158,7 @@ def fill(
     images_to_draw = {}
     rect_borders_to_draw = {}
     ellipse_borders_to_draw = {}
-    underline_borders_to_draw = {}
+    line_borders_to_draw = {}
     any_image_to_draw = False
 
     radio_button_tracker = {}
@@ -168,7 +168,7 @@ def fill(
         images_to_draw[page] = []
         rect_borders_to_draw[page] = []
         ellipse_borders_to_draw[page] = []
-        underline_borders_to_draw[page] = []
+        line_borders_to_draw[page] = []
         for widget_dict in widget_dicts:
             key = get_widget_key(widget_dict)
             text_needs_to_be_drawn = False
@@ -179,7 +179,7 @@ def fill(
                 widgets[key],
                 rect_borders_to_draw[page],
                 ellipse_borders_to_draw[page],
-                underline_borders_to_draw[page],
+                line_borders_to_draw[page],
             )
 
             if isinstance(widgets[key], (Checkbox, Radio)):
@@ -214,7 +214,7 @@ def fill(
     result = template_stream
     result = get_drawn_stream(rect_borders_to_draw, result, "rect")
     result = get_drawn_stream(ellipse_borders_to_draw, result, "ellipse")
-    result = get_drawn_stream(underline_borders_to_draw, result, "underline")
+    result = get_drawn_stream(line_borders_to_draw, result, "line")
     result = get_drawn_stream(texts_to_draw, result, "text")
 
     if any_image_to_draw:

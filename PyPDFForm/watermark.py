@@ -72,24 +72,6 @@ def draw_text(*args) -> None:
         canvas.restoreState()
 
 
-def draw_line(*args) -> None:
-    """Draws a line on the watermark."""
-
-    canvas = args[0]
-    src_x = args[1]
-    src_y = args[2]
-    dest_x = args[3]
-    dest_y = args[4]
-    r = args[5]
-    g = args[6]
-    b = args[7]
-
-    canvas.saveState()
-    canvas.setStrokeColorRGB(r, g, b)
-    canvas.line(src_x, src_y, dest_x, dest_y)
-    canvas.restoreState()
-
-
 def draw_rect(*args) -> None:
     """Draws a rectangle on the watermark."""
 
@@ -120,8 +102,8 @@ def draw_ellipse(*args) -> None:
     canvas.restoreState()
 
 
-def draw_underline(*args) -> None:
-    """Draws an underline for a widget on the watermark."""
+def draw_line(*args) -> None:
+    """Draws a line on the watermark."""
 
     canvas = args[0]
     src_x = args[1]
@@ -220,9 +202,6 @@ def create_watermarks_and_draw(
     elif action_type == "ellipse":
         for each in actions:
             draw_ellipse(*([canvas, *each]))
-    elif action_type == "underline":
-        for each in actions:
-            draw_underline(*([canvas, *each]))
 
     canvas.save()
     buff.seek(0)
