@@ -9,10 +9,11 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT,
                         Rect)
+from .patterns import WIDGET_ALIGNMENT_PATTERNS
 from .middleware.text import Text
-from .template import (get_char_rect_width, get_widget_alignment,
+from .template import (get_char_rect_width,
                        is_text_multiline)
-from .utils import handle_color, stream_to_io
+from .utils import handle_color, stream_to_io, extract_widget_property
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -135,7 +136,7 @@ def get_draw_text_coordinates(
         else widget_middleware.character_paddings
     )
 
-    alignment = get_widget_alignment(widget) or 0
+    alignment = extract_widget_property(widget, WIDGET_ALIGNMENT_PATTERNS, None, int) or 0
     x = float(widget[Rect][0])
 
     if int(alignment) != 0:

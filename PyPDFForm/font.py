@@ -16,7 +16,7 @@ from .constants import (DEFAULT_FONT, FONT_COLOR_IDENTIFIER,
                         MARGIN_BETWEEN_LINES, Rect)
 from .middleware.text import Text
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .utils import traverse_pattern
+from .utils import extract_widget_property
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
@@ -72,19 +72,12 @@ def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
 def auto_detect_font(widget: dict) -> str:
     """Returns the font of the text field if it is one of the standard fonts."""
 
-    result = DEFAULT_FONT
-
-    text_appearance = None
-    for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
-        text_appearance = traverse_pattern(pattern, widget)
-
-        if text_appearance:
-            break
+    text_appearance = extract_widget_property(widget, TEXT_FIELD_APPEARANCE_PATTERNS, None, None)
 
     if not text_appearance:
-        return result
+        return DEFAULT_FONT
 
-    return extract_font_from_text_appearance(text_appearance) or result
+    return extract_font_from_text_appearance(text_appearance) or DEFAULT_FONT
 
 
 def text_field_font_size(widget: dict) -> Union[float, int]:
@@ -115,13 +108,12 @@ def get_text_field_font_size(widget: dict) -> Union[float, int]:
     """Returns the font size of the text field if presented or zero."""
 
     result = 0
-    for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
-        text_appearance = traverse_pattern(pattern, widget)
-        if text_appearance:
-            properties = text_appearance.split(" ")
-            for i, val in enumerate(properties):
-                if val.startswith(FONT_SIZE_IDENTIFIER):
-                    return float(properties[i - 1])
+    text_appearance = extract_widget_property(widget, TEXT_FIELD_APPEARANCE_PATTERNS, None, None)
+    if text_appearance:
+        properties = text_appearance.split(" ")
+        for i, val in enumerate(properties):
+            if val.startswith(FONT_SIZE_IDENTIFIER):
+                return float(properties[i - 1])
 
     return result
 
@@ -132,21 +124,20 @@ def get_text_field_font_color(
     """Returns the font color tuple of the text field if presented or black."""
 
     result = (0, 0, 0)
-    for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
-        text_appearance = traverse_pattern(pattern, widget)
-        if text_appearance:
-            if FONT_COLOR_IDENTIFIER not in text_appearance:
-                return result
+    text_appearance = extract_widget_property(widget, TEXT_FIELD_APPEARANCE_PATTERNS, None, None)
+    if text_appearance:
+        if FONT_COLOR_IDENTIFIER not in text_appearance:
+            return result
 
-            text_appearance = text_appearance.split(" ")
-            for i, val in enumerate(text_appearance):
-                if val.startswith(FONT_COLOR_IDENTIFIER.replace(" ", "")):
-                    result = (
-                        float(text_appearance[i - 3]),
-                        float(text_appearance[i - 2]),
-                        float(text_appearance[i - 1]),
-                    )
-                    break
+        text_appearance = text_appearance.split(" ")
+        for i, val in enumerate(text_appearance):
+            if val.startswith(FONT_COLOR_IDENTIFIER.replace(" ", "")):
+                result = (
+                    float(text_appearance[i - 3]),
+                    float(text_appearance[i - 2]),
+                    float(text_appearance[i - 1]),
+                )
+                break
 
     return result
 

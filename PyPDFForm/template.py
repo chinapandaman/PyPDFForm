@@ -8,7 +8,6 @@ from typing import Dict, List, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
-from reportlab.lib.colors import CMYKColor, Color
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import (COMB, DEFAULT_BORDER_WIDTH, DEFAULT_FONT_SIZE,
@@ -25,11 +24,11 @@ from .patterns import (BACKGROUND_COLOR_PATTERNS, BORDER_COLOR_PATTERNS,
                        BORDER_DASH_ARRAY_PATTERNS, BORDER_STYLE_PATTERNS,
                        BORDER_WIDTH_PATTERNS, BUTTON_STYLE_PATTERNS,
                        DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
-                       WIDGET_ALIGNMENT_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
+                       WIDGET_DESCRIPTION_PATTERNS,
                        WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
                        update_annotation_name)
 from .utils import (find_pattern_match, handle_color, stream_to_io,
-                    traverse_pattern)
+                    extract_widget_property)
 
 
 def set_character_x_paddings(
@@ -39,7 +38,7 @@ def set_character_x_paddings(
 
     for _widgets in get_widgets_by_page(pdf_stream).values():
         for widget in _widgets:
-            key = get_widget_key(widget)
+            key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
             _widget = widgets[key]
 
             if isinstance(_widget, Text) and _widget.comb is True:
@@ -57,17 +56,19 @@ def build_widgets(
 
     for widgets in get_widgets_by_page(pdf_stream).values():
         for widget in widgets:
-            key = get_widget_key(widget)
+            key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
             _widget = construct_widget(widget, key)
             if _widget is not None:
                 if use_full_widget_name:
                     _widget.full_name = get_widget_full_key(widget)
-                _widget.desc = get_widget_description(widget)
-                _widget.border_color = get_border_color(widget)
-                _widget.background_color = get_background_color(widget)
-                _widget.border_width = get_border_width(widget)
-                _widget.border_style = get_border_style(widget)
-                _widget.dash_array = get_border_dash_array(widget)
+
+                _widget.desc = extract_widget_property(widget, WIDGET_DESCRIPTION_PATTERNS, None, str)
+                _widget.border_color = extract_widget_property(widget, BORDER_COLOR_PATTERNS, None, handle_color)
+                _widget.background_color = extract_widget_property(widget, BACKGROUND_COLOR_PATTERNS, None, handle_color)
+                _widget.border_width = extract_widget_property(widget, BORDER_WIDTH_PATTERNS, DEFAULT_BORDER_WIDTH, float)
+                _widget.border_style = extract_widget_property(widget, BORDER_STYLE_PATTERNS, None, str)
+                _widget.dash_array = extract_widget_property(widget, BORDER_DASH_ARRAY_PATTERNS, None, list)
+
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
                     if _widget.max_length is not None and is_text_field_comb(widget):
@@ -75,7 +76,7 @@ def build_widgets(
 
                 if isinstance(_widget, (Checkbox, Radio)):
                     _widget.button_style = (
-                        get_button_style(widget) or _widget.button_style
+                        extract_widget_property(widget, BUTTON_STYLE_PATTERNS, None, str) or _widget.button_style
                     )
 
                 if isinstance(_widget, Dropdown):
@@ -120,7 +121,7 @@ def update_text_field_attributes(
 
     for _widgets in get_widgets_by_page(template_stream).values():
         for _widget in _widgets:
-            key = get_widget_key(_widget)
+            key = extract_widget_property(_widget, WIDGET_KEY_PATTERNS, None, str)
 
             if isinstance(widgets[key], Text):
                 should_adjust_font_size = False
@@ -177,25 +178,13 @@ def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
     return result
 
 
-def get_widget_key(widget: dict) -> Union[str, list, None]:
-    """Finds a PDF widget's annotated key by pattern matching."""
-
-    result = None
-    for pattern in WIDGET_KEY_PATTERNS:
-        value = traverse_pattern(pattern, widget)
-        if value:
-            result = value
-            break
-    return result
-
-
 def get_widget_full_key(widget: dict) -> Union[str, None]:
     """
     Returns a PDF widget's full annotated key by prepending its
     parent widget's key.
     """
 
-    key = get_widget_key(widget)
+    key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
 
     if (
         Parent in widget
@@ -205,18 +194,6 @@ def get_widget_full_key(widget: dict) -> Union[str, None]:
         return f"{widget[Parent].get_object()[T]}.{key}"
 
     return None
-
-
-def get_widget_alignment(widget: dict) -> Union[str, list, None]:
-    """Finds a PDF widget's alignment by pattern matching."""
-
-    result = None
-    for pattern in WIDGET_ALIGNMENT_PATTERNS:
-        value = traverse_pattern(pattern, widget)
-        if value:
-            result = value
-            break
-    return result
 
 
 def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
@@ -240,26 +217,10 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
     return int(widget[MaxLen]) or None if MaxLen in widget else None
 
 
-def get_widget_description(widget: dict) -> Union[str, None]:
-    """Returns the description of the widget if presented or None."""
-
-    result = None
-    for pattern in WIDGET_DESCRIPTION_PATTERNS:
-        value = traverse_pattern(pattern, widget)
-        if value:
-            result = str(value)
-            break
-    return result
-
-
 def check_field_flag_bit(widget: dict, bit: int) -> bool:
     """Checks if a bit is set in a widget's field flag."""
 
-    field_flag = None
-    for pattern in TEXT_FIELD_FLAG_PATTERNS:
-        field_flag = traverse_pattern(pattern, widget)
-        if field_flag is not None:
-            break
+    field_flag = extract_widget_property(widget, TEXT_FIELD_FLAG_PATTERNS, None, int)
 
     if field_flag is None:
         return False
@@ -282,82 +243,11 @@ def is_text_multiline(widget: dict) -> bool:
 def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
     """Returns string options of a dropdown field."""
 
-    result = None
-    for pattern in DROPDOWN_CHOICE_PATTERNS:
-        choices = traverse_pattern(pattern, widget)
-        if choices:
-            result = tuple(
-                (each if isinstance(each, str) else str(each[1])) for each in choices
-            )
-            break
-
-    return result
-
-
-def get_button_style(widget: dict) -> Union[str, None]:
-    """Returns the button style of a checkbox or radiobutton."""
-
-    for pattern in BUTTON_STYLE_PATTERNS:
-        style = traverse_pattern(pattern, widget)
-        if style is not None:
-            return str(style)
-
-    return None
-
-
-def get_border_color(widget: dict) -> Union[Color, CMYKColor, None]:
-    """Returns the border color of a widget."""
-
-    for pattern in BORDER_COLOR_PATTERNS:
-        color = traverse_pattern(pattern, widget)
-        if color is not None:
-            return handle_color(color)
-
-    return None
-
-
-def get_background_color(widget: dict) -> Union[Color, CMYKColor, None]:
-    """Returns the background color of a widget."""
-
-    for pattern in BACKGROUND_COLOR_PATTERNS:
-        color = traverse_pattern(pattern, widget)
-        if color is not None:
-            return handle_color(color)
-
-    return None
-
-
-def get_border_width(widget: dict) -> float:
-    """Returns the border width of a widget."""
-
-    for pattern in BORDER_WIDTH_PATTERNS:
-        width = traverse_pattern(pattern, widget)
-        if width is not None:
-            return float(width)
-
-    return DEFAULT_BORDER_WIDTH
-
-
-def get_border_style(widget: dict) -> Union[str, None]:
-    """Returns the border style of a widget."""
-
-    for pattern in BORDER_STYLE_PATTERNS:
-        style = traverse_pattern(pattern, widget)
-        if style is not None:
-            return str(style)
-
-    return None
-
-
-def get_border_dash_array(widget: dict) -> Union[list, None]:
-    """Returns the border dash array of a widget if it has a dashed border."""
-
-    for pattern in BORDER_DASH_ARRAY_PATTERNS:
-        dash_arrary = traverse_pattern(pattern, widget)
-        if dash_arrary is not None:
-            return list(dash_arrary)
-
-    return None
+    return tuple(
+        (each if isinstance(each, str) else str(each[1])) for each in extract_widget_property(
+            widget, DROPDOWN_CHOICE_PATTERNS, None, None
+        )
+    )
 
 
 def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:
@@ -511,7 +401,7 @@ def update_widget_keys(
         for page in out.pages:
             for annot in page.get(Annots, []):  # noqa
                 annot = cast(DictionaryObject, annot.get_object())
-                key = get_widget_key(annot.get_object())
+                key = extract_widget_property(annot.get_object(), WIDGET_KEY_PATTERNS, None, str)
 
                 widget = widgets.get(key)
                 if widget is None:
