@@ -18,7 +18,7 @@ from .middleware.dropdown import Dropdown
 from .middleware.text import Text
 from .template import (build_widgets, dropdown_to_text,
                        set_character_x_paddings, update_text_field_attributes,
-                       update_widget_keys, widget_rect_watermarks)
+                       update_widget_keys)
 from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
                     preview_widget_to_draw, remove_all_widgets)
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
@@ -194,10 +194,16 @@ class PdfWrapper(FormWrapper):
     ) -> PdfWrapper:
         """Inspects a coordinate grid of the PDF."""
 
+        widgets = {
+            key: preview_widget_to_draw(value)
+            for key, value in self.widgets.items()
+        }
+        for widget in widgets.values():
+            widget.preview = False
+            widget.value = None
+
         self.stream = generate_coordinate_grid(
-            merge_watermarks_with_pdf(
-                remove_all_widgets(self.read()), widget_rect_watermarks(self.read())
-            ),
+            remove_all_widgets(fill(self.stream, widgets)),
             color,
             margin,
         )
