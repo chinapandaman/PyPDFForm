@@ -16,7 +16,7 @@ from .constants import (DEFAULT_FONT, FONT_COLOR_IDENTIFIER,
                         MARGIN_BETWEEN_LINES, Rect)
 from .middleware.text import Text
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .utils import traverse_pattern
+from .utils import extract_widget_property, traverse_pattern
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
@@ -72,19 +72,12 @@ def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
 def auto_detect_font(widget: dict) -> str:
     """Returns the font of the text field if it is one of the standard fonts."""
 
-    result = DEFAULT_FONT
-
-    text_appearance = None
-    for pattern in TEXT_FIELD_APPEARANCE_PATTERNS:
-        text_appearance = traverse_pattern(pattern, widget)
-
-        if text_appearance:
-            break
+    text_appearance = extract_widget_property(widget, TEXT_FIELD_APPEARANCE_PATTERNS, DEFAULT_FONT, None)
 
     if not text_appearance:
-        return result
+        return DEFAULT_FONT
 
-    return extract_font_from_text_appearance(text_appearance) or result
+    return extract_font_from_text_appearance(text_appearance) or DEFAULT_FONT
 
 
 def text_field_font_size(widget: dict) -> Union[float, int]:
