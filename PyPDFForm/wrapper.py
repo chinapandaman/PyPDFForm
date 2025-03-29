@@ -180,15 +180,12 @@ class PdfWrapper(FormWrapper):
         """Inspects all supported widgets' names for the PDF form."""
 
         return remove_all_widgets(
-            merge_watermarks_with_pdf(
-                fill(
-                    self.stream,
-                    {
-                        key: preview_widget_to_draw(value)
-                        for key, value in self.widgets.items()
-                    },
-                ),
-                widget_rect_watermarks(self.read()),
+            fill(
+                self.stream,
+                {
+                    key: preview_widget_to_draw(value)
+                    for key, value in self.widgets.items()
+                },
             )
         )
 

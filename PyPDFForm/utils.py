@@ -75,6 +75,8 @@ def preview_widget_to_draw(widget: WIDGET_TYPES) -> Text:
     new_widget.font_size = DEFAULT_FONT_SIZE
     new_widget.font_color = PREVIEW_FONT_COLOR
     new_widget.preview = True
+    new_widget.border_color = handle_color([0, 0, 0])
+    new_widget.border_width = 1
 
     return new_widget
 
