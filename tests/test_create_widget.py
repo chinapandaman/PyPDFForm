@@ -482,3 +482,19 @@ def test_create_dropdown(template_stream, pdf_samples, request):
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_fill_cmyk_color(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_fill_cmyk_color.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(
+            os.path.join(pdf_samples, "widget", "sample_template_with_cmyk_color.pdf")
+        ).fill({"foo": "foo"})
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
