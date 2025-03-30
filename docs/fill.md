@@ -149,3 +149,52 @@ pdf.fill(
 with open("output.pdf", "wb+") as output:
     output.write(pdf.read())
 ```
+
+## Disable rendering widgets
+
+By default, PyPDFForm will still render each widget on the filled PDF form even though it's flattened during filling the process. This behavior can be disabled globally by passing 
+the `render_widgets` parameter as `False` to the `PdfWrapper` object. Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf):
+
+```python
+from PyPDFForm import PdfWrapper
+
+filled = PdfWrapper("sample_template.pdf", render_widgets=False).fill(
+    {
+        "test": "test_1",
+        "check": True,
+        "test_2": "test_2",
+        "check_2": False,
+        "test_3": "test_3",
+        "check_3": True,
+    },
+)
+
+with open("output.pdf", "wb+") as output:
+    output.write(filled.read())
+```
+
+Alternatively, if you just want to disable rendering of some widgets but not others, you can do so at each widget's level by setting the attribute 
+`render_widget` to `False`:
+
+```python
+from PyPDFForm import PdfWrapper
+
+pdf = PdfWrapper("sample_template.pdf")
+
+pdf.widgets["check"].render_widget = False
+pdf.widgets["check_2"].render_widget = False
+
+pdf.fill(
+    {
+        "test": "test_1",
+        "check": True,
+        "test_2": "test_2",
+        "check_2": False,
+        "test_3": "test_3",
+        "check_3": True,
+    },
+)
+
+with open("output.pdf", "wb+") as output:
+    output.write(pdf.read())
+```
