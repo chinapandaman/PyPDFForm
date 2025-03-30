@@ -8,6 +8,15 @@
     <a href="https://pypistats.org/packages/pypdfform"><img src="https://img.shields.io/pypi/dm/pypdfform?logo=pypi&logoColor=white&label=downloads&labelColor=black&color=blue&style=for-the-badge"></a>
 </p>
 
+## Important Announcements
+
+Hello fellow Python developers! With the release of v2.0.0, there are some important changes I'm making to the library:
+
+* Since I started developing the library, versioning releases has been quite unorthodox, and there isn't any convention I followed. Starting with v2.0.0, PyPDFForm will version releases following the conventions defined by [Semantic Versioning](https://semver.org/).
+* PyPDFForm now renders PDF form widgets! Ever since its ancestral stage, the library has only been able to render the data you filled into a PDF form. Now if you fill a PDF form using `PdfWrapper`, the result will render the whole widget instead of just the value that got filled. If you would like to disable this behavior, please refer to the docs [here](https://chinapandaman.github.io/PyPDFForm/fill/#disable-rendering-widgets).
+
+Happy hacking!
+
 ## Introduction
 
 PyPDFForm is a free and open source pure-Python 3 library for PDF form processing. It contains the essential 
