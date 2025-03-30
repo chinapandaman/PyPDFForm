@@ -40,7 +40,9 @@ def handle_color(color: Union[list, ArrayObject]) -> Union[Color, CMYKColor, Non
     elif len(color) == 3:
         result = Color(red=color[0], green=color[1], blue=color[2])
     elif len(color) == 4:
-        result = CMYKColor(cyan=color[0], magenta=color[1], yellow=color[2], black=color[3])
+        result = CMYKColor(
+            cyan=color[0], magenta=color[1], yellow=color[2], black=color[3]
+        )
 
     return result
 
