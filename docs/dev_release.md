@@ -7,6 +7,10 @@ A PyPDFForm release starts with the following steps:
 
 Once these steps are done, the CI for deployment will be triggered.
 
+## Versioning
+
+PyPDFForm follows the conventions defined by [Semantic Versioning](https://semver.org/).
+
 ## Deploy process
 
 When the GitHub release is created, it will trigger two different CIs:
