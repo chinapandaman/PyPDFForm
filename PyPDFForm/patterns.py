@@ -25,6 +25,10 @@ WIDGET_TYPE_PATTERNS = [
         Signature,
     ),
     (
+        ({Parent: {FT: Sig}},),
+        Signature,
+    ),
+    (
         ({FT: Tx},),
         Text,
     ),
