@@ -87,3 +87,16 @@ def test_filling_soda_pdf_form(tool_pdf_directory, request):
         if os.name != "nt":
             assert len(result.read()) == len(expected)
             assert result.read() == expected
+
+
+def test_filling_pdfgear_sig(tool_pdf_directory, image_samples, request):
+    expected_path = os.path.join(tool_pdf_directory, "pdfgear_expected.pdf")
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        result = PdfWrapper(os.path.join(tool_pdf_directory, "pdfgear.pdf")).fill(
+            {"signature": os.path.join(image_samples, "sample_signature.png")}
+        )
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = result.read()
+        assert len(result.read()) == len(expected)
+        assert result.read() == expected
