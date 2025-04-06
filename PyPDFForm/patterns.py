@@ -115,7 +115,16 @@ BORDER_DASH_ARRAY_PATTERNS = [{BS: {D: True}}]
 
 
 def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
-    """Patterns to update values for checkbox annotations."""
+    """Update checkbox annotation values based on check state.
+
+    Modifies the appearance state (AS) and value (V) of a checkbox annotation
+    to reflect the desired checked/unchecked state. Uses the annotation's
+    appearance dictionary (AP/N) to determine valid states.
+
+    Args:
+        annot: PDF annotation dictionary to modify
+        check: Whether the checkbox should be checked (True) or unchecked (False)
+    """
 
     for each in annot[AP][N]:  # noqa
         if (check and str(each) != Off) or (not check and str(each) == Off):
@@ -125,7 +134,15 @@ def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -
 
 
 def simple_update_radio_value(annot: DictionaryObject) -> None:
-    """Patterns to update values for radio annotations."""
+    """Update radio button annotation values to selected state.
+
+    Modifies the appearance state (AS) of a radio button annotation and updates
+    the parent's value (V) to reflect the selected state. Uses the annotation's
+    appearance dictionary (AP/N) to determine valid states.
+
+    Args:
+        annot: PDF radio button annotation dictionary to modify
+    """
 
     for each in annot[AP][N]:  # noqa
         if str(each) != Off:
@@ -135,7 +152,16 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
 
 
 def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
-    """Patterns to update values for dropdown annotations."""
+    """Update dropdown annotation values based on widget selection.
+
+    Modifies the value (V) and appearance (AP) of a dropdown annotation to
+    reflect the currently selected choice from the widget. Handles both
+    standalone dropdowns and those with parent annotations.
+
+    Args:
+        annot: PDF dropdown annotation dictionary to modify
+        widget: Dropdown widget containing the selected value
+    """
 
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(V)] = TextStringObject(  # noqa
@@ -148,7 +174,16 @@ def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> N
 
 
 def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
-    """Patterns to update values for text annotations."""
+    """Update text field annotation values based on widget content.
+
+    Modifies the value (V) and appearance (AP) of a text field annotation to
+    reflect the current value from the text widget. Handles both standalone
+    text fields and those with parent annotations.
+
+    Args:
+        annot: PDF text field annotation dictionary to modify
+        widget: Text widget containing the value to set
+    """
 
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(V)] = TextStringObject(  # noqa
@@ -161,7 +196,15 @@ def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
 
 
 def simple_flatten_radio(annot: DictionaryObject) -> None:
-    """Patterns to flatten checkbox annotations."""
+    """Flatten radio button annotation by making it read-only.
+
+    Modifies the field flags (Ff) of a radio button's parent annotation
+    to set the read-only flag, effectively flattening the field and
+    preventing further user interaction.
+
+    Args:
+        annot: PDF radio button annotation dictionary to flatten
+    """
 
     annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(  # noqa
         int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY  # noqa
@@ -169,7 +212,15 @@ def simple_flatten_radio(annot: DictionaryObject) -> None:
 
 
 def simple_flatten_generic(annot: DictionaryObject) -> None:
-    """Patterns to flatten generic annotations."""
+    """Flatten generic annotation by making it read-only.
+
+    Modifies the field flags (Ff) of an annotation to set the read-only flag,
+    effectively flattening the field and preventing further user interaction.
+    Handles both standalone annotations and those with parent annotations.
+
+    Args:
+        annot: PDF annotation dictionary to flatten
+    """
 
     if Parent in annot and Ff not in annot:
         annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(  # noqa
@@ -182,7 +233,15 @@ def simple_flatten_generic(annot: DictionaryObject) -> None:
 
 
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:
-    """Patterns to update the name of an annotation."""
+    """Update the name/title of a PDF annotation.
+
+    Modifies the title (T) field of an annotation to set a new name.
+    Handles both standalone annotations and those with parent annotations.
+
+    Args:
+        annot: PDF annotation dictionary to modify
+        val: New name/title to set for the annotation
+    """
 
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(T)] = TextStringObject(val)  # noqa
@@ -191,13 +250,29 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
 
 
 def update_created_text_field_alignment(annot: DictionaryObject, val: int) -> None:
-    """Patterns to update text alignment for text annotations created by the library."""
+    """Update text alignment for created text field annotations.
+
+    Modifies the alignment (Q) field of a text field annotation created
+    by the library to set the specified text alignment.
+
+    Args:
+        annot: PDF text field annotation dictionary to modify
+        val: Alignment value to set (typically 0=left, 1=center, 2=right)
+    """
 
     annot[NameObject(Q)] = NumberObject(val)
 
 
 def update_created_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
-    """Patterns to update to multiline for text annotations created by the library."""
+    """Update multiline flag for created text field annotations.
+
+    Modifies the field flags (Ff) of a text field annotation created by
+    the library to set or clear the multiline flag based on the input value.
+
+    Args:
+        annot: PDF text field annotation dictionary to modify
+        val: Whether to enable multiline (True) or disable (False)
+    """
 
     if val:
         annot[NameObject(Ff)] = NumberObject(
