@@ -1,5 +1,17 @@
 # -*- coding: utf-8 -*-
-"""Contains helpers for coordinates calculations."""
+"""Provides coordinate calculation utilities for PDF form elements.
+
+This module contains functions for calculating positions and dimensions
+for drawing various PDF form elements including:
+- Text fields and paragraphs
+- Checkboxes and radio buttons
+- Images and signatures
+- Borders and decorative elements
+
+All calculations work in PDF coordinate space where:
+- Origin (0,0) is at bottom-left corner
+- Units are in PDF points (1/72 inch)
+"""
 
 from copy import deepcopy
 from typing import List, Tuple, Union
@@ -17,7 +29,17 @@ from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def get_draw_border_coordinates(widget: dict, shape: str) -> List[float]:
-    """Returns coordinates to draw each widget's border."""
+    """Calculates coordinates for drawing widget borders.
+
+    Args:
+        widget: PDF form widget dictionary containing Rect coordinates
+        shape: Type of border to draw ("rectangle", "ellipse" or "line")
+
+    Returns:
+        List[float]: Coordinates in format [x1, y1, x2, y2] for the border
+            For ellipses: [center_x, center_y, radius_x, radius_y]
+            For lines: [x1, y1, x2, y2] endpoints
+    """
 
     result = [
         float(widget[Rect][0]),
@@ -57,7 +79,17 @@ def get_draw_checkbox_radio_coordinates(
     widget_middleware: Text,
     border_width: int,
 ) -> Tuple[Union[float, int], Union[float, int]]:
-    """Returns coordinates to draw at given a PDF form checkbox/radio widget."""
+    """Calculates drawing coordinates for checkbox/radio button symbols.
+
+    Args:
+        widget: PDF form widget dictionary containing Rect coordinates
+        widget_middleware: Text middleware containing font properties
+        border_width: Width of widget border in points
+
+    Returns:
+        Tuple[Union[float, int], Union[float, int]]: (x, y) coordinates
+            for drawing the checkbox/radio symbol
+    """
 
     string_height = widget_middleware.font_size * 72 / 96
     width_mid_point = (float(widget[Rect][0]) + float(widget[Rect][2])) / 2
@@ -83,8 +115,18 @@ def get_draw_image_coordinates_resolutions(
     image_width: float,
     image_height: float,
 ) -> Tuple[float, float, float, float]:
-    """
-    Returns coordinates and resolutions to draw image at given a PDF form signature/image widget.
+    """Calculates image drawing coordinates and scaling factors.
+
+    Args:
+        widget: PDF form widget dictionary containing Rect coordinates
+        preserve_aspect_ratio: Whether to maintain image proportions
+        image_width: Original width of the image in points
+        image_height: Original height of the image in points
+
+    Returns:
+        Tuple[float, float, float, float]: (x, y, width, height) where:
+            x,y: Bottom-left corner coordinates
+            width,height: Scaled dimensions for drawing
     """
 
     x = float(widget[Rect][0])
@@ -110,7 +152,16 @@ def get_draw_image_coordinates_resolutions(
 def get_draw_text_coordinates(
     widget: dict, widget_middleware: Text
 ) -> Tuple[Union[float, int], Union[float, int]]:
-    """Returns coordinates to draw text at given a PDF form text widget."""
+    """Calculates text drawing coordinates within a PDF form field.
+
+    Args:
+        widget: PDF form widget dictionary containing Rect and alignment
+        widget_middleware: Text middleware containing text properties
+
+    Returns:
+        Tuple[Union[float, int], Union[float, int]]: (x, y) coordinates
+            for drawing the text baseline
+    """
 
     if widget_middleware.preview:
         return (
@@ -193,9 +244,15 @@ def get_draw_text_coordinates(
 def get_text_line_x_coordinates(
     widget: dict, widget_middleware: Text
 ) -> Union[List[float], None]:
-    """
-    Returns the x coordinates to draw lines
-    of the text at given a PDF form paragraph widget.
+    """Calculates x-coordinates for each line in a multiline text field.
+
+    Args:
+        widget: PDF form widget dictionary
+        widget_middleware: Text middleware with text_lines property
+
+    Returns:
+        Union[List[float], None]: List of x-coordinates for each text line,
+            or None if not a multiline field
     """
 
     if (
@@ -220,7 +277,16 @@ def get_text_line_x_coordinates(
 def generate_coordinate_grid(
     pdf: bytes, color: Tuple[float, float, float], margin: float
 ) -> bytes:
-    """Creates a grid view for the coordinates of a PDF."""
+    """Generates a coordinate grid overlay for a PDF document.
+
+    Args:
+        pdf: Input PDF document as bytes
+        color: RGB tuple (0-1 range) for grid line color
+        margin: Spacing between grid lines in PDF points
+
+    Returns:
+        bytes: New PDF with grid overlay as byte stream
+    """
 
     pdf_file = PdfReader(stream_to_io(pdf))
     lines_by_page = {}

@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Contains helpers for image."""
+"""Provides image processing utilities for PDF forms.
+
+This module contains functions for:
+- Rotating images while maintaining quality
+- Extracting image dimensions
+- Handling image streams and formats
+
+Supports common image formats including JPEG, PNG, and others supported by PIL.
+"""
 
 from io import BytesIO
 from typing import Tuple, Union
@@ -8,7 +16,18 @@ from PIL import Image
 
 
 def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
-    """Rotates an image by a rotation angle."""
+    """Rotates an image while maintaining original quality and format.
+
+    Args:
+        image_stream: Input image as bytes
+        rotation: Rotation angle in degrees (can be float for precise angles)
+
+    Returns:
+        bytes: Rotated image as bytes in the original format
+
+    Note:
+        Automatically expands the canvas to prevent cropping during rotation.
+    """
 
     buff = BytesIO()
     buff.write(image_stream)
@@ -29,7 +48,17 @@ def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
 
 
 def get_image_dimensions(image_stream: bytes) -> Tuple[float, float]:
-    """Gets the width and height of an image."""
+    """Extracts width and height from an image stream.
+
+    Args:
+        image_stream: Input image as bytes
+
+    Returns:
+        Tuple[float, float]: (width, height) in pixels
+
+    Note:
+        Works with any image format supported by PIL (Pillow)
+    """
 
     buff = BytesIO()
     buff.write(image_stream)
