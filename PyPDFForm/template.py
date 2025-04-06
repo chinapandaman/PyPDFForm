@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Contains helpers for generic template related processing."""
+"""Provides template processing utilities for PDF forms.
+
+This module contains functions for:
+- Building and managing PDF form widgets
+- Handling widget properties and attributes
+- Processing text fields and paragraphs
+- Managing widget keys and names
+- Supporting comb fields and multiline text
+"""
 
 from functools import lru_cache
 from io import BytesIO
@@ -33,7 +41,15 @@ from .utils import (extract_widget_property, find_pattern_match, handle_color,
 def set_character_x_paddings(
     pdf_stream: bytes, widgets: Dict[str, WIDGET_TYPES]
 ) -> Dict[str, WIDGET_TYPES]:
-    """Sets paddings between characters for combed text fields."""
+    """Calculates and sets character spacing for comb text fields.
+
+    Args:
+        pdf_stream: PDF form as bytes
+        widgets: Dictionary of widget middleware objects
+
+    Returns:
+        Dict[str, WIDGET_TYPES]: Updated widgets with character paddings
+    """
 
     for _widgets in get_widgets_by_page(pdf_stream).values():
         for widget in _widgets:
@@ -51,7 +67,16 @@ def build_widgets(
     use_full_widget_name: bool,
     render_widgets: bool,
 ) -> Dict[str, WIDGET_TYPES]:
-    """Builds a widget dict given a PDF form stream."""
+    """Constructs widget middleware objects from a PDF form.
+
+    Args:
+        pdf_stream: PDF form as bytes
+        use_full_widget_name: Whether to include parent widget names
+        render_widgets: Whether widgets should be rendered visibly
+
+    Returns:
+        Dict[str, WIDGET_TYPES]: Dictionary mapping field names to widgets
+    """
 
     results = {}
 
@@ -113,7 +138,14 @@ def build_widgets(
 
 
 def dropdown_to_text(dropdown: Dropdown) -> Text:
-    """Converts a dropdown widget to a text widget."""
+    """Converts a dropdown widget to a text widget while preserving properties.
+
+    Args:
+        dropdown: Dropdown widget to convert
+
+    Returns:
+        Text: New text widget with dropdown's selected value and styling
+    """
 
     result = Text(dropdown.name)
     result.border_color = dropdown.border_color
@@ -135,7 +167,18 @@ def update_text_field_attributes(
     template_stream: bytes,
     widgets: Dict[str, WIDGET_TYPES],
 ) -> None:
-    """Auto updates text fields' attributes."""
+    """Updates text field properties based on PDF template settings.
+
+    Handles:
+    - Font detection and sizing
+    - Color properties
+    - Paragraph wrapping
+    - Auto font size adjustment
+
+    Args:
+        template_stream: PDF form as bytes
+        widgets: Dictionary of widget middleware objects
+    """
 
     for _widgets in get_widgets_by_page(template_stream).values():
         for _widget in _widgets:
@@ -172,7 +215,14 @@ def update_text_field_attributes(
 
 @lru_cache()
 def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
-    """Iterates through a PDF and returns all widgets found grouped by page."""
+    """Extracts all form widgets from a PDF grouped by page number.
+
+    Args:
+        pdf: PDF form as bytes
+
+    Returns:
+        Dict[int, List[dict]]: Mapping of page numbers to widget dictionaries
+    """
 
     pdf_file = PdfReader(stream_to_io(pdf))
 
@@ -197,9 +247,14 @@ def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
 
 
 def get_widget_full_key(widget: dict) -> Union[str, None]:
-    """
-    Returns a PDF widget's full annotated key by prepending its
-    parent widget's key.
+    """Constructs a widget's full hierarchical key including parent names.
+
+    Args:
+        widget: PDF widget dictionary
+
+    Returns:
+        Union[str, None]: Full key in format "parent.child" if parent exists,
+            otherwise None
     """
 
     key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
@@ -215,7 +270,16 @@ def get_widget_full_key(widget: dict) -> Union[str, None]:
 
 
 def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
-    """Finds a PDF widget's annotated type by pattern matching."""
+    """Creates appropriate widget middleware based on PDF widget type.
+
+    Args:
+        widget: PDF widget dictionary
+        key: Field name/key for the widget
+
+    Returns:
+        Union[WIDGET_TYPES, None]: Appropriate widget middleware instance
+            or None if type not recognized
+    """
 
     result = None
     for each in WIDGET_TYPE_PATTERNS:
@@ -230,13 +294,28 @@ def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
 
 
 def get_text_field_max_length(widget: dict) -> Union[int, None]:
-    """Returns the max length of the text field if presented or None."""
+    """Extracts max length constraint from a text field widget.
+
+    Args:
+        widget: PDF widget dictionary
+
+    Returns:
+        Union[int, None]: Max character length if specified, otherwise None
+    """
 
     return int(widget[MaxLen]) or None if MaxLen in widget else None
 
 
 def check_field_flag_bit(widget: dict, bit: int) -> bool:
-    """Checks if a bit is set in a widget's field flag."""
+    """Tests whether a specific flag bit is set in a widget's field flags.
+
+    Args:
+        widget: PDF widget dictionary
+        bit: Flag bit to check (e.g. COMB, MULTILINE)
+
+    Returns:
+        bool: True if the bit is set, False otherwise
+    """
 
     field_flag = extract_widget_property(widget, TEXT_FIELD_FLAG_PATTERNS, None, int)
 
@@ -247,19 +326,41 @@ def check_field_flag_bit(widget: dict, bit: int) -> bool:
 
 
 def is_text_field_comb(widget: dict) -> bool:
-    """Returns true if characters in a text field needs to be formatted into combs."""
+    """Determines if a text field uses comb formatting (fixed character spacing).
+
+    Args:
+        widget: PDF widget dictionary
+
+    Returns:
+        bool: True if field uses comb formatting
+    """
 
     return check_field_flag_bit(widget, COMB)
 
 
 def is_text_multiline(widget: dict) -> bool:
-    """Returns true if a text field is a paragraph field."""
+    """Determines if a text field supports multiple lines/paragraphs.
+
+    Args:
+        widget: PDF widget dictionary
+
+    Returns:
+        bool: True if field supports multiline text
+    """
 
     return check_field_flag_bit(widget, MULTILINE)
 
 
 def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
-    """Returns string options of a dropdown field."""
+    """Extracts available choices from a dropdown widget.
+
+    Args:
+        widget: PDF widget dictionary
+
+    Returns:
+        Union[Tuple[str, ...], None]: Tuple of choice strings if found,
+            otherwise None
+    """
 
     return tuple(
         (each if isinstance(each, str) else str(each[1]))
@@ -270,14 +371,30 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
 
 
 def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:
-    """Returns rectangular width of each character for combed text fields."""
+    """Calculates per-character width for comb text fields.
+
+    Args:
+        widget: PDF widget dictionary
+        widget_middleware: Text middleware instance
+
+    Returns:
+        float: Width in points allocated per character
+    """
 
     rect_width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
     return rect_width / widget_middleware.max_length
 
 
 def get_character_x_paddings(widget: dict, widget_middleware: Text) -> List[float]:
-    """Returns paddings between characters for combed text fields."""
+    """Calculates horizontal positioning for each character in comb fields.
+
+    Args:
+        widget: PDF widget dictionary
+        widget_middleware: Text middleware instance
+
+    Returns:
+        List[float]: X-offsets for centering each character in its comb cell
+    """
 
     length = min(len(widget_middleware.value or ""), widget_middleware.max_length)
     char_rect_width = get_char_rect_width(widget, widget_middleware)
@@ -299,10 +416,15 @@ def get_character_x_paddings(widget: dict, widget_middleware: Text) -> List[floa
 def split_characters_into_lines(
     split_by_new_line_symbol: List[str], middleware: Text, width: float
 ) -> List[str]:
-    """
-    Given a long string meant to be filled for a paragraph widget
-    split by the new line symbol already, splits it further into lines
-    where each line would fit into the widget's width.
+    """Splits text into lines that fit within a paragraph field's width.
+
+    Args:
+        split_by_new_line_symbol: Text already split by newlines
+        middleware: Text middleware with font properties
+        width: Available width in points
+
+    Returns:
+        List[str]: Lines of text fitting within the specified width
     """
 
     lines = []
@@ -329,11 +451,15 @@ def split_characters_into_lines(
 
 
 def adjust_each_line(lines: List[str], middleware: Text, width: float) -> List[str]:
-    """
-    Given a list of strings which is the return value of
-    `split_characters_into_lines`, further adjusts each line
-    so that there is neither overflow nor over-splitting into
-    unnecessary lines.
+    """Optimizes line breaks to minimize empty space in paragraph fields.
+
+    Args:
+        lines: Text lines from split_characters_into_lines()
+        middleware: Text middleware with font properties
+        width: Available width in points
+
+    Returns:
+        List[str]: Optimized lines with balanced word wrapping
     """
 
     result = []
@@ -373,7 +499,15 @@ def adjust_each_line(lines: List[str], middleware: Text, width: float) -> List[s
 
 
 def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
-    """Splits the paragraph field's text to a list of lines."""
+    """Generates properly wrapped lines for a paragraph text field.
+
+    Args:
+        widget: PDF widget dictionary
+        widget_middleware: Text middleware instance
+
+    Returns:
+        List[str]: Wrapped lines fitting the paragraph field dimensions
+    """
 
     value = widget_middleware.value or ""
     if widget_middleware.max_length is not None:
@@ -390,7 +524,14 @@ def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
 
 
 def get_paragraph_auto_wrap_length(widget_middleware: Text) -> int:
-    """Calculates the text wrap length of a paragraph field."""
+    """Determines optimal line length for paragraph text wrapping.
+
+    Args:
+        widget_middleware: Text middleware instance
+
+    Returns:
+        int: Suggested maximum characters per line
+    """
 
     result = maxsize
     for line in widget_middleware.text_lines:
@@ -406,7 +547,18 @@ def update_widget_keys(
     new_keys: List[str],
     indices: List[int],
 ) -> bytes:
-    """Updates a list of keys of widgets."""
+    """Renames widget fields in a PDF template.
+
+    Args:
+        template: PDF form as bytes
+        widgets: Dictionary of widget middleware
+        old_keys: List of current field names
+        new_keys: List of new field names
+        indices: List of indices for handling radio button groups
+
+    Returns:
+        bytes: Modified PDF with updated field names
+    """
     # pylint: disable=R0801
 
     pdf = PdfReader(stream_to_io(template))
