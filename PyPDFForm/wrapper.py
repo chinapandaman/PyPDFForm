@@ -509,7 +509,7 @@ class PdfWrapper(FormWrapper):
             PdfWrapper: Returns self to allow method chaining
 
         Raises:
-            NotImplementedError: If use_full_widget_name is enabled
+            NotImplementedError: When use_full_widget_name is enabled
         """
 
         if getattr(self, "use_full_widget_name"):
@@ -537,7 +537,7 @@ class PdfWrapper(FormWrapper):
             PdfWrapper: Returns self to allow method chaining
 
         Raises:
-            NotImplementedError: If use_full_widget_name is enabled
+            NotImplementedError: When use_full_widget_name is enabled
         """
 
         if getattr(self, "use_full_widget_name"):

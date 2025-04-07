@@ -20,7 +20,7 @@ def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
 
     Args:
         image_stream: Input image as bytes
-        rotation: Rotation angle in degrees (can be float for precise angles)
+        rotation: Rotation angle in degrees (can be a float for precise angles)
 
     Returns:
         bytes: Rotated image as bytes in the original format
