@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Contains base class for all widgets to create."""
+"""Provides base widget class and utilities for PDF form field creation.
+
+This module contains:
+- Widget base class with core form field creation functionality
+- Watermark generation for form fields
+- Parameter handling for both AcroForm and non-AcroForm fields
+"""
 
 from io import BytesIO
 from typing import List, cast
@@ -15,7 +21,21 @@ from ..utils import extract_widget_property, stream_to_io
 
 
 class Widget:
-    """Base class for all widgets to create."""
+    """Abstract base class for all PDF form widget creators.
+
+    Provides common functionality for:
+    - Managing widget parameters
+    - Generating watermarks for form fields
+    - Handling both AcroForm and non-AcroForm parameters
+    - PDF page integration
+
+    Attributes:
+        USER_PARAMS: List of (user_name, pdf_param) mappings
+        COLOR_PARAMS: List of color parameters to convert
+        ALLOWED_NON_ACRO_FORM_PARAMS: Supported non-AcroForm parameters
+        NONE_DEFAULTS: Parameters that should default to None
+        ACRO_FORM_FUNC: Name of AcroForm function for widget creation
+    """
 
     USER_PARAMS = []
     COLOR_PARAMS = []
@@ -31,7 +51,15 @@ class Widget:
         y: float,
         **kwargs,
     ) -> None:
-        """Sets acro form parameters."""
+        """Initializes a new widget with position and parameters.
+
+        Args:
+            name: Field name/key for the widget
+            page_number: Page number to place widget on (1-based)
+            x: X coordinate for widget position
+            y: Y coordinate for widget position
+            **kwargs: Additional widget-specific parameters
+        """
 
         super().__init__()
         self.page_number = page_number
@@ -64,7 +92,14 @@ class Widget:
                 )
 
     def watermarks(self, stream: bytes) -> List[bytes]:
-        """Returns a list of watermarks after creating the widget."""
+        """Generates watermarks containing the widget for each page.
+
+        Args:
+            stream: PDF document as bytes to add widget to
+
+        Returns:
+            List[bytes]: Watermark data for each page (empty for non-target pages)
+        """
 
         pdf = PdfReader(stream_to_io(stream))
         page_count = len(pdf.pages)
@@ -91,7 +126,16 @@ class Widget:
 
 
 def handle_non_acro_form_params(pdf: bytes, key: str, params: list) -> bytes:
-    """Handles non acro form parameters when creating a widget."""
+    """Processes non-AcroForm parameters for a widget.
+
+    Args:
+        pdf: PDF document as bytes to modify
+        key: Field name/key of the widget to update
+        params: List of (parameter_name, value) tuples to set
+
+    Returns:
+        bytes: Modified PDF with updated parameters
+    """
 
     pdf_file = PdfReader(stream_to_io(pdf))
     out = PdfWriter()

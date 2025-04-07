@@ -1,11 +1,27 @@
 # -*- coding: utf-8 -*-
-"""Contains checkbox widget to create."""
+"""Provides checkbox widget creation functionality for PDF forms.
+
+This module contains the CheckBoxWidget class which handles creation of:
+- Interactive checkbox fields
+- Custom button styles (check, cross, circle)
+- Color styling for tick, background and border
+- Size adjustments
+"""
 
 from .base import Widget
 
 
 class CheckBoxWidget(Widget):
-    """Checkbox widget to create."""
+    """Creates and configures PDF checkbox widgets.
+
+    Supports all standard checkbox properties including:
+    - Button style customization (check, cross, circle)
+    - Tick, background and border colors
+    - Size adjustments
+    - PDF form field integration
+
+    Inherits from Widget base class adding checkbox-specific parameters.
+    """
 
     USER_PARAMS = [
         ("size", "size"),
