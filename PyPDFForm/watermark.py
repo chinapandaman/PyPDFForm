@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Contains helpers for watermark."""
+"""Provides watermark generation and merging functionality for PDF forms.
+
+This module handles:
+- Drawing text, images, shapes and lines onto PDF watermarks
+- Managing watermark styles and properties
+- Merging watermarks with PDF documents
+- Supporting various drawing operations needed for form filling
+"""
 
 from io import BytesIO
 from typing import List
@@ -12,7 +19,20 @@ from .utils import stream_to_io
 
 
 def draw_text(*args) -> None:
-    """Draws a text on the watermark."""
+    """Draws text onto a watermark canvas with proper formatting.
+
+    Handles:
+    - Comb fields (fixed character spacing)
+    - Multiline text with wrapping
+    - Font and color styling
+    - Text alignment
+
+    Args:
+        args[0]: Canvas object to draw on
+        args[1]: Text widget with content and properties
+        args[2]: X coordinate for drawing
+        args[3]: Y coordinate for drawing
+    """
 
     canvas = args[0]
     widget = args[1]
@@ -73,7 +93,19 @@ def draw_text(*args) -> None:
 
 
 def draw_rect(*args) -> None:
-    """Draws a rectangle on the watermark."""
+    """Draws a rectangle onto a watermark canvas.
+
+    Args:
+        args[0]: Canvas object to draw on
+        args[1]: X coordinate of bottom-left corner
+        args[2]: Y coordinate of bottom-left corner
+        args[3]: Width of rectangle
+        args[4]: Height of rectangle
+        args[5]: Border color
+        args[6]: Background color
+        args[7]: Border width
+        args[8]: Dash pattern for border
+    """
 
     canvas = args[0]
     x = args[1]
@@ -88,7 +120,19 @@ def draw_rect(*args) -> None:
 
 
 def draw_ellipse(*args) -> None:
-    """Draws an ellipse on the watermark."""
+    """Draws an ellipse onto a watermark canvas.
+
+    Args:
+        args[0]: Canvas object to draw on
+        args[1]: X coordinate of first bounding point
+        args[2]: Y coordinate of first bounding point
+        args[3]: X coordinate of second bounding point
+        args[4]: Y coordinate of second bounding point
+        args[5]: Border color
+        args[6]: Background color
+        args[7]: Border width
+        args[8]: Dash pattern for border
+    """
 
     canvas = args[0]
     x1 = args[1]
@@ -103,7 +147,19 @@ def draw_ellipse(*args) -> None:
 
 
 def draw_line(*args) -> None:
-    """Draws a line on the watermark."""
+    """Draws a line onto a watermark canvas.
+
+    Args:
+        args[0]: Canvas object to draw on
+        args[1]: X coordinate of start point
+        args[2]: Y coordinate of start point
+        args[3]: X coordinate of end point
+        args[4]: Y coordinate of end point
+        args[5]: Line color
+        args[6]: Unused (kept for consistency)
+        args[7]: Line width
+        args[8]: Dash pattern for line
+    """
 
     canvas = args[0]
     src_x = args[1]
@@ -118,7 +174,18 @@ def draw_line(*args) -> None:
 
 
 def set_border_and_background_styles(*args) -> tuple:
-    """Sets colors for both border and background before drawing."""
+    """Configures stroke and fill styles for drawing operations.
+
+    Args:
+        args[0]: Canvas object to configure
+        args[5]: Border color
+        args[6]: Background color
+        args[7]: Border width
+        args[8]: Dash pattern for border
+
+    Returns:
+        tuple: (stroke_flag, fill_flag) indicating which styles were set
+    """
 
     canvas = args[0]
     border_color = args[5]
@@ -143,7 +210,16 @@ def set_border_and_background_styles(*args) -> tuple:
 
 
 def draw_image(*args) -> None:
-    """Draws an image on the watermark."""
+    """Draws an image onto a watermark canvas.
+
+    Args:
+        args[0]: Canvas object to draw on
+        args[1]: Image data as bytes
+        args[2]: X coordinate for drawing
+        args[3]: Y coordinate for drawing
+        args[4]: Width of drawn image
+        args[5]: Height of drawn image
+    """
 
     canvas = args[0]
     image_stream = args[1]
@@ -174,7 +250,17 @@ def create_watermarks_and_draw(
     action_type: str,
     actions: List[list],
 ) -> List[bytes]:
-    """Creates a canvas watermark and draw some stuffs on it."""
+    """Creates watermarks for each page with specified drawing operations.
+
+    Args:
+        pdf: PDF document as bytes
+        page_number: Page number to create watermark for (1-based)
+        action_type: Type of drawing operation ('text', 'image', 'line', etc.)
+        actions: List of drawing operations to perform
+
+    Returns:
+        List[bytes]: Watermark data for each page (empty for non-target pages)
+    """
 
     pdf_file = PdfReader(stream_to_io(pdf))
     buff = BytesIO()
@@ -218,7 +304,15 @@ def merge_watermarks_with_pdf(
     pdf: bytes,
     watermarks: list,
 ) -> bytes:
-    """Merges watermarks with PDF."""
+    """Combines watermarks with their corresponding PDF pages.
+
+    Args:
+        pdf: Original PDF document as bytes
+        watermarks: List of watermark data for each page
+
+    Returns:
+        bytes: Merged PDF document with watermarks applied
+    """
 
     result = BytesIO()
     pdf_file = PdfReader(stream_to_io(pdf))

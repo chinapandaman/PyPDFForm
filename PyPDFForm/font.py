@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Contains helpers for font."""
+"""Provides font handling utilities for PDF forms.
+
+This module contains functions for:
+- Registering custom fonts from TTF files
+- Extracting font information from PDF text appearances
+- Calculating font sizes based on widget dimensions
+- Adjusting font sizes to fit text within fields
+- Managing font colors and properties
+"""
 
 from io import BytesIO
 from math import sqrt
@@ -20,7 +28,15 @@ from .utils import extract_widget_property
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
-    """Registers a font from a ttf file stream."""
+    """Registers a TrueType font for use in PDF generation.
+
+    Args:
+        font_name: Name to register the font under
+        ttf_stream: TTF font data as bytes
+
+    Returns:
+        bool: True if registration succeeded, False if failed
+    """
 
     buff = BytesIO()
     buff.write(ttf_stream)
@@ -37,9 +53,15 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
 
 
 def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
-    """
-    Uses regex to pattern match out the font from the text
-    appearance string of a text field widget.
+    """Extracts font name from PDF text appearance string.
+
+    Parses the font information embedded in PDF text field appearance strings.
+
+    Args:
+        text_appearance: PDF text appearance string (/DA field)
+
+    Returns:
+        Union[str, None]: Font name if found, None if not found
     """
 
     text_appearances = text_appearance.split(" ")
@@ -70,7 +92,16 @@ def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
 
 
 def auto_detect_font(widget: dict) -> str:
-    """Returns the font of the text field if it is one of the standard fonts."""
+    """Attempts to detect the font used in a PDF text field widget.
+
+    Falls back to DEFAULT_FONT if detection fails.
+
+    Args:
+        widget: PDF form widget dictionary
+
+    Returns:
+        str: Detected font name or DEFAULT_FONT
+    """
 
     text_appearance = extract_widget_property(
         widget, TEXT_FIELD_APPEARANCE_PATTERNS, None, None
@@ -83,9 +114,13 @@ def auto_detect_font(widget: dict) -> str:
 
 
 def text_field_font_size(widget: dict) -> Union[float, int]:
-    """
-    Calculates the font size it should be drawn with
-    given a text field widget.
+    """Calculates an appropriate font size based on text field dimensions.
+
+    Args:
+        widget: PDF form widget dictionary containing Rect coordinates
+
+    Returns:
+        Union[float, int]: Suggested font size in points
     """
 
     height = abs(float(widget[Rect][1]) - float(widget[Rect][3]))
@@ -94,9 +129,13 @@ def text_field_font_size(widget: dict) -> Union[float, int]:
 
 
 def checkbox_radio_font_size(widget: dict) -> Union[float, int]:
-    """
-    Calculates the font size it should be drawn with
-    given a checkbox/radio button widget.
+    """Calculates appropriate symbol size for checkbox/radio widgets.
+
+    Args:
+        widget: PDF form widget dictionary containing Rect coordinates
+
+    Returns:
+        Union[float, int]: Suggested symbol size in points
     """
 
     area = abs(float(widget[Rect][0]) - float(widget[Rect][2])) * abs(
@@ -107,7 +146,14 @@ def checkbox_radio_font_size(widget: dict) -> Union[float, int]:
 
 
 def get_text_field_font_size(widget: dict) -> Union[float, int]:
-    """Returns the font size of the text field if presented or zero."""
+    """Extracts font size from PDF text field appearance properties.
+
+    Args:
+        widget: PDF form widget dictionary
+
+    Returns:
+        Union[float, int]: Font size in points if found, otherwise 0
+    """
 
     result = 0
     text_appearance = extract_widget_property(
@@ -125,7 +171,15 @@ def get_text_field_font_size(widget: dict) -> Union[float, int]:
 def get_text_field_font_color(
     widget: dict,
 ) -> Union[Tuple[float, float, float], None]:
-    """Returns the font color tuple of the text field if presented or black."""
+    """Extracts font color from PDF text field appearance properties.
+
+    Args:
+        widget: PDF form widget dictionary
+
+    Returns:
+        Union[Tuple[float, float, float], None]: RGB color tuple (0-1 range)
+            or black by default if not specified
+    """
 
     result = (0, 0, 0)
     text_appearance = extract_widget_property(
@@ -149,7 +203,12 @@ def get_text_field_font_color(
 
 
 def adjust_paragraph_font_size(widget: dict, widget_middleware: Text) -> None:
-    """Reduces the font size of a paragraph field until texts fits."""
+    """Dynamically reduces font size until text fits in paragraph field.
+
+    Args:
+        widget: PDF form widget dictionary
+        widget_middleware: Text middleware instance containing text properties
+    """
 
     # pylint: disable=C0415, R0401
     from .template import get_paragraph_lines
@@ -167,7 +226,12 @@ def adjust_paragraph_font_size(widget: dict, widget_middleware: Text) -> None:
 
 
 def adjust_text_field_font_size(widget: dict, widget_middleware: Text) -> None:
-    """Reduces the font size of a text field until texts fits."""
+    """Dynamically reduces font size until text fits in text field.
+
+    Args:
+        widget: PDF form widget dictionary
+        widget_middleware: Text middleware instance containing text properties
+    """
 
     width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
 

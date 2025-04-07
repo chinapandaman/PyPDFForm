@@ -1,11 +1,28 @@
 # -*- coding: utf-8 -*-
-"""Contains text field widget to create."""
+"""Provides text field widget creation functionality for PDF forms.
+
+This module contains the TextWidget class which handles creation of:
+- Standard text input fields
+- Multiline text fields
+- Font and color styling
+- Field size and length constraints
+"""
 
 from .base import Widget
 
 
 class TextWidget(Widget):
-    """Text field widget to create."""
+    """Creates and configures PDF text field widgets.
+
+    Supports all standard text field properties including:
+    - Font styling (family, size, color)
+    - Background and border colors
+    - Width/height dimensions
+    - Maximum length constraints
+    - Alignment and multiline options
+
+    Inherits from Widget base class adding text-specific parameters.
+    """
 
     USER_PARAMS = [
         ("width", "width"),

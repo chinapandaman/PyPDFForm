@@ -1,18 +1,42 @@
 # -*- coding: utf-8 -*-
-"""Contains widget middleware."""
+"""Provides base widget middleware for PDF form elements.
+
+This module contains the Widget base class that defines common functionality
+and properties for all PDF form widgets, including:
+- Name and value management
+- Styling properties (borders, colors)
+- Schema generation
+- Basic validation
+"""
 
 from typing import Any
 
 
 class Widget:
-    """Base class for all PDF form widgets."""
+    """Abstract base class for all PDF form widget middleware.
+
+    Provides common interface and functionality for:
+    - Managing widget names and values
+    - Handling visual properties (borders, colors)
+    - Generating JSON schema definitions
+    - Providing sample values
+
+    Subclasses must implement:
+    - sample_value property
+    - Any widget-specific functionality
+    """
 
     def __init__(
         self,
         name: str,
         value: Any = None,
     ) -> None:
-        """Constructs basic attributes for the object."""
+        """Initializes a new widget with basic properties.
+
+        Args:
+            name: Field name/key for the widget
+            value: Initial value for the widget (default: None)
+        """
 
         super().__init__()
         self._name = name
@@ -28,25 +52,44 @@ class Widget:
 
     @property
     def name(self) -> str:
-        """Name of the widget."""
+        """Gets the widget's field name/key.
+
+        Returns:
+            str: The widget's name as it appears in the PDF form
+        """
 
         return self._name
 
     @property
     def value(self) -> Any:
-        """Value to fill for the widget."""
+        """Gets the widget's current value.
+
+        Returns:
+            Any: The widget's current value (type depends on widget type)
+        """
 
         return self._value
 
     @value.setter
     def value(self, value: Any) -> None:
-        """Sets value to fill for the widget."""
+        """Sets the widget's value.
+
+        Args:
+            value: New value for the widget (type depends on widget type)
+        """
 
         self._value = value
 
     @property
     def schema_definition(self) -> dict:
-        """Json schema definition of the widget."""
+        """Generates a JSON schema definition for the widget.
+
+        Returns:
+            dict: Schema properties including:
+                - description (if available)
+                - type constraints
+                - other widget-specific properties
+        """
 
         result = {}
 
@@ -57,6 +100,12 @@ class Widget:
 
     @property
     def sample_value(self) -> Any:
-        """Sample value of the widget."""
+        """Generates a sample value appropriate for the widget type.
 
+        Returns:
+            Any: A representative value demonstrating the widget's expected input
+
+        Raises:
+            NotImplementedError: Must be implemented by subclasses
+        """
         raise NotImplementedError
