@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Contains any object users might need."""
+"""PyPDFForm package for PDF form filling and manipulation.
+
+This package provides tools for filling PDF forms, drawing text and images,
+and manipulating PDF form elements programmatically.
+"""
 
 __version__ = "2.0.1"
 

@@ -1,5 +1,19 @@
 # -*- coding: utf-8 -*-
-"""Contains patterns used for identifying properties of widgets."""
+"""Pattern matching utilities for PDF form widgets.
+
+This module provides:
+- Pattern definitions for identifying widget types and properties
+- Functions for updating widget states and appearances
+- Support for common PDF form operations like flattening fields
+
+Patterns are used throughout PyPDFForm to:
+- Classify widget types (text, checkbox, radio, etc.)
+- Extract widget properties (alignment, colors, flags)
+- Modify widget states (values, appearances, flags)
+
+The module also contains utility functions for common PDF form operations
+like updating field values and flattening form fields.
+"""
 
 from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
                            TextStringObject)

@@ -2,10 +2,25 @@
 """Provides checkbox widget creation functionality for PDF forms.
 
 This module contains the CheckBoxWidget class which handles creation of:
-- Interactive checkbox fields
+- Interactive checkbox fields with three states (checked, unchecked, read-only)
 - Custom button styles (check, cross, circle)
 - Color styling for tick, background and border
 - Size adjustments
+- PDF form field integration
+
+Supports all standard PDF checkbox properties and integrates with both
+AcroForm and non-AcroForm PDF documents.
+
+Example:
+    >>> widget = CheckBoxWidget(
+    ...     name="agree",
+    ...     page_number=1,
+    ...     x=100,
+    ...     y=200,
+    ...     size=20,
+    ...     button_style="check",
+    ...     tick_color=(0,0,0)  # Black
+    ... )
 """
 
 from .base import Widget
