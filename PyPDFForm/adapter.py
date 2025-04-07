@@ -56,7 +56,7 @@ def fp_or_f_obj_or_stream_to_stream(
     Example:
         >>> # From file path
         >>> data = fp_or_f_obj_or_stream_to_stream("form.pdf")
-        >>> # From file object  
+        >>> # From file object
         >>> with open("form.pdf", "rb") as f:
         ...     data = fp_or_f_obj_or_stream_to_stream(f)
         >>> # From bytes
