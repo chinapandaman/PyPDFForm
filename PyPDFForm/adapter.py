@@ -25,10 +25,6 @@ def readable(obj: Any) -> bool:
 
     Returns:
         bool: True if the object has a callable read() method, False otherwise
-
-    Example:
-        >>> readable(open('file.txt'))  # Returns True
-        >>> readable(b'bytes')  # Returns False
     """
 
     return callable(getattr(obj, "read", None))
@@ -52,15 +48,6 @@ def fp_or_f_obj_or_stream_to_stream(
 
     Returns:
         bytes: The PDF data as a byte stream
-
-    Example:
-        >>> # From file path
-        >>> data = fp_or_f_obj_or_stream_to_stream("form.pdf")
-        >>> # From file object
-        >>> with open("form.pdf", "rb") as f:
-        ...     data = fp_or_f_obj_or_stream_to_stream(f)
-        >>> # From bytes
-        >>> data = fp_or_f_obj_or_stream_to_stream(b"%PDF-1.4...")
     """
 
     result = b""

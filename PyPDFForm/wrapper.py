@@ -53,11 +53,6 @@ class FormWrapper:
 
     The FormWrapper is designed to be extended by PdfWrapper which adds
     more advanced features like form analysis and widget creation.
-
-    Example:
-        >>> form = FormWrapper(template_pdf)
-        >>> form.fill({"existing_field": "value"})
-        >>> filled_pdf = form.read()  # Returns bytes of filled PDF
     """
 
     def __init__(
@@ -77,11 +72,6 @@ class FormWrapper:
         Note:
             This base class is designed to be extended by PdfWrapper which adds
             more advanced features. For most use cases, you'll want to use PdfWrapper.
-
-        Example:
-            >>> form = FormWrapper("simple_form.pdf")
-            >>> form.fill({"field1": "value"})
-            >>> filled_pdf = form.read()
         """
 
         super().__init__()
@@ -96,11 +86,6 @@ class FormWrapper:
 
         Returns:
             bytes: The complete PDF document as a byte string
-
-        Example:
-            >>> pdf_bytes = form.read()
-            >>> with open('filled_form.pdf', 'wb') as f:
-            ...     f.write(pdf_bytes)
         """
 
         return self.stream
@@ -124,14 +109,6 @@ class FormWrapper:
 
         Returns:
             FormWrapper: Returns self to allow method chaining
-
-        Example:
-            >>> form = FormWrapper(template_pdf)
-            >>> form.fill({
-            ...     "name_field": "John Doe",
-            ...     "checkbox1": True,
-            ...     "number_field": 42
-            ... })
         """
 
         widgets = build_widgets(self.stream, False, False) if self.stream else {}
@@ -166,12 +143,6 @@ class PdfWrapper(FormWrapper):
     - Supports per-page operations
     - Handles PDF version management
     - Provides preview functionality
-
-    Example:
-        >>> pdf = PdfWrapper(template_pdf)
-        >>> pdf.fill({"name": "John Doe"})
-        >>> pdf.draw_text("Signature", page_number=1, x=100, y=100)
-        >>> pdf_bytes = pdf.read()
     """
 
     USER_PARAMS = [
@@ -203,12 +174,6 @@ class PdfWrapper(FormWrapper):
             - Widgets dictionary to track form fields
             - Keys update queue for deferred operations
             - Any specified global settings from kwargs
-
-        Example:
-            >>> pdf = PdfWrapper("form.pdf",
-            ...     global_font="Helvetica",
-            ...     global_font_size=12,
-            ...     global_font_color=(0,0,0))
         """
 
         super().__init__(template)
@@ -278,12 +243,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             dict: Field names mapped to their sample values
-
-        Example:
-            >>> pdf = PdfWrapper(template_pdf)
-            >>> samples = pdf.sample_data
-            >>> print(samples)
-            {'name': 'name', 'agree': True, 'color': 2}  # color is last dropdown option
         """
 
         return {key: value.sample_value for key, value in self.widgets.items()}
@@ -300,11 +259,6 @@ class PdfWrapper(FormWrapper):
         Returns:
             str: The PDF version number (e.g. '1.4') if found
             None: If no valid version identifier exists in the PDF
-
-        Example:
-            >>> pdf = PdfWrapper(template_pdf)
-            >>> print(pdf.version)
-            '1.4'
         """
 
         for each in VERSION_IDENTIFIERS:
@@ -326,12 +280,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             List[PdfWrapper]: List of wrapper objects, one per page
-
-        Example:
-            >>> pdf = PdfWrapper(multi_page_pdf)
-            >>> first_page = pdf.pages[0]
-            >>> first_page.draw_text("Page 1", x=100, y=100)
-            >>> modified_pdf = pdf.read()  # Contains all pages with changes
         """
 
         return [
@@ -352,11 +300,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             PdfWrapper: Returns self to allow method chaining
-
-        Example:
-            >>> pdf = PdfWrapper(template_pdf)
-            >>> pdf.change_version('1.7')  # Changes header to %PDF-1.7
-            >>> pdf.read()  # Returns updated PDF
         """
 
         self.stream = self.stream.replace(
@@ -380,12 +323,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             PdfWrapper: New wrapper containing merged PDF
-
-        Example:
-            >>> pdf1 = PdfWrapper("form1.pdf")
-            >>> pdf2 = PdfWrapper("form2.pdf")
-            >>> merged = pdf1 + pdf2  # Equivalent to pdf1.__add__(pdf2)
-            >>> merged.read()  # Returns merged PDF bytes
         """
 
         if not self.stream:
@@ -414,11 +351,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             bytes: PDF bytes containing the preview annotations
-
-        Example:
-            >>> pdf = PdfWrapper(template_pdf)
-            >>> with open('form_preview.pdf', 'wb') as f:
-            ...     f.write(pdf.preview)
         """
 
         return remove_all_widgets(
@@ -447,11 +379,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             PdfWrapper: Returns self to allow method chaining
-
-        Example:
-            >>> pdf = PdfWrapper(template_pdf)
-            >>> pdf.generate_coordinate_grid(color=(0,0,1), margin=50)
-            >>> pdf.read()  # Returns PDF with blue grid lines 50 units apart
         """
 
         self.stream = generate_coordinate_grid(
@@ -488,14 +415,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             PdfWrapper: Returns self to allow method chaining
-
-        Example:
-            >>> pdf = PdfWrapper(template_pdf)
-            >>> pdf.fill({
-            ...     "name": "John Doe",
-            ...     "agree": True,
-            ...     "color": 1  # index for dropdown choice
-            ... })
         """
 
         for key, value in data.items():
@@ -543,19 +462,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             PdfWrapper: Returns self to allow method chaining
-
-        Example:
-            >>> pdf = PdfWrapper()
-            >>> pdf.create_widget(
-            ...     "text",
-            ...     "name_field",
-            ...     page_number=1,
-            ...     x=100,
-            ...     y=200,
-            ...     width=200,
-            ...     height=20,
-            ...     font="Helvetica"
-            ... )
         """
 
         _class = None
@@ -604,15 +510,6 @@ class PdfWrapper(FormWrapper):
 
         Raises:
             NotImplementedError: If use_full_widget_name is enabled
-
-        Example:
-            >>> pdf = PdfWrapper(template_pdf)
-            # Immediate update
-            >>> pdf.update_widget_key("old_name", "new_name")
-            # Deferred update (requires commit_widget_key_updates())
-            >>> pdf.update_widget_key("name1", "name2", defer=True)
-            >>> pdf.update_widget_key("name3", "name4", defer=True)
-            >>> pdf.commit_widget_key_updates()
         """
 
         if getattr(self, "use_full_widget_name"):
@@ -641,12 +538,6 @@ class PdfWrapper(FormWrapper):
 
         Raises:
             NotImplementedError: If use_full_widget_name is enabled
-
-        Example:
-            >>> pdf = PdfWrapper(template_pdf)
-            >>> pdf.update_widget_key("old1", "new1", defer=True)
-            >>> pdf.update_widget_key("old2", "new2", defer=True)
-            >>> pdf.commit_widget_key_updates()  # Applies both updates at once
         """
 
         if getattr(self, "use_full_widget_name"):
@@ -689,18 +580,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             PdfWrapper: Returns self to allow method chaining
-
-        Example:
-            >>> pdf = PdfWrapper()
-            >>> pdf.draw_text(
-            ...     "Sample Text\\nSecond Line",
-            ...     page_number=1,
-            ...     x=100,
-            ...     y=200,
-            ...     font="Courier",
-            ...     font_size=14,
-            ...     font_color=(1, 0, 0)  # Red
-            ... )
         """
 
         new_widget = Text("new")
@@ -757,29 +636,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             PdfWrapper: Returns self to allow method chaining
-
-        Example:
-            >>> pdf = PdfWrapper()
-            # From file path
-            >>> pdf.draw_image(
-            ...     "logo.png",
-            ...     page_number=1,
-            ...     x=100,
-            ...     y=200,
-            ...     width=150,
-            ...     height=50
-            ... )
-            # From bytes
-            >>> with open("sig.jpg", "rb") as f:
-            ...     pdf.draw_image(
-            ...         f.read(),
-            ...         page_number=1,
-            ...         x=50,
-            ...         y=50,
-            ...         width=100,
-            ...         height=30,
-            ...         rotation=45
-            ...     )
         """
 
         image = fp_or_f_obj_or_stream_to_stream(image)
@@ -807,11 +663,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             dict: A JSON Schema dictionary following Draft 7 format
-
-        Example:
-            >>> pdf = PdfWrapper(template_pdf)
-            >>> print(pdf.schema["properties"]["name"])
-            {'type': 'string', 'maxLength': 100}
         """
 
         return {
@@ -836,12 +687,6 @@ class PdfWrapper(FormWrapper):
 
         Returns:
             bool: True if registration succeeded, False if failed
-
-        Example:
-            >>> PdfWrapper.register_font("MyFont", "/path/to/font.ttf")
-            True
-            >>> pdf = PdfWrapper()
-            >>> pdf.draw_text("Text", font="MyFont", page_number=1, x=100, y=100)
         """
 
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
