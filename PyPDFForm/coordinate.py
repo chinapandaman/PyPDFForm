@@ -149,7 +149,7 @@ def get_draw_image_coordinates_resolutions(
     return x, y, width, height
 
 
-def _calculate_text_x(
+def calculate_text_coord_x(
     widget: dict,
     widget_middleware: Text,
     text_value: str,
@@ -237,7 +237,7 @@ def _calculate_text_x(
     return x
 
 
-def _calculate_text_y(widget: dict, widget_middleware: Text) -> float:
+def calculate_text_coord_y(widget: dict, widget_middleware: Text) -> float:
     """
     Calculate the vertical (y) coordinate for text drawing within a PDF form field.
 
@@ -322,12 +322,12 @@ def get_draw_text_coordinates(
     )
 
     # Calculate horizontal position based on alignment and comb settings
-    x = _calculate_text_x(
+    x = calculate_text_coord_x(
         widget, widget_middleware, text_value, length, character_paddings
     )
 
     # Calculate vertical position based on font size and multiline
-    y = _calculate_text_y(widget, widget_middleware)
+    y = calculate_text_coord_y(widget, widget_middleware)
 
     return x, y
 
