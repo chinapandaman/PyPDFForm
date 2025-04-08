@@ -176,7 +176,9 @@ def calculate_text_coord_x(
         float: The calculated x-coordinate for the text baseline start.
     """
 
-    alignment = extract_widget_property(widget, WIDGET_ALIGNMENT_PATTERNS, None, int) or 0
+    alignment = (
+        extract_widget_property(widget, WIDGET_ALIGNMENT_PATTERNS, None, int) or 0
+    )
     # Default to left boundary
     x = float(widget[Rect][0])
 
