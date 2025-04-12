@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Provides watermark generation and merging functionality for PDF forms.
+"""Provides watermark generation, annotation copying, and merging functionality for PDF forms.
 
 This module handles:
-- Drawing text, images, shapes and lines onto PDF watermarks
+- Drawing text, images, shapes, and lines onto PDF watermarks
 - Managing watermark styles and properties
 - Merging watermarks with PDF documents
+- Copying annotation widgets (form fields) from watermark PDFs onto base PDFs
 - Supporting various drawing operations needed for form filling
 """
 
@@ -336,6 +337,19 @@ def copy_watermark_widgets(
     pdf: bytes,
     watermarks: list,
 ) -> bytes:
+    """Copies annotation widgets from watermark PDFs onto the corresponding pages of a base PDF.
+
+    For each watermark in the provided list, any annotation widgets (such as form fields)
+    are cloned and appended to the annotations of the corresponding page in the base PDF.
+
+    Args:
+        pdf: The original PDF document as bytes.
+        watermarks: List of watermark PDF data (as bytes), one per page. Empty or None entries are skipped.
+
+    Returns:
+        bytes: The resulting PDF document with annotation widgets from watermarks copied onto their respective pages.
+    """
+
     pdf_file = PdfReader(stream_to_io(pdf))
     out = PdfWriter()
     out.append(pdf_file)
