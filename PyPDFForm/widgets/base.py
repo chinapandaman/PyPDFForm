@@ -8,7 +8,7 @@ This module contains:
 """
 
 from io import BytesIO
-from typing import List, cast
+from typing import List, cast, Union
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
@@ -47,8 +47,8 @@ class Widget:
         self,
         name: str,
         page_number: int,
-        x: float,
-        y: float,
+        x: Union[float, List[float]],
+        y: Union[float, List[float]],
         **kwargs,
     ) -> None:
         """Initializes a new widget with position and parameters.
@@ -56,8 +56,8 @@ class Widget:
         Args:
             name: Field name/key for the widget
             page_number: Page number to place widget on (1-based)
-            x: X coordinate for widget position
-            y: Y coordinate for widget position
+            x: X coordinate(s) for widget position
+            y: Y coordinate(s) for widget position
             **kwargs: Additional widget-specific parameters
         """
 
@@ -91,6 +91,18 @@ class Widget:
                     ((type(self).__name__, each), kwargs.get(each))
                 )
 
+    def canvas_operations(self, canvas: Canvas) -> None:
+        """Draws the widget on the provided PDF canvas using AcroForm.
+
+        Calls the appropriate AcroForm function on the canvas to create the widget
+        with the parameters specified in self.acro_form_params.
+
+        Args:
+            canvas: The ReportLab Canvas object to draw the widget on.
+        """
+
+        getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**self.acro_form_params)
+
     def watermarks(self, stream: bytes) -> List[bytes]:
         """Generates watermarks containing the widget for each page.
 
@@ -113,7 +125,7 @@ class Widget:
             ),
         )
 
-        getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**self.acro_form_params)
+        self.canvas_operations(canvas)
 
         canvas.showPage()
         canvas.save()

@@ -47,6 +47,15 @@ WIDGET_TYPE_PATTERNS = [
         Text,
     ),
     (
+        # reportlab creation pattern
+        (
+            {FT: Btn},
+            {Parent: {FT: Btn}},
+            {AS: (Yes, Off)},
+        ),
+        Radio,
+    ),
+    (
         (
             {FT: Btn},
             {AS: (Yes, Off)},
