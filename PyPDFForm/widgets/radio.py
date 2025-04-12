@@ -34,6 +34,17 @@ class RadioWidget(CheckBoxWidget):
 
     ACRO_FORM_FUNC = "radio"
 
+    def __init__(
+        self,
+        name: str,
+        page_number: int,
+        x: List[float],
+        y: List[float],
+        **kwargs,
+    ) -> None:
+        self.USER_PARAMS.append(("shape", "shape"))
+        super().__init__(name, page_number, x, y, **kwargs)
+
     def watermarks(self, stream: bytes) -> List[bytes]:
         """Generates watermarks containing the radio button widget for each page.
 
