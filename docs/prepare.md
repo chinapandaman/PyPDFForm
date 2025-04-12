@@ -76,6 +76,34 @@ with open("output.pdf", "wb+") as output:
 
 The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
 
+## Create a radio button group
+
+Unlike the other types of widgets, radio buttons must be created as a group. So for coordinate parameters `x` and `y`, you must specify a list of coordinates for each radio button under the group you are creating, and the length of the list must be more than one.
+
+Other than that, radio button creation shares almost the same parameters as checkbox:
+
+```python
+from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper("dummy.pdf").create_widget(
+    widget_type="radio",
+    name="new_radio_group",
+    page_number=1,
+    x=[50, 100, 150],
+    y=[50, 100, 150],
+    size=30,    # optional
+    button_style="check",   # optional
+    shape="square", # optional, circle or square
+    tick_color=(0, 1, 0),   # optional
+    bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
+    border_color=(1, 0, 0), # optional
+    border_width=5  # optional
+)
+
+with open("output.pdf", "wb+") as output:
+    output.write(new_form.read())
+```
+
 ## Create a dropdown widget
 
 A dropdown widget shares a similar set of parameters as a text field, with the only significant difference being
