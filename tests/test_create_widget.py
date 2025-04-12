@@ -504,7 +504,11 @@ def test_create_radio_default(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_radio_default.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
-            "radio", "radio", 2, [50, 100, 150], [50, 100, 150],
+            "radio",
+            "radio",
+            2,
+            [50, 100, 150],
+            [50, 100, 150],
         )
         assert obj.schema["properties"]["radio"]["type"] == "integer"
 
@@ -518,10 +522,16 @@ def test_create_radio_default(template_stream, pdf_samples, request):
 
 
 def test_create_radio_default_filled(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "create_radio_default_filled.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "create_radio_default_filled.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
-            "radio", "radio", 2, [50, 100, 150], [50, 100, 150],
+            "radio",
+            "radio",
+            2,
+            [50, 100, 150],
+            [50, 100, 150],
         )
         obj.fill(obj.sample_data)
 

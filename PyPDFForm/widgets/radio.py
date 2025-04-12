@@ -12,6 +12,7 @@ AcroForm and non-AcroForm PDF documents.
 """
 
 from typing import List
+
 from reportlab.pdfgen.canvas import Canvas
 
 from .checkbox import CheckBoxWidget

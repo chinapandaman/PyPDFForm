@@ -13,12 +13,12 @@ from io import BytesIO
 from typing import List
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import NameObject, ArrayObject
+from pypdf.generic import ArrayObject, NameObject
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
-from .utils import stream_to_io
 from .constants import Annots
+from .utils import stream_to_io
 
 
 def draw_text(*args) -> None:
@@ -368,7 +368,9 @@ def copy_watermark_widgets(
 
     for i, page in enumerate(out.pages):
         if i in widgets_to_copy:
-            page[NameObject(Annots)] = page[NameObject(Annots)] + ArrayObject(widgets_to_copy[i])   # noqa
+            page[NameObject(Annots)] = page[NameObject(Annots)] + ArrayObject(
+                widgets_to_copy[i]
+            )  # noqa
 
     with BytesIO() as f:
         out.write(f)

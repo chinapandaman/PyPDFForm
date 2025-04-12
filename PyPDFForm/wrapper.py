@@ -34,12 +34,13 @@ from .template import (build_widgets, dropdown_to_text,
                        update_widget_keys)
 from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
                     preview_widget_to_draw, remove_all_widgets)
-from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf, copy_watermark_widgets
+from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
+                        merge_watermarks_with_pdf)
 from .widgets.base import handle_non_acro_form_params
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
-from .widgets.text import TextWidget
 from .widgets.radio import RadioWidget
+from .widgets.text import TextWidget
 
 
 class FormWrapper:

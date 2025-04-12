@@ -8,7 +8,7 @@ This module contains:
 """
 
 from io import BytesIO
-from typing import List, cast, Union
+from typing import List, Union, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
