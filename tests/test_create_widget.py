@@ -5,6 +5,21 @@ import os
 from PyPDFForm import PdfWrapper
 
 
+def test_create_image_not_working(template_stream):
+    obj = PdfWrapper(template_stream)
+    stream = obj.stream
+    assert (
+        obj.create_widget(
+            "image",
+            "foo",
+            1,
+            100,
+            100,
+        ).stream
+        == stream
+    )
+
+
 def test_create_checkbox_default(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_default.pdf")
     with open(expected_path, "rb+") as f:
@@ -475,6 +490,40 @@ def test_fill_cmyk_color(pdf_samples, request):
         obj = PdfWrapper(
             os.path.join(pdf_samples, "widget", "sample_template_with_cmyk_color.pdf")
         ).fill({"foo": "foo"})
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
+def test_create_radio_default(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "create_radio_default.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "radio", "radio", 2, [50, 100, 150], [50, 100, 150],
+        )
+        assert obj.schema["properties"]["radio"]["type"] == "integer"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
+def test_create_radio_default_filled(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "create_radio_default_filled.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "radio", "radio", 2, [50, 100, 150], [50, 100, 150],
+        )
+        obj.fill(obj.sample_data)
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()

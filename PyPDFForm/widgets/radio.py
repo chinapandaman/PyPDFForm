@@ -56,11 +56,6 @@ class RadioWidget(CheckBoxWidget):
             ),
         )
 
-        if not isinstance(self.acro_form_params["x"], list):
-            self.acro_form_params["x"] = [self.acro_form_params["x"]]
-        if not isinstance(self.acro_form_params["y"], list):
-            self.acro_form_params["y"] = [self.acro_form_params["y"]]
-
         for i, x in enumerate(self.acro_form_params["x"]):
             y = self.acro_form_params["y"][i]
             new_acro_form_params = self.acro_form_params.copy()
