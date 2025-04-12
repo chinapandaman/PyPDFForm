@@ -8,7 +8,7 @@ This module contains:
 """
 
 from io import BytesIO
-from typing import List, cast
+from typing import List, cast, Union
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
@@ -47,8 +47,8 @@ class Widget:
         self,
         name: str,
         page_number: int,
-        x: float,
-        y: float,
+        x: Union[float, List[float]],
+        y: Union[float, List[float]],
         **kwargs,
     ) -> None:
         """Initializes a new widget with position and parameters.

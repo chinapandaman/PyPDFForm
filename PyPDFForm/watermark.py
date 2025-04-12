@@ -354,7 +354,7 @@ def copy_watermark_widgets(
 
     for i, page in enumerate(out.pages):
         if i in widgets_to_copy:
-            page[NameObject(Annots)] = page[NameObject(Annots)] + ArrayObject(widgets_to_copy[i])
+            page[NameObject(Annots)] = page[NameObject(Annots)] + ArrayObject(widgets_to_copy[i])   # noqa
 
     with BytesIO() as f:
         out.write(f)
