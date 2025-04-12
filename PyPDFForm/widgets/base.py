@@ -56,8 +56,8 @@ class Widget:
         Args:
             name: Field name/key for the widget
             page_number: Page number to place widget on (1-based)
-            x: X coordinate for widget position
-            y: Y coordinate for widget position
+            x: X coordinate(s) for widget position
+            y: Y coordinate(s) for widget position
             **kwargs: Additional widget-specific parameters
         """
 
