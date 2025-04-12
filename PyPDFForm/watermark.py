@@ -12,10 +12,12 @@ from io import BytesIO
 from typing import List
 
 from pypdf import PdfReader, PdfWriter
+from pypdf.generic import NameObject, ArrayObject
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
 from .utils import stream_to_io
+from .constants import Annots
 
 
 def draw_text(*args) -> None:
@@ -328,3 +330,33 @@ def merge_watermarks_with_pdf(
     output.write(result)
     result.seek(0)
     return result.read()
+
+
+def copy_watermark_widgets(
+    pdf: bytes,
+    watermarks: list,
+) -> bytes:
+    pdf_file = PdfReader(stream_to_io(pdf))
+    out = PdfWriter()
+    out.append(pdf_file)
+
+    widgets_to_copy = {}
+
+    for i, watermark in enumerate(watermarks):
+        if not watermark:
+            continue
+
+        widgets_to_copy[i] = []
+        watermark_file = PdfReader(stream_to_io(watermark))
+        for page in watermark_file.pages:
+            for annot in page.get(Annots, []):  # noqa
+                widgets_to_copy[i].append(annot.clone(out))
+
+    for i, page in enumerate(out.pages):
+        if i in widgets_to_copy:
+            page[NameObject(Annots)] = page[NameObject(Annots)] + ArrayObject(widgets_to_copy[i])
+
+    with BytesIO() as f:
+        out.write(f)
+        f.seek(0)
+        return f.read()
