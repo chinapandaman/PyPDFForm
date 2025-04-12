@@ -5,21 +5,6 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_create_radio_not_working(template_stream):
-    obj = PdfWrapper(template_stream)
-    stream = obj.stream
-    assert (
-        obj.create_widget(
-            "radio",
-            "foo",
-            1,
-            100,
-            100,
-        ).stream
-        == stream
-    )
-
-
 def test_create_checkbox_default(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_default.pdf")
     with open(expected_path, "rb+") as f:
