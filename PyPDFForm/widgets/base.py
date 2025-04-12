@@ -91,6 +91,18 @@ class Widget:
                     ((type(self).__name__, each), kwargs.get(each))
                 )
 
+    def canvas_operations(self, canvas: Canvas) -> None:
+        """Draws the widget on the provided PDF canvas using AcroForm.
+
+        Calls the appropriate AcroForm function on the canvas to create the widget
+        with the parameters specified in self.acro_form_params.
+
+        Args:
+            canvas: The ReportLab Canvas object to draw the widget on.
+        """
+
+        getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**self.acro_form_params)
+
     def watermarks(self, stream: bytes) -> List[bytes]:
         """Generates watermarks containing the widget for each page.
 
@@ -113,7 +125,7 @@ class Widget:
             ),
         )
 
-        getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**self.acro_form_params)
+        self.canvas_operations(canvas)
 
         canvas.showPage()
         canvas.save()

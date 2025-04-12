@@ -12,12 +12,9 @@ AcroForm and non-AcroForm PDF documents.
 """
 
 from typing import List
-from io import BytesIO
-from pypdf import PdfReader
 from reportlab.pdfgen.canvas import Canvas
 
 from .checkbox import CheckBoxWidget
-from ..utils import stream_to_io
 
 
 class RadioWidget(CheckBoxWidget):
@@ -60,27 +57,16 @@ class RadioWidget(CheckBoxWidget):
         self.USER_PARAMS.append(("shape", "shape"))
         super().__init__(name, page_number, x, y, **kwargs)
 
-    def watermarks(self, stream: bytes) -> List[bytes]:
-        """Generates watermarks containing the radio button widget for each page.
+    def canvas_operations(self, canvas: Canvas) -> None:
+        """Draws all radio button options on the provided PDF canvas.
+
+        Iterates over each (x, y) coordinate pair for the radio button group,
+        sets the value for each option, and calls the AcroForm radio function
+        to render each button on the canvas.
 
         Args:
-            stream: PDF document as bytes to add radio button widget to
-
-        Returns:
-            List[bytes]: Watermark data for each page (empty for non-target pages)
+            canvas: The ReportLab Canvas object to draw the radio buttons on.
         """
-
-        pdf = PdfReader(stream_to_io(stream))
-        page_count = len(pdf.pages)
-        watermark = BytesIO()
-
-        canvas = Canvas(
-            watermark,
-            pagesize=(
-                float(pdf.pages[self.page_number - 1].mediabox[2]),
-                float(pdf.pages[self.page_number - 1].mediabox[3]),
-            ),
-        )
 
         for i, x in enumerate(self.acro_form_params["x"]):
             y = self.acro_form_params["y"][i]
@@ -89,12 +75,3 @@ class RadioWidget(CheckBoxWidget):
             new_acro_form_params["y"] = y
             new_acro_form_params["value"] = str(i)
             getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**new_acro_form_params)
-
-        canvas.showPage()
-        canvas.save()
-        watermark.seek(0)
-
-        return [
-            watermark.read() if i == self.page_number - 1 else b""
-            for i in range(page_count)
-        ]
