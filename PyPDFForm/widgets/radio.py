@@ -42,6 +42,21 @@ class RadioWidget(CheckBoxWidget):
         y: List[float],
         **kwargs,
     ) -> None:
+        """Initializes a new radio button widget with options.
+
+        Args:
+            name: Field name/key for the radio group.
+            page_number: Page number to place widget on (1-based).
+            x: List of X coordinates for each radio button.
+            y: List of Y coordinates for each radio button.
+            **kwargs: Additional widget parameters including:
+                width/height: Field dimensions.
+                font/font_size: Text styling.
+                options: List of radio button choices.
+                shape: Button style (e.g., circle, check, cross, etc.).
+                color: Button color and border styling.
+        """
+
         self.USER_PARAMS.append(("shape", "shape"))
         super().__init__(name, page_number, x, y, **kwargs)
 
