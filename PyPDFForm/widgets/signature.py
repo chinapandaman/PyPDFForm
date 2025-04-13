@@ -4,10 +4,10 @@ from typing import List
 from io import BytesIO
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import NameObject, TextStringObject
+from pypdf.generic import NameObject, TextStringObject, ArrayObject, FloatObject
 
 from .bedrock import BEDROCK_PDF
-from ..constants import Annots, T
+from ..constants import Annots, T, Rect
 from ..utils import extract_widget_property, stream_to_io
 from ..patterns import WIDGET_KEY_PATTERNS
 
@@ -52,6 +52,14 @@ class SignatureWidget:
                     continue
 
                 annot.get_object()[NameObject(T)] = TextStringObject(self.name)
+                annot.get_object()[NameObject(Rect)] = ArrayObject(
+                    [
+                        FloatObject(self.x),
+                        FloatObject(self.y),
+                        FloatObject(self.x + self.width),
+                        FloatObject(self.y + self.height)
+                    ]
+                )
 
         with BytesIO() as f:
             out.write(f)
