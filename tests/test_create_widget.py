@@ -5,12 +5,12 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_create_image_not_working(template_stream):
+def test_create_not_supported_type_not_working(template_stream):
     obj = PdfWrapper(template_stream)
     stream = obj.stream
     assert (
         obj.create_widget(
-            "image",
+            "foo",
             "foo",
             1,
             100,
@@ -614,6 +614,59 @@ def test_create_signature_default_filled(
                 height=100,
             )
             .fill({"sig_1": os.path.join(image_samples, "sample_signature.png")})
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
+def test_create_image_default(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "create_image_default.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "image",
+            "image_1",
+            1,
+            100,
+            100,
+            width=192,
+            height=108,
+        )
+        assert obj.schema["properties"]["image_1"]["type"] == "string"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
+def test_create_image_default_filled(
+    template_stream, pdf_samples, image_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "create_image_default_filled.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = (
+            PdfWrapper(template_stream)
+            .create_widget(
+                "image",
+                "image_1",
+                1,
+                100,
+                100,
+                width=192,
+                height=108,
+            )
+            .fill({"image_1": os.path.join(image_samples, "sample_image.jpg")})
         )
 
         request.config.results["expected_path"] = expected_path

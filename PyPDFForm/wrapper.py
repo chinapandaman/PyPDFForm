@@ -39,6 +39,7 @@ from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
 from .widgets.base import handle_non_acro_form_params
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
+from .widgets.image import ImageWidget
 from .widgets.radio import RadioWidget
 from .widgets.signature import SignatureWidget
 from .widgets.text import TextWidget
@@ -454,10 +455,11 @@ class PdfWrapper(FormWrapper):
             - "dropdown": Dropdown/combobox field
             - "radio": Radio button field
             - "signature": Signature field
+            - "image": Image field
 
         Args:
             widget_type (str): Type of widget to create. Must be one of:
-                "text", "checkbox", "dropdown", "radio", or "signature".
+                "text", "checkbox", "dropdown", "radio", "signature", or "image".
             name (str): Unique name/identifier for the widget.
             page_number (int): 1-based page number to add the widget to.
             x (float or List[float]): X coordinate(s) for widget position.
@@ -466,10 +468,14 @@ class PdfWrapper(FormWrapper):
                 For text fields: width, height, font, font_size, etc.
                 For checkboxes: size, checked, etc.
                 For dropdowns: choices, default_index, etc.
-                For signature: width, height, etc.
+                For signature/image: width, height, etc.
 
         Returns:
             PdfWrapper: Returns self to allow method chaining.
+
+        Notes:
+            - If an unsupported widget_type is provided, the method returns self unchanged.
+            - After widget creation, the internal widget state is refreshed.
         """
 
         _class = None
@@ -483,13 +489,15 @@ class PdfWrapper(FormWrapper):
             _class = RadioWidget
         if widget_type == "signature":
             _class = SignatureWidget
+        if widget_type == "image":
+            _class = ImageWidget
         if _class is None:
             return self
 
         obj = _class(name=name, page_number=page_number, x=x, y=y, **kwargs)
         watermarks = obj.watermarks(self.read())
 
-        if widget_type in ["radio", "signature"]:
+        if widget_type in ["radio", "signature", "image"]:
             self.stream = copy_watermark_widgets(self.read(), watermarks, [name])
         else:
             self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
