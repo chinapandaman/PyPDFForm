@@ -53,7 +53,6 @@ class SignatureWidget:
         y: float,
         width: float,
         height: float,
-        **kwargs,
     ) -> None:
         """
         Initialize a SignatureWidget.
@@ -65,7 +64,6 @@ class SignatureWidget:
             y (float): The y-coordinate of the widget's lower-left corner.
             width (float): The width of the widget.
             height (float): The height of the widget.
-            **kwargs: Additional keyword arguments (currently unused).
         """
 
         super().__init__()
