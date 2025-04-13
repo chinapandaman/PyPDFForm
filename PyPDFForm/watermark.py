@@ -18,7 +18,8 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
 from .constants import Annots
-from .utils import stream_to_io
+from .patterns import WIDGET_KEY_PATTERNS
+from .utils import stream_to_io, extract_widget_property
 
 
 def draw_text(*args) -> None:
@@ -305,7 +306,7 @@ def create_watermarks_and_draw(
 
 def merge_watermarks_with_pdf(
     pdf: bytes,
-    watermarks: list,
+    watermarks: List[bytes],
 ) -> bytes:
     """Combines watermarks with their corresponding PDF pages.
 
@@ -335,7 +336,8 @@ def merge_watermarks_with_pdf(
 
 def copy_watermark_widgets(
     pdf: bytes,
-    watermarks: list,
+    watermarks: List[bytes],
+    keys: List[str]
 ) -> bytes:
     """Copies annotation widgets from watermark PDFs onto the corresponding pages of a base PDF.
 
@@ -364,13 +366,24 @@ def copy_watermark_widgets(
         watermark_file = PdfReader(stream_to_io(watermark))
         for page in watermark_file.pages:
             for annot in page.get(Annots, []):  # noqa
-                widgets_to_copy[i].append(annot.clone(out))
+                key = extract_widget_property(
+                    annot.get_object(), WIDGET_KEY_PATTERNS, None, str
+                )
+                if key in keys:
+                    widgets_to_copy[i].append(annot.clone(out))
 
     for i, page in enumerate(out.pages):
         if i in widgets_to_copy:
-            page[NameObject(Annots)] = page[NameObject(Annots)] + ArrayObject(
-                widgets_to_copy[i]
-            )  # noqa
+            page[NameObject(Annots)] = (
+                (
+                    page[NameObject(Annots)]
+                    + ArrayObject(  # noqa
+                        widgets_to_copy[i]
+                    )
+                )
+                if Annots in page
+                else ArrayObject(widgets_to_copy[i])
+            )
 
     with BytesIO() as f:
         out.write(f)

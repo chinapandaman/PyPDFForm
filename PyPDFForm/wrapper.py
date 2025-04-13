@@ -485,7 +485,7 @@ class PdfWrapper(FormWrapper):
         watermarks = obj.watermarks(self.read())
 
         if widget_type == "radio":
-            self.stream = copy_watermark_widgets(self.read(), watermarks)
+            self.stream = copy_watermark_widgets(self.read(), watermarks, [name])
         else:
             self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
         if obj.non_acro_form_params:
