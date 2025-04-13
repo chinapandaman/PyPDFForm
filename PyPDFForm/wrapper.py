@@ -39,6 +39,7 @@ from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
 from .widgets.base import handle_non_acro_form_params
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
+from .widgets.image import ImageWidget
 from .widgets.radio import RadioWidget
 from .widgets.signature import SignatureWidget
 from .widgets.text import TextWidget
@@ -483,13 +484,15 @@ class PdfWrapper(FormWrapper):
             _class = RadioWidget
         if widget_type == "signature":
             _class = SignatureWidget
+        if widget_type == "image":
+            _class = ImageWidget
         if _class is None:
             return self
 
         obj = _class(name=name, page_number=page_number, x=x, y=y, **kwargs)
         watermarks = obj.watermarks(self.read())
 
-        if widget_type in ["radio", "signature"]:
+        if widget_type in ["radio", "signature", "image"]:
             self.stream = copy_watermark_widgets(self.read(), watermarks, [name])
         else:
             self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
