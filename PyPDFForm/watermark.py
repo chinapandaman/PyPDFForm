@@ -19,7 +19,7 @@ from reportlab.pdfgen.canvas import Canvas
 
 from .constants import Annots
 from .patterns import WIDGET_KEY_PATTERNS
-from .utils import stream_to_io, extract_widget_property
+from .utils import extract_widget_property, stream_to_io
 
 
 def draw_text(*args) -> None:
@@ -335,9 +335,7 @@ def merge_watermarks_with_pdf(
 
 
 def copy_watermark_widgets(
-    pdf: bytes,
-    watermarks: List[bytes],
-    keys: List[str]
+    pdf: bytes, watermarks: List[bytes], keys: List[str]
 ) -> bytes:
     """Copies annotation widgets from watermark PDFs onto the corresponding pages of a base PDF.
 
@@ -375,12 +373,7 @@ def copy_watermark_widgets(
     for i, page in enumerate(out.pages):
         if i in widgets_to_copy:
             page[NameObject(Annots)] = (
-                (
-                    page[NameObject(Annots)]
-                    + ArrayObject(  # noqa
-                        widgets_to_copy[i]
-                    )
-                )
+                (page[NameObject(Annots)] + ArrayObject(widgets_to_copy[i]))  # noqa
                 if Annots in page
                 else ArrayObject(widgets_to_copy[i])
             )
