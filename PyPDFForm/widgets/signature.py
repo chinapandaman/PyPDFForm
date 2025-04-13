@@ -26,6 +26,8 @@ class SignatureWidget:
         **kwargs,
     ) -> None:
         super().__init__()
+        self.non_acro_form_params = []
+
         self.page_number = page_number
         self.name = name
         self.x = x
