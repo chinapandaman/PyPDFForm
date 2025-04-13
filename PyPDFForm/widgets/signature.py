@@ -44,6 +44,10 @@ class SignatureWidget:
             applied to the specified page.
     """
 
+    OPTIONAL_PARAMS = [
+        ("width", 160),
+        ("height", 90),
+    ]
     BEDROCK_WIDGET_TO_COPY = "signature"
 
     def __init__(
@@ -52,8 +56,7 @@ class SignatureWidget:
         page_number: int,
         x: float,
         y: float,
-        width: float,
-        height: float,
+        **kwargs,
     ) -> None:
         """
         Initialize a SignatureWidget.
@@ -74,8 +77,10 @@ class SignatureWidget:
         self.name = name
         self.x = x
         self.y = y
-        self.width = width
-        self.height = height
+        self.optional_params = {
+            each[0]: kwargs.get(each[0], each[1])
+            for each in self.OPTIONAL_PARAMS
+        }
 
     def watermarks(self, stream: bytes) -> List[bytes]:
         """
@@ -110,8 +115,8 @@ class SignatureWidget:
                     [
                         FloatObject(self.x),
                         FloatObject(self.y),
-                        FloatObject(self.x + self.width),
-                        FloatObject(self.y + self.height),
+                        FloatObject(self.x + self.optional_params.get("width")),
+                        FloatObject(self.y + self.optional_params.get("height")),
                     ]
                 )
 
