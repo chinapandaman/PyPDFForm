@@ -6,16 +6,17 @@ on specified pages and coordinates, and generates watermark overlays for
 PDF documents to visually represent signature fields.
 """
 
-from typing import List
 from io import BytesIO
+from typing import List
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import NameObject, TextStringObject, ArrayObject, FloatObject
+from pypdf.generic import (ArrayObject, FloatObject, NameObject,
+                           TextStringObject)
 
-from .bedrock import BEDROCK_PDF
-from ..constants import Annots, T, Rect
-from ..utils import extract_widget_property, stream_to_io
+from ..constants import Annots, Rect, T
 from ..patterns import WIDGET_KEY_PATTERNS
+from ..utils import extract_widget_property, stream_to_io
+from .bedrock import BEDROCK_PDF
 
 
 class SignatureWidget:
@@ -110,7 +111,7 @@ class SignatureWidget:
                         FloatObject(self.x),
                         FloatObject(self.y),
                         FloatObject(self.x + self.width),
-                        FloatObject(self.y + self.height)
+                        FloatObject(self.y + self.height),
                     ]
                 )
 

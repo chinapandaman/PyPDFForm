@@ -40,8 +40,8 @@ from .widgets.base import handle_non_acro_form_params
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
 from .widgets.radio import RadioWidget
-from .widgets.text import TextWidget
 from .widgets.signature import SignatureWidget
+from .widgets.text import TextWidget
 
 
 class FormWrapper:
