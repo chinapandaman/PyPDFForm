@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+This module provides the SignatureWidget class for creating and customizing
+signature fields in PDF forms. It enables placement of signature widgets
+on specified pages and coordinates, and generates watermark overlays for
+PDF documents to visually represent signature fields.
+"""
 
 from typing import List
 from io import BytesIO
@@ -13,6 +19,30 @@ from ..patterns import WIDGET_KEY_PATTERNS
 
 
 class SignatureWidget:
+    """
+    A widget for adding a digital signature field to a PDF form.
+
+    This class allows you to specify the name, page number, position (x, y),
+    and size (width, height) of a signature field to be placed on a PDF page.
+    The widget is based on a bedrock template and can generate a watermark
+    overlay for the specified page, updating the annotation's name and rectangle
+    to match the provided parameters.
+
+    Attributes:
+        BEDROCK_WIDGET_TO_COPY (str): The widget type to copy from the bedrock template.
+        name (str): The name of the signature field.
+        page_number (int): The 1-based page number where the signature field will appear.
+        x (float): The x-coordinate of the lower-left corner of the signature field.
+        y (float): The y-coordinate of the lower-left corner of the signature field.
+        width (float): The width of the signature field.
+        height (float): The height of the signature field.
+
+    Methods:
+        watermarks(stream: bytes) -> List[bytes]:
+            Generates a list of watermark overlays, with the signature field
+            applied to the specified page.
+    """
+
     BEDROCK_WIDGET_TO_COPY = "signature"
 
     def __init__(
@@ -25,6 +55,19 @@ class SignatureWidget:
         height: float,
         **kwargs,
     ) -> None:
+        """
+        Initialize a SignatureWidget.
+
+        Args:
+            name (str): The name of the signature widget.
+            page_number (int): The page number where the widget will be placed (1-based).
+            x (float): The x-coordinate of the widget's lower-left corner.
+            y (float): The y-coordinate of the widget's lower-left corner.
+            width (float): The width of the widget.
+            height (float): The height of the widget.
+            **kwargs: Additional keyword arguments (currently unused).
+        """
+
         super().__init__()
         self.non_acro_form_params = []
 
@@ -36,6 +79,18 @@ class SignatureWidget:
         self.height = height
 
     def watermarks(self, stream: bytes) -> List[bytes]:
+        """
+        Generate watermark overlays for the signature widget on the specified PDF page.
+
+        Args:
+            stream (bytes): The PDF file as a byte stream.
+
+        Returns:
+            List[bytes]: A list of byte streams, one for each page in the input PDF.
+                         Only the page corresponding to `page_number` contains the
+                         signature widget overlay; other pages are empty byte strings.
+        """
+
         input_pdf = PdfReader(stream_to_io(stream))
         page_count = len(input_pdf.pages)
         pdf = PdfReader(stream_to_io(BEDROCK_PDF))
