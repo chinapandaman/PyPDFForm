@@ -453,10 +453,11 @@ class PdfWrapper(FormWrapper):
             - "checkbox": Checkbox field
             - "dropdown": Dropdown/combobox field
             - "radio": Radio button field
+            - "signature": Signature field
 
         Args:
             widget_type (str): Type of widget to create. Must be one of:
-                "text", "checkbox", "dropdown", or "radio".
+                "text", "checkbox", "dropdown", "radio", or "signature".
             name (str): Unique name/identifier for the widget.
             page_number (int): 1-based page number to add the widget to.
             x (float or List[float]): X coordinate(s) for widget position.
@@ -465,6 +466,7 @@ class PdfWrapper(FormWrapper):
                 For text fields: width, height, font, font_size, etc.
                 For checkboxes: size, checked, etc.
                 For dropdowns: choices, default_index, etc.
+                For signature: width, height, etc.
 
         Returns:
             PdfWrapper: Returns self to allow method chaining.
