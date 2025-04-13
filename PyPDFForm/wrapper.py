@@ -41,6 +41,7 @@ from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
 from .widgets.radio import RadioWidget
 from .widgets.text import TextWidget
+from .widgets.signature import SignatureWidget
 
 
 class FormWrapper:
@@ -452,10 +453,11 @@ class PdfWrapper(FormWrapper):
             - "checkbox": Checkbox field
             - "dropdown": Dropdown/combobox field
             - "radio": Radio button field
+            - "signature": Signature field
 
         Args:
             widget_type (str): Type of widget to create. Must be one of:
-                "text", "checkbox", "dropdown", or "radio".
+                "text", "checkbox", "dropdown", "radio", or "signature".
             name (str): Unique name/identifier for the widget.
             page_number (int): 1-based page number to add the widget to.
             x (float or List[float]): X coordinate(s) for widget position.
@@ -464,6 +466,7 @@ class PdfWrapper(FormWrapper):
                 For text fields: width, height, font, font_size, etc.
                 For checkboxes: size, checked, etc.
                 For dropdowns: choices, default_index, etc.
+                For signature: width, height, etc.
 
         Returns:
             PdfWrapper: Returns self to allow method chaining.
@@ -478,13 +481,15 @@ class PdfWrapper(FormWrapper):
             _class = DropdownWidget
         if widget_type == "radio":
             _class = RadioWidget
+        if widget_type == "signature":
+            _class = SignatureWidget
         if _class is None:
             return self
 
         obj = _class(name=name, page_number=page_number, x=x, y=y, **kwargs)
         watermarks = obj.watermarks(self.read())
 
-        if widget_type == "radio":
+        if widget_type in ["radio", "signature"]:
             self.stream = copy_watermark_widgets(self.read(), watermarks, [name])
         else:
             self.stream = merge_watermarks_with_pdf(self.read(), watermarks)

@@ -570,3 +570,52 @@ def test_create_radio_complex(template_stream, pdf_samples, request):
 
         assert len(obj.stream) == len(expected)
         assert obj.stream == expected
+
+
+def test_create_signature_default(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "create_signature_default.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "signature",
+            "sig_1",
+            1,
+            100,
+            100,
+            width=410,
+            height=100,
+        )
+        assert obj.schema["properties"]["sig_1"]["type"] == "string"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
+def test_create_signature_default_filled(template_stream, pdf_samples, image_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "create_signature_default_filled.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "signature",
+            "sig_1",
+            1,
+            100,
+            100,
+            width=410,
+            height=100,
+        ).fill(
+            {
+                "sig_1": os.path.join(image_samples, "sample_signature.png")
+            }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected

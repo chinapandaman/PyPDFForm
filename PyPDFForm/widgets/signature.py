@@ -1,0 +1,123 @@
+# -*- coding: utf-8 -*-
+"""
+This module provides the SignatureWidget class for creating and customizing
+signature fields in PDF forms. It enables placement of signature widgets
+on specified pages and coordinates, and generates watermark overlays for
+PDF documents to visually represent signature fields.
+"""
+
+from typing import List
+from io import BytesIO
+
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import NameObject, TextStringObject, ArrayObject, FloatObject
+
+from .bedrock import BEDROCK_PDF
+from ..constants import Annots, T, Rect
+from ..utils import extract_widget_property, stream_to_io
+from ..patterns import WIDGET_KEY_PATTERNS
+
+
+class SignatureWidget:
+    """
+    A widget for adding a digital signature field to a PDF form.
+
+    This class allows you to specify the name, page number, position (x, y),
+    and size (width, height) of a signature field to be placed on a PDF page.
+    The widget is based on a bedrock template and can generate a watermark
+    overlay for the specified page, updating the annotation's name and rectangle
+    to match the provided parameters.
+
+    Attributes:
+        BEDROCK_WIDGET_TO_COPY (str): The widget type to copy from the bedrock template.
+        name (str): The name of the signature field.
+        page_number (int): The 1-based page number where the signature field will appear.
+        x (float): The x-coordinate of the lower-left corner of the signature field.
+        y (float): The y-coordinate of the lower-left corner of the signature field.
+        width (float): The width of the signature field.
+        height (float): The height of the signature field.
+
+    Methods:
+        watermarks(stream: bytes) -> List[bytes]:
+            Generates a list of watermark overlays, with the signature field
+            applied to the specified page.
+    """
+
+    BEDROCK_WIDGET_TO_COPY = "signature"
+
+    def __init__(
+        self,
+        name: str,
+        page_number: int,
+        x: float,
+        y: float,
+        width: float,
+        height: float,
+    ) -> None:
+        """
+        Initialize a SignatureWidget.
+
+        Args:
+            name (str): The name of the signature widget.
+            page_number (int): The page number where the widget will be placed (1-based).
+            x (float): The x-coordinate of the widget's lower-left corner.
+            y (float): The y-coordinate of the widget's lower-left corner.
+            width (float): The width of the widget.
+            height (float): The height of the widget.
+        """
+
+        super().__init__()
+        self.non_acro_form_params = []
+
+        self.page_number = page_number
+        self.name = name
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+    def watermarks(self, stream: bytes) -> List[bytes]:
+        """
+        Generate watermark overlays for the signature widget on the specified PDF page.
+
+        Args:
+            stream (bytes): The PDF file as a byte stream.
+
+        Returns:
+            List[bytes]: A list of byte streams, one for each page in the input PDF.
+                         Only the page corresponding to `page_number` contains the
+                         signature widget overlay; other pages are empty byte strings.
+        """
+
+        input_pdf = PdfReader(stream_to_io(stream))
+        page_count = len(input_pdf.pages)
+        pdf = PdfReader(stream_to_io(BEDROCK_PDF))
+        out = PdfWriter()
+        out.append(pdf)
+
+        for page in out.pages:
+            for annot in page.get(Annots, []):  # noqa
+                key = extract_widget_property(
+                    annot.get_object(), WIDGET_KEY_PATTERNS, None, str
+                )
+
+                if key != self.BEDROCK_WIDGET_TO_COPY:
+                    continue
+
+                annot.get_object()[NameObject(T)] = TextStringObject(self.name)
+                annot.get_object()[NameObject(Rect)] = ArrayObject(
+                    [
+                        FloatObject(self.x),
+                        FloatObject(self.y),
+                        FloatObject(self.x + self.width),
+                        FloatObject(self.y + self.height)
+                    ]
+                )
+
+        with BytesIO() as f:
+            out.write(f)
+            f.seek(0)
+            return [
+                f.read() if i == self.page_number - 1 else b""
+                for i in range(page_count)
+            ]
