@@ -78,8 +78,7 @@ class SignatureWidget:
         self.x = x
         self.y = y
         self.optional_params = {
-            each[0]: kwargs.get(each[0], each[1])
-            for each in self.OPTIONAL_PARAMS
+            each[0]: kwargs.get(each[0], each[1]) for each in self.OPTIONAL_PARAMS
         }
 
     def watermarks(self, stream: bytes) -> List[bytes]:
