@@ -11,6 +11,18 @@ It is advised that a virtual environment is created before running this command:
 pip install -r requirements.txt
 ```
 
+Alternatively, PyPDFForm provides a development container. Build it by running this command at the root directory of the project:
+
+```shell
+docker build -t pypdfform-dev .
+```
+
+Once successfully built, you can open a shell inside the container by running:
+
+```shell
+docker run -it --rm -p 8000:8000 -v ${PWD}:/pypdfform pypdfform-dev
+```
+
 ## Running tests
 
 See [testing PyPDFForm with pytest](dev_test.md).
