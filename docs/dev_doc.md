@@ -10,3 +10,11 @@ mkdocs serve
 ```
 
 And you will find the doc site at `http://127.0.0.1:8000/`.
+
+Alternatively, in the development container:
+
+```shell
+docs
+```
+
+And you will find the doc site at `http://localhost:8000/`.
