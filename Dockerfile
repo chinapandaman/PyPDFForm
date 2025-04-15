@@ -19,6 +19,6 @@ RUN echo "source /etc/profile" >> /root/.bashrc && \
 
 RUN chmod +x /pypdfform/entrypoint.sh
 
-ENTRYPOINT ["/pypdfform/entrypoint.sh"]
+ENTRYPOINT ["sh", "/pypdfform/entrypoint.sh"]
 
 CMD ["bash"]
