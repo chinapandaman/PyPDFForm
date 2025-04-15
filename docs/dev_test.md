@@ -7,6 +7,12 @@ for test coverages. Tests can be run by simply executing:
 coverage run -m pytest && coverage report --fail-under=100
 ```
 
+Alternatively, in the development container:
+
+```shell
+test
+```
+
 ## Generate coverage report
 
 To generate a coverage report, run:

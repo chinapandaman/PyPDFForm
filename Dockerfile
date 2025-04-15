@@ -5,7 +5,7 @@ WORKDIR /pypdfform
 EXPOSE 8000
 
 RUN apt-get update && \
-    apt-get install -y make dos2unix bash-completion
+    apt-get install -y make dos2unix bash-completion git
 
 COPY . /pypdfform
 
