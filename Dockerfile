@@ -11,11 +11,6 @@ COPY . /pypdfform
 
 RUN pip install -r requirements.txt
 
-RUN echo "alias coverage='make coverage-all'" >> /root/.bashrc && \
-    echo "alias docs='make serve-docs'" >> /root/.bashrc && \
-    echo "alias linting='make linting'" >> /root/.bashrc && \
-    echo "alias test='make test-all'" >> /root/.bashrc
-
 RUN echo "source /etc/profile" >> /root/.bashrc && \
     echo "[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion" >> /root/.bashrc
 
