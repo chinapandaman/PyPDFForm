@@ -13,6 +13,7 @@ echo "alias docs='make serve-docs'" >> /root/.bashrc
 echo "alias server='make serve-files'" >> /root/.bashrc
 echo "alias linting='make linting'" >> /root/.bashrc
 echo "alias test='make test-all'" >> /root/.bashrc
+echo "alias update='make generate-new-pdf-samples'" >> /root/.bashrc
 
 cat << "EOF"
 
@@ -39,6 +40,7 @@ Welcome to the PyPDFForm development container!
 | server   | Start an HTTP file server from the root of the code.    | N/A                                                                          |
 | linting  | Run all linters on the code.                            | N/A                                                                          |
 | test     | Run all tests and enforce 100% coverage.                | https://chinapandaman.github.io/PyPDFForm/dev_test/                          |
+| update   | Update PDF samples after changing the code              | N/A                                                                          |
 
 EOF
 
