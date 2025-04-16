@@ -139,7 +139,7 @@ with open("output.pdf", "wb+") as output:
 
 ## Create a signature widget
 
-A signature widget is only interactive in tools that support it. Otherwise it will just be displayed as a rectangle, and clicking on it will not trigger any action.
+A signature widget is only interactive in tools that support it. Otherwise, it will just be displayed as a rectangle, and clicking on it will not trigger any action.
 
 ```python
 from PyPDFForm import PdfWrapper
