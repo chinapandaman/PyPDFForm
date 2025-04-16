@@ -7,7 +7,7 @@ for test coverages. Tests can be run by simply executing:
 coverage run -m pytest && coverage report --fail-under=100
 ```
 
-Alternatively, in the development container:
+Alternatively, in the development container, run:
 
 ```shell
 test
@@ -22,6 +22,14 @@ coverage run -m pytest && coverage html
 ```
 
 And the coverage report can be viewed by opening `htmlcov/index.html` in a browser.
+
+Alternatively, in the development container, run:
+
+```shell
+coverage
+```
+
+And the coverage report can be found at `http://localhost:8000/htmlcov/index.html`.
 
 ## Test breakdown
 
