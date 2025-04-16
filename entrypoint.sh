@@ -1,8 +1,10 @@
 #!/bin/bash
 set -e
 
+git config --global --add safe.directory /pypdfform
 find /pypdfform/scripts -type f -name "*.sh" -print0 | xargs -0 dos2unix -q
 export PYPDFFORM_ENV=container
+
 echo "alias compare='(trap \"kill 0\" SIGINT; make serve-files > /dev/null 2>&1 & make compare-pdf-diffs && echo \"Finished comparing.\" & wait)'" >> /root/.bashrc
 echo "alias coverage='make coverage-all'" >> /root/.bashrc
 echo "alias docs='make serve-docs'" >> /root/.bashrc
