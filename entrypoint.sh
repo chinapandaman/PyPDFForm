@@ -20,10 +20,12 @@ cat << "EOF"
 
 Welcome to the PyPDFForm development container!
 
-| Command | Usage                                    | Documentation                                       |
--------------------------------------------------------------------------------------------------------------
-| test    | Run all tests and enforce 100% coverage. | https://chinapandaman.github.io/PyPDFForm/dev_test/ |
-| docs    | Host the documentation site locally.     | https://chinapandaman.github.io/PyPDFForm/dev_doc/  |
+| Command  | Usage                                             | Documentation                                                                |
+-----------------------------------------------------------------------------------------------------------------------------------------------
+| coverage | Run all tests and generate HTML coverage reports. | https://chinapandaman.github.io/PyPDFForm/dev_test/#generate-coverage-report |
+| docs     | Host the documentation site locally.              | https://chinapandaman.github.io/PyPDFForm/dev_doc/                           |
+| linting  | Run all linters on the code.                      | N/A                                                                          |
+| test     | Run all tests and enforce 100% coverage.          | https://chinapandaman.github.io/PyPDFForm/dev_test/                          |
 
 EOF
 
