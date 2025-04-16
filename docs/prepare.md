@@ -137,6 +137,48 @@ with open("output.pdf", "wb+") as output:
     output.write(new_form.read())
 ```
 
+## Create a signature widget
+
+A signature widget is only interactive in tools that support it. Otherwise, it will just be displayed as a rectangle, and clicking on it will not trigger any action.
+
+```python
+from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper("dummy.pdf").create_widget(
+    widget_type="signature",
+    name="new_signature_widget",
+    page_number=1,
+    x=100,
+    y=100,
+    width=410,  # optional
+    height=100,  # optional
+)
+
+with open("output.pdf", "wb+") as output:
+    output.write(new_form.read())
+```
+
+## Create an image widget
+
+Similar to a signature widget, an image widget is also only interactive in tools that support it.
+
+```python
+from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper("dummy.pdf").create_widget(
+    widget_type="image",
+    name="new_image_widget",
+    page_number=1,
+    x=100,
+    y=100,
+    width=192,  # optional
+    height=108,  # optional
+)
+
+with open("output.pdf", "wb+") as output:
+    output.write(new_form.read())
+```
+
 ## Modify the key of a widget
 
 For existing widgets, PyPDFForm supports modifying their keys. 
