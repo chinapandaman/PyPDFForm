@@ -3,7 +3,7 @@ set -e
 
 find /pypdfform/scripts -type f -name "*.sh" -print0 | xargs -0 dos2unix -q
 export PYPDFFORM_ENV=container
-echo "alias compare='make serve-files > /dev/null 2>&1 & make compare-pdf-diffs && fg; fg'" >> /root/.bashrc
+echo "alias compare='(trap \"kill 0\" SIGINT; make serve-files > /dev/null 2>&1 & make compare-pdf-diffs)'" >> /root/.bashrc
 echo "alias coverage='make coverage-all'" >> /root/.bashrc
 echo "alias docs='make serve-docs'" >> /root/.bashrc
 echo "alias linting='make linting'" >> /root/.bashrc
