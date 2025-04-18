@@ -428,6 +428,8 @@ def test_create_widget_sejda(sejda_template, pdf_samples, request):
 
 
 def test_create_widget_sejda_schema(sejda_template):
+    obj = PdfWrapper(sejda_template)
+    old_schema = obj.schema
     schema = (
         PdfWrapper(sejda_template)
         .create_widget(
@@ -447,7 +449,7 @@ def test_create_widget_sejda_schema(sejda_template):
     )
 
     assert schema["properties"]["new_text_field_widget"]
-    assert len(schema["properties"]) == 1
+    assert len(schema["properties"]) == len(old_schema["properties"]) + 1
 
 
 def test_create_dropdown(template_stream, pdf_samples, request):
