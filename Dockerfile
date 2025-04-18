@@ -14,9 +14,9 @@ RUN pip install -r requirements.txt
 RUN echo "source /etc/profile" >> /root/.bashrc && \
     echo "[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion" >> /root/.bashrc
 
-RUN chmod +x /pypdfform/entrypoint.sh && \
-    dos2unix /pypdfform/entrypoint.sh
+RUN chmod +x entrypoint.sh && \
+    dos2unix entrypoint.sh
 
-ENTRYPOINT ["sh", "/pypdfform/entrypoint.sh"]
+ENTRYPOINT ["sh", "entrypoint.sh"]
 
 CMD ["bash"]
