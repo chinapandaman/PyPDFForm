@@ -17,7 +17,7 @@ if __name__ == "__main__":
     latest_version = sys.argv[1].replace("(", "").replace(")", "")
     print(f"Latest deployed version: {latest_version}.")
     if latest_version == f"v{version}":
-        sys.exit(f"v{latest_version} is already deployed.")
+        sys.exit(f"{latest_version} is already deployed.")
 
     print(f"Bumping to: v{version}")
     token = os.environ.get("GITHUB_TOKEN")
