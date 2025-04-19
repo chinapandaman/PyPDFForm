@@ -1,10 +1,17 @@
+if ! command -v uv &> /dev/null
+then
+    echo "uv not found, installing..."
+    wget -qO- https://astral.sh/uv/install.sh | sh
+else
+    echo "uv is already installed."
+fi
+
 if [ ! -d "./venv" ]; then
-  python3 -m venv venv
+  uv venv venv
 fi
 
 if [ "$VIRTUAL_ENV" == "" ] && [ "$PYPDFFORM_ENV" != "container" ]; then
   source "./venv/bin/activate"
 fi
 
-pip install -U pip
-pip install -U -r "./requirements.txt"
+uv pip install -U -r pyproject.toml --extra dev

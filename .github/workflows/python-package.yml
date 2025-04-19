@@ -17,14 +17,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        uv pip install -U -r pyproject.toml --extra dev --system
     - name: Test with pytest
       run: |
         coverage run -m pytest && coverage report --fail-under=100
