@@ -106,6 +106,24 @@ select = [
 ]
 ignore = ["B009", "E501", "N999", "TC006"]
 
+[tool.pyright]
+typeCheckingMode = "basic"
+reportArgumentType = "none"
+reportAttributeAccessIssue = "none"
+reportIndexIssue = "none"
+reportOperatorIssue = "none"
+reportGeneralTypeIssues = "none"
+reportOptionalMemberAccess = "error"
+reportPossiblyUnboundVariable = "error"
+reportUnusedImport = "error"
+reportIncompatibleMethodOverride = "error"
+reportMissingSuperCall = "error"
+reportPrivateUsage = "error"
+reportSelfClsParameterName = "error"
+reportReturnType = "error"
+reportAssignmentType = "error"
+reportOptionalSubscript = "error"
+
 [tool.setuptools.dynamic]
 version = {attr = "PyPDFForm.__version__"}
 
