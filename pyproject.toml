@@ -7,6 +7,9 @@ name = "PyPDFForm"
 dynamic = ["version"]
 description = "The Python library for PDF forms."
 readme = "README.md"
+authors = [
+    {name = "Jinge Li"}
+]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -33,3 +36,16 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/chinapandaman/PyPDFForm"
 Documentation = "https://chinapandaman.github.io/PyPDFForm/"
+
+[project.optional-dependencies]
+dev = [
+    "coverage",
+    "jsonschema",
+    "mkdocs",
+    "pudb",
+    "pylint",
+    "pyright",
+    "pytest",
+    "requests",
+    "ruff",
+]
