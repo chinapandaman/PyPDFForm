@@ -10,6 +10,8 @@ readme = "README.md"
 authors = [
     {name = "Jinge Li"}
 ]
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -21,7 +23,6 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
@@ -49,3 +50,9 @@ dev = [
     "requests",
     "ruff",
 ]
+
+[tool.setuptools.dynamic]
+version = {attr = "PyPDFForm.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["PyPDFForm"]

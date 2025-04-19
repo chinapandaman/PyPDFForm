@@ -7,3 +7,5 @@ htmlcov/
 draft.py
 *.swp
 site/
+build/
+*.egg-info/
