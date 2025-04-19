@@ -20,7 +20,7 @@ jobs:
         run: |
           rm -rf PyPDFForm
           uv pip install PyPDFForm --system
-          uv pip install -r pyproject.toml --extra dev --system
+          uv pip install -U -r pyproject.toml --extra dev --system
       - name: Run nightly tests
         run: |
           pytest

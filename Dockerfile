@@ -11,7 +11,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 COPY . /pypdfform
 
-RUN uv pip install -r pyproject.toml --extra dev --system
+RUN uv pip install -U -r pyproject.toml --extra dev --system
 
 RUN echo "source /etc/profile" >> /root/.bashrc && \
     echo "[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion" >> /root/.bashrc

@@ -25,7 +25,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        uv pip install -r pyproject.toml --extra dev --system
+        uv pip install -U -r pyproject.toml --extra dev --system
     - name: Test with pytest
       run: |
         coverage run -m pytest && coverage report --fail-under=100
