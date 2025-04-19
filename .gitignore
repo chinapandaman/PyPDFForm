@@ -8,4 +8,5 @@ draft.py
 *.swp
 site/
 build/
+dist/
 *.egg-info/
