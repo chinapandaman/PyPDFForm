@@ -1,4 +1,0 @@
-cryptography
-pillow
-pypdf
-reportlab
