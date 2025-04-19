@@ -34,5 +34,9 @@ serve-docs:
 serve-files:
 	bash ./scripts/http_server.sh
 
+fix-pdf-permission:
+	rm -rf ./pdf_samples
+	git checkout -- ./pdf_samples
+
 clean-temp:
 	rm ./temp/*.pdf
