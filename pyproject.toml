@@ -128,4 +128,4 @@ reportOptionalSubscript = "error"
 version = {attr = "PyPDFForm.__version__"}
 
 [tool.setuptools.packages.find]
-where = ["PyPDFForm*"]
+include = ["PyPDFForm*"]
