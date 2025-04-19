@@ -3,5 +3,5 @@ if [ "$VIRTUAL_ENV" == "" ] && [ "$PYPDFFORM_ENV" != "container" ]; then
 fi
 
 echo "Fetching deployed versions..."
-LATEST=$(pip index versions PyPDFForm | grep -oP '\(.*?\)')
+LATEST=$(git describe --tags --abbrev=0)
 python ./scripts/create_release.py "$LATEST"

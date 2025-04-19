@@ -15,7 +15,7 @@ if __name__ == "__main__":
             version = version.group(1)
 
     latest_version = sys.argv[1].replace("(", "").replace(")", "")
-    print(f"Latest deployed version: v{latest_version}.")
+    print(f"Latest deployed version: {latest_version}.")
     if latest_version == version:
         sys.exit(f"v{latest_version} is already deployed.")
 
