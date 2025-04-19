@@ -57,6 +57,20 @@ omit = [
     "tests/*",
 ]
 
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "C0103",
+    "R0913",
+    "R0902",
+    "R0903",
+    "R0914",
+    "C0209",
+    "C0123",
+    "R0917",
+    "C2801",
+    "C0301",
+]
+
 [tool.setuptools.dynamic]
 version = {attr = "PyPDFForm.__version__"}
 
