@@ -3,12 +3,14 @@
 PyPDFForm's targeted users are other Python developers. This section of the documentation is not for the users, 
 but for people who want to start making contributions to PyPDFForm itself.
 
-## Installing requirements
+## Setup
 
-It is advised that a virtual environment is created before running this command:
+Create a virtual environment, then install all development dependencies using a package manager of your choice.
+
+The command below uses [uv](https://docs.astral.sh/uv/):
 
 ```shell
-pip install -r requirements.txt
+uv pip install -r pyproject.toml --extra dev
 ```
 
 Alternatively, PyPDFForm provides a development container. Build it by running this command at the root directory of the project:
