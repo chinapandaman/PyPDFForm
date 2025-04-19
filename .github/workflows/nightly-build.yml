@@ -10,6 +10,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -17,9 +19,8 @@ jobs:
       - name: Set up environment
         run: |
           rm -rf PyPDFForm
-          python -m pip install --upgrade pip
-          pip install PyPDFForm
-          pip install -r requirements.txt
+          uv pip install PyPDFForm --system
+          uv pip install -r pyproject.toml --extra dev --system
       - name: Run nightly tests
         run: |
           pytest
