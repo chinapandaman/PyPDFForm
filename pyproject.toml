@@ -51,6 +51,12 @@ dev = [
     "ruff",
 ]
 
+[tool.coverage.run]
+omit = [
+    "venv/*",
+    "tests/*",
+]
+
 [tool.setuptools.dynamic]
 version = {attr = "PyPDFForm.__version__"}
 
