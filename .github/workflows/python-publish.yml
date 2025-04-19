@@ -17,14 +17,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.x'
-    - name: Install dependencies
-      run: |
-        uv pip install build twine --system
     - name: Build and deploy to PyPI
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python -m build -s
-        python -m build -w
-        twine upload dist/*
+        uv build
+        uv publish
