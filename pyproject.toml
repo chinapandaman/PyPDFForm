@@ -40,7 +40,9 @@ Documentation = "https://chinapandaman.github.io/PyPDFForm/"
 
 [project.optional-dependencies]
 dev = [
+    "black",
     "coverage",
+    "isort",
     "jsonschema",
     "mkdocs",
     "pudb",

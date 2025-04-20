@@ -10,6 +10,9 @@ coverage-all:
 linting:
 	bash ./scripts/linting.sh
 
+format-code:
+	bash ./scripts/format.sh
+
 generate-new-pdf-samples:
 	bash ./scripts/new_pdf_samples.sh
 
