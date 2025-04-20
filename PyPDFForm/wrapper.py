@@ -41,8 +41,8 @@ from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
 from .widgets.image import ImageWidget
 from .widgets.radio import RadioWidget
-from .widgets.signature import SignatureWidget
 from .widgets.text import TextWidget
+from .widgets.signature import SignatureWidget
 
 
 class FormWrapper:
