@@ -20,8 +20,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Install black/isort
-        run: uv pip install black isort --system
+      - name: Install dependencies
+        run: uv pip install -U -r pyproject.toml --extra dev --system
       - name: If needed, commit black/isort changes to the pull request
         run: |
           black .
