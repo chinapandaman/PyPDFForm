@@ -1,7 +1,7 @@
 # Testing
 
-PyPDFForm uses [pytest](https://pytest.org/) for testing and [coverage.py](https://coverage.readthedocs.io/) 
-for test coverages. Tests can be run by simply executing:
+PyPDFForm uses [pytest](https://pytest.org/) for testing and [coverage.py](https://coverage.readthedocs.io/)
+for measuring test coverage. To run the tests, execute:
 
 ```shell
 coverage run -m pytest && coverage report --fail-under=100
@@ -15,13 +15,13 @@ test
 
 ## Generate coverage report
 
-To generate a coverage report, run:
+To generate a test coverage report, run:
 
 ```shell
 coverage run -m pytest && coverage html
 ```
 
-And the coverage report can be viewed by opening `htmlcov/index.html` in a browser.
+View the coverage report by opening `htmlcov/index.html` in a browser.
 
 Alternatively, in the development container, run:
 
@@ -33,9 +33,9 @@ And the coverage report can be found at `http://localhost:8000/htmlcov/index.htm
 
 ## Test breakdown
 
-Each PyPDFForm test is different. However, there is a general paradigm that almost all tests follow.
+Although each PyPDFForm test is unique, most follow a general paradigm.
 
-In most cases, a test can be verbally summed up into three steps:
+Most tests can be summarized into three steps:
 
 * Define an expected PDF file that the outcome of the test should look like.
 * Execute a sequence of code using PyPDFForm to generate a PDF that should look like the expected PDF file.
@@ -92,7 +92,7 @@ obj = PdfWrapper(
 )
 ```
 
-These two lines should almost always be included in every test to make updating old tests easier:
+Include these two lines in most tests to simplify updating old tests:
 
 ```python
 request.config.results["expected_path"] = expected_path

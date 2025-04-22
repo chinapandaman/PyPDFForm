@@ -1,11 +1,10 @@
 # Change checkbox and radio button styles
 
-Similar to text fields discussed in the last chapter, PyPDFForm gives you the ability to 
-modify some styles of checkboxes and radio buttons without changing the template.
+PyPDFForm allows you to modify certain styles of checkboxes and radio buttons without altering the template, similar to text fields.
 
 ## Change size
 
-You can change the size of the selection by specifying a `float` value. Consider 
+To change the size of the selection, specify a `float` value. For an example, refer to
 [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf):
 
 ```python
@@ -30,8 +29,8 @@ with open("output.pdf", "wb+") as output:
 
 ## Change button style
 
-The button style is the shape of the selection on a checkbox or radio button. PyPDFForm lets you pick 
-three different button styles: `check`, `circle`, and `cross`. Consider 
+The button style determines the shape of the selection on a checkbox or radio button. PyPDFForm offers
+three button styles: `check`, `circle`, and `cross`. For an example, see
 [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_radio_button.pdf):
 
 ```python

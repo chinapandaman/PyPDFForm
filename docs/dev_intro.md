@@ -1,11 +1,10 @@
 # Developer Intro
 
-PyPDFForm's targeted users are other Python developers. This section of the documentation is not for the users, 
-but for people who want to start making contributions to PyPDFForm itself.
+PyPDFForm is designed for Python developers. This documentation section is intended for contributors to PyPDFForm, not its end-users.
 
 ## Setup
 
-Create a virtual environment, then install all development dependencies using a package manager of your choice.
+To get started, create a virtual environment and install the development dependencies using your preferred package manager.
 
 The command below uses [uv](https://docs.astral.sh/uv/):
 
@@ -13,7 +12,7 @@ The command below uses [uv](https://docs.astral.sh/uv/):
 uv pip install -r pyproject.toml --extra dev
 ```
 
-Alternatively, PyPDFForm provides a development container. Build it by running this command at the root directory of the project:
+PyPDFForm also offers a development container. To build it, run the following command in the project's root directory:
 
 ```shell
 docker build -t pypdfform-dev .
@@ -31,7 +30,7 @@ See [testing PyPDFForm with pytest](dev_test.md).
 
 ## Creating issues
 
-When you create an issue on GitHub, try your best to follow these conventions:
+When creating a GitHub issue, follow these guidelines:
 
 * The issue title should have the format `PPF-<issue number>: <title of the issue>`.
 * The issue description should be as descriptive as possible, preferably with the following:
@@ -41,7 +40,7 @@ When you create an issue on GitHub, try your best to follow these conventions:
 
 ## Opening pull requests
 
-Please create an issue before making a pull request. Try your best to follow these conventions when doing so:
+Before opening a pull request, create an issue. When opening the pull request, follow these guidelines:
 
 * The PR title should be the same as its respective issue, so `PPF-<issue number>: <title of the issue>`.
 * The PR description should contain a brief explanation of the changes.
