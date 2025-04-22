@@ -1,14 +1,10 @@
 # Fill a PDF form
 
-PyPDFForm uses a single depth, non-nested dictionary to fill a PDF form. As a result of this process, the filled 
-PDF form will be flattened and no longer editable. This is to prevent future encoding issues, especially when 
-multiple PDF forms with overlaps on widget names are combined.
+PyPDFForm fills a PDF form using a flat, non-nested dictionary. The filled form is flattened and becomes non-editable to prevent encoding issues when combining multiple forms with overlapping widget names.
 
 ## Fill text field and checkbox widgets
 
-As seen when we 
-inspected [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf), a text 
-field can be filled with a value of `string`, whereas a checkbox can be filled with a `boolean` value:
+When inspecting [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf), note that text fields are filled with `string` values and checkboxes with `boolean` values.
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -30,7 +26,7 @@ with open("output.pdf", "wb+") as output:
 
 ## Fill radio button widgets
 
-A radio button group on a PDF form is a collection of radio buttons that share the same name.
+A radio button group is a collection of radio buttons sharing the same name on a PDF form.
 
 A [PDF form](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_radio_button.pdf) 
 with radio button groups can be filled using `integer` values where the value indicates which radio button to select 
@@ -53,8 +49,8 @@ with open("output.pdf", "wb+") as output:
 
 ## Fill dropdown widgets
 
-Similar to radio buttons, a dropdown choice can be selected by specifying an `integer` value of the choice. Consider 
-[this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf):
+Like radio buttons, select a dropdown choice by specifying its `integer` value. For an example, see
+[this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf).
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -71,8 +67,7 @@ with open("output.pdf", "wb+") as output:
 
 ## Fill signature widgets
 
-A signature field widget allows you to sign a PDF form in a handwritten format. PyPDFForm lets you use a signature image to populate 
-any signature field widget.
+A signature field widget enables signing a PDF form with a handwritten signature image.
 
 Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/signature/sample_template_with_signature.pdf) 
 and [this signature image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png):
@@ -90,8 +85,7 @@ with open("output.pdf", "wb+") as output:
     output.write(signed.read())
 ```
 
-**NOTE:** As described [here](install.md/#create-a-pdf-wrapper), the value of the signature in your dictionary can be 
-a file path shown above, but also an open file object and a file stream that's in `bytes`.
+**NOTE:** The signature value in your dictionary can be a file path, an open file object, or a `bytes` file stream, as described [here](install.md/#create-a-pdf-wrapper).
 
 By default, the library preserves the aspect ratio of the signature image when filling it. This can be turned off by setting 
 the `preserve_aspect_ratio` property to `False` on the signature widget:
@@ -113,8 +107,7 @@ with open("output.pdf", "wb+") as output:
 
 ## Fill image widgets
 
-An image field widget can be filled similarly to a signature field, by providing a value of file path, file object, or 
-file stream.
+Fill an image field widget similarly to a signature field, using a file path, file object, or file stream.
 
 Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_image_field.pdf) 
 and [this image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_image.jpg):
@@ -152,8 +145,7 @@ with open("output.pdf", "wb+") as output:
 
 ## Disable rendering widgets
 
-By default, PyPDFForm will still render each widget on the filled PDF form even though it's flattened during filling the process. This behavior can be disabled globally by passing 
-the `render_widgets` parameter as `False` to the `PdfWrapper` object. Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf):
+By default, PyPDFForm renders widgets on the filled PDF form despite flattening during the filling process. To disable this globally, pass `render_widgets=False` to the `PdfWrapper` object. For an example, see [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf).
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -173,8 +165,7 @@ with open("output.pdf", "wb+") as output:
     output.write(filled.read())
 ```
 
-Alternatively, if you just want to disable rendering of some widgets but not others, you can do so at each widget's level by setting the attribute 
-`render_widget` to `False`:
+To disable rendering for specific widgets, set the `render_widget` attribute to `False` at the individual widget level.
 
 ```python
 from PyPDFForm import PdfWrapper

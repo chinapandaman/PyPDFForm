@@ -1,11 +1,10 @@
 # Fill a PDF form in place
 
-The `FormWrapper` class allows you to fill a PDF form in place as if you were filling it manually.
+The `FormWrapper` class enables filling a PDF form in place, simulating manual filling.
 
 ## Normal mode
 
-Similar to the `PdfWrapper` class, the `FormWrapper` also supports widgets including text fields, checkboxes, radio 
-buttons, dropdowns, and paragraphs. However, it does NOT support signature or image widgets.
+Like `PdfWrapper`, `FormWrapper` supports widgets such as text fields, checkboxes, radio buttons, dropdowns, and paragraphs, but not signature or image widgets.
 
 Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf):
 
@@ -30,18 +29,13 @@ with open("output.pdf", "wb+") as output:
     output.write(filled.read())
 ```
 
-The optional parameter `flatten` has a default value of `False`, meaning PDF forms filled using `FormWrapper` will by 
-default remain editable. Setting it to `True` will flatten the PDF after it's filled, making all widgets read only.
+The `flatten` parameter defaults to `False`, keeping PDF forms filled with `FormWrapper` editable. Set it to `True` to flatten the PDF and make widgets read-only.
 
 ## Adobe mode (beta)
 
-**NOTE:** This is a beta feature, meaning it still needs to be tested against more PDF forms and may not work for 
-some of them.
+**NOTE:** This is a beta feature requiring further testing with various PDF forms and may not be compatible with all forms.
 
-Currently, there are some known issues with Adobe Acrobat displaying PDF forms filled using normal mode. 
-Specifically the text content that gets filled into a text field widget will only appear when the text field is clicked 
-and selected. This is not an issue in browsers like Chrome or other PDF viewing apps like Document Viewer 
-(the default PDF app on Ubuntu).
+Adobe Acrobat has known issues displaying PDF forms filled in normal mode, where text content appears only when the text field is selected. This issue doesn't occur in browsers like Chrome or PDF viewers like Document Viewer (Ubuntu's default PDF app).
 
 By setting the optional parameter `adobe_mode` (default value is `False`) to `True` when invoking the `fill` 
 method, `FormWrapper` will fill a PDF form such that its text 
@@ -68,7 +62,4 @@ with open("output.pdf", "wb+") as output:
     output.write(filled.read())
 ```
 
-**NOTE:** However, enabling Adobe mode may result in some unexpected style changes for checkboxes and radio buttons. It 
-may even result in selected radio button not displaying correctly when opened using Adobe Acrobat. It's currently 
-unclear why such behaviors exist. If you have trouble with these behaviors, consider using `PdfWrapper` instead to 
-fill your PDF forms.
+**NOTE:** Enabling Adobe mode may cause unexpected style changes to checkboxes and radio buttons, potentially affecting their display in Adobe Acrobat. If issues arise, consider using `PdfWrapper` to fill your PDF forms.
