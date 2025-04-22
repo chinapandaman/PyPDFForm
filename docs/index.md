@@ -19,7 +19,7 @@ It also supports other common utilities such as extracting pages and merging mul
 * [Fill a PDF form in place](simple_fill.md)
 * [Change text field styles](style.md)
 * [Change checkbox and radio button styles](button_style.md)
-* [Draw stuffs](draw.md)
+* [Draw elements](draw.md)
 * [Other utilities](utils.md)
 
 ## Developer Guide

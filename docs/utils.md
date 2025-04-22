@@ -1,14 +1,13 @@
 # Other utilities
 
-There are some additional utilities PyPDFForm provides similar to many other PDF libraries.
+PyPDFForm offers additional utilities similar to other PDF libraries.
 
 This section of the documentation will use 
 [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
 
 ## Extract pages
 
-Each `PdfWrapper` object has an attribute `.pages`. It's a `list` of `PdfWrapper` objects where each one of them is a 
-single page:
+The `PdfWrapper` object has a `.pages` attribute, which is a list of `PdfWrapper` objects representing individual pages.
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -27,8 +26,8 @@ with open("output.pdf", "wb+") as output:
 
 ## Merge multiple PDFs
 
-More than one PDF files can be merged by simply adding their `PdfWrapper` objects. Consider 
-[this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf):
+Merge multiple PDF files by adding their `PdfWrapper` objects. For an example, see
+[this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf).
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -41,7 +40,7 @@ with open("output.pdf", "wb+") as output:
     output.write(merged.read())
 ```
 
-Or if you wish to re-organize your pages:
+To reorganize pages:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -56,7 +55,7 @@ with open("output.pdf", "wb+") as output:
 
 ## Change PDF version
 
-PyPDFForm supports modifying PDF version up to 2.0:
+PyPDFForm allows modifying the PDF version up to 2.0:
 
 ```python
 from PyPDFForm import PdfWrapper

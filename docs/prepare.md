@@ -1,16 +1,15 @@
 # Prepare a PDF form
 
-The most common tool to create a PDF form is Adobe Acrobat. A tutorial can be found 
-[here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html). 
-There are other free alternatives like [DocFly](https://www.docfly.com/) that support similar functionalities.
+The most common tool for creating PDF forms is Adobe Acrobat, with a tutorial available
+[here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html).
+Alternative free tools like [DocFly](https://www.docfly.com/) offer similar functionality.
 
-Given a PDF that's not a form yet, PyPDFForm also supports 
-creating a subset of PDF form widgets on it through coding.
+PyPDFForm also allows creating PDF form widgets on existing PDFs through coding.
 
 This section of the documentation will mostly use 
 [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
 
-This section of the documentation requires a basic understanding of [the PDF coordinate system](coordinate.md).
+Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
 
 All optional parameters will have a comment `# optional` after each of them.
 
@@ -176,9 +175,9 @@ with open("output.pdf", "wb+") as output:
 
 ## Modify the key of a widget
 
-For existing widgets, PyPDFForm supports modifying their keys. 
-Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf), 
-the below snippet will change the key of the first text field `test` to `test_text`:
+PyPDFForm allows modifying the keys of existing widgets.
+For example, using [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf),
+you can change the key of the first text field `test` to `test_text`:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -191,9 +190,9 @@ with open("output.pdf", "wb+") as output:
     output.write(new_form.read())
 ```
 
-If there is more than one widget with the same key, the optional parameter `index` can be used to pick which one 
-to update. Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf), 
-the below snippet will change the key of the second row's text field with the key `Description[0]` to `Description[1]`:
+If multiple widgets share the same key, use the `index` parameter to specify which one to update. For instance, with
+[this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf),
+you can change the key of the second row's text field from `Description[0]` to `Description[1]`:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -206,9 +205,7 @@ with open("output.pdf", "wb+") as output:
     output.write(new_form.read())
 ```
 
-Finally, if there are multiple widgets that need to be bulk updated, the performance optimal way of doing it is to set 
-the optional parameter `defer` to `True` when updating each key and at the very end call `commit_widget_key_updates()` 
-to commit all the updates.
+For bulk updates, improve performance by setting `defer=True` when updating each key, then call `commit_widget_key_updates()` at the end to commit all changes.
 
 Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf), 
 the below snippet will change the key of each row's text field with the key `Description[0]` to `Description[i]` 

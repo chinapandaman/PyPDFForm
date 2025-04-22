@@ -1,18 +1,15 @@
 # Change text field styles
 
-PyPDFForm gives you the ability to modify certain styles of text fields through code. This allows you to manipulate 
-appearances of the texts without having to make changes to your PDF form template.
+PyPDFForm enables modifying text field styles through code, allowing you to change text appearances without altering the PDF form template.
 
-All these style changes can be done both globally upon instantiating a `PdfWrapper` object and individually for each 
-text field widget.
+You can apply these style changes globally when creating a `PdfWrapper` object or individually for each text field widget.
 
 This section of the documentation will use 
 [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
 
 ## Change font
 
-Some fonts, for example `Courier` and `Helvetica`, are builtin as part of the PDF standards. These fonts can be set 
-without registration:
+Some fonts like `Courier` and `Helvetica` are built into PDF standards and can be set without registration:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -35,9 +32,8 @@ with open("output.pdf", "wb+") as output:
     output.write(form.read())
 ```
 
-Other non-standard fonts, for example [Liberation Serif](https://fonts.adobe.com/fonts/liberation-serif), will need 
-a [TrueType file](https://github.com/chinapandaman/PyPDFForm/raw/master/font_samples/LiberationSerif-Regular.ttf) 
-to be registered before they can be set:
+To use non-standard fonts like [Liberation Serif](https://fonts.adobe.com/fonts/liberation-serif), register a
+[TrueType file](https://github.com/chinapandaman/PyPDFForm/raw/master/font_samples/LiberationSerif-Regular.ttf) before setting the font:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -64,7 +60,7 @@ with open("output.pdf", "wb+") as output:
 
 ## Change font size
 
-PyPDFForm allows setting font size using a numerical `float` value:
+Set font size using a `float` value in PyPDFForm:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -89,7 +85,7 @@ with open("output.pdf", "wb+") as output:
 
 ## Change font color
 
-PyPDFForm allows setting font color using an RGB numerical `tuple`:
+In PyPDFForm, set font color using an RGB `tuple`:
 
 ```python
 from PyPDFForm import PdfWrapper
