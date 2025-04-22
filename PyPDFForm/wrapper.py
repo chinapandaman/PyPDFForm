@@ -624,7 +624,9 @@ class PdfWrapper(FormWrapper):
             ],
         )
 
+        stream_with_widgets = self.read()
         self.stream = merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = copy_watermark_widgets(remove_all_widgets(self.stream), stream_with_widgets, None)
 
         return self
 
@@ -664,7 +666,9 @@ class PdfWrapper(FormWrapper):
             self.stream, page_number, "image", [[image, x, y, width, height]]
         )
 
+        stream_with_widgets = self.read()
         self.stream = merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = copy_watermark_widgets(remove_all_widgets(self.stream), stream_with_widgets, None)
 
         return self
 
