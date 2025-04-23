@@ -9,7 +9,7 @@ Understanding [the PDF coordinate system](coordinate.md) is necessary for this s
 
 All optional parameters will have a comment `# optional` after each of them.
 
-**NOTE:** Due to a known bug in a dependency, call the draw methods after filling the PDF form. Otherwise, some or all widgets, especially radio buttons, might be removed.
+**NOTE:** Avoid drawing elements that overlap with form widgets, as widgets take precedence and will cover drawn elements.
 
 ## Draw text
 

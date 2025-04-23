@@ -192,7 +192,7 @@ with open("output.pdf", "wb+") as output:
 
 If multiple widgets share the same key, use the `index` parameter to specify which one to update. For instance, with
 [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf),
-you can change the key of the second row's text field from `Description[0]` to `Description[1]`:
+you can change the key of the second row's text field with the key `Description[0]` to `Description[1]`:
 
 ```python
 from PyPDFForm import PdfWrapper

@@ -586,7 +586,10 @@ class PdfWrapper(FormWrapper):
         """Draws static text onto the PDF document at specified coordinates.
 
         Adds non-interactive text that becomes part of the PDF content rather
-        than a form field. Useful for annotations, labels, signatures, etc.
+        than a form field. The text is drawn using a temporary Text widget and
+        merged via watermark operations, preserving existing form fields.
+
+        Supports multi-line text (using NEW_LINE_SYMBOL) and custom formatting.
 
         Args:
             text: The text content to draw (supports newlines with NEW_LINE_SYMBOL)
@@ -624,7 +627,11 @@ class PdfWrapper(FormWrapper):
             ],
         )
 
+        stream_with_widgets = self.read()
         self.stream = merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = copy_watermark_widgets(
+            remove_all_widgets(self.stream), stream_with_widgets, None
+        )
 
         return self
 
@@ -640,10 +647,8 @@ class PdfWrapper(FormWrapper):
     ) -> PdfWrapper:
         """Draws an image onto the PDF document at specified coordinates.
 
-        Supports common image formats (JPEG, PNG) from various sources:
-        - Raw image bytes
-        - File path
-        - File-like object
+        The image is merged via watermark operations, preserving existing form fields.
+        Supports common formats (JPEG, PNG) from bytes, file paths, or file objects.
 
         Args:
             image: Image data as bytes, file path, or file object
@@ -664,7 +669,11 @@ class PdfWrapper(FormWrapper):
             self.stream, page_number, "image", [[image, x, y, width, height]]
         )
 
+        stream_with_widgets = self.read()
         self.stream = merge_watermarks_with_pdf(self.stream, watermarks)
+        self.stream = copy_watermark_widgets(
+            remove_all_widgets(self.stream), stream_with_widgets, None
+        )
 
         return self
 
