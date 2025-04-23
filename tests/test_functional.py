@@ -34,6 +34,25 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
             assert not widgets
 
 
+def test_fill_not_render_widgets(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "test_fill_not_render_widgets.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream, render_widgets=False).fill(
+            data_dict,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        assert len(obj.read()) == len(obj.stream)
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
 def test_register_bad_fonts():
     assert not PdfWrapper.register_font("foo", b"foo")
     assert not PdfWrapper.register_font("foo", "foo")

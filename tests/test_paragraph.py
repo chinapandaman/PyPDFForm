@@ -139,6 +139,102 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
         assert obj.stream == expected
 
 
+def test_fill_sejda_complex_not_render_widgets(
+    sejda_template_complex, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "paragraph", "test_fill_sejda_complex_not_render_widgets.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template_complex, render_widgets=False).fill(
+            {
+                "checkbox": True,
+                "radio": 0,
+                "dropdown_font_auto_left": 0,
+                "dropdown_font_auto_center": 1,
+                "dropdown_font_auto_right": 2,
+                "dropdown_font_ten_left": 0,
+                "dropdown_font_ten_center": 1,
+                "dropdown_font_ten_right": 2,
+                "paragraph_font_auto_left": "paragraph_font_auto_left",
+                "paragraph_font_auto_center": "paragraph_font_auto_center",
+                "paragraph_font_auto_right": "paragraph_font_auto_right",
+                "paragraph_font_ten_left": "paragraph_font_ten_left",
+                "paragraph_font_ten_center": "paragraph_font_ten_center",
+                "paragraph_font_ten_right": "paragraph_font_ten_right",
+                "text__font_auto_left": "test text",
+                "text_font_auto_center": "test text",
+                "text_font_auto_right": "test text",
+                "text_font_ten_left": "text_font_ten_left",
+                "text_font_ten_center": "text_font_ten_center",
+                "text_font_ten_right": "text_font_ten_right",
+            }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(obj.stream)
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
+def test_fill_sejda_complex_not_render_some_widgets(
+    sejda_template_complex, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "paragraph", "test_fill_sejda_complex_not_render_some_widgets.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template_complex)
+
+        obj.widgets["radio"].render_widget = False
+        obj.widgets["dropdown_font_auto_center"].render_widget = False
+        obj.widgets["dropdown_font_ten_center"].render_widget = False
+        obj.widgets["paragraph_font_auto_center"].render_widget = False
+        obj.widgets["paragraph_font_ten_center"].render_widget = False
+        obj.widgets["text_font_auto_center"].render_widget = False
+        obj.widgets["text_font_ten_center"].render_widget = False
+
+        obj.fill(
+            {
+                "checkbox": True,
+                "radio": 0,
+                "dropdown_font_auto_left": 0,
+                "dropdown_font_auto_center": 1,
+                "dropdown_font_auto_right": 2,
+                "dropdown_font_ten_left": 0,
+                "dropdown_font_ten_center": 1,
+                "dropdown_font_ten_right": 2,
+                "paragraph_font_auto_left": "paragraph_font_auto_left",
+                "paragraph_font_auto_center": "paragraph_font_auto_center",
+                "paragraph_font_auto_right": "paragraph_font_auto_right",
+                "paragraph_font_ten_left": "paragraph_font_ten_left",
+                "paragraph_font_ten_center": "paragraph_font_ten_center",
+                "paragraph_font_ten_right": "paragraph_font_ten_right",
+                "text__font_auto_left": "test text",
+                "text_font_auto_center": "test text",
+                "text_font_auto_right": "test text",
+                "text_font_ten_left": "text_font_ten_left",
+                "text_font_ten_center": "text_font_ten_center",
+                "text_font_ten_right": "text_font_ten_right",
+            }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(obj.stream)
+        assert obj.read() == obj.stream
+
+        expected = f.read()
+
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+
+
 def test_sejda_complex_paragraph_multiple_line_alignment(
     sejda_template_complex, pdf_samples, request
 ):
