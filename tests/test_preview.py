@@ -47,9 +47,8 @@ def test_preview_paragraph_complex(
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(preview) == len(expected)
-            assert preview == expected
+        assert len(preview) == len(expected)
+        assert preview == expected
 
 
 def test_preview_sejda_complex(sejda_template_complex, pdf_samples, request):

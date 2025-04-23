@@ -67,9 +67,8 @@ def test_paragraph_auto_font(
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
 
 
 def test_paragraph_auto_font_auto_wrap(
@@ -92,10 +91,9 @@ def test_paragraph_auto_font_auto_wrap(
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
-            assert obj.widgets["paragraph"].text_wrap_length is not None
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
+        assert obj.widgets["paragraph"].text_wrap_length is not None
 
 
 def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
@@ -191,9 +189,8 @@ def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, reque
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
 
 
 def test_paragraph_max_length(
@@ -216,6 +213,5 @@ def test_paragraph_max_length(
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+        assert len(obj.stream) == len(expected)
+        assert obj.stream == expected
