@@ -341,14 +341,16 @@ def copy_watermark_widgets(
     Copies annotation widgets (form fields) from watermark PDFs onto the corresponding pages of a base PDF,
     including only those widgets whose key matches an entry in the provided keys list.
 
-    For each watermark in the provided list, any annotation widgets (such as form fields) are cloned
-    and appended to the annotations of the corresponding page in the base PDF, but only if their key
-    matches one of the specified keys.
+    For each watermark in the provided list (or single watermark PDF if bytes input is provided),
+    any annotation widgets (such as form fields) are cloned and appended to the annotations of the
+    corresponding page in the base PDF, but only if their key matches one of the specified keys.
 
     Args:
         pdf: The original PDF document as bytes.
-        watermarks: List of watermark PDF data (as bytes), one per page. Empty or None entries are skipped.
+        watermarks: Either a list of watermark PDF data (as bytes, one per page) or a single watermark PDF.
+                   Empty or None entries are skipped.
         keys: List of widget keys (str). Only widgets whose key is in this list will be copied.
+              If None, all widgets will be copied.
 
     Returns:
         bytes: The resulting PDF document with selected annotation widgets from watermarks copied onto their respective pages.
