@@ -32,7 +32,7 @@ jobs:
           black .
           isort .
           python scripts/bump_version.py ${{ inputs.version-segment }}
-          git config --global user.name 'black-isort-bot'
+          git config --global user.name 'release-bot'
           git config --global user.email 'bot@domain.com'
-          git diff --quiet && git diff --staged --quiet || git commit -am '[skip ci]: black/isort'
+          git diff --quiet && git diff --staged --quiet || git commit -am '[skip ci]: bump version'
           git push
