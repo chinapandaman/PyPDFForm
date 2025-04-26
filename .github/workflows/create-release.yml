@@ -1,0 +1,22 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: uv pip install -U -r pyproject.toml --extra dev --system
+      - name: Create release based on the latest version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
+        run: python scripts/create_release.py $(git describe --tags --abbrev=0)
