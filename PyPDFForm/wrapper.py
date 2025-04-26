@@ -288,9 +288,10 @@ class PdfWrapper(FormWrapper):
 
         return [
             self.__class__(
-                each, **{param: getattr(self, param) for param, _ in self.USER_PARAMS}
+                copy_watermark_widgets(each, self.stream, None, i),
+                **{param: getattr(self, param) for param, _ in self.USER_PARAMS},
             )
-            for each in get_page_streams(self.stream)
+            for i, each in enumerate(get_page_streams(remove_all_widgets(self.read())))
         ]
 
     def change_version(self, version: str) -> PdfWrapper:
@@ -497,7 +498,7 @@ class PdfWrapper(FormWrapper):
         obj = _class(name=name, page_number=page_number, x=x, y=y, **kwargs)
         watermarks = obj.watermarks(self.read())
 
-        self.stream = copy_watermark_widgets(self.read(), watermarks, [name])
+        self.stream = copy_watermark_widgets(self.read(), watermarks, [name], None)
         if obj.non_acro_form_params:
             self.stream = handle_non_acro_form_params(
                 self.stream, name, obj.non_acro_form_params
@@ -630,7 +631,7 @@ class PdfWrapper(FormWrapper):
         stream_with_widgets = self.read()
         self.stream = merge_watermarks_with_pdf(self.stream, watermarks)
         self.stream = copy_watermark_widgets(
-            remove_all_widgets(self.stream), stream_with_widgets, None
+            remove_all_widgets(self.stream), stream_with_widgets, None, None
         )
 
         return self
@@ -672,7 +673,7 @@ class PdfWrapper(FormWrapper):
         stream_with_widgets = self.read()
         self.stream = merge_watermarks_with_pdf(self.stream, watermarks)
         self.stream = copy_watermark_widgets(
-            remove_all_widgets(self.stream), stream_with_widgets, None
+            remove_all_widgets(self.stream), stream_with_widgets, None, None
         )
 
         return self

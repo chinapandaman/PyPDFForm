@@ -629,6 +629,56 @@ def test_pages(template_stream, pdf_samples, request):
         assert obj.pages[0].read() == f.read()
 
 
+def test_sejda_pages_1(sejda_template, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "pages", "test_sejda_pages_1.pdf")
+    obj = PdfWrapper(sejda_template)
+
+    with open(expected_path, "rb+") as f:
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.pages[0].read()
+        assert obj.pages[0].read() == f.read()
+
+
+def test_sejda_pages_2(sejda_template, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "pages", "test_sejda_pages_2.pdf")
+    obj = PdfWrapper(sejda_template)
+
+    with open(expected_path, "rb+") as f:
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.pages[1].read()
+        assert obj.pages[1].read() == f.read()
+
+
+def test_radio_pages_1(template_with_radiobutton_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "pages", "test_radio_pages_1.pdf")
+    obj = PdfWrapper(template_with_radiobutton_stream)
+
+    with open(expected_path, "rb+") as f:
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.pages[0].read()
+        assert obj.pages[0].read() == f.read()
+
+
+def test_radio_pages_2(template_with_radiobutton_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "pages", "test_radio_pages_2.pdf")
+    obj = PdfWrapper(template_with_radiobutton_stream)
+
+    with open(expected_path, "rb+") as f:
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.pages[1].read()
+        assert obj.pages[1].read() == f.read()
+
+
+def test_radio_pages_3(template_with_radiobutton_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "pages", "test_radio_pages_3.pdf")
+    obj = PdfWrapper(template_with_radiobutton_stream)
+
+    with open(expected_path, "rb+") as f:
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.pages[2].read()
+        assert obj.pages[2].read() == f.read()
+
+
 def test_pages_inherit_attributes(template_stream):
     obj = PdfWrapper(
         template_stream,
