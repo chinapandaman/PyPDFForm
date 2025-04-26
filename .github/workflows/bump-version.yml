@@ -1,0 +1,39 @@
+name: Bump version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version-segment:
+        type: choice
+        description: Select the version segment to bump
+        required: true
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHA_TOKEN }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: uv pip install -U -r pyproject.toml --extra dev --system
+      - name: If needed, format the code, then bump version based on the input
+        run: |
+          black .
+          isort .
+          python scripts/bump_version.py ${{ inputs.version-segment }}
+          git config --global user.name 'release-bot'
+          git config --global user.email 'bot@domain.com'
+          git diff --quiet && git diff --staged --quiet || git commit -am '[skip ci]: bump version'
+          git push

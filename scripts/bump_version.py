@@ -6,12 +6,7 @@ import re
 import sys
 
 if __name__ == "__main__":
-    branch = sys.argv[1]
-    if not branch.startswith("PPF-"):
-        print("Bump version cannot be done on a non-issue branch.")
-        sys.exit(1)
-
-    to_bump = sys.argv[2]
+    to_bump = sys.argv[1]
 
     v = ""
     with open("PyPDFForm/__init__.py", encoding="utf8") as f:
