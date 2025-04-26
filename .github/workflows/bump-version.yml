@@ -1,10 +1,15 @@
-# https://github.com/cclauss/autoblack
-
-name: Code Formatting
+name: Bump version
 
 on:
-  push:
-    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      version-segment:
+        type: choice
+        description: Select the version segment to bump
+        options:
+          - major
+          - minor
+          - patch
 
 jobs:
   build:
@@ -13,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.BLACK_ISORT_TOKEN }}
+          token: ${{ secrets.GHA_TOKEN }}
       - name: Install uv
         uses: astral-sh/setup-uv@v5
       - name: Set up Python
@@ -22,10 +27,11 @@ jobs:
           python-version: '3.x'
       - name: Install dependencies
         run: uv pip install -U -r pyproject.toml --extra dev --system
-      - name: If needed, commit black/isort changes to the pull request
+      - name: If needed, format the code, then bump version based on the input
         run: |
           black .
           isort .
+          python scripts/bump_version.py ${{ inputs.version-segment }}
           git config --global user.name 'black-isort-bot'
           git config --global user.email 'bot@domain.com'
           git diff --quiet && git diff --staged --quiet || git commit -am '[skip ci]: black/isort'
