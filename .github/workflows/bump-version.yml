@@ -6,6 +6,7 @@ on:
       version-segment:
         type: choice
         description: Select the version segment to bump
+        required: true
         options:
           - major
           - minor
