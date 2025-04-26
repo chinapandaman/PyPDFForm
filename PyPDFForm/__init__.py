@@ -5,7 +5,7 @@ This package provides tools for filling PDF forms, drawing text and images,
 and manipulating PDF form elements programmatically.
 """
 
-__version__ = "2.2.3"
+__version__ = "2.2.4"
 
 from .wrapper import FormWrapper, PdfWrapper
 
