@@ -335,7 +335,10 @@ def merge_watermarks_with_pdf(
 
 
 def copy_watermark_widgets(
-    pdf: bytes, watermarks: Union[List[bytes], bytes], keys: Union[List[str], None]
+    pdf: bytes,
+    watermarks: Union[List[bytes], bytes],
+    keys: Union[List[str], None],
+    page_num: Union[int, None],
 ) -> bytes:
     """
     Copies annotation widgets (form fields) from watermark PDFs onto the corresponding pages of a base PDF,
@@ -368,6 +371,9 @@ def copy_watermark_widgets(
         watermarks = [watermarks]
         widgets_to_copy = widgets_to_copy_pdf
 
+    if page_num is not None:
+        widgets_to_copy = widgets_to_copy_watermarks
+
     for i, watermark in enumerate(watermarks):
         if not watermark:
             continue
@@ -380,7 +386,9 @@ def copy_watermark_widgets(
                 key = extract_widget_property(
                     annot.get_object(), WIDGET_KEY_PATTERNS, None, str
                 )
-                if keys is None or key in keys:
+                if (keys is None or key in keys) and (
+                    page_num is None or page_num == j
+                ):
                     widgets_to_copy_watermarks[i].append(annot.clone(out))
                     widgets_to_copy_pdf[j].append(annot.clone(out))
 
