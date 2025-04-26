@@ -7,6 +7,7 @@ on:
         type: choice
         description: Select the version segment to bump
         required: true
+        default: "patch"
         options:
           - major
           - minor
