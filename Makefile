@@ -22,15 +22,6 @@ compare-pdf-diffs:
 deploy:
 	bash ./scripts/create_release.sh
 
-bump-patch:
-	bash ./scripts/bump_version.sh patch
-
-bump-minor:
-	bash ./scripts/bump_version.sh minor
-
-bump-major:
-	bash ./scripts/bump_version.sh major
-
 serve-docs:
 	bash ./scripts/serve_docs.sh
 
