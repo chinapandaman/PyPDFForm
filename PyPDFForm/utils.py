@@ -11,6 +11,7 @@ This module contains general-purpose utilities used throughout PyPDFForm:
 """
 
 from collections.abc import Callable
+from functools import lru_cache
 from io import BytesIO
 from secrets import choice
 from string import ascii_letters, digits, punctuation
@@ -29,6 +30,7 @@ from .middleware.radio import Radio
 from .middleware.text import Text
 
 
+@lru_cache
 def stream_to_io(stream: bytes) -> BinaryIO:
     """Converts a byte stream to a seekable binary IO object.
 
