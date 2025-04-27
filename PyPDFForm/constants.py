@@ -32,7 +32,7 @@ VERSION_IDENTIFIERS = [
     b"%PDF-1.7",
     b"%PDF-2.0",
 ]
-VERSION_IDENTIFIER_PREFIX = b"%PDF-"
+VERSION_IDENTIFIER_PREFIX = "%PDF-".encode("utf-8")
 
 WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown, Signature, Image]
 
