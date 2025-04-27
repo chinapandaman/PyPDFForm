@@ -2,7 +2,7 @@
 
 The PyPDFForm release process begins with the following steps:
 
-* Creating a release [issue](https://github.com/chinapandaman/PyPDFForm/issues/686) and [PR](https://github.com/chinapandaman/PyPDFForm/pull/687).
+* A [version bump commit](https://github.com/chinapandaman/PyPDFForm/commit/71b4983d115819d413edfdfc83af57f95ad292c7), which will also run [black](https://black.readthedocs.io/) and [isort](https://pycqa.github.io/isort/) on the codebase.
 * Publishing a new [GitHub release](https://github.com/chinapandaman/PyPDFForm/releases) with auto-generated changelogs.
 
 After completing these steps, the deployment CI will be triggered.
