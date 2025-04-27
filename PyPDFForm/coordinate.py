@@ -34,13 +34,13 @@ def get_draw_border_coordinates(widget: dict, shape: str) -> dict:
     Args:
         widget: PDF form widget dictionary containing Rect coordinates (in PDF points)
         shape: Type of border to draw:
-            - "rectangle": Standard rectangular border
+            - "rect": Standard rectangular border
             - "ellipse": Circular/oval border
             - "line": Straight line border
 
     Returns:
         dict: Coordinate dictionary with different keys depending on shape:
-            - For "rectangle":
+            - For "rect":
                 {
                     "x": bottom-left x,
                     "y": bottom-left y,
