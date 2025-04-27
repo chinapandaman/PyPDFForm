@@ -104,13 +104,13 @@ def signature_image_handler(
             widget, middleware.preserve_aspect_ratio, image_width, image_height
         )
         images_to_draw.append(
-            [
-                stream,
-                x,
-                y,
-                width,
-                height,
-            ]
+            {
+                "stream": stream,
+                "x": x,
+                "y": y,
+                "width": width,
+                "height": height,
+            }
         )
 
     return any_image_to_draw
@@ -172,19 +172,24 @@ def border_handler(
         shape = "rect"
 
     list_to_append.append(
-        get_draw_border_coordinates(widget, shape)
-        + [
-            middleware.border_color,
-            middleware.background_color,
-            middleware.border_width,
-            middleware.dash_array,
-        ]
+        {
+            **get_draw_border_coordinates(widget, shape),
+            "border_color": middleware.border_color,
+            "background_color": middleware.background_color,
+            "border_width": middleware.border_width,
+            "dash_array": middleware.dash_array
+        }
     )
 
     if shape == "line":
         rect_borders_to_draw.append(
-            get_draw_border_coordinates(widget, "rect")
-            + [None, middleware.background_color, 0, None]
+            {
+                **get_draw_border_coordinates(widget, "rect"),
+                "border_color": None,
+                "background_color": middleware.background_color,
+                "border_width": 0,
+                "dash_array": None
+            }
         )
 
 
@@ -281,11 +286,11 @@ def fill(
                 ]
             ):
                 texts_to_draw[page].append(
-                    [
-                        to_draw,
-                        x,
-                        y,
-                    ]
+                    {
+                        "widget": to_draw,
+                        "x": x,
+                        "y": y,
+                    }
                 )
 
     result = template_stream

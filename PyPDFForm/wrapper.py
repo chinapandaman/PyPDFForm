@@ -620,11 +620,11 @@ class PdfWrapper(FormWrapper):
             page_number,
             "text",
             [
-                [
-                    new_widget,
-                    x,
-                    y,
-                ]
+                {
+                    "widget": new_widget,
+                    "x": x,
+                    "y": y,
+                }
             ],
         )
 
@@ -667,7 +667,15 @@ class PdfWrapper(FormWrapper):
         image = fp_or_f_obj_or_stream_to_stream(image)
         image = rotate_image(image, rotation)
         watermarks = create_watermarks_and_draw(
-            self.stream, page_number, "image", [[image, x, y, width, height]]
+            self.stream, page_number, "image", [
+                {
+                    "stream": image,
+                    "x": x,
+                    "y": y,
+                    "width": width,
+                    "height": height
+                }
+            ]
         )
 
         stream_with_widgets = self.read()
