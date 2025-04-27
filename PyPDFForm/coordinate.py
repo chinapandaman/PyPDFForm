@@ -29,16 +29,42 @@ from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def get_draw_border_coordinates(widget: dict, shape: str) -> dict:
-    """Calculates coordinates for drawing widget borders.
+    """Calculates coordinates for drawing widget borders in PDF coordinate space.
 
     Args:
-        widget: PDF form widget dictionary containing Rect coordinates
-        shape: Type of border to draw ("rectangle", "ellipse" or "line")
+        widget: PDF form widget dictionary containing Rect coordinates (in PDF points)
+        shape: Type of border to draw:
+            - "rectangle": Standard rectangular border
+            - "ellipse": Circular/oval border
+            - "line": Straight line border
 
     Returns:
-        List[float]: Coordinates in format [x1, y1, x2, y2] for the border
-            For ellipses: [center_x, center_y, radius_x, radius_y]
-            For lines: [x1, y1, x2, y2] endpoints
+        dict: Coordinate dictionary with different keys depending on shape:
+            - For "rectangle":
+                {
+                    "x": bottom-left x,
+                    "y": bottom-left y,
+                    "width": total width,
+                    "height": total height
+                }
+            - For "ellipse":
+                {
+                    "x1": left bound,
+                    "y1": bottom bound,
+                    "x2": right bound,
+                    "y2": top bound
+                }
+            - For "line":
+                {
+                    "src_x": start x,
+                    "src_y": start y,
+                    "dest_x": end x,
+                    "dest_y": end y
+                }
+
+    Note:
+        All coordinates are in PDF points (1/72 inch) with origin (0,0) at bottom-left.
+        For ellipses, the bounds form a square that would contain the ellipse.
     """
 
     result = {
