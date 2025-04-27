@@ -277,21 +277,17 @@ def create_watermarks_and_draw(
         ),
     )
 
-    if action_type == "image":
+    action_type_to_func = {
+        "image": draw_image,
+        "text": draw_text,
+        "line": draw_line,
+        "rect": draw_rect,
+        "ellipse": draw_ellipse,
+    }
+
+    if action_type_to_func.get(action_type):
         for each in actions:
-            draw_image(*([canvas, *each]))
-    elif action_type == "text":
-        for each in actions:
-            draw_text(*([canvas, *each]))
-    elif action_type == "line":
-        for each in actions:
-            draw_line(*([canvas, *each]))
-    elif action_type == "rect":
-        for each in actions:
-            draw_rect(*([canvas, *each]))
-    elif action_type == "ellipse":
-        for each in actions:
-            draw_ellipse(*([canvas, *each]))
+            action_type_to_func[action_type](*([canvas, *each]))
 
     canvas.save()
     buff.seek(0)
