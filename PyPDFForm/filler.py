@@ -177,7 +177,7 @@ def border_handler(
             "border_color": middleware.border_color,
             "background_color": middleware.background_color,
             "border_width": middleware.border_width,
-            "dash_array": middleware.dash_array
+            "dash_array": middleware.dash_array,
         }
     )
 
@@ -188,7 +188,7 @@ def border_handler(
                 "border_color": None,
                 "background_color": middleware.background_color,
                 "border_width": 0,
-                "dash_array": None
+                "dash_array": None,
             }
         )
 

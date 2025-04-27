@@ -83,7 +83,7 @@ class Widget:
                     )
                 self.acro_form_params[param] = value
             elif user_input in self.NONE_DEFAULTS:
-                self.acro_form_params[param] = None # noqa
+                self.acro_form_params[param] = None  # noqa
 
         for each in self.ALLOWED_NON_ACRO_FORM_PARAMS:
             if each in kwargs:
