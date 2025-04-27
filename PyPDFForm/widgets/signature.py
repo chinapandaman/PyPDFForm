@@ -101,7 +101,7 @@ class SignatureWidget:
 
         input_pdf = PdfReader(stream_to_io(stream))
         page_count = len(input_pdf.pages)
-        pdf = PdfReader(stream_to_io(BEDROCK_PDF))
+        pdf = PdfReader(stream_to_io(BEDROCK_PDF))  # noqa
         out = PdfWriter()
         out.append(pdf)
 
