@@ -33,9 +33,10 @@ def draw_text(canvas: Canvas, **kwargs) -> None:
 
     Args:
         canvas: Canvas object to draw on
-        widget: Text widget with content and properties
-        x: X coordinate for drawing
-        y: Y coordinate for drawing
+        **kwargs: Additional arguments including:
+            widget: Text widget with content and properties
+            x: X coordinate for drawing
+            y: Y coordinate for drawing
     """
 
     widget = kwargs["widget"]
@@ -100,14 +101,15 @@ def draw_rect(canvas: Canvas, **kwargs) -> None:
 
     Args:
         canvas: Canvas object to draw on
-        x: X coordinate of bottom-left corner
-        y: Y coordinate of bottom-left corner
-        width: Width of rectangle
-        height: Height of rectangle
-        border_color: Border color
-        background_color: Background color
-        border_width: Border width
-        dash_array: Dash pattern for border
+        **kwargs: Additional arguments including:
+            x: X coordinate of bottom-left corner
+            y: Y coordinate of bottom-left corner
+            width: Width of rectangle
+            height: Height of rectangle
+            border_color: Border color
+            background_color: Background color
+            border_width: Border width
+            dash_array: Dash pattern for border
     """
 
     x = kwargs["x"]
@@ -126,14 +128,15 @@ def draw_ellipse(canvas: Canvas, **kwargs) -> None:
 
     Args:
         canvas: Canvas object to draw on
-        x1: X coordinate of first bounding point
-        y1: Y coordinate of first bounding point
-        x2: X coordinate of second bounding point
-        y2: Y coordinate of second bounding point
-        border_color: Border color
-        background_color: Background color
-        border_width: Border width
-        dash_array: Dash pattern for border
+        **kwargs: Additional arguments including:
+            x1: X coordinate of first bounding point
+            y1: Y coordinate of first bounding point
+            x2: X coordinate of second bounding point
+            y2: Y coordinate of second bounding point
+            border_color: Border color
+            background_color: Background color
+            border_width: Border width
+            dash_array: Dash pattern for border
     """
 
     x1 = kwargs["x1"]
@@ -152,13 +155,14 @@ def draw_line(canvas: Canvas, **kwargs) -> None:
 
     Args:
         canvas: Canvas object to draw on
-        src_x: X coordinate of start point
-        src_y: Y coordinate of start point
-        dest_x: X coordinate of end point
-        dest_y: Y coordinate of end point
-        border_color: Line color
-        border_width: Line width
-        dash_array: Dash pattern for line
+        **kwargs: Additional arguments including:
+            src_x: X coordinate of start point
+            src_y: Y coordinate of start point
+            dest_x: X coordinate of end point
+            dest_y: Y coordinate of end point
+            border_color: Line color
+            border_width: Line width
+            dash_array: Dash pattern for line
     """
 
     src_x = kwargs["src_x"]
@@ -177,10 +181,11 @@ def set_border_and_background_styles(canvas: Canvas, **kwargs) -> tuple:
 
     Args:
         canvas: Canvas object to configure
-        border_color: Border color
-        background_color: Background color
-        border_width: Border width
-        dash_array: Dash pattern for border
+        **kwargs: Additional arguments including:
+            border_color: Border color
+            background_color: Background color
+            border_width: Border width
+            dash_array: Dash pattern for border
 
     Returns:
         tuple: (stroke_flag, fill_flag) indicating which styles were set
@@ -212,11 +217,12 @@ def draw_image(canvas: Canvas, **kwargs) -> None:
 
     Args:
         canvas: Canvas object to draw on
-        stream: Image data as bytes
-        x: X coordinate for drawing
-        y: Y coordinate for drawing
-        width: Width of drawn image
-        height: Height of drawn image
+        **kwargs: Additional arguments including:
+            stream: Image data as bytes
+            x: X coordinate for drawing
+            y: Y coordinate for drawing
+            width: Width of drawn image
+            height: Height of drawn image
     """
 
     image_stream = kwargs["stream"]
