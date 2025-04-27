@@ -28,7 +28,7 @@ from .utils import extract_widget_property, handle_color, stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
-def get_draw_border_coordinates(widget: dict, shape: str) -> List[float]:
+def get_draw_border_coordinates(widget: dict, shape: str) -> dict:
     """Calculates coordinates for drawing widget borders.
 
     Args:
@@ -41,12 +41,12 @@ def get_draw_border_coordinates(widget: dict, shape: str) -> List[float]:
             For lines: [x1, y1, x2, y2] endpoints
     """
 
-    result = [
-        float(widget[Rect][0]),
-        float(widget[Rect][1]),
-        abs(float(widget[Rect][0]) - float(widget[Rect][2])),
-        abs(float(widget[Rect][1]) - float(widget[Rect][3])),
-    ]
+    result = {
+        "x": float(widget[Rect][0]),
+        "y": float(widget[Rect][1]),
+        "width": abs(float(widget[Rect][0]) - float(widget[Rect][2])),
+        "height": abs(float(widget[Rect][1]) - float(widget[Rect][3])),
+    }
 
     if shape == "ellipse":
         width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
@@ -57,19 +57,19 @@ def get_draw_border_coordinates(widget: dict, shape: str) -> List[float]:
 
         less = min(width, height)
 
-        result = [
-            width_mid - less / 2,
-            height_mid - less / 2,
-            width_mid + less / 2,
-            height_mid + less / 2,
-        ]
+        result = {
+            "x1": width_mid - less / 2,
+            "y1": height_mid - less / 2,
+            "x2": width_mid + less / 2,
+            "y2": height_mid + less / 2,
+        }
     elif shape == "line":
-        result = [
-            float(widget[Rect][0]),
-            float(widget[Rect][1]),
-            float(widget[Rect][2]),
-            float(widget[Rect][1]),
-        ]
+        result = {
+            "src_x": float(widget[Rect][0]),
+            "src_y": float(widget[Rect][1]),
+            "dest_x": float(widget[Rect][2]),
+            "dest_y": float(widget[Rect][1]),
+        }
 
     return result
 
