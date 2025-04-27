@@ -397,14 +397,32 @@ def generate_coordinate_grid(
         current = margin
         while current < width:
             lines_by_page[i + 1].append(
-                [current, 0, current, height, handle_color([r, g, b]), None, 1, None]
+                {
+                    "src_x": current,
+                    "src_y": 0,
+                    "dest_x": current,
+                    "dest_y": height,
+                    "border_color": handle_color([r, g, b]),
+                    "background_color": None,
+                    "border_width": 1,
+                    "dash_array": None,
+                }
             )
             current += margin
 
         current = margin
         while current < height:
             lines_by_page[i + 1].append(
-                [0, current, width, current, handle_color([r, g, b]), None, 1, None]
+                {
+                    "src_x": 0,
+                    "src_y": current,
+                    "dest_x": width,
+                    "dest_y": current,
+                    "border_color": handle_color([r, g, b]),
+                    "background_color": None,
+                    "border_width": 1,
+                    "dash_array": None,
+                }
             )
             current += margin
 
@@ -419,11 +437,11 @@ def generate_coordinate_grid(
                 text.font_size = font_size
                 text.font_color = color
                 texts_by_page[i + 1].append(
-                    [
-                        text,
-                        x - stringWidth(value, DEFAULT_FONT, font_size),
-                        y - font_size,
-                    ]
+                    {
+                        "widget": text,
+                        "x": x - stringWidth(value, DEFAULT_FONT, font_size),
+                        "y": y - font_size,
+                    }
                 )
                 y += margin
             x += margin

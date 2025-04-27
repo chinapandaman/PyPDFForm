@@ -22,7 +22,7 @@ from .patterns import WIDGET_KEY_PATTERNS
 from .utils import extract_widget_property, stream_to_io
 
 
-def draw_text(*args) -> None:
+def draw_text(canvas: Canvas, **kwargs) -> None:
     """Draws text onto a watermark canvas with proper formatting.
 
     Handles:
@@ -38,10 +38,9 @@ def draw_text(*args) -> None:
         args[3]: Y coordinate for drawing
     """
 
-    canvas = args[0]
-    widget = args[1]
-    coordinate_x = args[2]
-    coordinate_y = args[3]
+    widget = kwargs["widget"]
+    coordinate_x = kwargs["x"]
+    coordinate_y = kwargs["y"]
 
     text_to_draw = widget.value
 
@@ -96,7 +95,7 @@ def draw_text(*args) -> None:
         canvas.restoreState()
 
 
-def draw_rect(*args) -> None:
+def draw_rect(canvas: Canvas, **kwargs) -> None:
     """Draws a rectangle onto a watermark canvas.
 
     Args:
@@ -111,19 +110,18 @@ def draw_rect(*args) -> None:
         args[8]: Dash pattern for border
     """
 
-    canvas = args[0]
-    x = args[1]
-    y = args[2]
-    width = args[3]
-    height = args[4]
+    x = kwargs["x"]
+    y = kwargs["y"]
+    width = kwargs["width"]
+    height = kwargs["height"]
 
     canvas.saveState()
-    stroke, fill = set_border_and_background_styles(*args)
+    stroke, fill = set_border_and_background_styles(canvas, **kwargs)
     canvas.rect(x, y, width, height, stroke=stroke, fill=fill)
     canvas.restoreState()
 
 
-def draw_ellipse(*args) -> None:
+def draw_ellipse(canvas: Canvas, **kwargs) -> None:
     """Draws an ellipse onto a watermark canvas.
 
     Args:
@@ -138,19 +136,18 @@ def draw_ellipse(*args) -> None:
         args[8]: Dash pattern for border
     """
 
-    canvas = args[0]
-    x1 = args[1]
-    y1 = args[2]
-    x2 = args[3]
-    y2 = args[4]
+    x1 = kwargs["x1"]
+    y1 = kwargs["y1"]
+    x2 = kwargs["x2"]
+    y2 = kwargs["y2"]
 
     canvas.saveState()
-    stroke, fill = set_border_and_background_styles(*args)
+    stroke, fill = set_border_and_background_styles(canvas, **kwargs)
     canvas.ellipse(x1, y1, x2, y2, stroke=stroke, fill=fill)
     canvas.restoreState()
 
 
-def draw_line(*args) -> None:
+def draw_line(canvas: Canvas, **kwargs) -> None:
     """Draws a line onto a watermark canvas.
 
     Args:
@@ -165,19 +162,18 @@ def draw_line(*args) -> None:
         args[8]: Dash pattern for line
     """
 
-    canvas = args[0]
-    src_x = args[1]
-    src_y = args[2]
-    dest_x = args[3]
-    dest_y = args[4]
+    src_x = kwargs["src_x"]
+    src_y = kwargs["src_y"]
+    dest_x = kwargs["dest_x"]
+    dest_y = kwargs["dest_y"]
 
     canvas.saveState()
-    set_border_and_background_styles(*args)
+    set_border_and_background_styles(canvas, **kwargs)
     canvas.line(src_x, src_y, dest_x, dest_y)
     canvas.restoreState()
 
 
-def set_border_and_background_styles(*args) -> tuple:
+def set_border_and_background_styles(canvas: Canvas, **kwargs) -> tuple:
     """Configures stroke and fill styles for drawing operations.
 
     Args:
@@ -191,11 +187,10 @@ def set_border_and_background_styles(*args) -> tuple:
         tuple: (stroke_flag, fill_flag) indicating which styles were set
     """
 
-    canvas = args[0]
-    border_color = args[5]
-    background_color = args[6]
-    border_width = args[7]
-    dash_array = args[8]
+    border_color = kwargs["border_color"]
+    background_color = kwargs["background_color"]
+    border_width = kwargs["border_width"]
+    dash_array = kwargs["dash_array"]
 
     stroke = 0
     fill = 0
@@ -213,7 +208,7 @@ def set_border_and_background_styles(*args) -> tuple:
     return stroke, fill
 
 
-def draw_image(*args) -> None:
+def draw_image(canvas: Canvas, **kwargs) -> None:
     """Draws an image onto a watermark canvas.
 
     Args:
@@ -225,12 +220,11 @@ def draw_image(*args) -> None:
         args[5]: Height of drawn image
     """
 
-    canvas = args[0]
-    image_stream = args[1]
-    coordinate_x = args[2]
-    coordinate_y = args[3]
-    width = args[4]
-    height = args[5]
+    image_stream = kwargs["stream"]
+    coordinate_x = kwargs["x"]
+    coordinate_y = kwargs["y"]
+    width = kwargs["width"]
+    height = kwargs["height"]
 
     image_buff = BytesIO()
     image_buff.write(image_stream)
@@ -252,7 +246,7 @@ def create_watermarks_and_draw(
     pdf: bytes,
     page_number: int,
     action_type: str,
-    actions: List[list],
+    actions: List[dict],
 ) -> List[bytes]:
     """Creates watermarks for each page with specified drawing operations.
 
@@ -287,7 +281,7 @@ def create_watermarks_and_draw(
 
     if action_type_to_func.get(action_type):
         for each in actions:
-            action_type_to_func[action_type](*([canvas, *each]))
+            action_type_to_func[action_type](canvas, **each)
 
     canvas.save()
     buff.seek(0)
