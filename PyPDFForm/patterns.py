@@ -15,13 +15,13 @@ The module also contains utility functions for common PDF form operations
 like updating field values and flattening form fields.
 """
 
-from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
-                           TextStringObject)
+from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
+                           NumberObject, TextStringObject)
 
 from .constants import (AP, AS, BC, BG, BS, CA, DA, DV, FT,
                         IMAGE_FIELD_IDENTIFIER, JS, MK, MULTILINE, READ_ONLY,
-                        TU, A, Btn, Ch, D, Ff, N, Off, Opt, Parent, Q, S, Sig,
-                        T, Tx, V, W, Yes)
+                        TU, A, Btn, Ch, D, Ff, I, N, Off, Opt, Parent, Q, S,
+                        Sig, T, Tx, V, W, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -160,12 +160,16 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
     """Update radio button annotation values to selected state.
 
     Modifies the appearance state (AS) of a radio button annotation and updates
-    the parent's value (V) to reflect the selected state. Uses the annotation's
-    appearance dictionary (AP/N) to determine valid states.
+    the parent's value (V) to reflect the selected state. Removes 'Opt' entry
+    from parent dictionary if present. Uses the annotation's appearance
+    dictionary (AP/N) to determine valid states.
 
     Args:
         annot: PDF radio button annotation dictionary to modify
     """
+
+    if Opt in annot[Parent]:
+        del annot[Parent][Opt]  # noqa
 
     for each in annot[AP][N]:  # noqa
         if str(each) != Off:
@@ -177,9 +181,9 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
 def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
     """Update dropdown annotation values based on widget selection.
 
-    Modifies the value (V) and appearance (AP) of a dropdown annotation to
-    reflect the currently selected choice from the widget. Handles both
-    standalone dropdowns and those with parent annotations.
+    Modifies the value (V), appearance (AP), and index (I) of a dropdown
+    annotation to reflect the currently selected choice from the widget.
+    Handles both standalone dropdowns and those with parent annotations.
 
     Args:
         annot: PDF dropdown annotation dictionary to modify
@@ -194,6 +198,7 @@ def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> N
     else:
         annot[NameObject(V)] = TextStringObject(widget.choices[widget.value])
         annot[NameObject(AP)] = TextStringObject(widget.choices[widget.value])
+        annot[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
 
 
 def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
