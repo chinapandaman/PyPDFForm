@@ -15,13 +15,13 @@ The module also contains utility functions for common PDF form operations
 like updating field values and flattening form fields.
 """
 
-from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
+from pypdf.generic import (ArrayObject, DictionaryObject, NameObject, NumberObject,
                            TextStringObject)
 
 from .constants import (AP, AS, BC, BG, BS, CA, DA, DV, FT,
                         IMAGE_FIELD_IDENTIFIER, JS, MK, MULTILINE, READ_ONLY,
                         TU, A, Btn, Ch, D, Ff, N, Off, Opt, Parent, Q, S, Sig,
-                        T, Tx, V, W, Yes)
+                        T, Tx, V, W, Yes, I)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -194,6 +194,7 @@ def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> N
     else:
         annot[NameObject(V)] = TextStringObject(widget.choices[widget.value])
         annot[NameObject(AP)] = TextStringObject(widget.choices[widget.value])
+        annot[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
 
 
 def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
