@@ -181,9 +181,9 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
 def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
     """Update dropdown annotation values based on widget selection.
 
-    Modifies the value (V) and appearance (AP) of a dropdown annotation to
-    reflect the currently selected choice from the widget. Handles both
-    standalone dropdowns and those with parent annotations.
+    Modifies the value (V), appearance (AP), and index (I) of a dropdown
+    annotation to reflect the currently selected choice from the widget.
+    Handles both standalone dropdowns and those with parent annotations.
 
     Args:
         annot: PDF dropdown annotation dictionary to modify
