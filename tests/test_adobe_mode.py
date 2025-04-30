@@ -101,7 +101,9 @@ def test_sample_template_libary(pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "adobe_mode", "test_sample_template_libary.pdf"
     )
-    template = PdfWrapper("temp/dummy.pdf").create_widget(
+    template = PdfWrapper(os.path.join(
+        pdf_samples, "dummy.pdf"
+    )).create_widget(
         widget_type="text",
         name="new_text_field_widget",
         page_number=1,

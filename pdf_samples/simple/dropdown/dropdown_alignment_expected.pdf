@@ -52,6 +52,7 @@ endobj
 /Opt [ [ (foo) (foo) ] [ (bar) (bar) ] [ (foobar) (foobar) ] ( ) ]
 /Q 0
 /V (foo)
+/I [ 0 ]
 >>
 endobj
 7 0 obj
@@ -84,6 +85,7 @@ endobj
 /Opt [ [ (option\0551) (option\0551) ] [ (option\0552) (option\0552) ] [ (option\0553) (option\0553) ] ( ) ]
 /Q 1
 /V (option\0552)
+/I [ 1 ]
 >>
 endobj
 9 0 obj
@@ -116,6 +118,7 @@ endobj
 /Opt [ [ (select\0551) (select\0551) ] [ (select\0552) (select\0552) ] [ (select\0553) (select\0553) ] ( ) ]
 /Q 2
 /V (select\0553)
+/I [ 2 ]
 >>
 endobj
 11 0 obj
@@ -144,12 +147,12 @@ xref
 0000000195 00000 n 
 0000000316 00000 n 
 0000000337 00000 n 
-0000000608 00000 n 
-0000000709 00000 n 
-0000001040 00000 n 
-0000001141 00000 n 
-0000001478 00000 n 
-0000001580 00000 n 
+0000000617 00000 n 
+0000000718 00000 n 
+0000001058 00000 n 
+0000001159 00000 n 
+0000001505 00000 n 
+0000001607 00000 n 
 trailer
 <<
 /Size 13
@@ -157,5 +160,5 @@ trailer
 /Info 1 0 R
 >>
 startxref
-1633
+1660
 %%EOF
