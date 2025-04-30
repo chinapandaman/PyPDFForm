@@ -16,7 +16,7 @@ from io import BytesIO
 from typing import Dict, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import BooleanObject, DictionaryObject, NameObject, IndirectObject
+from pypdf.generic import ArrayObject, BooleanObject, DictionaryObject, NameObject, IndirectObject
 
 from .constants import (BUTTON_STYLES, DEFAULT_RADIO_STYLE, WIDGET_TYPES,
                         AcroForm, Annots, NeedAppearances, Root, U, Fields)
@@ -331,9 +331,7 @@ def enable_adobe_mode(reader: PdfReader, writer: PdfWriter, adobe_mode: bool) ->
             }
         )
     writer.root_object[AcroForm][NameObject(NeedAppearances)] = BooleanObject(True)
-
-    if AcroForm in reader.trailer[Root]:
-        writer.root_object[AcroForm][NameObject(Fields)] = reader.trailer[Root][AcroForm][Fields]
+    writer.root_object[AcroForm][NameObject(Fields)] = ArrayObject()
 
 
 def simple_fill(
