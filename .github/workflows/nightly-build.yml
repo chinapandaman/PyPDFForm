@@ -1,6 +1,7 @@
 name: Nightly Build
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "00 00 * * *"
 
@@ -10,17 +11,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-      - name: Set up Python
-        uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-      - name: Set up environment
+          fetch-depth: 0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build dev image from latest tag
         run: |
-          rm -rf PyPDFForm
-          uv pip install PyPDFForm --system
-          uv pip install -U -r pyproject.toml --extra dev --system
-      - name: Run nightly tests
+          git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
+          docker build -t pypdfform-dev .
+      - name: Run nightly tests on newest PDF samples
         run: |
-          pytest
+          git checkout master
+          docker exec -it $(docker run -it -d --rm -v ${PWD}/pdf_samples:/pypdfform/pdf_samples pypdfform-dev) pytest
