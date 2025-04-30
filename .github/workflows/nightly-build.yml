@@ -1,7 +1,6 @@
 name: Nightly Build
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: "00 00 * * *"
 
@@ -22,4 +21,4 @@ jobs:
       - name: Run nightly tests on newest PDF samples
         run: |
           git checkout master
-          docker exec -i $(docker run -i -d --rm -v ${PWD}/pdf_samples:/pypdfform/pdf_samples pypdfform-dev) pytest
+          docker exec -i $(docker run -i -d --rm -v ${PWD}/pdf_samples:/pypdfform/pdf_samples pypdfform-dev) /bin/bash -c "rm -rf PyPDFForm; pip install PyPDFForm; pytest"
