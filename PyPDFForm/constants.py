@@ -75,6 +75,7 @@ Off = "/Off"
 # For Adobe Acrobat
 AcroForm = "/AcroForm"
 Root = "/Root"
+Fields = "/Fields"
 NeedAppearances = "/NeedAppearances"
 
 # Field flag bits

@@ -16,10 +16,10 @@ from io import BytesIO
 from typing import Dict, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import BooleanObject, DictionaryObject, NameObject
+from pypdf.generic import BooleanObject, DictionaryObject, NameObject, IndirectObject
 
 from .constants import (BUTTON_STYLES, DEFAULT_RADIO_STYLE, WIDGET_TYPES,
-                        AcroForm, Annots, NeedAppearances, Root, U)
+                        AcroForm, Annots, NeedAppearances, Root, U, Fields)
 from .coordinate import (get_draw_border_coordinates,
                          get_draw_checkbox_radio_coordinates,
                          get_draw_image_coordinates_resolutions,
@@ -305,18 +305,35 @@ def fill(
     return result
 
 
-def enable_adobe_mode(pdf: PdfReader, adobe_mode: bool) -> None:
+def enable_adobe_mode(reader: PdfReader, writer: PdfWriter, adobe_mode: bool) -> None:
     """Configures PDF for Adobe Acrobat compatibility.
 
     Args:
-        pdf: PdfReader instance of the PDF
+        reader: PdfReader instance of the PDF
         adobe_mode: If True, sets NeedAppearances flag for Acrobat
     """
 
-    if adobe_mode and AcroForm in pdf.trailer[Root]:
-        pdf.trailer[Root][AcroForm].update(
+    if not adobe_mode:
+        return
+
+    # https://stackoverflow.com/questions/47288578/pdf-form-filled-with-pypdf2-does-not-show-in-print
+    if AcroForm in reader.trailer[Root]:
+        reader.trailer[Root][AcroForm].update(
             {NameObject(NeedAppearances): BooleanObject(True)}
         )
+
+    if AcroForm not in writer.root_object:
+        writer.root_object.update(
+            {
+                NameObject(AcroForm): IndirectObject(
+                    len(writer.root_object), 0, writer
+                )
+            }
+        )
+    writer.root_object[AcroForm][NameObject(NeedAppearances)] = BooleanObject(True)
+
+    if AcroForm in reader.trailer[Root]:
+        writer.root_object[AcroForm][NameObject(Fields)] = reader.trailer[Root][AcroForm][Fields]
 
 
 def simple_fill(
@@ -343,8 +360,8 @@ def simple_fill(
     """
 
     pdf = PdfReader(stream_to_io(template))
-    enable_adobe_mode(pdf, adobe_mode)
     out = PdfWriter()
+    enable_adobe_mode(pdf, out, adobe_mode)
     out.append(pdf)
 
     radio_button_tracker = {}
