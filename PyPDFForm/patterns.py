@@ -167,6 +167,9 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
         annot: PDF radio button annotation dictionary to modify
     """
 
+    if Opt in annot[Parent]:
+        del annot[Parent][Opt]
+
     for each in annot[AP][N]:  # noqa
         if str(each) != Off:
             annot[NameObject(AS)] = NameObject(each)
