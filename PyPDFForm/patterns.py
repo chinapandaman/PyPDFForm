@@ -160,8 +160,9 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
     """Update radio button annotation values to selected state.
 
     Modifies the appearance state (AS) of a radio button annotation and updates
-    the parent's value (V) to reflect the selected state. Uses the annotation's
-    appearance dictionary (AP/N) to determine valid states.
+    the parent's value (V) to reflect the selected state. Removes 'Opt' entry
+    from parent dictionary if present. Uses the annotation's appearance
+    dictionary (AP/N) to determine valid states.
 
     Args:
         annot: PDF radio button annotation dictionary to modify

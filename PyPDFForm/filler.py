@@ -307,11 +307,13 @@ def fill(
 
 
 def enable_adobe_mode(reader: PdfReader, writer: PdfWriter, adobe_mode: bool) -> None:
-    """Configures PDF for Adobe Acrobat compatibility.
+    """Configures the PDF for Adobe Acrobat compatibility by setting the NeedAppearances flag
+    and ensuring the AcroForm structure is properly initialized.
 
     Args:
         reader: PdfReader instance of the PDF
-        adobe_mode: If True, sets NeedAppearances flag for Acrobat
+        writer: PdfWriter instance to configure
+        adobe_mode: If True, enables Adobe Acrobat compatibility mode
     """
 
     if not adobe_mode:
