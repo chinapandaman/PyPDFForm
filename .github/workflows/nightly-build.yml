@@ -22,4 +22,4 @@ jobs:
       - name: Run nightly tests on newest PDF samples
         run: |
           git checkout master
-          docker exec -it $(docker run -it -d --rm -v ${PWD}/pdf_samples:/pypdfform/pdf_samples pypdfform-dev) pytest
+          docker exec -i $(docker run -i -d --rm -v ${PWD}/pdf_samples:/pypdfform/pdf_samples pypdfform-dev) pytest
