@@ -15,13 +15,13 @@ The module also contains utility functions for common PDF form operations
 like updating field values and flattening form fields.
 """
 
-from pypdf.generic import (ArrayObject, DictionaryObject, NameObject, NumberObject,
-                           TextStringObject)
+from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
+                           NumberObject, TextStringObject)
 
 from .constants import (AP, AS, BC, BG, BS, CA, DA, DV, FT,
                         IMAGE_FIELD_IDENTIFIER, JS, MK, MULTILINE, READ_ONLY,
-                        TU, A, Btn, Ch, D, Ff, N, Off, Opt, Parent, Q, S, Sig,
-                        T, Tx, V, W, Yes, I)
+                        TU, A, Btn, Ch, D, Ff, I, N, Off, Opt, Parent, Q, S,
+                        Sig, T, Tx, V, W, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -168,7 +168,7 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
     """
 
     if Opt in annot[Parent]:
-        del annot[Parent][Opt]
+        del annot[Parent][Opt]  # noqa
 
     for each in annot[AP][N]:  # noqa
         if str(each) != Off:

@@ -101,50 +101,52 @@ def test_sample_template_libary(pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "adobe_mode", "test_sample_template_libary.pdf"
     )
-    template = PdfWrapper(os.path.join(
-        pdf_samples, "dummy.pdf"
-    )).create_widget(
-        widget_type="text",
-        name="new_text_field_widget",
-        page_number=1,
-        x=60,
-        y=710,
-    ).create_widget(
-        widget_type="checkbox",
-        name="new_checkbox_widget",
-        page_number=1,
-        x=100,
-        y=600,
-    ).create_widget(
-        widget_type="radio",
-        name="new_radio_group",
-        page_number=1,
-        x=[50, 100, 150],
-        y=[50, 100, 150],
-    ).create_widget(
-        widget_type="dropdown",
-        name="new_dropdown_widget",
-        page_number=1,
-        x=300,
-        y=710,
-        options=[
-            "foo",
-            "bar",
-            "foobar",
-        ],
+    template = (
+        PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+        .create_widget(
+            widget_type="text",
+            name="new_text_field_widget",
+            page_number=1,
+            x=60,
+            y=710,
+        )
+        .create_widget(
+            widget_type="checkbox",
+            name="new_checkbox_widget",
+            page_number=1,
+            x=100,
+            y=600,
+        )
+        .create_widget(
+            widget_type="radio",
+            name="new_radio_group",
+            page_number=1,
+            x=[50, 100, 150],
+            y=[50, 100, 150],
+        )
+        .create_widget(
+            widget_type="dropdown",
+            name="new_dropdown_widget",
+            page_number=1,
+            x=300,
+            y=710,
+            options=[
+                "foo",
+                "bar",
+                "foobar",
+            ],
+        )
     )
 
     with open(expected_path, "rb+") as f:
-        obj = FormWrapper(
-            template.read()
-        ).fill(
+        obj = FormWrapper(template.read()).fill(
             {
                 "new_text_field_widget": "test text",
                 "new_checkbox_widget": True,
                 "new_radio_group": 1,
                 "new_dropdown_widget": 2,
             },
-            adobe_mode=True
+            adobe_mode=True,
         )
 
         request.config.results["expected_path"] = expected_path

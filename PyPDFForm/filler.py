@@ -16,10 +16,11 @@ from io import BytesIO
 from typing import Dict, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import ArrayObject, BooleanObject, DictionaryObject, NameObject, IndirectObject
+from pypdf.generic import (ArrayObject, BooleanObject, DictionaryObject,
+                           IndirectObject, NameObject)
 
 from .constants import (BUTTON_STYLES, DEFAULT_RADIO_STYLE, WIDGET_TYPES,
-                        AcroForm, Annots, NeedAppearances, Root, U, Fields)
+                        AcroForm, Annots, Fields, NeedAppearances, Root, U)
 from .coordinate import (get_draw_border_coordinates,
                          get_draw_checkbox_radio_coordinates,
                          get_draw_image_coordinates_resolutions,
@@ -324,14 +325,12 @@ def enable_adobe_mode(reader: PdfReader, writer: PdfWriter, adobe_mode: bool) ->
 
     if AcroForm not in writer.root_object:
         writer.root_object.update(
-            {
-                NameObject(AcroForm): IndirectObject(
-                    len(writer.root_object), 0, writer
-                )
-            }
+            {NameObject(AcroForm): IndirectObject(len(writer.root_object), 0, writer)}
         )
-    writer.root_object[AcroForm][NameObject(NeedAppearances)] = BooleanObject(True)
-    writer.root_object[AcroForm][NameObject(Fields)] = ArrayObject()
+    writer.root_object[AcroForm][NameObject(NeedAppearances)] = BooleanObject(  # noqa
+        True
+    )
+    writer.root_object[AcroForm][NameObject(Fields)] = ArrayObject()  # noqa
 
 
 def simple_fill(
