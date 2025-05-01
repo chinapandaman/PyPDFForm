@@ -31,9 +31,7 @@ with open("output.pdf", "wb+") as output:
 
 The `flatten` parameter defaults to `False`, keeping PDF forms filled with `FormWrapper` editable. Set it to `True` to flatten the PDF and make widgets read-only.
 
-## Adobe mode (beta)
-
-**NOTE:** This is a beta feature requiring further testing with various PDF forms and may not be compatible with all forms.
+## Adobe mode
 
 Adobe Acrobat has known issues displaying PDF forms filled in normal mode, where text content appears only when the text field is selected. This issue doesn't occur in browsers like Chrome or PDF viewers like Document Viewer (Ubuntu's default PDF app).
 
@@ -62,4 +60,5 @@ with open("output.pdf", "wb+") as output:
     output.write(filled.read())
 ```
 
-**NOTE:** Enabling Adobe mode may cause unexpected style changes to checkboxes and radio buttons, potentially affecting their display in Adobe Acrobat. If issues arise, consider using `PdfWrapper` to fill your PDF forms.
+**NOTE:** PDF forms filled while enabling `adobe_mode` should only be opened and viewed by Adobe Acrobat, as other PDF viewing apps may have issues rendering certain widget styles such as font size and/or widget borders.
+So only enable `adobe_mode` when the generated PDFs are meant to be viewed by Adobe Acrobat.
