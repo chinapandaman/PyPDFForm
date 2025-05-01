@@ -75,7 +75,7 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
 
 def test_dropdown_two_flatten(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(
-        pdf_samples, "simple", "dropdown", "dropdown_two_simple.pdf"
+        pdf_samples, "simple", "dropdown", "dropdown_two_flatten.pdf"
     )
     with open(expected_path, "rb+") as f:
         obj = FormWrapper(sample_template_with_dropdown).fill(
