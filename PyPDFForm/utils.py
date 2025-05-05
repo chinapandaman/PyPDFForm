@@ -108,6 +108,7 @@ def preview_widget_to_draw(widget_name: str, widget: WIDGET_TYPES, with_preview_
     """Creates preview version of a widget showing field name/location.
 
     Args:
+        widget_name: Name of the widget to generate preview for
         widget: Widget to generate preview for
         with_preview_text: Whether to include field name in preview
 
