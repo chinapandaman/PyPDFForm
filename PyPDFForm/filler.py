@@ -232,6 +232,7 @@ def fill(
     Args:
         template_stream: Input PDF form as bytes
         widgets: Dictionary mapping field names to widget middleware
+        use_full_widget_name: If True, uses the full widget name as the key in the widgets dictionary
 
     Returns:
         bytes: Filled PDF form as bytes
