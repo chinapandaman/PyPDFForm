@@ -264,7 +264,7 @@ def get_widget_full_key(widget: dict) -> Union[str, None]:
         and T in widget[Parent].get_object()
         and widget[Parent].get_object()[T] != key
     ):
-        return f"{widget[Parent].get_object()[T]}.{key}"
+        key = f"{get_widget_full_key(widget[Parent].get_object())}.{key}"
 
     return key
 
