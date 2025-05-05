@@ -362,7 +362,7 @@ class PdfWrapper(FormWrapper):
             fill(
                 self.stream,
                 {
-                    key: preview_widget_to_draw(value, True)
+                    key: preview_widget_to_draw(key, value, True)
                     for key, value in self.widgets.items()
                 },
                 getattr(self, "use_full_widget_name")
@@ -392,7 +392,7 @@ class PdfWrapper(FormWrapper):
                 fill(
                     self.stream,
                     {
-                        key: preview_widget_to_draw(value, False)
+                        key: preview_widget_to_draw(key, value, False)
                         for key, value in self.widgets.items()
                     },
                     getattr(self, "use_full_widget_name"),
