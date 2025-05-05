@@ -266,7 +266,7 @@ def get_widget_full_key(widget: dict) -> Union[str, None]:
     ):
         return f"{widget[Parent].get_object()[T]}.{key}"
 
-    return None
+    return key
 
 
 def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
