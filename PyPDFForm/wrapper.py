@@ -365,7 +365,7 @@ class PdfWrapper(FormWrapper):
                     key: preview_widget_to_draw(key, value, True)
                     for key, value in self.widgets.items()
                 },
-                getattr(self, "use_full_widget_name")
+                getattr(self, "use_full_widget_name"),
             )
         )
 
@@ -436,7 +436,9 @@ class PdfWrapper(FormWrapper):
         if self.read():
             self.widgets = set_character_x_paddings(self.stream, self.widgets)
 
-        self.stream = remove_all_widgets(fill(self.stream, self.widgets, getattr(self, "use_full_widget_name")))
+        self.stream = remove_all_widgets(
+            fill(self.stream, self.widgets, getattr(self, "use_full_widget_name"))
+        )
 
         return self
 

@@ -38,7 +38,7 @@ from .patterns import (WIDGET_KEY_PATTERNS, simple_flatten_generic,
                        simple_flatten_radio, simple_update_checkbox_value,
                        simple_update_dropdown_value, simple_update_radio_value,
                        simple_update_text_value)
-from .template import get_widgets_by_page, get_widget_full_key
+from .template import get_widget_full_key, get_widgets_by_page
 from .utils import (checkbox_radio_to_draw, extract_widget_property,
                     stream_to_io)
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
