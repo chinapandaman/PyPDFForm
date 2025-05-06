@@ -374,7 +374,7 @@ def test_use_full_widget_name_2(issue_pdf_directory, request):
         assert obj.read() == expected
 
 
-def test_use_full_widget_name_both(issue_pdf_directory, request):
+def test_use_full_widget_name_both(issue_pdf_directory):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-939.pdf"), use_full_widget_name=True).fill(
         {
             "topmostSubform[0].Page1[0].c1_3[1]": True,
