@@ -569,7 +569,7 @@ def update_widget_keys(
         new_key = new_keys[i]
         tracker = -1
         for page in out.pages:
-            for annot in page.get(Annots, []):  # noqa
+            for annot in page.get(Annots, []):
                 annot = cast(DictionaryObject, annot.get_object())
                 key = extract_widget_property(
                     annot.get_object(), WIDGET_KEY_PATTERNS, None, str

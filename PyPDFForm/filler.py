@@ -333,10 +333,10 @@ def enable_adobe_mode(reader: PdfReader, writer: PdfWriter, adobe_mode: bool) ->
         writer.root_object.update(
             {NameObject(AcroForm): IndirectObject(len(writer.root_object), 0, writer)}
         )
-    writer.root_object[AcroForm][NameObject(NeedAppearances)] = BooleanObject(  # noqa
+    writer.root_object[AcroForm][NameObject(NeedAppearances)] = BooleanObject(
         True
     )
-    writer.root_object[AcroForm][NameObject(Fields)] = ArrayObject()  # noqa
+    writer.root_object[AcroForm][NameObject(Fields)] = ArrayObject()
 
 
 def simple_fill(
@@ -370,7 +370,7 @@ def simple_fill(
     radio_button_tracker = {}
 
     for page in out.pages:
-        for annot in page.get(Annots, []):  # noqa
+        for annot in page.get(Annots, []):
             annot = cast(DictionaryObject, annot.get_object())
             key = extract_widget_property(
                 annot.get_object(), WIDGET_KEY_PATTERNS, None, str

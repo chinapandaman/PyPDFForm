@@ -101,12 +101,12 @@ class SignatureWidget:
 
         input_pdf = PdfReader(stream_to_io(stream))
         page_count = len(input_pdf.pages)
-        pdf = PdfReader(stream_to_io(BEDROCK_PDF))  # noqa
+        pdf = PdfReader(stream_to_io(BEDROCK_PDF))
         out = PdfWriter()
         out.append(pdf)
 
         for page in out.pages:
-            for annot in page.get(Annots, []):  # noqa
+            for annot in page.get(Annots, []):
                 key = extract_widget_property(
                     annot.get_object(), WIDGET_KEY_PATTERNS, None, str
                 )

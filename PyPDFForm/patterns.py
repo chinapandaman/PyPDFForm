@@ -149,7 +149,7 @@ def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -
         check: Whether the checkbox should be checked (True) or unchecked (False)
     """
 
-    for each in annot[AP][N]:  # noqa
+    for each in annot[AP][N]:
         if (check and str(each) != Off) or (not check and str(each) == Off):
             annot[NameObject(AS)] = NameObject(each)
             annot[NameObject(V)] = NameObject(each)
@@ -169,12 +169,12 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
     """
 
     if Opt in annot[Parent]:
-        del annot[Parent][Opt]  # noqa
+        del annot[Parent][Opt]
 
-    for each in annot[AP][N]:  # noqa
+    for each in annot[AP][N]:
         if str(each) != Off:
             annot[NameObject(AS)] = NameObject(each)
-            annot[NameObject(Parent)][NameObject(V)] = NameObject(each)  # noqa
+            annot[NameObject(Parent)][NameObject(V)] = NameObject(each)
             break
 
 
@@ -191,7 +191,7 @@ def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> N
     """
 
     if Parent in annot and T not in annot:
-        annot[NameObject(Parent)][NameObject(V)] = TextStringObject(  # noqa
+        annot[NameObject(Parent)][NameObject(V)] = TextStringObject(
             widget.choices[widget.value]
         )
         annot[NameObject(AP)] = TextStringObject(widget.choices[widget.value])
@@ -214,7 +214,7 @@ def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
     """
 
     if Parent in annot and T not in annot:
-        annot[NameObject(Parent)][NameObject(V)] = TextStringObject(  # noqa
+        annot[NameObject(Parent)][NameObject(V)] = TextStringObject(
             widget.value
         )
         annot[NameObject(AP)] = TextStringObject(widget.value)
@@ -234,8 +234,8 @@ def simple_flatten_radio(annot: DictionaryObject) -> None:
         annot: PDF radio button annotation dictionary to flatten
     """
 
-    annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(  # noqa
-        int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY  # noqa
+    annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
+        int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
     )
 
 
@@ -251,12 +251,12 @@ def simple_flatten_generic(annot: DictionaryObject) -> None:
     """
 
     if Parent in annot and Ff not in annot:
-        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(  # noqa
-            int(annot.get(NameObject(Ff), 0)) | READ_ONLY  # noqa
+        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
+            int(annot.get(NameObject(Ff), 0)) | READ_ONLY
         )
     else:
         annot[NameObject(Ff)] = NumberObject(
-            int(annot.get(NameObject(Ff), 0)) | READ_ONLY  # noqa
+            int(annot.get(NameObject(Ff), 0)) | READ_ONLY
         )
 
 
@@ -272,9 +272,9 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
     """
 
     if Parent in annot and T not in annot:
-        annot[NameObject(Parent)][NameObject(T)] = TextStringObject(val)  # noqa
+        annot[NameObject(Parent)][NameObject(T)] = TextStringObject(val)
     else:
-        annot[NameObject(T)] = TextStringObject(val)  # noqa
+        annot[NameObject(T)] = TextStringObject(val)
 
 
 def update_created_text_field_alignment(annot: DictionaryObject, val: int) -> None:
@@ -304,7 +304,7 @@ def update_created_text_field_multiline(annot: DictionaryObject, val: bool) -> N
 
     if val:
         annot[NameObject(Ff)] = NumberObject(
-            int(annot[NameObject(Ff)]) | MULTILINE  # noqa
+            int(annot[NameObject(Ff)]) | MULTILINE
         )
 
 

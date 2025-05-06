@@ -380,7 +380,7 @@ def copy_watermark_widgets(
         watermark_file = PdfReader(stream_to_io(watermark))
         for j, page in enumerate(watermark_file.pages):
             widgets_to_copy_pdf[j] = []
-            for annot in page.get(Annots, []):  # noqa
+            for annot in page.get(Annots, []):
                 key = extract_widget_property(
                     annot.get_object(), WIDGET_KEY_PATTERNS, None, str
                 )
@@ -393,7 +393,7 @@ def copy_watermark_widgets(
     for i, page in enumerate(out.pages):
         if i in widgets_to_copy:
             page[NameObject(Annots)] = (
-                (page[NameObject(Annots)] + ArrayObject(widgets_to_copy[i]))  # noqa
+                (page[NameObject(Annots)] + ArrayObject(widgets_to_copy[i]))
                 if Annots in page
                 else ArrayObject(widgets_to_copy[i])
             )
