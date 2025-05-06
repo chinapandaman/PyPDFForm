@@ -338,3 +338,52 @@ def test_get_desc_in_schema_radio(issue_pdf_directory):
                 assert (
                     widget[Parent][TU] == obj.schema["properties"][key]["description"]
                 )
+
+
+def test_use_full_widget_name_1(issue_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-939.pdf"), use_full_widget_name=True).fill(
+        {
+            "topmostSubform[0].Page1[0].c1_3[1]": False,
+            "topmostSubform[0].Page1[0].FilingStatus_ReadOrder[0].c1_3[1]": True,
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-939_expected_1.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_use_full_widget_name_2(issue_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-939.pdf"), use_full_widget_name=True).fill(
+        {
+            "topmostSubform[0].Page1[0].c1_3[1]": True,
+            "topmostSubform[0].Page1[0].FilingStatus_ReadOrder[0].c1_3[1]": False,
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-939_expected_2.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_use_full_widget_name_both(issue_pdf_directory):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-939.pdf"), use_full_widget_name=True).fill(
+        {
+            "topmostSubform[0].Page1[0].c1_3[1]": True,
+            "topmostSubform[0].Page1[0].FilingStatus_ReadOrder[0].c1_3[1]": True,
+        }
+    )
+
+    assert obj.read() == PdfWrapper(os.path.join(issue_pdf_directory, "PPF-939.pdf")).fill(
+        {
+            "c1_3[1]": True,
+        }
+    ).read()

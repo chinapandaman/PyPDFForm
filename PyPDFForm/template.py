@@ -246,15 +246,14 @@ def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
     return result
 
 
-def get_widget_full_key(widget: dict) -> Union[str, None]:
+def get_widget_full_key(widget: dict) -> str:
     """Constructs a widget's full hierarchical key including parent names.
 
     Args:
         widget: PDF widget dictionary
 
     Returns:
-        Union[str, None]: Full key in format "parent.child" if parent exists,
-            otherwise None
+        str: Full key in format "parent.child" if parent exists, otherwise the widget's key
     """
 
     key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
@@ -264,9 +263,9 @@ def get_widget_full_key(widget: dict) -> Union[str, None]:
         and T in widget[Parent].get_object()
         and widget[Parent].get_object()[T] != key
     ):
-        return f"{widget[Parent].get_object()[T]}.{key}"
+        key = f"{get_widget_full_key(widget[Parent].get_object())}.{key}"
 
-    return None
+    return key
 
 
 def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:

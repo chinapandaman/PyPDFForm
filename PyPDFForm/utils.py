@@ -104,10 +104,11 @@ def checkbox_radio_to_draw(
     return new_widget
 
 
-def preview_widget_to_draw(widget: WIDGET_TYPES, with_preview_text: bool) -> Text:
+def preview_widget_to_draw(widget_name: str, widget: WIDGET_TYPES, with_preview_text: bool) -> Text:
     """Creates preview version of a widget showing field name/location.
 
     Args:
+        widget_name: Name of the widget to generate preview for
         widget: Widget to generate preview for
         with_preview_text: Whether to include field name in preview
 
@@ -117,7 +118,7 @@ def preview_widget_to_draw(widget: WIDGET_TYPES, with_preview_text: bool) -> Tex
 
     new_widget = Text(
         name=widget.name,
-        value="{" + f" {widget.name} " + "}" if with_preview_text else None,
+        value="{" + f" {widget_name} " + "}" if with_preview_text else None,
     )
     new_widget.font = DEFAULT_FONT
     new_widget.font_size = DEFAULT_FONT_SIZE
