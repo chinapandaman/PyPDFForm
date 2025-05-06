@@ -83,7 +83,7 @@ class Widget:
                     )
                 self.acro_form_params[param] = value
             elif user_input in self.NONE_DEFAULTS:
-                self.acro_form_params[param] = None  # noqa
+                self.acro_form_params[param] = None
 
         for each in self.ALLOWED_NON_ACRO_FORM_PARAMS:
             if each in kwargs:
@@ -154,7 +154,7 @@ def handle_non_acro_form_params(pdf: bytes, key: str, params: list) -> bytes:
     out.append(pdf_file)
 
     for page in out.pages:
-        for annot in page.get(Annots, []):  # noqa
+        for annot in page.get(Annots, []):
             annot = cast(DictionaryObject, annot.get_object())
             _key = extract_widget_property(
                 annot.get_object(), WIDGET_KEY_PATTERNS, None, str
