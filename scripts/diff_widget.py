@@ -13,6 +13,7 @@ from PyPDFForm.template import extract_widget_property, get_widgets_by_page
 
 max_level = 5
 
+
 def serializing_widget(widget, level):
     if hasattr(widget, "get_object"):
         widget = widget.get_object()
@@ -36,7 +37,10 @@ def serializing_widget_from_file(filename, key, buff):
 
         for w in widgets.values():
             for widget in w:
-                if extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str) == key:
+                if (
+                    extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+                    == key
+                ):
                     pprint(serializing_widget(widget, 0), stream=buff)
 
 
