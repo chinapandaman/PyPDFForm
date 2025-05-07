@@ -214,9 +214,7 @@ def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
     """
 
     if Parent in annot and T not in annot:
-        annot[NameObject(Parent)][NameObject(V)] = TextStringObject(
-            widget.value
-        )
+        annot[NameObject(Parent)][NameObject(V)] = TextStringObject(widget.value)
         annot[NameObject(AP)] = TextStringObject(widget.value)
     else:
         annot[NameObject(V)] = TextStringObject(widget.value)
@@ -303,9 +301,7 @@ def update_created_text_field_multiline(annot: DictionaryObject, val: bool) -> N
     """
 
     if val:
-        annot[NameObject(Ff)] = NumberObject(
-            int(annot[NameObject(Ff)]) | MULTILINE
-        )
+        annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | MULTILINE)
 
 
 NON_ACRO_FORM_PARAM_TO_FUNC = {

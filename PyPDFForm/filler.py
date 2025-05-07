@@ -333,9 +333,7 @@ def enable_adobe_mode(reader: PdfReader, writer: PdfWriter, adobe_mode: bool) ->
         writer.root_object.update(
             {NameObject(AcroForm): IndirectObject(len(writer.root_object), 0, writer)}
         )
-    writer.root_object[AcroForm][NameObject(NeedAppearances)] = BooleanObject(
-        True
-    )
+    writer.root_object[AcroForm][NameObject(NeedAppearances)] = BooleanObject(True)
     writer.root_object[AcroForm][NameObject(Fields)] = ArrayObject()
 
 

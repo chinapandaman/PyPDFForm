@@ -19,6 +19,9 @@ generate-new-pdf-samples:
 compare-pdf-diffs:
 	bash ./scripts/pdf_diffs.sh
 
+compare-widget-diffs:
+	bash ./scripts/diff_widget.sh $(F1) $(F2) $(KEY)
+
 serve-docs:
 	bash ./scripts/serve_docs.sh
 
