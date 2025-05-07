@@ -11,15 +11,13 @@ from pypdf.generic import ArrayObject, DictionaryObject
 from PyPDFForm.patterns import WIDGET_KEY_PATTERNS
 from PyPDFForm.template import extract_widget_property, get_widgets_by_page
 
-max_level = 5
-
 
 def serializing_widget(widget, level):
     if hasattr(widget, "get_object"):
         widget = widget.get_object()
 
     level += 1
-    if level == max_level:
+    if level == int(sys.argv[4]):
         return widget
 
     if isinstance(widget, (DictionaryObject, dict)):
@@ -42,6 +40,7 @@ def serializing_widget_from_file(filename, key, buff):
                     == key
                 ):
                     pprint(serializing_widget(widget, 0), stream=buff)
+                    buff.writelines("\n" * 3 + "=" * 100 + "\n" * 3)
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ if [ "$VIRTUAL_ENV" == "" ] && [ "$PYPDFFORM_ENV" != "container" ]; then
 fi
 
 export PYTHONPATH=.
-python ./scripts/diff_widget.py $1 $2 $3
+python ./scripts/diff_widget.py $1 $2 $3 $4
 
 if [ "$PYPDFFORM_ENV" == "container" ]; then
   echo "Diff view: http://localhost:8000/temp/diff.html"
