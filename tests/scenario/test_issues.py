@@ -401,19 +401,17 @@ def test_use_full_widget_name_both(issue_pdf_directory):
 
 
 def test_polish(issue_pdf_directory, request):
-    obj = PdfWrapper(
-        os.path.join(issue_pdf_directory, "949.pdf")
-    ).fill(
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "949.pdf")).fill(
         {
-            'topmostSubform[0].Page1[0].PESEL[0]': '12345671111',
-            'topmostSubform[0].Page2[0].PESEL[0]': '12345672222',
-            'topmostSubform[0].Page1[0].Imię[0]': 'Łucja',
-            'topmostSubform[0].Page1[0].Nazwisko[0]': 'Żółć-Piątkowska',
-            'topmostSubform[0].Page1[0].Dataurodzenia[0]': '01021992',
-            'topmostSubform[0].Page1[0].Miejscowość[0]': 'Świętochłowice-Łękawa',
-            'topmostSubform[0].Page1[0].Ulica[0]': 'Kręta',
-            'topmostSubform[0].Page1[0].Numerdomu[0]': '13',
-            'topmostSubform[0].Page2[0].OrzeczenieTAK[0]': 1
+            "topmostSubform[0].Page1[0].PESEL[0]": "12345671111",
+            "topmostSubform[0].Page2[0].PESEL[0]": "12345672222",
+            "topmostSubform[0].Page1[0].Imię[0]": "Łucja",
+            "topmostSubform[0].Page1[0].Nazwisko[0]": "Żółć-Piątkowska",
+            "topmostSubform[0].Page1[0].Dataurodzenia[0]": "01021992",
+            "topmostSubform[0].Page1[0].Miejscowość[0]": "Świętochłowice-Łękawa",
+            "topmostSubform[0].Page1[0].Ulica[0]": "Kręta",
+            "topmostSubform[0].Page1[0].Numerdomu[0]": "13",
+            "topmostSubform[0].Page2[0].OrzeczenieTAK[0]": 1,
         }
     )
 
@@ -431,15 +429,15 @@ def test_polish_use_full_widget_name(issue_pdf_directory, request):
         os.path.join(issue_pdf_directory, "949_new.pdf"), use_full_widget_name=True
     ).fill(
         {
-            'topmostSubform[0].Page1[0].PESEL[0]': '12345671111',
-            'topmostSubform[0].Page2[0].PESEL[0]': '12345672222',
-            'topmostSubform[0].Page1[0].Imię[0]': 'Łucja',
-            'topmostSubform[0].Page1[0].Nazwisko[0]': 'Żółć-Piątkowska',
-            'topmostSubform[0].Page1[0].Dataurodzenia[0]': '01021992',
-            'topmostSubform[0].Page1[0].Miejscowość[0]': 'Świętochłowice-Łękawa',
-            'topmostSubform[0].Page1[0].Ulica[0]': 'Kręta',
-            'topmostSubform[0].Page1[0].Numerdomu[0]': '13',
-            'topmostSubform[0].Page2[0].OrzeczenieTAK[0]': 1
+            "topmostSubform[0].Page1[0].PESEL[0]": "12345671111",
+            "topmostSubform[0].Page2[0].PESEL[0]": "12345672222",
+            "topmostSubform[0].Page1[0].Imię[0]": "Łucja",
+            "topmostSubform[0].Page1[0].Nazwisko[0]": "Żółć-Piątkowska",
+            "topmostSubform[0].Page1[0].Dataurodzenia[0]": "01021992",
+            "topmostSubform[0].Page1[0].Miejscowość[0]": "Świętochłowice-Łękawa",
+            "topmostSubform[0].Page1[0].Ulica[0]": "Kręta",
+            "topmostSubform[0].Page1[0].Numerdomu[0]": "13",
+            "topmostSubform[0].Page2[0].OrzeczenieTAK[0]": 1,
         }
     )
 

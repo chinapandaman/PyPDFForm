@@ -39,7 +39,9 @@ from .utils import (extract_widget_property, find_pattern_match, handle_color,
 
 
 def set_character_x_paddings(
-    pdf_stream: bytes, widgets: Dict[str, WIDGET_TYPES], use_full_widget_name: bool,
+    pdf_stream: bytes,
+    widgets: Dict[str, WIDGET_TYPES],
+    use_full_widget_name: bool,
 ) -> Dict[str, WIDGET_TYPES]:
     """Calculates and sets character spacing for comb text fields in PDF forms.
 
