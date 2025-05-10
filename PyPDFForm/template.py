@@ -173,7 +173,7 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
 def update_text_field_attributes(
     template_stream: bytes,
     widgets: Dict[str, WIDGET_TYPES],
-    use_full_widget_name: bool = False,
+    use_full_widget_name: bool,
 ) -> None:
     """Update text field properties in a PDF form template.
 
