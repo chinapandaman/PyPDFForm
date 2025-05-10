@@ -432,9 +432,9 @@ class PdfWrapper(FormWrapper):
             if isinstance(value, Dropdown):
                 self.widgets[key] = dropdown_to_text(value)
 
-        update_text_field_attributes(self.stream, self.widgets)
+        update_text_field_attributes(self.stream, self.widgets, getattr(self, "use_full_widget_name"))
         if self.read():
-            self.widgets = set_character_x_paddings(self.stream, self.widgets)
+            self.widgets = set_character_x_paddings(self.stream, self.widgets, getattr(self, "use_full_widget_name"))
 
         self.stream = remove_all_widgets(
             fill(self.stream, self.widgets, getattr(self, "use_full_widget_name"))

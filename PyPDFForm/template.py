@@ -39,7 +39,7 @@ from .utils import (extract_widget_property, find_pattern_match, handle_color,
 
 
 def set_character_x_paddings(
-    pdf_stream: bytes, widgets: Dict[str, WIDGET_TYPES]
+    pdf_stream: bytes, widgets: Dict[str, WIDGET_TYPES], use_full_widget_name: bool,
 ) -> Dict[str, WIDGET_TYPES]:
     """Calculates and sets character spacing for comb text fields.
 
@@ -54,6 +54,8 @@ def set_character_x_paddings(
     for _widgets in get_widgets_by_page(pdf_stream).values():
         for widget in _widgets:
             key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+            if use_full_widget_name:
+                key = get_widget_full_key(widget)
             _widget = widgets[key]
 
             if isinstance(_widget, Text) and _widget.comb is True:
@@ -166,6 +168,7 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
 def update_text_field_attributes(
     template_stream: bytes,
     widgets: Dict[str, WIDGET_TYPES],
+    use_full_widget_name: False,
 ) -> None:
     """Updates text field properties based on PDF template settings.
 
@@ -183,6 +186,8 @@ def update_text_field_attributes(
     for _widgets in get_widgets_by_page(template_stream).values():
         for _widget in _widgets:
             key = extract_widget_property(_widget, WIDGET_KEY_PATTERNS, None, str)
+            if use_full_widget_name:
+                key = get_widget_full_key(_widget)
 
             if isinstance(widgets[key], Text):
                 should_adjust_font_size = False
