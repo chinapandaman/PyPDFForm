@@ -53,9 +53,7 @@ with open("sample_template.pdf", "rb+") as template:
 
 This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
 
-## Use full widget name in PDF wrapper (beta)
-
-**NOTE:** This is a beta feature that requires further testing with various PDF forms and may not be compatible with all forms.
+## Use full widget name in PDF wrapper
 
 According to section 12.7.3.2 found on page 434 of [the PDF standard](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf), each PDF form widget can have a fully qualified name that is not explicitly defined but can be constructed following the pattern `<parent_widget_name>.<widget_name>`.
 
