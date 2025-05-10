@@ -106,7 +106,7 @@ select = [
     "YTT",
     "W",
 ]
-ignore = ["B009", "E501", "N999", "TC006"]
+ignore = ["B009", "E501", "N999", "Q000", "TC006"]
 
 [tool.pyright]
 typeCheckingMode = "basic"
