@@ -41,14 +41,19 @@ from .utils import (extract_widget_property, find_pattern_match, handle_color,
 def set_character_x_paddings(
     pdf_stream: bytes, widgets: Dict[str, WIDGET_TYPES], use_full_widget_name: bool,
 ) -> Dict[str, WIDGET_TYPES]:
-    """Calculates and sets character spacing for comb text fields.
+    """Calculates and sets character spacing for comb text fields in PDF forms.
+
+    This function processes each widget in the PDF form and calculates the horizontal spacing
+    between characters for comb text fields (fixed-width text fields). The spacing is stored
+    in the widget's character_paddings property.
 
     Args:
-        pdf_stream: PDF form as bytes
-        widgets: Dictionary of widget middleware objects
+        pdf_stream (bytes): PDF form as bytes
+        widgets (Dict[str, WIDGET_TYPES]): Dictionary of widget middleware objects
+        use_full_widget_name (bool): Whether to use full widget names including parent names
 
     Returns:
-        Dict[str, WIDGET_TYPES]: Updated widgets with character paddings
+        Dict[str, WIDGET_TYPES]: Updated widget dictionary with character paddings set for comb fields
     """
 
     for _widgets in get_widgets_by_page(pdf_stream).values():
@@ -168,19 +173,28 @@ def dropdown_to_text(dropdown: Dropdown) -> Text:
 def update_text_field_attributes(
     template_stream: bytes,
     widgets: Dict[str, WIDGET_TYPES],
-    use_full_widget_name: False,
+    use_full_widget_name: bool = False,
 ) -> None:
-    """Updates text field properties based on PDF template settings.
+    """Update text field properties in a PDF form template.
 
-    Handles:
-    - Font detection and sizing
-    - Color properties
-    - Paragraph wrapping
-    - Auto font size adjustment
+    Processes text field widgets in the template to update their visual attributes including:
+    - Font properties (family, size, color)
+    - Text alignment and wrapping behavior
+    - Auto-sizing of text to fit within field bounds
+    - Multi-line text field formatting
 
     Args:
-        template_stream: PDF form as bytes
-        widgets: Dictionary of widget middleware objects
+        template_stream: Raw bytes of the PDF template containing form fields
+        widgets: Dictionary mapping field names to widget objects to update
+        use_full_widget_name: If True, uses full hierarchical widget names including parent keys.
+            When False (default), uses simple field names.
+
+    Returns:
+        None: Modifies widget objects in-place
+
+    Note:
+        This function modifies the widget objects in-place and does not return anything.
+        Changes include font properties, text alignment, and auto-wrapping settings.
     """
 
     for _widgets in get_widgets_by_page(template_stream).values():
