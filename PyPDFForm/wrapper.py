@@ -718,10 +718,7 @@ class PdfWrapper(FormWrapper):
                 continue
             result[key] = value.schema_definition
 
-        return {
-            "type": "object",
-            "properties": result
-        }
+        return {"type": "object", "properties": result}
 
     @classmethod
     def register_font(
