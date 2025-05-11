@@ -34,13 +34,12 @@ from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .patterns import (simple_flatten_generic,
-                       simple_flatten_radio, simple_update_checkbox_value,
+from .patterns import (simple_flatten_generic, simple_flatten_radio,
+                       simple_update_checkbox_value,
                        simple_update_dropdown_value, simple_update_radio_value,
                        simple_update_text_value)
 from .template import get_widget_key, get_widgets_by_page
-from .utils import (checkbox_radio_to_draw,
-                    stream_to_io)
+from .utils import checkbox_radio_to_draw, stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 

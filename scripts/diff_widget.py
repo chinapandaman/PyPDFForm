@@ -34,9 +34,7 @@ def serializing_widget_from_file(filename, key, buff):
 
         for w in widgets.values():
             for widget in w:
-                if (
-                    get_widget_key(widget, False) == key
-                ):
+                if get_widget_key(widget, False) == key:
                     pprint(serializing_widget(widget, 0), stream=buff)
                     buff.writelines("\n" * 3 + "=" * 100 + "\n" * 3)
 

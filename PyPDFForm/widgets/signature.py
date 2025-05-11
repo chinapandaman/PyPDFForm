@@ -14,8 +14,8 @@ from pypdf.generic import (ArrayObject, FloatObject, NameObject,
                            TextStringObject)
 
 from ..constants import Annots, Rect, T
-from ..utils import stream_to_io
 from ..template import get_widget_key
+from ..utils import stream_to_io
 from .bedrock import BEDROCK_PDF
 
 

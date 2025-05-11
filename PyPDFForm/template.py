@@ -282,7 +282,9 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
         and T in widget[Parent].get_object()
         and widget[Parent].get_object()[T] != key
     ):
-        key = f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
+        key = (
+            f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
+        )
 
     return key
 
@@ -590,9 +592,7 @@ def update_widget_keys(
         for page in out.pages:
             for annot in page.get(Annots, []):
                 annot = cast(DictionaryObject, annot.get_object())
-                key = extract_widget_property(
-                    annot.get_object(), WIDGET_KEY_PATTERNS, None, str
-                )
+                key = get_widget_key(annot.get_object(), False)
 
                 widget = widgets.get(key)
                 if widget is None:

@@ -6,7 +6,7 @@ import os
 from PyPDFForm import PdfWrapper
 from PyPDFForm.constants import TU, Parent
 from PyPDFForm.middleware.radio import Radio
-from PyPDFForm.template import get_widgets_by_page, get_widget_key
+from PyPDFForm.template import get_widget_key, get_widgets_by_page
 
 
 def test_pdf_form_with_pages_without_widgets(issue_pdf_directory, request):
