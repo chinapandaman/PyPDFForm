@@ -38,7 +38,7 @@ from .patterns import (WIDGET_KEY_PATTERNS, simple_flatten_generic,
                        simple_flatten_radio, simple_update_checkbox_value,
                        simple_update_dropdown_value, simple_update_radio_value,
                        simple_update_text_value)
-from .template import get_widget_full_key, get_widgets_by_page
+from .template import get_widget_key, get_widgets_by_page
 from .utils import (checkbox_radio_to_draw, extract_widget_property,
                     stream_to_io)
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
@@ -254,9 +254,7 @@ def fill(
         ellipse_borders_to_draw[page] = []
         line_borders_to_draw[page] = []
         for widget_dict in widget_dicts:
-            key = extract_widget_property(widget_dict, WIDGET_KEY_PATTERNS, None, str)
-            if use_full_widget_name:
-                key = get_widget_full_key(widget_dict)
+            key = get_widget_key(widget_dict, use_full_widget_name)
             text_needs_to_be_drawn = False
             to_draw = x = y = None
 
