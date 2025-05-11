@@ -441,6 +441,9 @@ def test_polish_use_full_widget_name(issue_pdf_directory, request):
         }
     )
 
+    assert "PESEL[0]" not in obj.schema
+    assert obj.sample_data["topmostSubform[0].Page1[0].PESEL[0]"] == "PESEL[0]"
+
     expected_path = os.path.join(issue_pdf_directory, "949_new_expected.pdf")
     request.config.results["expected_path"] = expected_path
     request.config.results["stream"] = obj.read()
