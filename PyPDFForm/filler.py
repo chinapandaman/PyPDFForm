@@ -34,12 +34,12 @@ from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .patterns import (WIDGET_KEY_PATTERNS, simple_flatten_generic,
+from .patterns import (simple_flatten_generic,
                        simple_flatten_radio, simple_update_checkbox_value,
                        simple_update_dropdown_value, simple_update_radio_value,
                        simple_update_text_value)
 from .template import get_widget_key, get_widgets_by_page
-from .utils import (checkbox_radio_to_draw, extract_widget_property,
+from .utils import (checkbox_radio_to_draw,
                     stream_to_io)
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
@@ -368,9 +368,7 @@ def simple_fill(
     for page in out.pages:
         for annot in page.get(Annots, []):
             annot = cast(DictionaryObject, annot.get_object())
-            key = extract_widget_property(
-                annot.get_object(), WIDGET_KEY_PATTERNS, None, str
-            )
+            key = get_widget_key(annot.get_object(), False)
 
             widget = widgets.get(key)
             if widget is None or widget.value is None:

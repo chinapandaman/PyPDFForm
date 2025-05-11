@@ -14,8 +14,8 @@ from pypdf.generic import (ArrayObject, FloatObject, NameObject,
                            TextStringObject)
 
 from ..constants import Annots, Rect, T
-from ..patterns import WIDGET_KEY_PATTERNS
-from ..utils import extract_widget_property, stream_to_io
+from ..utils import stream_to_io
+from ..template import get_widget_key
 from .bedrock import BEDROCK_PDF
 
 
@@ -107,9 +107,7 @@ class SignatureWidget:
 
         for page in out.pages:
             for annot in page.get(Annots, []):
-                key = extract_widget_property(
-                    annot.get_object(), WIDGET_KEY_PATTERNS, None, str
-                )
+                key = get_widget_key(annot.get_object(), False)
 
                 if key != self.BEDROCK_WIDGET_TO_COPY:
                     continue

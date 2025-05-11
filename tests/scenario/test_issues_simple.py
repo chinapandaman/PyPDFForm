@@ -5,9 +5,7 @@ import os
 
 from PyPDFForm import FormWrapper
 from PyPDFForm.constants import V
-from PyPDFForm.patterns import WIDGET_KEY_PATTERNS
-from PyPDFForm.template import get_widgets_by_page
-from PyPDFForm.utils import extract_widget_property
+from PyPDFForm.template import get_widgets_by_page, get_widget_key
 
 
 def test_pdf_form_with_pages_without_widgets(issue_pdf_directory, pdf_samples, request):
@@ -60,7 +58,7 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_text(issue_pdf_directory
     for widgets in get_widgets_by_page(obj.read()).values():
         for widget in widgets:
             if (
-                extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+                get_widget_key(widget, False)
                 == "Address"
             ):
                 assert (
@@ -144,7 +142,7 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_dir
     for widgets in get_widgets_by_page(obj.read()).values():
         for widget in widgets:
             if (
-                extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+                get_widget_key(widget, False)
                 == "Address"
             ):
                 assert widget[V] == "J Smith\n132 A St\nNYC, NY 12401"

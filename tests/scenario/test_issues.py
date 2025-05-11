@@ -6,9 +6,7 @@ import os
 from PyPDFForm import PdfWrapper
 from PyPDFForm.constants import TU, Parent
 from PyPDFForm.middleware.radio import Radio
-from PyPDFForm.patterns import WIDGET_KEY_PATTERNS
-from PyPDFForm.template import get_widgets_by_page
-from PyPDFForm.utils import extract_widget_property
+from PyPDFForm.template import get_widgets_by_page, get_widget_key
 
 
 def test_pdf_form_with_pages_without_widgets(issue_pdf_directory, request):
@@ -332,7 +330,7 @@ def test_get_desc_in_schema_radio(issue_pdf_directory):
 
     for widgets in get_widgets_by_page(obj.read()).values():
         for widget in widgets:
-            key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+            key = get_widget_key(widget, False)
 
             if key in keys_to_check:
                 assert (
