@@ -8,7 +8,7 @@ from PyPDFForm import PdfWrapper
 def test_init(sample_template_with_full_key):
     obj = PdfWrapper(sample_template_with_full_key, use_full_widget_name=True)
     assert "Gain de 2 classes.0" in obj.widgets
-    assert obj.widgets["Gain de 2 classes.0"] is obj.widgets["0"]
+    assert "0" not in obj.widgets
 
 
 def test_sample_data(sample_template_with_full_key):
@@ -19,7 +19,7 @@ def test_sample_data(sample_template_with_full_key):
 
 def test_fill(sample_template_with_full_key):
     obj_1 = PdfWrapper(sample_template_with_full_key, use_full_widget_name=True)
-    obj_2 = PdfWrapper(sample_template_with_full_key, use_full_widget_name=True)
+    obj_2 = PdfWrapper(sample_template_with_full_key)
 
     assert (
         obj_1.fill({"Gain de 2 classes.0": True}).read()

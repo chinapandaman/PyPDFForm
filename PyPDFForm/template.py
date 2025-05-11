@@ -89,11 +89,9 @@ def build_widgets(
 
     for widgets in get_widgets_by_page(pdf_stream).values():
         for widget in widgets:
-            key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+            key = get_widget_key(widget, use_full_widget_name)
             _widget = construct_widget(widget, key)
             if _widget is not None:
-                if use_full_widget_name:
-                    _widget.full_name = get_widget_key(widget, use_full_widget_name)
 
                 _widget.render_widget = render_widgets
                 _widget.desc = extract_widget_property(
@@ -139,8 +137,7 @@ def build_widgets(
                     continue
 
                 results[key] = _widget
-                if _widget.full_name is not None and use_full_widget_name:
-                    results[_widget.full_name] = results[key]
+
     return results
 
 
