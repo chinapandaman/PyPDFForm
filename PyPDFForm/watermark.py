@@ -18,8 +18,8 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
 from .constants import Annots
-from .patterns import WIDGET_KEY_PATTERNS
-from .utils import extract_widget_property, stream_to_io
+from .template import get_widget_key
+from .utils import stream_to_io
 
 
 def draw_text(canvas: Canvas, **kwargs) -> None:
@@ -381,9 +381,7 @@ def copy_watermark_widgets(
         for j, page in enumerate(watermark_file.pages):
             widgets_to_copy_pdf[j] = []
             for annot in page.get(Annots, []):
-                key = extract_widget_property(
-                    annot.get_object(), WIDGET_KEY_PATTERNS, None, str
-                )
+                key = get_widget_key(annot.get_object(), False)
                 if (keys is None or key in keys) and (
                     page_num is None or page_num == j
                 ):

@@ -249,13 +249,7 @@ class PdfWrapper(FormWrapper):
             dict: Field names mapped to their sample values
         """
 
-        result = {}
-        for key, value in self.widgets.items():
-            if getattr(self, "use_full_widget_name") and key != value.full_name:
-                continue
-            result[key] = value.sample_value
-
-        return result
+        return {key: value.sample_value for key, value in self.widgets.items()}
 
     @property
     def version(self) -> Union[str, None]:
@@ -712,13 +706,12 @@ class PdfWrapper(FormWrapper):
             dict: A JSON Schema dictionary following Draft 7 format
         """
 
-        result = {}
-        for key, value in self.widgets.items():
-            if getattr(self, "use_full_widget_name") and key != value.full_name:
-                continue
-            result[key] = value.schema_definition
-
-        return {"type": "object", "properties": result}
+        return {
+            "type": "object",
+            "properties": {
+                key: value.schema_definition for key, value in self.widgets.items()
+            },
+        }
 
     @classmethod
     def register_font(

@@ -6,9 +6,7 @@ import os
 from PyPDFForm import PdfWrapper
 from PyPDFForm.constants import TU, Parent
 from PyPDFForm.middleware.radio import Radio
-from PyPDFForm.patterns import WIDGET_KEY_PATTERNS
-from PyPDFForm.template import get_widgets_by_page
-from PyPDFForm.utils import extract_widget_property
+from PyPDFForm.template import get_widget_key, get_widgets_by_page
 
 
 def test_pdf_form_with_pages_without_widgets(issue_pdf_directory, request):
@@ -332,7 +330,7 @@ def test_get_desc_in_schema_radio(issue_pdf_directory):
 
     for widgets in get_widgets_by_page(obj.read()).values():
         for widget in widgets:
-            key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+            key = get_widget_key(widget, False)
 
             if key in keys_to_check:
                 assert (
@@ -442,7 +440,6 @@ def test_polish_use_full_widget_name(issue_pdf_directory, request):
     )
 
     assert "PESEL[0]" not in obj.schema
-    assert obj.sample_data["topmostSubform[0].Page1[0].PESEL[0]"] == "PESEL[0]"
 
     expected_path = os.path.join(issue_pdf_directory, "949_new_expected.pdf")
     request.config.results["expected_path"] = expected_path

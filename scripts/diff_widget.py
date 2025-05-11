@@ -8,8 +8,7 @@ from pprint import pprint
 
 from pypdf.generic import ArrayObject, DictionaryObject
 
-from PyPDFForm.patterns import WIDGET_KEY_PATTERNS
-from PyPDFForm.template import extract_widget_property, get_widgets_by_page
+from PyPDFForm.template import get_widget_key, get_widgets_by_page
 
 
 def serializing_widget(widget, level):
@@ -35,10 +34,7 @@ def serializing_widget_from_file(filename, key, buff):
 
         for w in widgets.values():
             for widget in w:
-                if (
-                    extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
-                    == key
-                ):
+                if get_widget_key(widget, False) == key:
                     pprint(serializing_widget(widget, 0), stream=buff)
                     buff.writelines("\n" * 3 + "=" * 100 + "\n" * 3)
 

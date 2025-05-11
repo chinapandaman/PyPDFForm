@@ -60,9 +60,7 @@ def set_character_x_paddings(
 
     for _widgets in get_widgets_by_page(pdf_stream).values():
         for widget in _widgets:
-            key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
-            if use_full_widget_name:
-                key = get_widget_full_key(widget)
+            key = get_widget_key(widget, use_full_widget_name)
             _widget = widgets[key]
 
             if isinstance(_widget, Text) and _widget.comb is True:
@@ -91,11 +89,9 @@ def build_widgets(
 
     for widgets in get_widgets_by_page(pdf_stream).values():
         for widget in widgets:
-            key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+            key = get_widget_key(widget, use_full_widget_name)
             _widget = construct_widget(widget, key)
             if _widget is not None:
-                if use_full_widget_name:
-                    _widget.full_name = get_widget_full_key(widget)
 
                 _widget.render_widget = render_widgets
                 _widget.desc = extract_widget_property(
@@ -141,8 +137,7 @@ def build_widgets(
                     continue
 
                 results[key] = _widget
-                if _widget.full_name is not None and use_full_widget_name:
-                    results[_widget.full_name] = results[key]
+
     return results
 
 
@@ -201,9 +196,7 @@ def update_text_field_attributes(
 
     for _widgets in get_widgets_by_page(template_stream).values():
         for _widget in _widgets:
-            key = extract_widget_property(_widget, WIDGET_KEY_PATTERNS, None, str)
-            if use_full_widget_name:
-                key = get_widget_full_key(_widget)
+            key = get_widget_key(_widget, use_full_widget_name)
 
             if isinstance(widgets[key], Text):
                 should_adjust_font_size = False
@@ -267,24 +260,32 @@ def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
     return result
 
 
-def get_widget_full_key(widget: dict) -> str:
-    """Constructs a widget's full hierarchical key including parent names.
+def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
+    """Constructs a widget's key, optionally including parent names based on `use_full_widget_name`.
+
+    This function recursively builds the full key by appending parent names if `use_full_widget_name` is True.
+    If `use_full_widget_name` is False, it returns the widget's key directly.
 
     Args:
-        widget: PDF widget dictionary
+        widget (dict): PDF widget dictionary.
+        use_full_widget_name (bool): Whether to include parent widget names in the key.
 
     Returns:
-        str: Full key in format "parent.child" if parent exists, otherwise the widget's key
+        str: Full key in format "parent.child" if parent exists and `use_full_widget_name` is True, otherwise the widget's key.
     """
 
     key = extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+    if not use_full_widget_name:
+        return key
 
     if (
         Parent in widget
         and T in widget[Parent].get_object()
         and widget[Parent].get_object()[T] != key
     ):
-        key = f"{get_widget_full_key(widget[Parent].get_object())}.{key}"
+        key = (
+            f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
+        )
 
     return key
 
@@ -592,9 +593,7 @@ def update_widget_keys(
         for page in out.pages:
             for annot in page.get(Annots, []):
                 annot = cast(DictionaryObject, annot.get_object())
-                key = extract_widget_property(
-                    annot.get_object(), WIDGET_KEY_PATTERNS, None, str
-                )
+                key = get_widget_key(annot.get_object(), False)
 
                 widget = widgets.get(key)
                 if widget is None:

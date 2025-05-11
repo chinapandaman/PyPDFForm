@@ -16,8 +16,9 @@ from reportlab.lib.colors import Color
 from reportlab.pdfgen.canvas import Canvas
 
 from ..constants import Annots
-from ..patterns import NON_ACRO_FORM_PARAM_TO_FUNC, WIDGET_KEY_PATTERNS
-from ..utils import extract_widget_property, stream_to_io
+from ..patterns import NON_ACRO_FORM_PARAM_TO_FUNC
+from ..template import get_widget_key
+from ..utils import stream_to_io
 
 
 class Widget:
@@ -156,9 +157,7 @@ def handle_non_acro_form_params(pdf: bytes, key: str, params: list) -> bytes:
     for page in out.pages:
         for annot in page.get(Annots, []):
             annot = cast(DictionaryObject, annot.get_object())
-            _key = extract_widget_property(
-                annot.get_object(), WIDGET_KEY_PATTERNS, None, str
-            )
+            _key = get_widget_key(annot.get_object(), False)
 
             if _key == key:
                 for param in params:
