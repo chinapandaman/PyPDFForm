@@ -4,7 +4,7 @@ PyPDFForm is available on PyPI and can be installed using any compatible tool, w
 
 ## Install using pip
 
-PyPDFForm requires Python 3.8+.
+PyPDFForm requires Python 3.9+.
 
 Create a virtual environment before installation. Then, run the following command to install PyPDFForm:
 
