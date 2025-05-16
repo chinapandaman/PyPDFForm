@@ -55,9 +55,9 @@ This file adaptation applies to all PyPDFForm APIs. You can replace file path pa
 
 ## Use full widget name in PDF wrapper
 
-According to section 12.7.3.2 found on page 434 of [the PDF standard](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf), each PDF form widget can have a fully qualified name that is not explicitly defined but can be constructed following the pattern `<parent_widget_name>.<widget_name>`.
+According to section 12.7.3.2 of the [PDF standard](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf) (page 434), PDF form widgets can have fully qualified names constructed using the pattern `<parent_widget_name>.<widget_name>`.
 
-PyPDFForm supports accessing widgets through their full names by simply setting the optional parameter `use_full_widget_name` to `True` when a `PdfWrapper` or `FormWrapper` object is instantiated. Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_full_key.pdf):
+PyPDFForm allows you to access widgets by their full names by setting `use_full_widget_name=True` when instantiating `PdfWrapper` or `FormWrapper`. For example, using [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_full_key.pdf):
 
 ```python
 from PyPDFForm import PdfWrapper, FormWrapper
@@ -66,9 +66,9 @@ pdf = PdfWrapper("sample_template_with_full_key.pdf", use_full_widget_name=True)
 pdf = FormWrapper("sample_template_with_full_key.pdf", use_full_widget_name=True)    # FormWrapper
 ```
 
-By constructing the object like above, you can access the checkbox on the second labeled `Gain de 2 classes` through its full name `Gain de 2 classes.0` instead of its partial name `0`.
+This enables accessing widgets by their full names. For instance, you can access the checkbox labeled `Gain de 2 classes` using its full name `Gain de 2 classes.0` instead of the partial name `0`.
 
-**NOTE:** When using full widget names, the `update_widget_key` and `commit_widget_key_updates` methods for `PdfWrapper` are disabled and raise a `NotImplementedError` because full names involve both the widget and its parent.
+**NOTE:** When using full widget names, the `update_widget_key` and `commit_widget_key_updates` methods of `PdfWrapper` are disabled and raise a `NotImplementedError` because full names include both the widget and its parent.
 
 ## Write to a file
 
