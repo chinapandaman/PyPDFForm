@@ -66,7 +66,7 @@ pdf = PdfWrapper("sample_template_with_full_key.pdf", use_full_widget_name=True)
 pdf = FormWrapper("sample_template_with_full_key.pdf", use_full_widget_name=True)    # FormWrapper
 ```
 
-This snippet enables accessing widgets by their full names. For instance, you can access the checkbox labeled `Gain de 2 classes` using its full name `Gain de 2 classes.0` instead of the partial name `0`.
+This enables accessing widgets by their full names. For instance, you can access the checkbox labeled `Gain de 2 classes` using its full name `Gain de 2 classes.0` instead of the partial name `0`.
 
 **NOTE:** When using full widget names, the `update_widget_key` and `commit_widget_key_updates` methods of `PdfWrapper` are disabled and raise a `NotImplementedError` because full names include both the widget and its parent.
 
