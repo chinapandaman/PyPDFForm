@@ -119,7 +119,11 @@ class FormWrapper:
             FormWrapper: Returns self to allow method chaining
         """
 
-        widgets = build_widgets(self.stream, self.use_full_widget_name, False) if self.stream else {}
+        widgets = (
+            build_widgets(self.stream, self.use_full_widget_name, False)
+            if self.stream
+            else {}
+        )
 
         for key, value in data.items():
             if key in widgets:
