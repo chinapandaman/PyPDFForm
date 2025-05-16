@@ -62,6 +62,7 @@ class FormWrapper:
     def __init__(
         self,
         template: Union[bytes, str, BinaryIO] = b"",
+        **kwargs,
     ) -> None:
         """Initializes the base form wrapper with a PDF template.
 
@@ -80,6 +81,7 @@ class FormWrapper:
 
         super().__init__()
         self.stream = fp_or_f_obj_or_stream_to_stream(template)
+        self.use_full_widget_name = kwargs.get("use_full_widget_name", False)
 
     def read(self) -> bytes:
         """Returns the raw bytes of the PDF form data.
@@ -115,7 +117,7 @@ class FormWrapper:
             FormWrapper: Returns self to allow method chaining
         """
 
-        widgets = build_widgets(self.stream, False, False) if self.stream else {}
+        widgets = build_widgets(self.stream, self.use_full_widget_name, False) if self.stream else {}
 
         for key, value in data.items():
             if key in widgets:
@@ -124,6 +126,7 @@ class FormWrapper:
         self.stream = simple_fill(
             self.read(),
             widgets,
+            use_full_widget_name=self.use_full_widget_name,
             flatten=kwargs.get("flatten", False),
             adobe_mode=kwargs.get("adobe_mode", False),
         )
