@@ -11,3 +11,4 @@ build/
 dist/
 *.egg-info/
 .aider*
+.DS_store
