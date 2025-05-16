@@ -69,6 +69,8 @@ class FormWrapper:
         Args:
             template: PDF form as bytes, file path, or file object. Defaults to
                 empty bytes if not provided.
+            **kwargs: Optional configuration parameters including:
+                use_full_widget_name: Whether to use full widget names
 
         Initializes:
             - Internal PDF stream from the template

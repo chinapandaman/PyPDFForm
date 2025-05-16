@@ -351,6 +351,7 @@ def simple_fill(
     Args:
         template: Input PDF form as bytes
         widgets: Dictionary mapping field names to widget middleware
+        use_full_widget_name: If True, uses the full widget name as the key in the widgets dictionary
         flatten: If True, makes form fields read-only
         adobe_mode: If True, enables Adobe Acrobat compatibility
 
