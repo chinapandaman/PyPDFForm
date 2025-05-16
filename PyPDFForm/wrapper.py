@@ -109,9 +109,9 @@ class FormWrapper:
 
         Takes a dictionary of field names to values and updates the corresponding
         form fields in the PDF. Supports these value types:
-        - Strings for text fields
-        - Booleans for checkboxes (True=checked, False=unchecked)
-        - Integers for numeric fields and dropdown selections
+            - Strings for text fields
+            - Booleans for checkboxes (True=checked, False=unchecked)
+            - Integers for numeric fields and dropdown selections
 
         Only fields that exist in the template PDF will be filled - unknown field
         names are silently ignored.
