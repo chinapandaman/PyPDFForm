@@ -62,16 +62,21 @@ class FormWrapper:
     def __init__(
         self,
         template: Union[bytes, str, BinaryIO] = b"",
+        **kwargs,
     ) -> None:
         """Initializes the base form wrapper with a PDF template.
 
         Args:
             template: PDF form as bytes, file path, or file object. Defaults to
                 empty bytes if not provided.
+            **kwargs: Additional options:
+                use_full_widget_name: If True, uses complete widget names including
+                    field hierarchy (default: False)
 
         Initializes:
             - Internal PDF stream from the template
             - Basic form filling capabilities
+            - Widget naming configuration from kwargs
 
         Note:
             This base class is designed to be extended by PdfWrapper which adds
@@ -80,6 +85,7 @@ class FormWrapper:
 
         super().__init__()
         self.stream = fp_or_f_obj_or_stream_to_stream(template)
+        self.use_full_widget_name = kwargs.get("use_full_widget_name", False)
 
     def read(self) -> bytes:
         """Returns the raw bytes of the PDF form data.
@@ -102,20 +108,34 @@ class FormWrapper:
         """Fills form fields in the PDF with provided values.
 
         Takes a dictionary of field names to values and updates the corresponding
-        form fields in the PDF. Only fields that exist in the template PDF will
-        be filled - unknown field names are silently ignored.
+        form fields in the PDF. Supports these value types:
+            - Strings for text fields
+            - Booleans for checkboxes (True=checked, False=unchecked)
+            - Integers for numeric fields and dropdown selections
+
+        Only fields that exist in the template PDF will be filled - unknown field
+        names are silently ignored.
 
         Args:
-            data: Dictionary mapping field names to values (str, bool or int)
+            data: Dictionary mapping field names to values. Supported types:
+                str: For text fields
+                bool: For checkboxes (True=checked)
+                int: For numeric fields and dropdown selections
             **kwargs: Additional options:
-                flatten: If True, makes form fields read-only after filling
-                adobe_mode: If True, uses Adobe-compatible filling logic
+                flatten (bool): If True, makes form fields read-only after filling
+                    (default: False)
+                adobe_mode (bool): If True, uses Adobe-compatible filling logic
+                    (default: False)
 
         Returns:
             FormWrapper: Returns self to allow method chaining
         """
 
-        widgets = build_widgets(self.stream, False, False) if self.stream else {}
+        widgets = (
+            build_widgets(self.stream, self.use_full_widget_name, False)
+            if self.stream
+            else {}
+        )
 
         for key, value in data.items():
             if key in widgets:
@@ -124,6 +144,7 @@ class FormWrapper:
         self.stream = simple_fill(
             self.read(),
             widgets,
+            use_full_widget_name=self.use_full_widget_name,
             flatten=kwargs.get("flatten", False),
             adobe_mode=kwargs.get("adobe_mode", False),
         )

@@ -337,6 +337,7 @@ def enable_adobe_mode(reader: PdfReader, writer: PdfWriter, adobe_mode: bool) ->
 def simple_fill(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
+    use_full_widget_name: bool,
     flatten: bool = False,
     adobe_mode: bool = False,
 ) -> bytes:
@@ -350,6 +351,7 @@ def simple_fill(
     Args:
         template: Input PDF form as bytes
         widgets: Dictionary mapping field names to widget middleware
+        use_full_widget_name: If True, uses the full widget name as the key in the widgets dictionary
         flatten: If True, makes form fields read-only
         adobe_mode: If True, enables Adobe Acrobat compatibility
 
@@ -367,7 +369,7 @@ def simple_fill(
     for page in out.pages:
         for annot in page.get(Annots, []):
             annot = cast(DictionaryObject, annot.get_object())
-            key = get_widget_key(annot.get_object(), False)
+            key = get_widget_key(annot.get_object(), use_full_widget_name)
 
             widget = widgets.get(key)
             if widget is None or widget.value is None:
