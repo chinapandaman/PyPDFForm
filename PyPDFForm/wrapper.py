@@ -111,7 +111,7 @@ class FormWrapper:
             other: Another PdfWrapper instance to merge with
 
         Returns:
-            PdfWrapper: New wrapper containing merged PDF
+            FormWrapper: New wrapper containing merged PDF
         """
 
         if not self.stream:
@@ -199,7 +199,7 @@ class FormWrapper:
         repeated calls.
 
         Returns:
-            List[PdfWrapper]: List of wrapper objects, one per page
+            List[FormWrapper]: List of wrapper objects, one per page
         """
 
         return [
@@ -240,7 +240,7 @@ class FormWrapper:
             version: Target version string (e.g. '1.4', '1.7')
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
         """
 
         self.stream = self.stream.replace(
@@ -331,7 +331,7 @@ class FormWrapper:
             margin: Spacing between grid lines in PDF units (default: 100)
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
         """
 
         self.stream = generate_coordinate_grid(
@@ -436,7 +436,7 @@ class FormWrapper:
                 For signature/image: width, height, etc.
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining.
+            FormWrapper: Returns self to allow method chaining.
 
         Notes:
             - If an unsupported widget_type is provided, the method returns self unchanged.
@@ -491,7 +491,7 @@ class FormWrapper:
             defer: If True, queues the update for later batch processing
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
 
         Raises:
             NotImplementedError: When use_full_widget_name is enabled
@@ -519,7 +519,7 @@ class FormWrapper:
         multiple fields.
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
 
         Raises:
             NotImplementedError: When use_full_widget_name is enabled
@@ -567,7 +567,7 @@ class FormWrapper:
                 font_color: Font color as RGB tuple (default: (0, 0, 0))
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
         """
 
         new_widget = Text("new")
@@ -625,7 +625,7 @@ class FormWrapper:
             rotation: Rotation angle in degrees (default: 0)
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
         """
 
         image = fp_or_f_obj_or_stream_to_stream(image)
@@ -668,21 +668,10 @@ class FormWrapper:
 
 
 class PdfWrapper(FormWrapper):
-    """Extended PDF form wrapper with advanced features.
+    """Simplified PDF form wrapper inheriting core functionality from FormWrapper.
 
-    Inherits from FormWrapper and adds capabilities for:
-    - Creating and modifying form widgets
-    - Drawing text and images
-    - Merging PDF documents
-    - Generating coordinate grids
-    - Form schema generation
-    - Font registration
-
-    Key Features:
-    - Maintains widget state and properties
-    - Supports per-page operations
-    - Handles PDF version management
-    - Provides preview functionality
+    Currently extends FormWrapper with a customized fill() method that preserves
+    widget properties and positions.
     """
 
     def fill(
@@ -692,17 +681,15 @@ class PdfWrapper(FormWrapper):
     ) -> PdfWrapper:
         """Fills form fields while preserving widget properties and positions.
 
-        Extends FormWrapper.fill() with additional features:
-        - Maintains widget properties like fonts and styles
-        - Converts dropdowns to text fields while preserving choices
-        - Updates text field attributes and character spacing
+        Extends FormWrapper.fill() with additional features like maintaining widget
+        properties and converting dropdowns to text fields.
 
         Args:
-            data: Dictionary mapping field names to values (str, bool or int)
-            **kwargs: Currently unused, maintained for future compatibility
+            data: Dictionary mapping field names to values
+            **kwargs: Currently unused
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            PdfWrapper: Returns self for chaining
         """
 
         for key, value in data.items():
