@@ -18,6 +18,8 @@ for page in out.pages:
         annot[NameObject("/DA")] = TextStringObject(" ".join(da))
         annot[NameObject("/MaxLen")] = NumberObject(2)  # max_length
         annot[NameObject("/Ff")] = NumberObject(annot["/Ff"] | 1 << 24)  # comb
+        annot[NameObject("/Ff")] = NumberObject(annot["/Ff"] | 1 << 12)  # multiline
+
 
 with open("temp/output.pdf", "wb+") as f:
     out.write(f)
