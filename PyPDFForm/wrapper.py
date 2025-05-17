@@ -99,6 +99,36 @@ class FormWrapper:
 
         self._init_helper()
 
+    def __add__(self, other: FormWrapper) -> FormWrapper:
+        """Merges two PDF forms together using the + operator.
+
+        Combines the content of both PDF forms while:
+        - Preserving each form's widgets and data
+        - Adding unique suffixes to duplicate field names
+        - Maintaining all page content and ordering
+
+        Args:
+            other: Another PdfWrapper instance to merge with
+
+        Returns:
+            PdfWrapper: New wrapper containing merged PDF
+        """
+
+        if not self.stream:
+            return other
+
+        if not other.stream:
+            return self
+
+        unique_suffix = generate_unique_suffix()
+        for k in self.widgets:
+            if k in other.widgets:
+                other.update_widget_key(k, f"{k}-{unique_suffix}", defer=True)
+
+        other.commit_widget_key_updates()
+
+        return self.__class__(merge_two_pdfs(self.stream, other.stream))
+
     def _init_helper(self, key_to_refresh: str = None) -> None:
         """Internal method to refresh widget state after PDF stream changes.
 
@@ -156,6 +186,170 @@ class FormWrapper:
         """
 
         return self.stream
+    
+    @cached_property
+    def pages(self) -> List[FormWrapper]:
+        """Returns individual page wrappers for each page in the PDF.
+
+        Creates a separate PdfWrapper instance for each page, maintaining all
+        the original wrapper's settings (fonts, rendering options etc.). This
+        allows per-page operations while preserving the parent's configuration.
+
+        The result is cached after first access for better performance with
+        repeated calls.
+
+        Returns:
+            List[PdfWrapper]: List of wrapper objects, one per page
+        """
+
+        return [
+            self.__class__(
+                copy_watermark_widgets(each, self.stream, None, i),
+                **{param: getattr(self, param) for param, _ in self.USER_PARAMS},
+            )
+            for i, each in enumerate(get_page_streams(remove_all_widgets(self.read())))
+        ]
+    
+    @property
+    def version(self) -> Union[str, None]:
+        """Gets the PDF version number from the document header.
+
+        The version is extracted from the PDF header which contains a version
+        identifier like '%PDF-1.4'. This method returns just the version number
+        portion (e.g. '1.4') if found, or None if no valid version identifier
+        is present.
+
+        Returns:
+            str: The PDF version number (e.g. '1.4') if found
+            None: If no valid version identifier exists in the PDF
+        """
+
+        for each in VERSION_IDENTIFIERS:
+            if self.stream.startswith(each):
+                return each.replace(VERSION_IDENTIFIER_PREFIX, b"").decode()
+
+        return None
+    
+    def change_version(self, version: str) -> FormWrapper:
+        """Changes the PDF version identifier in the document header.
+
+        Modifies the version header (e.g. '%PDF-1.4') to match the specified version.
+        Note this only changes the version identifier, not the actual PDF features used.
+
+        Args:
+            version: Target version string (e.g. '1.4', '1.7')
+
+        Returns:
+            PdfWrapper: Returns self to allow method chaining
+        """
+
+        self.stream = self.stream.replace(
+            VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
+            VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
+            1,
+        )
+
+        return self
+    
+    @property
+    def preview(self) -> bytes:
+        """Generates a preview PDF showing widget names above their locations.
+
+        Creates a modified version of the PDF where:
+        - All form widgets are removed
+        - Widget names are drawn slightly above their original positions
+        - Helps visualize form field locations without interactive widgets
+
+        Returns:
+            bytes: PDF bytes containing the preview annotations
+        """
+
+        return remove_all_widgets(
+            fill(
+                self.stream,
+                {
+                    key: preview_widget_to_draw(key, value, True)
+                    for key, value in self.widgets.items()
+                },
+                getattr(self, "use_full_widget_name"),
+            )
+        )
+    
+    @property
+    def schema(self) -> dict:
+        """Generates a JSON schema describing the PDF form's fields and types.
+
+        The schema includes:
+        - Field names as property names
+        - Type information (string, boolean, integer)
+        - Field-specific constraints like max lengths for text fields
+        - Choice indices for dropdown fields
+
+        Note: Does not include required field indicators since the PDF form's
+        validation rules are not extracted.
+
+        Returns:
+            dict: A JSON Schema dictionary following Draft 7 format
+        """
+
+        return {
+            "type": "object",
+            "properties": {
+                key: value.schema_definition for key, value in self.widgets.items()
+            },
+        }
+    
+    @property
+    def sample_data(self) -> dict:
+        """Generates a dictionary of sample values for all form fields.
+
+        Returns a dictionary mapping each widget/field name to an appropriate
+        sample value based on its type:
+        - Text fields: Field name (truncated if max_length specified)
+        - Checkboxes: True
+        - Dropdowns: Index of last available choice
+        - Other fields: Type-specific sample values
+
+        Returns:
+            dict: Field names mapped to their sample values
+        """
+
+        return {key: value.sample_value for key, value in self.widgets.items()}
+    
+    def generate_coordinate_grid(
+        self, color: Tuple[float, float, float] = (1, 0, 0), margin: float = 100
+    ) -> FormWrapper:
+        """Generates a coordinate grid overlay for the PDF.
+
+        Creates a visual grid showing x,y coordinates to help with:
+        - Precise widget placement
+        - Measuring distances between elements
+        - Debugging layout issues
+
+        Args:
+            color: RGB tuple (0-1 range) for grid line color (default: red)
+            margin: Spacing between grid lines in PDF units (default: 100)
+
+        Returns:
+            PdfWrapper: Returns self to allow method chaining
+        """
+
+        self.stream = generate_coordinate_grid(
+            remove_all_widgets(
+                fill(
+                    self.stream,
+                    {
+                        key: preview_widget_to_draw(key, value, False)
+                        for key, value in self.widgets.items()
+                    },
+                    getattr(self, "use_full_widget_name"),
+                )
+            ),
+            color,
+            margin,
+        )
+
+        return self
 
     def fill(
         self,
@@ -207,238 +401,7 @@ class FormWrapper:
         )
 
         return self
-
-
-class PdfWrapper(FormWrapper):
-    """Extended PDF form wrapper with advanced features.
-
-    Inherits from FormWrapper and adds capabilities for:
-    - Creating and modifying form widgets
-    - Drawing text and images
-    - Merging PDF documents
-    - Generating coordinate grids
-    - Form schema generation
-    - Font registration
-
-    Key Features:
-    - Maintains widget state and properties
-    - Supports per-page operations
-    - Handles PDF version management
-    - Provides preview functionality
-    """
-
-    @property
-    def sample_data(self) -> dict:
-        """Generates a dictionary of sample values for all form fields.
-
-        Returns a dictionary mapping each widget/field name to an appropriate
-        sample value based on its type:
-        - Text fields: Field name (truncated if max_length specified)
-        - Checkboxes: True
-        - Dropdowns: Index of last available choice
-        - Other fields: Type-specific sample values
-
-        Returns:
-            dict: Field names mapped to their sample values
-        """
-
-        return {key: value.sample_value for key, value in self.widgets.items()}
-
-    @property
-    def version(self) -> Union[str, None]:
-        """Gets the PDF version number from the document header.
-
-        The version is extracted from the PDF header which contains a version
-        identifier like '%PDF-1.4'. This method returns just the version number
-        portion (e.g. '1.4') if found, or None if no valid version identifier
-        is present.
-
-        Returns:
-            str: The PDF version number (e.g. '1.4') if found
-            None: If no valid version identifier exists in the PDF
-        """
-
-        for each in VERSION_IDENTIFIERS:
-            if self.stream.startswith(each):
-                return each.replace(VERSION_IDENTIFIER_PREFIX, b"").decode()
-
-        return None
-
-    @cached_property
-    def pages(self) -> List[PdfWrapper]:
-        """Returns individual page wrappers for each page in the PDF.
-
-        Creates a separate PdfWrapper instance for each page, maintaining all
-        the original wrapper's settings (fonts, rendering options etc.). This
-        allows per-page operations while preserving the parent's configuration.
-
-        The result is cached after first access for better performance with
-        repeated calls.
-
-        Returns:
-            List[PdfWrapper]: List of wrapper objects, one per page
-        """
-
-        return [
-            self.__class__(
-                copy_watermark_widgets(each, self.stream, None, i),
-                **{param: getattr(self, param) for param, _ in self.USER_PARAMS},
-            )
-            for i, each in enumerate(get_page_streams(remove_all_widgets(self.read())))
-        ]
-
-    def change_version(self, version: str) -> PdfWrapper:
-        """Changes the PDF version identifier in the document header.
-
-        Modifies the version header (e.g. '%PDF-1.4') to match the specified version.
-        Note this only changes the version identifier, not the actual PDF features used.
-
-        Args:
-            version: Target version string (e.g. '1.4', '1.7')
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining
-        """
-
-        self.stream = self.stream.replace(
-            VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
-            VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
-            1,
-        )
-
-        return self
-
-    def __add__(self, other: PdfWrapper) -> PdfWrapper:
-        """Merges two PDF forms together using the + operator.
-
-        Combines the content of both PDF forms while:
-        - Preserving each form's widgets and data
-        - Adding unique suffixes to duplicate field names
-        - Maintaining all page content and ordering
-
-        Args:
-            other: Another PdfWrapper instance to merge with
-
-        Returns:
-            PdfWrapper: New wrapper containing merged PDF
-        """
-
-        if not self.stream:
-            return other
-
-        if not other.stream:
-            return self
-
-        unique_suffix = generate_unique_suffix()
-        for k in self.widgets:
-            if k in other.widgets:
-                other.update_widget_key(k, f"{k}-{unique_suffix}", defer=True)
-
-        other.commit_widget_key_updates()
-
-        return self.__class__(merge_two_pdfs(self.stream, other.stream))
-
-    @property
-    def preview(self) -> bytes:
-        """Generates a preview PDF showing widget names above their locations.
-
-        Creates a modified version of the PDF where:
-        - All form widgets are removed
-        - Widget names are drawn slightly above their original positions
-        - Helps visualize form field locations without interactive widgets
-
-        Returns:
-            bytes: PDF bytes containing the preview annotations
-        """
-
-        return remove_all_widgets(
-            fill(
-                self.stream,
-                {
-                    key: preview_widget_to_draw(key, value, True)
-                    for key, value in self.widgets.items()
-                },
-                getattr(self, "use_full_widget_name"),
-            )
-        )
-
-    def generate_coordinate_grid(
-        self, color: Tuple[float, float, float] = (1, 0, 0), margin: float = 100
-    ) -> PdfWrapper:
-        """Generates a coordinate grid overlay for the PDF.
-
-        Creates a visual grid showing x,y coordinates to help with:
-        - Precise widget placement
-        - Measuring distances between elements
-        - Debugging layout issues
-
-        Args:
-            color: RGB tuple (0-1 range) for grid line color (default: red)
-            margin: Spacing between grid lines in PDF units (default: 100)
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining
-        """
-
-        self.stream = generate_coordinate_grid(
-            remove_all_widgets(
-                fill(
-                    self.stream,
-                    {
-                        key: preview_widget_to_draw(key, value, False)
-                        for key, value in self.widgets.items()
-                    },
-                    getattr(self, "use_full_widget_name"),
-                )
-            ),
-            color,
-            margin,
-        )
-
-        return self
-
-    def fill(
-        self,
-        data: Dict[str, Union[str, bool, int]],
-        **kwargs,
-    ) -> PdfWrapper:
-        """Fills form fields while preserving widget properties and positions.
-
-        Extends FormWrapper.fill() with additional features:
-        - Maintains widget properties like fonts and styles
-        - Converts dropdowns to text fields while preserving choices
-        - Updates text field attributes and character spacing
-
-        Args:
-            data: Dictionary mapping field names to values (str, bool or int)
-            **kwargs: Currently unused, maintained for future compatibility
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining
-        """
-
-        for key, value in data.items():
-            if key in self.widgets:
-                self.widgets[key].value = value
-
-        for key, value in self.widgets.items():
-            if isinstance(value, Dropdown):
-                self.widgets[key] = dropdown_to_text(value)
-
-        update_text_field_attributes(
-            self.stream, self.widgets, getattr(self, "use_full_widget_name")
-        )
-        if self.read():
-            self.widgets = set_character_x_paddings(
-                self.stream, self.widgets, getattr(self, "use_full_widget_name")
-            )
-
-        self.stream = remove_all_widgets(
-            fill(self.stream, self.widgets, getattr(self, "use_full_widget_name"))
-        )
-
-        return self
-
+    
     def create_widget(
         self,
         widget_type: str,
@@ -447,7 +410,7 @@ class PdfWrapper(FormWrapper):
         x: Union[float, List[float]],
         y: Union[float, List[float]],
         **kwargs,
-    ) -> PdfWrapper:
+    ) -> FormWrapper:
         """
         Creates a new interactive widget (form field) on the PDF.
 
@@ -515,7 +478,7 @@ class PdfWrapper(FormWrapper):
 
     def update_widget_key(
         self, old_key: str, new_key: str, index: int = 0, defer: bool = False
-    ) -> PdfWrapper:
+    ) -> FormWrapper:
         """Updates the field name/key of an existing widget in the PDF form.
 
         Allows renaming form fields while preserving all other properties.
@@ -548,7 +511,7 @@ class PdfWrapper(FormWrapper):
 
         return self
 
-    def commit_widget_key_updates(self) -> PdfWrapper:
+    def commit_widget_key_updates(self) -> FormWrapper:
         """Processes all deferred widget key updates in a single batch operation.
 
         Applies all key updates that were queued using update_widget_key() with
@@ -584,7 +547,7 @@ class PdfWrapper(FormWrapper):
         x: Union[float, int],
         y: Union[float, int],
         **kwargs,
-    ) -> PdfWrapper:
+    ) -> FormWrapper:
         """Draws static text onto the PDF document at specified coordinates.
 
         Adds non-interactive text that becomes part of the PDF content rather
@@ -646,7 +609,7 @@ class PdfWrapper(FormWrapper):
         width: Union[float, int],
         height: Union[float, int],
         rotation: Union[float, int] = 0,
-    ) -> PdfWrapper:
+    ) -> FormWrapper:
         """Draws an image onto the PDF document at specified coordinates.
 
         The image is merged via watermark operations, preserving existing form fields.
@@ -681,31 +644,7 @@ class PdfWrapper(FormWrapper):
         )
 
         return self
-
-    @property
-    def schema(self) -> dict:
-        """Generates a JSON schema describing the PDF form's fields and types.
-
-        The schema includes:
-        - Field names as property names
-        - Type information (string, boolean, integer)
-        - Field-specific constraints like max lengths for text fields
-        - Choice indices for dropdown fields
-
-        Note: Does not include required field indicators since the PDF form's
-        validation rules are not extracted.
-
-        Returns:
-            dict: A JSON Schema dictionary following Draft 7 format
-        """
-
-        return {
-            "type": "object",
-            "properties": {
-                key: value.schema_definition for key, value in self.widgets.items()
-            },
-        }
-
+    
     @classmethod
     def register_font(
         cls, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
@@ -726,3 +665,64 @@ class PdfWrapper(FormWrapper):
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         return register_font(font_name, ttf_file) if ttf_file is not None else False
+
+
+class PdfWrapper(FormWrapper):
+    """Extended PDF form wrapper with advanced features.
+
+    Inherits from FormWrapper and adds capabilities for:
+    - Creating and modifying form widgets
+    - Drawing text and images
+    - Merging PDF documents
+    - Generating coordinate grids
+    - Form schema generation
+    - Font registration
+
+    Key Features:
+    - Maintains widget state and properties
+    - Supports per-page operations
+    - Handles PDF version management
+    - Provides preview functionality
+    """
+
+    def fill(
+        self,
+        data: Dict[str, Union[str, bool, int]],
+        **kwargs,
+    ) -> PdfWrapper:
+        """Fills form fields while preserving widget properties and positions.
+
+        Extends FormWrapper.fill() with additional features:
+        - Maintains widget properties like fonts and styles
+        - Converts dropdowns to text fields while preserving choices
+        - Updates text field attributes and character spacing
+
+        Args:
+            data: Dictionary mapping field names to values (str, bool or int)
+            **kwargs: Currently unused, maintained for future compatibility
+
+        Returns:
+            PdfWrapper: Returns self to allow method chaining
+        """
+
+        for key, value in data.items():
+            if key in self.widgets:
+                self.widgets[key].value = value
+
+        for key, value in self.widgets.items():
+            if isinstance(value, Dropdown):
+                self.widgets[key] = dropdown_to_text(value)
+
+        update_text_field_attributes(
+            self.stream, self.widgets, getattr(self, "use_full_widget_name")
+        )
+        if self.read():
+            self.widgets = set_character_x_paddings(
+                self.stream, self.widgets, getattr(self, "use_full_widget_name")
+            )
+
+        self.stream = remove_all_widgets(
+            fill(self.stream, self.widgets, getattr(self, "use_full_widget_name"))
+        )
+
+        return self
