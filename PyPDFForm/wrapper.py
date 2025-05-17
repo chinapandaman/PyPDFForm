@@ -3,13 +3,14 @@
 
 This module contains:
 - FormWrapper: The base class providing core PDF form functionality including:
+  * Filling PDF forms
   * Creating and modifying PDF form widgets
   * Drawing text and images on PDFs
   * Merging PDF documents
   * Generating coordinate grids
   * Other PDF manipulation tasks
 
-- PdfWrapper: Extends FormWrapper with the fill() method for PDF form filling
+- PdfWrapper: Extends FormWrapper with additional PDF manipulation capabilities
 
 The wrappers handle low-level PDF operations while exposing simple methods
 for common use cases.
