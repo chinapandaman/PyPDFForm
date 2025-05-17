@@ -59,117 +59,6 @@ class FormWrapper:
     more advanced features like form analysis and widget creation.
     """
 
-    def __init__(
-        self,
-        template: Union[bytes, str, BinaryIO] = b"",
-        **kwargs,
-    ) -> None:
-        """Initializes the base form wrapper with a PDF template.
-
-        Args:
-            template: PDF form as bytes, file path, or file object. Defaults to
-                empty bytes if not provided.
-            **kwargs: Additional options:
-                use_full_widget_name: If True, uses complete widget names including
-                    field hierarchy (default: False)
-
-        Initializes:
-            - Internal PDF stream from the template
-            - Basic form filling capabilities
-            - Widget naming configuration from kwargs
-
-        Note:
-            This base class is designed to be extended by PdfWrapper which adds
-            more advanced features. For most use cases, you'll want to use PdfWrapper.
-        """
-
-        super().__init__()
-        self.stream = fp_or_f_obj_or_stream_to_stream(template)
-        self.use_full_widget_name = kwargs.get("use_full_widget_name", False)
-
-    def read(self) -> bytes:
-        """Returns the raw bytes of the PDF form data.
-
-        This method provides access to the underlying PDF bytes after operations
-        like fill() have been performed. No parsing or analysis of the PDF
-        content is done - the bytes are returned as-is.
-
-        Returns:
-            bytes: The complete PDF document as a byte string
-        """
-
-        return self.stream
-
-    def fill(
-        self,
-        data: Dict[str, Union[str, bool, int]],
-        **kwargs,
-    ) -> FormWrapper:
-        """Fills form fields in the PDF with provided values.
-
-        Takes a dictionary of field names to values and updates the corresponding
-        form fields in the PDF. Supports these value types:
-            - Strings for text fields
-            - Booleans for checkboxes (True=checked, False=unchecked)
-            - Integers for numeric fields and dropdown selections
-
-        Only fields that exist in the template PDF will be filled - unknown field
-        names are silently ignored.
-
-        Args:
-            data: Dictionary mapping field names to values. Supported types:
-                str: For text fields
-                bool: For checkboxes (True=checked)
-                int: For numeric fields and dropdown selections
-            **kwargs: Additional options:
-                flatten (bool): If True, makes form fields read-only after filling
-                    (default: False)
-                adobe_mode (bool): If True, uses Adobe-compatible filling logic
-                    (default: False)
-
-        Returns:
-            FormWrapper: Returns self to allow method chaining
-        """
-
-        widgets = (
-            build_widgets(self.stream, self.use_full_widget_name, False)
-            if self.stream
-            else {}
-        )
-
-        for key, value in data.items():
-            if key in widgets:
-                widgets[key].value = value
-
-        self.stream = simple_fill(
-            self.read(),
-            widgets,
-            use_full_widget_name=self.use_full_widget_name,
-            flatten=kwargs.get("flatten", False),
-            adobe_mode=kwargs.get("adobe_mode", False),
-        )
-
-        return self
-
-
-class PdfWrapper(FormWrapper):
-    """Extended PDF form wrapper with advanced features.
-
-    Inherits from FormWrapper and adds capabilities for:
-    - Creating and modifying form widgets
-    - Drawing text and images
-    - Merging PDF documents
-    - Generating coordinate grids
-    - Form schema generation
-    - Font registration
-
-    Key Features:
-    - Maintains widget state and properties
-    - Supports per-page operations
-    - Handles PDF version management
-    - Provides preview functionality
-    """
-
     USER_PARAMS = [
         ("global_font", None),
         ("global_font_size", None),
@@ -201,7 +90,8 @@ class PdfWrapper(FormWrapper):
             - Any specified global settings from kwargs
         """
 
-        super().__init__(template)
+        super().__init__()
+        self.stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
         self._keys_to_update = []
 
@@ -254,6 +144,89 @@ class PdfWrapper(FormWrapper):
                 value.font = getattr(self, "global_font")
                 value.font_size = getattr(self, "global_font_size")
                 value.font_color = getattr(self, "global_font_color")
+
+    def read(self) -> bytes:
+        """Returns the raw bytes of the PDF form data.
+
+        This method provides access to the underlying PDF bytes after operations
+        like fill() have been performed. No parsing or analysis of the PDF
+        content is done - the bytes are returned as-is.
+
+        Returns:
+            bytes: The complete PDF document as a byte string
+        """
+
+        return self.stream
+
+    def fill(
+        self,
+        data: Dict[str, Union[str, bool, int]],
+        **kwargs,
+    ) -> FormWrapper:
+        """Fills form fields in the PDF with provided values.
+
+        Takes a dictionary of field names to values and updates the corresponding
+        form fields in the PDF. Supports these value types:
+            - Strings for text fields
+            - Booleans for checkboxes (True=checked, False=unchecked)
+            - Integers for numeric fields and dropdown selections
+
+        Only fields that exist in the template PDF will be filled - unknown field
+        names are silently ignored.
+
+        Args:
+            data: Dictionary mapping field names to values. Supported types:
+                str: For text fields
+                bool: For checkboxes (True=checked)
+                int: For numeric fields and dropdown selections
+            **kwargs: Additional options:
+                flatten (bool): If True, makes form fields read-only after filling
+                    (default: False)
+                adobe_mode (bool): If True, uses Adobe-compatible filling logic
+                    (default: False)
+
+        Returns:
+            FormWrapper: Returns self to allow method chaining
+        """
+
+        widgets = (
+            build_widgets(self.stream, getattr(self, "use_full_widget_name"), False)
+            if self.stream
+            else {}
+        )
+
+        for key, value in data.items():
+            if key in widgets:
+                widgets[key].value = value
+
+        self.stream = simple_fill(
+            self.read(),
+            widgets,
+            use_full_widget_name=getattr(self, "use_full_widget_name"),
+            flatten=kwargs.get("flatten", False),
+            adobe_mode=kwargs.get("adobe_mode", False),
+        )
+
+        return self
+
+
+class PdfWrapper(FormWrapper):
+    """Extended PDF form wrapper with advanced features.
+
+    Inherits from FormWrapper and adds capabilities for:
+    - Creating and modifying form widgets
+    - Drawing text and images
+    - Merging PDF documents
+    - Generating coordinate grids
+    - Form schema generation
+    - Font registration
+
+    Key Features:
+    - Maintains widget state and properties
+    - Supports per-page operations
+    - Handles PDF version management
+    - Provides preview functionality
+    """
 
     @property
     def sample_data(self) -> dict:
