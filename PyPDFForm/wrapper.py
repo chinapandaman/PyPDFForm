@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """Provides high-level wrapper classes for working with PDF forms.
 
-This module contains the FormWrapper and PdfWrapper classes which provide
-a user-friendly interface for:
-- Filling PDF form fields
-- Creating and modifying PDF form widgets
-- Drawing text and images on PDFs
-- Merging PDF documents
-- Generating coordinate grids
-- Other PDF manipulation tasks
+This module contains:
+- FormWrapper: The base class providing core PDF form functionality including:
+  * Creating and modifying PDF form widgets
+  * Drawing text and images on PDFs
+  * Merging PDF documents
+  * Generating coordinate grids
+  * Other PDF manipulation tasks
+
+- PdfWrapper: Extends FormWrapper with the fill() method for PDF form filling
 
 The wrappers handle low-level PDF operations while exposing simple methods
 for common use cases.
@@ -108,10 +109,10 @@ class FormWrapper:
         - Maintaining all page content and ordering
 
         Args:
-            other: Another PdfWrapper instance to merge with
+            other: Another FormWrapper instance to merge with
 
         Returns:
-            PdfWrapper: New wrapper containing merged PDF
+            FormWrapper: New wrapper containing merged PDF
         """
 
         if not self.stream:
@@ -191,7 +192,7 @@ class FormWrapper:
     def pages(self) -> List[FormWrapper]:
         """Returns individual page wrappers for each page in the PDF.
 
-        Creates a separate PdfWrapper instance for each page, maintaining all
+        Creates a separate FormWrapper instance for each page, maintaining all
         the original wrapper's settings (fonts, rendering options etc.). This
         allows per-page operations while preserving the parent's configuration.
 
@@ -199,7 +200,7 @@ class FormWrapper:
         repeated calls.
 
         Returns:
-            List[PdfWrapper]: List of wrapper objects, one per page
+            List[FormWrapper]: List of wrapper objects, one per page
         """
 
         return [
@@ -240,7 +241,7 @@ class FormWrapper:
             version: Target version string (e.g. '1.4', '1.7')
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
         """
 
         self.stream = self.stream.replace(
@@ -331,7 +332,7 @@ class FormWrapper:
             margin: Spacing between grid lines in PDF units (default: 100)
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
         """
 
         self.stream = generate_coordinate_grid(
@@ -436,7 +437,7 @@ class FormWrapper:
                 For signature/image: width, height, etc.
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining.
+            FormWrapper: Returns self to allow method chaining.
 
         Notes:
             - If an unsupported widget_type is provided, the method returns self unchanged.
@@ -491,7 +492,7 @@ class FormWrapper:
             defer: If True, queues the update for later batch processing
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
 
         Raises:
             NotImplementedError: When use_full_widget_name is enabled
@@ -519,7 +520,7 @@ class FormWrapper:
         multiple fields.
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
 
         Raises:
             NotImplementedError: When use_full_widget_name is enabled
@@ -567,7 +568,7 @@ class FormWrapper:
                 font_color: Font color as RGB tuple (default: (0, 0, 0))
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
         """
 
         new_widget = Text("new")
@@ -625,7 +626,7 @@ class FormWrapper:
             rotation: Rotation angle in degrees (default: 0)
 
         Returns:
-            PdfWrapper: Returns self to allow method chaining
+            FormWrapper: Returns self to allow method chaining
         """
 
         image = fp_or_f_obj_or_stream_to_stream(image)
@@ -651,7 +652,7 @@ class FormWrapper:
     ) -> bool:
         """Class method to register a TrueType font for use in PDF form text fields.
 
-        Registers the font globally so it can be used by all PdfWrapper instances.
+        Registers the font globally so it can be used by all FormWrapper instances.
         The font will be available when specified by name in text operations.
 
         Args:
@@ -668,21 +669,15 @@ class FormWrapper:
 
 
 class PdfWrapper(FormWrapper):
-    """Extended PDF form wrapper with advanced features.
+    """Extends FormWrapper with specialized PDF form filling capabilities.
 
-    Inherits from FormWrapper and adds capabilities for:
-    - Creating and modifying form widgets
-    - Drawing text and images
-    - Merging PDF documents
-    - Generating coordinate grids
-    - Form schema generation
-    - Font registration
+    This class provides an enhanced fill() method that:
+    - Preserves widget properties and positions during filling
+    - Converts dropdowns to text fields while maintaining choices
+    - Updates text field attributes and character spacing
+    - Handles Adobe-compatible form filling mode
 
-    Key Features:
-    - Maintains widget state and properties
-    - Supports per-page operations
-    - Handles PDF version management
-    - Provides preview functionality
+    All other PDF manipulation functionality is provided by the base FormWrapper class.
     """
 
     def fill(
