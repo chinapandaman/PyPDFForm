@@ -46,17 +46,15 @@ from .widgets.text import TextWidget
 
 
 class FormWrapper:
-    """Base class providing core PDF form filling functionality.
+    """Base class providing core PDF form initialization and filling functionality.
 
-    This wrapper handles basic PDF form operations:
-    - Accessing raw PDF data through the read() method
-    - Filling existing form fields with provided values
-
-    Note: This class does not parse or analyze form fields - it only fills values
-    into fields that already exist in the template PDF.
+    This wrapper handles:
+    - Initializing PDF form with template and configuration
+    - Basic PDF form operations like filling existing form fields
+    - Managing widget state and properties
 
     The FormWrapper is designed to be extended by PdfWrapper which adds
-    more advanced features like form analysis and widget creation.
+    more advanced features like form analysis, widget creation, and PDF manipulation.
     """
 
     USER_PARAMS = [
@@ -72,7 +70,7 @@ class FormWrapper:
         template: Union[bytes, str, BinaryIO] = b"",
         **kwargs,
     ) -> None:
-        """Initializes the PDF wrapper with template and configuration.
+        """Initializes the PDF form wrapper with template and configuration.
 
         Args:
             template: PDF form as bytes, file path, or file object. Defaults to
@@ -85,6 +83,7 @@ class FormWrapper:
                 render_widgets: Whether to render widgets in the PDF
 
         Initializes:
+            - PDF stream from the provided template
             - Widgets dictionary to track form fields
             - Keys update queue for deferred operations
             - Any specified global settings from kwargs
@@ -104,15 +103,15 @@ class FormWrapper:
         """Internal method to refresh widget state after PDF stream changes.
 
         Called whenever the underlying PDF stream is modified to:
-        - Rebuild the widgets dictionary
-        - Preserve existing widget properties
+        - Rebuild the widgets dictionary from the current PDF stream
+        - Preserve existing widget properties when possible
         - Apply global font settings to text widgets
-        - Handle special refresh cases for specific widgets
+        - Handle special refresh cases for specific widget types
 
         Args:
             key_to_refresh: Optional specific widget key that needs refreshing.
-                If provided, only that widget's font properties will be updated.
-                If None, all text widgets will have their fonts updated.
+                If provided, only that widget's properties will be updated.
+                If None, all text widgets will have their properties updated.
 
         Note:
             This is an internal method and typically shouldn't be called directly.
