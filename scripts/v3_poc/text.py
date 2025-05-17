@@ -13,6 +13,7 @@ for page in out.pages:
     for annot in page.get("/Annots", []):
         annot = cast(DictionaryObject, annot.get_object())
         da = annot["/DA"].split(" ")
+        da[0] = "/Cour"  # font
         da[1] = "20"  # font_size
         da = da[:3] + ["0", "1", "0", "rg"]  # font_color
         annot[NameObject("/DA")] = TextStringObject(" ".join(da))
