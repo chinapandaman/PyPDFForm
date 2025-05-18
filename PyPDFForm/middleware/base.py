@@ -54,9 +54,7 @@ class Widget:
 
     def __setattr__(self, name: str, value: Any):
         if name in self.SET_ATTR_TRIGGER_HOOK_MAP and value is not None:
-            self.hooks_to_trigger.append(
-                (self.SET_ATTR_TRIGGER_HOOK_MAP[name], value)
-            )
+            self.hooks_to_trigger.append((self.SET_ATTR_TRIGGER_HOOK_MAP[name], value))
         super().__setattr__(name, value)
 
     @property

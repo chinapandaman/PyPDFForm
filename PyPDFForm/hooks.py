@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from io import BytesIO
 import sys
-from typing import cast, BinaryIO
+from io import BytesIO
+from typing import BinaryIO, cast
+
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject, NameObject, TextStringObject
-from .constants import Parent, DA, FONT_SIZE_IDENTIFIER, Annots
+
+from .constants import DA, FONT_SIZE_IDENTIFIER, Annots, Parent
 from .template import get_widget_key
 
 
@@ -55,6 +57,8 @@ def update_text_field_font_size(annot: DictionaryObject, value: float) -> None:
     new_text_appearance = " ".join(text_appearance)
 
     if Parent in annot and DA not in annot:
-        annot[NameObject(Parent)][NameObject(DA)] = TextStringObject(new_text_appearance)
+        annot[NameObject(Parent)][NameObject(DA)] = TextStringObject(
+            new_text_appearance
+        )
     else:
         annot[NameObject(DA)] = TextStringObject(new_text_appearance)

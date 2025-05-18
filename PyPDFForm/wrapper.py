@@ -26,6 +26,7 @@ from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
 from .coordinate import generate_coordinate_grid
 from .filler import fill, simple_fill
 from .font import register_font
+from .hooks import trigger_widget_hooks
 from .image import rotate_image
 from .middleware.dropdown import Dropdown
 from .middleware.text import Text
@@ -36,7 +37,6 @@ from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
                     preview_widget_to_draw, remove_all_widgets, stream_to_io)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
-from .hooks import trigger_widget_hooks
 from .widgets.base import handle_non_acro_form_params
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
@@ -178,6 +178,7 @@ class PdfWrapper(FormWrapper):
         ("use_full_widget_name", False),
         ("render_widgets", True),
     ]
+    TRIGGER_WIDGET_HOOKS = False
 
     def __init__(
         self,
@@ -256,8 +257,15 @@ class PdfWrapper(FormWrapper):
                 value.font_size = getattr(self, "global_font_size")
                 value.font_color = getattr(self, "global_font_color")
 
-    def read(self):
-        self.stream = trigger_widget_hooks(stream_to_io(self.stream), self.widgets, getattr(self, "use_full_widget_name"))
+    def read(self) -> bytes:
+        if self.TRIGGER_WIDGET_HOOKS:
+            for widget in self.widgets.values():
+                if widget.hooks_to_trigger:
+                    self.stream = trigger_widget_hooks(
+                        stream_to_io(self.stream),
+                        self.widgets,
+                        getattr(self, "use_full_widget_name"),
+                    )
 
         return self.stream
 
