@@ -28,7 +28,7 @@ def trigger_widget_hooks(
                 continue
 
             for hook in widget.hooks_to_trigger:
-                hook[0](annot, hook[1])
+                globals()[hook[0]](annot, hook[1])
 
             widget.hooks_to_trigger = []
 

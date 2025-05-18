@@ -12,7 +12,6 @@ This module contains the Text class which handles:
 from typing import Any
 
 from .base import Widget
-from ..hooks import update_text_field_font_size
 
 
 class Text(Widget):
@@ -29,7 +28,7 @@ class Text(Widget):
     """
 
     SET_ATTR_TRIGGER_HOOK_MAP = {
-        "font_size": update_text_field_font_size,
+        "font_size": "update_text_field_font_size",
     }
 
     def __init__(
