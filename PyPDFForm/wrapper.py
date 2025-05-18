@@ -10,7 +10,7 @@ This module contains:
   * Generating coordinate grids
   * Other PDF manipulation tasks
 
-- PdfWrapper: Extends FormWrapper with additional PDF manipulation capabilities
+- PdfWrapper: Extends FormWrapper with specialized PDF form filling capabilities.
 
 The wrappers handle low-level PDF operations while exposing simple methods
 for common use cases.
