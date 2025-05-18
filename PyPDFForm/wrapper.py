@@ -46,103 +46,46 @@ from .widgets.text import TextWidget
 
 
 class FormWrapper:
-    """Base class providing core PDF form initialization and filling functionality.
+    """Base class providing core PDF form filling functionality.
 
-    This wrapper handles:
-    - Initializing PDF form with template and configuration
-    - Basic PDF form operations like filling existing form fields
-    - Managing widget state and properties
+    This wrapper handles basic PDF form operations:
+    - Accessing raw PDF data through the read() method
+    - Filling existing form fields with provided values
+
+    Note: This class does not parse or analyze form fields - it only fills values
+    into fields that already exist in the template PDF.
 
     The FormWrapper is designed to be extended by PdfWrapper which adds
-    more advanced features like form analysis, widget creation, and PDF manipulation.
+    more advanced features like form analysis and widget creation.
     """
-
-    USER_PARAMS = [
-        ("global_font", None),
-        ("global_font_size", None),
-        ("global_font_color", None),
-        ("use_full_widget_name", False),
-        ("render_widgets", True),
-    ]
 
     def __init__(
         self,
         template: Union[bytes, str, BinaryIO] = b"",
         **kwargs,
     ) -> None:
-        """Initializes the PDF form wrapper with template and configuration.
+        """Initializes the base form wrapper with a PDF template.
 
         Args:
             template: PDF form as bytes, file path, or file object. Defaults to
                 empty bytes if not provided.
-            **kwargs: Optional configuration parameters including:
-                global_font: Default font name for text fields
-                global_font_size: Default font size
-                global_font_color: Default font color as RGB tuple
-                use_full_widget_name: Whether to use full widget names
-                render_widgets: Whether to render widgets in the PDF
+            **kwargs: Additional options:
+                use_full_widget_name: If True, uses complete widget names including
+                    field hierarchy (default: False)
 
         Initializes:
-            - PDF stream from the provided template
-            - Widgets dictionary to track form fields
-            - Keys update queue for deferred operations
-            - Any specified global settings from kwargs
+            - Internal PDF stream from the template
+            - Basic form filling capabilities
+            - Widget naming configuration from kwargs
+
+        Note:
+            This base class is designed to be extended by PdfWrapper which adds
+            more advanced features. For most use cases, you'll want to use PdfWrapper.
         """
 
         super().__init__()
         self.stream = fp_or_f_obj_or_stream_to_stream(template)
-        self.widgets = {}
-        self._keys_to_update = []
-
-        for attr, default in self.USER_PARAMS:
-            setattr(self, attr, kwargs.get(attr, default))
-
-        self._init_helper()
-
-    def _init_helper(self, key_to_refresh: str = None) -> None:
-        """Internal method to refresh widget state after PDF stream changes.
-
-        Called whenever the underlying PDF stream is modified to:
-        - Rebuild the widgets dictionary from the current PDF stream
-        - Preserve existing widget properties when possible
-        - Apply global font settings to text widgets
-        - Handle special refresh cases for specific widget types
-
-        Args:
-            key_to_refresh: Optional specific widget key that needs refreshing.
-                If provided, only that widget's properties will be updated.
-                If None, all text widgets will have their properties updated.
-
-        Note:
-            This is an internal method and typically shouldn't be called directly.
-            It's automatically invoked after operations that modify the PDF stream.
-        """
-
-        refresh_not_needed = {}
-        new_widgets = (
-            build_widgets(
-                self.read(),
-                getattr(self, "use_full_widget_name"),
-                getattr(self, "render_widgets"),
-            )
-            if self.read()
-            else {}
-        )
-        for k, v in self.widgets.items():
-            if k in new_widgets:
-                new_widgets[k] = v
-                refresh_not_needed[k] = True
-        self.widgets = new_widgets
-
-        for key, value in self.widgets.items():
-            if (key_to_refresh and key == key_to_refresh) or (
-                key_to_refresh is None
-                and isinstance(value, Text)
-                and not refresh_not_needed.get(key)
-            ):
-                value.font = getattr(self, "global_font")
-                value.font_size = getattr(self, "global_font_size")
-                value.font_color = getattr(self, "global_font_color")
+        self.use_full_widget_name = kwargs.get("use_full_widget_name", False)
 
     def read(self) -> bytes:
         """Returns the raw bytes of the PDF form data.
@@ -189,7 +132,7 @@ class FormWrapper:
         """
 
         widgets = (
-            build_widgets(self.stream, getattr(self, "use_full_widget_name"), False)
+            build_widgets(self.stream, self.use_full_widget_name, False)
             if self.stream
             else {}
         )
@@ -201,7 +144,7 @@ class FormWrapper:
         self.stream = simple_fill(
             self.read(),
             widgets,
-            use_full_widget_name=getattr(self, "use_full_widget_name"),
+            use_full_widget_name=self.use_full_widget_name,
             flatten=kwargs.get("flatten", False),
             adobe_mode=kwargs.get("adobe_mode", False),
         )
@@ -226,6 +169,91 @@ class PdfWrapper(FormWrapper):
     - Handles PDF version management
     - Provides preview functionality
     """
+
+    USER_PARAMS = [
+        ("global_font", None),
+        ("global_font_size", None),
+        ("global_font_color", None),
+        ("use_full_widget_name", False),
+        ("render_widgets", True),
+    ]
+
+    def __init__(
+        self,
+        template: Union[bytes, str, BinaryIO] = b"",
+        **kwargs,
+    ) -> None:
+        """Initializes the PDF wrapper with template and configuration.
+
+        Args:
+            template: PDF form as bytes, file path, or file object. Defaults to
+                empty bytes if not provided.
+            **kwargs: Optional configuration parameters including:
+                global_font: Default font name for text fields
+                global_font_size: Default font size
+                global_font_color: Default font color as RGB tuple
+                use_full_widget_name: Whether to use full widget names
+                render_widgets: Whether to render widgets in the PDF
+
+        Initializes:
+            - Widgets dictionary to track form fields
+            - Keys update queue for deferred operations
+            - Any specified global settings from kwargs
+        """
+
+        super().__init__(template)
+        self.widgets = {}
+        self._keys_to_update = []
+
+        for attr, default in self.USER_PARAMS:
+            setattr(self, attr, kwargs.get(attr, default))
+
+        self._init_helper()
+
+    def _init_helper(self, key_to_refresh: str = None) -> None:
+        """Internal method to refresh widget state after PDF stream changes.
+
+        Called whenever the underlying PDF stream is modified to:
+        - Rebuild the widgets dictionary
+        - Preserve existing widget properties
+        - Apply global font settings to text widgets
+        - Handle special refresh cases for specific widgets
+
+        Args:
+            key_to_refresh: Optional specific widget key that needs refreshing.
+                If provided, only that widget's font properties will be updated.
+                If None, all text widgets will have their fonts updated.
+
+        Note:
+            This is an internal method and typically shouldn't be called directly.
+            It's automatically invoked after operations that modify the PDF stream.
+        """
+
+        refresh_not_needed = {}
+        new_widgets = (
+            build_widgets(
+                self.read(),
+                getattr(self, "use_full_widget_name"),
+                getattr(self, "render_widgets"),
+            )
+            if self.read()
+            else {}
+        )
+        for k, v in self.widgets.items():
+            if k in new_widgets:
+                new_widgets[k] = v
+                refresh_not_needed[k] = True
+        self.widgets = new_widgets
+
+        for key, value in self.widgets.items():
+            if (key_to_refresh and key == key_to_refresh) or (
+                key_to_refresh is None
+                and isinstance(value, Text)
+                and not refresh_not_needed.get(key)
+            ):
+                value.font = getattr(self, "global_font")
+                value.font_size = getattr(self, "global_font_size")
+                value.font_color = getattr(self, "global_font_color")
 
     @property
     def sample_data(self) -> dict:
