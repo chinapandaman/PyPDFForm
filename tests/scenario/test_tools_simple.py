@@ -28,7 +28,7 @@ def test_filling_pdf_escape_pdf_form(tool_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_filling_docfly_pdf_form(tool_pdf_directory, pdf_samples, request):
@@ -54,7 +54,7 @@ def test_filling_docfly_pdf_form(tool_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_filling_soda_pdf_form(tool_pdf_directory, pdf_samples, request):
@@ -82,4 +82,4 @@ def test_filling_soda_pdf_form(tool_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected

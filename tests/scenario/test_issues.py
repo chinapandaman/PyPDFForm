@@ -97,7 +97,7 @@ def test_521(issue_pdf_directory, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(

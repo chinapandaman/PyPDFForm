@@ -30,7 +30,7 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
@@ -70,7 +70,7 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_issue_613(pdf_samples, request):
@@ -94,7 +94,7 @@ def test_issue_613(pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_sample_template_libary(pdf_samples, request):
@@ -155,4 +155,4 @@ def test_sample_template_libary(pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected

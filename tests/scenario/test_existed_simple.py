@@ -56,7 +56,7 @@ def test_illinois_gun_bill_of_sale(existed_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_ds82(existed_pdf_directory, pdf_samples, request):
@@ -76,7 +76,7 @@ def test_ds82(existed_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_ds82_all_chars_lowercase(existed_pdf_directory, pdf_samples, request):
@@ -100,7 +100,7 @@ def test_ds82_all_chars_lowercase(existed_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_ds82_all_chars_uppercase(existed_pdf_directory, pdf_samples, request):
@@ -124,7 +124,7 @@ def test_ds82_all_chars_uppercase(existed_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_ds82_mixed_case(existed_pdf_directory, pdf_samples, request):
@@ -144,7 +144,7 @@ def test_ds82_mixed_case(existed_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_illinois_real_estate_power_of_attorney_form(
@@ -190,4 +190,4 @@ def test_illinois_real_estate_power_of_attorney_form(
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected

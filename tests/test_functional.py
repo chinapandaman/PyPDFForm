@@ -22,13 +22,13 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
         for widgets in template.get_widgets_by_page(obj.read()).values():
             assert not widgets
@@ -44,13 +44,13 @@ def test_fill_not_render_widgets(template_stream, pdf_samples, data_dict, reques
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
 
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_register_bad_fonts():
@@ -83,7 +83,7 @@ def test_fill_font_liberation_serif_italic(
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
         for k, v in obj.widgets.items():
             assert k in data_dict
@@ -108,7 +108,7 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
         for k, v in obj.widgets.items():
             assert k in data_dict
@@ -134,7 +134,7 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
         for k, v in obj.widgets.items():
             assert k in data_dict
@@ -164,7 +164,7 @@ def test_fill_with_customized_widgets(template_stream, pdf_samples, data_dict, r
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
         for k, v in obj.widgets.items():
             assert k in data_dict
@@ -194,7 +194,7 @@ def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream, request
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_fill_sejda_and_read(sejda_template, pdf_samples, sejda_data, request):
@@ -206,13 +206,13 @@ def test_fill_sejda_and_read(sejda_template, pdf_samples, sejda_data, request):
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_draw_text_on_one_page(template_stream, pdf_samples, request):
@@ -233,8 +233,8 @@ def test_draw_text_on_one_page(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_draw_text_on_radio_template(
@@ -257,8 +257,8 @@ def test_draw_text_on_radio_template(
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_draw_text_on_sejda_template(sejda_template, pdf_samples, request):
@@ -279,8 +279,8 @@ def test_draw_text_on_sejda_template(sejda_template, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_draw_text_new_line_symbol(template_stream, pdf_samples, request):
@@ -300,8 +300,8 @@ def test_draw_text_new_line_symbol(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples, request):
@@ -322,8 +322,8 @@ def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples, req
         if os.name != "nt":
             request.config.results["expected_path"] = expected_path
             request.config.results["stream"] = obj.read()
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
 
 
 def test_draw_image_on_radio_template(
@@ -346,8 +346,8 @@ def test_draw_image_on_radio_template(
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_draw_image_on_sejda_template(
@@ -370,8 +370,8 @@ def test_draw_image_on_sejda_template(
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_draw_png_image_on_one_page(
@@ -393,8 +393,8 @@ def test_draw_png_image_on_one_page(
         if os.name != "nt":
             request.config.results["expected_path"] = expected_path
             request.config.results["stream"] = obj.read()
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
 
 
 def test_draw_transparent_png_image_on_one_page(
@@ -416,8 +416,8 @@ def test_draw_transparent_png_image_on_one_page(
         if os.name != "nt":
             request.config.results["expected_path"] = expected_path
             request.config.results["stream"] = obj.read()
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
 
 
 def test_addition_operator_3_times(template_stream, pdf_samples, data_dict, request):
@@ -541,13 +541,13 @@ def test_fill_right_aligned(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
         for widgets in template.get_widgets_by_page(obj.read()).values():
             assert not widgets
@@ -579,14 +579,14 @@ def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request)
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
         if os.name != "nt":
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
 
 
 def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, request):
@@ -615,8 +615,8 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
         expected = f.read()
 
         if os.name != "nt":
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
 
 
 def test_pages(template_stream, pdf_samples, request):
@@ -706,7 +706,7 @@ def test_generate_coordinate_grid(template_stream, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_generate_coordinate_grid_margin_50(template_stream, pdf_samples, request):
@@ -722,7 +722,7 @@ def test_generate_coordinate_grid_margin_50(template_stream, pdf_samples, reques
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_checkbox_change_size_and_button_style(template_stream, pdf_samples, request):
@@ -751,7 +751,7 @@ def test_checkbox_change_size_and_button_style(template_stream, pdf_samples, req
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_radio_change_size_and_button_style(
@@ -782,7 +782,7 @@ def test_radio_change_size_and_button_style(
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_fill_image(
@@ -800,7 +800,7 @@ def test_fill_image(
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_update_radio_key(template_with_radiobutton_stream, pdf_samples, request):
