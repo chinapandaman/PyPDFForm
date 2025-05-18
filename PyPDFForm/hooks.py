@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from io import BytesIO
+import sys
 from typing import cast, BinaryIO
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject, NameObject, TextStringObject
@@ -27,7 +28,7 @@ def trigger_widget_hooks(
                 continue
 
             for hook in widget.hooks_to_trigger:
-                globals()[hook[0]](annot, hook[1])
+                getattr(sys.modules[__name__], hook[0])(annot, hook[1])
 
             widget.hooks_to_trigger = []
 
