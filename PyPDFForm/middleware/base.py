@@ -26,6 +26,8 @@ class Widget:
     - Any widget-specific functionality
     """
 
+    SET_ATTR_TRIGGER_HOOK_MAP = {}
+
     def __init__(
         self,
         name: str,
@@ -48,6 +50,14 @@ class Widget:
         self.border_style = None
         self.dash_array = None
         self.render_widget = None
+        self.hooks_to_trigger = []
+
+    def __setattr__(self, name: str, value: Any):
+        if name in self.SET_ATTR_TRIGGER_HOOK_MAP and value is not None:
+            self.hooks_to_trigger.append(
+                (self.SET_ATTR_TRIGGER_HOOK_MAP[name], value)
+            )
+        super().__setattr__(name, value)
 
     @property
     def name(self) -> str:
