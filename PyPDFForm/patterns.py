@@ -275,7 +275,7 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
         annot[NameObject(T)] = TextStringObject(val)
 
 
-def update_created_text_field_alignment(annot: DictionaryObject, val: int) -> None:
+def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
     """Update text alignment for created text field annotations.
 
     Modifies the alignment (Q) field of a text field annotation created
@@ -289,7 +289,7 @@ def update_created_text_field_alignment(annot: DictionaryObject, val: int) -> No
     annot[NameObject(Q)] = NumberObject(val)
 
 
-def update_created_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
+def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
     """Update multiline flag for created text field annotations.
 
     Modifies the field flags (Ff) of a text field annotation created by
@@ -305,6 +305,6 @@ def update_created_text_field_multiline(annot: DictionaryObject, val: bool) -> N
 
 
 NON_ACRO_FORM_PARAM_TO_FUNC = {
-    ("TextWidget", "alignment"): update_created_text_field_alignment,
-    ("TextWidget", "multiline"): update_created_text_field_multiline,
+    ("TextWidget", "alignment"): update_text_field_alignment,
+    ("TextWidget", "multiline"): update_text_field_multiline,
 }
