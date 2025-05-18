@@ -17,10 +17,10 @@ def trigger_widget_hooks(
     use_full_widget_name: bool,
 ) -> bytes:
     pdf_file = PdfReader(pdf)
-    out = PdfWriter()
-    out.append(pdf_file)
+    output = PdfWriter()
+    output.append(pdf_file)
 
-    for page in out.pages:
+    for page in output.pages:
         for annot in page.get(Annots, []):
             annot = cast(DictionaryObject, annot.get_object())
             key = get_widget_key(annot.get_object(), use_full_widget_name)
@@ -35,7 +35,7 @@ def trigger_widget_hooks(
             widget.hooks_to_trigger = []
 
     with BytesIO() as f:
-        out.write(f)
+        output.write(f)
         f.seek(0)
         return f.read()
 
