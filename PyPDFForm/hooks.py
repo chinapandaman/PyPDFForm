@@ -4,6 +4,8 @@ from io import BytesIO
 from typing import cast, BinaryIO
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject, NameObject, TextStringObject
+from .constants import Parent, DA, FONT_SIZE_IDENTIFIER, Annots
+from .template import get_widget_key
 
 
 def trigger_widget_hooks(
@@ -11,9 +13,6 @@ def trigger_widget_hooks(
     widgets: dict,
     use_full_widget_name: bool,
 ) -> bytes:
-    from .constants import Annots
-    from .template import get_widget_key
-
     pdf_file = PdfReader(pdf)
     out = PdfWriter()
     out.append(pdf_file)
@@ -39,8 +38,6 @@ def trigger_widget_hooks(
 
 
 def update_text_field_font_size(annot: DictionaryObject, value: float) -> None:
-    from .constants import Parent, DA, FONT_SIZE_IDENTIFIER
-
     if Parent in annot and DA not in annot:
         text_appearance = annot[Parent][DA]
     else:
