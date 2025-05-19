@@ -2,21 +2,22 @@
 
 import sys
 from io import BytesIO
-from typing import BinaryIO, cast
+from typing import cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject, NameObject, TextStringObject
 
 from .constants import DA, FONT_SIZE_IDENTIFIER, Annots, Parent
 from .template import get_widget_key
+from .utils import stream_to_io
 
 
 def trigger_widget_hooks(
-    pdf: BinaryIO,
+    pdf: bytes,
     widgets: dict,
     use_full_widget_name: bool,
 ) -> bytes:
-    pdf_file = PdfReader(pdf)
+    pdf_file = PdfReader(stream_to_io(pdf))
     output = PdfWriter()
     output.append(pdf_file)
 

@@ -34,7 +34,7 @@ from .template import (build_widgets, dropdown_to_text,
                        set_character_x_paddings, update_text_field_attributes,
                        update_widget_keys)
 from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
-                    preview_widget_to_draw, remove_all_widgets, stream_to_io)
+                    preview_widget_to_draw, remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
 from .widgets.base import handle_non_acro_form_params
@@ -262,7 +262,7 @@ class PdfWrapper(FormWrapper):
             for widget in self.widgets.values():
                 if widget.hooks_to_trigger:
                     self._stream = trigger_widget_hooks(
-                        stream_to_io(self._stream),
+                        self._stream,
                         self.widgets,
                         getattr(self, "use_full_widget_name"),
                     )
