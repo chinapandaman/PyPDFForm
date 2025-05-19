@@ -29,6 +29,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     width=120,  # optional
     height=40,  # optional
     max_length=5,   # optional
+    comb=True,  # optional, when set to True, max_length also must be set
     font="Courier", # optional
     font_size=15,   # optional
     font_color=(1, 0, 0),   # optional
