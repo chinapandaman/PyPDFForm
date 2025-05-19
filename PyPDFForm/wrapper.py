@@ -133,8 +133,8 @@ class FormWrapper:
         """
 
         widgets = (
-            build_widgets(self.stream, self.use_full_widget_name, False)
-            if self.stream
+            build_widgets(self.read(), self.use_full_widget_name, False)
+            if self.read()
             else {}
         )
 
@@ -143,7 +143,7 @@ class FormWrapper:
                 widgets[key].value = value
 
         self.stream = simple_fill(
-            self.stream,
+            self.read(),
             widgets,
             use_full_widget_name=self.use_full_widget_name,
             flatten=kwargs.get("flatten", False),
@@ -234,11 +234,11 @@ class PdfWrapper(FormWrapper):
         refresh_not_needed = {}
         new_widgets = (
             build_widgets(
-                self.stream,
+                self.read(),
                 getattr(self, "use_full_widget_name"),
                 getattr(self, "render_widgets"),
             )
-            if self.stream
+            if self.read()
             else {}
         )
         for k, v in self.widgets.items():
@@ -301,7 +301,7 @@ class PdfWrapper(FormWrapper):
         """
 
         for each in VERSION_IDENTIFIERS:
-            if self.stream.startswith(each):
+            if self.read().startswith(each):
                 return each.replace(VERSION_IDENTIFIER_PREFIX, b"").decode()
 
         return None
@@ -323,10 +323,10 @@ class PdfWrapper(FormWrapper):
 
         return [
             self.__class__(
-                copy_watermark_widgets(each, self.stream, None, i),
+                copy_watermark_widgets(each, self.read(), None, i),
                 **{param: getattr(self, param) for param, _ in self.USER_PARAMS},
             )
-            for i, each in enumerate(get_page_streams(remove_all_widgets(self.stream)))
+            for i, each in enumerate(get_page_streams(remove_all_widgets(self.read())))
         ]
 
     def change_version(self, version: str) -> PdfWrapper:
@@ -342,7 +342,7 @@ class PdfWrapper(FormWrapper):
             PdfWrapper: Returns self to allow method chaining
         """
 
-        self.stream = self.stream.replace(
+        self.stream = self.read().replace(
             VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
             VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
             1,
@@ -365,10 +365,10 @@ class PdfWrapper(FormWrapper):
             PdfWrapper: New wrapper containing merged PDF
         """
 
-        if not self.stream:
+        if not self.read():
             return other
 
-        if not other.stream:
+        if not other.read():
             return self
 
         unique_suffix = generate_unique_suffix()
@@ -378,7 +378,7 @@ class PdfWrapper(FormWrapper):
 
         other.commit_widget_key_updates()
 
-        return self.__class__(merge_two_pdfs(self.stream, other.stream))
+        return self.__class__(merge_two_pdfs(self.read(), other.read()))
 
     @property
     def preview(self) -> bytes:
@@ -395,7 +395,7 @@ class PdfWrapper(FormWrapper):
 
         return remove_all_widgets(
             fill(
-                self.stream,
+                self.read(),
                 {
                     key: preview_widget_to_draw(key, value, True)
                     for key, value in self.widgets.items()
@@ -425,7 +425,7 @@ class PdfWrapper(FormWrapper):
         self.stream = generate_coordinate_grid(
             remove_all_widgets(
                 fill(
-                    self.stream,
+                    self.read(),
                     {
                         key: preview_widget_to_draw(key, value, False)
                         for key, value in self.widgets.items()
@@ -468,15 +468,15 @@ class PdfWrapper(FormWrapper):
                 self.widgets[key] = dropdown_to_text(value)
 
         update_text_field_attributes(
-            self.stream, self.widgets, getattr(self, "use_full_widget_name")
+            self.read(), self.widgets, getattr(self, "use_full_widget_name")
         )
-        if self.stream:
+        if self.read():
             self.widgets = set_character_x_paddings(
-                self.stream, self.widgets, getattr(self, "use_full_widget_name")
+                self.read(), self.widgets, getattr(self, "use_full_widget_name")
             )
 
         self.stream = remove_all_widgets(
-            fill(self.stream, self.widgets, getattr(self, "use_full_widget_name"))
+            fill(self.read(), self.widgets, getattr(self, "use_full_widget_name"))
         )
 
         return self
@@ -539,12 +539,12 @@ class PdfWrapper(FormWrapper):
             return self
 
         obj = _class(name=name, page_number=page_number, x=x, y=y, **kwargs)
-        watermarks = obj.watermarks(self.stream)
+        watermarks = obj.watermarks(self.read())
 
-        self.stream = copy_watermark_widgets(self.stream, watermarks, [name], None)
+        self.stream = copy_watermark_widgets(self.read(), watermarks, [name], None)
         if obj.non_acro_form_params:
             self.stream = handle_non_acro_form_params(
-                self.stream, name, obj.non_acro_form_params
+                self.read(), name, obj.non_acro_form_params
             )
 
         key_to_refresh = ""
@@ -584,7 +584,7 @@ class PdfWrapper(FormWrapper):
             return self
 
         self.stream = update_widget_keys(
-            self.stream, self.widgets, [old_key], [new_key], [index]
+            self.read(), self.widgets, [old_key], [new_key], [index]
         )
         self._init_helper()
 
@@ -612,7 +612,7 @@ class PdfWrapper(FormWrapper):
         indices = [each[2] for each in self._keys_to_update]
 
         self.stream = update_widget_keys(
-            self.stream, self.widgets, old_keys, new_keys, indices
+            self.read(), self.widgets, old_keys, new_keys, indices
         )
         self._init_helper()
         self._keys_to_update = []
@@ -659,7 +659,7 @@ class PdfWrapper(FormWrapper):
             new_widget.text_lines = text.split(NEW_LINE_SYMBOL)
 
         watermarks = create_watermarks_and_draw(
-            self.stream,
+            self.read(),
             page_number,
             "text",
             [
@@ -671,10 +671,10 @@ class PdfWrapper(FormWrapper):
             ],
         )
 
-        stream_with_widgets = self.stream
-        self.stream = merge_watermarks_with_pdf(self.stream, watermarks)
+        stream_with_widgets = self.read()
+        self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
         self.stream = copy_watermark_widgets(
-            remove_all_widgets(self.stream), stream_with_widgets, None, None
+            remove_all_widgets(self.read()), stream_with_widgets, None, None
         )
 
         return self
@@ -710,16 +710,16 @@ class PdfWrapper(FormWrapper):
         image = fp_or_f_obj_or_stream_to_stream(image)
         image = rotate_image(image, rotation)
         watermarks = create_watermarks_and_draw(
-            self.stream,
+            self.read(),
             page_number,
             "image",
             [{"stream": image, "x": x, "y": y, "width": width, "height": height}],
         )
 
-        stream_with_widgets = self.stream
-        self.stream = merge_watermarks_with_pdf(self.stream, watermarks)
+        stream_with_widgets = self.read()
+        self.stream = merge_watermarks_with_pdf(self.read(), watermarks)
         self.stream = copy_watermark_widgets(
-            remove_all_widgets(self.stream), stream_with_widgets, None, None
+            remove_all_widgets(self.read()), stream_with_widgets, None, None
         )
 
         return self
