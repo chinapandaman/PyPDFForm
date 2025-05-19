@@ -19,9 +19,9 @@ from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
 from .constants import (AP, AS, BC, BG, BS, CA, DA, DV, FT,
-                        IMAGE_FIELD_IDENTIFIER, JS, MK, MULTILINE, READ_ONLY,
-                        TU, A, Btn, Ch, D, Ff, I, N, Off, Opt, Parent, Q, S,
-                        Sig, T, Tx, V, W, Yes)
+                        IMAGE_FIELD_IDENTIFIER, JS, MK, READ_ONLY, TU, A, Btn,
+                        Ch, D, Ff, I, N, Off, Opt, Parent, Q, S, Sig, T, Tx, V,
+                        W, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -273,38 +273,3 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
         annot[NameObject(Parent)][NameObject(T)] = TextStringObject(val)
     else:
         annot[NameObject(T)] = TextStringObject(val)
-
-
-def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
-    """Update text alignment for text field annotations.
-
-    Modifies the alignment (Q) field of a text field annotation to set the
-    specified text alignment.
-
-    Args:
-        annot: PDF text field annotation dictionary to modify
-        val: Alignment value to set (typically 0=left, 1=center, 2=right)
-    """
-
-    annot[NameObject(Q)] = NumberObject(val)
-
-
-def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
-    """Update multiline flag for text field annotations.
-
-    Modifies the field flags (Ff) of a text field annotation to set or
-    clear the multiline flag based on the input value.
-
-    Args:
-        annot: PDF text field annotation dictionary to modify
-        val: Whether to enable multiline (True) or disable (False)
-    """
-
-    if val:
-        annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | MULTILINE)
-
-
-NON_ACRO_FORM_PARAM_TO_FUNC = {
-    ("TextWidget", "alignment"): update_text_field_alignment,
-    ("TextWidget", "multiline"): update_text_field_multiline,
-}
