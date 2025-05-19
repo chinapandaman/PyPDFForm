@@ -23,7 +23,7 @@ def test_pdf_form_with_pages_without_widgets(issue_pdf_directory, pdf_samples, r
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_pdf_form_with_central_aligned_text_fields(
@@ -47,7 +47,7 @@ def test_pdf_form_with_central_aligned_text_fields(
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_pdf_form_with_paragraph_fields_new_line_symbol_text(issue_pdf_directory):
@@ -83,7 +83,7 @@ def test_pdf_form_with_paragraph_fields_new_line_symbol_text_overflow(
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_521(issue_pdf_directory, pdf_samples, request):
@@ -105,7 +105,7 @@ def test_521(issue_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_521_flattened(issue_pdf_directory, pdf_samples, request):
@@ -128,7 +128,7 @@ def test_521_flattened(issue_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(issue_pdf_directory):
@@ -189,7 +189,7 @@ def test_encrypted_edit_pdf_form(issue_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_ppf_627_fill_0(issue_pdf_directory, pdf_samples, request):
@@ -207,7 +207,7 @@ def test_ppf_627_fill_0(issue_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_ppf_627_fill_1(issue_pdf_directory, pdf_samples, request):
@@ -225,7 +225,7 @@ def test_ppf_627_fill_1(issue_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_ppf_627_fill_2(issue_pdf_directory, pdf_samples, request):
@@ -243,7 +243,7 @@ def test_ppf_627_fill_2(issue_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_ppf_627_fill_3(issue_pdf_directory, pdf_samples, request):
@@ -261,7 +261,7 @@ def test_ppf_627_fill_3(issue_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_polish(issue_pdf_directory, pdf_samples, request):
@@ -289,7 +289,7 @@ def test_polish(issue_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_polish_use_full_widget_name(issue_pdf_directory, pdf_samples, request):
@@ -319,4 +319,4 @@ def test_polish_use_full_widget_name(issue_pdf_directory, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected

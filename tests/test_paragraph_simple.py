@@ -21,7 +21,7 @@ def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples, req
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, request):
@@ -41,7 +41,7 @@ def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, reques
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_paragraph_auto_font(
@@ -62,7 +62,7 @@ def test_paragraph_auto_font(
 
         if os.name != "nt":
             assert len(obj.read()) == len(expected)
-            assert obj.stream == expected
+            assert obj.read() == expected
 
 
 def test_paragraph_auto_font_auto_wrap(
@@ -85,7 +85,7 @@ def test_paragraph_auto_font_auto_wrap(
 
         if os.name != "nt":
             assert len(obj.read()) == len(expected)
-            assert obj.stream == expected
+            assert obj.read() == expected
 
 
 def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
@@ -124,7 +124,7 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_fill_sejda_complex_flatten(sejda_template_complex, pdf_samples, request):
@@ -164,7 +164,7 @@ def test_fill_sejda_complex_flatten(sejda_template_complex, pdf_samples, request
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_sejda_complex_paragraph_multiple_line_alignment(
@@ -194,7 +194,7 @@ def test_sejda_complex_paragraph_multiple_line_alignment(
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, request):
@@ -220,7 +220,7 @@ def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, reque
 
         if os.name != "nt":
             assert len(obj.read()) == len(expected)
-            assert obj.stream == expected
+            assert obj.read() == expected
 
 
 def test_paragraph_max_length(
@@ -243,4 +243,4 @@ def test_paragraph_max_length(
 
         if os.name != "nt":
             assert len(obj.read()) == len(expected)
-            assert obj.stream == expected
+            assert obj.read() == expected

@@ -30,8 +30,8 @@ def test_fill_max_length_text_field_all_chars(
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_max_length_text_field_odd_chars(
@@ -59,8 +59,8 @@ def test_fill_max_length_text_field_odd_chars(
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_max_length_text_field_even_chars(
@@ -88,8 +88,8 @@ def test_fill_max_length_text_field_even_chars(
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_comb_text_field_all_chars(
@@ -117,8 +117,8 @@ def test_fill_comb_text_field_all_chars(
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_comb_text_field_odd_chars(
@@ -146,8 +146,8 @@ def test_fill_comb_text_field_odd_chars(
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_comb_text_field_even_chars(
@@ -175,8 +175,8 @@ def test_fill_comb_text_field_even_chars(
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_comb_text_field_even_chars_right_aligned(
@@ -204,5 +204,5 @@ def test_fill_comb_text_field_even_chars_right_aligned(
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected

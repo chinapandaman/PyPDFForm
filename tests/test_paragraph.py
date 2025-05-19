@@ -17,13 +17,13 @@ def test_paragraph_y_coordinate(sample_template_with_paragraph, pdf_samples, req
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, request):
@@ -39,13 +39,13 @@ def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, reques
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
         assert obj.widgets["paragraph_1"].text_wrap_length is not None
 
 
@@ -62,14 +62,14 @@ def test_paragraph_auto_font(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
         if os.name != "nt":
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
 
 
 def test_paragraph_auto_font_auto_wrap(
@@ -87,14 +87,14 @@ def test_paragraph_auto_font_auto_wrap(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
         if os.name != "nt":
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
             assert obj.widgets["paragraph"].text_wrap_length is not None
 
 
@@ -130,13 +130,13 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_sejda_complex_not_render_widgets(
@@ -173,13 +173,13 @@ def test_fill_sejda_complex_not_render_widgets(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_sejda_complex_not_render_some_widgets(
@@ -226,13 +226,13 @@ def test_fill_sejda_complex_not_render_some_widgets(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_sejda_complex_paragraph_multiple_line_alignment(
@@ -257,13 +257,13 @@ def test_sejda_complex_paragraph_multiple_line_alignment(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, request):
@@ -282,14 +282,14 @@ def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, reque
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
         if os.name != "nt":
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
 
 
 def test_paragraph_max_length(
@@ -307,11 +307,11 @@ def test_paragraph_max_length(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.stream)
-        assert obj.read() == obj.stream
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
 
         expected = f.read()
 
         if os.name != "nt":
-            assert len(obj.stream) == len(expected)
-            assert obj.stream == expected
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected

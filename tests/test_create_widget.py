@@ -7,7 +7,7 @@ from PyPDFForm import PdfWrapper
 
 def test_create_not_supported_type_not_working(template_stream):
     obj = PdfWrapper(template_stream)
-    stream = obj.stream
+    stream = obj.read()
     assert (
         obj.create_widget(
             "foo",
@@ -15,7 +15,7 @@ def test_create_not_supported_type_not_working(template_stream):
             1,
             100,
             100,
-        ).stream
+        ).read()
         == stream
     )
 
@@ -37,8 +37,8 @@ def test_create_checkbox_default(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_checkbox_default_filled(template_stream, pdf_samples, request):
@@ -60,8 +60,8 @@ def test_create_checkbox_default_filled(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_checkbox_complex(template_stream, pdf_samples, request):
@@ -88,8 +88,8 @@ def test_create_checkbox_complex(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_checkbox_check(template_stream, pdf_samples, request):
@@ -110,8 +110,8 @@ def test_create_checkbox_check(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_checkbox_circle(template_stream, pdf_samples, request):
@@ -132,8 +132,8 @@ def test_create_checkbox_circle(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_checkbox_cross(template_stream, pdf_samples, request):
@@ -154,8 +154,8 @@ def test_create_checkbox_cross(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_checkbox_complex_filled(template_stream, pdf_samples, request):
@@ -173,8 +173,8 @@ def test_create_checkbox_complex_filled(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_text_default(template_stream, pdf_samples, request):
@@ -194,8 +194,8 @@ def test_create_text_default(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_text_alpha_bg_color(template_stream, pdf_samples, request):
@@ -218,8 +218,8 @@ def test_create_text_alpha_bg_color(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_text_align_center(template_stream, pdf_samples, request):
@@ -240,8 +240,8 @@ def test_create_text_align_center(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_text_align_right(template_stream, pdf_samples, request):
@@ -262,8 +262,8 @@ def test_create_text_align_right(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_text_align_multiline(template_stream, pdf_samples, request):
@@ -286,8 +286,8 @@ def test_create_text_align_multiline(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_text_default_filled(template_stream, pdf_samples, request):
@@ -309,8 +309,8 @@ def test_create_text_default_filled(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_text_complex(template_stream, pdf_samples, request):
@@ -340,8 +340,8 @@ def test_create_text_complex(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_text_complex_filled(template_stream, pdf_samples, request):
@@ -369,8 +369,8 @@ def test_create_text_complex_filled(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_checkbox_persist_old_widgets(template_stream, pdf_samples, request):
@@ -395,8 +395,8 @@ def test_create_checkbox_persist_old_widgets(template_stream, pdf_samples, reque
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_widget_sejda(sejda_template, pdf_samples, request):
@@ -423,8 +423,8 @@ def test_create_widget_sejda(sejda_template, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_widget_sejda_schema(sejda_template):
@@ -482,8 +482,8 @@ def test_create_dropdown(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_cmyk_color(pdf_samples, request):
@@ -498,8 +498,8 @@ def test_fill_cmyk_color(pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_radio_default(template_stream, pdf_samples, request):
@@ -519,8 +519,8 @@ def test_create_radio_default(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_radio_default_filled(template_stream, pdf_samples, request):
@@ -542,8 +542,8 @@ def test_create_radio_default_filled(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_radio_complex(template_stream, pdf_samples, request):
@@ -570,8 +570,8 @@ def test_create_radio_complex(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_signature_default(template_stream, pdf_samples, request):
@@ -593,8 +593,8 @@ def test_create_signature_default(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_signature_default_filled(
@@ -623,8 +623,8 @@ def test_create_signature_default_filled(
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_image_default(template_stream, pdf_samples, request):
@@ -646,8 +646,8 @@ def test_create_image_default(template_stream, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_create_image_default_filled(
@@ -676,5 +676,5 @@ def test_create_image_default_filled(
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected

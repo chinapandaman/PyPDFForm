@@ -27,6 +27,10 @@ class Text(Widget):
     Inherits from Widget base class and extends it with text-specific features.
     """
 
+    SET_ATTR_TRIGGER_HOOK_MAP = {
+        "font_size": "update_text_field_font_size",
+    }
+
     def __init__(
         self,
         name: str,

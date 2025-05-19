@@ -17,8 +17,8 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream, request):
@@ -38,7 +38,7 @@ def test_fill_radiobutton(pdf_samples, template_with_radiobutton_stream, request
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_fill_sejda_and_read(pdf_samples, sejda_template, sejda_data, request):
@@ -52,7 +52,7 @@ def test_fill_sejda_and_read(pdf_samples, sejda_template, sejda_data, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_fill_right_aligned(
@@ -76,7 +76,7 @@ def test_fill_right_aligned(
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        assert obj.stream == expected
+        assert obj.read() == expected
 
 
 def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request):
@@ -98,7 +98,7 @@ def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request)
 
         if os.name != "nt":
             assert len(obj.read()) == len(expected)
-            assert obj.stream == expected
+            assert obj.read() == expected
 
 
 def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, request):
@@ -128,7 +128,7 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
 
         if os.name != "nt":
             assert len(obj.read()) == len(expected)
-            assert obj.stream == expected
+            assert obj.read() == expected
 
 
 def test_undo_checkbox(pdf_samples, request):
@@ -151,8 +151,8 @@ def test_undo_checkbox(pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.stream) == len(expected)
-        assert obj.stream == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_merging_unique_suffix(template_stream):
