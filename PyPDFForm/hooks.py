@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""Module containing hook functions for PDF form widget manipulation.
+
+This module provides functions to apply various transformations and modifications
+to PDF form widgets through a hook system. It allows dynamic modification of
+widget properties like font sizes and other attributes.
+"""
 
 import sys
 from io import BytesIO
@@ -17,6 +23,21 @@ def trigger_widget_hooks(
     widgets: dict,
     use_full_widget_name: bool,
 ) -> bytes:
+    """Apply all registered widget hooks to a PDF document.
+
+    Args:
+        pdf: The input PDF document as bytes
+        widgets: Dictionary mapping widget names to widget objects
+        use_full_widget_name: Whether to use full widget names including parent hierarchy
+
+    Returns:
+        The modified PDF document as bytes
+
+    Note:
+        This function processes all pages and annotations in the PDF, applying
+        any hooks registered in the widget objects.
+    """
+
     pdf_file = PdfReader(stream_to_io(pdf))
     output = PdfWriter()
     output.append(pdf_file)
@@ -42,6 +63,17 @@ def trigger_widget_hooks(
 
 
 def update_text_field_font_size(annot: DictionaryObject, value: float) -> None:
+    """Update the font size of a text field widget.
+
+    Args:
+        annot: The PDF annotation (widget) dictionary object
+        value: The new font size value to apply
+
+    Note:
+        Handles both direct font size specification and inherited font sizes
+        from parent objects. Modifies the DA (default appearance) string.
+    """
+
     if Parent in annot and DA not in annot:
         text_appearance = annot[Parent][DA]
     else:
