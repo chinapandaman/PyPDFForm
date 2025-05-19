@@ -29,3 +29,7 @@ It also supports other common utilities such as extracting pages and merging mul
 * [Hosting Docs Locally](dev_doc.md)
 * [Testing](dev_test.md)
 * [Releasing](dev_release.md)
+
+## News
+
+* [2024-01-01: Important API Changes](news/2024-01-01.md)
