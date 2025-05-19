@@ -11,9 +11,11 @@ from io import BytesIO
 from typing import cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject, NameObject, TextStringObject
+from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
+                           TextStringObject)
 
-from .constants import DA, FONT_SIZE_IDENTIFIER, Annots, Parent
+from .constants import (COMB, DA, FONT_SIZE_IDENTIFIER, MULTILINE, Annots, Ff,
+                        Parent, Q)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -62,12 +64,12 @@ def trigger_widget_hooks(
         return f.read()
 
 
-def update_text_field_font_size(annot: DictionaryObject, value: float) -> None:
+def update_text_field_font_size(annot: DictionaryObject, val: float) -> None:
     """Update the font size of a text field widget.
 
     Args:
         annot: The PDF annotation (widget) dictionary object
-        value: The new font size value to apply
+        val: The new font size value to apply
 
     Note:
         Handles both direct font size specification and inherited font sizes
@@ -81,12 +83,12 @@ def update_text_field_font_size(annot: DictionaryObject, value: float) -> None:
 
     text_appearance = text_appearance.split(" ")
     font_size_index = 0
-    for i, val in enumerate(text_appearance):
-        if val.startswith(FONT_SIZE_IDENTIFIER):
+    for i, value in enumerate(text_appearance):
+        if value.startswith(FONT_SIZE_IDENTIFIER):
             font_size_index = i - 1
             break
 
-    text_appearance[font_size_index] = str(value)
+    text_appearance[font_size_index] = str(val)
     new_text_appearance = " ".join(text_appearance)
 
     if Parent in annot and DA not in annot:
@@ -95,3 +97,54 @@ def update_text_field_font_size(annot: DictionaryObject, value: float) -> None:
         )
     else:
         annot[NameObject(DA)] = TextStringObject(new_text_appearance)
+
+
+def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
+    """Update text alignment for text field annotations.
+
+    Modifies the alignment (Q) field of a text field annotation to set the
+    specified text alignment.
+
+    Args:
+        annot: PDF text field annotation dictionary to modify
+        val: Alignment value to set (typically 0=left, 1=center, 2=right)
+    """
+
+    annot[NameObject(Q)] = NumberObject(val)
+
+
+def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
+    """Update multiline flag for text field annotations.
+
+    Modifies the field flags (Ff) of a text field annotation to set or
+    clear the multiline flag based on the input value.
+
+    Args:
+        annot: PDF text field annotation dictionary to modify
+        val: Whether to enable multiline (True) or disable (False)
+    """
+
+    if val:
+        annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | MULTILINE)
+
+
+def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
+    """Update comb formatting flag for text field annotations.
+
+    Modifies the field flags (Ff) of a text field annotation to set or
+    clear the comb flag which enables/disables comb formatting.
+
+    Args:
+        annot: PDF text field annotation dictionary to modify
+        val: Whether to enable comb formatting (True) or disable (False)
+    """
+    if val:
+        annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | COMB)
+
+
+# TODO: remove this and switch to hooks
+NON_ACRO_FORM_PARAM_TO_FUNC = {
+    ("TextWidget", "alignment"): update_text_field_alignment,
+    ("TextWidget", "multiline"): update_text_field_multiline,
+    ("TextWidget", "comb"): update_text_field_comb,
+}

@@ -25,7 +25,9 @@ def test_set_text_field_font_size(pdf_samples, template_stream, request):
 
 def test_set_text_field_font_size_sejda(pdf_samples, sejda_template, request):
     expected_path = os.path.join(
-        pdf_samples, "test_widget_attr_trigger", "test_set_text_field_font_size_sejda.pdf"
+        pdf_samples,
+        "test_widget_attr_trigger",
+        "test_set_text_field_font_size_sejda.pdf",
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sejda_template)
