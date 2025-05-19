@@ -18,6 +18,9 @@ nav:
     - dev_doc.md
     - dev_test.md
     - dev_release.md
+  - 'News':
+    - news/2025-03-29.md
+    - news/2024-01-01.md
 theme:
   name: readthedocs
   logo: img/logo.png
