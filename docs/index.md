@@ -32,4 +32,5 @@ It also supports other common utilities such as extracting pages and merging mul
 
 ## News
 
-* [2024-01-01: Important API Changes](news/2024-01-01.md)
+* [2025-03-29: Announcements](news/2025-03-29.md)
+* [2024-01-01: API Changes](news/2024-01-01.md)
