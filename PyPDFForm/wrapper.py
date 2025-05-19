@@ -258,6 +258,19 @@ class PdfWrapper(FormWrapper):
                 value.font_color = getattr(self, "global_font_color")
 
     def read(self) -> bytes:
+        """Returns the raw bytes of the PDF form data with optional widget hook processing.
+
+        Extends FormWrapper.read() with additional functionality:
+        - Triggers any registered widget hooks if TRIGGER_WIDGET_HOOKS is True
+        - Maintains all parent class behavior of returning raw PDF bytes
+
+        The method first processes any widget hooks that need triggering, then delegates
+        to the parent class's read() implementation to return the PDF bytes.
+
+        Returns:
+            bytes: The complete PDF document as a byte string, after any hook processing
+        """
+
         if self.TRIGGER_WIDGET_HOOKS:
             for widget in self.widgets.values():
                 if widget.hooks_to_trigger:
