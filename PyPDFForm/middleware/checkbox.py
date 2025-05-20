@@ -25,6 +25,10 @@ class Checkbox(Widget):
     Inherits from Widget base class and extends it with checkbox-specific features.
     """
 
+    SET_ATTR_TRIGGER_HOOK_MAP = {
+        "size": "update_check_radio_size",
+    }
+
     BUTTON_STYLE_MAPPING = {
         "check": "4",
         "cross": "5",

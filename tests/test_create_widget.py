@@ -374,9 +374,7 @@ def test_create_text_complex_filled(template_stream, pdf_samples, request):
 
 
 def test_create_text_comb(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "create_text_comb.pdf"
-    )
+    expected_path = os.path.join(pdf_samples, "widget", "create_text_comb.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "text",

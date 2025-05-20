@@ -178,6 +178,7 @@ class PdfWrapper(FormWrapper):
         ("use_full_widget_name", False),
         ("render_widgets", True),
     ]
+    # TODO: remove, always default to True
     TRIGGER_WIDGET_HOOKS = False
 
     def __init__(
