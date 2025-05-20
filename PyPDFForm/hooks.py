@@ -128,7 +128,7 @@ def update_text_field_font_color(annot: DictionaryObject, val: tuple) -> None:
     new_text_appearance = (
         text_appearance[:font_size_identifier_index]
         + [FONT_SIZE_IDENTIFIER]
-        + list(str(each) for each in val)
+        + [str(each) for each in val]
     )
     new_text_appearance = " ".join(new_text_appearance) + FONT_COLOR_IDENTIFIER
 

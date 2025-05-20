@@ -273,7 +273,7 @@ class PdfWrapper(FormWrapper):
         """
 
         if self.TRIGGER_WIDGET_HOOKS and any(
-            [widget.hooks_to_trigger for widget in self.widgets.values()]
+            widget.hooks_to_trigger for widget in self.widgets.values()
         ):
             self._stream = trigger_widget_hooks(
                 self._stream,
