@@ -272,14 +272,14 @@ class PdfWrapper(FormWrapper):
             bytes: The complete PDF document as a byte string, after any hook processing
         """
 
-        if self.TRIGGER_WIDGET_HOOKS:
-            for widget in self.widgets.values():
-                if widget.hooks_to_trigger:
-                    self._stream = trigger_widget_hooks(
-                        self._stream,
-                        self.widgets,
-                        getattr(self, "use_full_widget_name"),
-                    )
+        if self.TRIGGER_WIDGET_HOOKS and any(
+            widget.hooks_to_trigger for widget in self.widgets.values()
+        ):
+            self._stream = trigger_widget_hooks(
+                self._stream,
+                self.widgets,
+                getattr(self, "use_full_widget_name"),
+            )
 
         return super().read()
 
