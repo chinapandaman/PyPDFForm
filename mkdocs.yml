@@ -25,4 +25,4 @@ theme:
   name: readthedocs
   logo: img/logo.png
 extra:
-  version: v2.4.0
+  version: v2.5.0
