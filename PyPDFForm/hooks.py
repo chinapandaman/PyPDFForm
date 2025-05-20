@@ -11,8 +11,8 @@ from io import BytesIO
 from typing import cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
-                           TextStringObject, FloatObject, ArrayObject)
+from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
+                           NameObject, NumberObject, TextStringObject)
 
 from .constants import (COMB, DA, FONT_SIZE_IDENTIFIER, MULTILINE, Annots, Ff,
                         Parent, Q, Rect)
