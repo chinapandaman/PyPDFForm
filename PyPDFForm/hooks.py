@@ -14,8 +14,8 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
-from .constants import (COMB, DA, FONT_SIZE_IDENTIFIER, MULTILINE, Annots, Ff,
-                        Parent, Q, Rect, FONT_COLOR_IDENTIFIER)
+from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
+                        MULTILINE, Annots, Ff, Parent, Q, Rect)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -113,8 +113,10 @@ def update_text_field_font_color(annot: DictionaryObject, val: tuple) -> None:
             font_size_identifier_index = i
             break
 
-    new_text_appearance = text_appearance[:font_size_identifier_index] + [FONT_SIZE_IDENTIFIER] + list(
-        str(each) for each in val
+    new_text_appearance = (
+        text_appearance[:font_size_identifier_index]
+        + [FONT_SIZE_IDENTIFIER]
+        + list(str(each) for each in val)
     )
     new_text_appearance = " ".join(new_text_appearance) + FONT_COLOR_IDENTIFIER
 
