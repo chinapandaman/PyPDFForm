@@ -25,7 +25,7 @@ from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
 from .filler import fill, simple_fill
-from .font import register_font
+from .font import register_font, register_font_acroform
 from .hooks import trigger_widget_hooks
 from .image import rotate_image
 from .middleware.dropdown import Dropdown
@@ -275,6 +275,10 @@ class PdfWrapper(FormWrapper):
         if self.TRIGGER_WIDGET_HOOKS and any(
             widget.hooks_to_trigger for widget in self.widgets.values()
         ):
+            for widget in self.widgets.values():
+                if isinstance(widget, Text) and widget.font != widget.available_fonts.get(widget.font):
+                    widget.font = widget.available_fonts.get(widget.font)
+
             self._stream = trigger_widget_hooks(
                 self._stream,
                 self.widgets,
@@ -762,10 +766,9 @@ class PdfWrapper(FormWrapper):
             },
         }
 
-    @classmethod
     def register_font(
-        cls, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
-    ) -> bool:
+        self, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
+    ) -> PdfWrapper:
         """Class method to register a TrueType font for use in PDF form text fields.
 
         Registers the font globally so it can be used by all PdfWrapper instances.
@@ -781,4 +784,12 @@ class PdfWrapper(FormWrapper):
 
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
-        return register_font(font_name, ttf_file) if ttf_file is not None else False
+        if (register_font(font_name, ttf_file) if ttf_file is not None else False) and (
+            self.TRIGGER_WIDGET_HOOKS
+        ):
+            self._stream, new_font_name = register_font_acroform(self.read(), ttf_file)
+            for widget in self.widgets.values():
+                if isinstance(widget, Text):
+                    widget.available_fonts[font_name] = new_font_name
+
+        return self
