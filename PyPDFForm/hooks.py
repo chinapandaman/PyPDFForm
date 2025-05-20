@@ -139,11 +139,23 @@ def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
         annot: PDF text field annotation dictionary to modify
         val: Whether to enable comb formatting (True) or disable (False)
     """
+
     if val:
         annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | COMB)
 
 
 def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
+    """Update the size of a checkbox or radio button widget while maintaining center position.
+
+    Args:
+        annot: PDF annotation dictionary containing the widget to modify
+        val: New size value (width and height) for the widget
+
+    Note:
+        The widget will be resized symmetrically around its center point,
+        maintaining the same center position while changing its dimensions.
+    """
+
     rect = annot[Rect]
     center_x = (rect[0] + rect[2]) / 2
     center_y = (rect[1] + rect[3]) / 2
