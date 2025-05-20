@@ -280,6 +280,7 @@ class PdfWrapper(FormWrapper):
                         self.widgets,
                         getattr(self, "use_full_widget_name"),
                     )
+                    break
 
         return super().read()
 

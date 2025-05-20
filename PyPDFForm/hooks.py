@@ -15,7 +15,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
 from .constants import (COMB, DA, FONT_SIZE_IDENTIFIER, MULTILINE, Annots, Ff,
-                        Parent, Q, Rect)
+                        Parent, Q, Rect, FONT_COLOR_IDENTIFIER)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -91,6 +91,32 @@ def update_text_field_font_size(annot: DictionaryObject, val: float) -> None:
 
     text_appearance[font_size_index] = str(val)
     new_text_appearance = " ".join(text_appearance)
+
+    if Parent in annot and DA not in annot:
+        annot[NameObject(Parent)][NameObject(DA)] = TextStringObject(
+            new_text_appearance
+        )
+    else:
+        annot[NameObject(DA)] = TextStringObject(new_text_appearance)
+
+
+def update_text_field_font_color(annot: DictionaryObject, val: tuple) -> None:
+    if Parent in annot and DA not in annot:
+        text_appearance = annot[Parent][DA]
+    else:
+        text_appearance = annot[DA]
+
+    text_appearance = text_appearance.split(" ")
+    font_size_identifier_index = 0
+    for i, value in enumerate(text_appearance):
+        if value == FONT_SIZE_IDENTIFIER:
+            font_size_identifier_index = i
+            break
+
+    new_text_appearance = text_appearance[:font_size_identifier_index] + [FONT_SIZE_IDENTIFIER] + list(
+        str(each) for each in val
+    )
+    new_text_appearance = " ".join(new_text_appearance) + FONT_COLOR_IDENTIFIER
 
     if Parent in annot and DA not in annot:
         annot[NameObject(Parent)][NameObject(DA)] = TextStringObject(
