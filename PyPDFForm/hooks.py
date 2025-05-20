@@ -101,6 +101,18 @@ def update_text_field_font_size(annot: DictionaryObject, val: float) -> None:
 
 
 def update_text_field_font_color(annot: DictionaryObject, val: tuple) -> None:
+    """Update the font color of a text field widget.
+
+    Args:
+        annot: The PDF annotation (widget) dictionary object
+        val: Tuple containing RGB color values (e.g. (1, 0, 0) for red)
+
+    Note:
+        Handles both direct font color specification and inherited font colors
+        from parent objects. Modifies the DA (default appearance) string to
+        include the new color values after the font size identifier.
+    """
+
     if Parent in annot and DA not in annot:
         text_appearance = annot[Parent][DA]
     else:
