@@ -12,10 +12,10 @@ from typing import cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (DictionaryObject, NameObject, NumberObject,
-                           TextStringObject)
+                           TextStringObject, FloatObject, ArrayObject)
 
 from .constants import (COMB, DA, FONT_SIZE_IDENTIFIER, MULTILINE, Annots, Ff,
-                        Parent, Q)
+                        Parent, Q, Rect)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -140,6 +140,19 @@ def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
     """
     if val:
         annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | COMB)
+
+
+def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
+    rect = annot[Rect]
+    center_x = (rect[0] + rect[2]) / 2
+    center_y = (rect[1] + rect[3]) / 2
+    new_rect = [
+        FloatObject(center_x - val / 2),
+        FloatObject(center_y - val / 2),
+        FloatObject(center_x + val / 2),
+        FloatObject(center_y + val / 2),
+    ]
+    annot[NameObject(Rect)] = ArrayObject(new_rect)
 
 
 # TODO: remove this and switch to hooks
