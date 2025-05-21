@@ -25,7 +25,8 @@ from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
 from .filler import fill, simple_fill
-from .font import register_font, register_font_acroform, get_all_available_fonts
+from .font import (get_all_available_fonts, register_font,
+                   register_font_acroform)
 from .hooks import trigger_widget_hooks
 from .image import rotate_image
 from .middleware.dropdown import Dropdown
@@ -283,9 +284,10 @@ class PdfWrapper(FormWrapper):
             widget.hooks_to_trigger for widget in self.widgets.values()
         ):
             for widget in self.widgets.values():
-                if isinstance(
-                    widget, Text
-                ) and widget.font not in self._available_fonts.values():
+                if (
+                    isinstance(widget, Text)
+                    and widget.font not in self._available_fonts.values()
+                ):
                     widget.font = self._available_fonts.get(widget.font)
 
             self._stream = trigger_widget_hooks(

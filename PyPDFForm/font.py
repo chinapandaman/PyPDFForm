@@ -171,6 +171,7 @@ def get_new_font_name(fonts: dict) -> str:
         n += 1
     return f"{FONT_NAME_PREFIX}{n}"
 
+
 def get_all_available_fonts(pdf: bytes) -> dict:
     """Extracts all available fonts from a PDF's AcroForm resources.
 
@@ -199,7 +200,7 @@ def get_all_available_fonts(pdf: bytes) -> dict:
         fonts = reader.root_object[AcroForm][DR][Font]
     except KeyError:
         return {}
-    
+
     result = {}
     for key, value in fonts.items():
         result[value[BaseFont]] = key
