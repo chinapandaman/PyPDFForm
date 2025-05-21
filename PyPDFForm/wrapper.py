@@ -276,7 +276,9 @@ class PdfWrapper(FormWrapper):
             widget.hooks_to_trigger for widget in self.widgets.values()
         ):
             for widget in self.widgets.values():
-                if isinstance(widget, Text) and widget.font != widget.available_fonts.get(widget.font):
+                if isinstance(
+                    widget, Text
+                ) and widget.font != widget.available_fonts.get(widget.font):
                     widget.font = widget.available_fonts.get(widget.font)
 
             self._stream = trigger_widget_hooks(
