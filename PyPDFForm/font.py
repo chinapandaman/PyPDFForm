@@ -172,6 +172,28 @@ def get_new_font_name(fonts: dict) -> str:
     return f"{FONT_NAME_PREFIX}{n}"
 
 def get_all_available_fonts(pdf: bytes) -> dict:
+    """Extracts all available fonts from a PDF's AcroForm resources.
+
+    Scans the PDF's AcroForm DR (Resource Dictionary) Fonts section to collect
+    all registered fonts and their corresponding resource keys.
+
+    Args:
+        pdf: Input PDF data as bytes to scan for fonts
+
+    Returns:
+        dict: Dictionary mapping base font names (str) to their resource keys (str).
+            Returns empty dictionary if:
+            - PDF has no AcroForm
+            - AcroForm has no DR (Resource Dictionary)
+            - DR has no Fonts section
+
+    Example:
+        {
+            '/Helvetica': '/F1',
+            '/Times-Roman': '/F2'
+        }
+    """
+
     reader = PdfReader(stream_to_io(pdf))
     try:
         fonts = reader.root_object[AcroForm][DR][Font]
