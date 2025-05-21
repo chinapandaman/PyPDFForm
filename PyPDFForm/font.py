@@ -83,7 +83,7 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
     """
 
     base_font_name = (
-        f"/{TTFont(name="new_font", filename=stream_to_io(ttf_stream)).face.name.ustr}"
+        f"/{TTFont(name='new_font', filename=stream_to_io(ttf_stream)).face.name.ustr}"
     )
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
