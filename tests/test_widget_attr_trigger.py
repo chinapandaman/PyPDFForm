@@ -5,6 +5,28 @@ import os
 from PyPDFForm import PdfWrapper
 
 
+def test_register_font_no_form_fields(pdf_samples, font_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "test_widget_attr_trigger", "test_register_font_no_form_fields.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(os.path.join(
+            pdf_samples, "dummy.pdf"
+        ))
+        obj.TRIGGER_WIDGET_HOOKS = True
+        obj.register_font(
+            "new_font", os.path.join(font_samples, "LiberationSerif-Regular.ttf")
+        ).draw_text("foo", 1, 100, 100, font="new_font")
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_set_text_field_font(pdf_samples, font_samples, template_stream, request):
     expected_path = os.path.join(
         pdf_samples, "test_widget_attr_trigger", "test_set_text_field_font.pdf"
