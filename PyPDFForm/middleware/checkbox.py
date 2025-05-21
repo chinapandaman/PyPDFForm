@@ -27,7 +27,6 @@ class Checkbox(Widget):
 
     SET_ATTR_TRIGGER_HOOK_MAP = {
         "size": "update_check_radio_size",
-        "button_style": "update_check_button_style",
     }
 
     BUTTON_STYLE_MAPPING = {

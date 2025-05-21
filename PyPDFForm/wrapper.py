@@ -28,7 +28,6 @@ from .filler import fill, simple_fill
 from .font import register_font, register_font_acroform
 from .hooks import trigger_widget_hooks
 from .image import rotate_image
-from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.text import Text
 from .template import (build_widgets, dropdown_to_text,
@@ -284,16 +283,6 @@ class PdfWrapper(FormWrapper):
                     widget, Text
                 ) and widget.font != widget.available_fonts.get(widget.font):
                     widget.font = widget.available_fonts.get(widget.font)
-                if isinstance(widget, Checkbox):
-                    new_hooks = []
-                    for hook in widget.hooks_to_trigger:
-                        new_hooks.append(
-                            (
-                                hook[0],
-                                Checkbox.BUTTON_STYLE_MAPPING.get(hook[1], hook[1]),
-                            )
-                        )
-                    widget.hooks_to_trigger = new_hooks
 
             self._stream = trigger_widget_hooks(
                 self._stream,

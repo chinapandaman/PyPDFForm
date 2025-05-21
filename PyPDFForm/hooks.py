@@ -14,9 +14,8 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
-from .constants import (AP, BUTTON_STYLE_STREAM_IDENTIFIER, CA, COMB, DA,
-                        FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER, MK,
-                        MULTILINE, Annots, Ff, N, Off, Parent, Q, Rect)
+from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
+                        MULTILINE, Annots, Ff, Parent, Q, Rect)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -237,23 +236,6 @@ def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
         FloatObject(center_y + val / 2),
     ]
     annot[NameObject(Rect)] = ArrayObject(new_rect)
-
-
-def update_check_button_style(annot: DictionaryObject, val: str) -> None:
-    annot[NameObject(MK)][NameObject(CA)] = TextStringObject(val)
-    yes_obj = None
-    for k, v in annot[NameObject(AP)][NameObject(N)].items():
-        if k != Off:
-            yes_obj = v
-
-    if yes_obj:
-        old_stream = yes_obj.get_data()
-        if BUTTON_STYLE_STREAM_IDENTIFIER not in old_stream:
-            return
-        old_style = old_stream.split(BUTTON_STYLE_STREAM_IDENTIFIER)[0][-3:]
-        new_style = bytes(f"({val})", "utf-8")
-        new_stream = old_stream.replace(old_style, new_style)
-        yes_obj.set_data(new_stream)
 
 
 # TODO: remove this and switch to hooks

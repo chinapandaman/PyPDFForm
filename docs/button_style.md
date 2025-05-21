@@ -27,6 +27,7 @@ with open("output.pdf", "wb+") as output:
     output.write(form.read())
 ```
 
+<!-- TODO: no longer supported -->
 ## Change button style
 
 The button style determines the shape of the selection on a checkbox or radio button. PyPDFForm offers
