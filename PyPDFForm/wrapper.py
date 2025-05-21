@@ -25,7 +25,7 @@ from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
 from .filler import fill, simple_fill
-from .font import register_font
+from .font import register_font, register_font_acroform
 from .hooks import trigger_widget_hooks
 from .image import rotate_image
 from .middleware.dropdown import Dropdown
@@ -259,22 +259,31 @@ class PdfWrapper(FormWrapper):
                 value.font_color = getattr(self, "global_font_color")
 
     def read(self) -> bytes:
-        """Returns the raw bytes of the PDF form data with optional widget hook processing.
+        """Reads and returns the raw PDF data with optional widget hook processing.
 
-        Extends FormWrapper.read() with additional functionality:
-        - Triggers any registered widget hooks if TRIGGER_WIDGET_HOOKS is True
-        - Maintains all parent class behavior of returning raw PDF bytes
+        This method returns the raw bytes of the PDF document. If widget hooks are enabled
+        (TRIGGER_WIDGET_HOOKS is True), it will:
+        - Process any pending widget hooks
+        - Update font properties if needed
+        - Trigger widget-specific processing
 
-        The method first processes any widget hooks that need triggering, then delegates
-        to the parent class's read() implementation to return the PDF bytes.
+        The method ensures font properties are properly applied to text widgets before
+        returning the final PDF data.
 
         Returns:
-            bytes: The complete PDF document as a byte string, after any hook processing
+            bytes: The complete PDF document as raw bytes, with any widget processing applied
+            if enabled.
         """
 
         if self.TRIGGER_WIDGET_HOOKS and any(
             widget.hooks_to_trigger for widget in self.widgets.values()
         ):
+            for widget in self.widgets.values():
+                if isinstance(
+                    widget, Text
+                ) and widget.font != widget.available_fonts.get(widget.font):
+                    widget.font = widget.available_fonts.get(widget.font)
+
             self._stream = trigger_widget_hooks(
                 self._stream,
                 self.widgets,
@@ -762,23 +771,39 @@ class PdfWrapper(FormWrapper):
             },
         }
 
-    @classmethod
     def register_font(
-        cls, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
-    ) -> bool:
-        """Class method to register a TrueType font for use in PDF form text fields.
+        self, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
+    ) -> PdfWrapper:
+        """Registers a custom TrueType font for use in PDF form text fields.
 
-        Registers the font globally so it can be used by all PdfWrapper instances.
-        The font will be available when specified by name in text operations.
+        This method allows adding custom fonts to be used when rendering text in PDF forms.
+        The font will be available for all subsequent text field operations.
 
         Args:
-            font_name: Name to register the font under (used when setting font)
-            ttf_file: The TTF font data as bytes, file path, or file object
+            font_name: The name to associate with the font (used when setting font properties)
+            ttf_file: The TrueType font file as either:
+                - Raw bytes of the TTF file
+                - File path string
+                - File-like object
 
         Returns:
-            bool: True if registration succeeded, False if failed
+            PdfWrapper: Returns self to allow method chaining
+
+        Note:
+            - The font registration affects both the PDF's internal font resources and
+              the wrapper's available fonts for text widgets
+            - If TRIGGER_WIDGET_HOOKS is True, also updates AcroForm font resources
+            - Registered fonts become available in all text widgets' available_fonts dict
         """
 
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
-        return register_font(font_name, ttf_file) if ttf_file is not None else False
+        if (register_font(font_name, ttf_file) if ttf_file is not None else False) and (
+            self.TRIGGER_WIDGET_HOOKS
+        ):
+            self._stream, new_font_name = register_font_acroform(self.read(), ttf_file)
+            for widget in self.widgets.values():
+                if isinstance(widget, Text):
+                    widget.available_fonts[font_name] = new_font_name
+
+        return self

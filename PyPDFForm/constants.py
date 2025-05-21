@@ -54,6 +54,7 @@ I = "/I"  # noqa: E741
 N = "/N"
 Sig = "/Sig"
 DA = "/DA"
+DR = "/DR"
 DV = "/DV"
 Btn = "/Btn"
 MaxLen = "/MaxLen"
@@ -72,6 +73,21 @@ U = "/U"
 AS = "/AS"
 Yes = "/Yes"
 Off = "/Off"
+
+# Font dict
+Length1 = "/Length1"
+Type = "/Type"
+FontDescriptor = "/FontDescriptor"
+FontName = "/FontName"
+FontFile2 = "/FontFile2"
+Font = "/Font"
+Subtype = "/Subtype"
+TrueType = "/TrueType"
+BaseFont = "/BaseFont"
+Encoding = "/Encoding"
+WinAnsiEncoding = "/WinAnsiEncoding"
+
+FONT_NAME_PREFIX = "/F"
 
 # For Adobe Acrobat
 AcroForm = "/AcroForm"

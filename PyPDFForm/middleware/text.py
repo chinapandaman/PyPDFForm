@@ -28,6 +28,7 @@ class Text(Widget):
     """
 
     SET_ATTR_TRIGGER_HOOK_MAP = {
+        "font": "update_text_field_font",
         "font_size": "update_text_field_font_size",
         "font_color": "update_text_field_font_color",
     }
@@ -56,6 +57,7 @@ class Text(Widget):
         self.text_lines = None
         self.text_line_x_coordinates = None
         self.preview = False
+        self.available_fonts = {}
 
     @property
     def value(self) -> Any:

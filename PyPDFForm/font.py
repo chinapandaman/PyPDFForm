@@ -14,17 +14,23 @@ from math import sqrt
 from re import findall
 from typing import Tuple, Union
 
-from reportlab.pdfbase.acroform import AcroForm
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
+                           NumberObject, StreamObject)
+from reportlab.pdfbase.acroform import AcroForm as RAcroForm
 from reportlab.pdfbase.pdfmetrics import (registerFont, standardFonts,
                                           stringWidth)
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
-from .constants import (DEFAULT_FONT, FONT_COLOR_IDENTIFIER,
-                        FONT_SIZE_IDENTIFIER, FONT_SIZE_REDUCE_STEP,
-                        MARGIN_BETWEEN_LINES, Rect)
+from .constants import (DEFAULT_FONT, DR, FONT_COLOR_IDENTIFIER,
+                        FONT_NAME_PREFIX, FONT_SIZE_IDENTIFIER,
+                        FONT_SIZE_REDUCE_STEP, MARGIN_BETWEEN_LINES, AcroForm,
+                        BaseFont, Encoding, Fields, Font, FontDescriptor,
+                        FontFile2, FontName, Length1, Rect, Subtype, TrueType,
+                        Type, WinAnsiEncoding)
 from .middleware.text import Text
 from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .utils import extract_widget_property
+from .utils import extract_widget_property, stream_to_io
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
@@ -52,6 +58,120 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
     return result
 
 
+def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
+    """Registers a TrueType font in a PDF's AcroForm and returns modified PDF.
+
+    This function handles the registration of a TTF font into a PDF's AcroForm structure,
+    creating all necessary font-related objects in the PDF and ensuring proper font
+    registration for form fields.
+
+    Args:
+        pdf: Input PDF data as bytes to modify
+        ttf_stream: TTF font data as bytes to register in the PDF
+
+    Returns:
+        tuple: A tuple containing:
+            - bytes: Modified PDF data with font registration
+            - str: The registered font name (with format '/FontName')
+
+    Note:
+        This function performs several PDF object manipulations:
+        - Creates font file stream object
+        - Builds font descriptor dictionary
+        - Registers font in PDF's AcroForm structure
+        - Handles font naming and encoding
+    """
+
+    base_font_name = (
+        f"/{TTFont(name='new_font', filename=stream_to_io(ttf_stream)).face.name.ustr}"
+    )
+    reader = PdfReader(stream_to_io(pdf))
+    writer = PdfWriter()
+    writer.append(reader)
+
+    font_file_stream = StreamObject()
+    font_file_stream.set_data(ttf_stream)
+    font_file_stream.update(
+        {
+            NameObject(Length1): NumberObject(len(ttf_stream)),
+        }
+    )
+    font_file_ref = writer._add_object(font_file_stream)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+
+    font_descriptor = DictionaryObject()
+    font_descriptor.update(
+        {
+            NameObject(Type): NameObject(FontDescriptor),
+            NameObject(FontName): NameObject(base_font_name),
+            NameObject(FontFile2): font_file_ref,
+        }
+    )
+    font_descriptor_ref = writer._add_object(font_descriptor)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+
+    font_dict = DictionaryObject()
+    font_dict.update(
+        {
+            NameObject(Type): NameObject(Font),
+            NameObject(Subtype): NameObject(TrueType),
+            NameObject(BaseFont): NameObject(base_font_name),
+            NameObject(FontDescriptor): font_descriptor_ref,
+            NameObject(Encoding): NameObject(WinAnsiEncoding),
+        }
+    )
+    font_dict_ref = writer._add_object(font_dict)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+
+    if AcroForm not in writer._root_object:  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+        writer._root_object[NameObject(AcroForm)] = DictionaryObject({NameObject(Fields): ArrayObject([])})  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+    acroform = writer._root_object[AcroForm]  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+
+    if DR not in acroform:
+        acroform[NameObject(DR)] = DictionaryObject()
+    dr = acroform[DR]
+
+    if Font not in dr:
+        dr[NameObject(Font)] = DictionaryObject()
+    fonts = dr[Font]
+
+    new_font_name = get_new_font_name(fonts)
+    fonts[NameObject(new_font_name)] = font_dict_ref
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read(), new_font_name
+
+
+def get_new_font_name(fonts: dict) -> str:
+    """Generates a new unique font name for font registration.
+
+    Scans existing font names and generates a new unique name by finding the next
+    available numeric suffix. Used when registering new fonts to avoid name conflicts.
+
+    Args:
+        fonts: Dictionary of existing font names to check for conflicts.
+            Keys should be strings, values are font objects.
+
+    Returns:
+        str: New unique font name in format '/F#' where # is the next available number.
+            Example: '/F1', '/F2' etc.
+
+    Note:
+        - Handles numeric suffixes to ensure uniqueness
+        - Skips existing numbers in font names
+        - Returns names with prefix '/F' by default
+    """
+
+    existing = set()
+    for key in fonts:
+        if isinstance(key, str) and key.startswith(FONT_NAME_PREFIX):
+            existing.add(int(key[2:]))
+
+    n = 1
+    while n in existing:
+        n += 1
+    return f"{FONT_NAME_PREFIX}{n}"
+
+
 def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
     """Extracts font name from PDF text appearance string.
 
@@ -71,7 +191,7 @@ def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
             text_segments = findall("[A-Z][^A-Z]*", each.replace("/", ""))
 
             if len(text_segments) == 1:
-                for k, v in AcroForm.formFontNames.items():
+                for k, v in RAcroForm.formFontNames.items():
                     if v == text_segments[0]:
                         return k
 

@@ -65,6 +65,36 @@ def trigger_widget_hooks(
         return f.read()
 
 
+def update_text_field_font(annot: DictionaryObject, val: str) -> None:
+    """Update the font of a text field widget.
+
+    Args:
+        annot: The PDF annotation (widget) dictionary object
+        val: The new font name to apply
+
+    Note:
+        Handles both direct font specification and inherited fonts
+        from parent objects. Modifies the DA (default appearance) string
+        by replacing the first token (the font name).
+    """
+
+    if Parent in annot and DA not in annot:
+        text_appearance = annot[Parent][DA]
+    else:
+        text_appearance = annot[DA]
+
+    text_appearance = text_appearance.split(" ")
+    text_appearance[0] = val
+    new_text_appearance = " ".join(text_appearance)
+
+    if Parent in annot and DA not in annot:
+        annot[NameObject(Parent)][NameObject(DA)] = TextStringObject(
+            new_text_appearance
+        )
+    else:
+        annot[NameObject(DA)] = TextStringObject(new_text_appearance)
+
+
 def update_text_field_font_size(annot: DictionaryObject, val: float) -> None:
     """Update the font size of a text field widget.
 

@@ -54,18 +54,13 @@ def test_fill_not_render_widgets(template_stream, pdf_samples, data_dict, reques
 
 
 def test_register_bad_fonts():
-    assert not PdfWrapper.register_font("foo", b"foo")
-    assert not PdfWrapper.register_font("foo", "foo")
+    assert not PdfWrapper().register_font("foo", b"foo").read()
+    assert not PdfWrapper().register_font("foo", "foo").read()
 
 
 def test_fill_font_liberation_serif_italic(
     template_stream, pdf_samples, font_samples, data_dict, request
 ):
-    with open(os.path.join(font_samples, "LiberationSerif-Italic.ttf"), "rb+") as _f:
-        stream = _f.read()
-        _f.seek(0)
-        PdfWrapper.register_font("LiberationSerif-Italic", stream)
-
     expected_path = os.path.join(
         pdf_samples, "sample_filled_font_liberation_serif_italic.pdf"
     )
@@ -73,8 +68,15 @@ def test_fill_font_liberation_serif_italic(
         expected_path,
         "rb+",
     ) as f:
-        obj = PdfWrapper(template_stream, global_font="LiberationSerif-Italic").fill(
-            data_dict,
+        obj = (
+            PdfWrapper(template_stream, global_font="LiberationSerif-Italic")
+            .register_font(
+                "LiberationSerif-Italic",
+                os.path.join(font_samples, "LiberationSerif-Italic.ttf"),
+            )
+            .fill(
+                data_dict,
+            )
         )
 
         request.config.results["expected_path"] = expected_path
