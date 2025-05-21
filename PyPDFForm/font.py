@@ -9,6 +9,7 @@ This module contains functions for:
 - Managing font colors and properties
 """
 
+from functools import lru_cache
 from io import BytesIO
 from math import sqrt
 from re import findall
@@ -82,9 +83,7 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
         - Handles font naming and encoding
     """
 
-    base_font_name = (
-        f"/{TTFont(name='new_font', filename=stream_to_io(ttf_stream)).face.name.ustr}"
-    )
+    base_font_name = get_base_font_name(ttf_stream)
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
     writer.append(reader)
@@ -139,6 +138,13 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
         writer.write(f)
         f.seek(0)
         return f.read(), new_font_name
+
+
+@lru_cache
+def get_base_font_name(ttf_stream: bytes) -> str:
+    return (
+        f"/{TTFont(name='new_font', filename=stream_to_io(ttf_stream)).face.name.ustr}"
+    )
 
 
 def get_new_font_name(fonts: dict) -> str:

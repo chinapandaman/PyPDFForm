@@ -208,6 +208,7 @@ class PdfWrapper(FormWrapper):
         super().__init__(template)
         self.widgets = {}
         self._available_fonts = {}
+        self._font_register_events = []
         self._keys_to_update = []
 
         for attr, default in self.USER_PARAMS:
@@ -705,6 +706,7 @@ class PdfWrapper(FormWrapper):
         self._stream = copy_watermark_widgets(
             remove_all_widgets(self.read()), stream_with_widgets, None, None
         )
+        self._reregister_font()
 
         return self
 
@@ -750,6 +752,7 @@ class PdfWrapper(FormWrapper):
         self._stream = copy_watermark_widgets(
             remove_all_widgets(self.read()), stream_with_widgets, None, None
         )
+        self._reregister_font()
 
         return self
 
@@ -809,5 +812,17 @@ class PdfWrapper(FormWrapper):
         ):
             self._stream, new_font_name = register_font_acroform(self.read(), ttf_file)
             self._available_fonts[font_name] = new_font_name
+            self._font_register_events.append((font_name, ttf_file))
+
+        return self
+
+    def _reregister_font(self) -> PdfWrapper:
+        font_register_events_len = len(self._font_register_events)
+        for i in range(font_register_events_len):
+            event = self._font_register_events[i]
+            self.register_font(event[0], event[1])
+        self._font_register_events = self._font_register_events[
+            font_register_events_len:
+        ]
 
         return self
