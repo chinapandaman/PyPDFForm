@@ -57,7 +57,6 @@ class Text(Widget):
         self.text_lines = None
         self.text_line_x_coordinates = None
         self.preview = False
-        self.available_fonts = {}
 
     @property
     def value(self) -> Any:

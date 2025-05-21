@@ -25,7 +25,8 @@ from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
 from .filler import fill, simple_fill
-from .font import register_font, register_font_acroform
+from .font import (get_all_available_fonts, register_font,
+                   register_font_acroform)
 from .hooks import trigger_widget_hooks
 from .image import rotate_image
 from .middleware.dropdown import Dropdown
@@ -206,6 +207,7 @@ class PdfWrapper(FormWrapper):
 
         super().__init__(template)
         self.widgets = {}
+        self._available_fonts = {}
         self._keys_to_update = []
 
         for attr, default in self.USER_PARAMS:
@@ -248,6 +250,9 @@ class PdfWrapper(FormWrapper):
                 refresh_not_needed[k] = True
         self.widgets = new_widgets
 
+        if self.read():
+            self._available_fonts.update(**get_all_available_fonts(self.read()))
+
         for key, value in self.widgets.items():
             if (key_to_refresh and key == key_to_refresh) or (
                 key_to_refresh is None
@@ -279,10 +284,11 @@ class PdfWrapper(FormWrapper):
             widget.hooks_to_trigger for widget in self.widgets.values()
         ):
             for widget in self.widgets.values():
-                if isinstance(
-                    widget, Text
-                ) and widget.font != widget.available_fonts.get(widget.font):
-                    widget.font = widget.available_fonts.get(widget.font)
+                if (
+                    isinstance(widget, Text)
+                    and widget.font not in self._available_fonts.values()
+                ):
+                    widget.font = self._available_fonts.get(widget.font)
 
             self._stream = trigger_widget_hooks(
                 self._stream,
@@ -802,8 +808,6 @@ class PdfWrapper(FormWrapper):
             self.TRIGGER_WIDGET_HOOKS
         ):
             self._stream, new_font_name = register_font_acroform(self.read(), ttf_file)
-            for widget in self.widgets.values():
-                if isinstance(widget, Text):
-                    widget.available_fonts[font_name] = new_font_name
+            self._available_fonts[font_name] = new_font_name
 
         return self
