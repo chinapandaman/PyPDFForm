@@ -171,6 +171,19 @@ def get_new_font_name(fonts: dict) -> str:
         n += 1
     return f"{FONT_NAME_PREFIX}{n}"
 
+def get_all_available_fonts(pdf: bytes) -> dict:
+    reader = PdfReader(stream_to_io(pdf))
+    try:
+        fonts = reader.root_object[AcroForm][DR][Font]
+    except KeyError:
+        return {}
+    
+    result = {}
+    for key, value in fonts.items():
+        result[value[BaseFont]] = key
+
+    return result
+
 
 def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
     """Extracts font name from PDF text appearance string.
