@@ -15,7 +15,8 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
 from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
-                        MULTILINE, Annots, Ff, Parent, Q, Rect, MK, CA, Off, AP, N)
+                        MULTILINE, Annots, Ff, Parent, Q, Rect, MK, CA, Off, AP, N,
+                        BUTTON_STYLE_STREAM_IDENTIFIER)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -239,7 +240,6 @@ def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
 
 
 def update_check_button_style(annot: DictionaryObject, val: str) -> None:
-    old_style = annot[MK].get(CA)
     annot[NameObject(MK)][NameObject(CA)] = TextStringObject(val)
     yes_obj = None
     for k, v in annot[NameObject(AP)][NameObject(N)].items():
@@ -248,17 +248,9 @@ def update_check_button_style(annot: DictionaryObject, val: str) -> None:
 
     if yes_obj:
         old_stream = yes_obj.get_data()
-        old_style = bytes(f"({old_style})", "utf-8")
+        old_style = old_stream.split(BUTTON_STYLE_STREAM_IDENTIFIER)[0][-3:]
         new_style = bytes(f"({val})", "utf-8")
-        if old_style in old_stream:
-            new_stream = old_stream.replace(old_style, new_style)
-        else:
-            new_stream = b" Tj".join(
-                [
-                    old_stream.split(b" Tj")[0][:-3] + bytes(f"({val})", "utf-8"),
-                    old_stream.split(b" Tj")[1]
-                ]
-            )
+        new_stream = old_stream.replace(old_style, new_style)
         yes_obj.set_data(new_stream)
 
 
