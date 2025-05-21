@@ -248,6 +248,8 @@ def update_check_button_style(annot: DictionaryObject, val: str) -> None:
 
     if yes_obj:
         old_stream = yes_obj.get_data()
+        if BUTTON_STYLE_STREAM_IDENTIFIER not in old_stream:
+            return
         old_style = old_stream.split(BUTTON_STYLE_STREAM_IDENTIFIER)[0][-3:]
         new_style = bytes(f"({val})", "utf-8")
         new_stream = old_stream.replace(old_style, new_style)
