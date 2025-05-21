@@ -23,6 +23,10 @@ class Radio(Checkbox):
     Inherits from Checkbox class and extends it with radio-specific features.
     """
 
+    SET_ATTR_TRIGGER_HOOK_MAP = {
+        "size": "update_check_radio_size",
+    }
+
     def __init__(
         self,
         name: str,
