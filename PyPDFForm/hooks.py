@@ -14,9 +14,9 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
-from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
-                        MULTILINE, Annots, Ff, Parent, Q, Rect, MK, CA, Off, AP, N,
-                        BUTTON_STYLE_STREAM_IDENTIFIER)
+from .constants import (AP, BUTTON_STYLE_STREAM_IDENTIFIER, CA, COMB, DA,
+                        FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER, MK,
+                        MULTILINE, Annots, Ff, N, Off, Parent, Q, Rect)
 from .template import get_widget_key
 from .utils import stream_to_io
 
