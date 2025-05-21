@@ -36,7 +36,10 @@ def test_set_text_field_font_sejda(pdf_samples, font_samples, sejda_template, re
         obj = PdfWrapper(sejda_template)
         obj.TRIGGER_WIDGET_HOOKS = True
         obj.register_font(
-            "new_font_2", os.path.join(font_samples, "LiberationSerif-BoldItalic.ttf")
+            "new_font", os.path.join(font_samples, "LiberationSerif-Italic.ttf")
+        )
+        obj.register_font(
+            "new_font_2", os.path.join(font_samples, "LiberationSerif-Bold.ttf")
         )
         obj.widgets["buyer_name"].font = "new_font_2"
 

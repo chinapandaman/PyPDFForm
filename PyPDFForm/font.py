@@ -122,10 +122,7 @@ def get_new_font_name(fonts: dict):
     existing = set()
     for key in fonts:
         if isinstance(key, str) and key.startswith(FONT_NAME_PREFIX):
-            try:
-                existing.add(int(key[2:]))
-            except ValueError:
-                continue
+            existing.add(int(key[2:]))
 
     n = 1
     while n in existing:
