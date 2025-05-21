@@ -9,8 +9,8 @@ This module contains functions for:
 - Managing font colors and properties
 """
 
-from io import BytesIO
 from functools import lru_cache
+from io import BytesIO
 from math import sqrt
 from re import findall
 from typing import Tuple, Union
@@ -138,7 +138,7 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
         writer.write(f)
         f.seek(0)
         return f.read(), new_font_name
-    
+
 
 @lru_cache
 def get_base_font_name(ttf_stream: bytes) -> str:

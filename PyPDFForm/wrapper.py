@@ -706,7 +706,7 @@ class PdfWrapper(FormWrapper):
         self._stream = copy_watermark_widgets(
             remove_all_widgets(self.read()), stream_with_widgets, None, None
         )
-        self.reregister_font()
+        self._reregister_font()
 
         return self
 
@@ -752,6 +752,7 @@ class PdfWrapper(FormWrapper):
         self._stream = copy_watermark_widgets(
             remove_all_widgets(self.read()), stream_with_widgets, None, None
         )
+        self._reregister_font()
 
         return self
 
@@ -814,13 +815,14 @@ class PdfWrapper(FormWrapper):
             self._font_register_events.append((font_name, ttf_file))
 
         return self
-    
 
-    def reregister_font(self) -> PdfWrapper:
+    def _reregister_font(self) -> PdfWrapper:
         font_register_events_len = len(self._font_register_events)
         for i in range(font_register_events_len):
             event = self._font_register_events[i]
             self.register_font(event[0], event[1])
-        self._font_register_events = self._font_register_events[font_register_events_len:]
+        self._font_register_events = self._font_register_events[
+            font_register_events_len:
+        ]
 
         return self
