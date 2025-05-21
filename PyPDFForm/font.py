@@ -60,20 +60,20 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
 
 def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
     """Registers a TrueType font in a PDF's AcroForm and returns modified PDF.
-    
+
     This function handles the registration of a TTF font into a PDF's AcroForm structure,
     creating all necessary font-related objects in the PDF and ensuring proper font
     registration for form fields.
-    
+
     Args:
         pdf: Input PDF data as bytes to modify
         ttf_stream: TTF font data as bytes to register in the PDF
-        
+
     Returns:
         tuple: A tuple containing:
             - bytes: Modified PDF data with font registration
             - str: The registered font name (with format '/FontName')
-            
+
     Note:
         This function performs several PDF object manipulations:
         - Creates font file stream object
@@ -143,18 +143,18 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
 
 def get_new_font_name(fonts: dict) -> str:
     """Generates a new unique font name for font registration.
-    
+
     Scans existing font names and generates a new unique name by finding the next
     available numeric suffix. Used when registering new fonts to avoid name conflicts.
-    
+
     Args:
         fonts: Dictionary of existing font names to check for conflicts.
             Keys should be strings, values are font objects.
-            
+
     Returns:
         str: New unique font name in format '/F#' where # is the next available number.
             Example: '/F1', '/F2' etc.
-            
+
     Note:
         - Handles numeric suffixes to ensure uniqueness
         - Skips existing numbers in font names
