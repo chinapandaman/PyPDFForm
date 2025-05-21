@@ -10,9 +10,7 @@ def test_register_font_no_form_fields(pdf_samples, font_samples, request):
         pdf_samples, "test_widget_attr_trigger", "test_register_font_no_form_fields.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(os.path.join(
-            pdf_samples, "dummy.pdf"
-        ))
+        obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
         obj.TRIGGER_WIDGET_HOOKS = True
         obj.register_font(
             "new_font", os.path.join(font_samples, "LiberationSerif-Regular.ttf")
