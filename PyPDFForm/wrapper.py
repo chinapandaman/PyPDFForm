@@ -37,8 +37,6 @@ class PdfWrapper:
         ("use_full_widget_name", False),
         ("render_widgets", True),
     ]
-    # TODO: remove, always default to True
-    TRIGGER_WIDGET_HOOKS = False
 
     def __init__(
         self,
@@ -88,7 +86,7 @@ class PdfWrapper:
                 value.font_color = getattr(self, "global_font_color")
 
     def read(self) -> bytes:
-        if self.TRIGGER_WIDGET_HOOKS and any(
+        if any(
             widget.hooks_to_trigger for widget in self.widgets.values()
         ):
             for widget in self.widgets.values():
@@ -360,9 +358,7 @@ class PdfWrapper:
     ) -> PdfWrapper:
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
-        if (register_font(font_name, ttf_file) if ttf_file is not None else False) and (
-            self.TRIGGER_WIDGET_HOOKS
-        ):
+        if (register_font(font_name, ttf_file) if ttf_file is not None else False):
             self._stream, new_font_name = register_font_acroform(self.read(), ttf_file)
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))

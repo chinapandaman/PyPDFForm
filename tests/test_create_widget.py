@@ -67,9 +67,7 @@ def test_create_checkbox_default_filled(template_stream, pdf_samples, request):
 def test_create_checkbox_complex(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_complex.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream)
-        obj.TRIGGER_WIDGET_HOOKS = True
-        obj.create_widget(
+        obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
             "foo",
             1,
@@ -208,9 +206,7 @@ def test_create_text_alpha_bg_color(template_stream, pdf_samples, request):
 def test_create_text_align_center(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_text_align_center.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream)
-        obj.TRIGGER_WIDGET_HOOKS = True
-        obj.create_widget(
+        obj = PdfWrapper(template_stream).create_widget(
             "text",
             "foo",
             1,
@@ -232,9 +228,7 @@ def test_create_text_align_center(template_stream, pdf_samples, request):
 def test_create_text_align_right(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_text_align_right.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream)
-        obj.TRIGGER_WIDGET_HOOKS = True
-        obj.create_widget(
+        obj = PdfWrapper(template_stream).create_widget(
             "text",
             "foo",
             1,
@@ -258,9 +252,7 @@ def test_create_text_align_multiline(template_stream, pdf_samples, request):
         pdf_samples, "widget", "create_text_align_multiline.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream)
-        obj.TRIGGER_WIDGET_HOOKS = True
-        obj.create_widget(
+        obj = PdfWrapper(template_stream).create_widget(
             "text",
             "foo",
             1,
@@ -365,9 +357,7 @@ def test_create_text_complex_filled(template_stream, pdf_samples, request):
 def test_create_text_comb(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_text_comb.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream)
-        obj.TRIGGER_WIDGET_HOOKS = True
-        obj.create_widget(
+        obj = PdfWrapper(template_stream).create_widget(
             "text",
             "foo",
             1,
@@ -562,9 +552,7 @@ def test_create_radio_default_filled(template_stream, pdf_samples, request):
 def test_create_radio_complex(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_radio_complex.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream)
-        obj.TRIGGER_WIDGET_HOOKS = True
-        obj.create_widget(
+        obj = PdfWrapper(template_stream).create_widget(
             "radio",
             "radio",
             2,
