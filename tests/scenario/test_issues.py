@@ -247,11 +247,11 @@ def test_update_key(issue_pdf_directory, request):
 
     expected_path = os.path.join(issue_pdf_directory, "733_expected.pdf")
     request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.preview
+    request.config.results["stream"] = obj.read()
     with open(expected_path, "rb+") as f:
         expected = f.read()
-        assert len(obj.preview) == len(expected)
-        assert obj.preview == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_update_key_persist_properties(issue_pdf_directory, request):
@@ -271,11 +271,11 @@ def test_update_key_persist_properties(issue_pdf_directory, request):
 
     expected_path = os.path.join(issue_pdf_directory, "733_expected.pdf")
     request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.preview
+    request.config.results["stream"] = obj.read()
     with open(expected_path, "rb+") as f:
         expected = f.read()
-        assert len(obj.preview) == len(expected)
-        assert obj.preview == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_bulk_update_key(issue_pdf_directory, request):
@@ -296,11 +296,11 @@ def test_bulk_update_key(issue_pdf_directory, request):
 
     expected_path = os.path.join(issue_pdf_directory, "733_expected.pdf")
     request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.preview
+    request.config.results["stream"] = obj.read()
     with open(expected_path, "rb+") as f:
         expected = f.read()
-        assert len(obj.preview) == len(expected)
-        assert obj.preview == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_get_desc_in_schema(issue_pdf_directory):

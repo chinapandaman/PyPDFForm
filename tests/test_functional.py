@@ -812,12 +812,12 @@ def test_update_radio_key(template_with_radiobutton_stream, pdf_samples, request
         obj.update_widget_key("radio_3", "RADIO")
 
         request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.preview
+        request.config.results["stream"] = obj.read()
 
         expected = f.read()
 
-        assert len(obj.preview) == len(expected)
-        assert obj.preview == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_update_sejda_key(sejda_template, pdf_samples, request):
@@ -830,9 +830,9 @@ def test_update_sejda_key(sejda_template, pdf_samples, request):
         obj.update_widget_key("buyer_signed_date", "BUYER_SIGNED_DATE")
 
         request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.preview
+        request.config.results["stream"] = obj.read()
 
         expected = f.read()
 
-        assert len(obj.preview) == len(expected)
-        assert obj.preview == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected

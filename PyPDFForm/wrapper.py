@@ -151,19 +151,6 @@ class PdfWrapper:
 
         return self.__class__(merge_two_pdfs(self.read(), other.read()))
 
-    @property
-    def preview(self) -> bytes:
-        return remove_all_widgets(
-            fill(
-                self.read(),
-                {
-                    key: preview_widget_to_draw(key, value, True)
-                    for key, value in self.widgets.items()
-                },
-                getattr(self, "use_full_widget_name"),
-            )
-        )
-
     def generate_coordinate_grid(
         self, color: Tuple[float, float, float] = (1, 0, 0), margin: float = 100
     ) -> PdfWrapper:
