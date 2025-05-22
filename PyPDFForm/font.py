@@ -126,7 +126,7 @@ def get_all_available_fonts(pdf: bytes) -> dict:
 
     result = {}
     for key, value in fonts.items():
-        result[value[BaseFont]] = key
+        result[value[BaseFont].replace("/", "")] = key
 
     return result
 
