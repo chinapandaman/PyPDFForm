@@ -51,9 +51,7 @@ class Widget:
 
         for each in self.ALLOWED_NON_ACRO_FORM_PARAMS:
             if each in kwargs:
-                self.non_acro_form_params.append(
-                    (each, kwargs.get(each))
-                )
+                self.non_acro_form_params.append((each, kwargs.get(each)))
 
     def canvas_operations(self, canvas: Canvas) -> None:
         getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**self.acro_form_params)
