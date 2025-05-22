@@ -1,18 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Provides high-level wrapper classes for working with PDF forms.
-
-This module contains the FormWrapper and PdfWrapper classes which provide
-a user-friendly interface for:
-- Filling PDF form fields
-- Creating and modifying PDF form widgets
-- Drawing text and images on PDFs
-- Merging PDF documents
-- Generating coordinate grids
-- Other PDF manipulation tasks
-
-The wrappers handle low-level PDF operations while exposing simple methods
-for common use cases.
-"""
 
 from __future__ import annotations
 
@@ -48,58 +34,16 @@ from .widgets.text import TextWidget
 
 
 class FormWrapper:
-    """Base class providing core PDF form filling functionality.
-
-    This wrapper handles basic PDF form operations:
-    - Accessing raw PDF data through the read() method
-    - Filling existing form fields with provided values
-
-    Note: This class does not parse or analyze form fields - it only fills values
-    into fields that already exist in the template PDF.
-
-    The FormWrapper is designed to be extended by PdfWrapper which adds
-    more advanced features like form analysis and widget creation.
-    """
-
     def __init__(
         self,
         template: Union[bytes, str, BinaryIO] = b"",
         **kwargs,
     ) -> None:
-        """Initializes the base form wrapper with a PDF template.
-
-        Args:
-            template: PDF form as bytes, file path, or file object. Defaults to
-                empty bytes if not provided.
-            **kwargs: Additional options:
-                use_full_widget_name: If True, uses complete widget names including
-                    field hierarchy (default: False)
-
-        Initializes:
-            - Internal PDF stream from the template
-            - Basic form filling capabilities
-            - Widget naming configuration from kwargs
-
-        Note:
-            This base class is designed to be extended by PdfWrapper which adds
-            more advanced features. For most use cases, you'll want to use PdfWrapper.
-        """
-
         super().__init__()
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.use_full_widget_name = kwargs.get("use_full_widget_name", False)
 
     def read(self) -> bytes:
-        """Returns the raw bytes of the PDF form data.
-
-        This method provides access to the underlying PDF bytes after operations
-        like fill() have been performed. No parsing or analysis of the PDF
-        content is done - the bytes are returned as-is.
-
-        Returns:
-            bytes: The complete PDF document as a byte string
-        """
-
         return self._stream
 
     def fill(
@@ -107,32 +51,6 @@ class FormWrapper:
         data: Dict[str, Union[str, bool, int]],
         **kwargs,
     ) -> FormWrapper:
-        """Fills form fields in the PDF with provided values.
-
-        Takes a dictionary of field names to values and updates the corresponding
-        form fields in the PDF. Supports these value types:
-            - Strings for text fields
-            - Booleans for checkboxes (True=checked, False=unchecked)
-            - Integers for numeric fields and dropdown selections
-
-        Only fields that exist in the template PDF will be filled - unknown field
-        names are silently ignored.
-
-        Args:
-            data: Dictionary mapping field names to values. Supported types:
-                str: For text fields
-                bool: For checkboxes (True=checked)
-                int: For numeric fields and dropdown selections
-            **kwargs: Additional options:
-                flatten (bool): If True, makes form fields read-only after filling
-                    (default: False)
-                adobe_mode (bool): If True, uses Adobe-compatible filling logic
-                    (default: False)
-
-        Returns:
-            FormWrapper: Returns self to allow method chaining
-        """
-
         widgets = (
             build_widgets(self.read(), self.use_full_widget_name, False)
             if self.read()
@@ -155,23 +73,6 @@ class FormWrapper:
 
 
 class PdfWrapper(FormWrapper):
-    """Extended PDF form wrapper with advanced features.
-
-    Inherits from FormWrapper and adds capabilities for:
-    - Creating and modifying form widgets
-    - Drawing text and images
-    - Merging PDF documents
-    - Generating coordinate grids
-    - Form schema generation
-    - Font registration
-
-    Key Features:
-    - Maintains widget state and properties
-    - Supports per-page operations
-    - Handles PDF version management
-    - Provides preview functionality
-    """
-
     USER_PARAMS = [
         ("global_font", None),
         ("global_font_size", None),
@@ -187,24 +88,6 @@ class PdfWrapper(FormWrapper):
         template: Union[bytes, str, BinaryIO] = b"",
         **kwargs,
     ) -> None:
-        """Initializes the PDF wrapper with template and configuration.
-
-        Args:
-            template: PDF form as bytes, file path, or file object. Defaults to
-                empty bytes if not provided.
-            **kwargs: Optional configuration parameters including:
-                global_font: Default font name for text fields
-                global_font_size: Default font size
-                global_font_color: Default font color as RGB tuple
-                use_full_widget_name: Whether to use full widget names
-                render_widgets: Whether to render widgets in the PDF
-
-        Initializes:
-            - Widgets dictionary to track form fields
-            - Keys update queue for deferred operations
-            - Any specified global settings from kwargs
-        """
-
         super().__init__(template)
         self.widgets = {}
         self._available_fonts = {}
@@ -217,24 +100,6 @@ class PdfWrapper(FormWrapper):
         self._init_helper()
 
     def _init_helper(self, key_to_refresh: str = None) -> None:
-        """Internal method to refresh widget state after PDF stream changes.
-
-        Called whenever the underlying PDF stream is modified to:
-        - Rebuild the widgets dictionary
-        - Preserve existing widget properties
-        - Apply global font settings to text widgets
-        - Handle special refresh cases for specific widgets
-
-        Args:
-            key_to_refresh: Optional specific widget key that needs refreshing.
-                If provided, only that widget's font properties will be updated.
-                If None, all text widgets will have their fonts updated.
-
-        Note:
-            This is an internal method and typically shouldn't be called directly.
-            It's automatically invoked after operations that modify the PDF stream.
-        """
-
         refresh_not_needed = {}
         new_widgets = (
             build_widgets(
@@ -265,22 +130,6 @@ class PdfWrapper(FormWrapper):
                 value.font_color = getattr(self, "global_font_color")
 
     def read(self) -> bytes:
-        """Reads and returns the raw PDF data with optional widget hook processing.
-
-        This method returns the raw bytes of the PDF document. If widget hooks are enabled
-        (TRIGGER_WIDGET_HOOKS is True), it will:
-        - Process any pending widget hooks
-        - Update font properties if needed
-        - Trigger widget-specific processing
-
-        The method ensures font properties are properly applied to text widgets before
-        returning the final PDF data.
-
-        Returns:
-            bytes: The complete PDF document as raw bytes, with any widget processing applied
-            if enabled.
-        """
-
         if self.TRIGGER_WIDGET_HOOKS and any(
             widget.hooks_to_trigger for widget in self.widgets.values()
         ):
@@ -301,35 +150,10 @@ class PdfWrapper(FormWrapper):
 
     @property
     def sample_data(self) -> dict:
-        """Generates a dictionary of sample values for all form fields.
-
-        Returns a dictionary mapping each widget/field name to an appropriate
-        sample value based on its type:
-        - Text fields: Field name (truncated if max_length specified)
-        - Checkboxes: True
-        - Dropdowns: Index of last available choice
-        - Other fields: Type-specific sample values
-
-        Returns:
-            dict: Field names mapped to their sample values
-        """
-
         return {key: value.sample_value for key, value in self.widgets.items()}
 
     @property
     def version(self) -> Union[str, None]:
-        """Gets the PDF version number from the document header.
-
-        The version is extracted from the PDF header which contains a version
-        identifier like '%PDF-1.4'. This method returns just the version number
-        portion (e.g. '1.4') if found, or None if no valid version identifier
-        is present.
-
-        Returns:
-            str: The PDF version number (e.g. '1.4') if found
-            None: If no valid version identifier exists in the PDF
-        """
-
         for each in VERSION_IDENTIFIERS:
             if self.read().startswith(each):
                 return each.replace(VERSION_IDENTIFIER_PREFIX, b"").decode()
@@ -338,19 +162,6 @@ class PdfWrapper(FormWrapper):
 
     @cached_property
     def pages(self) -> List[PdfWrapper]:
-        """Returns individual page wrappers for each page in the PDF.
-
-        Creates a separate PdfWrapper instance for each page, maintaining all
-        the original wrapper's settings (fonts, rendering options etc.). This
-        allows per-page operations while preserving the parent's configuration.
-
-        The result is cached after first access for better performance with
-        repeated calls.
-
-        Returns:
-            List[PdfWrapper]: List of wrapper objects, one per page
-        """
-
         return [
             self.__class__(
                 copy_watermark_widgets(each, self.read(), None, i),
@@ -360,18 +171,6 @@ class PdfWrapper(FormWrapper):
         ]
 
     def change_version(self, version: str) -> PdfWrapper:
-        """Changes the PDF version identifier in the document header.
-
-        Modifies the version header (e.g. '%PDF-1.4') to match the specified version.
-        Note this only changes the version identifier, not the actual PDF features used.
-
-        Args:
-            version: Target version string (e.g. '1.4', '1.7')
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining
-        """
-
         self._stream = self.read().replace(
             VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
             VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
@@ -381,20 +180,6 @@ class PdfWrapper(FormWrapper):
         return self
 
     def __add__(self, other: PdfWrapper) -> PdfWrapper:
-        """Merges two PDF forms together using the + operator.
-
-        Combines the content of both PDF forms while:
-        - Preserving each form's widgets and data
-        - Adding unique suffixes to duplicate field names
-        - Maintaining all page content and ordering
-
-        Args:
-            other: Another PdfWrapper instance to merge with
-
-        Returns:
-            PdfWrapper: New wrapper containing merged PDF
-        """
-
         if not self.read():
             return other
 
@@ -412,17 +197,6 @@ class PdfWrapper(FormWrapper):
 
     @property
     def preview(self) -> bytes:
-        """Generates a preview PDF showing widget names above their locations.
-
-        Creates a modified version of the PDF where:
-        - All form widgets are removed
-        - Widget names are drawn slightly above their original positions
-        - Helps visualize form field locations without interactive widgets
-
-        Returns:
-            bytes: PDF bytes containing the preview annotations
-        """
-
         return remove_all_widgets(
             fill(
                 self.read(),
@@ -437,21 +211,6 @@ class PdfWrapper(FormWrapper):
     def generate_coordinate_grid(
         self, color: Tuple[float, float, float] = (1, 0, 0), margin: float = 100
     ) -> PdfWrapper:
-        """Generates a coordinate grid overlay for the PDF.
-
-        Creates a visual grid showing x,y coordinates to help with:
-        - Precise widget placement
-        - Measuring distances between elements
-        - Debugging layout issues
-
-        Args:
-            color: RGB tuple (0-1 range) for grid line color (default: red)
-            margin: Spacing between grid lines in PDF units (default: 100)
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining
-        """
-
         self._stream = generate_coordinate_grid(
             remove_all_widgets(
                 fill(
@@ -474,21 +233,6 @@ class PdfWrapper(FormWrapper):
         data: Dict[str, Union[str, bool, int]],
         **kwargs,
     ) -> PdfWrapper:
-        """Fills form fields while preserving widget properties and positions.
-
-        Extends FormWrapper.fill() with additional features:
-        - Maintains widget properties like fonts and styles
-        - Converts dropdowns to text fields while preserving choices
-        - Updates text field attributes and character spacing
-
-        Args:
-            data: Dictionary mapping field names to values (str, bool or int)
-            **kwargs: Currently unused, maintained for future compatibility
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining
-        """
-
         for key, value in data.items():
             if key in self.widgets:
                 self.widgets[key].value = value
@@ -520,38 +264,6 @@ class PdfWrapper(FormWrapper):
         y: Union[float, List[float]],
         **kwargs,
     ) -> PdfWrapper:
-        """
-        Creates a new interactive widget (form field) on the PDF.
-
-        Supported widget types:
-            - "text": Text input field
-            - "checkbox": Checkbox field
-            - "dropdown": Dropdown/combobox field
-            - "radio": Radio button field
-            - "signature": Signature field
-            - "image": Image field
-
-        Args:
-            widget_type (str): Type of widget to create. Must be one of:
-                "text", "checkbox", "dropdown", "radio", "signature", or "image".
-            name (str): Unique name/identifier for the widget.
-            page_number (int): 1-based page number to add the widget to.
-            x (float or List[float]): X coordinate(s) for widget position.
-            y (float or List[float]): Y coordinate(s) for widget position.
-            **kwargs: Additional widget-specific parameters:
-                For text fields: width, height, font, font_size, etc.
-                For checkboxes: size, checked, etc.
-                For dropdowns: choices, default_index, etc.
-                For signature/image: width, height, etc.
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining.
-
-        Notes:
-            - If an unsupported widget_type is provided, the method returns self unchanged.
-            - After widget creation, the internal widget state is refreshed.
-        """
-
         _class = None
         if widget_type == "text":
             _class = TextWidget
@@ -588,24 +300,6 @@ class PdfWrapper(FormWrapper):
     def update_widget_key(
         self, old_key: str, new_key: str, index: int = 0, defer: bool = False
     ) -> PdfWrapper:
-        """Updates the field name/key of an existing widget in the PDF form.
-
-        Allows renaming form fields while preserving all other properties.
-        Supports both immediate and deferred (batched) updates.
-
-        Args:
-            old_key: Current field name/key to be updated
-            new_key: New field name/key to use
-            index: Index for widgets with duplicate names (default: 0)
-            defer: If True, queues the update for later batch processing
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining
-
-        Raises:
-            NotImplementedError: When use_full_widget_name is enabled
-        """
-
         if getattr(self, "use_full_widget_name"):
             raise NotImplementedError
 
@@ -621,19 +315,6 @@ class PdfWrapper(FormWrapper):
         return self
 
     def commit_widget_key_updates(self) -> PdfWrapper:
-        """Processes all deferred widget key updates in a single batch operation.
-
-        Applies all key updates that were queued using update_widget_key() with
-        defer=True. This is more efficient than individual updates when renaming
-        multiple fields.
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining
-
-        Raises:
-            NotImplementedError: When use_full_widget_name is enabled
-        """
-
         if getattr(self, "use_full_widget_name"):
             raise NotImplementedError
 
@@ -657,28 +338,6 @@ class PdfWrapper(FormWrapper):
         y: Union[float, int],
         **kwargs,
     ) -> PdfWrapper:
-        """Draws static text onto the PDF document at specified coordinates.
-
-        Adds non-interactive text that becomes part of the PDF content rather
-        than a form field. The text is drawn using a temporary Text widget and
-        merged via watermark operations, preserving existing form fields.
-
-        Supports multi-line text (using NEW_LINE_SYMBOL) and custom formatting.
-
-        Args:
-            text: The text content to draw (supports newlines with NEW_LINE_SYMBOL)
-            page_number: Page number (1-based) to draw text on
-            x: X coordinate for text position
-            y: Y coordinate for text position
-            **kwargs: Text formatting options:
-                font: Font name (default: "Helvetica")
-                font_size: Font size in points (default: 12)
-                font_color: Font color as RGB tuple (default: (0, 0, 0))
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining
-        """
-
         new_widget = Text("new")
         new_widget.value = text
         new_widget.font = kwargs.get("font", DEFAULT_FONT)
@@ -720,24 +379,6 @@ class PdfWrapper(FormWrapper):
         height: Union[float, int],
         rotation: Union[float, int] = 0,
     ) -> PdfWrapper:
-        """Draws an image onto the PDF document at specified coordinates.
-
-        The image is merged via watermark operations, preserving existing form fields.
-        Supports common formats (JPEG, PNG) from bytes, file paths, or file objects.
-
-        Args:
-            image: Image data as bytes, file path, or file object
-            page_number: Page number (1-based) to draw image on
-            x: X coordinate for image position (lower-left corner)
-            y: Y coordinate for image position (lower-left corner)
-            width: Width of the drawn image in PDF units
-            height: Height of the drawn image in PDF units
-            rotation: Rotation angle in degrees (default: 0)
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining
-        """
-
         image = fp_or_f_obj_or_stream_to_stream(image)
         image = rotate_image(image, rotation)
         watermarks = create_watermarks_and_draw(
@@ -758,21 +399,6 @@ class PdfWrapper(FormWrapper):
 
     @property
     def schema(self) -> dict:
-        """Generates a JSON schema describing the PDF form's fields and types.
-
-        The schema includes:
-        - Field names as property names
-        - Type information (string, boolean, integer)
-        - Field-specific constraints like max lengths for text fields
-        - Choice indices for dropdown fields
-
-        Note: Does not include required field indicators since the PDF form's
-        validation rules are not extracted.
-
-        Returns:
-            dict: A JSON Schema dictionary following Draft 7 format
-        """
-
         return {
             "type": "object",
             "properties": {
@@ -783,28 +409,6 @@ class PdfWrapper(FormWrapper):
     def register_font(
         self, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
     ) -> PdfWrapper:
-        """Registers a custom TrueType font for use in PDF form text fields.
-
-        This method allows adding custom fonts to be used when rendering text in PDF forms.
-        The font will be available for all subsequent text field operations.
-
-        Args:
-            font_name: The name to associate with the font (used when setting font properties)
-            ttf_file: The TrueType font file as either:
-                - Raw bytes of the TTF file
-                - File path string
-                - File-like object
-
-        Returns:
-            PdfWrapper: Returns self to allow method chaining
-
-        Note:
-            - The font registration affects both the PDF's internal font resources and
-              the wrapper's available fonts for text widgets
-            - If TRIGGER_WIDGET_HOOKS is True, also updates AcroForm font resources
-            - Registered fonts become available in all text widgets' available_fonts dict
-        """
-
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         if (register_font(font_name, ttf_file) if ttf_file is not None else False) and (
