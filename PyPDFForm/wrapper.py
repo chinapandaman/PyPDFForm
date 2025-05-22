@@ -24,7 +24,6 @@ from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
                     preview_widget_to_draw, remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
-from .widgets.base import handle_non_acro_form_params
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
 from .widgets.image import ImageWidget
@@ -284,16 +283,15 @@ class PdfWrapper(FormWrapper):
         watermarks = obj.watermarks(self.read())
 
         self._stream = copy_watermark_widgets(self.read(), watermarks, [name], None)
-        if obj.non_acro_form_params:
-            self._stream = handle_non_acro_form_params(
-                self.read(), name, obj.non_acro_form_params
-            )
+        hook_params = obj.hook_params
 
         key_to_refresh = ""
         if widget_type in ("text", "dropdown"):
             key_to_refresh = name
 
         self._init_helper(key_to_refresh)
+        for k, v in hook_params:
+            self.widgets[name].__setattr__(k, v)
 
         return self
 
