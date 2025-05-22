@@ -2,33 +2,27 @@
 
 from functools import lru_cache
 from io import BytesIO
-from sys import maxsize
 from typing import Dict, List, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .constants import (COMB, DEFAULT_BORDER_WIDTH, MULTILINE, NEW_LINE_SYMBOL,
-                        WIDGET_TYPES, Annots, MaxLen, Parent, Rect, T)
-from .middleware.checkbox import Checkbox
+from .constants import (NEW_LINE_SYMBOL, WIDGET_TYPES, Annots, MaxLen,
+                        Parent, T)
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
-from .patterns import (BACKGROUND_COLOR_PATTERNS, BORDER_COLOR_PATTERNS,
-                       BORDER_DASH_ARRAY_PATTERNS, BORDER_STYLE_PATTERNS,
-                       BORDER_WIDTH_PATTERNS, BUTTON_STYLE_PATTERNS,
-                       DROPDOWN_CHOICE_PATTERNS, TEXT_FIELD_FLAG_PATTERNS,
-                       WIDGET_DESCRIPTION_PATTERNS, WIDGET_KEY_PATTERNS,
-                       WIDGET_TYPE_PATTERNS, update_annotation_name)
-from .utils import (extract_widget_property, find_pattern_match, handle_color,
-                    stream_to_io)
+from .patterns import (DROPDOWN_CHOICE_PATTERNS,
+                       WIDGET_DESCRIPTION_PATTERNS,
+                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
+                       update_annotation_name)
+from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
 def build_widgets(
     pdf_stream: bytes,
     use_full_widget_name: bool,
-    render_widgets: bool,
 ) -> Dict[str, WIDGET_TYPES]:
     results = {}
 
@@ -37,39 +31,12 @@ def build_widgets(
             key = get_widget_key(widget, use_full_widget_name)
             _widget = construct_widget(widget, key)
             if _widget is not None:
-
-                _widget.render_widget = render_widgets
                 _widget.desc = extract_widget_property(
                     widget, WIDGET_DESCRIPTION_PATTERNS, None, str
-                )
-                _widget.border_color = extract_widget_property(
-                    widget, BORDER_COLOR_PATTERNS, None, handle_color
-                )
-                _widget.background_color = extract_widget_property(
-                    widget, BACKGROUND_COLOR_PATTERNS, None, handle_color
-                )
-                _widget.border_width = extract_widget_property(
-                    widget, BORDER_WIDTH_PATTERNS, DEFAULT_BORDER_WIDTH, float
-                )
-                _widget.border_style = extract_widget_property(
-                    widget, BORDER_STYLE_PATTERNS, None, str
-                )
-                _widget.dash_array = extract_widget_property(
-                    widget, BORDER_DASH_ARRAY_PATTERNS, None, list
                 )
 
                 if isinstance(_widget, Text):
                     _widget.max_length = get_text_field_max_length(widget)
-                    if _widget.max_length is not None and is_text_field_comb(widget):
-                        _widget.comb = True
-
-                if isinstance(_widget, (Checkbox, Radio)):
-                    _widget.button_style = (
-                        extract_widget_property(
-                            widget, BUTTON_STYLE_PATTERNS, None, str
-                        )
-                        or _widget.button_style
-                    )
 
                 if isinstance(_widget, Dropdown):
                     _widget.choices = get_dropdown_choices(widget)
@@ -144,23 +111,6 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
     return int(widget[MaxLen]) or None if MaxLen in widget else None
 
 
-def check_field_flag_bit(widget: dict, bit: int) -> bool:
-    field_flag = extract_widget_property(widget, TEXT_FIELD_FLAG_PATTERNS, None, int)
-
-    if field_flag is None:
-        return False
-
-    return bool(int(field_flag) & bit)
-
-
-def is_text_field_comb(widget: dict) -> bool:
-    return check_field_flag_bit(widget, COMB)
-
-
-def is_text_multiline(widget: dict) -> bool:
-    return check_field_flag_bit(widget, MULTILINE)
-
-
 def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
     return tuple(
         (each if isinstance(each, str) else str(each[1]))
@@ -168,11 +118,6 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
             widget, DROPDOWN_CHOICE_PATTERNS, None, None
         )
     )
-
-
-def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:
-    rect_width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
-    return rect_width / widget_middleware.max_length
 
 
 def split_characters_into_lines(
@@ -199,66 +144,6 @@ def split_characters_into_lines(
         )
 
     return lines
-
-
-def adjust_each_line(lines: List[str], middleware: Text, width: float) -> List[str]:
-    result = []
-    for each in lines:
-        tracker = ""
-        for char in each:
-            check = tracker + char
-            if stringWidth(check, middleware.font, middleware.font_size) > width:
-                result.append(tracker)
-                tracker = char
-            else:
-                tracker = check
-
-        each = tracker
-        if each:
-            if (
-                result
-                and stringWidth(
-                    f"{each} {result[-1]}",
-                    middleware.font,
-                    middleware.font_size,
-                )
-                <= width
-                and NEW_LINE_SYMBOL not in result[-1]
-            ):
-                result[-1] = f"{result[-1]}{each} "
-            else:
-                result.append(f"{each} ")
-
-    for i, each in enumerate(result):
-        result[i] = each.replace(NEW_LINE_SYMBOL, "")
-
-    if result:
-        result[-1] = result[-1][:-1]
-
-    return result
-
-
-def get_paragraph_lines(widget: dict, widget_middleware: Text) -> List[str]:
-    value = widget_middleware.value or ""
-    if widget_middleware.max_length is not None:
-        value = value[: widget_middleware.max_length]
-
-    width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
-
-    split_by_new_line_symbol = value.split(NEW_LINE_SYMBOL)
-    lines = split_characters_into_lines(
-        split_by_new_line_symbol, widget_middleware, width
-    )
-
-    return adjust_each_line(lines, widget_middleware, width)
-
-
-def get_paragraph_auto_wrap_length(widget_middleware: Text) -> int:
-    result = maxsize
-    for line in widget_middleware.text_lines:
-        result = min(result, len(line))
-
-    return result
 
 
 def update_widget_keys(

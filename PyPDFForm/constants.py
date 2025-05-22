@@ -49,15 +49,6 @@ MaxLen = "/MaxLen"
 Q = "/Q"
 Ch = "/Ch"
 Opt = "/Opt"
-MK = "/MK"
-CA = "/CA"
-BC = "/BC"
-BG = "/BG"
-BS = "/BS"
-W = "/W"
-S = "/S"
-D = "/D"
-U = "/U"
 AS = "/AS"
 Yes = "/Yes"
 Off = "/Off"
@@ -90,7 +81,6 @@ COMB = 1 << 24
 
 FONT_SIZE_IDENTIFIER = "Tf"
 FONT_COLOR_IDENTIFIER = " rg"
-DEFAULT_BORDER_WIDTH = 1
 DEFAULT_FONT = "Helvetica"
 DEFAULT_FONT_SIZE = 12
 DEFAULT_FONT_COLOR = (0, 0, 0)
@@ -98,14 +88,6 @@ DEFAULT_FONT_COLOR = (0, 0, 0)
 NEW_LINE_SYMBOL = "\n"
 
 IMAGE_FIELD_IDENTIFIER = "event.target.buttonImportIcon();"
-
-DEFAULT_CHECKBOX_STYLE = "\u2713"
-DEFAULT_RADIO_STYLE = "\u25cf"
-BUTTON_STYLES = {
-    "4": "\u2713",  # check
-    "5": "\u00d7",  # cross
-    "l": "\u25cf",  # circle
-}
 
 COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO = DEFAULT_FONT_SIZE / 100
 UNIQUE_SUFFIX_LENGTH = 20

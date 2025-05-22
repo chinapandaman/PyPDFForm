@@ -71,30 +71,6 @@ def draw_text(canvas: Canvas, **kwargs) -> None:
         canvas.restoreState()
 
 
-def draw_rect(canvas: Canvas, **kwargs) -> None:
-    x = kwargs["x"]
-    y = kwargs["y"]
-    width = kwargs["width"]
-    height = kwargs["height"]
-
-    canvas.saveState()
-    stroke, fill = set_border_and_background_styles(canvas, **kwargs)
-    canvas.rect(x, y, width, height, stroke=stroke, fill=fill)
-    canvas.restoreState()
-
-
-def draw_ellipse(canvas: Canvas, **kwargs) -> None:
-    x1 = kwargs["x1"]
-    y1 = kwargs["y1"]
-    x2 = kwargs["x2"]
-    y2 = kwargs["y2"]
-
-    canvas.saveState()
-    stroke, fill = set_border_and_background_styles(canvas, **kwargs)
-    canvas.ellipse(x1, y1, x2, y2, stroke=stroke, fill=fill)
-    canvas.restoreState()
-
-
 def draw_line(canvas: Canvas, **kwargs) -> None:
     src_x = kwargs["src_x"]
     src_y = kwargs["src_y"]
@@ -173,8 +149,6 @@ def create_watermarks_and_draw(
         "image": draw_image,
         "text": draw_text,
         "line": draw_line,
-        "rect": draw_rect,
-        "ellipse": draw_ellipse,
     }
 
     if action_type_to_func.get(action_type):

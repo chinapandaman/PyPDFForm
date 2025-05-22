@@ -15,6 +15,7 @@ from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
 from .hooks import trigger_widget_hooks
 from .image import rotate_image
+from .middleware.signature import Signature
 from .middleware.text import Text
 from .template import build_widgets, update_widget_keys
 from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
@@ -35,7 +36,6 @@ class PdfWrapper:
         ("global_font_size", None),
         ("global_font_color", None),
         ("use_full_widget_name", False),
-        ("render_widgets", True),
     ]
 
     def __init__(
@@ -61,7 +61,6 @@ class PdfWrapper:
             build_widgets(
                 self.read(),
                 getattr(self, "use_full_widget_name"),
-                getattr(self, "render_widgets"),
             )
             if self.read()
             else {}
@@ -86,9 +85,7 @@ class PdfWrapper:
                 value.font_color = getattr(self, "global_font_color")
 
     def read(self) -> bytes:
-        if any(
-            widget.hooks_to_trigger for widget in self.widgets.values()
-        ):
+        if any(widget.hooks_to_trigger for widget in self.widgets.values()):
             for widget in self.widgets.values():
                 if (
                     isinstance(widget, Text)
@@ -157,8 +154,13 @@ class PdfWrapper:
         stream_with_widgets = self.read()
         self._stream = copy_watermark_widgets(
             generate_coordinate_grid(
-                remove_all_widgets(self.read()), color, margin,
-            ), stream_with_widgets, None, None,
+                remove_all_widgets(self.read()),
+                color,
+                margin,
+            ),
+            stream_with_widgets,
+            None,
+            None,
         )
         self._reregister_font()
 
@@ -173,13 +175,26 @@ class PdfWrapper:
             if key in self.widgets:
                 self.widgets[key].value = value
 
-        self._stream = simple_fill(
+        filled_stream, image_drawn_stream = simple_fill(
             self.read(),
             self.widgets,
             use_full_widget_name=self.use_full_widget_name,
             flatten=kwargs.get("flatten", False),
             adobe_mode=kwargs.get("adobe_mode", False),
         )
+
+        if image_drawn_stream is not None:
+            keys_to_copy = [
+                k for k, v in self.widgets.items() if not isinstance(v, Signature)
+            ]
+            filled_stream = copy_watermark_widgets(
+                remove_all_widgets(image_drawn_stream),
+                filled_stream,
+                keys_to_copy,
+                None,
+            )
+        self._stream = filled_stream
+        self._reregister_font()
 
         return self
 
@@ -338,7 +353,7 @@ class PdfWrapper:
     ) -> PdfWrapper:
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
-        if (register_font(font_name, ttf_file) if ttf_file is not None else False):
+        if register_font(font_name, ttf_file) if ttf_file is not None else False:
             self._stream, new_font_name = register_font_acroform(self.read(), ttf_file)
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))

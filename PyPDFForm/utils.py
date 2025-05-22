@@ -11,13 +11,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject
 from reportlab.lib.colors import CMYKColor, Color
 
-from .constants import (BUTTON_STYLES, DEFAULT_CHECKBOX_STYLE, DEFAULT_FONT,
-                        DEFAULT_FONT_COLOR,
-                        DEFAULT_RADIO_STYLE,
-                        UNIQUE_SUFFIX_LENGTH)
-from .middleware.checkbox import Checkbox
-from .middleware.radio import Radio
-from .middleware.text import Text
+from .constants import UNIQUE_SUFFIX_LENGTH
 
 
 @lru_cache
@@ -42,23 +36,6 @@ def handle_color(color: Union[list, ArrayObject]) -> Union[Color, CMYKColor, Non
         )
 
     return result
-
-
-def checkbox_radio_to_draw(
-    widget: Union[Checkbox, Radio], font_size: Union[float, int]
-) -> Text:
-    new_widget = Text(
-        name=widget.name,
-        value="",
-    )
-    new_widget.font = DEFAULT_FONT
-    new_widget.font_size = font_size
-    new_widget.font_color = DEFAULT_FONT_COLOR
-    new_widget.value = BUTTON_STYLES.get(widget.button_style) or (
-        DEFAULT_CHECKBOX_STYLE if type(widget) is Checkbox else DEFAULT_RADIO_STYLE
-    )
-
-    return new_widget
 
 
 def remove_all_widgets(pdf: bytes) -> bytes:

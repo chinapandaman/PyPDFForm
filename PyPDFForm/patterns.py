@@ -3,9 +3,9 @@
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
-from .constants import (AP, AS, BC, BG, BS, CA, DV, FT, IMAGE_FIELD_IDENTIFIER,
-                        JS, MK, READ_ONLY, TU, A, Btn, Ch, D, Ff, I, N, Off,
-                        Opt, Parent, Q, S, Sig, T, Tx, V, W, Yes)
+from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS,
+                        READ_ONLY, TU, A, Btn, Ch, Ff, I, N, Off, Opt, Parent,
+                        Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -86,34 +86,6 @@ DROPDOWN_CHOICE_PATTERNS = [
     {Opt: True},
     {Parent: {Opt: True}},
 ]
-
-WIDGET_ALIGNMENT_PATTERNS = [
-    {Q: True},
-    {Parent: {Q: True}},
-]
-
-TEXT_FIELD_FLAG_PATTERNS = [
-    {Ff: True},
-    {Parent: {Ff: True}},
-]
-
-BUTTON_STYLE_PATTERNS = [
-    {MK: {CA: True}},
-]
-
-BORDER_COLOR_PATTERNS = [
-    {MK: {BC: True}},
-]
-
-BACKGROUND_COLOR_PATTERNS = [
-    {MK: {BG: True}},
-]
-
-BORDER_WIDTH_PATTERNS = [{BS: {W: True}}]
-
-BORDER_STYLE_PATTERNS = [{BS: {S: True}}]
-
-BORDER_DASH_ARRAY_PATTERNS = [{BS: {D: True}}]
 
 
 def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:

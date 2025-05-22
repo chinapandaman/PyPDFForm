@@ -13,7 +13,6 @@ class Radio(Checkbox):
 
         self.size = None
         self.number_of_options = 0
-        self._button_style = self.BUTTON_STYLE_MAPPING["circle"]
 
     @property
     def schema_definition(self) -> dict:

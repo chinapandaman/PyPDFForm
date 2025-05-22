@@ -34,25 +34,6 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
             assert not widgets
 
 
-def test_fill_not_render_widgets(template_stream, pdf_samples, data_dict, request):
-    expected_path = os.path.join(pdf_samples, "test_fill_not_render_widgets.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream, render_widgets=False).fill(
-            data_dict,
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        assert len(obj.read()) == len(obj.read())
-        assert obj.read() == obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 def test_register_bad_fonts():
     assert not PdfWrapper().register_font("foo", b"foo").read()
     assert not PdfWrapper().register_font("foo", "foo").read()
@@ -734,11 +715,8 @@ def test_checkbox_change_size_and_button_style(template_stream, pdf_samples, req
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream)
         obj.widgets["check"].size = 50
-        obj.widgets["check"].button_style = "cross"
         obj.widgets["check_2"].size = 40
-        obj.widgets["check_2"].button_style = "circle"
         obj.widgets["check_3"].size = 60
-        obj.widgets["check_3"].button_style = "check"
         obj = obj.fill(
             {
                 "check": True,
@@ -765,11 +743,8 @@ def test_radio_change_size_and_button_style(
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_with_radiobutton_stream)
         obj.widgets["radio_1"].size = 50
-        obj.widgets["radio_1"].button_style = "cross"
         obj.widgets["radio_2"].size = 40
-        obj.widgets["radio_2"].button_style = "circle"
         obj.widgets["radio_3"].size = 60
-        obj.widgets["radio_3"].button_style = "check"
         obj = obj.fill(
             {
                 "radio_1": 0,

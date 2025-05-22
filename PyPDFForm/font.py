@@ -2,8 +2,6 @@
 
 from functools import lru_cache
 from io import BytesIO
-from math import sqrt
-from typing import Union
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
@@ -13,8 +11,7 @@ from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from .constants import (DR, FONT_NAME_PREFIX, AcroForm, BaseFont, Encoding,
                         Fields, Font, FontDescriptor, FontFile2, FontName,
-                        Length1, Rect, Subtype, TrueType, Type,
-                        WinAnsiEncoding)
+                        Length1, Subtype, TrueType, Type, WinAnsiEncoding)
 from .utils import stream_to_io
 
 
@@ -122,11 +119,3 @@ def get_all_available_fonts(pdf: bytes) -> dict:
         result[value[BaseFont].replace("/", "")] = key
 
     return result
-
-
-def checkbox_radio_font_size(widget: dict) -> Union[float, int]:
-    area = abs(float(widget[Rect][0]) - float(widget[Rect][2])) * abs(
-        float(widget[Rect][1]) - float(widget[Rect][3])
-    )
-
-    return sqrt(area) * 72 / 96
