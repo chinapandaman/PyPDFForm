@@ -2,7 +2,7 @@
 
 import os
 
-from PyPDFForm import FormWrapper, PdfWrapper
+from PyPDFForm import PdfWrapper
 
 
 def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
@@ -10,7 +10,7 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
         pdf_samples, "adobe_mode", "dropdown", "dropdown_two.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = FormWrapper(sample_template_with_dropdown).fill(
+        obj = PdfWrapper(sample_template_with_dropdown).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -38,7 +38,7 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
         pdf_samples, "adobe_mode", "paragraph", "sample_filled_sejda_complex.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = FormWrapper(sejda_template_complex).fill(
+        obj = PdfWrapper(sejda_template_complex).fill(
             {
                 "checkbox": True,
                 "radio": 0,
@@ -78,7 +78,7 @@ def test_issue_613(pdf_samples, request):
         pdf_samples, "adobe_mode", "issues", "613_expected.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = FormWrapper(
+        obj = PdfWrapper(
             os.path.join(pdf_samples, "scenario", "issues", "613.pdf")
         ).fill(
             {
@@ -139,7 +139,7 @@ def test_sample_template_libary(pdf_samples, request):
     )
 
     with open(expected_path, "rb+") as f:
-        obj = FormWrapper(template.read()).fill(
+        obj = PdfWrapper(template.read()).fill(
             {
                 "new_text_field_widget": "test text",
                 "new_checkbox_widget": True,
