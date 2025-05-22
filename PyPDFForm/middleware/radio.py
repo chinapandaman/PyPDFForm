@@ -11,7 +11,6 @@ class Radio(Checkbox):
     ) -> None:
         super().__init__(name, value)
 
-        self.size = None
         self.number_of_options = 0
 
     @property

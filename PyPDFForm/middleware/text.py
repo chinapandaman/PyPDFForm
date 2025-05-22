@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any
-
 from .base import Widget
 
 
@@ -32,7 +30,7 @@ class Text(Widget):
         self.max_length = None
 
     @property
-    def value(self) -> Any:
+    def value(self) -> str:
         if isinstance(self._value, (int, float)):
             return str(self._value)
 
