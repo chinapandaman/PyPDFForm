@@ -10,6 +10,9 @@ class Text(Widget):
         "font": "update_text_field_font",
         "font_size": "update_text_field_font_size",
         "font_color": "update_text_field_font_color",
+        "comb": "update_text_field_comb",
+        "alignment": "update_text_field_alignment",
+        "multiline": "update_text_field_multiline",
     }
 
     def __init__(
@@ -29,6 +32,8 @@ class Text(Widget):
         self.text_lines = None
         self.text_line_x_coordinates = None
         self.preview = False
+        self.alignment = None
+        self.multiline = None
 
     @property
     def value(self) -> Any:

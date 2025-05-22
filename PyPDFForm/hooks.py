@@ -139,11 +139,3 @@ def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
         FloatObject(center_y + val / 2),
     ]
     annot[NameObject(Rect)] = ArrayObject(new_rect)
-
-
-# TODO: remove this and switch to hooks
-NON_ACRO_FORM_PARAM_TO_FUNC = {
-    ("TextWidget", "alignment"): update_text_field_alignment,
-    ("TextWidget", "multiline"): update_text_field_multiline,
-    ("TextWidget", "comb"): update_text_field_comb,
-}
