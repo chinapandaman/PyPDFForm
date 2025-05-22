@@ -34,6 +34,7 @@ def trigger_widget_hooks(
 
             for hook in widget.hooks_to_trigger:
                 getattr(sys.modules[__name__], hook[0])(annot, hook[1])
+                print(key, hook[0], hook[1])
 
     for widget in widgets.values():
         widget.hooks_to_trigger = []
