@@ -3,10 +3,9 @@
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
-from .constants import (AP, AS, BC, BG, BS, CA, DA, DV, FT,
-                        IMAGE_FIELD_IDENTIFIER, JS, MK, READ_ONLY, TU, A, Btn,
-                        Ch, D, Ff, I, N, Off, Opt, Parent, Q, S, Sig, T, Tx, V,
-                        W, Yes)
+from .constants import (AP, AS, BC, BG, BS, CA, DV, FT, IMAGE_FIELD_IDENTIFIER,
+                        JS, MK, READ_ONLY, TU, A, Btn, Ch, D, Ff, I, N, Off,
+                        Opt, Parent, Q, S, Sig, T, Tx, V, W, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -96,11 +95,6 @@ WIDGET_ALIGNMENT_PATTERNS = [
 TEXT_FIELD_FLAG_PATTERNS = [
     {Ff: True},
     {Parent: {Ff: True}},
-]
-
-TEXT_FIELD_APPEARANCE_PATTERNS = [
-    {DA: True},
-    {Parent: {DA: True}},
 ]
 
 BUTTON_STYLE_PATTERNS = [

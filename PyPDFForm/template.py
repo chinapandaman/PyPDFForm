@@ -9,9 +9,8 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .constants import (COMB, DEFAULT_BORDER_WIDTH,
-                        MULTILINE, NEW_LINE_SYMBOL, WIDGET_TYPES, Annots,
-                        MaxLen, Parent, Rect, T)
+from .constants import (COMB, DEFAULT_BORDER_WIDTH, MULTILINE, NEW_LINE_SYMBOL,
+                        WIDGET_TYPES, Annots, MaxLen, Parent, Rect, T)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio

@@ -4,25 +4,20 @@ from functools import lru_cache
 from io import BytesIO
 from math import sqrt
 from re import findall
-from typing import Tuple, Union
+from typing import Union
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, StreamObject)
 from reportlab.pdfbase.acroform import AcroForm as RAcroForm
-from reportlab.pdfbase.pdfmetrics import (registerFont, standardFonts,
-                                          stringWidth)
+from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
-from .constants import (DEFAULT_FONT, DR, FONT_COLOR_IDENTIFIER,
-                        FONT_NAME_PREFIX, FONT_SIZE_IDENTIFIER,
-                        FONT_SIZE_REDUCE_STEP, MARGIN_BETWEEN_LINES, AcroForm,
-                        BaseFont, Encoding, Fields, Font, FontDescriptor,
-                        FontFile2, FontName, Length1, Rect, Subtype, TrueType,
-                        Type, WinAnsiEncoding)
-from .middleware.text import Text
-from .patterns import TEXT_FIELD_APPEARANCE_PATTERNS
-from .utils import extract_widget_property, stream_to_io
+from .constants import (DR, FONT_NAME_PREFIX, AcroForm, BaseFont, Encoding,
+                        Fields, Font, FontDescriptor, FontFile2, FontName,
+                        Length1, Rect, Subtype, TrueType, Type,
+                        WinAnsiEncoding)
+from .utils import stream_to_io
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
