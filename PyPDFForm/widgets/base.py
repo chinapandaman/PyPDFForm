@@ -13,7 +13,7 @@ from ..utils import stream_to_io
 class Widget:
     USER_PARAMS = []
     COLOR_PARAMS = []
-    ALLOWED_NON_ACRO_FORM_PARAMS = []
+    ALLOWED_HOOK_PARAMS = []
     NONE_DEFAULTS = []
     ACRO_FORM_FUNC = ""
 
@@ -32,7 +32,7 @@ class Widget:
             "x": x,
             "y": y,
         }
-        self.non_acro_form_params = []
+        self.hook_params = []
 
         for each in self.USER_PARAMS:
             user_input, param = each
@@ -49,9 +49,9 @@ class Widget:
             elif user_input in self.NONE_DEFAULTS:
                 self.acro_form_params[param] = None
 
-        for each in self.ALLOWED_NON_ACRO_FORM_PARAMS:
+        for each in self.ALLOWED_HOOK_PARAMS:
             if each in kwargs:
-                self.non_acro_form_params.append((each, kwargs.get(each)))
+                self.hook_params.append((each, kwargs.get(each)))
 
     def canvas_operations(self, canvas: Canvas) -> None:
         getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**self.acro_form_params)
