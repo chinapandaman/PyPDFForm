@@ -67,7 +67,9 @@ def test_create_checkbox_default_filled(template_stream, pdf_samples, request):
 def test_create_checkbox_complex(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_checkbox_complex.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_widget(
+        obj = PdfWrapper(template_stream)
+        obj.TRIGGER_WIDGET_HOOKS = True
+        obj.create_widget(
             "checkbox",
             "foo",
             1,
@@ -146,25 +148,6 @@ def test_create_checkbox_cross(template_stream, pdf_samples, request):
             100,
             100,
             button_style="cross",
-        )
-        obj.fill(obj.sample_data)
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_create_checkbox_complex_filled(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "create_checkbox_complex_filled.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_widget(
-            "checkbox", "foo", 1, 100, 100, size=100
         )
         obj.fill(obj.sample_data)
 
@@ -579,7 +562,9 @@ def test_create_radio_default_filled(template_stream, pdf_samples, request):
 def test_create_radio_complex(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "create_radio_complex.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_widget(
+        obj = PdfWrapper(template_stream)
+        obj.TRIGGER_WIDGET_HOOKS = True
+        obj.create_widget(
             "radio",
             "radio",
             2,

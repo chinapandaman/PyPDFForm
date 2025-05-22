@@ -130,12 +130,10 @@ def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
 
 def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
     rect = annot[Rect]
-    center_x = (rect[0] + rect[2]) / 2
-    center_y = (rect[1] + rect[3]) / 2
     new_rect = [
-        FloatObject(center_x - val / 2),
-        FloatObject(center_y - val / 2),
-        FloatObject(center_x + val / 2),
-        FloatObject(center_y + val / 2),
+        rect[0],
+        rect[1],
+        FloatObject(rect[0] + val),
+        FloatObject(rect[1] + val),
     ]
     annot[NameObject(Rect)] = ArrayObject(new_rect)
