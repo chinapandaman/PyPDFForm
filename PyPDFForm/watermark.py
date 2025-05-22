@@ -41,28 +41,6 @@ def draw_line(canvas: Canvas, **kwargs) -> None:
     canvas.line(src_x, src_y, dest_x, dest_y)
 
 
-def set_border_and_background_styles(canvas: Canvas, **kwargs) -> tuple:
-    border_color = kwargs["border_color"]
-    background_color = kwargs["background_color"]
-    border_width = kwargs["border_width"]
-    dash_array = kwargs["dash_array"]
-
-    stroke = 0
-    fill = 0
-    if border_color is not None and border_width:
-        canvas.setStrokeColor(border_color)
-        canvas.setLineWidth(border_width)
-        stroke = 1
-    if background_color is not None:
-        canvas.setFillColor(background_color)
-        fill = 1
-
-    if dash_array is not None:
-        canvas.setDash(array=dash_array)
-
-    return stroke, fill
-
-
 def draw_image(canvas: Canvas, **kwargs) -> None:
     image_stream = kwargs["stream"]
     coordinate_x = kwargs["x"]
