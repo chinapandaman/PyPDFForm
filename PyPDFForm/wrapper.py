@@ -154,20 +154,13 @@ class PdfWrapper:
     def generate_coordinate_grid(
         self, color: Tuple[float, float, float] = (1, 0, 0), margin: float = 100
     ) -> PdfWrapper:
-        self._stream = generate_coordinate_grid(
-            remove_all_widgets(
-                fill(
-                    self.read(),
-                    {
-                        key: preview_widget_to_draw(key, value, False)
-                        for key, value in self.widgets.items()
-                    },
-                    getattr(self, "use_full_widget_name"),
-                )
-            ),
-            color,
-            margin,
+        stream_with_widgets = self.read()
+        self._stream = copy_watermark_widgets(
+            generate_coordinate_grid(
+                remove_all_widgets(self.read()), color, margin,
+            ), stream_with_widgets, None, None,
         )
+        self._reregister_font()
 
         return self
 
