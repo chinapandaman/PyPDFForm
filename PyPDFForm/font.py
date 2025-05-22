@@ -3,14 +3,12 @@
 from functools import lru_cache
 from io import BytesIO
 from math import sqrt
-from re import findall
 from typing import Union
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, StreamObject)
-from reportlab.pdfbase.acroform import AcroForm as RAcroForm
-from reportlab.pdfbase.pdfmetrics import registerFont, standardFonts
+from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from .constants import (DR, FONT_NAME_PREFIX, AcroForm, BaseFont, Encoding,
@@ -124,34 +122,6 @@ def get_all_available_fonts(pdf: bytes) -> dict:
         result[value[BaseFont].replace("/", "")] = key
 
     return result
-
-
-def extract_font_from_text_appearance(text_appearance: str) -> Union[str, None]:
-    text_appearances = text_appearance.split(" ")
-
-    for each in text_appearances:
-        if each.startswith("/"):
-            text_segments = findall("[A-Z][^A-Z]*", each.replace("/", ""))
-
-            if len(text_segments) == 1:
-                for k, v in RAcroForm.formFontNames.items():
-                    if v == text_segments[0]:
-                        return k
-
-            for font in standardFonts:
-                font_segments = findall("[A-Z][^A-Z]*", font.replace("-", ""))
-                if len(font_segments) != len(text_segments):
-                    continue
-
-                found = True
-                for i, val in enumerate(font_segments):
-                    if not val.startswith(text_segments[i]):
-                        found = False
-
-                if found:
-                    return font
-
-    return None
 
 
 def checkbox_radio_font_size(widget: dict) -> Union[float, int]:
