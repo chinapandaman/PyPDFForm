@@ -3,9 +3,9 @@
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
-from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS,
-                        READ_ONLY, TU, A, Btn, Ch, Ff, I, N, Off, Opt, Parent,
-                        Sig, T, Tx, V, Yes)
+from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, READ_ONLY,
+                        TU, A, Btn, Ch, Ff, I, N, Off, Opt, Parent, Sig, T, Tx,
+                        V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image

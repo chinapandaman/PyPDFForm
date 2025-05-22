@@ -7,13 +7,11 @@ from typing import Dict, List, Tuple, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
-from .constants import (WIDGET_TYPES, Annots, MaxLen,
-                        Parent, T)
+from .constants import WIDGET_TYPES, Annots, MaxLen, Parent, T
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
-from .patterns import (DROPDOWN_CHOICE_PATTERNS,
-                       WIDGET_DESCRIPTION_PATTERNS,
+from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
                        WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
                        update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io

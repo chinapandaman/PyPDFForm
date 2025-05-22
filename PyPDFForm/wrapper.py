@@ -7,8 +7,7 @@ from typing import BinaryIO, Dict, List, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
-                        VERSION_IDENTIFIER_PREFIX,
-                        VERSION_IDENTIFIERS)
+                        VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
 from .filler import simple_fill
 from .font import (get_all_available_fonts, register_font,
@@ -194,7 +193,8 @@ class PdfWrapper:
                 None,
             )
         self._stream = filled_stream
-        self._reregister_font()
+        if image_drawn_stream is not None:
+            self._reregister_font()
 
         return self
 
