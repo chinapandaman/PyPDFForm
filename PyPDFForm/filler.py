@@ -87,6 +87,7 @@ def simple_fill(
     flatten: bool = False,
     adobe_mode: bool = False,
 ) -> tuple:
+    # pylint: disable=R0912
     pdf = PdfReader(stream_to_io(template))
     out = PdfWriter()
     enable_adobe_mode(pdf, out, adobe_mode)

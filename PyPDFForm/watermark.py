@@ -35,11 +35,10 @@ def draw_line(canvas: Canvas, **kwargs) -> None:
     src_y = kwargs["src_y"]
     dest_x = kwargs["dest_x"]
     dest_y = kwargs["dest_y"]
+    color = kwargs["color"]
 
-    canvas.saveState()
-    set_border_and_background_styles(canvas, **kwargs)
+    canvas.setStrokeColorRGB(*(color))
     canvas.line(src_x, src_y, dest_x, dest_y)
-    canvas.restoreState()
 
 
 def set_border_and_background_styles(canvas: Canvas, **kwargs) -> tuple:

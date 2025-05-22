@@ -8,7 +8,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from .constants import (COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT,
                         Rect)
 from .middleware.text import Text
-from .utils import handle_color, stream_to_io
+from .utils import stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -52,8 +52,6 @@ def generate_coordinate_grid(
         width = float(page.mediabox[2])
         height = float(page.mediabox[3])
 
-        r, g, b = color
-
         current = margin
         while current < width:
             lines_by_page[i + 1].append(
@@ -62,10 +60,7 @@ def generate_coordinate_grid(
                     "src_y": 0,
                     "dest_x": current,
                     "dest_y": height,
-                    "border_color": handle_color([r, g, b]),
-                    "background_color": None,
-                    "border_width": 1,
-                    "dash_array": None,
+                    "color": color,
                 }
             )
             current += margin
@@ -78,10 +73,7 @@ def generate_coordinate_grid(
                     "src_y": current,
                     "dest_x": width,
                     "dest_y": current,
-                    "border_color": handle_color([r, g, b]),
-                    "background_color": None,
-                    "border_width": 1,
-                    "dash_array": None,
+                    "color": color,
                 }
             )
             current += margin
