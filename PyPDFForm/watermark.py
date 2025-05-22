@@ -19,56 +19,15 @@ def draw_text(canvas: Canvas, **kwargs) -> None:
     coordinate_y = kwargs["y"]
 
     text_to_draw = widget.value
-
-    if not text_to_draw:
-        text_to_draw = ""
-
-    if widget.max_length is not None:
-        text_to_draw = text_to_draw[: widget.max_length]
-
     canvas.setFont(widget.font, widget.font_size)
     canvas.setFillColorRGB(
         widget.font_color[0], widget.font_color[1], widget.font_color[2]
     )
-
-    if widget.comb is True:
-        for i, char in enumerate(text_to_draw):
-            canvas.drawString(
-                coordinate_x + widget.character_paddings[i],
-                coordinate_y,
-                char,
-            )
-    elif (
-        widget.text_wrap_length is None or len(text_to_draw) < widget.text_wrap_length
-    ) and widget.text_lines is None:
-        canvas.drawString(
-            coordinate_x,
-            coordinate_y,
-            text_to_draw,
-        )
-    else:
-        text_obj = canvas.beginText(0, 0)
-        for i, line in enumerate(widget.text_lines):
-            cursor_moved = False
-            if (
-                widget.text_line_x_coordinates is not None
-                and widget.text_line_x_coordinates[i] - coordinate_x != 0
-            ):
-                text_obj.moveCursor(widget.text_line_x_coordinates[i] - coordinate_x, 0)
-                cursor_moved = True
-            text_obj.textLine(line)
-            if cursor_moved:
-                text_obj.moveCursor(
-                    -1 * (widget.text_line_x_coordinates[i] - coordinate_x), 0
-                )
-
-        canvas.saveState()
-        canvas.translate(
-            coordinate_x,
-            coordinate_y,
-        )
-        canvas.drawText(text_obj)
-        canvas.restoreState()
+    canvas.drawString(
+        coordinate_x,
+        coordinate_y,
+        text_to_draw,
+    )
 
 
 def draw_line(canvas: Canvas, **kwargs) -> None:

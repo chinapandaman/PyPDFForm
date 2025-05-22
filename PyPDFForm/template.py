@@ -6,9 +6,8 @@ from typing import Dict, List, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
-from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .constants import (NEW_LINE_SYMBOL, WIDGET_TYPES, Annots, MaxLen,
+from .constants import (WIDGET_TYPES, Annots, MaxLen,
                         Parent, T)
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -118,32 +117,6 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
             widget, DROPDOWN_CHOICE_PATTERNS, None, None
         )
     )
-
-
-def split_characters_into_lines(
-    split_by_new_line_symbol: List[str], middleware: Text, width: float
-) -> List[str]:
-    lines = []
-    for line in split_by_new_line_symbol:
-        characters = line.split(" ")
-        current_line = ""
-        for each in characters:
-            line_extended = f"{current_line} {each}" if current_line else each
-            if (
-                stringWidth(line_extended, middleware.font, middleware.font_size)
-                <= width
-            ):
-                current_line = line_extended
-            else:
-                lines.append(current_line)
-                current_line = each
-        lines.append(
-            current_line + NEW_LINE_SYMBOL
-            if len(split_by_new_line_symbol) > 1
-            else current_line
-        )
-
-    return lines
 
 
 def update_widget_keys(
