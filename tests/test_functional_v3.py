@@ -62,3 +62,8 @@ def test_fill_adobe_mode(template_stream, pdf_samples, data_dict, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_register_bad_fonts():
+    assert not PdfWrapper().register_font("foo", b"foo").read()
+    assert not PdfWrapper().register_font("foo", "foo").read()
