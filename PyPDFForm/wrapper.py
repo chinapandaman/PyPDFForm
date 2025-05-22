@@ -10,7 +10,7 @@ from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         NEW_LINE_SYMBOL, VERSION_IDENTIFIER_PREFIX,
                         VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
-from .filler import fill, simple_fill
+from .filler import simple_fill
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
 from .hooks import trigger_widget_hooks
@@ -18,7 +18,7 @@ from .image import rotate_image
 from .middleware.text import Text
 from .template import build_widgets, update_widget_keys
 from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
-                    preview_widget_to_draw, remove_all_widgets)
+                    remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
 from .widgets.checkbox import CheckBoxWidget
