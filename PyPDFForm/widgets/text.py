@@ -7,7 +7,6 @@ class TextWidget(Widget):
     USER_PARAMS = [
         ("width", "width"),
         ("height", "height"),
-        ("font", "fontName"),
         ("font_size", "fontSize"),
         ("font_color", "textColor"),
         ("bg_color", "fillColor"),
@@ -16,6 +15,6 @@ class TextWidget(Widget):
         ("max_length", "maxlen"),
     ]
     COLOR_PARAMS = ["font_color", "bg_color", "border_color"]
-    ALLOWED_HOOK_PARAMS = ["alignment", "multiline", "comb"]
+    ALLOWED_HOOK_PARAMS = ["alignment", "multiline", "comb", "font"]
     NONE_DEFAULTS = ["max_length"]
     ACRO_FORM_FUNC = "textfield"

@@ -14,8 +14,7 @@ def test_register_font_no_form_fields(pdf_samples, font_samples, request):
         obj.TRIGGER_WIDGET_HOOKS = True
         obj.register_font(
             "new_font", os.path.join(font_samples, "LiberationSerif-Regular.ttf")
-        ).create_widget("text", "foo", 1, 100, 100)
-        obj.widgets["foo"].font = "new_font"
+        ).create_widget("text", "foo", 1, 100, 100, font="new_font")
         obj.draw_text("foo", 1, 200, 200, font="new_font")
 
         request.config.results["expected_path"] = expected_path
