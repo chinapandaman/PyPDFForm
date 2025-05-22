@@ -2,6 +2,6 @@
 
 __version__ = "2.5.0"
 
-from .wrapper import FormWrapper, PdfWrapper
+from .wrapper import PdfWrapper
 
-__all__ = ["FormWrapper", "PdfWrapper"]
+__all__ = ["PdfWrapper"]

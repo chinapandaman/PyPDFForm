@@ -32,46 +32,7 @@ from .widgets.signature import SignatureWidget
 from .widgets.text import TextWidget
 
 
-class FormWrapper:
-    def __init__(
-        self,
-        template: Union[bytes, str, BinaryIO] = b"",
-        **kwargs,
-    ) -> None:
-        super().__init__()
-        self._stream = fp_or_f_obj_or_stream_to_stream(template)
-        self.use_full_widget_name = kwargs.get("use_full_widget_name", False)
-
-    def read(self) -> bytes:
-        return self._stream
-
-    def fill(
-        self,
-        data: Dict[str, Union[str, bool, int]],
-        **kwargs,
-    ) -> FormWrapper:
-        widgets = (
-            build_widgets(self.read(), self.use_full_widget_name, False)
-            if self.read()
-            else {}
-        )
-
-        for key, value in data.items():
-            if key in widgets:
-                widgets[key].value = value
-
-        self._stream = simple_fill(
-            self.read(),
-            widgets,
-            use_full_widget_name=self.use_full_widget_name,
-            flatten=kwargs.get("flatten", False),
-            adobe_mode=kwargs.get("adobe_mode", False),
-        )
-
-        return self
-
-
-class PdfWrapper(FormWrapper):
+class PdfWrapper:
     USER_PARAMS = [
         ("global_font", None),
         ("global_font_size", None),
@@ -87,7 +48,8 @@ class PdfWrapper(FormWrapper):
         template: Union[bytes, str, BinaryIO] = b"",
         **kwargs,
     ) -> None:
-        super().__init__(template)
+        super().__init__()
+        self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
         self._available_fonts = {}
         self._font_register_events = []
@@ -145,7 +107,7 @@ class PdfWrapper(FormWrapper):
                 getattr(self, "use_full_widget_name"),
             )
 
-        return super().read()
+        return self._stream
 
     @property
     def sample_data(self) -> dict:
@@ -236,20 +198,12 @@ class PdfWrapper(FormWrapper):
             if key in self.widgets:
                 self.widgets[key].value = value
 
-        for key, value in self.widgets.items():
-            if isinstance(value, Dropdown):
-                self.widgets[key] = dropdown_to_text(value)
-
-        update_text_field_attributes(
-            self.read(), self.widgets, getattr(self, "use_full_widget_name")
-        )
-        if self.read():
-            self.widgets = set_character_x_paddings(
-                self.read(), self.widgets, getattr(self, "use_full_widget_name")
-            )
-
-        self._stream = remove_all_widgets(
-            fill(self.read(), self.widgets, getattr(self, "use_full_widget_name"))
+        self._stream = simple_fill(
+            self.read(),
+            self.widgets,
+            use_full_widget_name=self.use_full_widget_name,
+            flatten=kwargs.get("flatten", False),
+            adobe_mode=kwargs.get("adobe_mode", False),
         )
 
         return self
