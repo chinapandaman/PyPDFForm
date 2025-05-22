@@ -9,12 +9,9 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .constants import (COMB, DEFAULT_BORDER_WIDTH, DEFAULT_FONT_SIZE,
+from .constants import (COMB, DEFAULT_BORDER_WIDTH,
                         MULTILINE, NEW_LINE_SYMBOL, WIDGET_TYPES, Annots,
                         MaxLen, Parent, Rect, T)
-from .font import (adjust_paragraph_font_size, adjust_text_field_font_size,
-                   auto_detect_font, get_text_field_font_color,
-                   get_text_field_font_size, text_field_font_size)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -27,22 +24,6 @@ from .patterns import (BACKGROUND_COLOR_PATTERNS, BORDER_COLOR_PATTERNS,
                        WIDGET_TYPE_PATTERNS, update_annotation_name)
 from .utils import (extract_widget_property, find_pattern_match, handle_color,
                     stream_to_io)
-
-
-def set_character_x_paddings(
-    pdf_stream: bytes,
-    widgets: Dict[str, WIDGET_TYPES],
-    use_full_widget_name: bool,
-) -> Dict[str, WIDGET_TYPES]:
-    for _widgets in get_widgets_by_page(pdf_stream).values():
-        for widget in _widgets:
-            key = get_widget_key(widget, use_full_widget_name)
-            _widget = widgets[key]
-
-            if isinstance(_widget, Text) and _widget.comb is True:
-                _widget.character_paddings = get_character_x_paddings(widget, _widget)
-
-    return widgets
 
 
 def build_widgets(
@@ -104,61 +85,6 @@ def build_widgets(
                 results[key] = _widget
 
     return results
-
-
-def dropdown_to_text(dropdown: Dropdown) -> Text:
-    result = Text(dropdown.name)
-    result.border_color = dropdown.border_color
-    result.background_color = dropdown.background_color
-    result.border_width = dropdown.border_width
-    result.render_widget = dropdown.render_widget
-
-    if dropdown.value is not None:
-        result.value = (
-            dropdown.choices[dropdown.value]
-            if dropdown.value < len(dropdown.choices)
-            else ""
-        )
-
-    return result
-
-
-def update_text_field_attributes(
-    template_stream: bytes,
-    widgets: Dict[str, WIDGET_TYPES],
-    use_full_widget_name: bool,
-) -> None:
-    for _widgets in get_widgets_by_page(template_stream).values():
-        for _widget in _widgets:
-            key = get_widget_key(_widget, use_full_widget_name)
-
-            if isinstance(widgets[key], Text):
-                should_adjust_font_size = False
-                is_paragraph = is_text_multiline(_widget)
-                if widgets[key].font is None:
-                    widgets[key].font = auto_detect_font(_widget)
-                if widgets[key].font_size is None:
-                    template_font_size = get_text_field_font_size(_widget)
-                    widgets[key].font_size = template_font_size or (
-                        text_field_font_size(_widget)
-                        if not is_paragraph
-                        else DEFAULT_FONT_SIZE
-                    )
-                    should_adjust_font_size = (
-                        not template_font_size and widgets[key].max_length is None
-                    )
-                if widgets[key].font_color is None:
-                    widgets[key].font_color = get_text_field_font_color(_widget)
-                if is_paragraph and widgets[key].text_wrap_length is None:
-                    widgets[key].text_lines = get_paragraph_lines(_widget, widgets[key])
-                    widgets[key].text_wrap_length = get_paragraph_auto_wrap_length(
-                        widgets[key]
-                    )
-                if widgets[key].value and should_adjust_font_size:
-                    if is_paragraph:
-                        adjust_paragraph_font_size(_widget, widgets[key])
-                    else:
-                        adjust_text_field_font_size(_widget, widgets[key])
 
 
 @lru_cache()
@@ -248,24 +174,6 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
 def get_char_rect_width(widget: dict, widget_middleware: Text) -> float:
     rect_width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
     return rect_width / widget_middleware.max_length
-
-
-def get_character_x_paddings(widget: dict, widget_middleware: Text) -> List[float]:
-    length = min(len(widget_middleware.value or ""), widget_middleware.max_length)
-    char_rect_width = get_char_rect_width(widget, widget_middleware)
-
-    result = []
-
-    current_x = 0
-    for char in (widget_middleware.value or "")[:length]:
-        current_mid_point = current_x + char_rect_width / 2
-        result.append(
-            current_mid_point
-            - stringWidth(char, widget_middleware.font, widget_middleware.font_size) / 2
-        )
-        current_x += char_rect_width
-
-    return result
 
 
 def split_characters_into_lines(
