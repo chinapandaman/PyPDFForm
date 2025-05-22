@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Provides base widget class and utilities for PDF form field creation.
-
-This module contains:
-- Widget base class with core form field creation functionality
-- Watermark generation for form fields
-- Parameter handling for both AcroForm and non-AcroForm fields
-"""
 
 from io import BytesIO
 from typing import List, Union, cast
@@ -22,22 +15,6 @@ from ..utils import stream_to_io
 
 
 class Widget:
-    """Abstract base class for all PDF form widget creators.
-
-    Provides common functionality for:
-    - Managing widget parameters
-    - Generating watermarks for form fields
-    - Handling both AcroForm and non-AcroForm parameters
-    - PDF page integration
-
-    Attributes:
-        USER_PARAMS: List of (user_name, pdf_param) mappings
-        COLOR_PARAMS: List of color parameters to convert
-        ALLOWED_NON_ACRO_FORM_PARAMS: Supported non-AcroForm parameters
-        NONE_DEFAULTS: Parameters that should default to None
-        ACRO_FORM_FUNC: Name of AcroForm function for widget creation
-    """
-
     USER_PARAMS = []
     COLOR_PARAMS = []
     ALLOWED_NON_ACRO_FORM_PARAMS = []
@@ -52,16 +29,6 @@ class Widget:
         y: Union[float, List[float]],
         **kwargs,
     ) -> None:
-        """Initializes a new widget with position and parameters.
-
-        Args:
-            name: Field name/key for the widget
-            page_number: Page number to place widget on (1-based)
-            x: X coordinate(s) for widget position
-            y: Y coordinate(s) for widget position
-            **kwargs: Additional widget-specific parameters
-        """
-
         super().__init__()
         self.page_number = page_number
         self.acro_form_params = {
@@ -93,27 +60,9 @@ class Widget:
                 )
 
     def canvas_operations(self, canvas: Canvas) -> None:
-        """Draws the widget on the provided PDF canvas using AcroForm.
-
-        Calls the appropriate AcroForm function on the canvas to create the widget
-        with the parameters specified in self.acro_form_params.
-
-        Args:
-            canvas: The ReportLab Canvas object to draw the widget on.
-        """
-
         getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**self.acro_form_params)
 
     def watermarks(self, stream: bytes) -> List[bytes]:
-        """Generates watermarks containing the widget for each page.
-
-        Args:
-            stream: PDF document as bytes to add widget to
-
-        Returns:
-            List[bytes]: Watermark data for each page (empty for non-target pages)
-        """
-
         pdf = PdfReader(stream_to_io(stream))
         page_count = len(pdf.pages)
         watermark = BytesIO()
@@ -139,17 +88,6 @@ class Widget:
 
 
 def handle_non_acro_form_params(pdf: bytes, key: str, params: list) -> bytes:
-    """Processes non-AcroForm parameters for a widget.
-
-    Args:
-        pdf: PDF document as bytes to modify
-        key: Field name/key of the widget to update
-        params: List of (parameter_name, value) tuples to set
-
-    Returns:
-        bytes: Modified PDF with updated parameters
-    """
-
     pdf_file = PdfReader(stream_to_io(pdf))
     out = PdfWriter()
     out.append(pdf_file)

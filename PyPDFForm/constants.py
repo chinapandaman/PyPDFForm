@@ -1,16 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Centralized location for all PyPDFForm constants and default values.
-
-This module defines all the constants used throughout the package including:
-- PDF version identifiers and format strings
-- PDF field type and property constants
-- Default values for fonts, colors and sizes
-- Special identifiers and symbols
-- Field flag bitmasks
-- Button style definitions
-
-All constants are organized by category and used consistently across the package.
-"""
 
 from typing import Union
 

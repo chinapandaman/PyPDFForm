@@ -1,19 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Pattern matching utilities for PDF form widgets.
-
-This module provides:
-- Pattern definitions for identifying widget types and properties
-- Functions for updating widget states and appearances
-- Support for common PDF form operations like flattening fields
-
-Patterns are used throughout PyPDFForm to:
-- Classify widget types (text, checkbox, radio, etc.)
-- Extract widget properties (alignment, colors, flags)
-- Modify widget states (values, appearances, flags)
-
-The module also contains utility functions for common PDF form operations
-like updating field values and flattening form fields.
-"""
 
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
@@ -138,17 +123,6 @@ BORDER_DASH_ARRAY_PATTERNS = [{BS: {D: True}}]
 
 
 def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
-    """Update checkbox annotation values based on check state.
-
-    Modifies the appearance state (AS) and value (V) of a checkbox annotation
-    to reflect the desired checked/unchecked state. Uses the annotation's
-    appearance dictionary (AP/N) to determine valid states.
-
-    Args:
-        annot: PDF annotation dictionary to modify
-        check: Whether the checkbox should be checked (True) or unchecked (False)
-    """
-
     for each in annot[AP][N]:
         if (check and str(each) != Off) or (not check and str(each) == Off):
             annot[NameObject(AS)] = NameObject(each)
@@ -157,17 +131,6 @@ def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -
 
 
 def simple_update_radio_value(annot: DictionaryObject) -> None:
-    """Update radio button annotation values to selected state.
-
-    Modifies the appearance state (AS) of a radio button annotation and updates
-    the parent's value (V) to reflect the selected state. Removes 'Opt' entry
-    from parent dictionary if present. Uses the annotation's appearance
-    dictionary (AP/N) to determine valid states.
-
-    Args:
-        annot: PDF radio button annotation dictionary to modify
-    """
-
     if Opt in annot[Parent]:
         del annot[Parent][Opt]
 
@@ -179,17 +142,6 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
 
 
 def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
-    """Update dropdown annotation values based on widget selection.
-
-    Modifies the value (V), appearance (AP), and index (I) of a dropdown
-    annotation to reflect the currently selected choice from the widget.
-    Handles both standalone dropdowns and those with parent annotations.
-
-    Args:
-        annot: PDF dropdown annotation dictionary to modify
-        widget: Dropdown widget containing the selected value
-    """
-
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(V)] = TextStringObject(
             widget.choices[widget.value]
@@ -202,17 +154,6 @@ def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> N
 
 
 def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
-    """Update text field annotation values based on widget content.
-
-    Modifies the value (V) and appearance (AP) of a text field annotation to
-    reflect the current value from the text widget. Handles both standalone
-    text fields and those with parent annotations.
-
-    Args:
-        annot: PDF text field annotation dictionary to modify
-        widget: Text widget containing the value to set
-    """
-
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(V)] = TextStringObject(widget.value)
         annot[NameObject(AP)] = TextStringObject(widget.value)
@@ -222,32 +163,12 @@ def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
 
 
 def simple_flatten_radio(annot: DictionaryObject) -> None:
-    """Flatten radio button annotation by making it read-only.
-
-    Modifies the field flags (Ff) of a radio button's parent annotation
-    to set the read-only flag, effectively flattening the field and
-    preventing further user interaction.
-
-    Args:
-        annot: PDF radio button annotation dictionary to flatten
-    """
-
     annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
         int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
     )
 
 
 def simple_flatten_generic(annot: DictionaryObject) -> None:
-    """Flatten generic annotation by making it read-only.
-
-    Modifies the field flags (Ff) of an annotation to set the read-only flag,
-    effectively flattening the field and preventing further user interaction.
-    Handles both standalone annotations and those with parent annotations.
-
-    Args:
-        annot: PDF annotation dictionary to flatten
-    """
-
     if Parent in annot and Ff not in annot:
         annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
             int(annot.get(NameObject(Ff), 0)) | READ_ONLY
@@ -259,16 +180,6 @@ def simple_flatten_generic(annot: DictionaryObject) -> None:
 
 
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:
-    """Update the name/title of a PDF annotation.
-
-    Modifies the title (T) field of an annotation to set a new name.
-    Handles both standalone annotations and those with parent annotations.
-
-    Args:
-        annot: PDF annotation dictionary to modify
-        val: New name/title to set for the annotation
-    """
-
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(T)] = TextStringObject(val)
     else:
