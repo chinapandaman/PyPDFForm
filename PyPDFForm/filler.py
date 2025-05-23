@@ -104,7 +104,14 @@ def simple_fill(
             key = get_widget_key(annot.get_object(), use_full_widget_name)
 
             widget = widgets.get(key)
-            if widget is None or widget.value is None:
+            if widget is None:
+                continue
+            if flatten:
+                if isinstance(widget, Radio):
+                    simple_flatten_radio(annot)
+                else:
+                    simple_flatten_generic(annot)
+            if widget.value is None:
                 continue
 
             if isinstance(widgets[key], (Signature, Image)):
@@ -123,12 +130,6 @@ def simple_fill(
                 simple_update_dropdown_value(annot, widget)
             elif isinstance(widget, Text):
                 simple_update_text_value(annot, widget)
-
-            if flatten:
-                if isinstance(widget, Radio):
-                    simple_flatten_radio(annot)
-                else:
-                    simple_flatten_generic(annot)
 
     with BytesIO() as f:
         out.write(f)
