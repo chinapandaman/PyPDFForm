@@ -557,3 +557,25 @@ def test_create_text_complex_filled_flatten(template_stream, pdf_samples, reques
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_create_text_comb(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_create_text_comb.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "text",
+            "foo",
+            1,
+            100,
+            100,
+            max_length=3,
+            comb=True,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
