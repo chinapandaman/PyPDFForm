@@ -949,3 +949,40 @@ def test_radio_change_size(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_fill_image(
+    sample_template_with_image_field, image_samples, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_image.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_image_field).fill(
+            {"image_1": os.path.join(image_samples, "sample_image.jpg")},
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_fill_image_flatten(
+    sample_template_with_image_field, image_samples, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_image_flatten.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_image_field).fill(
+            {"image_1": os.path.join(image_samples, "sample_image.jpg")},
+            flatten=True,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
