@@ -2,6 +2,8 @@
 
 import os
 
+from jsonschema import ValidationError, validate
+
 from PyPDFForm import PdfWrapper
 from PyPDFForm.middleware.base import Widget
 from PyPDFForm.middleware.text import Text
@@ -539,3 +541,84 @@ def test_draw_transparent_png_image_on_one_page(
             request.config.results["stream"] = obj.read()
             assert len(obj.read()) == len(expected)
             assert obj.read() == expected
+
+
+def test_addition_operator_3_times(template_stream, data_dict):
+    result = PdfWrapper()
+
+    for _ in range(3):
+        result += PdfWrapper(template_stream).fill(data_dict)
+
+    assert len((result + PdfWrapper()).read()) == len(result.read())
+    assert (result + PdfWrapper()).read() == result.read()
+    assert len(result.pages) == len(PdfWrapper(template_stream).pages) * 3
+
+
+def test_schema(sample_template_with_comb_text_field):
+    data = {
+        "FirstName": "John",
+        "MiddleName": "Joe",
+        "LastName": "XXXXXXX",
+        "Awesomeness": True,
+        "Gender": 0,
+    }
+    schema = PdfWrapper(sample_template_with_comb_text_field).schema
+
+    assert schema["type"] == "object"
+    properties = schema["properties"]
+    for key, value in data.items():
+        if key == "LastName":
+            assert properties[key]["maxLength"] == 7
+        if isinstance(value, str):
+            assert properties[key]["type"] == "string"
+        elif isinstance(value, bool):
+            assert properties[key]["type"] == "boolean"
+        elif isinstance(value, int):
+            assert properties[key]["type"] == "integer"
+            assert properties[key]["maximum"] == 1
+
+    validate(instance=data, schema=schema)
+
+    data["LastName"] = "XXXXXXXX"
+    try:
+        validate(instance=data, schema=schema)
+        raise AssertionError
+    except ValidationError:
+        pass
+
+    data["LastName"] = "XXXXXXX"
+    data["Gender"] = 1
+    validate(instance=data, schema=schema)
+
+    data["Gender"] = 2
+    try:
+        validate(instance=data, schema=schema)
+        raise AssertionError
+    except ValidationError:
+        pass
+
+
+def test_sample_data(sejda_template_complex):
+    obj = PdfWrapper(sejda_template_complex)
+    try:
+        validate(instance=obj.sample_data, schema=obj.schema)
+    except ValidationError:
+        raise AssertionError from ValidationError
+
+    widget = Widget("foo")
+    try:
+        widget.sample_value()
+        raise AssertionError
+    except NotImplementedError:
+        pass
+
+
+def test_sample_data_max_boundary(sample_template_with_comb_text_field):
+    obj = PdfWrapper(sample_template_with_comb_text_field)
+    try:
+        validate(instance=obj.sample_data, schema=obj.schema)
+    except ValidationError:
+        raise AssertionError from ValidationError
+
+    assert obj.sample_data["LastName"] == "LastNam"
+    assert obj.sample_data["Gender"] == 1
