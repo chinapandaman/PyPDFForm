@@ -282,3 +282,54 @@ def test_dropdown_alignment_flatten(dropdown_alignment, pdf_samples, request):
         if os.name != "nt":
             assert len(obj.read()) == len(expected)
             assert obj.read() == expected
+
+
+def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "dropdown", "test_dropdown_alignment_sejda.pdf"
+    )
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(dropdown_alignment_sejda).fill(
+            {
+                "dropdown_left": 0,
+                "dropdown_center": 1,
+                "dropdown_right": 2,
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_dropdown_alignment_sejda_flatten(dropdown_alignment_sejda, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "dropdown", "test_dropdown_alignment_sejda_flatten.pdf"
+    )
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(dropdown_alignment_sejda).fill(
+            {
+                "dropdown_left": 0,
+                "dropdown_center": 1,
+                "dropdown_right": 2,
+            },
+            flatten=True,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
