@@ -6,7 +6,9 @@ from PyPDFForm import PdfWrapper
 
 
 def test_filling_pdf_escape_pdf_form(tool_pdf_directory, request):
-    expected_path = os.path.join(tool_pdf_directory, "test_filling_pdf_escape_pdf_form.pdf")
+    expected_path = os.path.join(
+        tool_pdf_directory, "test_filling_pdf_escape_pdf_form.pdf"
+    )
     with open(expected_path, "rb+") as f:
         expected = f.read()
         result = PdfWrapper(os.path.join(tool_pdf_directory, "pdf_escape.pdf")).fill(
@@ -52,7 +54,9 @@ def test_filling_docfly_pdf_form(tool_pdf_directory, request):
 
 
 def test_filling_sejda_dropdown_pdf_form(tool_pdf_directory, request):
-    expected_path = os.path.join(tool_pdf_directory, "test_filling_sejda_dropdown_pdf_form.pdf")
+    expected_path = os.path.join(
+        tool_pdf_directory, "test_filling_sejda_dropdown_pdf_form.pdf"
+    )
     with open(expected_path, "rb+") as f:
         expected = f.read()
         result = PdfWrapper(
