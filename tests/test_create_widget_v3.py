@@ -21,7 +21,9 @@ def test_create_not_supported_type_not_working(template_stream):
 
 
 def test_create_checkbox_default(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_default.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_checkbox_default.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -88,7 +90,9 @@ def test_create_checkbox_default_filled_flatten(template_stream, pdf_samples, re
 
 
 def test_create_checkbox_complex(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_complex.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_checkbox_complex.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -116,7 +120,9 @@ def test_create_checkbox_complex(template_stream, pdf_samples, request):
 
 
 def test_create_checkbox_complex_fill(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_complex_fill.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_checkbox_complex_fill.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -145,7 +151,9 @@ def test_create_checkbox_complex_fill(template_stream, pdf_samples, request):
 
 
 def test_create_checkbox_complex_fill_flatten(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_complex_fill_flatten.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_checkbox_complex_fill_flatten.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -174,7 +182,9 @@ def test_create_checkbox_complex_fill_flatten(template_stream, pdf_samples, requ
 
 
 def test_create_checkbox_check_fill(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_check_fill.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_checkbox_check_fill.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -196,7 +206,9 @@ def test_create_checkbox_check_fill(template_stream, pdf_samples, request):
 
 
 def test_create_checkbox_check_fill_flatten(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_check_fill_flatten.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_checkbox_check_fill_flatten.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -218,7 +230,9 @@ def test_create_checkbox_check_fill_flatten(template_stream, pdf_samples, reques
 
 
 def test_create_checkbox_circle_fill(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_circle_fill.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_checkbox_circle_fill.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -240,7 +254,9 @@ def test_create_checkbox_circle_fill(template_stream, pdf_samples, request):
 
 
 def test_create_checkbox_circle_fill_flatten(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_circle_fill_flatten.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_checkbox_circle_fill_flatten.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -262,7 +278,9 @@ def test_create_checkbox_circle_fill_flatten(template_stream, pdf_samples, reque
 
 
 def test_create_checkbox_cross_fill(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_cross_fill.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_checkbox_cross_fill.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -284,7 +302,9 @@ def test_create_checkbox_cross_fill(template_stream, pdf_samples, request):
 
 
 def test_create_checkbox_cross_fill_flatten(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_cross_fill_flatten.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_checkbox_cross_fill_flatten.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "checkbox",
@@ -351,7 +371,9 @@ def test_create_text_alpha_bg_color(template_stream, pdf_samples, request):
 
 
 def test_create_text_align_center(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_text_align_center.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_text_align_center.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "text",
@@ -373,7 +395,9 @@ def test_create_text_align_center(template_stream, pdf_samples, request):
 
 
 def test_create_text_align_right(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_text_align_right.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_text_align_right.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "text",
@@ -581,7 +605,9 @@ def test_create_text_comb(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_create_checkbox_persist_old_widgets_fill(template_stream, pdf_samples, request):
+def test_create_checkbox_persist_old_widgets_fill(
+    template_stream, pdf_samples, request
+):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_checkbox_persist_old_widgets_fill.pdf"
     )
@@ -607,9 +633,13 @@ def test_create_checkbox_persist_old_widgets_fill(template_stream, pdf_samples, 
         assert obj.read() == expected
 
 
-def test_create_checkbox_persist_old_widgets_fill_flatten(template_stream, pdf_samples, request):
+def test_create_checkbox_persist_old_widgets_fill_flatten(
+    template_stream, pdf_samples, request
+):
     expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_persist_old_widgets_fill_flatten.pdf"
+        pdf_samples,
+        "widget",
+        "test_create_checkbox_persist_old_widgets_fill_flatten.pdf",
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream)
@@ -634,7 +664,9 @@ def test_create_checkbox_persist_old_widgets_fill_flatten(template_stream, pdf_s
 
 
 def test_create_widget_sejda_fill(sejda_template, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_widget_sejda_fill.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_widget_sejda_fill.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sejda_template)
         obj.fill(obj.sample_data).create_widget(
@@ -662,7 +694,9 @@ def test_create_widget_sejda_fill(sejda_template, pdf_samples, request):
 
 
 def test_create_widget_sejda_fill_flatten_before(sejda_template, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_widget_sejda_fill_flatten_before.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_widget_sejda_fill_flatten_before.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sejda_template)
         obj.fill(obj.sample_data, flatten=True).create_widget(
@@ -690,7 +724,9 @@ def test_create_widget_sejda_fill_flatten_before(sejda_template, pdf_samples, re
 
 
 def test_create_widget_sejda_fill_flatten_after(sejda_template, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_widget_sejda_fill_flatten_after.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_widget_sejda_fill_flatten_after.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sejda_template)
         obj.fill(obj.sample_data).create_widget(
@@ -793,7 +829,9 @@ def test_fill_cmyk_color(pdf_samples, request):
 
 
 def test_fill_cmyk_color_flatten(pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_fill_cmyk_color_flatten.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_fill_cmyk_color_flatten.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(
             os.path.join(pdf_samples, "widget", "sample_template_with_cmyk_color.pdf")
@@ -904,7 +942,9 @@ def test_create_radio_complex(template_stream, pdf_samples, request):
 
 
 def test_create_signature_default(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_signature_default.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_signature_default.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).create_widget(
             "signature",
@@ -974,7 +1014,10 @@ def test_create_signature_default_filled_flatten(
                 width=410,
                 height=100,
             )
-            .fill({"sig_1": os.path.join(image_samples, "sample_signature.png")}, flatten=True)
+            .fill(
+                {"sig_1": os.path.join(image_samples, "sample_signature.png")},
+                flatten=True,
+            )
         )
 
         request.config.results["expected_path"] = expected_path
@@ -1057,7 +1100,10 @@ def test_create_image_default_filled_flatten(
                 width=192,
                 height=108,
             )
-            .fill({"image_1": os.path.join(image_samples, "sample_image.jpg")}, flatten=True)
+            .fill(
+                {"image_1": os.path.join(image_samples, "sample_image.jpg")},
+                flatten=True,
+            )
         )
 
         request.config.results["expected_path"] = expected_path
