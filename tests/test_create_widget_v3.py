@@ -873,3 +873,54 @@ def test_create_radio_default_filled_flatten(template_stream, pdf_samples, reque
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_create_radio_complex(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_create_radio_complex.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "radio",
+            "radio",
+            2,
+            [50, 100, 150],
+            [50, 100, 150],
+            size=50,
+            button_style="check",
+            shape="circle",
+            tick_color=(0, 1, 0),
+            bg_color=(0, 0, 1, 1),
+            border_color=(1, 0, 0),
+            border_width=5,
+        )
+        assert obj.schema["properties"]["radio"]["type"] == "integer"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_create_signature_default(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_create_signature_default.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "signature",
+            "sig_1",
+            1,
+            100,
+            100,
+            width=410,
+            height=100,
+        )
+        assert obj.schema["properties"]["sig_1"]["type"] == "string"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
