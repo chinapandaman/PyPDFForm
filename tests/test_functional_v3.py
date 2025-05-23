@@ -5,6 +5,8 @@ import os
 from jsonschema import ValidationError, validate
 
 from PyPDFForm import PdfWrapper
+from PyPDFForm.template import get_widgets_by_page
+from PyPDFForm.constants import UNIQUE_SUFFIX_LENGTH, T, V
 from PyPDFForm.middleware.base import Widget
 from PyPDFForm.middleware.text import Text
 
@@ -552,6 +554,28 @@ def test_addition_operator_3_times(template_stream, data_dict):
     assert len((result + PdfWrapper()).read()) == len(result.read())
     assert (result + PdfWrapper()).read() == result.read()
     assert len(result.pages) == len(PdfWrapper(template_stream).pages) * 3
+
+
+def test_merging_unique_suffix(template_stream):
+    result = PdfWrapper()
+
+    for i in range(10):
+        obj = PdfWrapper(
+            PdfWrapper(template_stream).fill({"test": f"value-{i}"}).read()
+        )
+        result += obj
+
+    merged = PdfWrapper(result.read())
+
+    for page, widgets in get_widgets_by_page(result.read()).items():
+        for widget in widgets:
+            assert widget[T] in merged.widgets
+            if widget[T] == "test":
+                assert widget[V] == "value-0"
+            elif V in widget and "value-" in widget[V]:
+                assert widget[V] == f"value-{page // 3}"
+                assert widget[T].split("-")[0] == "test"
+                assert len(widget[T].split("-")[1]) == UNIQUE_SUFFIX_LENGTH
 
 
 def test_schema(sample_template_with_comb_text_field):
