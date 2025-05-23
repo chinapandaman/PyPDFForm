@@ -76,3 +76,69 @@ def test_ds82(existed_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_ds82_all_chars_lowercase(existed_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
+        {
+            "LastName": "x" * 30,
+        }
+    )
+
+    expected_path = os.path.join(
+        existed_pdf_directory,
+        "test_ds82_all_chars_lowercase.pdf",
+    )
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_ds82_all_chars_uppercase(existed_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
+        {
+            "LastName": "X" * 30,
+        }
+    )
+
+    expected_path = os.path.join(
+        existed_pdf_directory,
+        "test_ds82_all_chars_uppercase.pdf",
+    )
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_ds82_mixed_case(existed_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
+        {
+            "LastName": "xX" * 10,
+        }
+    )
+
+    expected_path = os.path.join(
+        existed_pdf_directory,
+        "test_ds82_mixed_case.pdf",
+    )
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
