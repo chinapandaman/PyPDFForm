@@ -691,3 +691,60 @@ def test_fill_right_aligned_flatten(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_version(pdf_samples):
+    versions = ["1.0", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "2.0"]
+
+    for version in versions:
+        obj = PdfWrapper(os.path.join(pdf_samples, "versions", f"{version}.pdf"))
+        assert obj.version == version
+        assert obj.change_version("2.0").version == "2.0"
+
+    obj = PdfWrapper(os.path.join(pdf_samples, "versions", "unknown.pdf"))
+    assert obj.version is None
+
+
+def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_fill_font_color.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_font_colors).fill(
+            {
+                "red_12": "red",
+                "green_14": "green",
+                "blue_16": "blue",
+                "mixed_auto": "mixed",
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
+
+
+def test_fill_font_color_flatten(sample_template_with_font_colors, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_fill_font_color_flatten.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_font_colors).fill(
+            {
+                "red_12": "red",
+                "green_14": "green",
+                "blue_16": "blue",
+                "mixed_auto": "mixed",
+            },
+            flatten=True
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
