@@ -230,3 +230,78 @@ def test_fill_font_20_adobe_mode(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_fill_font_color_red(
+    template_stream, pdf_samples, data_dict, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_font_color_red.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(template_stream)
+        for v in obj.widgets.values():
+            if isinstance(v, Text):
+                v.font_color = (1, 0, 0)
+        obj.fill(
+            data_dict,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_fill_font_color_red_flatten(
+    template_stream, pdf_samples, data_dict, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_font_color_red_flatten.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(template_stream)
+        for v in obj.widgets.values():
+            if isinstance(v, Text):
+                v.font_color = (1, 0, 0)
+        obj.fill(
+            data_dict, flatten=True
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_fill_font_color_red_adobe_mode(
+    template_stream, pdf_samples, data_dict, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_font_color_red_adobe_mode.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(template_stream)
+        for v in obj.widgets.values():
+            if isinstance(v, Text):
+                v.font_color = (1, 0, 0)
+        obj.fill(
+            data_dict, adobe_mode=True
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
