@@ -55,8 +55,6 @@ def test_paragraph_auto_wrap(sample_template_with_paragraph, pdf_samples, reques
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.read())
-        assert obj.read() == obj.read()
 
         expected = f.read()
 
@@ -78,8 +76,6 @@ def test_paragraph_auto_wrap_flatten(sample_template_with_paragraph, pdf_samples
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.read())
-        assert obj.read() == obj.read()
 
         expected = f.read()
 
@@ -100,8 +96,6 @@ def test_paragraph_auto_font(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.read())
-        assert obj.read() == obj.read()
 
         expected = f.read()
 
@@ -123,11 +117,135 @@ def test_paragraph_auto_font_flatten(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.read())
-        assert obj.read() == obj.read()
 
         expected = f.read()
 
         if os.name != "nt":
             assert len(obj.read()) == len(expected)
             assert obj.read() == expected
+
+
+def test_paragraph_auto_font_auto_wrap(
+    sample_template_with_paragraph_auto_font, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "paragraph", "test_paragraph_auto_font_auto_wrap.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_paragraph_auto_font).fill(
+            {
+                "paragraph": "t xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx t"
+            }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
+
+
+def test_paragraph_auto_font_auto_wrap_flatten(
+    sample_template_with_paragraph_auto_font, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "paragraph", "test_paragraph_auto_font_auto_wrap_flatten.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_paragraph_auto_font).fill(
+            {
+                "paragraph": "t xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx t"
+            },
+            flatten=True
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
+
+
+def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "paragraph", "test_fill_sejda_complex.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template_complex).fill(
+            {
+                "checkbox": True,
+                "radio": 0,
+                "dropdown_font_auto_left": 0,
+                "dropdown_font_auto_center": 1,
+                "dropdown_font_auto_right": 2,
+                "dropdown_font_ten_left": 0,
+                "dropdown_font_ten_center": 1,
+                "dropdown_font_ten_right": 2,
+                "paragraph_font_auto_left": "paragraph_font_auto_left",
+                "paragraph_font_auto_center": "paragraph_font_auto_center",
+                "paragraph_font_auto_right": "paragraph_font_auto_right",
+                "paragraph_font_ten_left": "paragraph_font_ten_left",
+                "paragraph_font_ten_center": "paragraph_font_ten_center",
+                "paragraph_font_ten_right": "paragraph_font_ten_right",
+                "text__font_auto_left": "test text",
+                "text_font_auto_center": "test text",
+                "text_font_auto_right": "test text",
+                "text_font_ten_left": "text_font_ten_left",
+                "text_font_ten_center": "text_font_ten_center",
+                "text_font_ten_right": "text_font_ten_right",
+            }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_fill_sejda_complex_flatten(sejda_template_complex, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "paragraph", "test_fill_sejda_complex_flatten.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template_complex).fill(
+            {
+                "checkbox": True,
+                "radio": 0,
+                "dropdown_font_auto_left": 0,
+                "dropdown_font_auto_center": 1,
+                "dropdown_font_auto_right": 2,
+                "dropdown_font_ten_left": 0,
+                "dropdown_font_ten_center": 1,
+                "dropdown_font_ten_right": 2,
+                "paragraph_font_auto_left": "paragraph_font_auto_left",
+                "paragraph_font_auto_center": "paragraph_font_auto_center",
+                "paragraph_font_auto_right": "paragraph_font_auto_right",
+                "paragraph_font_ten_left": "paragraph_font_ten_left",
+                "paragraph_font_ten_center": "paragraph_font_ten_center",
+                "paragraph_font_ten_right": "paragraph_font_ten_right",
+                "text__font_auto_left": "test text",
+                "text_font_auto_center": "test text",
+                "text_font_auto_right": "test text",
+                "text_font_ten_left": "text_font_ten_left",
+                "text_font_ten_center": "text_font_ten_center",
+                "text_font_ten_right": "text_font_ten_right",
+            },
+            flatten=True
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
