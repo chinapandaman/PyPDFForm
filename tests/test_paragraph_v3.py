@@ -85,3 +85,49 @@ def test_paragraph_auto_wrap_flatten(sample_template_with_paragraph, pdf_samples
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_paragraph_auto_font(
+    sample_template_with_paragraph_auto_font, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "paragraph", "test_paragraph_auto_font.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_paragraph_auto_font).fill(
+            {"paragraph": "test paragraph"}
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
+
+        expected = f.read()
+
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
+
+
+def test_paragraph_auto_font_flatten(
+    sample_template_with_paragraph_auto_font, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "paragraph", "test_paragraph_auto_font_flatten.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_paragraph_auto_font).fill(
+            {"paragraph": "test paragraph"}, flatten=True
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(obj.read())
+        assert obj.read() == obj.read()
+
+        expected = f.read()
+
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
