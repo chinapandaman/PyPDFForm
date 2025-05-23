@@ -462,3 +462,98 @@ def test_create_text_default_filled_flatten(template_stream, pdf_samples, reques
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_create_text_complex(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_create_text_complex.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "text",
+            "foo",
+            1,
+            100,
+            100,
+            width=400,
+            height=400,
+            max_length=2,
+            font="Arial",
+            font_size=50,
+            font_color=(1, 0.5, 1),
+            bg_color=(0, 0, 1),
+            border_color=(1, 0, 0),
+            border_width=5,
+        )
+        assert obj.schema["properties"]["foo"]["type"] == "string"
+        assert obj.schema["properties"]["foo"]["maxLength"] == 2
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_create_text_complex_filled(template_stream, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_text_complex_filled.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "text",
+            "foo",
+            1,
+            100,
+            100,
+            width=400,
+            height=400,
+            max_length=2,
+            font="Arial",
+            font_size=50,
+            font_color=(1, 0.5, 1),
+            bg_color=(0, 0, 1),
+            border_color=(1, 0, 0),
+            border_width=5,
+        )
+        obj.fill(obj.sample_data)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_create_text_complex_filled_flatten(template_stream, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_text_complex_filled_flatten.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "text",
+            "foo",
+            1,
+            100,
+            100,
+            width=400,
+            height=400,
+            max_length=2,
+            font="Arial",
+            font_size=50,
+            font_color=(1, 0.5, 1),
+            bg_color=(0, 0, 1),
+            border_color=(1, 0, 0),
+            border_width=5,
+        )
+        obj.fill(obj.sample_data, flatten=True)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
