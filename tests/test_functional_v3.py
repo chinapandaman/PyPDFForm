@@ -748,3 +748,64 @@ def test_fill_font_color_flatten(sample_template_with_font_colors, pdf_samples, 
         if os.name != "nt":
             assert len(obj.read()) == len(expected)
             assert obj.read() == expected
+
+
+def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_fill_complex_fonts.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_complex_fonts).fill(
+            {
+                "Courier": "Test",
+                "Courier-Bold": "Test",
+                "Courier-BoldOblique": "Test",
+                "Courier-Oblique": "Test",
+                "Helvetica": "Test",
+                "Helvetica-Bold": "Test",
+                "Helvetica-BoldOblique": "Test",
+                "Helvetica-Oblique": "Test",
+                "Times-Bold": "Test",
+                "Times-BoldItalic": "Test",
+                "Times-Italic": "Test",
+                "Times-Roman": "Test",
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
+
+
+def test_fill_complex_fonts_flatten(sample_template_with_complex_fonts, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_fill_complex_fonts_flatten.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_complex_fonts).fill(
+            {
+                "Courier": "Test",
+                "Courier-Bold": "Test",
+                "Courier-BoldOblique": "Test",
+                "Courier-Oblique": "Test",
+                "Helvetica": "Test",
+                "Helvetica-Bold": "Test",
+                "Helvetica-BoldOblique": "Test",
+                "Helvetica-Oblique": "Test",
+                "Times-Bold": "Test",
+                "Times-BoldItalic": "Test",
+                "Times-Italic": "Test",
+                "Times-Roman": "Test",
+            },
+            flatten=True
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
