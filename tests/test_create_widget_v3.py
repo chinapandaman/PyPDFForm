@@ -715,3 +715,62 @@ def test_create_widget_sejda_fill_flatten_after(sejda_template, pdf_samples, req
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_create_widget_sejda_schema(sejda_template):
+    obj = PdfWrapper(sejda_template)
+    old_schema = obj.schema
+    schema = (
+        PdfWrapper(sejda_template)
+        .create_widget(
+            widget_type="text",
+            name="new_text_field_widget",
+            page_number=1,
+            x=72,
+            y=730,
+            width=120,
+            height=40,
+            max_length=6,
+            font="Times-Roman",
+            font_size=20,
+            font_color=(0, 0, 1),
+        )
+        .schema
+    )
+
+    assert schema["properties"]["new_text_field_widget"]
+    assert len(schema["properties"]) == len(old_schema["properties"]) + 1
+
+
+def test_create_dropdown(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_create_dropdown.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            widget_type="dropdown",
+            name="new_dropdown_widget",
+            page_number=1,
+            x=57,
+            y=700,
+            options=[
+                "foo",
+                "bar",
+                "foobar",
+            ],
+            width=120,
+            height=40,
+            font="Arial",
+            font_size=15,
+            font_color=(1, 0, 0),
+            bg_color=(0, 0, 1),
+            border_color=(1, 0, 0),
+            border_width=5,
+        )
+        assert obj.schema["properties"]["new_dropdown_widget"]["type"] == "integer"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
