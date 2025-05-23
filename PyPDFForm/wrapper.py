@@ -31,9 +31,6 @@ from .widgets.text import TextWidget
 
 class PdfWrapper:
     USER_PARAMS = [
-        ("global_font", None),
-        ("global_font_size", None),
-        ("global_font_color", None),
         ("use_full_widget_name", False),
     ]
 
@@ -54,8 +51,7 @@ class PdfWrapper:
 
         self._init_helper()
 
-    def _init_helper(self, key_to_refresh: str = None) -> None:
-        refresh_not_needed = {}
+    def _init_helper(self) -> None:
         new_widgets = (
             build_widgets(
                 self.read(),
@@ -67,21 +63,10 @@ class PdfWrapper:
         for k, v in self.widgets.items():
             if k in new_widgets:
                 new_widgets[k] = v
-                refresh_not_needed[k] = True
         self.widgets = new_widgets
 
         if self.read():
             self._available_fonts.update(**get_all_available_fonts(self.read()))
-
-        for key, value in self.widgets.items():
-            if (key_to_refresh and key == key_to_refresh) or (
-                key_to_refresh is None
-                and isinstance(value, Text)
-                and not refresh_not_needed.get(key)
-            ):
-                value.font = getattr(self, "global_font")
-                value.font_size = getattr(self, "global_font_size")
-                value.font_color = getattr(self, "global_font_color")
 
     def read(self) -> bytes:
         if any(widget.hooks_to_trigger for widget in self.widgets.values()):
@@ -89,6 +74,7 @@ class PdfWrapper:
                 if (
                     isinstance(widget, Text)
                     and widget.font not in self._available_fonts.values()
+                    and widget.font in self._available_fonts
                 ):
                     widget.font = self._available_fonts.get(widget.font)
 
@@ -229,11 +215,7 @@ class PdfWrapper:
         self._stream = copy_watermark_widgets(self.read(), watermarks, [name], None)
         hook_params = obj.hook_params
 
-        key_to_refresh = ""
-        if widget_type in ("text", "dropdown"):
-            key_to_refresh = name
-
-        self._init_helper(key_to_refresh)
+        self._init_helper()
         for k, v in hook_params:
             self.widgets[name].__setattr__(k, v)
 
