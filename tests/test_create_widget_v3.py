@@ -984,3 +984,86 @@ def test_create_signature_default_filled_flatten(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_create_image_default(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_create_image_default.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "image",
+            "image_1",
+            1,
+            100,
+            100,
+            width=192,
+            height=108,
+        )
+        assert obj.schema["properties"]["image_1"]["type"] == "string"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_create_image_default_filled(
+    template_stream, pdf_samples, image_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_image_default_filled.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = (
+            PdfWrapper(template_stream)
+            .create_widget(
+                "image",
+                "image_1",
+                1,
+                100,
+                100,
+                width=192,
+                height=108,
+            )
+            .fill({"image_1": os.path.join(image_samples, "sample_image.jpg")})
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_create_image_default_filled_flatten(
+    template_stream, pdf_samples, image_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_image_default_filled_flatten.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = (
+            PdfWrapper(template_stream)
+            .create_widget(
+                "image",
+                "image_1",
+                1,
+                100,
+                100,
+                width=192,
+                height=108,
+            )
+            .fill({"image_1": os.path.join(image_samples, "sample_image.jpg")}, flatten=True)
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
