@@ -128,6 +128,7 @@ def test_register_global_font_fill_flatten(
 def test_register_global_font_fill_adobe_mode(
     template_stream, pdf_samples, samle_font_stream, data_dict, request
 ):
+    # TODO: adobe cannot read text
     expected_path = os.path.join(
         pdf_samples, "test_register_global_font_fill_adobe_mode.pdf"
     )
@@ -145,6 +146,81 @@ def test_register_global_font_fill_adobe_mode(
         obj.fill(
             data_dict,
             adobe_mode=True,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_fill_font_20(
+    template_stream, pdf_samples, data_dict, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_font_20.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(template_stream)
+        for v in obj.widgets.values():
+            if isinstance(v, Text):
+                v.font_size = 20
+        obj.fill(
+            data_dict,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_fill_font_20_flatten(
+    template_stream, pdf_samples, data_dict, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_font_20_flatten.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(template_stream)
+        for v in obj.widgets.values():
+            if isinstance(v, Text):
+                v.font_size = 20
+        obj.fill(
+            data_dict, flatten=True,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_fill_font_20_adobe_mode(
+    template_stream, pdf_samples, data_dict, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_font_20_adobe_mode.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(template_stream)
+        for v in obj.widgets.values():
+            if isinstance(v, Text):
+                v.font_size = 20
+        obj.fill(
+            data_dict, adobe_mode=True,
         )
 
         request.config.results["expected_path"] = expected_path
