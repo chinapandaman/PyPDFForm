@@ -59,7 +59,9 @@ def test_dropdown_one(sample_template_with_dropdown, pdf_samples, request):
 
 
 def test_dropdown_one_flatten(sample_template_with_dropdown, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_one_flatten.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "dropdown", "test_dropdown_one_flatten.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sample_template_with_dropdown).fill(
             {
@@ -72,7 +74,7 @@ def test_dropdown_one_flatten(sample_template_with_dropdown, pdf_samples, reques
                 "radio_1": 1,
                 "dropdown_1": 0,
             },
-            flatten=True
+            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -110,7 +112,9 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
 
 
 def test_dropdown_two_flatten(sample_template_with_dropdown, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_two_flatten.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "dropdown", "test_dropdown_two_flatten.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sample_template_with_dropdown).fill(
             {
@@ -123,7 +127,7 @@ def test_dropdown_two_flatten(sample_template_with_dropdown, pdf_samples, reques
                 "radio_1": 1,
                 "dropdown_1": 1,
             },
-            flatten=True
+            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -161,7 +165,9 @@ def test_dropdown_three(sample_template_with_dropdown, pdf_samples, request):
 
 
 def test_dropdown_three_flatten(sample_template_with_dropdown, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_three_flatten.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "dropdown", "test_dropdown_three_flatten.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sample_template_with_dropdown).fill(
             {
@@ -174,7 +180,7 @@ def test_dropdown_three_flatten(sample_template_with_dropdown, pdf_samples, requ
                 "radio_1": 1,
                 "dropdown_1": 2,
             },
-            flatten=True
+            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -212,7 +218,9 @@ def test_dropdown_four(sample_template_with_dropdown, pdf_samples, request):
 
 
 def test_dropdown_four_flatten(sample_template_with_dropdown, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_four_flatten.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "dropdown", "test_dropdown_four_flatten.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sample_template_with_dropdown).fill(
             {
@@ -238,9 +246,7 @@ def test_dropdown_four_flatten(sample_template_with_dropdown, pdf_samples, reque
 
 
 def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_alignment.pdf"
-    )
+    expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_alignment.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(dropdown_alignment).fill(
             {
@@ -271,7 +277,7 @@ def test_dropdown_alignment_flatten(dropdown_alignment, pdf_samples, request):
                 "dropdown_center": 1,
                 "dropdown_right": 2,
             },
-            flatten=True
+            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -309,7 +315,9 @@ def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples, request
         assert obj.read() == expected
 
 
-def test_dropdown_alignment_sejda_flatten(dropdown_alignment_sejda, pdf_samples, request):
+def test_dropdown_alignment_sejda_flatten(
+    dropdown_alignment_sejda, pdf_samples, request
+):
     expected_path = os.path.join(
         pdf_samples, "dropdown", "test_dropdown_alignment_sejda_flatten.pdf"
     )
