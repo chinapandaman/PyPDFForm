@@ -179,7 +179,7 @@ class PdfWrapper:
                 None,
             )
         self._stream = filled_stream
-        if image_drawn_stream is not None:
+        if image_drawn_stream is not None or kwargs.get("adobe_mode", False):
             self._reregister_font()
 
         return self
