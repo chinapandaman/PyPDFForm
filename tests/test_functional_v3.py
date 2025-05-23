@@ -5,10 +5,10 @@ import os
 from jsonschema import ValidationError, validate
 
 from PyPDFForm import PdfWrapper
-from PyPDFForm.template import get_widgets_by_page
 from PyPDFForm.constants import UNIQUE_SUFFIX_LENGTH, T, V
 from PyPDFForm.middleware.base import Widget
 from PyPDFForm.middleware.text import Text
+from PyPDFForm.template import get_widgets_by_page
 
 
 def test_base_schema_definition():
@@ -113,9 +113,7 @@ def test_register_global_font_fill_flatten(
         assert obj.read() == expected
 
 
-def test_fill_font_20(
-    template_stream, pdf_samples, data_dict, request
-):
+def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "test_fill_font_20.pdf")
     with open(
         expected_path,
@@ -138,9 +136,7 @@ def test_fill_font_20(
         assert obj.read() == expected
 
 
-def test_fill_font_20_flatten(
-    template_stream, pdf_samples, data_dict, request
-):
+def test_fill_font_20_flatten(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "test_fill_font_20_flatten.pdf")
     with open(
         expected_path,
@@ -151,7 +147,8 @@ def test_fill_font_20_flatten(
             if isinstance(v, Text):
                 v.font_size = 20
         obj.fill(
-            data_dict, flatten=True,
+            data_dict,
+            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -163,9 +160,7 @@ def test_fill_font_20_flatten(
         assert obj.read() == expected
 
 
-def test_fill_font_color_red(
-    template_stream, pdf_samples, data_dict, request
-):
+def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "test_fill_font_color_red.pdf")
     with open(
         expected_path,
@@ -188,9 +183,7 @@ def test_fill_font_color_red(
         assert obj.read() == expected
 
 
-def test_fill_font_color_red_flatten(
-    template_stream, pdf_samples, data_dict, request
-):
+def test_fill_font_color_red_flatten(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "test_fill_font_color_red_flatten.pdf")
     with open(
         expected_path,
@@ -200,9 +193,7 @@ def test_fill_font_color_red_flatten(
         for v in obj.widgets.values():
             if isinstance(v, Text):
                 v.font_color = (1, 0, 0)
-        obj.fill(
-            data_dict, flatten=True
-        )
+        obj.fill(data_dict, flatten=True)
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
@@ -245,7 +236,9 @@ def test_fill_with_customized_widgets(
 def test_fill_with_customized_widgets_flatten(
     template_stream, pdf_samples, samle_font_stream, data_dict, request
 ):
-    expected_path = os.path.join(pdf_samples, "test_fill_with_customized_widgets_flatten.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "test_fill_with_customized_widgets_flatten.pdf"
+    )
     with open(
         expected_path,
         "rb+",
@@ -259,7 +252,8 @@ def test_fill_with_customized_widgets_flatten(
         obj.widgets["test"].font_color = (1, 0, 0)
         obj.widgets["test_2"].font_color = (0, 1, 0)
         obj.fill(
-            data_dict, flatten=True,
+            data_dict,
+            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -271,9 +265,7 @@ def test_fill_with_customized_widgets_flatten(
         assert obj.read() == expected
 
 
-def test_fill_radiobutton(
-    template_with_radiobutton_stream, pdf_samples, request
-):
+def test_fill_radiobutton(template_with_radiobutton_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_fill_radiobutton.pdf")
     with open(
         expected_path,
@@ -322,17 +314,13 @@ def test_fill_radiobutton_flatten(
         assert obj.read() == expected
 
 
-def test_fill_sejda(
-    sejda_template, pdf_samples, sejda_data, request
-):
+def test_fill_sejda(sejda_template, pdf_samples, sejda_data, request):
     expected_path = os.path.join(pdf_samples, "test_fill_sejda.pdf")
     with open(
         expected_path,
         "rb+",
     ) as f:
-        obj = PdfWrapper(sejda_template).fill(
-            sejda_data
-        )
+        obj = PdfWrapper(sejda_template).fill(sejda_data)
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
@@ -343,16 +331,15 @@ def test_fill_sejda(
         assert obj.read() == expected
 
 
-def test_fill_sejda_flatten(
-    sejda_template, pdf_samples, sejda_data, request
-):
+def test_fill_sejda_flatten(sejda_template, pdf_samples, sejda_data, request):
     expected_path = os.path.join(pdf_samples, "test_fill_sejda_flatten.pdf")
     with open(
         expected_path,
         "rb+",
     ) as f:
         obj = PdfWrapper(sejda_template).fill(
-            sejda_data, flatten=True,
+            sejda_data,
+            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -525,7 +512,9 @@ def test_draw_png_image_on_one_page(
 def test_draw_transparent_png_image_on_one_page(
     template_stream, image_samples, pdf_samples, request
 ):
-    expected_path = os.path.join(pdf_samples, "test_draw_transparent_png_image_on_one_page.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "test_draw_transparent_png_image_on_one_page.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).draw_image(
             os.path.join(image_samples, "sample_transparent_png.png"),
@@ -663,7 +652,7 @@ def test_fill_right_aligned(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        
+
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
@@ -686,7 +675,7 @@ def test_fill_right_aligned_flatten(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        
+
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
@@ -727,7 +716,9 @@ def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request)
             assert obj.read() == expected
 
 
-def test_fill_font_color_flatten(sample_template_with_font_colors, pdf_samples, request):
+def test_fill_font_color_flatten(
+    sample_template_with_font_colors, pdf_samples, request
+):
     expected_path = os.path.join(pdf_samples, "test_fill_font_color_flatten.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sample_template_with_font_colors).fill(
@@ -737,7 +728,7 @@ def test_fill_font_color_flatten(sample_template_with_font_colors, pdf_samples, 
                 "blue_16": "blue",
                 "mixed_auto": "mixed",
             },
-            flatten=True
+            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -780,7 +771,9 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
             assert obj.read() == expected
 
 
-def test_fill_complex_fonts_flatten(sample_template_with_complex_fonts, pdf_samples, request):
+def test_fill_complex_fonts_flatten(
+    sample_template_with_complex_fonts, pdf_samples, request
+):
     expected_path = os.path.join(pdf_samples, "test_fill_complex_fonts_flatten.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sample_template_with_complex_fonts).fill(
@@ -798,7 +791,7 @@ def test_fill_complex_fonts_flatten(sample_template_with_complex_fonts, pdf_samp
                 "Times-Italic": "Test",
                 "Times-Roman": "Test",
             },
-            flatten=True
+            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -912,9 +905,7 @@ def test_generate_coordinate_grid_margin_50(template_stream, pdf_samples, reques
 
 
 def test_checkbox_change_size(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "test_checkbox_change_size.pdf"
-    )
+    expected_path = os.path.join(pdf_samples, "test_checkbox_change_size.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream)
         obj.widgets["check"].size = 50
@@ -930,12 +921,8 @@ def test_checkbox_change_size(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_radio_change_size(
-    template_with_radiobutton_stream, pdf_samples, request
-):
-    expected_path = os.path.join(
-        pdf_samples, "test_radio_change_size.pdf"
-    )
+def test_radio_change_size(template_with_radiobutton_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_radio_change_size.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_with_radiobutton_stream)
         obj.widgets["radio_1"].size = 50
@@ -1017,7 +1004,7 @@ def test_update_sejda_key(sejda_template, pdf_samples, request):
                 "YEAR": "12",
                 "FUTURE_DATE": True,
                 "PURCHASE_OPTION": 1,
-                "BUYER_SIGNED_DATE": "2012-01-01"
+                "BUYER_SIGNED_DATE": "2012-01-01",
             }
         )
 
