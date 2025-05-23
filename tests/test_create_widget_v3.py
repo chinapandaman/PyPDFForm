@@ -215,3 +215,47 @@ def test_create_checkbox_check_fill_flatten(template_stream, pdf_samples, reques
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_create_checkbox_circle_fill(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_circle_fill.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "checkbox",
+            "foo",
+            1,
+            100,
+            100,
+            button_style="circle",
+        )
+        obj.fill(obj.sample_data)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_create_checkbox_circle_fill_flatten(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_create_checkbox_circle_fill_flatten.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            "checkbox",
+            "foo",
+            1,
+            100,
+            100,
+            button_style="circle",
+        )
+        obj.fill(obj.sample_data, flatten=True)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
