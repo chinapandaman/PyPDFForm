@@ -316,3 +316,45 @@ def test_fill_radiobutton_flatten(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_fill_sejda(
+    sejda_template, pdf_samples, sejda_data, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_sejda.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(sejda_template).fill(
+            sejda_data
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_fill_sejda_flatten(
+    sejda_template, pdf_samples, sejda_data, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_sejda_flatten.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(sejda_template).fill(
+            sejda_data, flatten=True,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
