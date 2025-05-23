@@ -631,3 +631,87 @@ def test_create_checkbox_persist_old_widgets_fill_flatten(template_stream, pdf_s
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_create_widget_sejda_fill(sejda_template, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_create_widget_sejda_fill.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template)
+        obj.fill(obj.sample_data).create_widget(
+            widget_type="text",
+            name="new_text_field_widget",
+            page_number=1,
+            x=72,
+            y=730,
+            width=120,
+            height=40,
+            max_length=6,
+            font="Helvetica",
+            font_size=20,
+            font_color=(0, 0, 1),
+        ).fill(obj.sample_data)
+        assert obj.schema["properties"]["new_text_field_widget"]["type"] == "string"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_create_widget_sejda_fill_flatten_before(sejda_template, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_create_widget_sejda_fill_flatten_before.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template)
+        obj.fill(obj.sample_data, flatten=True).create_widget(
+            widget_type="text",
+            name="new_text_field_widget",
+            page_number=1,
+            x=72,
+            y=730,
+            width=120,
+            height=40,
+            max_length=6,
+            font="Helvetica",
+            font_size=20,
+            font_color=(0, 0, 1),
+        ).fill(obj.sample_data)
+        assert obj.schema["properties"]["new_text_field_widget"]["type"] == "string"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_create_widget_sejda_fill_flatten_after(sejda_template, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "widget", "test_create_widget_sejda_fill_flatten_after.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template)
+        obj.fill(obj.sample_data).create_widget(
+            widget_type="text",
+            name="new_text_field_widget",
+            page_number=1,
+            x=72,
+            y=730,
+            width=120,
+            height=40,
+            max_length=6,
+            font="Helvetica",
+            font_size=20,
+            font_color=(0, 0, 1),
+        ).fill(obj.sample_data, flatten=True)
+        assert obj.schema["properties"]["new_text_field_widget"]["type"] == "string"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
