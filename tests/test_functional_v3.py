@@ -646,3 +646,48 @@ def test_sample_data_max_boundary(sample_template_with_comb_text_field):
 
     assert obj.sample_data["LastName"] == "LastNam"
     assert obj.sample_data["Gender"] == 1
+
+
+def test_fill_right_aligned(
+    sample_template_with_right_aligned_text_field, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_right_aligned.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_right_aligned_text_field).fill(
+            {
+                "name": "Hans Mustermann",
+                "fulladdress": "Musterstr. 12, 82903 Musterdorf, Musterland",
+                "advisorname": "Karl Test",
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_fill_right_aligned_flatten(
+    sample_template_with_right_aligned_text_field, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "test_fill_right_aligned_flatten.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_right_aligned_text_field).fill(
+            {
+                "name": "Hans Mustermann",
+                "fulladdress": "Musterstr. 12, 82903 Musterdorf, Musterland",
+                "advisorname": "Karl Test",
+            },
+            flatten=True,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
