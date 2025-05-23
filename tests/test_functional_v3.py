@@ -986,3 +986,45 @@ def test_fill_image_flatten(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_update_radio_key(template_with_radiobutton_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_update_radio_key.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_with_radiobutton_stream)
+        obj.update_widget_key("radio_3", "RADIO")
+        obj.fill({"RADIO": 0})
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_update_sejda_key(sejda_template, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_update_sejda_key.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template)
+        obj.update_widget_key("year", "YEAR")
+        obj.update_widget_key("at_future_date", "FUTURE_DATE")
+        obj.update_widget_key("purchase_option", "PURCHASE_OPTION")
+        obj.update_widget_key("buyer_signed_date", "BUYER_SIGNED_DATE")
+        obj.fill(
+            {
+                "YEAR": "12",
+                "FUTURE_DATE": True,
+                "PURCHASE_OPTION": 1,
+                "BUYER_SIGNED_DATE": "2012-01-01"
+            }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
