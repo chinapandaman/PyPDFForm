@@ -423,3 +423,73 @@ def test_draw_text_on_sejda_template(sejda_template, pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_draw_image_on_one_page.pdf")
+    with open(expected_path, "rb+") as f:
+        with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
+            obj = PdfWrapper(template_stream).draw_image(
+                _f,
+                2,
+                100,
+                100,
+                400,
+                225,
+            )
+
+        expected = f.read()
+
+        if os.name != "nt":
+            request.config.results["expected_path"] = expected_path
+            request.config.results["stream"] = obj.read()
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
+
+
+def test_draw_image_on_radio_template(
+    template_with_radiobutton_stream, image_samples, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "test_draw_image_on_radio_template.pdf")
+    with open(expected_path, "rb+") as f:
+        with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
+            obj = PdfWrapper(template_with_radiobutton_stream).draw_image(
+                _f,
+                2,
+                100,
+                100,
+                400,
+                225,
+            )
+
+        expected = f.read()
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_draw_image_on_sejda_template(
+    sejda_template, image_samples, pdf_samples, request
+):
+    expected_path = os.path.join(pdf_samples, "test_draw_image_on_sejda_template.pdf")
+    with open(expected_path, "rb+") as f:
+        with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
+            obj = PdfWrapper(sejda_template).draw_image(
+                _f,
+                2,
+                100,
+                100,
+                400,
+                225,
+            )
+
+        expected = f.read()
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
