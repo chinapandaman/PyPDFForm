@@ -431,11 +431,10 @@ def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples, req
 
         expected = f.read()
 
-        if os.name != "nt":
-            request.config.results["expected_path"] = expected_path
-            request.config.results["stream"] = obj.read()
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_draw_image_on_radio_template(
@@ -502,11 +501,10 @@ def test_draw_png_image_on_one_page(
 
         expected = f.read()
 
-        if os.name != "nt":
-            request.config.results["expected_path"] = expected_path
-            request.config.results["stream"] = obj.read()
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_draw_transparent_png_image_on_one_page(
@@ -527,11 +525,10 @@ def test_draw_transparent_png_image_on_one_page(
 
         expected = f.read()
 
-        if os.name != "nt":
-            request.config.results["expected_path"] = expected_path
-            request.config.results["stream"] = obj.read()
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_addition_operator_3_times(template_stream, data_dict):

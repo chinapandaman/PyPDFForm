@@ -56,9 +56,8 @@ def test_fill_signature_overlap(pdf_samples, image_samples, request):
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_signature_overlap_not_preserve_aspect_ratio(
@@ -83,9 +82,8 @@ def test_fill_signature_overlap_not_preserve_aspect_ratio(
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_small_icon(pdf_samples, image_samples, request):
@@ -103,9 +101,8 @@ def test_fill_small_icon(pdf_samples, image_samples, request):
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_small_icon_not_preserve_aspect_ratio(pdf_samples, image_samples, request):
@@ -126,9 +123,8 @@ def test_fill_small_icon_not_preserve_aspect_ratio(pdf_samples, image_samples, r
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_vertical_image(pdf_samples, image_samples, request):
@@ -148,9 +144,8 @@ def test_fill_vertical_image(pdf_samples, image_samples, request):
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_vertical_image_not_preserve_aspect_ratio(
@@ -175,6 +170,5 @@ def test_fill_vertical_image_not_preserve_aspect_ratio(
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
