@@ -814,6 +814,18 @@ def test_pages(template_stream, pdf_samples, request):
         assert obj.pages[0].read() == f.read()
 
 
+def test_pages_preserve_font(template_stream, pdf_samples, samle_font_stream, request):
+    expected_path = os.path.join(pdf_samples, "pages", "test_pages_preserve_font.pdf")
+    obj = PdfWrapper(template_stream)
+    obj.register_font("new_font", samle_font_stream)
+    obj.widgets["test_2"].font = "new_font"
+
+    with open(expected_path, "rb+") as f:
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.pages[1].read()
+        assert obj.pages[1].read() == f.read()
+
+
 def test_sejda_pages_1(sejda_template, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "pages", "test_sejda_pages_1.pdf")
     obj = PdfWrapper(sejda_template)
