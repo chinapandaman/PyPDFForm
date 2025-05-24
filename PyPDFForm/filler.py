@@ -111,6 +111,8 @@ def simple_fill(
             widget = widgets.get(key)
             if widget is None:
                 continue
+
+            # flatten all
             if flatten:
                 if isinstance(widget, Radio):
                     simple_flatten_radio(annot)
