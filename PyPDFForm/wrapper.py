@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import BinaryIO, Dict, List, Tuple, Union
+from typing import BinaryIO, Dict, List, Tuple, Union, Sequence
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
@@ -99,14 +99,21 @@ class PdfWrapper:
         return None
 
     @cached_property
-    def pages(self) -> List[PdfWrapper]:
-        return [
+    def pages(self) -> Sequence[PdfWrapper]:
+        result = [
             self.__class__(
                 copy_watermark_widgets(each, self.read(), None, i),
                 **{param: getattr(self, param) for param, _ in self.USER_PARAMS},
             )
             for i, each in enumerate(get_page_streams(remove_all_widgets(self.read())))
         ]
+
+        if self._font_register_events:
+            for event in self._font_register_events:
+                for page in result:
+                    page.register_font(event[0], event[1])
+
+        return result
 
     def change_version(self, version: str) -> PdfWrapper:
         self._stream = self.read().replace(
