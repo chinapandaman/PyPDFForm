@@ -138,14 +138,15 @@ def test_sample_template_libary(pdf_samples, request):
                     "foobar",
                 ],
             )
-        ).fill(
-            {
-                "new_text_field_widget": "test text",
-                "new_checkbox_widget": True,
-                "new_radio_group": 1,
-                "new_dropdown_widget": 2,
-            },
-            adobe_mode=True,
+            .fill(
+                {
+                    "new_text_field_widget": "test text",
+                    "new_checkbox_widget": True,
+                    "new_radio_group": 1,
+                    "new_dropdown_widget": 2,
+                },
+                adobe_mode=True,
+            )
         )
 
         request.config.results["expected_path"] = expected_path
