@@ -130,6 +130,7 @@ def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
 
 def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
     rect = annot[Rect]
+    # scale from bottom left
     new_rect = [
         rect[0],
         rect[1],
