@@ -95,7 +95,7 @@ class PdfWrapper:
         ]
 
         return self
-    
+
     @property
     def schema(self) -> dict:
         return {
@@ -104,7 +104,7 @@ class PdfWrapper:
                 key: value.schema_definition for key, value in self.widgets.items()
             },
         }
-    
+
     @property
     def sample_data(self) -> dict:
         return {key: value.sample_value for key, value in self.widgets.items()}

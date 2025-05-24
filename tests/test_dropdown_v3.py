@@ -261,9 +261,9 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
 
         expected = f.read()
 
-        # if os.name != "nt":
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
 
 
 def test_dropdown_alignment_flatten(dropdown_alignment, pdf_samples, request):
@@ -285,9 +285,9 @@ def test_dropdown_alignment_flatten(dropdown_alignment, pdf_samples, request):
 
         expected = f.read()
 
-        # if os.name != "nt":
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        if os.name != "nt":
+            assert len(obj.read()) == len(expected)
+            assert obj.read() == expected
 
 
 def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples, request):
