@@ -25,9 +25,9 @@ def test_filling_pdf_escape_pdf_form(tool_pdf_directory, request):
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = result.read()
 
-        if os.name != "nt":
-            assert len(result.read()) == len(expected)
-            assert result.read() == expected
+        # if os.name != "nt":
+        assert len(result.read()) == len(expected)
+        assert result.read() == expected
 
 
 def test_filling_docfly_pdf_form(tool_pdf_directory, request):
@@ -48,9 +48,9 @@ def test_filling_docfly_pdf_form(tool_pdf_directory, request):
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = result.read()
 
-        if os.name != "nt":
-            assert len(result.read()) == len(expected)
-            assert result.read() == expected
+        # if os.name != "nt":
+        assert len(result.read()) == len(expected)
+        assert result.read() == expected
 
 
 def test_filling_sejda_dropdown_pdf_form(tool_pdf_directory, request):
@@ -88,9 +88,9 @@ def test_filling_soda_pdf_form(tool_pdf_directory, request):
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = result.read()
 
-        if os.name != "nt":
-            assert len(result.read()) == len(expected)
-            assert result.read() == expected
+        # if os.name != "nt":
+        assert len(result.read()) == len(expected)
+        assert result.read() == expected
 
 
 def test_filling_pdfgear_sig(tool_pdf_directory, image_samples, request):
@@ -103,6 +103,6 @@ def test_filling_pdfgear_sig(tool_pdf_directory, image_samples, request):
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = result.read()
 
-        if os.name != "nt":
-            assert len(result.read()) == len(expected)
-            assert result.read() == expected
+        # if os.name != "nt":
+        assert len(result.read()) == len(expected)
+        assert result.read() == expected

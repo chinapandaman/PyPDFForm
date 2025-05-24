@@ -431,11 +431,11 @@ def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples, req
 
         expected = f.read()
 
-        if os.name != "nt":
-            request.config.results["expected_path"] = expected_path
-            request.config.results["stream"] = obj.read()
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        # if os.name != "nt":
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_draw_image_on_radio_template(
@@ -502,11 +502,11 @@ def test_draw_png_image_on_one_page(
 
         expected = f.read()
 
-        if os.name != "nt":
-            request.config.results["expected_path"] = expected_path
-            request.config.results["stream"] = obj.read()
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        # if os.name != "nt":
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_draw_transparent_png_image_on_one_page(
@@ -527,11 +527,11 @@ def test_draw_transparent_png_image_on_one_page(
 
         expected = f.read()
 
-        if os.name != "nt":
-            request.config.results["expected_path"] = expected_path
-            request.config.results["stream"] = obj.read()
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        # if os.name != "nt":
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_addition_operator_3_times(template_stream, data_dict):
@@ -711,9 +711,9 @@ def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request)
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        # if os.name != "nt":
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_font_color_flatten(
@@ -736,9 +736,9 @@ def test_fill_font_color_flatten(
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        # if os.name != "nt":
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, request):
@@ -766,9 +766,9 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        # if os.name != "nt":
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_fill_complex_fonts_flatten(
@@ -799,9 +799,9 @@ def test_fill_complex_fonts_flatten(
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        # if os.name != "nt":
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_pages(template_stream, pdf_samples, request):
