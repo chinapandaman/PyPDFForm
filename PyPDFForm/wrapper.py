@@ -160,7 +160,7 @@ class PdfWrapper:
             self._stream = enable_adobe_mode(self._stream)  # cached
 
         return self._stream
-    
+
     def write(self, path: str) -> PdfWrapper:
         with open(path, "wb+") as f:
             f.write(self.read())
