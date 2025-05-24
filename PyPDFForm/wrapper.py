@@ -44,8 +44,8 @@ class PdfWrapper:
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
         self._available_fonts = {}  # for setting /F1
-        self._font_register_events = [] # for reregister
-        self._keys_to_update = []   # for bulk update keys
+        self._font_register_events = []  # for reregister
+        self._keys_to_update = []  # for bulk update keys
 
         # sets attrs from kwargs
         for attr, default in self.USER_PARAMS:
@@ -146,7 +146,9 @@ class PdfWrapper:
                     and widget.font not in self._available_fonts.values()
                     and widget.font in self._available_fonts
                 ):
-                    widget.font = self._available_fonts.get(widget.font)    # from `new_font` to `/F1`
+                    widget.font = self._available_fonts.get(
+                        widget.font
+                    )  # from `new_font` to `/F1`
 
             self._stream = trigger_widget_hooks(
                 self._stream,
@@ -206,7 +208,7 @@ class PdfWrapper:
         if image_drawn_stream is not None:
             keys_to_copy = [
                 k for k, v in self.widgets.items() if not isinstance(v, Signature)
-            ]   # only copy non-image fields
+            ]  # only copy non-image fields
             filled_stream = copy_watermark_widgets(
                 remove_all_widgets(image_drawn_stream),
                 filled_stream,

@@ -85,7 +85,7 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
     if (
         Parent in widget
         and T in widget[Parent].get_object()
-        and widget[Parent].get_object()[T] != key   # sejda case
+        and widget[Parent].get_object()[T] != key  # sejda case
     ):
         key = (
             f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
