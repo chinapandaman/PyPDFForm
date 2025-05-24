@@ -52,6 +52,12 @@ def font_samples():
 
 
 @pytest.fixture
+def samle_font_stream(font_samples):
+    with open(os.path.join(font_samples, "LiberationSerif-BoldItalic.ttf"), "rb+") as f:
+        return f.read()
+
+
+@pytest.fixture
 def data_dict():
     return {
         "test": "test_1",

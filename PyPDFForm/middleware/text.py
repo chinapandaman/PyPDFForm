@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any
-
 from .base import Widget
 
 
@@ -25,18 +23,14 @@ class Text(Widget):
         self.font = None
         self.font_size = None
         self.font_color = None
-        self.text_wrap_length = None
-        self.max_length = None
         self.comb = None
-        self.character_paddings = []
-        self.text_lines = None
-        self.text_line_x_coordinates = None
-        self.preview = False
         self.alignment = None
         self.multiline = None
 
+        self.max_length = None
+
     @property
-    def value(self) -> Any:
+    def value(self) -> str:
         if isinstance(self._value, (int, float)):
             return str(self._value)
 

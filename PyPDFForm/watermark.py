@@ -19,80 +19,15 @@ def draw_text(canvas: Canvas, **kwargs) -> None:
     coordinate_y = kwargs["y"]
 
     text_to_draw = widget.value
-
-    if not text_to_draw:
-        text_to_draw = ""
-
-    if widget.max_length is not None:
-        text_to_draw = text_to_draw[: widget.max_length]
-
     canvas.setFont(widget.font, widget.font_size)
     canvas.setFillColorRGB(
         widget.font_color[0], widget.font_color[1], widget.font_color[2]
     )
-
-    if widget.comb is True:
-        for i, char in enumerate(text_to_draw):
-            canvas.drawString(
-                coordinate_x + widget.character_paddings[i],
-                coordinate_y,
-                char,
-            )
-    elif (
-        widget.text_wrap_length is None or len(text_to_draw) < widget.text_wrap_length
-    ) and widget.text_lines is None:
-        canvas.drawString(
-            coordinate_x,
-            coordinate_y,
-            text_to_draw,
-        )
-    else:
-        text_obj = canvas.beginText(0, 0)
-        for i, line in enumerate(widget.text_lines):
-            cursor_moved = False
-            if (
-                widget.text_line_x_coordinates is not None
-                and widget.text_line_x_coordinates[i] - coordinate_x != 0
-            ):
-                text_obj.moveCursor(widget.text_line_x_coordinates[i] - coordinate_x, 0)
-                cursor_moved = True
-            text_obj.textLine(line)
-            if cursor_moved:
-                text_obj.moveCursor(
-                    -1 * (widget.text_line_x_coordinates[i] - coordinate_x), 0
-                )
-
-        canvas.saveState()
-        canvas.translate(
-            coordinate_x,
-            coordinate_y,
-        )
-        canvas.drawText(text_obj)
-        canvas.restoreState()
-
-
-def draw_rect(canvas: Canvas, **kwargs) -> None:
-    x = kwargs["x"]
-    y = kwargs["y"]
-    width = kwargs["width"]
-    height = kwargs["height"]
-
-    canvas.saveState()
-    stroke, fill = set_border_and_background_styles(canvas, **kwargs)
-    canvas.rect(x, y, width, height, stroke=stroke, fill=fill)
-    canvas.restoreState()
-
-
-def draw_ellipse(canvas: Canvas, **kwargs) -> None:
-    x1 = kwargs["x1"]
-    y1 = kwargs["y1"]
-    x2 = kwargs["x2"]
-    y2 = kwargs["y2"]
-
-    canvas.saveState()
-    stroke, fill = set_border_and_background_styles(canvas, **kwargs)
-    canvas.ellipse(x1, y1, x2, y2, stroke=stroke, fill=fill)
-    canvas.restoreState()
+    canvas.drawString(
+        coordinate_x,
+        coordinate_y,
+        text_to_draw,
+    )
 
 
 def draw_line(canvas: Canvas, **kwargs) -> None:
@@ -100,33 +35,10 @@ def draw_line(canvas: Canvas, **kwargs) -> None:
     src_y = kwargs["src_y"]
     dest_x = kwargs["dest_x"]
     dest_y = kwargs["dest_y"]
+    color = kwargs["color"]
 
-    canvas.saveState()
-    set_border_and_background_styles(canvas, **kwargs)
+    canvas.setStrokeColorRGB(*(color))
     canvas.line(src_x, src_y, dest_x, dest_y)
-    canvas.restoreState()
-
-
-def set_border_and_background_styles(canvas: Canvas, **kwargs) -> tuple:
-    border_color = kwargs["border_color"]
-    background_color = kwargs["background_color"]
-    border_width = kwargs["border_width"]
-    dash_array = kwargs["dash_array"]
-
-    stroke = 0
-    fill = 0
-    if border_color is not None and border_width:
-        canvas.setStrokeColor(border_color)
-        canvas.setLineWidth(border_width)
-        stroke = 1
-    if background_color is not None:
-        canvas.setFillColor(background_color)
-        fill = 1
-
-    if dash_array is not None:
-        canvas.setDash(array=dash_array)
-
-    return stroke, fill
 
 
 def draw_image(canvas: Canvas, **kwargs) -> None:
@@ -173,8 +85,6 @@ def create_watermarks_and_draw(
         "image": draw_image,
         "text": draw_text,
         "line": draw_line,
-        "rect": draw_rect,
-        "ellipse": draw_ellipse,
     }
 
     if action_type_to_func.get(action_type):

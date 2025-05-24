@@ -15,12 +15,6 @@ class Widget:
         self._name = name
         self._value = value
         self.desc = None
-        self.border_color = None
-        self.background_color = None
-        self.border_width = None
-        self.border_style = None
-        self.dash_array = None
-        self.render_widget = None
         self.hooks_to_trigger = []
 
     def __setattr__(self, name: str, value: Any) -> None:
