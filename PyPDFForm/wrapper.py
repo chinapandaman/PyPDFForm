@@ -52,6 +52,22 @@ class PdfWrapper:
 
         self._init_helper()
 
+    def __add__(self, other: PdfWrapper) -> PdfWrapper:
+        if not self.read():
+            return other
+
+        if not other.read():
+            return self
+
+        unique_suffix = generate_unique_suffix()
+        for k in self.widgets:
+            if k in other.widgets:
+                other.update_widget_key(k, f"{k}-{unique_suffix}", defer=True)
+
+        other.commit_widget_key_updates()
+
+        return self.__class__(merge_two_pdfs(self.read(), other.read()))
+
     def _init_helper(self) -> None:
         new_widgets = (
             build_widgets(
@@ -69,27 +85,26 @@ class PdfWrapper:
         if self.read():
             self._available_fonts.update(**get_all_available_fonts(self.read()))
 
-    def read(self) -> bytes:
-        if any(widget.hooks_to_trigger for widget in self.widgets.values()):
-            for widget in self.widgets.values():
-                if (
-                    isinstance(widget, Text)
-                    and widget.font not in self._available_fonts.values()
-                    and widget.font in self._available_fonts
-                ):
-                    widget.font = self._available_fonts.get(widget.font)
+    def _reregister_font(self) -> PdfWrapper:
+        font_register_events_len = len(self._font_register_events)
+        for i in range(font_register_events_len):
+            event = self._font_register_events[i]
+            self.register_font(event[0], event[1])
+        self._font_register_events = self._font_register_events[
+            font_register_events_len:
+        ]
 
-            self._stream = trigger_widget_hooks(
-                self._stream,
-                self.widgets,
-                getattr(self, "use_full_widget_name"),
-            )
-
-        if getattr(self, "adobe_mode"):
-            self._stream = enable_adobe_mode(self._stream)
-
-        return self._stream
-
+        return self
+    
+    @property
+    def schema(self) -> dict:
+        return {
+            "type": "object",
+            "properties": {
+                key: value.schema_definition for key, value in self.widgets.items()
+            },
+        }
+    
     @property
     def sample_data(self) -> dict:
         return {key: value.sample_value for key, value in self.widgets.items()}
@@ -119,6 +134,27 @@ class PdfWrapper:
 
         return result
 
+    def read(self) -> bytes:
+        if any(widget.hooks_to_trigger for widget in self.widgets.values()):
+            for widget in self.widgets.values():
+                if (
+                    isinstance(widget, Text)
+                    and widget.font not in self._available_fonts.values()
+                    and widget.font in self._available_fonts
+                ):
+                    widget.font = self._available_fonts.get(widget.font)
+
+            self._stream = trigger_widget_hooks(
+                self._stream,
+                self.widgets,
+                getattr(self, "use_full_widget_name"),
+            )
+
+        if getattr(self, "adobe_mode"):
+            self._stream = enable_adobe_mode(self._stream)
+
+        return self._stream
+
     def change_version(self, version: str) -> PdfWrapper:
         self._stream = self.read().replace(
             VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
@@ -127,22 +163,6 @@ class PdfWrapper:
         )
 
         return self
-
-    def __add__(self, other: PdfWrapper) -> PdfWrapper:
-        if not self.read():
-            return other
-
-        if not other.read():
-            return self
-
-        unique_suffix = generate_unique_suffix()
-        for k in self.widgets:
-            if k in other.widgets:
-                other.update_widget_key(k, f"{k}-{unique_suffix}", defer=True)
-
-        other.commit_widget_key_updates()
-
-        return self.__class__(merge_two_pdfs(self.read(), other.read()))
 
     def generate_coordinate_grid(
         self, color: Tuple[float, float, float] = (1, 0, 0), margin: float = 100
@@ -330,15 +350,6 @@ class PdfWrapper:
 
         return self
 
-    @property
-    def schema(self) -> dict:
-        return {
-            "type": "object",
-            "properties": {
-                key: value.schema_definition for key, value in self.widgets.items()
-            },
-        }
-
     def register_font(
         self, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
     ) -> PdfWrapper:
@@ -348,16 +359,5 @@ class PdfWrapper:
             self._stream, new_font_name = register_font_acroform(self.read(), ttf_file)
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))
-
-        return self
-
-    def _reregister_font(self) -> PdfWrapper:
-        font_register_events_len = len(self._font_register_events)
-        for i in range(font_register_events_len):
-            event = self._font_register_events[i]
-            self.register_font(event[0], event[1])
-        self._font_register_events = self._font_register_events[
-            font_register_events_len:
-        ]
 
         return self
