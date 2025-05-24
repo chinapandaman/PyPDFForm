@@ -43,10 +43,11 @@ class PdfWrapper:
         super().__init__()
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
-        self._available_fonts = {}
-        self._font_register_events = []
-        self._keys_to_update = []
+        self._available_fonts = {}  # for setting /F1
+        self._font_register_events = []  # for reregister
+        self._keys_to_update = []  # for bulk update keys
 
+        # sets attrs from kwargs
         for attr, default in self.USER_PARAMS:
             setattr(self, attr, kwargs.get(attr, default))
 
@@ -66,6 +67,7 @@ class PdfWrapper:
 
         other.commit_widget_key_updates()
 
+        # TODO: check if inherit fonts
         return self.__class__(merge_two_pdfs(self.read(), other.read()))
 
     def _init_helper(self) -> None:
@@ -77,10 +79,11 @@ class PdfWrapper:
             if self.read()
             else {}
         )
+        # ensure old widgets don't get overwritten
         for k, v in self.widgets.items():
             if k in new_widgets:
                 new_widgets[k] = v
-        self.widgets = new_widgets
+        self.widgets = new_widgets  # TODO: check update key preserve old key hook attrs
 
         if self.read():
             self._available_fonts.update(**get_all_available_fonts(self.read()))
@@ -127,6 +130,7 @@ class PdfWrapper:
             for i, each in enumerate(get_page_streams(remove_all_widgets(self.read())))
         ]
 
+        # because copy_watermark_widgets and remove_all_widgets
         if self._font_register_events:
             for event in self._font_register_events:
                 for page in result:
@@ -142,7 +146,9 @@ class PdfWrapper:
                     and widget.font not in self._available_fonts.values()
                     and widget.font in self._available_fonts
                 ):
-                    widget.font = self._available_fonts.get(widget.font)
+                    widget.font = self._available_fonts.get(
+                        widget.font
+                    )  # from `new_font` to `/F1`
 
             self._stream = trigger_widget_hooks(
                 self._stream,
@@ -151,7 +157,7 @@ class PdfWrapper:
             )
 
         if getattr(self, "adobe_mode"):
-            self._stream = enable_adobe_mode(self._stream)
+            self._stream = enable_adobe_mode(self._stream)  # cached
 
         return self._stream
 
@@ -178,6 +184,7 @@ class PdfWrapper:
             None,
             None,
         )
+        # because copy_watermark_widgets and remove_all_widgets
         self._reregister_font()
 
         return self
@@ -201,7 +208,7 @@ class PdfWrapper:
         if image_drawn_stream is not None:
             keys_to_copy = [
                 k for k, v in self.widgets.items() if not isinstance(v, Signature)
-            ]
+            ]  # only copy non-image fields
             filled_stream = copy_watermark_widgets(
                 remove_all_widgets(image_drawn_stream),
                 filled_stream,
@@ -318,6 +325,7 @@ class PdfWrapper:
         self._stream = copy_watermark_widgets(
             remove_all_widgets(self.read()), stream_with_widgets, None, None
         )
+        # because copy_watermark_widgets and remove_all_widgets
         self._reregister_font()
 
         return self
@@ -346,6 +354,7 @@ class PdfWrapper:
         self._stream = copy_watermark_widgets(
             remove_all_widgets(self.read()), stream_with_widgets, None, None
         )
+        # because copy_watermark_widgets and remove_all_widgets
         self._reregister_font()
 
         return self

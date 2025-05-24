@@ -153,6 +153,8 @@ def copy_watermark_widgets(
             widgets_to_copy_pdf[j] = []
             for annot in page.get(Annots, []):
                 key = get_widget_key(annot.get_object(), False)
+
+                # cannot be watermarks when page_num not None
                 if (keys is None or key in keys) and (
                     page_num is None or page_num == j
                 ):

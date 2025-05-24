@@ -12,7 +12,7 @@ class Signature(Widget):
 
     @property
     def schema_definition(self) -> dict:
-        return {"type": "string"}
+        return {"type": "string", **super().schema_definition}
 
     @property
     def sample_value(self) -> str:

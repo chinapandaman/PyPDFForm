@@ -90,6 +90,7 @@ DROPDOWN_CHOICE_PATTERNS = [
 
 def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
     for each in annot[AP][N]:
+        # TODO: support uncheck again
         if (check and str(each) != Off) or (not check and str(each) == Off):
             annot[NameObject(AS)] = NameObject(each)
             annot[NameObject(V)] = NameObject(each)
