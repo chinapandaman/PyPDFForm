@@ -62,9 +62,9 @@ def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
     return merge_watermarks_with_pdf(stream, watermark_list)
 
 
-def enable_adobe_mode(reader: PdfReader, writer: PdfWriter, adobe_mode: bool) -> None:
-    if not adobe_mode:
-        return
+def enable_adobe_mode(pdf: bytes) -> bytes:
+    reader = PdfReader(stream_to_io(pdf))
+    writer = PdfWriter()
 
     # https://stackoverflow.com/questions/47288578/pdf-form-filled-with-pypdf2-does-not-show-in-print
     if AcroForm in reader.trailer[Root]:
@@ -79,18 +79,22 @@ def enable_adobe_mode(reader: PdfReader, writer: PdfWriter, adobe_mode: bool) ->
     writer.root_object[AcroForm][NameObject(NeedAppearances)] = BooleanObject(True)
     writer.root_object[AcroForm][NameObject(Fields)] = ArrayObject()
 
+    writer.append(reader)
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
+
 
 def simple_fill(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
     use_full_widget_name: bool,
     flatten: bool = False,
-    adobe_mode: bool = False,
 ) -> tuple:
     # pylint: disable=R0912
     pdf = PdfReader(stream_to_io(template))
     out = PdfWriter()
-    enable_adobe_mode(pdf, out, adobe_mode)
     out.append(pdf)
 
     radio_button_tracker = {}
