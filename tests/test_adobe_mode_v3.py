@@ -97,7 +97,7 @@ def test_issue_613(pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_sample_template_libary(pdf_samples, request):
+def test_sample_template_libary(pdf_samples, image_samples, request):
     expected_path = os.path.join(
         pdf_samples, "adobe_mode", "test_sample_template_libary.pdf"
     )
@@ -137,6 +137,18 @@ def test_sample_template_libary(pdf_samples, request):
                     "bar",
                     "foobar",
                 ],
+            ).create_widget(
+                widget_type="image",
+                name="new_image_widget",
+                page_number=1,
+                x=300,
+                y=200,
+            ).create_widget(
+                widget_type="signature",
+                name="new_signature_wiget",
+                page_number=1,
+                x=300,
+                y=400
             )
             .fill(
                 {
@@ -144,10 +156,17 @@ def test_sample_template_libary(pdf_samples, request):
                     "new_checkbox_widget": True,
                     "new_radio_group": 1,
                     "new_dropdown_widget": 2,
+                    "new_image_widget": os.path.join(image_samples, "sample_image.jpg"),
+                    "new_signature_wiget": os.path.join(image_samples, "sample_signature.png"),
                 },
                 adobe_mode=True,
             )
         )
+
+        obj.widgets["new_text_field_widget"].font_color = (1, 0, 0)
+        obj.widgets["new_text_field_widget"].alignment = 2
+        obj.widgets["new_checkbox_widget"].size = 40
+        obj.widgets["new_radio_group"].size = 50
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()

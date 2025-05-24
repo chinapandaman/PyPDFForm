@@ -167,6 +167,7 @@ class PdfWrapper:
             if key in self.widgets:
                 self.widgets[key].value = value
 
+        unfilled = self.read()
         filled_stream, image_drawn_stream = simple_fill(
             self.read(),
             self.widgets,
@@ -179,12 +180,14 @@ class PdfWrapper:
             keys_to_copy = [
                 k for k, v in self.widgets.items() if not isinstance(v, Signature)
             ]
-            filled_stream = copy_watermark_widgets(
+            self._stream = copy_watermark_widgets(
                 remove_all_widgets(image_drawn_stream),
-                filled_stream,
+                unfilled,
                 keys_to_copy,
                 None,
             )
+            return self.fill(data, **kwargs)
+
         self._stream = filled_stream
         if image_drawn_stream is not None or kwargs.get("adobe_mode", False):
             self._reregister_font()
