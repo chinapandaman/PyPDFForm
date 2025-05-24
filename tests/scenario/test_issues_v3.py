@@ -305,3 +305,98 @@ def test_bulk_update_key(issue_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_get_desc_in_schema(issue_pdf_directory):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "757.pdf"))
+
+    assert (
+        obj.schema["properties"]["P1_checkbox4[0]"]["description"]
+        == "Part 1. Information About You. Your Full Name. 4. Has your name legally changed since the issuance of your Permanent Resident Card? Select Yes. (Proceed to Item Numbers 5. A. through 5. C.)."
+    )
+    assert (
+        obj.schema["properties"]["P1_checkbox4[1]"]["description"]
+        == "Part 1. Information About You. Your Full Name. 4. Has your name legally changed since the issuance of your Permanent Resident Card? Select No (Proceed to Item Numbers 6. A. through 6. I.)."
+    )
+    assert (
+        obj.schema["properties"]["P1_checkbox4[2]"]["description"]
+        == "Part 1. Information About You. Your Full Name. 4. Has your name legally changed since the issuance of your Permanent Resident Card? Select Not Applicable - I never received my previous card. (Proceed to Item Numbers 6. A. through 6. I.)."
+    )
+
+
+def test_get_desc_in_schema_radio(issue_pdf_directory):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-620.pdf"))
+
+    keys_to_check = []
+    for key, value in obj.widgets.items():
+        if isinstance(value, Radio) and value.desc is not None:
+            keys_to_check.append(key)
+
+    for widgets in get_widgets_by_page(obj.read()).values():
+        for widget in widgets:
+            key = get_widget_key(widget, False)
+
+            if key in keys_to_check:
+                assert (
+                    widget[Parent][TU] == obj.schema["properties"][key]["description"]
+                )
+
+
+def test_use_full_widget_name_1(issue_pdf_directory, request):
+    obj = PdfWrapper(
+        os.path.join(issue_pdf_directory, "PPF-939.pdf"), use_full_widget_name=True
+    ).fill(
+        {
+            "topmostSubform[0].Page1[0].c1_3[1]": False,
+            "topmostSubform[0].Page1[0].FilingStatus_ReadOrder[0].c1_3[1]": True,
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-939_expected_1.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_use_full_widget_name_2(issue_pdf_directory, request):
+    obj = PdfWrapper(
+        os.path.join(issue_pdf_directory, "PPF-939.pdf"), use_full_widget_name=True
+    ).fill(
+        {
+            "topmostSubform[0].Page1[0].c1_3[1]": True,
+            "topmostSubform[0].Page1[0].FilingStatus_ReadOrder[0].c1_3[1]": False,
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-939_expected_2.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_use_full_widget_name_both(issue_pdf_directory):
+    obj = PdfWrapper(
+        os.path.join(issue_pdf_directory, "PPF-939.pdf"), use_full_widget_name=True
+    ).fill(
+        {
+            "topmostSubform[0].Page1[0].c1_3[1]": True,
+            "topmostSubform[0].Page1[0].FilingStatus_ReadOrder[0].c1_3[1]": True,
+        }
+    )
+
+    assert (
+        obj.read()
+        == PdfWrapper(os.path.join(issue_pdf_directory, "PPF-939.pdf"))
+        .fill(
+            {
+                "c1_3[1]": True,
+            }
+        )
+        .read()
+    )
