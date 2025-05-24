@@ -16,120 +16,133 @@ endobj
 <<
 /Type /Catalog
 /Pages 2 0 R
+/Outlines 6 0 R
+/AcroForm 10 0 R
 >>
 endobj
 4 0 obj
 <<
-/Annots [ ]
 /Contents 5 0 R
 /CropBox [ 0.0 0.0 612 792 ]
 /MediaBox [ 0.0 0.0 612 792 ]
 /Resources <<
-/Font <<
-/F1 6 0 R
-/F1-0 7 0 R
->>
-/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
 >>
 /Rotate 0
 /Type /Page
 /Parent 2 0 R
+/Annots [ 9 0 R ]
 >>
 endobj
 5 0 obj
 <<
-/Length 339
+/Length 1
 >>
 stream
-q
-q
-
-Q
-
-q
-0.0 0.0 612 792 re
-W
-n
-1 0 0 1 0 0 cm
-BT
-/F1 12 Tf
-14.4 TL
-ET
-q
-n
-337.092 592.617 201.055 70.437 re
-n
-Q
-Q
-
-
-Q
-
-q
-0.0 0.0 612 792 re
-W
-n
-1 0 0 1 0 0 cm
-BT
-/F1-0 12 Tf
-14.4 TL
-ET
-BT
-/F1-0 12 Tf
-14.4 TL
-ET
-0 0 0 rg
-q
-1 0 0 1 337.092 652.3873 cm
-BT
-1 0 0 1 0 0 Tm
-(J Smith ) Tj
-T*
-(132 A St ) Tj
-T*
-(NYC\054 NY 12401) Tj
-T*
-ET
-Q
-Q
-
 
 endstream
 endobj
 6 0 obj
 <<
-/BaseFont /Helvetica
-/Encoding /WinAnsiEncoding
-/Name /F1
-/Subtype /Type1
-/Type /Font
+/First 7 0 R
+/Count 1
+/Last 7 0 R
 >>
 endobj
 7 0 obj
 <<
+/Title (Blank Page)
+/A <<
+/D [ 4 0 R /XYZ 0 792 null ]
+/S /GoTo
+>>
+/F 0
+/C [ 0.0 0.0 0.0 ]
+/Parent 6 0 R
+>>
+endobj
+8 0 obj
+<<
+/D [ 4 0 R /XYZ 0 792 null ]
+/S /GoTo
+>>
+endobj
+9 0 obj
+<<
+/DA (\057Helv 12 Tf 0 g)
+/F 4
+/FT /Tx
+/Ff 4096
+/MK <<
+>>
+/P 4 0 R
+/Rect [ 337.092 592.617 538.147 663.054 ]
+/Subtype /Widget
+/T (Address)
+/Type /Annot
+/V (J Smith\012132 A St\012NYC\054 NY 12401)
+/AP (J Smith\012132 A St\012NYC\054 NY 12401)
+>>
+endobj
+10 0 obj
+<<
+/DA (\057Helv 0 Tf 0 g )
+/DR <<
+/Encoding <<
+/PDFDocEncoding 11 0 R
+>>
+/Font <<
+/Helv 12 0 R
+/ZaDb 13 0 R
+>>
+>>
+/Fields [ 9 0 R ]
+>>
+endobj
+11 0 obj
+<<
+/Differences [ 24 /breve /caron /circumflex /dotaccent /hungarumlaut /ogonek /ring /tilde 39 /quotesingle 96 /grave 128 /bullet /dagger /daggerdbl /ellipsis /emdash /endash /florin /fraction /guilsinglleft /guilsinglright /minus /perthousand /quotedblbase /quotedblleft /quotedblright /quoteleft /quoteright /quotesinglbase /trademark /fi /fl /Lslash /OE /Scaron /Ydieresis /Zcaron /dotlessi /lslash /oe /scaron /zcaron 160 /Euro 164 /currency 166 /brokenbar 168 /dieresis /copyright /ordfeminine 172 /logicalnot /.notdef /registered /macron /degree /plusminus /twosuperior /threesuperior /acute /mu 183 /periodcentered /cedilla /onesuperior /ordmasculine 188 /onequarter /onehalf /threequarters 192 /Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla /Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis /Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls /agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla /egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis /eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide /oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis ]
+/Type /Encoding
+>>
+endobj
+12 0 obj
+<<
 /BaseFont /Helvetica
-/Encoding /WinAnsiEncoding
-/Name /F1
+/Encoding 11 0 R
+/Name /Helv
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+13 0 obj
+<<
+/BaseFont /ZapfDingbats
+/Name /ZaDb
 /Subtype /Type1
 /Type /Font
 >>
 endobj
 xref
-0 8
+0 14
 0000000000 65535 f 
 0000000015 00000 n 
 0000000054 00000 n 
 0000000113 00000 n 
-0000000162 00000 n 
-0000000405 00000 n 
-0000000795 00000 n 
-0000000902 00000 n 
+0000000195 00000 n 
+0000000362 00000 n 
+0000000412 00000 n 
+0000000467 00000 n 
+0000000593 00000 n 
+0000000652 00000 n 
+0000000915 00000 n 
+0000001067 00000 n 
+0000002394 00000 n 
+0000002494 00000 n 
 trailer
 <<
-/Size 8
+/Size 14
 /Root 3 0 R
 /Info 1 0 R
 >>
 startxref
-1009
+2580
 %%EOF
