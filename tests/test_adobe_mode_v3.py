@@ -10,7 +10,7 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
         pdf_samples, "adobe_mode", "dropdown", "dropdown_two.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sample_template_with_dropdown).fill(
+        obj = PdfWrapper(sample_template_with_dropdown, adobe_mode=True).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -21,7 +21,6 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
                 "radio_1": 1,
                 "dropdown_1": 1,
             },
-            adobe_mode=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -38,7 +37,7 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
         pdf_samples, "adobe_mode", "paragraph", "sample_filled_sejda_complex.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sejda_template_complex).fill(
+        obj = PdfWrapper(sejda_template_complex, adobe_mode=True).fill(
             {
                 "checkbox": True,
                 "radio": 0,
@@ -61,7 +60,6 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
                 "text_font_ten_center": "text_font_ten_center",
                 "text_font_ten_right": "text_font_ten_right",
             },
-            adobe_mode=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -79,13 +77,12 @@ def test_issue_613(pdf_samples, request):
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(
-            os.path.join(pdf_samples, "scenario", "issues", "613.pdf")
+            os.path.join(pdf_samples, "scenario", "issues", "613.pdf"), adobe_mode=True
         ).fill(
             {
                 "301 Full name": "John Smith",
                 "301 Address Street": "1234 road number 6",
             },
-            adobe_mode=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -104,7 +101,7 @@ def test_sample_template_libary(pdf_samples, image_samples, request):
 
     with open(expected_path, "rb+") as f:
         obj = (
-            PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+            PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"), adobe_mode=True)
             .create_widget(
                 widget_type="text",
                 name="new_text_field_widget",
@@ -159,7 +156,6 @@ def test_sample_template_libary(pdf_samples, image_samples, request):
                     "new_image_widget": os.path.join(image_samples, "sample_image.jpg"),
                     "new_signature_wiget": os.path.join(image_samples, "sample_signature.png"),
                 },
-                adobe_mode=True,
             )
         )
 

@@ -9,7 +9,7 @@ from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
-from .filler import simple_fill
+from .filler import simple_fill, enable_adobe_mode
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
 from .hooks import trigger_widget_hooks
@@ -32,6 +32,7 @@ from .widgets.text import TextWidget
 class PdfWrapper:
     USER_PARAMS = [
         ("use_full_widget_name", False),
+        ("adobe_mode", False),
     ]
 
     def __init__(
@@ -83,6 +84,9 @@ class PdfWrapper:
                 self.widgets,
                 getattr(self, "use_full_widget_name"),
             )
+
+        if getattr(self, "adobe_mode"):
+            self._stream = enable_adobe_mode(self._stream)
 
         return self._stream
 
@@ -167,29 +171,26 @@ class PdfWrapper:
             if key in self.widgets:
                 self.widgets[key].value = value
 
-        unfilled = self.read()
         filled_stream, image_drawn_stream = simple_fill(
             self.read(),
             self.widgets,
             use_full_widget_name=getattr(self, "use_full_widget_name"),
             flatten=kwargs.get("flatten", False),
-            adobe_mode=kwargs.get("adobe_mode", False),
         )
 
         if image_drawn_stream is not None:
             keys_to_copy = [
                 k for k, v in self.widgets.items() if not isinstance(v, Signature)
             ]
-            self._stream = copy_watermark_widgets(
+            filled_stream = copy_watermark_widgets(
                 remove_all_widgets(image_drawn_stream),
-                unfilled,
+                filled_stream,
                 keys_to_copy,
                 None,
             )
-            return self.fill(data, **kwargs)
 
         self._stream = filled_stream
-        if image_drawn_stream is not None or kwargs.get("adobe_mode", False):
+        if image_drawn_stream is not None or getattr(self, "adobe_mode"):
             self._reregister_font()
 
         return self
