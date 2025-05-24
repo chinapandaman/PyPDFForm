@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from functools import lru_cache
 from io import BytesIO
 from typing import Dict, Union, cast
 
@@ -61,6 +62,7 @@ def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
     return merge_watermarks_with_pdf(stream, watermark_list)
 
 
+@lru_cache
 def enable_adobe_mode(pdf: bytes) -> bytes:
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
