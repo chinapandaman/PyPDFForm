@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import BinaryIO, Dict, List, Tuple, Union, Sequence
+from typing import BinaryIO, Dict, List, Sequence, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
-from .filler import simple_fill, enable_adobe_mode
+from .filler import enable_adobe_mode, simple_fill
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
 from .hooks import trigger_widget_hooks
@@ -190,7 +190,8 @@ class PdfWrapper:
             )
 
         self._stream = filled_stream
-        if image_drawn_stream is not None or getattr(self, "adobe_mode"):
+        if image_drawn_stream is not None:
+            # because copy_watermark_widgets and remove_all_widgets
             self._reregister_font()
 
         return self

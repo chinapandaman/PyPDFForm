@@ -134,18 +134,20 @@ def test_sample_template_libary(pdf_samples, image_samples, request):
                     "bar",
                     "foobar",
                 ],
-            ).create_widget(
+            )
+            .create_widget(
                 widget_type="image",
                 name="new_image_widget",
                 page_number=1,
                 x=300,
                 y=200,
-            ).create_widget(
+            )
+            .create_widget(
                 widget_type="signature",
                 name="new_signature_wiget",
                 page_number=1,
                 x=300,
-                y=400
+                y=400,
             )
             .fill(
                 {
@@ -154,7 +156,9 @@ def test_sample_template_libary(pdf_samples, image_samples, request):
                     "new_radio_group": 1,
                     "new_dropdown_widget": 2,
                     "new_image_widget": os.path.join(image_samples, "sample_image.jpg"),
-                    "new_signature_wiget": os.path.join(image_samples, "sample_signature.png"),
+                    "new_signature_wiget": os.path.join(
+                        image_samples, "sample_signature.png"
+                    ),
                 },
             )
         )
