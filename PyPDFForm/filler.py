@@ -9,8 +9,7 @@ from pypdf.generic import (ArrayObject, BooleanObject, DictionaryObject,
 
 from .constants import (WIDGET_TYPES, AcroForm, Annots, Fields,
                         NeedAppearances, Root)
-from .coordinate import get_draw_image_coordinates_resolutions
-from .image import get_image_dimensions
+from .image import get_draw_image_resolutions, get_image_dimensions
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -34,7 +33,7 @@ def signature_image_handler(
     if stream is not None:
         any_image_to_draw = True
         image_width, image_height = get_image_dimensions(stream)
-        x, y, width, height = get_draw_image_coordinates_resolutions(
+        x, y, width, height = get_draw_image_resolutions(
             widget, middleware.preserve_aspect_ratio, image_width, image_height
         )
         images_to_draw.append(

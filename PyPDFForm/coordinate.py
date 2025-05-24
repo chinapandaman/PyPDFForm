@@ -5,37 +5,10 @@ from typing import Tuple
 from pypdf import PdfReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from .constants import (COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT,
-                        Rect)
+from .constants import COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT
 from .middleware.text import Text
 from .utils import stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
-
-
-def get_draw_image_coordinates_resolutions(
-    widget: dict,
-    preserve_aspect_ratio: bool,
-    image_width: float,
-    image_height: float,
-) -> Tuple[float, float, float, float]:
-    x = float(widget[Rect][0])
-    y = float(widget[Rect][1])
-    width = abs(float(widget[Rect][0]) - float(widget[Rect][2]))
-    height = abs(float(widget[Rect][1]) - float(widget[Rect][3]))
-
-    if preserve_aspect_ratio:
-        ratio = max(image_width / width, image_height / height)
-
-        new_width = image_width / ratio
-        new_height = image_height / ratio
-
-        x += abs(new_width - width) / 2
-        y += abs(new_height - height) / 2
-
-        width = new_width
-        height = new_height
-
-    return x, y, width, height
 
 
 def generate_coordinate_grid(
