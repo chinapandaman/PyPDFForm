@@ -15,6 +15,12 @@ def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
 
 
+def test_write(template_stream, pdf_samples):
+    assert PdfWrapper(template_stream).write(
+        os.path.join(pdf_samples, "sample_template.pdf")
+    )
+
+
 def test_fill(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "test_fill.pdf")
     with open(expected_path, "rb+") as f:
