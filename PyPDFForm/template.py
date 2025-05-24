@@ -33,15 +33,18 @@ def build_widgets(
                 )
 
                 if isinstance(_widget, Text):
+                    # mostly for schema for now
                     _widget.max_length = get_text_field_max_length(widget)
 
                 if isinstance(_widget, Dropdown):
+                    # actually used for filling value
                     _widget.choices = get_dropdown_choices(widget)
 
                 if isinstance(_widget, Radio):
                     if key not in results:
                         results[key] = _widget
 
+                    # for schema
                     results[key].number_of_options += 1
                     continue
 
@@ -82,7 +85,7 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
     if (
         Parent in widget
         and T in widget[Parent].get_object()
-        and widget[Parent].get_object()[T] != key
+        and widget[Parent].get_object()[T] != key   # sejda case
     ):
         key = (
             f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
