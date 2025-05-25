@@ -8,6 +8,14 @@
     <a href="https://pypistats.org/packages/pypdfform"><img src="https://img.shields.io/pypi/dm/pypdfform?logo=pypi&logoColor=white&label=downloads&labelColor=black&color=blue&style=for-the-badge"></a>
 </p>
 
+## Important Announcement
+
+Hello fellow Python developers!
+
+Please read [this article](https://chinapandaman.github.io/PyPDFForm/news/2025-05-24/) about the upcoming v3.0.0 release, which contains some backward-incompatible changes.
+
+Happy hacking!
+
 ## Introduction
 
 PyPDFForm is a free and open source pure-Python 3 library for PDF form processing. It contains the essential 
