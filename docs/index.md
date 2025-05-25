@@ -5,7 +5,7 @@ functionalities needed to interact with PDF forms:
 
 * Inspect what data a PDF form needs to be filled with.
 * Fill a PDF form by simply creating a Python dictionary.
-* Create a subset of form widgets on a PDF.
+* Create form fields on a PDF.
 
 It also supports other common utilities such as extracting pages and merging multiple PDFs together.
 
