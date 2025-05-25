@@ -55,7 +55,7 @@ This file adaptation applies to all PyPDFForm APIs. You can replace file path pa
 
 Adobe Acrobat has known issues displaying PDF forms filled with text. Specifically, text content may only be visible when the text field is selected. This issue is not present in browsers like Chrome or PDF viewers such as Document Viewer (Ubuntu's default PDF application).
 
-By setting the optional parameter `adobe_mode` (default value is `False`) to `True` when instantiating the object, `PdfWrapper` will ensure that the PDF in the object can be processed and displayed correctly by Adobe Acrobat:
+By setting the optional parameter `adobe_mode` (default value is `False`) to `True` when instantiating the object, `PdfWrapper` will ensure that the PDF can be processed and displayed correctly by Adobe Acrobat:
 
 ```python
 from PyPDFForm import PdfWrapper
