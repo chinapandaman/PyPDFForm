@@ -1,4 +1,4 @@
-# Create PDF form fields
+# Create PDF form field
 
 The most common tool for creating PDF form fields is Adobe Acrobat, with a tutorial available
 [here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html).

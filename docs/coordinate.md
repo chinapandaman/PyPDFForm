@@ -1,4 +1,4 @@
-# PDF coordinates
+# PDF coordinate system
 
 The PDF coordinate system originates at the bottom left of the page. The unit of measurement is "points," with 72 points per inch. PyPDFForm uses this coordinate system in its APIs to create fields, text, or images on a PDF.
 

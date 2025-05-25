@@ -12,12 +12,11 @@ It also supports other common utilities such as extracting pages and merging mul
 ## User Guide
 
 * [Installation and setup](install.md)
-* [PDF coordinates](coordinate.md)
-* [Create PDF form fields](prepare.md)
+* [PDF coordinate system](coordinate.md)
+* [Create PDF form field](prepare.md)
 * [Inspect PDF form field data](inspect.md)
 * [Fill PDF form](fill.md)
-* [Change text field styles](style.md)
-* [Change checkbox and radio button styles](button_style.md)
+* [Change PDF form field style](style.md)
 * [Draw elements](draw.md)
 * [Other utilities](utils.md)
 
