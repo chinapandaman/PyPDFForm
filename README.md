@@ -10,7 +10,11 @@
 
 ## Important Announcement
 
+Hello fellow Python developers!
+
 Please read [this article](https://chinapandaman.github.io/PyPDFForm/news/2025-05-24/) about the upcoming v3.0.0 release, which contains some backward-incompatible changes.
+
+Happy hacking!
 
 ## Introduction
 
