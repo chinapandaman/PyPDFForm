@@ -66,10 +66,7 @@ class PdfWrapper:
             if k in other.widgets:
                 other.update_widget_key(k, f"{k}-{unique_suffix}", defer=True)
 
-        # preserve filled data before merge
-        other.commit_widget_key_updates().fill(
-            {k: v.value for k, v in other.widgets.items() if v.value is not None}
-        )
+        other.commit_widget_key_updates()
 
         # inherit fonts
         result = self.__class__(merge_two_pdfs(self.read(), other.read()))
