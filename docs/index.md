@@ -15,7 +15,7 @@ It also supports other common utilities such as extracting pages and merging mul
 * [PDF coordinates](coordinate.md)
 * [Create PDF form fields](prepare.md)
 * [Inspect PDF form field data](inspect.md)
-* [Fill a PDF form](fill.md)
+* [Fill PDF form](fill.md)
 * [Change text field styles](style.md)
 * [Change checkbox and radio button styles](button_style.md)
 * [Draw elements](draw.md)
