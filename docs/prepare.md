@@ -1,10 +1,10 @@
-# Prepare a PDF form
+# Create PDF form fields
 
-The most common tool for creating PDF forms is Adobe Acrobat, with a tutorial available
+The most common tool for creating PDF form fields is Adobe Acrobat, with a tutorial available
 [here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html).
 Alternative free tools like [DocFly](https://www.docfly.com/) offer similar functionality.
 
-PyPDFForm also allows creating PDF form widgets on existing PDFs through coding.
+PyPDFForm also allows creating PDF form fields on existing PDFs through coding.
 
 This section of the documentation will mostly use 
 [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
@@ -13,16 +13,16 @@ Understanding [the PDF coordinate system](coordinate.md) is necessary for this s
 
 All optional parameters will have a comment `# optional` after each of them.
 
-## Create a text field widget
+## Create a text field
 
-A text field widget can be created by downloading the PDF and running the following snippet:
+A text field can be created by downloading the PDF and running the following snippet:
 
 ```python
 from PyPDFForm import PdfWrapper
 
 new_form = PdfWrapper("dummy.pdf").create_widget(
     widget_type="text",
-    name="new_text_field_widget",
+    name="new_text_field",
     page_number=1,
     x=57,
     y=700,
@@ -30,7 +30,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     height=40,  # optional
     max_length=5,   # optional
     comb=True,  # optional, when set to True, max_length must also be set
-    font="Courier", # optional
+    font="Arial", # optional
     font_size=15,   # optional
     font_color=(1, 0, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
@@ -40,20 +40,19 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     multiline=True # optional
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(new_form.read())
+new_form.write("output.pdf")
 ```
 
-## Create a checkbox widget
+## Create a checkbox
 
-A checkbox widget can be created using the same method with some changes to the parameters:
+A checkbox can be created using the same method with some changes to the parameters:
 
 ```python
 from PyPDFForm import PdfWrapper
 
 new_form = PdfWrapper("dummy.pdf").create_widget(
     widget_type="checkbox",
-    name="new_checkbox_widget",
+    name="new_checkbox",
     page_number=1,
     x=57,
     y=700,
@@ -65,15 +64,14 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     border_width=5  # optional
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(new_form.read())
+new_form.write("output.pdf")
 ```
 
 The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
 
 ## Create a radio button group
 
-Unlike the other types of widgets, radio buttons must be created as a group. So for coordinate parameters `x` and `y`, you must specify a list of coordinates for each radio button under the group you are creating, and the length of the list must be more than one.
+Unlike the other types of fields, radio buttons must be created as a group. So for coordinate parameters `x` and `y`, you must specify a list of coordinates for each radio button under the group you are creating, and the length of the list must be more than one.
 
 Other than that, radio button creation shares almost the same parameters as checkbox:
 
@@ -95,13 +93,12 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     border_width=5  # optional
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(new_form.read())
+new_form.write("output.pdf")
 ```
 
-## Create a dropdown widget
+## Create a dropdown field
 
-A dropdown widget shares a similar set of parameters as a text field, with the only significant difference being
+A dropdown field shares a similar set of parameters as a text field, with the only significant difference being
 a list of `options` needs to be specified:
 
 ```python
@@ -109,7 +106,7 @@ from PyPDFForm import PdfWrapper
 
 new_form = PdfWrapper("dummy.pdf").create_widget(
     widget_type="dropdown",
-    name="new_dropdown_widget",
+    name="new_dropdown",
     page_number=1,
     x=57,
     y=700,
@@ -120,7 +117,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     ],
     width=120,  # optional
     height=40,  # optional
-    font="Courier", # optional
+    font="Arial", # optional
     font_size=15,   # optional
     font_color=(1, 0, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
@@ -128,20 +125,19 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     border_width=5  # optional
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(new_form.read())
+new_form.write("output.pdf")
 ```
 
-## Create a signature widget
+## Create a signature field
 
-A signature widget is only interactive in tools that support it. Otherwise, it will just be displayed as a rectangle, and clicking on it will not trigger any action.
+A signature field is only interactive in tools that support it. Otherwise, it will just be displayed as a rectangle, and clicking on it will not trigger any action.
 
 ```python
 from PyPDFForm import PdfWrapper
 
 new_form = PdfWrapper("dummy.pdf").create_widget(
     widget_type="signature",
-    name="new_signature_widget",
+    name="new_signature",
     page_number=1,
     x=100,
     y=100,
@@ -149,20 +145,19 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     height=100,  # optional
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(new_form.read())
+new_form.write("output.pdf")
 ```
 
-## Create an image widget
+## Create an image field
 
-Similar to a signature widget, an image widget is also only interactive in tools that support it.
+Similar to a signature field, an image field is also only interactive in tools that support it.
 
 ```python
 from PyPDFForm import PdfWrapper
 
 new_form = PdfWrapper("dummy.pdf").create_widget(
     widget_type="image",
-    name="new_image_widget",
+    name="new_image",
     page_number=1,
     x=100,
     y=100,
@@ -170,13 +165,12 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     height=108,  # optional
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(new_form.read())
+new_form.write("output.pdf")
 ```
 
-## Modify the key of a widget
+## Modify the key of a field
 
-PyPDFForm allows modifying the keys of existing widgets.
+PyPDFForm allows modifying the keys of existing fields.
 For example, using [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf),
 you can change the key of the first text field `test` to `test_text`:
 
@@ -187,11 +181,10 @@ new_form = PdfWrapper("sample_template.pdf").update_widget_key(
     "test", "test_text"
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(new_form.read())
+new_form.write("output.pdf")
 ```
 
-If multiple widgets share the same key, use the `index` parameter to specify which one to update. For instance, with
+If multiple fields share the same key, use the `index` parameter to specify which one to update. For instance, with
 [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf),
 you can change the key of the second row's text field with the key `Description[0]` to `Description[1]`:
 
@@ -202,8 +195,7 @@ new_form = PdfWrapper("733.pdf").update_widget_key(
     "Description[0]", "Description[1]", index=1
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(new_form.read())
+new_form.write("output.pdf")
 ```
 
 For bulk updates, improve performance by setting `defer=True` when updating each key, then call `commit_widget_key_updates()` at the end to commit all changes.
@@ -222,8 +214,5 @@ for i in range(1, 10):
         "Description[0]", f"Description[{i}]", index=1, defer=True
     )
 
-new_form.commit_widget_key_updates()
-
-with open("output.pdf", "wb+") as output:
-    output.write(new_form.read())
+new_form.commit_widget_key_updates().write("output.pdf")
 ```
