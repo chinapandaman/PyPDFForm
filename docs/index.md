@@ -17,7 +17,7 @@ It also supports other common utilities such as extracting pages and merging mul
 * [Inspect PDF form field data](inspect.md)
 * [Fill PDF form](fill.md)
 * [Change PDF form field style](style.md)
-* [Draw elements](draw.md)
+* [Draw element](draw.md)
 * [Other utilities](utils.md)
 
 ## Developer Guide

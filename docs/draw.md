@@ -1,6 +1,6 @@
-# Draw elements
+# Draw element
 
-PyPDFForm enables drawing elements on a PDF, which is useful when a widget is missing from your PDF form or when you need to add text or images.
+PyPDFForm enables drawing elements on a PDF, which is useful when a field is missing from your PDF form or when you need to add text or images.
 
 This section of the documentation will use 
 [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
@@ -8,8 +8,6 @@ This section of the documentation will use
 Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
 
 All optional parameters will have a comment `# optional` after each of them.
-
-**NOTE:** Avoid drawing elements that overlap with form widgets, as widgets take precedence and will cover drawn elements.
 
 ## Draw text
 
@@ -26,8 +24,7 @@ pdf = PdfWrapper("sample_template.pdf").draw_text(
     font_color=(1, 0, 0)    # optional
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(pdf.read())
+pdf.write("output.pdf")
 ```
 
 ## Draw image
@@ -45,6 +42,5 @@ pdf = PdfWrapper("sample_template.pdf").draw_image(
     rotation=0  # optional
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(pdf.read())
+pdf.write("output.pdf")
 ```

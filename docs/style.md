@@ -45,7 +45,7 @@ form.fill(
     },
 )
 
-form.save("output.pdf")
+form.write("output.pdf")
 ```
 
 ## Change text field font size
@@ -76,7 +76,7 @@ form.fill(
     },
 )
 
-form.save("output.pdf")
+form.write("output.pdf")
 ```
 
 ## Change text field font color
@@ -107,7 +107,7 @@ form.fill(
     },
 )
 
-form.save("output.pdf")
+form.write("output.pdf")
 ```
 
 ## Change checkbox/radio button size
@@ -131,5 +131,5 @@ form.fill(
     },
 )
 
-form.save("output.pdf")
+form.write("output.pdf")
 ```
