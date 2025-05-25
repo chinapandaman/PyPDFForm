@@ -20,8 +20,7 @@ first_page.fill(
     },
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(first_page.read())
+first_page.write("output.pdf")
 ```
 
 ## Merge multiple PDFs
@@ -36,8 +35,7 @@ pdf_one = PdfWrapper("dummy.pdf")
 pdf_two = PdfWrapper("sample_template.pdf")
 merged = pdf_one + pdf_two
 
-with open("output.pdf", "wb+") as output:
-    output.write(merged.read())
+merged.write("output.pdf")
 ```
 
 To reorganize pages:
@@ -49,8 +47,7 @@ pdf_one = PdfWrapper("dummy.pdf")
 pdf_two = PdfWrapper("sample_template.pdf")
 merged = pdf_two.pages[0] + pdf_one + pdf_two.pages[1] + pdf_two.pages[2]
 
-with open("output.pdf", "wb+") as output:
-    output.write(merged.read())
+merged.write("output.pdf")
 ```
 
 ## Change PDF version
@@ -61,7 +58,5 @@ PyPDFForm allows modifying the PDF version up to 2.0:
 from PyPDFForm import PdfWrapper
 
 new_version = PdfWrapper("sample_template.pdf").change_version("2.0")
-
-with open("output.pdf", "wb+") as output:
-    output.write(new_version.read())
+new_version.write("output.pdf")
 ```
