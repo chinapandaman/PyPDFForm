@@ -45,7 +45,7 @@ class PdfWrapper:
         self.widgets = {}
         self._available_fonts = {}  # for setting /F1
         self._font_register_events = []  # for reregister
-        self._key_update_tracker = {}
+        self._key_update_tracker = {}  # for update key preserve old key attrs
         self._keys_to_update = []  # for bulk update keys
 
         # sets attrs from kwargs
@@ -66,12 +66,9 @@ class PdfWrapper:
             if k in other.widgets:
                 other.update_widget_key(k, f"{k}-{unique_suffix}", defer=True)
 
+        # preserve filled data before merge
         other.commit_widget_key_updates().fill(
-            {
-                k: v.value
-                for k, v in other.widgets.items()
-                if v.value is not None
-            }
+            {k: v.value for k, v in other.widgets.items() if v.value is not None}
         )
 
         # inherit fonts
@@ -94,12 +91,16 @@ class PdfWrapper:
         for k, v in self.widgets.items():
             if k in new_widgets:
                 new_widgets[k] = v
-            
+
+        # update key preserve old key attrs
         for k, v in new_widgets.items():
             if k in self._key_update_tracker:
-                for name, value in self.widgets[self._key_update_tracker[k]].__dict__.items():
+                for name, value in self.widgets[
+                    self._key_update_tracker[k]
+                ].__dict__.items():
                     setattr(v, name, value)
-        self.widgets = new_widgets  # TODO: check update key preserve old key hook attrs
+
+        self.widgets = new_widgets
 
         if self.read():
             self._available_fonts.update(**get_all_available_fonts(self.read()))
@@ -311,7 +312,7 @@ class PdfWrapper:
         self._stream = update_widget_keys(
             self.read(), self.widgets, old_keys, new_keys, indices
         )
-        
+
         for each in self._keys_to_update:
             self._key_update_tracker[each[1]] = each[0]
         self._init_helper()
