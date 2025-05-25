@@ -20,9 +20,7 @@ pip install -U PyPDFForm
 
 ## Create a PDF wrapper
 
-The library provides two classes for abstracting PDF forms. Use `FormWrapper` to fill a PDF form without needing other APIs; more information is available [here](simple_fill.md).
-
-`PdfWrapper` implements most PyPDFForm APIs and accepts various optional parameters, with the PDF form template being the most critical.
+The library's main user interface is the class `PdfWrapper`. It implements most PyPDFForm APIs and accepts various optional parameters, with the PDF form template being the most critical.
 
 For example, if you download [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf), 
 you will want to instantiate your object like this:
@@ -53,26 +51,40 @@ with open("sample_template.pdf", "rb+") as template:
 
 This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
 
-## Use full widget name in PDF wrapper
+## Create an Adobe Acrobat compatible PDF wrapper
 
-According to section 12.7.3.2 of the [PDF standard](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf) (page 434), PDF form widgets can have fully qualified names constructed using the pattern `<parent_widget_name>.<widget_name>`.
+Adobe Acrobat has known issues displaying PDF forms filled with text. Specifically, text content may only be visible when the text field is selected. This issue is not present in browsers like Chrome or PDF viewers such as Document Viewer (Ubuntu's default PDF application).
 
-PyPDFForm allows you to access widgets by their full names by setting `use_full_widget_name` to `True` when instantiating `PdfWrapper` or `FormWrapper`. For example, using [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_full_key.pdf):
+By setting the optional parameter `adobe_mode` (default value is `False`) to `True` when instantiating the object, `PdfWrapper` will ensure that the PDF in the object can be processed and displayed correctly by Adobe Acrobat:
 
 ```python
-from PyPDFForm import PdfWrapper, FormWrapper
+from PyPDFForm import PdfWrapper
 
-pdf = PdfWrapper("sample_template_with_full_key.pdf", use_full_widget_name=True)    # PdfWrapper
-pdf = FormWrapper("sample_template_with_full_key.pdf", use_full_widget_name=True)    # FormWrapper
+pdf = PdfWrapper("sample_template.pdf", adobe_mode=True)
 ```
 
-This enables accessing widgets by their full names. For instance, you can access the checkbox labeled `Gain de 2 classes` using its full name `Gain de 2 classes.0` instead of the partial name `0`.
+**NOTE:** PDF objects with `adobe_mode` enabled are optimized for viewing in Adobe Acrobat. Other PDF viewers may experience rendering issues with certain field styles, such as text font or field borders.
+So only enable `adobe_mode` when the generated PDFs are meant to be viewed by Adobe Acrobat.
 
-**NOTE:** When using full widget names, the `update_widget_key` and `commit_widget_key_updates` methods of `PdfWrapper` are disabled and raise a `NotImplementedError` because full names involve both the widget and its parent.
+## Use full name for PDF form fields
+
+According to section 12.7.3.2 of the [PDF standard](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf) (page 434), PDF form fields can have fully qualified names constructed using the pattern `<parent_field_name>.<field_name>`.
+
+PyPDFForm allows you to access fields by their full names by setting `use_full_widget_name` to `True` when instantiating `PdfWrapper`. For example, using [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_full_key.pdf):
+
+```python
+from PyPDFForm import PdfWrapper
+
+pdf = PdfWrapper("sample_template_with_full_key.pdf", use_full_widget_name=True)
+```
+
+This enables accessing fields by their full names. For instance, you can access the checkbox labeled `Gain de 2 classes` using its full name `Gain de 2 classes.0` instead of the partial name `0`.
+
+**NOTE:** When using full names, the `update_widget_key` and `commit_widget_key_updates` methods of `PdfWrapper` are disabled and raise a `NotImplementedError` because full names involve both the field and its parent.
 
 ## Write to a file
 
-`PdfWrapper` also behaves like an open file object, allowing you to write the PDF to another file or buffer.
+`PdfWrapper` also behaves like an open file object, allowing you to write the PDF to another file object. For example, to write to a disk file:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -94,4 +106,13 @@ pdf = PdfWrapper("sample_template.pdf")
 
 with BytesIO() as output:
     output.write(pdf.read())
+```
+
+On top of being similar to a file object, `PdfWrapper` also implements a `write` method which lets you write the PDF to a disk file by specifying the path:
+
+```python
+from PyPDFForm import PdfWrapper
+
+pdf = PdfWrapper("sample_template.pdf")
+pdf.write("output.pdf")
 ```
