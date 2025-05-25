@@ -11,7 +11,6 @@ Describe the dictionary used to fill a PDF form using a JSON schema. For example
 
 ```python
 import json
-
 from PyPDFForm import PdfWrapper
 
 pdf_form_schema = PdfWrapper("sample_template.pdf").schema
@@ -57,7 +56,6 @@ PyPDFForm can also generate sample data for filling a PDF form:
 
 ```python
 from pprint import pprint
-
 from PyPDFForm import PdfWrapper
 
 pprint(PdfWrapper("sample_template.pdf").sample_data)

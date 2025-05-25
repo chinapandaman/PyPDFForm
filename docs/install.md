@@ -99,7 +99,6 @@ And it doesn't have to be a disk file, it can be a memory buffer as well:
 
 ```python
 from io import BytesIO
-
 from PyPDFForm import PdfWrapper
 
 pdf = PdfWrapper("sample_template.pdf")
