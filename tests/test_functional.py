@@ -5,7 +5,7 @@ import os
 from jsonschema import ValidationError, validate
 
 from PyPDFForm import PdfWrapper
-from PyPDFForm.constants import UNIQUE_SUFFIX_LENGTH, T, V
+from PyPDFForm.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
 from PyPDFForm.middleware.base import Widget
 from PyPDFForm.middleware.text import Text
 from PyPDFForm.template import get_widgets_by_page
@@ -570,6 +570,24 @@ def test_merging_unique_suffix(template_stream):
                 assert len(widget[T].split("-")[1]) == UNIQUE_SUFFIX_LENGTH
 
 
+def test_merge_preserve_font_and_data(template_stream, samle_font_stream):
+    result = PdfWrapper()
+
+    for i in range(10):
+        obj = PdfWrapper(template_stream).register_font("new_font", samle_font_stream)
+        obj.widgets["test"].font = "new_font"
+        result += obj.fill({"test": f"test_{i}"})
+
+    for page, widgets in get_widgets_by_page(result.read()).items():
+        for widget in widgets:
+            if widget[T] == "test":
+                assert widget[V] == "test_0"
+                assert widget["/DA"].startswith("/F1")
+            elif widget[T].startswith("test-"):
+                assert widget[V] == f"test_{page // 3}"
+                assert widget[DA].startswith("/F1")
+
+
 def test_schema(sample_template_with_comb_text_field):
     data = {
         "FirstName": "John",
@@ -1021,6 +1039,53 @@ def test_update_sejda_key(sejda_template, pdf_samples, request):
                 "PURCHASE_OPTION": 1,
                 "BUYER_SIGNED_DATE": "2012-01-01",
             }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_uncheck_checkbox(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_uncheck_checkbox.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf")).fill(
+            {
+                "check": False,
+                "check_2": False,
+                "check_3": False
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_uncheck_checkbox_flatten(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_uncheck_checkbox_flatten.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf")).fill(
+            {
+                "check": False,
+                "check_2": False,
+                "check_3": False
+            },
+            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
