@@ -98,7 +98,8 @@ class PdfWrapper:
                 for name, value in self.widgets[
                     self._key_update_tracker[k]
                 ].__dict__.items():
-                    setattr(v, name, value)
+                    if not name.startswith("_"):
+                        setattr(v, name, value)
         self._key_update_tracker = {}
 
         self.widgets = new_widgets
@@ -294,10 +295,10 @@ class PdfWrapper:
             self._keys_to_update.append((old_key, new_key, index))
             return self
 
+        self._key_update_tracker[new_key] = old_key
         self._stream = update_widget_keys(
             self.read(), self.widgets, [old_key], [new_key], [index]
         )
-        self._key_update_tracker[new_key] = old_key
         self._init_helper()
 
         return self
