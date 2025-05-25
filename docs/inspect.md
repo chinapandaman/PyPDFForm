@@ -1,24 +1,9 @@
-# Inspect a PDF form
+# Inspect PDF form field data
 
-After preparing a PDF form, use PyPDFForm to inspect its widget names and determine the required filling data. You can choose from multiple inspection methods to suit your needs.
+After preparing a PDF form, use PyPDFForm to inspect its field names and determine the required filling data. You can choose from multiple inspection methods to suit your needs.
 
 This section of the documentation will use 
 [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
-
-## Generate a preview PDF
-
-To inspect a PDF form, generate a preview document. The `PdfWrapper` object has a `.preview` attribute, which is a file stream that can be written to a file or memory buffer.
-
-```python
-from PyPDFForm import PdfWrapper
-
-preview_stream = PdfWrapper("sample_template.pdf").preview
-
-with open("output.pdf", "wb+") as output:
-    output.write(preview_stream)
-```
-
-The generated preview PDF will have the name of each widget labeled on top of it in red.
 
 ## Generate a JSON schema that describes a PDF form
 
