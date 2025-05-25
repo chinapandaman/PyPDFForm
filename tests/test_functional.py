@@ -1048,3 +1048,50 @@ def test_update_sejda_key(sejda_template, pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_uncheck_checkbox(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_uncheck_checkbox.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf")).fill(
+            {
+                "check": False,
+                "check_2": False,
+                "check_3": False
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_uncheck_checkbox_flatten(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_uncheck_checkbox_flatten.pdf")
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf")).fill(
+            {
+                "check": False,
+                "check_2": False,
+                "check_3": False
+            },
+            flatten=True,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
