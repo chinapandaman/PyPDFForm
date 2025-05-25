@@ -99,6 +99,7 @@ class PdfWrapper:
                     self._key_update_tracker[k]
                 ].__dict__.items():
                     setattr(v, name, value)
+        self._key_update_tracker = {}
 
         self.widgets = new_widgets
 
