@@ -33,6 +33,7 @@ class SignatureWidget:
             parameter name and its default value.
         BEDROCK_WIDGET_TO_COPY (str): The name of the bedrock widget to copy.
     """
+
     OPTIONAL_PARAMS = [
         ("width", 160),
         ("height", 90),
