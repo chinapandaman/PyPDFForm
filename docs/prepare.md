@@ -1,13 +1,10 @@
 # Create PDF form field
 
-The most common tool for creating PDF form fields is Adobe Acrobat, with a tutorial available
-[here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html).
-Alternative free tools like [DocFly](https://www.docfly.com/) offer similar functionality.
+The most common tool for creating PDF form fields is Adobe Acrobat, and a tutorial is available [here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html). Alternative free tools like [DocFly](https://www.docfly.com/) offer similar functionality.
 
 PyPDFForm also allows creating PDF form fields on existing PDFs through coding.
 
-This section of the documentation will mostly use 
-[this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
+This section of the documentation will primarily use [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
 
 Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
 
@@ -71,9 +68,9 @@ The `button_style` parameter currently supports three options: `check`, `circle`
 
 ## Create a radio button group
 
-Unlike the other types of fields, radio buttons must be created as a group. So for coordinate parameters `x` and `y`, you must specify a list of coordinates for each radio button under the group you are creating, and the length of the list must be more than one.
+Unlike other field types, radio buttons must be created as a group. Therefore, for the coordinate parameters `x` and `y`, you must specify a list of coordinates for each radio button within the group, and the list must contain more than one coordinate.
 
-Other than that, radio button creation shares almost the same parameters as checkbox:
+Otherwise, radio button creation shares almost the same parameters as a checkbox:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -98,8 +95,7 @@ new_form.write("output.pdf")
 
 ## Create a dropdown field
 
-A dropdown field shares a similar set of parameters as a text field, with the only significant difference being
-a list of `options` needs to be specified:
+A dropdown field shares a similar set of parameters as a text field. The only significant difference is that a list of `options` needs to be specified:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -130,7 +126,7 @@ new_form.write("output.pdf")
 
 ## Create a signature field
 
-A signature field is only interactive in tools that support it. Otherwise, it will just be displayed as a rectangle, and clicking on it will not trigger any action.
+A signature field is only interactive in tools that support it. Otherwise, it is displayed as a rectangle, and clicking it will not trigger any action.
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -170,9 +166,7 @@ new_form.write("output.pdf")
 
 ## Modify the key of a field
 
-PyPDFForm allows modifying the keys of existing fields.
-For example, using [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf),
-you can change the key of the first text field `test` to `test_text`:
+PyPDFForm allows you to modify the keys of existing fields. For example, to change the key of the first text field, `test`, to `test_text` using [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf), use the following code:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -184,9 +178,7 @@ new_form = PdfWrapper("sample_template.pdf").update_widget_key(
 new_form.write("output.pdf")
 ```
 
-If multiple fields share the same key, use the `index` parameter to specify which one to update. For instance, with
-[this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf),
-you can change the key of the second row's text field with the key `Description[0]` to `Description[1]`:
+If multiple fields share the same key, use the `index` parameter to specify which one to update. For instance, to change the key of the second row's text field with the key `Description[0]` to `Description[1]` using [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf), use the following code:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -200,9 +192,7 @@ new_form.write("output.pdf")
 
 For bulk updates, improve performance by setting `defer=True` when updating each key, then call `commit_widget_key_updates()` at the end to commit all changes.
 
-Consider [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf), 
-the below snippet will change the key of each row's text field with the key `Description[0]` to `Description[i]` 
-where `i` is the index of each row:
+To change the key of each row's text field with the key `Description[0]` to `Description[i]`, where `i` is the index of each row, using [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf), use the following code:
 
 ```python
 from PyPDFForm import PdfWrapper
