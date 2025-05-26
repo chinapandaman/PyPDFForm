@@ -191,7 +191,8 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
 
 
 def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
-    """Extracts the choices from a dropdown widget dictionary.
+    """
+    Extracts the choices from a dropdown widget dictionary.
 
     This function extracts the choices from a dropdown widget dictionary.
 
@@ -216,7 +217,8 @@ def update_widget_keys(
     new_keys: List[str],
     indices: List[int],
 ) -> bytes:
-    """Updates the keys of widgets in a PDF template.
+    """
+    Updates the keys of widgets in a PDF template.
 
     This function updates the keys of widgets in a PDF template based on the provided old keys and new keys.
     It iterates through each page and annotation, finds the widgets with the old keys, and updates their names with the corresponding new keys.
