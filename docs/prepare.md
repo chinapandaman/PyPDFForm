@@ -126,7 +126,7 @@ new_form.write("output.pdf")
 
 ## Create a signature field
 
-A signature field is only interactive in tools that support it. Otherwise, it is displayed as a rectangle, and clicking it will not trigger any action.
+A signature field is only interactive in tools that support it. Otherwise, it is displayed as a rectangle, and clicking it will not trigger any action:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -146,7 +146,7 @@ new_form.write("output.pdf")
 
 ## Create an image field
 
-Similar to a signature field, an image field is also only interactive in tools that support it.
+Similar to a signature field, an image field is also only interactive in tools that support it:
 
 ```python
 from PyPDFForm import PdfWrapper

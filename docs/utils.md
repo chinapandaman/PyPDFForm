@@ -6,7 +6,7 @@ This section of the documentation uses [this PDF](https://github.com/chinapandam
 
 ## Extract pages
 
-The `PdfWrapper` object has a `.pages` attribute, which is a list of `PdfWrapper` objects representing individual pages.
+The `PdfWrapper` object has a `.pages` attribute, which is a list of `PdfWrapper` objects representing individual pages:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -24,7 +24,7 @@ first_page.write("output.pdf")
 
 ## Merge multiple PDFs
 
-You can merge multiple PDF files by adding their `PdfWrapper` objects. For example, see [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf).
+You can merge multiple PDF files by adding their `PdfWrapper` objects. For example, to merge [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) and [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf):
 
 ```python
 from PyPDFForm import PdfWrapper
