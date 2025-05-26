@@ -1,4 +1,4 @@
-# Inspect PDF form field data
+# Inspect form field data
 
 After preparing a PDF form, use PyPDFForm to inspect its field names and determine the data required for filling it. You can choose from multiple inspection methods to suit your needs.
 

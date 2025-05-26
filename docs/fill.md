@@ -1,4 +1,4 @@
-# Fill PDF form
+# Fill PDF forms
 
 PyPDFForm fills a PDF form using a flat, non-nested dictionary.
 The filled form is editable by default. When you call the `fill` method, you can set the optional parameter `flatten` to `True` to flatten the filled form, making it uneditable.
@@ -52,7 +52,7 @@ filled = PdfWrapper(
 filled.write("output.pdf")
 ```
 
-## Fill dropdown
+## Fill dropdown field
 
 As with radio buttons, select a dropdown choice by specifying its `integer` value. For example, to fill [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf):
 
@@ -72,7 +72,7 @@ filled = PdfWrapper(
 filled.write("output.pdf")
 ```
 
-## Fill signature
+## Fill signature field
 
 A signature field enables signing a PDF form with a handwritten signature image.
 
@@ -112,7 +112,7 @@ pdf.fill(
 pdf.write("output.pdf")
 ```
 
-## Fill image
+## Fill image field
 
 Fill an image field similarly to a signature field, using a file path, file object, or file stream.
 

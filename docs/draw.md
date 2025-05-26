@@ -1,4 +1,4 @@
-# Draw element
+# Draw elements
 
 PyPDFForm enables you to draw elements on a PDF, which is useful when a field is missing from your PDF form or when you need to add text or images.
 
