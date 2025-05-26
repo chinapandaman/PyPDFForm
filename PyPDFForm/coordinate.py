@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 Module for generating coordinate grids on PDFs.
+
+This module provides functionality to generate coordinate grids on existing PDF documents.
+It allows developers to visualize the coordinate system of each page in a PDF, which can be helpful
+for debugging and precisely positioning elements when filling or drawing on PDF forms.
 """
 
 from typing import Tuple
@@ -18,15 +22,22 @@ def generate_coordinate_grid(
     pdf: bytes, color: Tuple[float, float, float], margin: float
 ) -> bytes:
     """
-    Generates a coordinate grid on a PDF.
+    Generates a coordinate grid overlay on a PDF document.
+
+    This function takes a PDF file as bytes, along with a color and margin, and generates
+    a coordinate grid on each page of the PDF. The grid consists of lines and text indicating
+    the X and Y coordinates. This can be useful for visualizing the layout and positioning
+    elements on the PDF.
 
     Args:
         pdf (bytes): The PDF file as bytes.
         color (Tuple[float, float, float]): The color of the grid lines and text as a tuple of RGB values (0.0-1.0).
-        margin (float): The margin between the grid lines and the edge of the page.
+                                            For example, (0.0, 0.0, 0.0) represents black.
+        margin (float): The margin between the grid lines and the edge of the page, in points.
+                        This value determines the spacing of the grid.
 
     Returns:
-        bytes: The PDF file with the coordinate grid as bytes.
+        bytes: The PDF file with the coordinate grid overlay as bytes.
     """
 
     pdf_file = PdfReader(stream_to_io(pdf))

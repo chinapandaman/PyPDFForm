@@ -1,5 +1,19 @@
 # -*- coding: utf-8 -*-
-"""Module containing constants used throughout the PyPDFForm library."""
+"""
+Module containing constants used throughout the PyPDFForm library.
+
+This module defines a collection of constants that are used across various
+modules within the PyPDFForm library. These constants include:
+
+- String identifiers for PDF syntax elements (e.g., /Annots, /Rect, /FT).
+- Numerical values representing field flags (e.g., READ_ONLY, MULTILINE).
+- Default values for fonts, font sizes, and font colors.
+- Identifiers for image fields and coordinate grid calculations.
+- Version identifiers for PDF versions.
+
+Using constants improves code readability and maintainability by providing
+meaningful names for frequently used values and reducing the risk of typos.
+"""
 
 from typing import Union
 
