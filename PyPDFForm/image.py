@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Module related to images in PyPDFForm."""
+"""
+This module provides functionalities for handling images within PyPDFForm.
+
+It includes functions for rotating images, retrieving image dimensions, and
+calculating the resolutions for drawing an image on a PDF page, taking into
+account whether to preserve the aspect ratio.
+"""
 
 from io import BytesIO
 from typing import Tuple, Union
@@ -10,11 +16,18 @@ from .constants import Rect
 
 
 def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
-    """Rotates an image by a given angle.
+    """
+    Rotates an image by a specified angle in degrees.
+
+    This function takes an image stream as bytes and rotates it using the PIL library.
+    The rotation is performed around the center of the image, and the expand=True
+    parameter ensures that the entire rotated image is visible, even if it extends
+    beyond the original image boundaries.
 
     Args:
         image_stream (bytes): The image data as bytes.
-        rotation (Union[float, int]): The rotation angle in degrees.
+        rotation (Union[float, int]): The rotation angle in degrees. Positive values
+            rotate the image counterclockwise, while negative values rotate it clockwise.
 
     Returns:
         bytes: The rotated image data as bytes.
@@ -38,13 +51,17 @@ def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
 
 
 def get_image_dimensions(image_stream: bytes) -> Tuple[float, float]:
-    """Gets the dimensions of an image.
+    """
+    Retrieves the width and height of an image from its byte stream.
+
+    This function uses the PIL library to open the image from the provided byte stream
+    and returns its dimensions (width and height) as a tuple of floats.
 
     Args:
         image_stream (bytes): The image data as bytes.
 
     Returns:
-        Tuple[float, float]: The width and height of the image.
+        Tuple[float, float]: The width and height of the image in pixels.
     """
     buff = BytesIO()
     buff.write(image_stream)
@@ -61,16 +78,26 @@ def get_draw_image_resolutions(
     image_width: float,
     image_height: float,
 ) -> Tuple[float, float, float, float]:
-    """Calculates the resolutions for drawing an image on a PDF page.
+    """
+    Calculates the position and dimensions for drawing an image on a PDF page.
+
+    This function determines the x, y coordinates, width, and height for drawing an
+    image within a specified widget area on a PDF page. It takes into account whether
+    the aspect ratio of the image should be preserved and adjusts the dimensions
+    accordingly.
 
     Args:
-        widget (dict): The widget dictionary.
+        widget (dict): A dictionary containing the widget's rectangle coordinates
+            (x1, y1, x2, y2) under the key "Rect".
         preserve_aspect_ratio (bool): Whether to preserve the aspect ratio of the image.
-        image_width (float): The width of the image.
-        image_height (float): The height of the image.
+            If True, the image will be scaled to fit within the widget area while
+            maintaining its original aspect ratio.
+        image_width (float): The width of the image in pixels.
+        image_height (float): The height of the image in pixels.
 
     Returns:
-        Tuple[float, float, float, float]: The x, y, width, and height of the image to be drawn.
+        Tuple[float, float, float, float]: A tuple containing the x, y coordinates,
+            width, and height of the image to be drawn on the PDF page.
     """
     x = float(widget[Rect][0])
     y = float(widget[Rect][1])

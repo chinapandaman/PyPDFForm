@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Module related to custom font handling."""
+"""
+This module provides functionalities for handling custom fonts within PDF documents.
+
+It includes functions for registering fonts with ReportLab and within the PDF's AcroForm,
+allowing these fonts to be used when filling form fields. The module also provides utilities
+for extracting font information from TTF streams and managing font names within a PDF.
+"""
 
 from functools import lru_cache
 from io import BytesIO
@@ -17,14 +23,21 @@ from .utils import stream_to_io
 
 
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
-    """Registers a font with ReportLab.
+    """
+    Registers a TrueType font with the ReportLab library.
+
+    This allows the font to be used for generating PDF documents with ReportLab.
 
     Args:
-        font_name (str): The name to register the font under.
-        ttf_stream (bytes): The font file data in TTF format.
+        font_name (str): The name to register the font under. This name will be used
+            to reference the font when creating PDF documents with ReportLab.
+        ttf_stream (bytes): The font file data in TTF format. This should be the raw
+            bytes of the TTF file.
 
     Returns:
         bool: True if the font was registered successfully, False otherwise.
+            Returns False if a TTFError occurs during registration, which usually
+            indicates an invalid TTF stream.
     """
     buff = BytesIO()
     buff.write(ttf_stream)
@@ -41,16 +54,22 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
 
 
 def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
-    """Registers a font within the PDF's AcroForm.
+    """
+    Registers a TrueType font within the PDF's AcroForm dictionary.
 
-    This allows the font to be used when filling form fields.
+    This allows the font to be used when filling form fields within the PDF.
+    The function adds the font as a resource to the PDF, making it available
+    for use in form fields.
 
     Args:
-        pdf (bytes): The PDF file data.
-        ttf_stream (bytes): The font file data in TTF format.
+        pdf (bytes): The PDF file data as bytes. This is the PDF document that
+            will be modified to include the new font.
+        ttf_stream (bytes): The font file data in TTF format as bytes. This is the
+            raw data of the TrueType font file.
 
     Returns:
-        tuple: A tuple containing the modified PDF data and the new font name.
+        tuple: A tuple containing the modified PDF data as bytes and the new font name
+            (str) that was assigned to the registered font within the PDF.
     """
     base_font_name = get_base_font_name(ttf_stream)
     reader = PdfReader(stream_to_io(pdf))
@@ -111,13 +130,18 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
 
 @lru_cache
 def get_base_font_name(ttf_stream: bytes) -> str:
-    """Gets the base font name from a TTF stream.
+    """
+    Extracts the base font name from a TrueType font stream.
+
+    This function parses the TTF stream to extract the font's face name,
+    which is used as the base font name. The result is cached using lru_cache
+    for performance.
 
     Args:
         ttf_stream (bytes): The font file data in TTF format.
 
     Returns:
-        str: The base font name.
+        str: The base font name, prefixed with a forward slash.
     """
     return (
         f"/{TTFont(name='new_font', filename=stream_to_io(ttf_stream)).face.name.ustr}"
@@ -125,10 +149,14 @@ def get_base_font_name(ttf_stream: bytes) -> str:
 
 
 def get_new_font_name(fonts: dict) -> str:
-    """Generates a new unique font name.
+    """
+    Generates a new unique font name to avoid conflicts with existing fonts in the PDF.
+
+    This function iterates through the existing fonts in the PDF and generates a new
+    font name with the prefix '/F' followed by a unique integer.
 
     Args:
-        fonts (dict): A dictionary of existing fonts.
+        fonts (dict): A dictionary of existing fonts in the PDF.
 
     Returns:
         str: A new unique font name.
@@ -145,13 +173,19 @@ def get_new_font_name(fonts: dict) -> str:
 
 
 def get_all_available_fonts(pdf: bytes) -> dict:
-    """Gets all available fonts from a PDF.
+    """
+    Retrieves all available fonts from a PDF document's AcroForm.
+
+    This function extracts the font resources from the PDF's AcroForm dictionary
+    and returns them as a dictionary.
 
     Args:
         pdf (bytes): The PDF file data.
 
     Returns:
-        dict: A dictionary of available fonts.
+        dict: A dictionary of available fonts, where the keys are the font names
+            (without the leading slash) and the values are the corresponding font
+            identifiers in the PDF. Returns an empty dictionary if no fonts are found.
     """
     reader = PdfReader(stream_to_io(pdf))
     try:

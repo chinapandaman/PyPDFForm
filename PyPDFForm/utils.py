@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Module containing utility functions for PyPDFForm.
+This module provides a collection of utility functions used throughout the PyPDFForm library.
+
+It includes functions for:
+- Converting byte streams to BinaryIO objects.
+- Removing all widgets (form fields) from a PDF.
+- Extracting the content stream of each page in a PDF.
+- Merging two PDFs into one.
+- Finding and traversing patterns within PDF widgets.
+- Extracting widget properties based on defined patterns.
+- Generating unique suffixes for internal use.
 """
 
 from collections.abc import Callable
@@ -19,7 +28,13 @@ from .constants import UNIQUE_SUFFIX_LENGTH
 @lru_cache
 def stream_to_io(stream: bytes) -> BinaryIO:
     """
-    Converts a bytes stream to a BinaryIO object.
+    Converts a bytes stream to a BinaryIO object, which can be used by PyPDFForm.
+
+    This function takes a bytes stream as input and returns a BinaryIO object
+    that represents the same data. This is useful because PyPDFForm often
+    works with BinaryIO objects, so this function allows you to easily convert
+    a bytes stream to the correct format. The result is cached using lru_cache
+    for performance.
 
     Args:
         stream (bytes): The bytes stream to convert.
@@ -36,7 +51,11 @@ def stream_to_io(stream: bytes) -> BinaryIO:
 
 def remove_all_widgets(pdf: bytes) -> bytes:
     """
-    Removes all widgets (form fields) from a PDF.
+    Removes all widgets (form fields) from a PDF, effectively flattening the form.
+
+    This function takes a PDF as a bytes stream, removes all of its interactive
+    form fields (widgets), and returns the modified PDF as a bytes stream. This
+    is useful for creating a non-interactive version of a PDF form.
 
     Args:
         pdf (bytes): The PDF as a bytes stream.
@@ -59,7 +78,10 @@ def remove_all_widgets(pdf: bytes) -> bytes:
 
 def get_page_streams(pdf: bytes) -> List[bytes]:
     """
-    Extracts the content stream of each page in a PDF.
+    Extracts the content stream of each page in a PDF as a list of byte streams.
+
+    This function takes a PDF as a bytes stream and returns a list of bytes streams,
+    where each element in the list represents the content stream of a page in the PDF.
 
     Args:
         pdf (bytes): The PDF as a bytes stream.
@@ -83,7 +105,10 @@ def get_page_streams(pdf: bytes) -> List[bytes]:
 
 def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     """
-    Merges two PDFs into one.
+    Merges two PDFs into one, creating a single PDF containing all pages from both input PDFs.
+
+    This function takes two PDFs as bytes streams and merges them into a single PDF.
+    The pages from the second PDF are appended to the end of the first PDF.
 
     Args:
         pdf (bytes): The first PDF as a bytes stream.
@@ -109,11 +134,16 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
 
 def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> bool:
     """
-    Finds a pattern match in a widget.
+    Recursively finds a pattern match within a PDF widget (annotation dictionary).
+
+    This function searches for a specific pattern within a PDF widget's properties.
+    It recursively traverses the widget's dictionary, comparing keys and values
+    to the provided pattern.
 
     Args:
-        pattern (dict): The pattern to search for.
-        widget (Union[dict, DictionaryObject]): The widget to search in.
+        pattern (dict): The pattern to search for, represented as a dictionary.
+        widget (Union[dict, DictionaryObject]): The widget to search within, which
+            can be a dictionary or a DictionaryObject.
 
     Returns:
         bool: True if a match is found, False otherwise.
@@ -140,11 +170,16 @@ def traverse_pattern(
     pattern: dict, widget: Union[dict, DictionaryObject]
 ) -> Union[str, list, None]:
     """
-    Traverses a pattern in a widget.
+    Recursively traverses a pattern within a PDF widget (annotation dictionary) and returns the value.
+
+    This function searches for a specific pattern within a PDF widget's properties.
+    It recursively traverses the widget's dictionary, comparing keys and values
+    to the provided pattern and returns the value if the pattern is True.
 
     Args:
-        pattern (dict): The pattern to traverse.
-        widget (Union[dict, DictionaryObject]): The widget to traverse in.
+        pattern (dict): The pattern to traverse, represented as a dictionary.
+        widget (Union[dict, DictionaryObject]): The widget to traverse within, which
+            can be a dictionary or a DictionaryObject.
 
     Returns:
         Union[str, list, None]: The value found, or None if not found.
@@ -172,16 +207,23 @@ def extract_widget_property(
     func_before_return: Union[Callable, None],
 ) -> Any:
     """
-    Extracts a widget property based on a list of patterns.
+    Extracts a specific property from a PDF widget based on a list of patterns.
+
+    This function iterates through a list of patterns, attempting to find a match
+    within the provided widget. If a match is found, the corresponding value is
+    extracted and returned. If no match is found, a default value is returned.
 
     Args:
         widget (Union[dict, DictionaryObject]): The widget to extract the property from.
-        patterns (list): A list of patterns to search for.
+        patterns (list): A list of patterns to search for. Each pattern should be a
+            dictionary representing the structure of the property to extract.
         default_value (Any): The default value to return if no pattern is found.
-        func_before_return (Union[Callable, None]): A function to call before returning the value.
+        func_before_return (Union[Callable, None]): An optional function to call before
+            returning the extracted value. This can be used to perform additional
+            processing or formatting on the value.
 
     Returns:
-        Any: The extracted property value.
+        Any: The extracted property value, or the default value if no pattern is found.
     """
     result = default_value
 
@@ -196,7 +238,11 @@ def extract_widget_property(
 
 def generate_unique_suffix() -> str:
     """
-    Generates a unique suffix.
+    Generates a unique suffix string for internal use, such as to avoid naming conflicts.
+
+    This function creates a random string of characters with a predefined length
+    (UNIQUE_SUFFIX_LENGTH) using a combination of ASCII letters, digits, and
+    punctuation characters (excluding hyphens).
 
     Returns:
         str: A unique suffix string.

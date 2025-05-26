@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Module related to widget hooks handling."""
+"""
+This module defines widget hooks that allow for dynamic modification of PDF form fields.
+
+It provides functions to trigger these hooks, enabling changes to text field properties
+like font, font size, color, alignment, and multiline settings, as well as the size
+of checkbox and radio button widgets. These hooks are triggered during the PDF form
+filling process, allowing for customization of the form's appearance and behavior.
+"""
 
 import sys
 from io import BytesIO
@@ -20,15 +27,25 @@ def trigger_widget_hooks(
     widgets: dict,
     use_full_widget_name: bool,
 ) -> bytes:
-    """Triggers widget hooks to apply dynamic changes.
+    """
+    Triggers widget hooks to apply dynamic changes to PDF form fields.
+
+    This function iterates through the annotations on each page of the PDF and,
+    if a widget is associated with an annotation and has hooks to trigger,
+    it executes those hooks. Hooks are functions defined in this module that
+    modify the annotation dictionary, allowing for dynamic changes to the form field's
+    appearance or behavior.
 
     Args:
-        pdf (bytes): The PDF file data.
-        widgets (dict): A dictionary of widgets.
-        use_full_widget_name (bool): Whether to use the full widget name.
+        pdf (bytes): The PDF file data as bytes.
+        widgets (dict): A dictionary of widgets, where keys are widget identifiers
+            and values are widget objects containing information about the widget
+            and its associated hooks.
+        use_full_widget_name (bool): Whether to use the full widget name when
+            looking up widgets in the widgets dictionary.
 
     Returns:
-        bytes: The modified PDF data.
+        bytes: The modified PDF data as bytes, with the widget hooks applied.
     """
     pdf_file = PdfReader(stream_to_io(pdf))
     output = PdfWriter()
@@ -56,11 +73,15 @@ def trigger_widget_hooks(
 
 
 def update_text_field_font(annot: DictionaryObject, val: str) -> None:
-    """Updates the font of a text field.
+    """
+    Updates the font of a text field annotation.
+
+    This function modifies the appearance string (DA) in the annotation dictionary
+    to change the font used for the text field.
 
     Args:
-        annot (DictionaryObject): The annotation dictionary.
-        val (str): The new font.
+        annot (DictionaryObject): The annotation dictionary for the text field.
+        val (str): The new font name to use for the text field.
     """
     if Parent in annot and DA not in annot:
         text_appearance = annot[Parent][DA]
@@ -80,11 +101,15 @@ def update_text_field_font(annot: DictionaryObject, val: str) -> None:
 
 
 def update_text_field_font_size(annot: DictionaryObject, val: float) -> None:
-    """Updates the font size of a text field.
+    """
+    Updates the font size of a text field annotation.
+
+    This function modifies the appearance string (DA) in the annotation dictionary
+    to change the font size used for the text field.
 
     Args:
-        annot (DictionaryObject): The annotation dictionary.
-        val (float): The new font size.
+        annot (DictionaryObject): The annotation dictionary for the text field.
+        val (float): The new font size to use for the text field.
     """
     if Parent in annot and DA not in annot:
         text_appearance = annot[Parent][DA]
@@ -110,11 +135,15 @@ def update_text_field_font_size(annot: DictionaryObject, val: float) -> None:
 
 
 def update_text_field_font_color(annot: DictionaryObject, val: tuple) -> None:
-    """Updates the font color of a text field.
+    """
+    Updates the font color of a text field annotation.
+
+    This function modifies the appearance string (DA) in the annotation dictionary
+    to change the font color used for the text field.
 
     Args:
-        annot (DictionaryObject): The annotation dictionary.
-        val (tuple): The new font color (RGB).
+        annot (DictionaryObject): The annotation dictionary for the text field.
+        val (tuple): The new font color as an RGB tuple (e.g., (1, 0, 0) for red).
     """
     if Parent in annot and DA not in annot:
         text_appearance = annot[Parent][DA]
@@ -144,43 +173,61 @@ def update_text_field_font_color(annot: DictionaryObject, val: tuple) -> None:
 
 
 def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
-    """Updates the alignment of a text field.
+    """
+    Updates the text alignment of a text field annotation.
+
+    This function modifies the Q entry in the annotation dictionary to change
+    the text alignment of the text field.
 
     Args:
-        annot (DictionaryObject): The annotation dictionary.
-        val (int): The new alignment (0=Left, 1=Center, 2=Right).
+        annot (DictionaryObject): The annotation dictionary for the text field.
+        val (int): The new alignment value (0=Left, 1=Center, 2=Right).
     """
     annot[NameObject(Q)] = NumberObject(val)
 
 
 def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
-    """Updates the multiline property of a text field.
+    """
+    Updates the multiline property of a text field annotation.
+
+    This function modifies the Ff (flags) entry in the annotation dictionary to
+    enable or disable the multiline property of the text field.
 
     Args:
-        annot (DictionaryObject): The annotation dictionary.
-        val (bool): Whether the field is multiline.
+        annot (DictionaryObject): The annotation dictionary for the text field.
+        val (bool): True to enable multiline, False to disable.
     """
     if val:
         annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | MULTILINE)
 
 
 def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
-    """Updates the comb property of a text field.
+    """
+    Updates the comb property of a text field annotation.
+
+    This function modifies the Ff (flags) entry in the annotation dictionary to
+    enable or disable the comb property of the text field, which limits the
+    number of characters that can be entered in each line.
 
     Args:
-        annot (DictionaryObject): The annotation dictionary.
-        val (bool): Whether the field is a comb field.
+        annot (DictionaryObject): The annotation dictionary for the text field.
+        val (bool): True to enable comb, False to disable.
     """
     if val:
         annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | COMB)
 
 
 def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
-    """Updates the size of a check or radio button.
+    """
+    Updates the size of a check box or radio button annotation.
+
+    This function modifies the Rect entry in the annotation dictionary to change
+    the size of the check box or radio button.
 
     Args:
-        annot (DictionaryObject): The annotation dictionary.
-        val (float): The new size.
+        annot (DictionaryObject): The annotation dictionary for the check box or
+            radio button.
+        val (float): The new size (width and height) for the check box or radio button.
     """
     rect = annot[Rect]
     # scale from bottom left
