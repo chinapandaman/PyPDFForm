@@ -46,8 +46,7 @@ filled = PdfWrapper("sample_template.pdf").fill(
     },
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(filled.read())
+filled.write("output.pdf")
 ```
 
 After running the above code snippet you can find `output.pdf` at the location you specified, 
