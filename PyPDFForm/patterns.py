@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+Module containing patterns and utility functions for interacting with PDF form fields.
+"""
 
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
@@ -89,6 +92,13 @@ DROPDOWN_CHOICE_PATTERNS = [
 
 
 def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
+    """
+    Update the value of a checkbox annotation.
+
+    Args:
+        annot: The checkbox annotation dictionary.
+        check: A boolean indicating whether to check or uncheck the checkbox.
+    """
     for each in annot[AP][N]:
         if (check and str(each) != Off) or (not check and str(each) == Off):
             annot[NameObject(AS)] = NameObject(each)
@@ -97,6 +107,12 @@ def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -
 
 
 def simple_update_radio_value(annot: DictionaryObject) -> None:
+    """
+    Update the value of a radio button annotation.
+
+    Args:
+        annot: The radio button annotation dictionary.
+    """
     if Opt in annot[Parent]:
         del annot[Parent][Opt]
 
@@ -108,6 +124,13 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
 
 
 def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
+    """
+    Update the value of a dropdown annotation.
+
+    Args:
+        annot: The dropdown annotation dictionary.
+        widget: The Dropdown widget object.
+    """
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(V)] = TextStringObject(
             widget.choices[widget.value]
@@ -120,6 +143,13 @@ def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> N
 
 
 def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
+    """
+    Update the value of a text annotation.
+
+    Args:
+        annot: The text annotation dictionary.
+        widget: The Text widget object.
+    """
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(V)] = TextStringObject(widget.value)
         annot[NameObject(AP)] = TextStringObject(widget.value)
@@ -129,12 +159,24 @@ def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
 
 
 def simple_flatten_radio(annot: DictionaryObject) -> None:
+    """
+    Flatten a radio button annotation by setting the ReadOnly flag.
+
+    Args:
+        annot: The radio button annotation dictionary.
+    """
     annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
         int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
     )
 
 
 def simple_flatten_generic(annot: DictionaryObject) -> None:
+    """
+    Flatten a generic annotation by setting the ReadOnly flag.
+
+    Args:
+        annot: The annotation dictionary.
+    """
     if Parent in annot and Ff not in annot:
         annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
             int(annot.get(NameObject(Ff), 0)) | READ_ONLY
@@ -146,6 +188,13 @@ def simple_flatten_generic(annot: DictionaryObject) -> None:
 
 
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:
+    """
+    Update the name of an annotation.
+
+    Args:
+        annot: The annotation dictionary.
+        val: The new name for the annotation.
+    """
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(T)] = TextStringObject(val)
     else:

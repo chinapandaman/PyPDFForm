@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Module containing functions to fill a PDF form."""
 
 from functools import lru_cache
 from io import BytesIO
@@ -29,6 +30,17 @@ from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 def signature_image_handler(
     widget: dict, middleware: Union[Signature, Image], images_to_draw: list
 ) -> bool:
+    """
+    Handles signature and image widgets by extracting image data and preparing it for drawing.
+
+    Args:
+        widget (dict): The widget dictionary.
+        middleware (Union[Signature, Image]): The middleware object for signature or image.
+        images_to_draw (list): A list to store image data for drawing.
+
+    Returns:
+        bool: True if any image is to be drawn, False otherwise.
+    """
     stream = middleware.stream
     any_image_to_draw = False
     if stream is not None:
@@ -51,6 +63,17 @@ def signature_image_handler(
 
 
 def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
+    """
+    Applies watermarks to specific pages of a PDF based on the provided drawing instructions.
+
+    Args:
+        to_draw (dict): A dictionary containing page numbers as keys and lists of drawing instructions as values.
+        stream (bytes): The PDF content as bytes.
+        action (str): The type of action to perform (e.g., "image").
+
+    Returns:
+        bytes: The modified PDF content with watermarks applied.
+    """
     watermark_list = []
     for page, stuffs in to_draw.items():
         watermark_list.append(b"")
@@ -64,6 +87,18 @@ def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
 
 @lru_cache
 def enable_adobe_mode(pdf: bytes) -> bytes:
+    """
+    Enables Adobe-specific settings in the PDF to ensure proper rendering of form fields.
+
+    This function modifies the PDF's AcroForm dictionary to include the NeedAppearances flag,
+    which forces Adobe Reader to generate appearance streams for form fields.
+
+    Args:
+        pdf (bytes): The PDF content as bytes.
+
+    Returns:
+        bytes: The modified PDF content with Adobe mode enabled.
+    """
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
 
@@ -93,6 +128,18 @@ def simple_fill(
     use_full_widget_name: bool,
     flatten: bool = False,
 ) -> tuple:
+    """
+    Fills a PDF template with the given widgets.
+
+    Args:
+        template (bytes): The PDF template as bytes.
+        widgets (Dict[str, WIDGET_TYPES]): A dictionary of widgets to fill.
+        use_full_widget_name (bool): Whether to use the full widget name.
+        flatten (bool): Whether to flatten the filled PDF.
+
+    Returns:
+        tuple: A tuple containing the filled PDF as bytes and the image drawn stream as bytes, if any.
+    """
     # pylint: disable=R0912
     pdf = PdfReader(stream_to_io(template))
     out = PdfWriter()

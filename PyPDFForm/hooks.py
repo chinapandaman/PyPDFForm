@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Module related to widget hooks handling."""
 
 import sys
 from io import BytesIO
@@ -19,6 +20,16 @@ def trigger_widget_hooks(
     widgets: dict,
     use_full_widget_name: bool,
 ) -> bytes:
+    """Triggers widget hooks to apply dynamic changes.
+
+    Args:
+        pdf (bytes): The PDF file data.
+        widgets (dict): A dictionary of widgets.
+        use_full_widget_name (bool): Whether to use the full widget name.
+
+    Returns:
+        bytes: The modified PDF data.
+    """
     pdf_file = PdfReader(stream_to_io(pdf))
     output = PdfWriter()
     output.append(pdf_file)
@@ -45,6 +56,12 @@ def trigger_widget_hooks(
 
 
 def update_text_field_font(annot: DictionaryObject, val: str) -> None:
+    """Updates the font of a text field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+        val (str): The new font.
+    """
     if Parent in annot and DA not in annot:
         text_appearance = annot[Parent][DA]
     else:
@@ -63,6 +80,12 @@ def update_text_field_font(annot: DictionaryObject, val: str) -> None:
 
 
 def update_text_field_font_size(annot: DictionaryObject, val: float) -> None:
+    """Updates the font size of a text field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+        val (float): The new font size.
+    """
     if Parent in annot and DA not in annot:
         text_appearance = annot[Parent][DA]
     else:
@@ -87,6 +110,12 @@ def update_text_field_font_size(annot: DictionaryObject, val: float) -> None:
 
 
 def update_text_field_font_color(annot: DictionaryObject, val: tuple) -> None:
+    """Updates the font color of a text field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+        val (tuple): The new font color (RGB).
+    """
     if Parent in annot and DA not in annot:
         text_appearance = annot[Parent][DA]
     else:
@@ -115,20 +144,44 @@ def update_text_field_font_color(annot: DictionaryObject, val: tuple) -> None:
 
 
 def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
+    """Updates the alignment of a text field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+        val (int): The new alignment (0=Left, 1=Center, 2=Right).
+    """
     annot[NameObject(Q)] = NumberObject(val)
 
 
 def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
+    """Updates the multiline property of a text field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+        val (bool): Whether the field is multiline.
+    """
     if val:
         annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | MULTILINE)
 
 
 def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
+    """Updates the comb property of a text field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+        val (bool): Whether the field is a comb field.
+    """
     if val:
         annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | COMB)
 
 
 def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
+    """Updates the size of a check or radio button.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+        val (float): The new size.
+    """
     rect = annot[Rect]
     # scale from bottom left
     new_rect = [

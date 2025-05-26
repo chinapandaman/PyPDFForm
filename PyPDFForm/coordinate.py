@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+Module for generating coordinate grids on PDFs.
+"""
 
 from typing import Tuple
 
@@ -14,6 +17,18 @@ from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 def generate_coordinate_grid(
     pdf: bytes, color: Tuple[float, float, float], margin: float
 ) -> bytes:
+    """
+    Generates a coordinate grid on a PDF.
+
+    Args:
+        pdf (bytes): The PDF file as bytes.
+        color (Tuple[float, float, float]): The color of the grid lines and text as a tuple of RGB values (0.0-1.0).
+        margin (float): The margin between the grid lines and the edge of the page.
+
+    Returns:
+        bytes: The PDF file with the coordinate grid as bytes.
+    """
+
     pdf_file = PdfReader(stream_to_io(pdf))
     lines_by_page = {}
     texts_by_page = {}

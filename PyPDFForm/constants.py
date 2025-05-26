@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Module containing constants used throughout the PyPDFForm library."""
 
 from typing import Union
 
