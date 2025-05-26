@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+"""
+Module related to adding watermarks to a PDF.
+
+This module provides functionalities to add watermarks to existing PDF documents.
+It supports drawing text, lines, and images as watermarks.
+The module also includes functions to merge these watermarks with the original PDF content
+and to copy specific widgets from the watermarks to the original PDF.
+"""
 
 from io import BytesIO
 from typing import List, Union
@@ -14,6 +22,19 @@ from .utils import stream_to_io
 
 
 def draw_text(canvas: Canvas, **kwargs) -> None:
+    """
+    Draws a text string on the given canvas using the specified font, size, and color.
+
+    Args:
+        canvas (Canvas): The ReportLab Canvas object to draw on.
+        **kwargs: Keyword arguments containing the text's properties and coordinates.
+            - widget: The widget object containing font, font_size, font_color, and value.
+            - x (float): The x-coordinate of the text's starting point.
+            - y (float): The y-coordinate of the text's starting point.
+
+    Returns:
+        None
+    """
     widget = kwargs["widget"]
     coordinate_x = kwargs["x"]
     coordinate_y = kwargs["y"]
@@ -31,6 +52,21 @@ def draw_text(canvas: Canvas, **kwargs) -> None:
 
 
 def draw_line(canvas: Canvas, **kwargs) -> None:
+    """
+    Draws a line on the given canvas with the specified source and destination coordinates, and color.
+
+    Args:
+        canvas (Canvas): The ReportLab Canvas object to draw on.
+        **kwargs: Keyword arguments containing the line's properties and coordinates.
+            - src_x (float): The x-coordinate of the line's starting point.
+            - src_y (float): The y-coordinate of the line's starting point.
+            - dest_x (float): The x-coordinate of the line's ending point.
+            - dest_y (float): The y-coordinate of the line's ending point.
+            - color (tuple): A tuple representing the RGB color of the line.
+
+    Returns:
+        None
+    """
     src_x = kwargs["src_x"]
     src_y = kwargs["src_y"]
     dest_x = kwargs["dest_x"]
@@ -42,6 +78,21 @@ def draw_line(canvas: Canvas, **kwargs) -> None:
 
 
 def draw_image(canvas: Canvas, **kwargs) -> None:
+    """
+    Draws an image on the given canvas, scaling it to fit within the specified width and height.
+
+    Args:
+        canvas (Canvas): The ReportLab Canvas object to draw on.
+        **kwargs: Keyword arguments containing the image's properties and coordinates.
+            - stream (bytes): The image data as a byte stream.
+            - x (float): The x-coordinate of the image's bottom-left corner.
+            - y (float): The y-coordinate of the image's bottom-left corner.
+            - width (float): The desired width of the image.
+            - height (float): The desired height of the image.
+
+    Returns:
+        None
+    """
     image_stream = kwargs["stream"]
     coordinate_x = kwargs["x"]
     coordinate_y = kwargs["y"]
@@ -70,6 +121,22 @@ def create_watermarks_and_draw(
     action_type: str,
     actions: List[dict],
 ) -> List[bytes]:
+    """
+    Creates watermarks for a specific page in the PDF based on the provided actions and draws them.
+
+    This function takes a PDF file, a page number, an action type, and a list of actions as input.
+    It then creates a watermark for the specified page by drawing the specified actions on a Canvas object.
+
+    Args:
+        pdf (bytes): The PDF file as a byte stream.
+        page_number (int): The page number to which the watermark should be applied (1-indexed).
+        action_type (str): The type of action to perform when creating the watermark (e.g., "image", "text", "line").
+        actions (List[dict]): A list of dictionaries, where each dictionary represents an action to be performed on the watermark.
+
+    Returns:
+        List[bytes]: A list of byte streams, where the element at index (page_number - 1) contains the watermark for the specified page,
+                     and all other elements are empty byte streams.
+    """
     pdf_file = PdfReader(stream_to_io(pdf))
     buff = BytesIO()
 
@@ -106,6 +173,19 @@ def merge_watermarks_with_pdf(
     pdf: bytes,
     watermarks: List[bytes],
 ) -> bytes:
+    """
+    Merges the generated watermarks with the original PDF content.
+
+    This function takes a PDF file and a list of watermarks as input.
+    It then merges each watermark with its corresponding page in the PDF.
+
+    Args:
+        pdf (bytes): The PDF file as a byte stream.
+        watermarks (List[bytes]): A list of byte streams, where each element represents the watermark for a specific page.
+
+    Returns:
+        bytes: A byte stream representing the merged PDF with watermarks applied.
+    """
     result = BytesIO()
     pdf_file = PdfReader(stream_to_io(pdf))
     output = PdfWriter()
@@ -128,6 +208,21 @@ def copy_watermark_widgets(
     keys: Union[List[str], None],
     page_num: Union[int, None],
 ) -> bytes:
+    """
+    Copies specific widgets from the watermarks to the original PDF.
+
+    This function allows you to selectively copy widgets (e.g., form fields) from the watermarks to the original PDF.
+    You can specify which widgets to copy by providing a list of keys.
+
+    Args:
+        pdf (bytes): The PDF file as a byte stream.
+        watermarks (Union[List[bytes], bytes]): A list of byte streams, where each element represents the watermark for a specific page.
+        keys (Union[List[str], None]): A list of keys identifying the widgets to copy from the watermarks. If None, all widgets are copied.
+        page_num (Union[int, None]): The page number to copy the widgets from. If None, widgets are copied from all pages.
+
+    Returns:
+        bytes: A byte stream representing the modified PDF with the specified widgets copied from the watermarks.
+    """
     pdf_file = PdfReader(stream_to_io(pdf))
     out = PdfWriter()
     out.append(pdf_file)

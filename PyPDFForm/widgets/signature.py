@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+This module defines the SignatureWidget class, which is responsible for
+representing signature fields in a PDF form. It handles the creation and
+rendering of signature widgets, as well as the integration of signatures
+into the PDF document.
+"""
 
 from io import BytesIO
 from typing import List
@@ -14,6 +20,20 @@ from .bedrock import BEDROCK_PDF
 
 
 class SignatureWidget:
+    """
+    Represents a signature widget in a PDF form.
+
+    This class is responsible for handling the creation, rendering, and
+    integration of signature fields in a PDF document. It inherits from
+    the base Widget class and provides specific functionality for handling
+    signatures.
+
+    Attributes:
+        OPTIONAL_PARAMS (list): A list of tuples, where each tuple contains the
+            parameter name and its default value.
+        BEDROCK_WIDGET_TO_COPY (str): The name of the bedrock widget to copy.
+    """
+
     OPTIONAL_PARAMS = [
         ("width", 160),
         ("height", 90),
@@ -28,6 +48,16 @@ class SignatureWidget:
         y: float,
         **kwargs,
     ) -> None:
+        """
+        Initializes a SignatureWidget object.
+
+        Args:
+            name (str): The name of the signature widget.
+            page_number (int): The page number of the signature widget.
+            x (float): The x coordinate of the signature widget.
+            y (float): The y coordinate of the signature widget.
+            **kwargs: Additional keyword arguments.
+        """
         super().__init__()
         self.hook_params = []
 
@@ -40,6 +70,24 @@ class SignatureWidget:
         }
 
     def watermarks(self, stream: bytes) -> List[bytes]:
+        """
+        Generates watermarks for the signature widget.
+
+        This method takes a PDF stream as input, reads a "bedrock" PDF, and
+        creates a new PDF with the signature widget added as a watermark on the
+        specified page. The signature's name and rectangle are then added to the
+        new PDF.
+
+        Args:
+            stream (bytes): The PDF stream.
+
+        Returns:
+            List[bytes]: A list of watermarks for the signature widget. Each
+            element in the list represents a page in the PDF. If the current
+            page matches the signature's page number, the corresponding element
+            will contain the watermark data. Otherwise, the element will be an
+            empty byte string.
+        """
         input_pdf = PdfReader(stream_to_io(stream))
         page_count = len(input_pdf.pages)
         pdf = PdfReader(stream_to_io(BEDROCK_PDF))
