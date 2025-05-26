@@ -91,7 +91,7 @@ signed = PdfWrapper(
     flatten=False   # optional, set to True to flatten the filled PDF form
 )
 
-filled.write("output.pdf")
+signed.write("output.pdf")
 ```
 
 **NOTE:** The signature value in your dictionary can be a file path, an open file object, or a `bytes` file stream, as described [here](install.md/#create-a-pdf-wrapper).
@@ -122,7 +122,7 @@ To fill an image field, consider [this PDF](https://github.com/chinapandaman/PyP
 from PyPDFForm import PdfWrapper
 
 filled = PdfWrapper(
-    "sample_template_with_image_field.pdf"
+    "sample_template_with_image_field.pdf",
     adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
 ).fill(
     {
