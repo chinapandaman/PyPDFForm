@@ -2,8 +2,7 @@
 
 PyPDFForm offers additional utilities similar to other PDF libraries.
 
-This section of the documentation will use 
-[this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
+This section of the documentation uses [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
 
 ## Extract pages
 
@@ -25,8 +24,7 @@ first_page.write("output.pdf")
 
 ## Merge multiple PDFs
 
-Merge multiple PDF files by adding their `PdfWrapper` objects. For an example, see
-[this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf).
+You can merge multiple PDF files by adding their `PdfWrapper` objects. For example, see [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf).
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -52,7 +50,7 @@ merged.write("output.pdf")
 
 ## Change PDF version
 
-PyPDFForm allows modifying the PDF version up to 2.0:
+PyPDFForm allows you to modify the PDF version up to 2.0:
 
 ```python
 from PyPDFForm import PdfWrapper
