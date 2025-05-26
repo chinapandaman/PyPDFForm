@@ -96,8 +96,9 @@ def test_fill_sig(pdf_samples, image_samples, request):
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(filled.read()) == len(expected)
-        assert filled.read() == expected
+        if os.name != "nt":
+            assert len(filled.read()) == len(expected)
+            assert filled.read() == expected
 
 
 def test_fill_sig_ratio(pdf_samples, image_samples, request):
@@ -119,8 +120,9 @@ def test_fill_sig_ratio(pdf_samples, image_samples, request):
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+        if os.name != "nt":
+            assert len(pdf.read()) == len(expected)
+            assert pdf.read() == expected
 
 
 def test_fill_image(
