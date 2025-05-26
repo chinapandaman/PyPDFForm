@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Module for handling PDF form templates.
 
@@ -6,7 +7,6 @@ in PDF form templates. It leverages the pypdf library for PDF manipulation
 and defines specific patterns for identifying and constructing different
 types of widgets.
 """
-# -*- coding: utf-8 -*-
 
 from functools import lru_cache
 from io import BytesIO
