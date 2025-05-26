@@ -1,13 +1,12 @@
 # Inspect PDF form field data
 
-After preparing a PDF form, use PyPDFForm to inspect its field names and determine the required filling data. You can choose from multiple inspection methods to suit your needs.
+After preparing a PDF form, use PyPDFForm to inspect its field names and determine the data required for filling it. You can choose from multiple inspection methods to suit your needs.
 
-This section of the documentation will use 
-[this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
+This section of the documentation uses [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
 
 ## Generate a JSON schema that describes a PDF form
 
-Describe the dictionary used to fill a PDF form using a JSON schema. For example:
+You can describe the dictionary used to fill a PDF form using a JSON schema. For example:
 
 ```python
 import json
@@ -48,7 +47,7 @@ The above snippet will yield the following output:
 
 In this example, `sample_template.pdf` contains three text fields (`test`, `test_2`, and `test_3`) of type `string` and three checkboxes (`check`, `check_2`, and `check_3`) of type `boolean`.
 
-Use the PyPDFForm-generated JSON schema to validate the data used for filling a PDF form.
+You can use the PyPDFForm-generated JSON schema to validate the data used for filling a PDF form.
 
 ## Generate sample data
 
