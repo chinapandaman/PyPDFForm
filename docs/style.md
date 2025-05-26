@@ -1,17 +1,16 @@
 # Change PDF form field style
 
-PyPDFForm enables modifying some field styles through code, allowing you to change field appearances without altering the PDF form template.
+PyPDFForm enables you to modify some field styles through code, allowing you to change field appearances without altering the PDF form template.
 
-This section of the documentation will use 
-[this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
+This section of the documentation uses [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
 
 ## Change text field font
 
-**NOTE:** Do NOT change text field font to a non-builtin registered font when `adobe_mode` is enabled. Adobe Acrobat will not recognize any registered font that didn't belong to the PDF form before, and will not render the form fields correctly.
+**NOTE:** Do NOT change the text field font to a non-builtin registered font when `adobe_mode` is enabled. Adobe Acrobat will not recognize any registered font that didn't belong to the PDF form before and will not render the form fields correctly.
 
-Before changing a text field's font, you need to first register the TrueType file of the font you wish to change to.
+Before changing a text field's font, you first need to register the TrueType file of the font you want to change to.
 
-For example, if you want to change the font to one of the [Liberation Serif](https://fonts.adobe.com/fonts/liberation-serif) font family, you can register its [TrueType file](https://github.com/chinapandaman/PyPDFForm/raw/master/font_samples/LiberationSerif-BoldItalic.ttf) like this:
+For example, if you want to change the font to one of the [Liberation Serif](https://fonts.adobe.com/fonts/liberation-serif) font family, you can register its [TrueType file](https://github.com/chinapandaman/PyPDFForm/raw/master/font_samples/LiberationSerif-BoldItalic.ttf) as follows:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -20,7 +19,7 @@ form = PdfWrapper("sample_template.pdf")
 form.register_font("new_font_name", "LiberationSerif-BoldItalic.ttf")
 ```
 
-Once registered, you can change any text field's font to that font:
+Once registered, you can change any text field's font to the registered font:
 
 ```python
 from PyPDFForm import PdfWrapper, Text
@@ -52,7 +51,7 @@ form.write("output.pdf")
 
 ## Change text field font size
 
-Change font size using a `float` value in PyPDFForm:
+You can change the font size using a `float` value in PyPDFForm:
 
 ```python
 from PyPDFForm import PdfWrapper, Text
@@ -83,7 +82,7 @@ form.write("output.pdf")
 
 ## Change text field font color
 
-Change font color using an RGB `tuple`:
+You can change the font color using an RGB `tuple`:
 
 ```python
 from PyPDFForm import PdfWrapper, Text
@@ -114,7 +113,7 @@ form.write("output.pdf")
 
 ## Change checkbox/radio button size
 
-Change the size of a checkbox or a group of radio buttons using a `float` value:
+You can change the size of a checkbox or a group of radio buttons using a `float` value:
 
 ```python
 from PyPDFForm import PdfWrapper
