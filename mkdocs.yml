@@ -7,9 +7,7 @@ nav:
     - prepare.md
     - inspect.md
     - fill.md
-    - simple_fill.md
     - style.md
-    - button_style.md
     - draw.md
     - utils.md
   - 'Developer Guide':
