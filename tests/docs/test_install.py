@@ -29,7 +29,8 @@ def test_create_adobe_mode_wrapper(template_stream):
 
 def test_use_full_widget_name(pdf_samples):
     pdf = PdfWrapper(
-        os.path.join(pdf_samples, "sample_template_with_full_key.pdf"), use_full_widget_name=True
+        os.path.join(pdf_samples, "sample_template_with_full_key.pdf"),
+        use_full_widget_name=True,
     )
 
     assert getattr(pdf, "use_full_widget_name")

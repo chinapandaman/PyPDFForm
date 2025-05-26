@@ -1057,11 +1057,7 @@ def test_uncheck_checkbox(pdf_samples, request):
         "rb+",
     ) as f:
         obj = PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf")).fill(
-            {
-                "check": False,
-                "check_2": False,
-                "check_3": False
-            },
+            {"check": False, "check_2": False, "check_3": False},
         )
 
         request.config.results["expected_path"] = expected_path
@@ -1080,11 +1076,7 @@ def test_uncheck_checkbox_flatten(pdf_samples, request):
         "rb+",
     ) as f:
         obj = PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf")).fill(
-            {
-                "check": False,
-                "check_2": False,
-                "check_3": False
-            },
+            {"check": False, "check_2": False, "check_3": False},
             flatten=True,
         )
 
