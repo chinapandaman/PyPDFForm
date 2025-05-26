@@ -10,7 +10,6 @@ forms. The module ensures that the input is properly converted into a byte
 stream before further processing.
 """
 
-
 from os.path import isfile
 from typing import Any, BinaryIO, Union
 

@@ -39,7 +39,6 @@ def generate_coordinate_grid(
     Returns:
         bytes: The PDF file with the coordinate grid overlay as bytes.
     """
-
     pdf_file = PdfReader(stream_to_io(pdf))
     lines_by_page = {}
     texts_by_page = {}
