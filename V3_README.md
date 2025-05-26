@@ -35,7 +35,7 @@ A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm
 ```python
 from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper("sample_template.pdf").fill(
+filled = PdfWrapper("sample_template.pdf", adobe_mode=True).fill(
     {
         "test": "test_1",
         "check": True,
@@ -46,8 +46,7 @@ filled = PdfWrapper("sample_template.pdf").fill(
     },
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(filled.read())
+filled.write("output.pdf")
 ```
 
 After running the above code snippet you can find `output.pdf` at the location you specified, 
