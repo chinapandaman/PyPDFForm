@@ -6,7 +6,7 @@ This section of the documentation uses [this PDF](https://github.com/chinapandam
 
 ## Change text field font
 
-**NOTE:** Changing the text field font to a non-builtin registered font is not supported when `adobe_mode` is enabled.
+**NOTE:** Changing the text field font to a non-built-in registered font is not supported when `adobe_mode` is enabled.
 
 Before changing a text field's font, you first need to register the TrueType file of the font you want to change to.
 
