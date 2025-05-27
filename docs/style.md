@@ -6,7 +6,7 @@ This section of the documentation uses [this PDF](https://github.com/chinapandam
 
 ## Change text field font
 
-**NOTE:** Do NOT change the text field font to a non-builtin registered font when `adobe_mode` is enabled. Adobe Acrobat will not recognize any registered font that didn't belong to the PDF form before and will not render the form fields correctly.
+**NOTE:** Changing the text field font to a non-builtin registered font is not supported when `adobe_mode` is enabled.
 
 Before changing a text field's font, you first need to register the TrueType file of the font you want to change to.
 

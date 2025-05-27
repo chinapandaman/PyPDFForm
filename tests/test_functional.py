@@ -379,7 +379,9 @@ def test_draw_text_on_one_page(template_stream, pdf_samples, request):
 
 
 def test_draw_multiline_text_on_one_page(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "test_draw_multiline_text_on_one_page.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "test_draw_multiline_text_on_one_page.pdf"
+    )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).draw_text(
             "drawn_text\ndrawn_text\ndrawn_text",
