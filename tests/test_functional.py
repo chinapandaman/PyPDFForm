@@ -378,6 +378,27 @@ def test_draw_text_on_one_page(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
+def test_draw_multiline_text_on_one_page(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_draw_multiline_text_on_one_page.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).draw_text(
+            "drawn_text\ndrawn_text\ndrawn_text",
+            1,
+            300,
+            225,
+            font_size=20,
+            font_color=(1, 0, 0),
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_draw_text_on_radio_template(
     template_with_radiobutton_stream, pdf_samples, request
 ):

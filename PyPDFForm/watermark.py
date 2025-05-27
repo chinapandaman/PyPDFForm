@@ -24,6 +24,7 @@ from .utils import stream_to_io
 def draw_text(canvas: Canvas, **kwargs) -> None:
     """
     Draws a text string on the given canvas using the specified font, size, and color.
+    Supports multiline text by splitting the input string by newline characters.
 
     Args:
         canvas (Canvas): The ReportLab Canvas object to draw on.
@@ -44,11 +45,10 @@ def draw_text(canvas: Canvas, **kwargs) -> None:
     canvas.setFillColorRGB(
         widget.font_color[0], widget.font_color[1], widget.font_color[2]
     )
-    canvas.drawString(
-        coordinate_x,
-        coordinate_y,
-        text_to_draw,
-    )
+    text_obj = canvas.beginText(coordinate_x, coordinate_y)
+    for line in text_to_draw.split("\n"):
+        text_obj.textLine(line)
+    canvas.drawText(text_obj)
 
 
 def draw_line(canvas: Canvas, **kwargs) -> None:
