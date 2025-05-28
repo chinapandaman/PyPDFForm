@@ -6,7 +6,7 @@ from PyPDFForm import PdfWrapper
 
 
 def test_fill(template_stream, pdf_samples, data_dict, request):
-    expected_path = os.path.join(pdf_samples, "adobe_mode", "test_fill.pdf")
+    expected_path = os.path.join(pdf_samples, "adobe_mode", "sample_filled.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream, adobe_mode=True).fill(
             data_dict,

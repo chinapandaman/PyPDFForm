@@ -50,7 +50,7 @@ filled.write("output.pdf")
 ```
 
 After running the above code snippet you can find `output.pdf` at the location you specified, 
-and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/adobe_mode/test_fill.pdf).
+and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/adobe_mode/sample_filled.pdf).
 
 ## Documentation
 
