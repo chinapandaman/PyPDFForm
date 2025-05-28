@@ -123,6 +123,8 @@ def enable_adobe_mode(pdf: bytes) -> bytes:
 
     # https://stackoverflow.com/questions/47288578/pdf-form-filled-with-pypdf2-does-not-show-in-print
     if AcroForm in reader.trailer[Root]:
+        if NeedAppearances in reader.trailer[Root][AcroForm]:
+            return pdf
         reader.trailer[Root][AcroForm].update(
             {NameObject(NeedAppearances): BooleanObject(True)}
         )
