@@ -59,7 +59,7 @@ with open("output.pdf", "wb+") as output:
 ```
 
 After running the above code snippet you can find `output.pdf` at the location you specified, 
-and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_filled.pdf).
+and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_filled.pdf).
 
 ## Documentation
 
