@@ -5,6 +5,22 @@ import os
 from PyPDFForm import PdfWrapper
 
 
+def test_fill(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "adobe_mode", "test_fill.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream, adobe_mode=True).fill(
+            data_dict,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "adobe_mode", "dropdown", "dropdown_two.pdf"
