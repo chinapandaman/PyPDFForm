@@ -14,11 +14,9 @@ from io import BytesIO
 from typing import Dict, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (ArrayObject, BooleanObject, DictionaryObject,
-                           IndirectObject, NameObject)
+from pypdf.generic import BooleanObject, DictionaryObject, NameObject
 
-from .constants import (WIDGET_TYPES, AcroForm, Annots, Fields,
-                        NeedAppearances, Root)
+from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root
 from .image import get_draw_image_resolutions, get_image_dimensions
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
@@ -125,18 +123,13 @@ def enable_adobe_mode(pdf: bytes) -> bytes:
     if AcroForm in reader.trailer[Root]:
         if NeedAppearances in reader.trailer[Root][AcroForm]:
             return pdf
-        reader.trailer[Root][AcroForm].update(
-            {NameObject(NeedAppearances): BooleanObject(True)}
-        )
-
-    if AcroForm not in writer.root_object:
-        writer.root_object.update(
-            {NameObject(AcroForm): IndirectObject(len(writer.root_object), 0, writer)}
-        )
-    writer.root_object[AcroForm][NameObject(NeedAppearances)] = BooleanObject(True)
-    writer.root_object[AcroForm][NameObject(Fields)] = ArrayObject()
-
+    else:
+        reader.trailer[Root].update({NameObject(AcroForm): DictionaryObject()})
+    reader.trailer[Root][AcroForm].update(
+        {NameObject(NeedAppearances): BooleanObject(True)}
+    )
     writer.append(reader)
+
     with BytesIO() as f:
         writer.write(f)
         f.seek(0)
