@@ -640,7 +640,10 @@ class PdfWrapper:
         return self
 
     def register_font(
-        self, font_name: str, ttf_file: Union[bytes, str, BinaryIO], first_time=True,
+        self,
+        font_name: str,
+        ttf_file: Union[bytes, str, BinaryIO],
+        first_time=True,
     ) -> PdfWrapper:
         """
         Registers a custom font for use in the PDF.
@@ -661,7 +664,9 @@ class PdfWrapper:
         if register_font(font_name, ttf_file) if ttf_file is not None else False:
             if first_time and getattr(self, "adobe_mode"):
                 self.draw_text(" ", 1, 0, 0, font=font_name)
-            self._stream, new_font_name = register_font_acroform(self.read(), ttf_file, getattr(self, "adobe_mode"))
+            self._stream, new_font_name = register_font_acroform(
+                self.read(), ttf_file, getattr(self, "adobe_mode")
+            )
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))
 
