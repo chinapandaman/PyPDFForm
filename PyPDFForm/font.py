@@ -55,6 +55,24 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
 
 
 def get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
+    """
+    Retrieves additional font parameters from a PDF document for a given base font name.
+
+    This function searches the PDF's resources for a font dictionary matching the provided
+    base font name. If a match is found, it extracts the font descriptor parameters and
+    the font dictionary parameters. These parameters can be used to further describe
+    and define the font within the PDF.
+
+    Args:
+        pdf (bytes): The PDF file data as bytes.
+        base_font_name (str): The base font name to search for within the PDF's font resources.
+
+    Returns:
+        tuple: A tuple containing two dictionaries:
+            - font_descriptor_params (dict): A dictionary of font descriptor parameters.
+            - font_dict_params (dict): A dictionary of font dictionary parameters.
+            Returns empty dictionaries if the font is not found.
+    """
     font_descriptor_params = {}
     font_dict_params = {}
     reader = PdfReader(stream_to_io(pdf))
