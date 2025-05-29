@@ -25,7 +25,7 @@ from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
-from .filler import enable_adobe_mode, simple_fill
+from .filler import fill
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
 from .hooks import trigger_widget_hooks
@@ -33,8 +33,8 @@ from .image import rotate_image
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .template import build_widgets, update_widget_keys
-from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
-                    remove_all_widgets)
+from .utils import (enable_adobe_mode, generate_unique_suffix,
+                    get_page_streams, merge_two_pdfs, remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
 from .widgets.checkbox import CheckBoxWidget
@@ -387,7 +387,7 @@ class PdfWrapper:
             if key in self.widgets:
                 self.widgets[key].value = value
 
-        filled_stream, image_drawn_stream = simple_fill(
+        filled_stream, image_drawn_stream = fill(
             self.read(),
             self.widgets,
             use_full_widget_name=getattr(self, "use_full_widget_name"),
