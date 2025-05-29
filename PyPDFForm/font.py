@@ -18,7 +18,7 @@ from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from .constants import (DR, FONT_NAME_PREFIX, AcroForm, BaseFont, Encoding,
                         Fields, Font, FontDescriptor, FontFile2, FontName,
-                        Length1, Subtype, TrueType, Type, WinAnsiEncoding)
+                        Length1, Subtype, TrueType, Type, WinAnsiEncoding, Resources)
 from .utils import stream_to_io
 
 
@@ -53,7 +53,27 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
     return result
 
 
-def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
+def get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
+    font_descriptor_params = {}
+    font_dict_params = {}
+    reader = PdfReader(stream_to_io(pdf))
+
+    for _, font in reader.pages[0][Resources][Font].items():
+        if base_font_name.replace("/", "") in font[BaseFont]:
+            font_descriptor_params = {
+                k: v
+                for k, v in font[FontDescriptor].items()
+            }
+            font_dict_params = {
+                k: v
+                for k, v in font.items()
+            }
+            break
+
+    return font_descriptor_params, font_dict_params
+
+
+def register_font_acroform(pdf: bytes, ttf_stream: bytes, adobe_mode: bool) -> tuple:
     """
     Registers a TrueType font within the PDF's AcroForm dictionary.
 
@@ -76,6 +96,11 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
     writer = PdfWriter()
     writer.append(reader)
 
+    font_descriptor_params = {}
+    font_dict_params = {}
+    if adobe_mode:
+        font_descriptor_params, font_dict_params = get_additional_font_params(pdf, base_font_name)
+
     font_file_stream = StreamObject()
     font_file_stream.set_data(ttf_stream)
     font_file_stream.update(
@@ -93,6 +118,13 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
             NameObject(FontFile2): font_file_ref,
         }
     )
+    font_descriptor.update(
+        {
+            k: v
+            for k, v in font_descriptor_params.items()
+            if k not in font_descriptor
+        }
+    )
     font_descriptor_ref = writer._add_object(font_descriptor)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 
     font_dict = DictionaryObject()
@@ -103,6 +135,13 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes) -> tuple:
             NameObject(BaseFont): NameObject(base_font_name),
             NameObject(FontDescriptor): font_descriptor_ref,
             NameObject(Encoding): NameObject(WinAnsiEncoding),
+        }
+    )
+    font_dict.update(
+        {
+            k: v
+            for k, v in font_dict_params.items()
+            if k not in font_dict
         }
     )
     font_dict_ref = writer._add_object(font_dict)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
