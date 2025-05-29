@@ -187,7 +187,7 @@ class PdfWrapper:
         font_register_events_len = len(self._font_register_events)
         for i in range(font_register_events_len):
             event = self._font_register_events[i]
-            self.register_font(event[0], event[1])
+            self.register_font(event[0], event[1], False)
         self._font_register_events = self._font_register_events[
             font_register_events_len:
         ]
@@ -640,17 +640,22 @@ class PdfWrapper:
         return self
 
     def register_font(
-        self, font_name: str, ttf_file: Union[bytes, str, BinaryIO]
+        self,
+        font_name: str,
+        ttf_file: Union[bytes, str, BinaryIO],
+        first_time: bool = True,
     ) -> PdfWrapper:
         """
         Registers a custom font for use in the PDF.
 
         Args:
-            font_name (str): The name of the font.  This name will be used to reference the font when drawing text.
+            font_name (str): The name of the font. This name will be used to reference the font when drawing text.
             ttf_file (Union[bytes, str, BinaryIO]): The TTF file data, provided as either:
                 - bytes: The raw TTF file data as a byte string.
                 - str: The file path to the TTF file.
                 - BinaryIO: An open file-like object containing the TTF file data.
+            first_time (bool): Whether this is the first time the font is being registered (default: True).
+                If True and `adobe_mode` is enabled, a blank text string is drawn to ensure the font is properly embedded in the PDF.
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
@@ -659,7 +664,11 @@ class PdfWrapper:
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         if register_font(font_name, ttf_file) if ttf_file is not None else False:
-            self._stream, new_font_name = register_font_acroform(self.read(), ttf_file)
+            if first_time and getattr(self, "adobe_mode"):
+                self.draw_text(" ", 1, 0, 0, font=font_name)
+            self._stream, new_font_name = register_font_acroform(
+                self.read(), ttf_file, getattr(self, "adobe_mode")
+            )
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))
 

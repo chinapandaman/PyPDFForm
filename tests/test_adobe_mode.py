@@ -5,6 +5,22 @@ import os
 from PyPDFForm import PdfWrapper
 
 
+def test_fill(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "adobe_mode", "sample_filled.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream, adobe_mode=True).fill(
+            data_dict,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "adobe_mode", "dropdown", "dropdown_two.pdf"
@@ -94,7 +110,7 @@ def test_issue_613(pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_sample_template_libary(pdf_samples, image_samples, request):
+def test_sample_template_libary(pdf_samples, image_samples, samle_font_stream, request):
     expected_path = os.path.join(
         pdf_samples, "adobe_mode", "test_sample_template_libary.pdf"
     )
@@ -102,6 +118,7 @@ def test_sample_template_libary(pdf_samples, image_samples, request):
     with open(expected_path, "rb+") as f:
         obj = (
             PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"), adobe_mode=True)
+            .register_font("new_font", samle_font_stream)
             .create_widget(
                 widget_type="text",
                 name="new_text_field_widget",
@@ -163,6 +180,7 @@ def test_sample_template_libary(pdf_samples, image_samples, request):
             )
         )
 
+        obj.widgets["new_text_field_widget"].font = "new_font"
         obj.widgets["new_text_field_widget"].font_color = (1, 0, 0)
         obj.widgets["new_text_field_widget"].alignment = 2
         obj.widgets["new_checkbox_widget"].size = 40

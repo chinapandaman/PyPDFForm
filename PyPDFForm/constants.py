@@ -81,6 +81,7 @@ BaseFont = "/BaseFont"
 Encoding = "/Encoding"
 WinAnsiEncoding = "/WinAnsiEncoding"
 
+Resources = "/Resources"
 FONT_NAME_PREFIX = "/F"
 
 # For Adobe Acrobat
