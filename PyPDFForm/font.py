@@ -99,6 +99,7 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes, adobe_mode: bool) -> t
             will be modified to include the new font.
         ttf_stream (bytes): The font file data in TTF format as bytes. This is the
             raw data of the TrueType font file.
+        adobe_mode (bool): A flag indicating whether to use Adobe-specific font parameters.
 
     Returns:
         tuple: A tuple containing the modified PDF data as bytes and the new font name

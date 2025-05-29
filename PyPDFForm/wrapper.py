@@ -649,11 +649,13 @@ class PdfWrapper:
         Registers a custom font for use in the PDF.
 
         Args:
-            font_name (str): The name of the font.  This name will be used to reference the font when drawing text.
+            font_name (str): The name of the font. This name will be used to reference the font when drawing text.
             ttf_file (Union[bytes, str, BinaryIO]): The TTF file data, provided as either:
                 - bytes: The raw TTF file data as a byte string.
                 - str: The file path to the TTF file.
                 - BinaryIO: An open file-like object containing the TTF file data.
+            first_time (bool): Whether this is the first time the font is being registered (default: True).
+                If True and `adobe_mode` is enabled, a blank text string is drawn to ensure the font is properly embedded in the PDF.
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
