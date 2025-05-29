@@ -59,10 +59,10 @@ def get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
     font_dict_params = {}
     reader = PdfReader(stream_to_io(pdf))
 
-    for _, font in reader.pages[0][Resources][Font].items():
+    for font in reader.pages[0][Resources][Font].values():
         if base_font_name.replace("/", "") in font[BaseFont]:
-            font_descriptor_params = {k: v for k, v in font[FontDescriptor].items()}
-            font_dict_params = {k: v for k, v in font.items()}
+            font_descriptor_params = dict(font[FontDescriptor])
+            font_dict_params = dict(font)
             break
 
     return font_descriptor_params, font_dict_params
