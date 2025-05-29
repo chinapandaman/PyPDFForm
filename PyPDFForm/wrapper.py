@@ -643,7 +643,7 @@ class PdfWrapper:
         self,
         font_name: str,
         ttf_file: Union[bytes, str, BinaryIO],
-        first_time=True,
+        first_time: bool = True,
     ) -> PdfWrapper:
         """
         Registers a custom font for use in the PDF.
