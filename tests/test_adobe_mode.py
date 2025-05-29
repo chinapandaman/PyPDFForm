@@ -110,7 +110,7 @@ def test_issue_613(pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_sample_template_libary(pdf_samples, image_samples, request):
+def test_sample_template_libary(pdf_samples, image_samples, samle_font_stream, request):
     expected_path = os.path.join(
         pdf_samples, "adobe_mode", "test_sample_template_libary.pdf"
     )
@@ -118,6 +118,7 @@ def test_sample_template_libary(pdf_samples, image_samples, request):
     with open(expected_path, "rb+") as f:
         obj = (
             PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"), adobe_mode=True)
+            .register_font("new_font", samle_font_stream)
             .create_widget(
                 widget_type="text",
                 name="new_text_field_widget",
@@ -179,6 +180,7 @@ def test_sample_template_libary(pdf_samples, image_samples, request):
             )
         )
 
+        obj.widgets["new_text_field_widget"].font = "new_font"
         obj.widgets["new_text_field_widget"].font_color = (1, 0, 0)
         obj.widgets["new_text_field_widget"].alignment = 2
         obj.widgets["new_checkbox_widget"].size = 40
