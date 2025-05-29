@@ -96,7 +96,7 @@ DROPDOWN_CHOICE_PATTERNS = [
 ]
 
 
-def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
+def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
     """
     Updates the value of a checkbox annotation, setting it to checked or unchecked.
 
@@ -114,7 +114,7 @@ def simple_update_checkbox_value(annot: DictionaryObject, check: bool = False) -
             break
 
 
-def simple_update_radio_value(annot: DictionaryObject) -> None:
+def update_radio_value(annot: DictionaryObject) -> None:
     """
     Updates the value of a radio button annotation, selecting it.
 
@@ -134,7 +134,7 @@ def simple_update_radio_value(annot: DictionaryObject) -> None:
             break
 
 
-def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
+def update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
     """
     Updates the value of a dropdown annotation, selecting an option from the list.
 
@@ -157,7 +157,7 @@ def simple_update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> N
         annot[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
 
 
-def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
+def update_text_value(annot: DictionaryObject, widget: Text) -> None:
     """
     Updates the value of a text annotation, setting the text content.
 
@@ -176,7 +176,7 @@ def simple_update_text_value(annot: DictionaryObject, widget: Text) -> None:
         annot[NameObject(AP)] = TextStringObject(widget.value)
 
 
-def simple_flatten_radio(annot: DictionaryObject) -> None:
+def flatten_radio(annot: DictionaryObject) -> None:
     """
     Flattens a radio button annotation by setting the ReadOnly flag, making it non-editable.
 
@@ -192,7 +192,7 @@ def simple_flatten_radio(annot: DictionaryObject) -> None:
     )
 
 
-def simple_flatten_generic(annot: DictionaryObject) -> None:
+def flatten_generic(annot: DictionaryObject) -> None:
     """
     Flattens a generic annotation by setting the ReadOnly flag, making it non-editable.
 
