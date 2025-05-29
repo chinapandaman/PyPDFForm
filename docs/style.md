@@ -6,8 +6,6 @@ This section of the documentation uses [this PDF](https://github.com/chinapandam
 
 ## Change text field font
 
-**NOTE:** Do NOT change the text field font to a non-built-in registered font when `adobe_mode` is enabled. Adobe Acrobat will not recognize any registered font that didn't belong to the PDF form before and will not render the form fields correctly.
-
 Before changing a text field's font, you first need to register the TrueType file of the font you want to change to.
 
 For example, if you want to change the font to one of the [Liberation Serif](https://fonts.adobe.com/fonts/liberation-serif) font family, you can register its [TrueType file](https://github.com/chinapandaman/PyPDFForm/raw/master/font_samples/LiberationSerif-BoldItalic.ttf) as follows:
