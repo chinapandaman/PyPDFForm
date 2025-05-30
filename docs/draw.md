@@ -10,6 +10,8 @@ All optional parameters will have a comment `# optional` after each of them.
 
 ## Draw text
 
+To use a custom font, see how to register it [here](style.md/#change-text-field-font).
+
 ```python
 from PyPDFForm import PdfWrapper
 
@@ -27,6 +29,8 @@ pdf.write("output.pdf")
 ```
 
 ## Draw image
+
+For the rotation parameter, a positive value rotates the image counter-clockwise, and a negative value rotates it clockwise.
 
 ```python
 from PyPDFForm import PdfWrapper

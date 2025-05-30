@@ -10,6 +10,7 @@ It includes functions for:
 - Finding and traversing patterns within PDF widgets.
 - Extracting widget properties based on defined patterns.
 - Generating unique suffixes for internal use.
+- Enabling Adobe-specific settings in the PDF to ensure proper rendering of form fields.
 """
 
 from collections.abc import Callable
