@@ -5,8 +5,7 @@ Module containing functions to fill PDF forms.
 This module provides the core functionality for filling PDF forms programmatically.
 It includes functions for handling various form field types, such as text fields,
 checkboxes, radio buttons, dropdowns, images, and signatures. The module also
-supports flattening the filled form to prevent further modifications and enabling
-Adobe-specific settings for improved rendering in Adobe Reader.
+supports flattening the filled form to prevent further modifications.
 """
 
 from io import BytesIO
