@@ -85,6 +85,7 @@ def enable_adobe_mode(pdf: bytes) -> bytes:
         return f.read()
 
 
+@lru_cache
 def remove_all_widgets(pdf: bytes) -> bytes:
     """
     Removes all widgets (form fields) from a PDF, effectively flattening the form.
