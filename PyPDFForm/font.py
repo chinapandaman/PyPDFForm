@@ -23,6 +23,7 @@ from .constants import (DR, FONT_NAME_PREFIX, AcroForm, BaseFont, Encoding,
 from .utils import stream_to_io
 
 
+@lru_cache
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
     """
     Registers a TrueType font with the ReportLab library.
@@ -217,6 +218,7 @@ def get_new_font_name(fonts: dict) -> str:
     return f"{FONT_NAME_PREFIX}{n}"
 
 
+@lru_cache
 def get_all_available_fonts(pdf: bytes) -> dict:
     """
     Retrieves all available fonts from a PDF document's AcroForm.
