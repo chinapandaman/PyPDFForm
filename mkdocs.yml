@@ -22,6 +22,6 @@ nav:
     - news/2024-01-01.md
 theme:
   name: readthedocs
-  logo: img/logo.png
+  logo: img/v3_logo.png
 extra:
   version: v2.5.0
