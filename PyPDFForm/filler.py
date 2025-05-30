@@ -5,18 +5,16 @@ Module containing functions to fill PDF forms.
 This module provides the core functionality for filling PDF forms programmatically.
 It includes functions for handling various form field types, such as text fields,
 checkboxes, radio buttons, dropdowns, images, and signatures. The module also
-supports flattening the filled form to prevent further modifications and enabling
-Adobe-specific settings for improved rendering in Adobe Reader.
+supports flattening the filled form to prevent further modifications.
 """
 
-from functools import lru_cache
 from io import BytesIO
 from typing import Dict, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import BooleanObject, DictionaryObject, NameObject
+from pypdf.generic import DictionaryObject
 
-from .constants import WIDGET_TYPES, AcroForm, Annots, NeedAppearances, Root
+from .constants import WIDGET_TYPES, Annots
 from .image import get_draw_image_resolutions, get_image_dimensions
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
@@ -24,10 +22,9 @@ from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .patterns import (simple_flatten_generic, simple_flatten_radio,
-                       simple_update_checkbox_value,
-                       simple_update_dropdown_value, simple_update_radio_value,
-                       simple_update_text_value)
+from .patterns import (flatten_generic, flatten_radio, update_checkbox_value,
+                       update_dropdown_value, update_radio_value,
+                       update_text_value)
 from .template import get_widget_key
 from .utils import stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
@@ -101,42 +98,7 @@ def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
     return merge_watermarks_with_pdf(stream, watermark_list)
 
 
-@lru_cache
-def enable_adobe_mode(pdf: bytes) -> bytes:
-    """Enables Adobe-specific settings in the PDF to ensure proper rendering of form fields.
-
-    This function modifies the PDF's AcroForm dictionary to include the `NeedAppearances` flag,
-    which forces Adobe Reader to generate appearance streams for form fields. This ensures that
-    the form fields are rendered correctly in Adobe Reader, especially when the form is filled
-    programmatically.
-
-    Args:
-        pdf (bytes): The PDF content as bytes.
-
-    Returns:
-        bytes: The modified PDF content with Adobe mode enabled.
-    """
-    reader = PdfReader(stream_to_io(pdf))
-    writer = PdfWriter()
-
-    # https://stackoverflow.com/questions/47288578/pdf-form-filled-with-pypdf2-does-not-show-in-print
-    if AcroForm in reader.trailer[Root]:
-        if NeedAppearances in reader.trailer[Root][AcroForm]:
-            return pdf
-    else:
-        reader.trailer[Root].update({NameObject(AcroForm): DictionaryObject()})
-    reader.trailer[Root][AcroForm].update(
-        {NameObject(NeedAppearances): BooleanObject(True)}
-    )
-    writer.append(reader)
-
-    with BytesIO() as f:
-        writer.write(f)
-        f.seek(0)
-        return f.read()
-
-
-def simple_fill(
+def fill(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
     use_full_widget_name: bool,
@@ -185,9 +147,9 @@ def simple_fill(
             # flatten all
             if flatten:
                 if isinstance(widget, Radio):
-                    simple_flatten_radio(annot)
+                    flatten_radio(annot)
                 else:
-                    simple_flatten_generic(annot)
+                    flatten_generic(annot)
             if widget.value is None:
                 continue
 
@@ -196,17 +158,17 @@ def simple_fill(
                     annot, widgets[key], images_to_draw[page_num + 1]
                 )
             elif type(widget) is Checkbox:
-                simple_update_checkbox_value(annot, widget.value)
+                update_checkbox_value(annot, widget.value)
             elif isinstance(widget, Radio):
                 if key not in radio_button_tracker:
                     radio_button_tracker[key] = 0
                 radio_button_tracker[key] += 1
                 if widget.value == radio_button_tracker[key] - 1:
-                    simple_update_radio_value(annot)
+                    update_radio_value(annot)
             elif isinstance(widget, Dropdown):
-                simple_update_dropdown_value(annot, widget)
+                update_dropdown_value(annot, widget)
             elif isinstance(widget, Text):
-                simple_update_text_value(annot, widget)
+                update_text_value(annot, widget)
 
     with BytesIO() as f:
         out.write(f)

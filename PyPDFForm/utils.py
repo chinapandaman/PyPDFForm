@@ -10,6 +10,7 @@ It includes functions for:
 - Finding and traversing patterns within PDF widgets.
 - Extracting widget properties based on defined patterns.
 - Generating unique suffixes for internal use.
+- Enabling Adobe-specific settings in the PDF to ensure proper rendering of form fields.
 """
 
 from collections.abc import Callable
@@ -20,9 +21,9 @@ from string import ascii_letters, digits, punctuation
 from typing import Any, BinaryIO, List, Union
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject
+from pypdf.generic import BooleanObject, DictionaryObject, NameObject
 
-from .constants import UNIQUE_SUFFIX_LENGTH
+from .constants import UNIQUE_SUFFIX_LENGTH, AcroForm, NeedAppearances, Root
 
 
 @lru_cache
@@ -49,6 +50,42 @@ def stream_to_io(stream: bytes) -> BinaryIO:
     return result
 
 
+@lru_cache
+def enable_adobe_mode(pdf: bytes) -> bytes:
+    """Enables Adobe-specific settings in the PDF to ensure proper rendering of form fields.
+
+    This function modifies the PDF's AcroForm dictionary to include the `NeedAppearances` flag,
+    which forces Adobe Reader to generate appearance streams for form fields. This ensures that
+    the form fields are rendered correctly in Adobe Reader, especially when the form is filled
+    programmatically.
+
+    Args:
+        pdf (bytes): The PDF content as bytes.
+
+    Returns:
+        bytes: The modified PDF content with Adobe mode enabled.
+    """
+    reader = PdfReader(stream_to_io(pdf))
+    writer = PdfWriter()
+
+    # https://stackoverflow.com/questions/47288578/pdf-form-filled-with-pypdf2-does-not-show-in-print
+    if AcroForm in reader.trailer[Root]:
+        if NeedAppearances in reader.trailer[Root][AcroForm]:
+            return pdf
+    else:
+        reader.trailer[Root].update({NameObject(AcroForm): DictionaryObject()})
+    reader.trailer[Root][AcroForm].update(
+        {NameObject(NeedAppearances): BooleanObject(True)}
+    )
+    writer.append(reader)
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
+
+
+@lru_cache
 def remove_all_widgets(pdf: bytes) -> bytes:
     """
     Removes all widgets (form fields) from a PDF, effectively flattening the form.

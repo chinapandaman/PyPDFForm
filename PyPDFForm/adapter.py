@@ -10,6 +10,7 @@ forms. The module ensures that the input is properly converted into a byte
 stream before further processing.
 """
 
+from functools import lru_cache
 from os.path import isfile
 from typing import Any, BinaryIO, Union
 
@@ -31,6 +32,7 @@ def readable(obj: Any) -> bool:
     return callable(getattr(obj, "read", None))
 
 
+@lru_cache
 def fp_or_f_obj_or_stream_to_stream(
     fp_or_f_obj_or_stream: Union[bytes, str, BinaryIO],
 ) -> bytes:
