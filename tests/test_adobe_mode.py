@@ -110,15 +110,17 @@ def test_issue_613(pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_sample_template_libary(pdf_samples, image_samples, samle_font_stream, request):
+def test_sample_template_library(
+    pdf_samples, image_samples, sample_font_stream, request
+):
     expected_path = os.path.join(
-        pdf_samples, "adobe_mode", "test_sample_template_libary.pdf"
+        pdf_samples, "adobe_mode", "test_sample_template_library.pdf"
     )
 
     with open(expected_path, "rb+") as f:
         obj = (
             PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"), adobe_mode=True)
-            .register_font("new_font", samle_font_stream)
+            .register_font("new_font", sample_font_stream)
             .create_widget(
                 widget_type="text",
                 name="new_text_field_widget",
