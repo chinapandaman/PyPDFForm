@@ -6,9 +6,9 @@ This section of the documentation uses [this PDF](https://github.com/chinapandam
 
 ## Change text field font
 
-Before changing a text field's font, you first need to [register](font.md) a font you want to change to.
+Before changing a text field's font, you must first [register](font.md) the desired font.
 
-Once registered, you can change any text field's font to the registered font:
+After registration, you can apply the registered font to any text field:
 
 ```python
 from PyPDFForm import PdfWrapper, Text
