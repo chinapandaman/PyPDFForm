@@ -12,3 +12,18 @@ form.register_font("new_font_name", "LiberationSerif-BoldItalic.ttf")
 ```
 
 In this example, `LiberationSerif-BoldItalic.ttf` is registered as `new_font_name`. You can now reference this font in the object's APIs using the name `new_font_name`.
+
+## Get registered fonts
+
+To see which fonts have been registered, access the `fonts` attribute of the `PdfWrapper` object:
+
+```python
+from PyPDFForm import PdfWrapper
+
+form = PdfWrapper("sample_template.pdf")
+form.register_font("new_font_name", "LiberationSerif-BoldItalic.ttf")
+
+print(form.fonts)
+```
+
+The `fonts` attribute lists the names of the registered fonts.
