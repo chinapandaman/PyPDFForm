@@ -61,7 +61,7 @@ def test_register_bad_fonts():
 
 
 def test_register_global_font_fill(
-    template_stream, pdf_samples, samle_font_stream, data_dict, request
+    template_stream, pdf_samples, sample_font_stream, data_dict, request
 ):
     expected_path = os.path.join(pdf_samples, "test_register_global_font_fill.pdf")
     with open(
@@ -70,7 +70,7 @@ def test_register_global_font_fill(
     ) as f:
         obj = PdfWrapper(template_stream).register_font(
             "new_font",
-            samle_font_stream,
+            sample_font_stream,
         )
         for v in obj.widgets.values():
             if isinstance(v, Text):
@@ -89,7 +89,7 @@ def test_register_global_font_fill(
 
 
 def test_register_global_font_fill_flatten(
-    template_stream, pdf_samples, samle_font_stream, data_dict, request
+    template_stream, pdf_samples, sample_font_stream, data_dict, request
 ):
     expected_path = os.path.join(
         pdf_samples, "test_register_global_font_fill_flatten.pdf"
@@ -100,7 +100,7 @@ def test_register_global_font_fill_flatten(
     ) as f:
         obj = PdfWrapper(template_stream).register_font(
             "new_font",
-            samle_font_stream,
+            sample_font_stream,
         )
         for v in obj.widgets.values():
             if isinstance(v, Text):
@@ -211,7 +211,7 @@ def test_fill_font_color_red_flatten(template_stream, pdf_samples, data_dict, re
 
 
 def test_fill_with_customized_widgets(
-    template_stream, pdf_samples, samle_font_stream, data_dict, request
+    template_stream, pdf_samples, sample_font_stream, data_dict, request
 ):
     expected_path = os.path.join(pdf_samples, "test_fill_with_customized_widgets.pdf")
     with open(
@@ -220,7 +220,7 @@ def test_fill_with_customized_widgets(
     ) as f:
         obj = PdfWrapper(template_stream).register_font(
             "new_font",
-            samle_font_stream,
+            sample_font_stream,
         )
         obj.widgets["test"].font = "new_font"
         obj.widgets["test"].font_size = 20
@@ -240,7 +240,7 @@ def test_fill_with_customized_widgets(
 
 
 def test_fill_with_customized_widgets_flatten(
-    template_stream, pdf_samples, samle_font_stream, data_dict, request
+    template_stream, pdf_samples, sample_font_stream, data_dict, request
 ):
     expected_path = os.path.join(
         pdf_samples, "test_fill_with_customized_widgets_flatten.pdf"
@@ -251,7 +251,7 @@ def test_fill_with_customized_widgets_flatten(
     ) as f:
         obj = PdfWrapper(template_stream).register_font(
             "new_font",
-            samle_font_stream,
+            sample_font_stream,
         )
         obj.widgets["test"].font = "new_font"
         obj.widgets["test"].font_size = 20
@@ -593,11 +593,11 @@ def test_merging_unique_suffix(template_stream):
                 assert len(widget[T].split("-")[1]) == UNIQUE_SUFFIX_LENGTH
 
 
-def test_merge_preserve_font_and_data(template_stream, samle_font_stream):
+def test_merge_preserve_font_and_data(template_stream, sample_font_stream):
     result = PdfWrapper()
 
     for i in range(10):
-        obj = PdfWrapper(template_stream).register_font("new_font", samle_font_stream)
+        obj = PdfWrapper(template_stream).register_font("new_font", sample_font_stream)
         obj.widgets["test"].font = "new_font"
         result += obj.fill({"test": f"test_{i}"})
 
@@ -858,10 +858,10 @@ def test_pages(template_stream, pdf_samples, request):
         assert obj.pages[0].read() == f.read()
 
 
-def test_pages_preserve_font(template_stream, pdf_samples, samle_font_stream, request):
+def test_pages_preserve_font(template_stream, pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "pages", "test_pages_preserve_font.pdf")
     obj = PdfWrapper(template_stream)
-    obj.register_font("new_font", samle_font_stream)
+    obj.register_font("new_font", sample_font_stream)
     obj.widgets["test_2"].font = "new_font"
 
     with open(expected_path, "rb+") as f:
