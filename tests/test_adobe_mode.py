@@ -153,6 +153,7 @@ def test_sample_template_library(
                     "bar",
                     "foobar",
                 ],
+                font="new_font",
             )
             .create_widget(
                 widget_type="image",
