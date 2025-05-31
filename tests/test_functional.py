@@ -59,6 +59,9 @@ def test_register_bad_fonts():
     assert not PdfWrapper().register_font("foo", b"foo").read()
     assert not PdfWrapper().register_font("foo", "foo").read()
 
+    obj = PdfWrapper().register_font("foo", b"foo")
+    assert "foo" not in obj.fonts
+
 
 def test_register_global_font_fill(
     template_stream, pdf_samples, sample_font_stream, data_dict, request
@@ -72,6 +75,7 @@ def test_register_global_font_fill(
             "new_font",
             sample_font_stream,
         )
+        assert "new_font" in obj.fonts
         for v in obj.widgets.values():
             if isinstance(v, Text):
                 v.font = "new_font"
