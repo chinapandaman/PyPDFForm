@@ -18,6 +18,10 @@ class Dropdown(Widget):
     implements the schema_definition and sample_value properties.
     """
 
+    SET_ATTR_TRIGGER_HOOK_MAP = {
+        "font": "update_text_field_font",
+    }
+
     def __init__(
         self,
         name: str,
@@ -34,6 +38,8 @@ class Dropdown(Widget):
             choices (List[str]): The list of choices for the dropdown.
         """
         super().__init__(name, value)
+
+        self.font = None
 
         self.choices = []
 

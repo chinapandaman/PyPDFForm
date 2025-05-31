@@ -30,6 +30,7 @@ from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
 from .hooks import trigger_widget_hooks
 from .image import rotate_image
+from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .template import build_widgets, update_widget_keys
@@ -281,7 +282,7 @@ class PdfWrapper:
         if any(widget.hooks_to_trigger for widget in self.widgets.values()):
             for widget in self.widgets.values():
                 if (
-                    isinstance(widget, Text)
+                    isinstance(widget, (Text, Dropdown))
                     and widget.font not in self._available_fonts.values()
                     and widget.font in self._available_fonts
                 ):
