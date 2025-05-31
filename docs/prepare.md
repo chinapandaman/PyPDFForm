@@ -40,6 +40,8 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
 new_form.write("output.pdf")
 ```
 
+To use a custom font, see how to register it [here](font.md).
+
 ## Create a checkbox
 
 A checkbox can be created using the same method with some changes to the parameters:
@@ -123,6 +125,8 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
 
 new_form.write("output.pdf")
 ```
+
+To use a custom font, see how to register it [here](font.md).
 
 ## Create a signature field
 
