@@ -110,9 +110,11 @@ def test_issue_613(pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_sample_template_libary(pdf_samples, image_samples, sample_font_stream, request):
+def test_sample_template_library(
+    pdf_samples, image_samples, sample_font_stream, request
+):
     expected_path = os.path.join(
-        pdf_samples, "adobe_mode", "test_sample_template_libary.pdf"
+        pdf_samples, "adobe_mode", "test_sample_template_library.pdf"
     )
 
     with open(expected_path, "rb+") as f:
