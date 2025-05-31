@@ -35,6 +35,7 @@ class Dropdown(Widget):
             value (int): The initial value of the dropdown. Defaults to None.
 
         Attributes:
+            font (str): The font of the dropdown field. Defaults to None.
             choices (List[str]): The list of choices for the dropdown.
         """
         super().__init__(name, value)
