@@ -6,32 +6,22 @@ This section of the documentation uses [this PDF](https://github.com/chinapandam
 
 ## Change text field font
 
-Before changing a text field's font, you first need to register the TrueType file of the font you want to change to.
+Before changing a text field's font, you must first [register](font.md) the desired font.
 
-For example, if you want to change the font to one of the [Liberation Serif](https://fonts.adobe.com/fonts/liberation-serif) font family, you can register its [TrueType file](https://github.com/chinapandaman/PyPDFForm/raw/master/font_samples/LiberationSerif-BoldItalic.ttf) as follows:
-
-```python
-from PyPDFForm import PdfWrapper
-
-form = PdfWrapper("sample_template.pdf")
-form.register_font("new_font_name", "LiberationSerif-BoldItalic.ttf")
-```
-
-Once registered, you can change any text field's font to the registered font:
+After registration, you can apply the registered font to any text field:
 
 ```python
 from PyPDFForm import PdfWrapper, Text
 
 form = PdfWrapper("sample_template.pdf")
-form.register_font("new_font_name", "LiberationSerif-BoldItalic.ttf")
 
 # change globally by iterating each text field
 for field in form.widgets.values():
     if isinstance(field, Text):
-        field.font = "new_font_name"
+        field.font = "your_registered_font"
 
 # or change at each field's widget level
-form.widgets["test"].font = "new_font_name"
+form.widgets["test"].font = "your_registered_font"
 
 form.fill(
     {
