@@ -5,27 +5,34 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_create_text(pdf_samples, request):
+def test_create_text(pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_text.pdf")
 
-    new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).create_widget(
-        widget_type="text",
-        name="new_text_field",
-        page_number=1,
-        x=57,
-        y=700,
-        width=120,  # optional
-        height=40,  # optional
-        max_length=10,  # optional
-        comb=True,  # optional, when set to True, max_length must also be set
-        font="Arial",  # optional
-        font_size=15,  # optional
-        font_color=(0, 1, 0),  # optional
-        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-        border_color=(1, 0, 0),  # optional
-        border_width=5,  # optional
-        alignment=2,  # optional, 0=left, 1=center, 2=right
-        multiline=False,  # optional
+    new_form = (
+        PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+        .register_font(
+            "your_registered_font",
+            sample_font_stream,
+        )
+        .create_widget(
+            widget_type="text",
+            name="new_text_field",
+            page_number=1,
+            x=57,
+            y=700,
+            width=120,  # optional
+            height=40,  # optional
+            max_length=10,  # optional
+            comb=True,  # optional, when set to True, max_length must also be set
+            font="your_registered_font",  # optional
+            font_size=15,  # optional
+            font_color=(0, 1, 0),  # optional
+            bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+            border_color=(1, 0, 0),  # optional
+            border_width=5,  # optional
+            alignment=2,  # optional, 0=left, 1=center, 2=right
+            multiline=False,  # optional
+        )
     )
 
     request.config.results["expected_path"] = expected_path
@@ -93,28 +100,32 @@ def test_create_radio(pdf_samples, request):
         assert new_form.read() == expected
 
 
-def test_create_dropdown(pdf_samples, request):
+def test_create_dropdown(pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_dropdown.pdf")
 
-    new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).create_widget(
-        widget_type="dropdown",
-        name="new_dropdown",
-        page_number=1,
-        x=57,
-        y=700,
-        options=[
-            "foo",
-            "bar",
-            "foobar",
-        ],
-        width=120,  # optional
-        height=40,  # optional
-        font="Arial",  # optional
-        font_size=15,  # optional
-        font_color=(0, 1, 0),  # optional
-        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-        border_color=(1, 0, 0),  # optional
-        border_width=5,  # optional
+    new_form = (
+        PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+        .register_font("your_registered_font", sample_font_stream)
+        .create_widget(
+            widget_type="dropdown",
+            name="new_dropdown",
+            page_number=1,
+            x=57,
+            y=700,
+            options=[
+                "foo",
+                "bar",
+                "foobar",
+            ],
+            width=120,  # optional
+            height=40,  # optional
+            font="your_registered_font",  # optional
+            font_size=15,  # optional
+            font_color=(0, 1, 0),  # optional
+            bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+            border_color=(1, 0, 0),  # optional
+            border_width=5,  # optional
+        )
     )
 
     request.config.results["expected_path"] = expected_path
