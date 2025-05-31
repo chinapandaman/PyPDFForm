@@ -241,6 +241,17 @@ class PdfWrapper:
 
         return None
 
+    @property
+    def fonts(self) -> list:
+        """
+        Returns a list of the names of the currently registered fonts.
+
+        Returns:
+            list: A list of font names (str).
+        """
+
+        return list(self._available_fonts.keys())
+
     @cached_property
     def pages(self) -> Sequence[PdfWrapper]:
         """
