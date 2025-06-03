@@ -234,8 +234,6 @@ def update_widget_keys(
     Returns:
         bytes: The updated PDF template as a byte stream.
     """
-    # pylint: disable=R0801
-
     pdf = PdfReader(stream_to_io(template))
     out = PdfWriter()
     out.append(pdf)

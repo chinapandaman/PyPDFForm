@@ -4,6 +4,7 @@ nav:
   - 'User Guide':
     - install.md
     - coordinate.md
+    - font.md
     - prepare.md
     - inspect.md
     - fill.md

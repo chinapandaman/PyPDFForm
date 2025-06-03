@@ -5,11 +5,11 @@ import os
 from PyPDFForm import PdfWrapper, Text
 
 
-def test_change_text_font(template_stream, samle_font_stream, pdf_samples, request):
+def test_change_text_font(template_stream, sample_font_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
 
     form = PdfWrapper(template_stream)
-    form.register_font("new_font_name", samle_font_stream)
+    form.register_font("new_font_name", sample_font_stream)
 
     # change globally by iterating each text field
     for field in form.widgets.values():

@@ -11,12 +11,24 @@ from .base import Widget
 
 class Dropdown(Widget):
     """
-    Represents a dropdown widget.
+    Represents a dropdown widget in a PDF form.
 
-    The Dropdown class provides a concrete implementation for
-    dropdown form fields. It inherits from the Widget class and
-    implements the schema_definition and sample_value properties.
+    Inherits from the Widget class and provides specific functionality
+    for handling dropdown form fields.
+
+    Key attributes:
+        font (str): The font of the dropdown field.
+        choices (List[str]): The list of available options in the dropdown.
+        value (int): The index of the selected choice in the choices list.
+
+    Methods:
+        schema_definition: Returns a schema definition for the dropdown's value.
+        sample_value: Returns a sample value for the dropdown.
     """
+
+    SET_ATTR_TRIGGER_HOOK_MAP = {
+        "font": "update_text_field_font",
+    }
 
     def __init__(
         self,
@@ -31,9 +43,12 @@ class Dropdown(Widget):
             value (int): The initial value of the dropdown. Defaults to None.
 
         Attributes:
+            font (str): The font of the dropdown field.
             choices (List[str]): The list of choices for the dropdown.
         """
         super().__init__(name, value)
+
+        self.font = None
 
         self.choices = []
 

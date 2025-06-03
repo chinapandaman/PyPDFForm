@@ -125,7 +125,6 @@ def fill(
                The image drawn stream is only returned if there are any image or signature widgets
                in the form.
     """
-    # pylint: disable=R0912
     pdf = PdfReader(stream_to_io(template))
     out = PdfWriter()
     out.append(pdf)
@@ -146,10 +145,7 @@ def fill(
 
             # flatten all
             if flatten:
-                if isinstance(widget, Radio):
-                    flatten_radio(annot)
-                else:
-                    flatten_generic(annot)
+                (flatten_radio if isinstance(widget, Radio) else flatten_generic)(annot)
             if widget.value is None:
                 continue
 
@@ -175,8 +171,6 @@ def fill(
         f.seek(0)
         result = f.read()
 
-    image_drawn_stream = None
-    if any_image_to_draw:
-        image_drawn_stream = get_drawn_stream(images_to_draw, result, "image")
-
-    return result, image_drawn_stream
+    return result, (
+        get_drawn_stream(images_to_draw, result, "image") if any_image_to_draw else None
+    )
