@@ -1,6 +1,7 @@
 site_name: Welcome to PyPDFForm - PyPDFForm Documentation
 repo_url: https://github.com/chinapandaman/PyPDFForm
 nav:
+  - Home: index.md
   - 'User Guide':
     - install.md
     - coordinate.md
