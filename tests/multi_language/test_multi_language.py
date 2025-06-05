@@ -5,12 +5,12 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_chinese_simplified(multi_language_pdf_samples, request):
+def test_zh_cn(zh_cn, request):
     expected_path = os.path.join(
-        multi_language_pdf_samples, "test_chinese_simplified.pdf"
+        zh_cn, "test_zh_cn.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(os.path.join(multi_language_pdf_samples, "zh_cn.pdf")).fill(
+        obj = PdfWrapper(os.path.join(zh_cn, "zh_cn.pdf")).fill(
             {
                 "投资者名称": "张三",
                 "基金账户": "央行",
