@@ -488,24 +488,28 @@ def test_create_text_default_filled_flatten(template_stream, pdf_samples, reques
         assert obj.read() == expected
 
 
-def test_create_text_complex(template_stream, pdf_samples, request):
+def test_create_text_complex(template_stream, pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "widget", "test_create_text_complex.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_widget(
-            "text",
-            "foo",
-            1,
-            100,
-            100,
-            width=400,
-            height=400,
-            max_length=2,
-            font="Arial",
-            font_size=50,
-            font_color=(1, 0.5, 1),
-            bg_color=(0, 0, 1),
-            border_color=(1, 0, 0),
-            border_width=5,
+        obj = (
+            PdfWrapper(template_stream)
+            .register_font("new_font", sample_font_stream)
+            .create_widget(
+                "text",
+                "foo",
+                1,
+                100,
+                100,
+                width=400,
+                height=400,
+                max_length=2,
+                font="new_font",
+                font_size=50,
+                font_color=(1, 0.5, 1),
+                bg_color=(0, 0, 1),
+                border_color=(1, 0, 0),
+                border_width=5,
+            )
         )
         assert obj.schema["properties"]["foo"]["type"] == "string"
         assert obj.schema["properties"]["foo"]["maxLength"] == 2
@@ -519,26 +523,32 @@ def test_create_text_complex(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_create_text_complex_filled(template_stream, pdf_samples, request):
+def test_create_text_complex_filled(
+    template_stream, pdf_samples, sample_font_stream, request
+):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_text_complex_filled.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_widget(
-            "text",
-            "foo",
-            1,
-            100,
-            100,
-            width=400,
-            height=400,
-            max_length=2,
-            font="Arial",
-            font_size=50,
-            font_color=(1, 0.5, 1),
-            bg_color=(0, 0, 1),
-            border_color=(1, 0, 0),
-            border_width=5,
+        obj = (
+            PdfWrapper(template_stream)
+            .register_font("new_font", sample_font_stream)
+            .create_widget(
+                "text",
+                "foo",
+                1,
+                100,
+                100,
+                width=400,
+                height=400,
+                max_length=2,
+                font="new_font",
+                font_size=50,
+                font_color=(1, 0.5, 1),
+                bg_color=(0, 0, 1),
+                border_color=(1, 0, 0),
+                border_width=5,
+            )
         )
         obj.fill(obj.sample_data)
 
@@ -551,26 +561,32 @@ def test_create_text_complex_filled(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_create_text_complex_filled_flatten(template_stream, pdf_samples, request):
+def test_create_text_complex_filled_flatten(
+    template_stream, pdf_samples, sample_font_stream, request
+):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_text_complex_filled_flatten.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_widget(
-            "text",
-            "foo",
-            1,
-            100,
-            100,
-            width=400,
-            height=400,
-            max_length=2,
-            font="Arial",
-            font_size=50,
-            font_color=(1, 0.5, 1),
-            bg_color=(0, 0, 1),
-            border_color=(1, 0, 0),
-            border_width=5,
+        obj = (
+            PdfWrapper(template_stream)
+            .register_font("new_font", sample_font_stream)
+            .create_widget(
+                "text",
+                "foo",
+                1,
+                100,
+                100,
+                width=400,
+                height=400,
+                max_length=2,
+                font="new_font",
+                font_size=50,
+                font_color=(1, 0.5, 1),
+                bg_color=(0, 0, 1),
+                border_color=(1, 0, 0),
+                border_width=5,
+            )
         )
         obj.fill(obj.sample_data, flatten=True)
 
@@ -778,28 +794,32 @@ def test_create_widget_sejda_schema(sejda_template):
     assert len(schema["properties"]) == len(old_schema["properties"]) + 1
 
 
-def test_create_dropdown(template_stream, pdf_samples, request):
+def test_create_dropdown(template_stream, pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "widget", "test_create_dropdown.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_widget(
-            widget_type="dropdown",
-            name="new_dropdown_widget",
-            page_number=1,
-            x=57,
-            y=700,
-            options=[
-                "foo",
-                "bar",
-                "foobar",
-            ],
-            width=120,
-            height=40,
-            font="Arial",
-            font_size=15,
-            font_color=(1, 0, 0),
-            bg_color=(0, 0, 1),
-            border_color=(1, 0, 0),
-            border_width=5,
+        obj = (
+            PdfWrapper(template_stream)
+            .register_font("new_font", sample_font_stream)
+            .create_widget(
+                widget_type="dropdown",
+                name="new_dropdown_widget",
+                page_number=1,
+                x=57,
+                y=700,
+                options=[
+                    "foo",
+                    "bar",
+                    "foobar",
+                ],
+                width=120,
+                height=40,
+                font="new_font",
+                font_size=15,
+                font_color=(1, 0, 0),
+                bg_color=(0, 0, 1),
+                border_color=(1, 0, 0),
+                border_width=5,
+            )
         )
         assert obj.schema["properties"]["new_dropdown_widget"]["type"] == "integer"
 

@@ -13,6 +13,7 @@ It also supports other common utilities such as extracting pages and merging mul
 
 * [Installation and setup](install.md)
 * [PDF coordinate system](coordinate.md)
+* [Register fonts](font.md)
 * [Create form fields](prepare.md)
 * [Inspect form field data](inspect.md)
 * [Fill PDF forms](fill.md)

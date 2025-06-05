@@ -27,7 +27,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     height=40,  # optional
     max_length=5,   # optional
     comb=True,  # optional, when set to True, max_length must also be set
-    font="Arial", # optional
+    font="your_registered_font", # optional
     font_size=15,   # optional
     font_color=(1, 0, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
@@ -39,6 +39,8 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
 
 new_form.write("output.pdf")
 ```
+
+To use a custom font, see how to register it [here](font.md).
 
 ## Create a checkbox
 
@@ -113,7 +115,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     ],
     width=120,  # optional
     height=40,  # optional
-    font="Arial", # optional
+    font="your_registered_font", # optional
     font_size=15,   # optional
     font_color=(1, 0, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
@@ -123,6 +125,8 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
 
 new_form.write("output.pdf")
 ```
+
+To use a custom font, see how to register it [here](font.md).
 
 ## Create a signature field
 

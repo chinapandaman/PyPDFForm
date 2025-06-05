@@ -10,7 +10,7 @@ All optional parameters will have a comment `# optional` after each of them.
 
 ## Draw text
 
-To use a custom font, see how to register it [here](style.md/#change-text-field-font).
+To use a custom font, see how to register it [here](font.md).
 
 ```python
 from PyPDFForm import PdfWrapper
