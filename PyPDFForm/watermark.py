@@ -227,6 +227,7 @@ def copy_watermark_widgets(
     out = PdfWriter()
     out.append(pdf_file)
 
+    # TODO: refactor duplicate logic with merge_two_pdfs
     widgets_to_copy_watermarks = {}
     widgets_to_copy_pdf = {}
 

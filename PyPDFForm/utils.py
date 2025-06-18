@@ -173,6 +173,7 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     output = PdfWriter()
     output.append(merged_no_widgets)
 
+    # TODO: refactor duplicate logic with copy_watermark_widgets
     widgets_to_copy = {}
     for i, page in enumerate(pdf_file.pages):
         widgets_to_copy[i] = []
