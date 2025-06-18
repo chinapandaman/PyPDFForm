@@ -144,17 +144,18 @@ def get_page_streams(pdf: bytes) -> List[bytes]:
 
 def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     """
-    Merges two PDFs into one, creating a single PDF containing all pages from both input PDFs.
+    Merges two PDF files into a single PDF file.
 
-    This function takes two PDFs as bytes streams and merges them into a single PDF.
-    The pages from the second PDF are appended to the end of the first PDF.
+    This function takes two PDF files as byte streams, merges them, and returns the result as a single PDF byte stream.
+    It handles the merging of pages from both PDFs and also attempts to preserve form field widgets from both input PDFs
+    in the final merged PDF. The form fields are cloned and added to the output pages.
 
     Args:
-        pdf (bytes): The first PDF as a bytes stream.
-        other (bytes): The second PDF as a bytes stream.
+        pdf (bytes): The first PDF file as a byte stream.
+        other (bytes): The second PDF file as a byte stream.
 
     Returns:
-        bytes: The merged PDF as a bytes stream.
+        bytes: The merged PDF file as a byte stream.
     """
     output = PdfWriter()
     pdf_file = PdfReader(stream_to_io(pdf))
