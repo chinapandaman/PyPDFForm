@@ -21,9 +21,11 @@ from string import ascii_letters, digits, punctuation
 from typing import Any, BinaryIO, List, Union
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import BooleanObject, DictionaryObject, NameObject
+from pypdf.generic import (ArrayObject, BooleanObject, DictionaryObject,
+                           NameObject)
 
-from .constants import UNIQUE_SUFFIX_LENGTH, AcroForm, NeedAppearances, Root
+from .constants import (UNIQUE_SUFFIX_LENGTH, AcroForm, Annots,
+                        NeedAppearances, Root)
 
 
 @lru_cache
@@ -164,6 +166,32 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     for page in other_file.pages:
         output.add_page(page)
 
+    output.write(result)
+    result.seek(0)
+
+    merged_no_widgets = PdfReader(stream_to_io(remove_all_widgets(result.read())))
+    output = PdfWriter()
+    output.append(merged_no_widgets)
+
+    widgets_to_copy = {}
+    for i, page in enumerate(pdf_file.pages):
+        widgets_to_copy[i] = []
+        for annot in page.get(Annots, []):
+            widgets_to_copy[i].append(annot.clone(output))
+
+    for i, page in enumerate(other_file.pages):
+        widgets_to_copy[i + len(pdf_file.pages)] = []
+        for annot in page.get(Annots, []):
+            widgets_to_copy[i + len(pdf_file.pages)].append(annot.clone(output))
+
+    for i, page in enumerate(output.pages):
+        page[NameObject(Annots)] = (
+            (page[NameObject(Annots)] + ArrayObject(widgets_to_copy[i]))
+            if Annots in page
+            else ArrayObject(widgets_to_copy[i])
+        )
+
+    result = BytesIO()
     output.write(result)
     result.seek(0)
     return result.read()
