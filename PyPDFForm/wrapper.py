@@ -132,8 +132,13 @@ class PdfWrapper:
 
         other.commit_widget_key_updates()
 
+        # user params are based on the first object
+        result = self.__class__(
+            merge_two_pdfs(self.read(), other.read()),
+            **{each[0]: getattr(self, each[0], each[1]) for each in self.USER_PARAMS},
+        )
+
         # inherit fonts
-        result = self.__class__(merge_two_pdfs(self.read(), other.read()))
         for event in self._font_register_events:
             result.register_font(event[0], event[1])
 
@@ -307,7 +312,7 @@ class PdfWrapper:
                 getattr(self, "use_full_widget_name"),
             )
 
-        if getattr(self, "adobe_mode"):
+        if getattr(self, "adobe_mode") and self._stream:
             self._stream = enable_adobe_mode(self._stream)  # cached
 
         return self._stream
