@@ -2,10 +2,13 @@
 
 import os
 
+from pypdf import PdfReader
+
 from PyPDFForm import PdfWrapper
-from PyPDFForm.constants import TU, Parent
+from PyPDFForm.constants import TU, Parent, V
 from PyPDFForm.middleware.radio import Radio
 from PyPDFForm.template import get_widget_key, get_widgets_by_page
+from PyPDFForm.utils import stream_to_io
 
 
 def test_pdf_form_with_pages_without_widgets(issue_pdf_directory, request):
@@ -449,3 +452,28 @@ def test_polish_use_full_widget_name(issue_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_merge_sejda_pdf_forms(issue_pdf_directory):
+    data = [
+        {"name": "John", "dob": "1990-01-01", "note": "test1"},
+        {"name": "James", "dob": "1992-06-15", "note": "test2"},
+        {"name": "Dan", "dob": "1988-12-30", "note": "test3"},
+    ]
+
+    obj = PdfWrapper(adobe_mode=True)
+
+    for i in range(3):
+        obj += PdfWrapper(
+            os.path.join(issue_pdf_directory, "PPF-884.pdf"), adobe_mode=True
+        ).fill(data[i])
+
+    result = PdfReader(stream_to_io(obj.read()))
+
+    for i, page in enumerate(result.pages):
+        page_data = data[i]
+        for widget in page.annotations or []:
+            key = get_widget_key(widget, use_full_widget_name=False)
+            for k, v in page_data.items():
+                if key.startswith(k):
+                    assert widget[Parent][V] == v

@@ -21,9 +21,11 @@ from string import ascii_letters, digits, punctuation
 from typing import Any, BinaryIO, List, Union
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import BooleanObject, DictionaryObject, NameObject
+from pypdf.generic import (ArrayObject, BooleanObject, DictionaryObject,
+                           NameObject)
 
-from .constants import UNIQUE_SUFFIX_LENGTH, AcroForm, NeedAppearances, Root
+from .constants import (UNIQUE_SUFFIX_LENGTH, AcroForm, Annots,
+                        NeedAppearances, Root)
 
 
 @lru_cache
@@ -142,17 +144,18 @@ def get_page_streams(pdf: bytes) -> List[bytes]:
 
 def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     """
-    Merges two PDFs into one, creating a single PDF containing all pages from both input PDFs.
+    Merges two PDF files into a single PDF file.
 
-    This function takes two PDFs as bytes streams and merges them into a single PDF.
-    The pages from the second PDF are appended to the end of the first PDF.
+    This function takes two PDF files as byte streams, merges them, and returns the result as a single PDF byte stream.
+    It handles the merging of pages from both PDFs and also attempts to preserve form field widgets from both input PDFs
+    in the final merged PDF. The form fields are cloned and added to the output pages.
 
     Args:
-        pdf (bytes): The first PDF as a bytes stream.
-        other (bytes): The second PDF as a bytes stream.
+        pdf (bytes): The first PDF file as a byte stream.
+        other (bytes): The second PDF file as a byte stream.
 
     Returns:
-        bytes: The merged PDF as a bytes stream.
+        bytes: The merged PDF file as a byte stream.
     """
     output = PdfWriter()
     pdf_file = PdfReader(stream_to_io(pdf))
@@ -164,6 +167,33 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     for page in other_file.pages:
         output.add_page(page)
 
+    output.write(result)
+    result.seek(0)
+
+    merged_no_widgets = PdfReader(stream_to_io(remove_all_widgets(result.read())))
+    output = PdfWriter()
+    output.append(merged_no_widgets)
+
+    # TODO: refactor duplicate logic with copy_watermark_widgets
+    widgets_to_copy = {}
+    for i, page in enumerate(pdf_file.pages):
+        widgets_to_copy[i] = []
+        for annot in page.get(Annots, []):
+            widgets_to_copy[i].append(annot.clone(output))
+
+    for i, page in enumerate(other_file.pages):
+        widgets_to_copy[i + len(pdf_file.pages)] = []
+        for annot in page.get(Annots, []):
+            widgets_to_copy[i + len(pdf_file.pages)].append(annot.clone(output))
+
+    for i, page in enumerate(output.pages):
+        page[NameObject(Annots)] = (
+            (page[NameObject(Annots)] + ArrayObject(widgets_to_copy[i]))
+            if Annots in page
+            else ArrayObject(widgets_to_copy[i])
+        )
+
+    result = BytesIO()
     output.write(result)
     result.seek(0)
     return result.read()
