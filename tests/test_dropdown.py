@@ -341,3 +341,20 @@ def test_dropdown_alignment_sejda_flatten(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_change_dropdown_choices(sample_template_with_dropdown, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "dropdown", "test_change_dropdown_choices.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_dropdown)
+        obj.widgets["dropdown_1"].choices = ["", "apple", "banana", "cherry", "dates"]
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
