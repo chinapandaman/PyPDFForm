@@ -125,7 +125,7 @@ form.write("output.pdf")
 
 ## Change dropdown field choices
 
-You can change the choices of a dropdown field by setting a new list of strings. For example, the below snippet changes the dropdown field `dropdown_1` of [this PDF form](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf) to a new set of options:
+To modify the options available in a dropdown field, assign a new list of strings to the `.choices` attribute of the corresponding field. For instance, the following code snippet updates the `dropdown_1` field in [this PDF form](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf) with a new set of choices:
 
 ```python
 from PyPDFForm import PdfWrapper

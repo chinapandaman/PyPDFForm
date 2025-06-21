@@ -136,7 +136,9 @@ def test_change_check_size(template_stream, pdf_samples, request):
 
 
 def test_change_dropdown_choices(pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_choices.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_change_dropdown_choices.pdf"
+    )
 
     form = PdfWrapper(
         os.path.join(pdf_samples, "dropdown", "sample_template_with_dropdown.pdf")
