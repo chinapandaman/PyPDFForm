@@ -146,14 +146,15 @@ def update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         annot (DictionaryObject): The dropdown annotation dictionary.
         widget (Dropdown): The Dropdown widget object containing the selected value.
     """
+    choices = widget.choices or []
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(V)] = TextStringObject(
-            widget.choices[widget.value]
+            choices[widget.value]
         )
-        annot[NameObject(AP)] = TextStringObject(widget.choices[widget.value])
+        annot[NameObject(AP)] = TextStringObject(choices[widget.value])
     else:
-        annot[NameObject(V)] = TextStringObject(widget.choices[widget.value])
-        annot[NameObject(AP)] = TextStringObject(widget.choices[widget.value])
+        annot[NameObject(V)] = TextStringObject(choices[widget.value])
+        annot[NameObject(AP)] = TextStringObject(choices[widget.value])
         annot[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
 
 
