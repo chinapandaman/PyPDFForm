@@ -17,7 +17,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
 from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
-                        MULTILINE, Annots, Ff, Parent, Q, Rect)
+                        MULTILINE, Annots, Ff, Opt, Parent, Q, Rect)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -238,3 +238,9 @@ def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
         FloatObject(rect[1] + val),
     ]
     annot[NameObject(Rect)] = ArrayObject(new_rect)
+
+
+def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
+    annot[NameObject(Opt)] = ArrayObject(
+        [ArrayObject([TextStringObject(each), TextStringObject(each)]) for each in val]
+    )

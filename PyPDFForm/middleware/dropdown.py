@@ -28,6 +28,7 @@ class Dropdown(Widget):
 
     SET_ATTR_TRIGGER_HOOK_MAP = {
         "font": "update_text_field_font",
+        "choices": "update_dropdown_choices",
     }
 
     def __init__(
@@ -49,7 +50,6 @@ class Dropdown(Widget):
         super().__init__(name, value)
 
         self.font = None
-
         self.choices = []
 
     @property
