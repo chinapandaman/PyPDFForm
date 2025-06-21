@@ -241,6 +241,16 @@ def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
 
 
 def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
+    """
+    Updates the choices in a dropdown field annotation.
+
+    This function modifies the Opt entry in the annotation dictionary to change
+    the available choices in the dropdown field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the dropdown field.
+        val (list): A list of strings representing the new choices for the dropdown.
+    """
     annot[NameObject(Opt)] = ArrayObject(
         [ArrayObject([TextStringObject(each), TextStringObject(each)]) for each in val]
     )
