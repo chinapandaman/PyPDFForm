@@ -64,7 +64,8 @@ def build_widgets(
 
                 if isinstance(_widget, Dropdown):
                     # actually used for filling value
-                    _widget.choices = get_dropdown_choices(widget)
+                    # doesn't trigger hook
+                    _widget.__dict__["choices"] = get_dropdown_choices(widget)
 
                 if isinstance(_widget, Radio):
                     if key not in results:
