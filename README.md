@@ -2,19 +2,11 @@
 <p align="center">
     <a href="https://pypi.org/project/PyPDFForm/"><img src="https://img.shields.io/pypi/v/pypdfform?logo=pypi&logoColor=white&label=version&labelColor=black&color=magenta&style=for-the-badge"></a>
     <a href="https://chinapandaman.github.io/PyPDFForm/"><img src="https://img.shields.io/github/v/release/chinapandaman/pypdfform?logo=read%20the%20docs&logoColor=white&label=docs&labelColor=black&color=cyan&style=for-the-badge"></a>
-    <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml"><img src="https://img.shields.io/github/actions/workflow/status/chinapandaman/pypdfform/python-package.yml?logo=github&logoColor=white&label=tests&labelColor=black&color=green&style=for-the-badge"></a>
+    <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml"><img src="https://img.shields.io/badge/coverage-100%25-green?logo=codecov&logoColor=white&labelColor=black&style=for-the-badge"></a>
     <a href="https://github.com/chinapandaman/PyPDFForm/raw/master/LICENSE"><img src="https://img.shields.io/github/license/chinapandaman/pypdfform?logo=github&logoColor=white&label=license&labelColor=black&color=orange&style=for-the-badge"></a>
     <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/pypi/pyversions/pypdfform?logo=python&logoColor=white&label=python&labelColor=black&color=gold&style=for-the-badge"></a>
     <a href="https://pypistats.org/packages/pypdfform"><img src="https://img.shields.io/pypi/dm/pypdfform?logo=pypi&logoColor=white&label=downloads&labelColor=black&color=blue&style=for-the-badge"></a>
 </p>
-
-## Important Announcement
-
-Hello fellow Python developers!
-
-Please read [this article](https://chinapandaman.github.io/PyPDFForm/news/2025-05-24/) about the upcoming v3.0.0 release, which contains some backward-incompatible changes.
-
-Happy hacking!
 
 ## Introduction
 
@@ -23,7 +15,7 @@ functionalities needed to interact with PDF forms:
 
 * Inspect what data a PDF form needs to be filled with.
 * Fill a PDF form by simply creating a Python dictionary.
-* Create a subset of form widgets on a PDF.
+* Create form fields on a PDF.
 
 It also supports other common utilities such as extracting pages and merging multiple PDFs together.
 
@@ -43,7 +35,7 @@ A sample PDF form can be found [here](https://github.com/chinapandaman/PyPDFForm
 ```python
 from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper("sample_template.pdf").fill(
+filled = PdfWrapper("sample_template.pdf", adobe_mode=True).fill(
     {
         "test": "test_1",
         "check": True,
@@ -54,12 +46,11 @@ filled = PdfWrapper("sample_template.pdf").fill(
     },
 )
 
-with open("output.pdf", "wb+") as output:
-    output.write(filled.read())
+filled.write("output.pdf")
 ```
 
 After running the above code snippet you can find `output.pdf` at the location you specified, 
-and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/v2.5.0/pdf_samples/sample_filled.pdf).
+and it should look like [this](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/adobe_mode/sample_filled.pdf).
 
 ## Documentation
 
