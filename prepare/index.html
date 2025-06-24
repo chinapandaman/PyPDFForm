@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Create form fields - Welcome to PyPDFForm - PyPDFForm Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Create form fields";
+        var mkdocs_page_input_path = "prepare.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="..">
+          <img src="../img/logo.png" class="logo" alt="Logo"/>
+        </a>
+        <div class="version">
+          v3.0.0
+        </div><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../install/">Installation and setup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../coordinate/">PDF coordinate system</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../font/">Register fonts</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Create form fields</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#create-a-text-field">Create a text field</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#create-a-checkbox">Create a checkbox</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#create-a-radio-button-group">Create a radio button group</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#create-a-dropdown-field">Create a dropdown field</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#create-a-signature-field">Create a signature field</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#create-an-image-field">Create an image field</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#modify-the-key-of-a-field">Modify the key of a field</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inspect/">Inspect form field data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../fill/">Fill PDF forms</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../style/">Change form field styles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Draw elements</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../utils/">Other utilities</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Guide</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_intro/">Developer Intro</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_changes/">Pull Request Requirements</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_doc/">Hosting Docs Locally</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_test/">Testing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_release/">Releasing</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">News</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../news/2025-05-24/">2025-05-24: V3 Announcements</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../news/2025-03-29/">2025-03-29: Announcements</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../news/2024-01-01/">2024-01-01: API Changes</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Welcome to PyPDFForm - PyPDFForm Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+      <li class="breadcrumb-item active">Create form fields</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/chinapandaman/PyPDFForm/edit/master/docs/prepare.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="create-form-fields">Create form fields</h1>
+<p>The most common tool for creating PDF form fields is Adobe Acrobat, and a tutorial is available <a href="https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html">here</a>. Alternative free tools like <a href="https://www.docfly.com/">DocFly</a> offer similar functionality.</p>
+<p>PyPDFForm also allows creating PDF form fields on existing PDFs through coding.</p>
+<p>This section of the documentation will primarily use <a href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf">this PDF</a> as an example.</p>
+<p>Understanding <a href="../coordinate/">the PDF coordinate system</a> is necessary for this section.</p>
+<p>All optional parameters will have a comment <code># optional</code> after each of them.</p>
+<h2 id="create-a-text-field">Create a text field</h2>
+<p>A text field can be created by downloading the PDF and running the following snippet:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper(&quot;dummy.pdf&quot;).create_widget(
+    widget_type=&quot;text&quot;,
+    name=&quot;new_text_field&quot;,
+    page_number=1,
+    x=57,
+    y=700,
+    width=120,  # optional
+    height=40,  # optional
+    max_length=5,   # optional
+    comb=True,  # optional, when set to True, max_length must also be set
+    font=&quot;your_registered_font&quot;, # optional
+    font_size=15,   # optional
+    font_color=(1, 0, 0),   # optional
+    bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
+    border_color=(1, 0, 0), # optional
+    border_width=5,  # optional
+    alignment=0, # optional, 0=left, 1=center, 2=right
+    multiline=True # optional
+)
+
+new_form.write(&quot;output.pdf&quot;)
+</code></pre>
+<p>To use a custom font, see how to register it <a href="../font/">here</a>.</p>
+<h2 id="create-a-checkbox">Create a checkbox</h2>
+<p>A checkbox can be created using the same method with some changes to the parameters:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper(&quot;dummy.pdf&quot;).create_widget(
+    widget_type=&quot;checkbox&quot;,
+    name=&quot;new_checkbox&quot;,
+    page_number=1,
+    x=57,
+    y=700,
+    size=30,    # optional
+    button_style=&quot;check&quot;,   # optional
+    tick_color=(0, 1, 0),   # optional
+    bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
+    border_color=(1, 0, 0), # optional
+    border_width=5  # optional
+)
+
+new_form.write(&quot;output.pdf&quot;)
+</code></pre>
+<p>The <code>button_style</code> parameter currently supports three options: <code>check</code>, <code>circle</code>, and <code>cross</code>.</p>
+<h2 id="create-a-radio-button-group">Create a radio button group</h2>
+<p>Unlike other field types, radio buttons must be created as a group. Therefore, for the coordinate parameters <code>x</code> and <code>y</code>, you must specify a list of coordinates for each radio button within the group, and the list must contain more than one coordinate.</p>
+<p>Otherwise, radio button creation shares almost the same parameters as a checkbox:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper(&quot;dummy.pdf&quot;).create_widget(
+    widget_type=&quot;radio&quot;,
+    name=&quot;new_radio_group&quot;,
+    page_number=1,
+    x=[50, 100, 150],
+    y=[50, 100, 150],
+    size=30,    # optional
+    button_style=&quot;check&quot;,   # optional
+    shape=&quot;square&quot;, # optional, circle or square
+    tick_color=(0, 1, 0),   # optional
+    bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
+    border_color=(1, 0, 0), # optional
+    border_width=5  # optional
+)
+
+new_form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="create-a-dropdown-field">Create a dropdown field</h2>
+<p>A dropdown field shares a similar set of parameters as a text field. The only significant difference is that a list of <code>options</code> needs to be specified:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper(&quot;dummy.pdf&quot;).create_widget(
+    widget_type=&quot;dropdown&quot;,
+    name=&quot;new_dropdown&quot;,
+    page_number=1,
+    x=57,
+    y=700,
+    options=[
+        &quot;foo&quot;,
+        &quot;bar&quot;,
+        &quot;foobar&quot;,
+    ],
+    width=120,  # optional
+    height=40,  # optional
+    font=&quot;your_registered_font&quot;, # optional
+    font_size=15,   # optional
+    font_color=(1, 0, 0),   # optional
+    bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
+    border_color=(1, 0, 0), # optional
+    border_width=5  # optional
+)
+
+new_form.write(&quot;output.pdf&quot;)
+</code></pre>
+<p>To use a custom font, see how to register it <a href="../font/">here</a>.</p>
+<h2 id="create-a-signature-field">Create a signature field</h2>
+<p>A signature field is only interactive in tools that support it. Otherwise, it is displayed as a rectangle, and clicking it will not trigger any action:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper(&quot;dummy.pdf&quot;).create_widget(
+    widget_type=&quot;signature&quot;,
+    name=&quot;new_signature&quot;,
+    page_number=1,
+    x=100,
+    y=100,
+    width=410,  # optional
+    height=100,  # optional
+)
+
+new_form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="create-an-image-field">Create an image field</h2>
+<p>Similar to a signature field, an image field is also only interactive in tools that support it:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper(&quot;dummy.pdf&quot;).create_widget(
+    widget_type=&quot;image&quot;,
+    name=&quot;new_image&quot;,
+    page_number=1,
+    x=100,
+    y=100,
+    width=192,  # optional
+    height=108,  # optional
+)
+
+new_form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="modify-the-key-of-a-field">Modify the key of a field</h2>
+<p>PyPDFForm allows you to modify the keys of existing fields. For example, to change the key of the first text field, <code>test</code>, to <code>test_text</code> using <a href="https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf">this PDF</a>, use the following code:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper(&quot;sample_template.pdf&quot;).update_widget_key(
+    &quot;test&quot;, &quot;test_text&quot;
+)
+
+new_form.write(&quot;output.pdf&quot;)
+</code></pre>
+<p>If multiple fields share the same key, use the <code>index</code> parameter to specify which one to update. For instance, to change the key of the second row's text field with the key <code>Description[0]</code> to <code>Description[1]</code> using <a href="https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf">this PDF</a>, use the following code:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper(&quot;733.pdf&quot;).update_widget_key(
+    &quot;Description[0]&quot;, &quot;Description[1]&quot;, index=1
+)
+
+new_form.write(&quot;output.pdf&quot;)
+</code></pre>
+<p>For bulk updates, improve performance by setting <code>defer=True</code> when updating each key, then call <code>commit_widget_key_updates()</code> at the end to commit all changes.</p>
+<p>To change the key of each row's text field with the key <code>Description[0]</code> to <code>Description[i]</code>, where <code>i</code> is the index of each row, using <a href="https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/scenario/issues/733.pdf">this PDF</a>, use the following code:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper(&quot;733.pdf&quot;)
+
+for i in range(1, 10):
+    new_form.update_widget_key(
+        &quot;Description[0]&quot;, f&quot;Description[{i}]&quot;, index=1, defer=True
+    )
+
+new_form.commit_widget_key_updates().write(&quot;output.pdf&quot;)
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../font/" class="btn btn-neutral float-left" title="Register fonts"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../inspect/" class="btn btn-neutral float-right" title="Inspect form field data">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/chinapandaman/PyPDFForm" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../font/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../inspect/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
