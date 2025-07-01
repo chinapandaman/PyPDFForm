@@ -24,7 +24,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, BooleanObject, DictionaryObject,
                            NameObject)
 
-from .constants import (UNIQUE_SUFFIX_LENGTH, AcroForm, Annots,
+from .constants import (UNIQUE_SUFFIX_LENGTH, XFA, AcroForm, Annots,
                         NeedAppearances, Root)
 
 
@@ -79,6 +79,8 @@ def enable_adobe_mode(pdf: bytes) -> bytes:
     reader.trailer[Root][AcroForm].update(
         {NameObject(NeedAppearances): BooleanObject(True)}
     )
+    if XFA in reader.trailer[Root][AcroForm]:
+        del reader.trailer[Root][AcroForm][XFA]
     writer.append(reader)
 
     with BytesIO() as f:

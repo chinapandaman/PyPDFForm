@@ -477,3 +477,24 @@ def test_merge_sejda_pdf_forms(issue_pdf_directory):
             for k, v in page_data.items():
                 if key.startswith(k):
                     assert widget[Parent][V] == v
+
+
+def test_xfa_to_regular_form(issue_pdf_directory, request):
+    obj = PdfWrapper(
+        os.path.join(issue_pdf_directory, "1087.pdf"), adobe_mode=True
+    ).fill(
+        {
+            "G28CheckBox[0]": True,
+            "Pt1Line1a_FamilyName[0]": "Mylastname",
+            "Pt1Line1b_GivenName[0]": "Myfirstname",
+            "Line2_CompanyName[0]": "The company LLC",
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "1087_expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
