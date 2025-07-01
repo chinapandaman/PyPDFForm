@@ -24,8 +24,8 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, BooleanObject, DictionaryObject,
                            NameObject)
 
-from .constants import (UNIQUE_SUFFIX_LENGTH, AcroForm, Annots,
-                        NeedAppearances, Root, XFA)
+from .constants import (UNIQUE_SUFFIX_LENGTH, XFA, AcroForm, Annots,
+                        NeedAppearances, Root)
 
 
 @lru_cache
