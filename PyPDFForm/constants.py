@@ -89,6 +89,7 @@ AcroForm = "/AcroForm"
 Root = "/Root"
 Fields = "/Fields"
 NeedAppearances = "/NeedAppearances"
+XFA = "/XFA"
 
 # Field flag bits
 READ_ONLY = 1 << 0
