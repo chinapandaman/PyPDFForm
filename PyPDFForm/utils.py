@@ -21,11 +21,9 @@ from string import ascii_letters, digits, punctuation
 from typing import Any, BinaryIO, List, Union
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (ArrayObject, BooleanObject, DictionaryObject,
-                           NameObject)
+from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
-from .constants import (UNIQUE_SUFFIX_LENGTH, XFA, AcroForm, Annots,
-                        NeedAppearances, Root)
+from .constants import UNIQUE_SUFFIX_LENGTH, XFA, AcroForm, Annots, Root
 
 
 @lru_cache
@@ -70,18 +68,11 @@ def enable_adobe_mode(pdf: bytes) -> bytes:
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
 
-    # https://stackoverflow.com/questions/47288578/pdf-form-filled-with-pypdf2-does-not-show-in-print
-    if AcroForm in reader.trailer[Root]:
-        if NeedAppearances in reader.trailer[Root][AcroForm]:
-            return pdf
-    else:
-        reader.trailer[Root].update({NameObject(AcroForm): DictionaryObject()})
-    reader.trailer[Root][AcroForm].update(
-        {NameObject(NeedAppearances): BooleanObject(True)}
-    )
-    if XFA in reader.trailer[Root][AcroForm]:
+    if AcroForm in reader.trailer[Root] and XFA in reader.trailer[Root][AcroForm]:
         del reader.trailer[Root][AcroForm][XFA]
+
     writer.append(reader)
+    writer.set_need_appearances_writer()
 
     with BytesIO() as f:
         writer.write(f)
