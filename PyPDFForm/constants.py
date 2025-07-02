@@ -88,7 +88,6 @@ FONT_NAME_PREFIX = "/F"
 AcroForm = "/AcroForm"
 Root = "/Root"
 Fields = "/Fields"
-NeedAppearances = "/NeedAppearances"
 XFA = "/XFA"
 
 # Field flag bits
