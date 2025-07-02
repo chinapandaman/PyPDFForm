@@ -21,11 +21,9 @@ from string import ascii_letters, digits, punctuation
 from typing import Any, BinaryIO, List, Union
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (ArrayObject, BooleanObject, DictionaryObject,
-                           NameObject)
+from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
-from .constants import (UNIQUE_SUFFIX_LENGTH, XFA, AcroForm, Annots,
-                        NeedAppearances, Root)
+from .constants import UNIQUE_SUFFIX_LENGTH, XFA, AcroForm, Annots, Root
 
 
 @lru_cache
@@ -57,9 +55,10 @@ def enable_adobe_mode(pdf: bytes) -> bytes:
     """Enables Adobe-specific settings in the PDF to ensure proper rendering of form fields.
 
     This function modifies the PDF's AcroForm dictionary to include the `NeedAppearances` flag,
-    which forces Adobe Reader to generate appearance streams for form fields. This ensures that
-    the form fields are rendered correctly in Adobe Reader, especially when the form is filled
-    programmatically.
+    which forces Adobe Reader to generate appearance streams for form fields. It also handles
+    XFA (XML Forms Architecture) forms by removing the XFA entry from the AcroForm dictionary
+    if it exists, ensuring compatibility and proper rendering. This ensures that the form fields
+    are rendered correctly in Adobe Reader, especially when the form is filled programmatically.
 
     Args:
         pdf (bytes): The PDF content as bytes.
@@ -70,18 +69,11 @@ def enable_adobe_mode(pdf: bytes) -> bytes:
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
 
-    # https://stackoverflow.com/questions/47288578/pdf-form-filled-with-pypdf2-does-not-show-in-print
-    if AcroForm in reader.trailer[Root]:
-        if NeedAppearances in reader.trailer[Root][AcroForm]:
-            return pdf
-    else:
-        reader.trailer[Root].update({NameObject(AcroForm): DictionaryObject()})
-    reader.trailer[Root][AcroForm].update(
-        {NameObject(NeedAppearances): BooleanObject(True)}
-    )
-    if XFA in reader.trailer[Root][AcroForm]:
+    if AcroForm in reader.trailer[Root] and XFA in reader.trailer[Root][AcroForm]:
         del reader.trailer[Root][AcroForm][XFA]
+
     writer.append(reader)
+    writer.set_need_appearances_writer()
 
     with BytesIO() as f:
         writer.write(f)
