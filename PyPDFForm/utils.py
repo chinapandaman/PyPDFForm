@@ -55,9 +55,10 @@ def enable_adobe_mode(pdf: bytes) -> bytes:
     """Enables Adobe-specific settings in the PDF to ensure proper rendering of form fields.
 
     This function modifies the PDF's AcroForm dictionary to include the `NeedAppearances` flag,
-    which forces Adobe Reader to generate appearance streams for form fields. This ensures that
-    the form fields are rendered correctly in Adobe Reader, especially when the form is filled
-    programmatically.
+    which forces Adobe Reader to generate appearance streams for form fields. It also handles
+    XFA (XML Forms Architecture) forms by removing the XFA entry from the AcroForm dictionary
+    if it exists, ensuring compatibility and proper rendering. This ensures that the form fields
+    are rendered correctly in Adobe Reader, especially when the form is filled programmatically.
 
     Args:
         pdf (bytes): The PDF content as bytes.
