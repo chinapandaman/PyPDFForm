@@ -156,8 +156,8 @@ def test_change_dropdown_choices(pdf_samples, request):
         assert form.read() == expected
 
 
-def test_flatten_then_unflatten(pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "docs", "test_flatten_then_unflatten.pdf")
+def test_change_field_editability(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_change_field_editability.pdf")
 
     form = PdfWrapper(
         os.path.join(pdf_samples, "dropdown", "sample_template_with_dropdown.pdf")
