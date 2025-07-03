@@ -11,9 +11,8 @@ for updating and flattening these widgets.
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
-from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS,
-                        TU, A, Btn, Ch, I, N, Off, Opt, Parent, Sig, T, Tx,
-                        V, Yes)
+from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, TU, A, Btn,
+                        Ch, I, N, Off, Opt, Parent, Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image

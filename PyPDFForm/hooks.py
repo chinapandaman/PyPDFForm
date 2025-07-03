@@ -17,7 +17,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
 from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
-                        MULTILINE, Annots, Ff, Opt, Parent, Q, Rect, READ_ONLY)
+                        MULTILINE, READ_ONLY, Annots, Ff, Opt, Parent, Q, Rect)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -256,7 +256,7 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
     )
 
 
-def flatten_radio(annot: DictionaryObject) -> None:
+def flatten_radio(annot: DictionaryObject, val: bool) -> None:
     """
     Flattens a radio button annotation by setting the ReadOnly flag, making it non-editable.
 
@@ -268,11 +268,15 @@ def flatten_radio(annot: DictionaryObject) -> None:
         annot (DictionaryObject): The radio button annotation dictionary.
     """
     annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-        int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
+        (
+            int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
+            if val
+            else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~READ_ONLY
+        )
     )
 
 
-def flatten_generic(annot: DictionaryObject) -> None:
+def flatten_generic(annot: DictionaryObject, val: bool) -> None:
     """
     Flattens a generic annotation by setting the ReadOnly flag, making it non-editable.
 
@@ -284,9 +288,17 @@ def flatten_generic(annot: DictionaryObject) -> None:
     """
     if Parent in annot and Ff not in annot:
         annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-            int(annot.get(NameObject(Ff), 0)) | READ_ONLY
+            (
+                int(annot.get(NameObject(Ff), 0)) | READ_ONLY
+                if val
+                else int(annot.get(NameObject(Ff), 0)) & ~READ_ONLY
+            )
         )
     else:
         annot[NameObject(Ff)] = NumberObject(
-            int(annot.get(NameObject(Ff), 0)) | READ_ONLY
+            (
+                int(annot.get(NameObject(Ff), 0)) | READ_ONLY
+                if val
+                else int(annot.get(NameObject(Ff), 0)) & ~READ_ONLY
+            )
         )

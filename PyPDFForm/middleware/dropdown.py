@@ -27,6 +27,7 @@ class Dropdown(Widget):
     """
 
     SET_ATTR_TRIGGER_HOOK_MAP = {
+        "readonly": "flatten_generic",
         "font": "update_text_field_font",
         "choices": "update_dropdown_choices",
     }

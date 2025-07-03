@@ -19,6 +19,10 @@ class Radio(Checkbox):
     the schema_definition and sample_value properties.
     """
 
+    SET_ATTR_TRIGGER_HOOK_MAP = {
+        "readonly": "flatten_generic",
+    }
+
     def __init__(
         self,
         name: str,

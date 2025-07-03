@@ -21,6 +21,7 @@ class Checkbox(Widget):
     """
 
     SET_ATTR_TRIGGER_HOOK_MAP = {
+        "readonly": "flatten_generic",
         "size": "update_check_radio_size",
     }
 

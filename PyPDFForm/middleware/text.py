@@ -23,6 +23,7 @@ class Text(Widget):
     """
 
     SET_ATTR_TRIGGER_HOOK_MAP = {
+        "readonly": "flatten_generic",
         "font": "update_text_field_font",
         "font_size": "update_text_field_font_size",
         "font_color": "update_text_field_font_color",
