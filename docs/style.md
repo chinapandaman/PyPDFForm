@@ -139,7 +139,7 @@ form.write("output.pdf")
 
 ## Change field editability
 
-The `readonly` property of each form field can be set or unset to flatten of unflatten the field respectively. For example, the following code snippet shows how you can unflatten different form fields in [this PDF form](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf) after they have been flattened:
+The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. For example, the following code snippet shows how you can make different form fields editable in [this PDF form](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf) after they have been flattened:
 
 ```python
 from PyPDFForm import PdfWrapper
