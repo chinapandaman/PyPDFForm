@@ -258,14 +258,16 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
 
 def flatten_radio(annot: DictionaryObject, val: bool) -> None:
     """
-    Flattens a radio button annotation by setting the ReadOnly flag, making it non-editable.
+    Flattens a radio button annotation by setting or unsetting the ReadOnly flag,
+    making it non-editable or editable based on the `val` parameter.
 
     This function modifies the Ff (flags) entry in the radio button's parent
-    dictionary to set the ReadOnly flag, preventing the user from changing the
-    selected option.
+    dictionary to set or unset the ReadOnly flag, preventing or allowing the user
+    from changing the selected option.
 
     Args:
         annot (DictionaryObject): The radio button annotation dictionary.
+        val (bool): True to flatten (make read-only), False to unflatten (make editable).
     """
     annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
         (
@@ -278,13 +280,16 @@ def flatten_radio(annot: DictionaryObject, val: bool) -> None:
 
 def flatten_generic(annot: DictionaryObject, val: bool) -> None:
     """
-    Flattens a generic annotation by setting the ReadOnly flag, making it non-editable.
+    Flattens a generic annotation by setting or unsetting the ReadOnly flag,
+    making it non-editable or editable based on the `val` parameter.
 
     This function modifies the Ff (flags) entry in the annotation dictionary to
-    set the ReadOnly flag, preventing the user from interacting with the form field.
+    set or unset the ReadOnly flag, preventing or allowing the user from
+    interacting with the form field.
 
     Args:
         annot (DictionaryObject): The annotation dictionary.
+        val (bool): True to flatten (make read-only), False to unflatten (make editable).
     """
     if Parent in annot and Ff not in annot:
         annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
