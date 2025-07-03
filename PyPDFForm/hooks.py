@@ -17,7 +17,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
 from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
-                        MULTILINE, Annots, Ff, Opt, Parent, Q, Rect)
+                        MULTILINE, Annots, Ff, Opt, Parent, Q, Rect, READ_ONLY)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -254,3 +254,39 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
     annot[NameObject(Opt)] = ArrayObject(
         [ArrayObject([TextStringObject(each), TextStringObject(each)]) for each in val]
     )
+
+
+def flatten_radio(annot: DictionaryObject) -> None:
+    """
+    Flattens a radio button annotation by setting the ReadOnly flag, making it non-editable.
+
+    This function modifies the Ff (flags) entry in the radio button's parent
+    dictionary to set the ReadOnly flag, preventing the user from changing the
+    selected option.
+
+    Args:
+        annot (DictionaryObject): The radio button annotation dictionary.
+    """
+    annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
+        int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
+    )
+
+
+def flatten_generic(annot: DictionaryObject) -> None:
+    """
+    Flattens a generic annotation by setting the ReadOnly flag, making it non-editable.
+
+    This function modifies the Ff (flags) entry in the annotation dictionary to
+    set the ReadOnly flag, preventing the user from interacting with the form field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+    """
+    if Parent in annot and Ff not in annot:
+        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
+            int(annot.get(NameObject(Ff), 0)) | READ_ONLY
+        )
+    else:
+        annot[NameObject(Ff)] = NumberObject(
+            int(annot.get(NameObject(Ff), 0)) | READ_ONLY
+        )
