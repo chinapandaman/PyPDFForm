@@ -5,15 +5,14 @@ This module defines patterns and utility functions for interacting with PDF form
 It includes patterns for identifying different types of widgets (e.g., text fields,
 checkboxes, radio buttons, dropdowns, images, and signatures) based on their
 properties in the PDF's annotation dictionary. It also provides utility functions
-for updating and flattening these widgets.
+for updating these widgets.
 """
 
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
-from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, READ_ONLY,
-                        TU, A, Btn, Ch, Ff, I, N, Off, Opt, Parent, Sig, T, Tx,
-                        V, Yes)
+from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, TU, A, Btn,
+                        Ch, I, N, Off, Opt, Parent, Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -175,42 +174,6 @@ def update_text_value(annot: DictionaryObject, widget: Text) -> None:
     else:
         annot[NameObject(V)] = TextStringObject(widget.value)
         annot[NameObject(AP)] = TextStringObject(widget.value)
-
-
-def flatten_radio(annot: DictionaryObject) -> None:
-    """
-    Flattens a radio button annotation by setting the ReadOnly flag, making it non-editable.
-
-    This function modifies the Ff (flags) entry in the radio button's parent
-    dictionary to set the ReadOnly flag, preventing the user from changing the
-    selected option.
-
-    Args:
-        annot (DictionaryObject): The radio button annotation dictionary.
-    """
-    annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-        int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
-    )
-
-
-def flatten_generic(annot: DictionaryObject) -> None:
-    """
-    Flattens a generic annotation by setting the ReadOnly flag, making it non-editable.
-
-    This function modifies the Ff (flags) entry in the annotation dictionary to
-    set the ReadOnly flag, preventing the user from interacting with the form field.
-
-    Args:
-        annot (DictionaryObject): The annotation dictionary.
-    """
-    if Parent in annot and Ff not in annot:
-        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-            int(annot.get(NameObject(Ff), 0)) | READ_ONLY
-        )
-    else:
-        annot[NameObject(Ff)] = NumberObject(
-            int(annot.get(NameObject(Ff), 0)) | READ_ONLY
-        )
 
 
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:

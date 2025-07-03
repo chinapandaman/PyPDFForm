@@ -22,15 +22,6 @@ class Text(Widget):
     font_size, font_color, comb, alignment, and multiline.
     """
 
-    SET_ATTR_TRIGGER_HOOK_MAP = {
-        "font": "update_text_field_font",
-        "font_size": "update_text_field_font_size",
-        "font_color": "update_text_field_font_color",
-        "comb": "update_text_field_comb",
-        "alignment": "update_text_field_alignment",
-        "multiline": "update_text_field_multiline",
-    }
-
     def __init__(
         self,
         name: str,
@@ -52,6 +43,16 @@ class Text(Widget):
             multiline (bool): Whether the text field is multiline. Defaults to None.
             max_length (int): The maximum length of the text field. Defaults to None.
         """
+        self.SET_ATTR_TRIGGER_HOOK_MAP.update(
+            {
+                "font": "update_text_field_font",
+                "font_size": "update_text_field_font_size",
+                "font_color": "update_text_field_font_color",
+                "comb": "update_text_field_comb",
+                "alignment": "update_text_field_alignment",
+                "multiline": "update_text_field_multiline",
+            }
+        )
         super().__init__(name, value)
 
         self.font = None

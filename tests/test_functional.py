@@ -55,6 +55,25 @@ def test_fill_flatten(template_stream, pdf_samples, data_dict, request):
         assert obj.read() == expected
 
 
+# TODO: why failing when running in bulk?
+# def test_fill_flatten_then_unflatten(template_stream, pdf_samples, data_dict, request):
+#     expected_path = os.path.join(pdf_samples, "test_fill_flatten_then_unflatten.pdf")
+#     with open(expected_path, "rb+") as f:
+#         obj = PdfWrapper(template_stream).fill(data_dict, flatten=True)
+#         obj.widgets["test_2"].readonly = False
+#         obj.widgets["check_3"].readonly = False
+
+#         request.config.results["expected_path"] = expected_path
+#         request.config.results["stream"] = obj.read()
+#         assert len(obj.read()) == len(obj.read())
+#         assert obj.read() == obj.read()
+
+#         expected = f.read()
+
+#         assert len(obj.read()) == len(expected)
+#         assert obj.read() == expected
+
+
 def test_register_bad_fonts():
     assert not PdfWrapper().register_font("foo", b"foo").read()
     assert not PdfWrapper().register_font("foo", "foo").read()
@@ -324,6 +343,35 @@ def test_fill_radiobutton_flatten(
         assert obj.read() == expected
 
 
+def test_fill_radiobutton_flatten_then_unflatten(
+    template_with_radiobutton_stream, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "test_fill_radiobutton_flatten_then_unflatten.pdf"
+    )
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(template_with_radiobutton_stream).fill(
+            {
+                "radio_1": 0,
+                "radio_2": 1,
+                "radio_3": 2,
+            },
+            flatten=True,
+        )
+        obj.widgets["radio_2"].readonly = False
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_fill_sejda(sejda_template, pdf_samples, sejda_data, request):
     expected_path = os.path.join(pdf_samples, "test_fill_sejda.pdf")
     with open(
@@ -351,6 +399,33 @@ def test_fill_sejda_flatten(sejda_template, pdf_samples, sejda_data, request):
             sejda_data,
             flatten=True,
         )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_fill_sejda_flatten_then_unflatten(
+    sejda_template, pdf_samples, sejda_data, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "test_fill_sejda_flatten_then_unflatten.pdf"
+    )
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(sejda_template).fill(
+            sejda_data,
+            flatten=True,
+        )
+        obj.widgets["buyer_name"].readonly = False
+        obj.widgets["at_future_date"].readonly = False
+        obj.widgets["purchase_option"].readonly = False
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()

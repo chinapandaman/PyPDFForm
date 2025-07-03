@@ -34,6 +34,11 @@ class Radio(Checkbox):
         Attributes:
             number_of_options (int): The number of options for the radio button.
         """
+        self.SET_ATTR_TRIGGER_HOOK_MAP.update(
+            {
+                "readonly": "flatten_radio",
+            }
+        )
         super().__init__(name, value)
 
         self.number_of_options = 0

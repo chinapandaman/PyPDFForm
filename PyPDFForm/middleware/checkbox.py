@@ -20,10 +20,6 @@ class Checkbox(Widget):
     implements the schema_definition and sample_value properties.
     """
 
-    SET_ATTR_TRIGGER_HOOK_MAP = {
-        "size": "update_check_radio_size",
-    }
-
     def __init__(
         self,
         name: str,
@@ -39,6 +35,11 @@ class Checkbox(Widget):
         Attributes:
             size (int): The size of the checkbox. Defaults to None.
         """
+        self.SET_ATTR_TRIGGER_HOOK_MAP.update(
+            {
+                "size": "update_check_radio_size",
+            }
+        )
         super().__init__(name, value)
 
         self.size = None

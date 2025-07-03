@@ -4,7 +4,8 @@ This module defines widget hooks that allow for dynamic modification of PDF form
 
 It provides functions to trigger these hooks, enabling changes to text field properties
 like font, font size, color, alignment, and multiline settings, as well as the size
-of checkbox and radio button widgets. These hooks are triggered during the PDF form
+of checkbox and radio button widgets. It also provides functions for flattening
+generic and radio button widgets. These hooks are triggered during the PDF form
 filling process, allowing for customization of the form's appearance and behavior.
 """
 
@@ -17,7 +18,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
 from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
-                        MULTILINE, Annots, Ff, Opt, Parent, Q, Rect)
+                        MULTILINE, READ_ONLY, Annots, Ff, Opt, Parent, Q, Rect)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -254,3 +255,56 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
     annot[NameObject(Opt)] = ArrayObject(
         [ArrayObject([TextStringObject(each), TextStringObject(each)]) for each in val]
     )
+
+
+def flatten_radio(annot: DictionaryObject, val: bool) -> None:
+    """
+    Flattens a radio button annotation by setting or unsetting the ReadOnly flag,
+    making it non-editable or editable based on the `val` parameter.
+
+    This function modifies the Ff (flags) entry in the radio button's parent
+    dictionary to set or unset the ReadOnly flag, preventing or allowing the user
+    from changing the selected option.
+
+    Args:
+        annot (DictionaryObject): The radio button annotation dictionary.
+        val (bool): True to flatten (make read-only), False to unflatten (make editable).
+    """
+    annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
+        (
+            int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
+            if val
+            else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~READ_ONLY
+        )
+    )
+
+
+def flatten_generic(annot: DictionaryObject, val: bool) -> None:
+    """
+    Flattens a generic annotation by setting or unsetting the ReadOnly flag,
+    making it non-editable or editable based on the `val` parameter.
+
+    This function modifies the Ff (flags) entry in the annotation dictionary to
+    set or unset the ReadOnly flag, preventing or allowing the user from
+    interacting with the form field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+        val (bool): True to flatten (make read-only), False to unflatten (make editable).
+    """
+    if Parent in annot and Ff not in annot:
+        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
+            (
+                int(annot.get(NameObject(Ff), 0)) | READ_ONLY
+                if val
+                else int(annot.get(NameObject(Ff), 0)) & ~READ_ONLY
+            )
+        )
+    else:
+        annot[NameObject(Ff)] = NumberObject(
+            (
+                int(annot.get(NameObject(Ff), 0)) | READ_ONLY
+                if val
+                else int(annot.get(NameObject(Ff), 0)) & ~READ_ONLY
+            )
+        )

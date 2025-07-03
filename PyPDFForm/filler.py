@@ -15,6 +15,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
 from .constants import WIDGET_TYPES, Annots
+from .hooks import flatten_generic, flatten_radio
 from .image import get_draw_image_resolutions, get_image_dimensions
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
@@ -22,9 +23,8 @@ from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .patterns import (flatten_generic, flatten_radio, update_checkbox_value,
-                       update_dropdown_value, update_radio_value,
-                       update_text_value)
+from .patterns import (update_checkbox_value, update_dropdown_value,
+                       update_radio_value, update_text_value)
 from .template import get_widget_key
 from .utils import stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
@@ -145,7 +145,9 @@ def fill(
 
             # flatten all
             if flatten:
-                (flatten_radio if isinstance(widget, Radio) else flatten_generic)(annot)
+                (flatten_radio if isinstance(widget, Radio) else flatten_generic)(
+                    annot, True
+                )
             if widget.value is None:
                 continue
 
