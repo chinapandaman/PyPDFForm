@@ -21,7 +21,9 @@ class Widget:
     as name, value, and schema definition.
     """
 
-    SET_ATTR_TRIGGER_HOOK_MAP = {}
+    SET_ATTR_TRIGGER_HOOK_MAP = {
+        "readonly": "flatten_radio",
+    }
 
     def __init__(
         self,
@@ -39,6 +41,7 @@ class Widget:
         self._name = name
         self._value = value
         self.desc = None
+        self.readonly = None
         self.hooks_to_trigger = []
 
     def __setattr__(self, name: str, value: Any) -> None:

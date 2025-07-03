@@ -26,12 +26,6 @@ class Dropdown(Widget):
         sample_value: Returns a sample value for the dropdown.
     """
 
-    SET_ATTR_TRIGGER_HOOK_MAP = {
-        "readonly": "flatten_generic",
-        "font": "update_text_field_font",
-        "choices": "update_dropdown_choices",
-    }
-
     def __init__(
         self,
         name: str,
@@ -48,6 +42,12 @@ class Dropdown(Widget):
             font (str): The font of the dropdown field.
             choices (List[str]): The list of choices for the dropdown.
         """
+        self.SET_ATTR_TRIGGER_HOOK_MAP.update(
+            {
+                "font": "update_text_field_font",
+                "choices": "update_dropdown_choices",
+            }
+        )
         super().__init__(name, value)
 
         self.font = None
