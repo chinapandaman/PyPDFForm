@@ -4,7 +4,8 @@ This module defines widget hooks that allow for dynamic modification of PDF form
 
 It provides functions to trigger these hooks, enabling changes to text field properties
 like font, font size, color, alignment, and multiline settings, as well as the size
-of checkbox and radio button widgets. These hooks are triggered during the PDF form
+of checkbox and radio button widgets. It also provides functions for flattening
+generic and radio button widgets. These hooks are triggered during the PDF form
 filling process, allowing for customization of the form's appearance and behavior.
 """
 

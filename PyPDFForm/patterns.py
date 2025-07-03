@@ -5,7 +5,7 @@ This module defines patterns and utility functions for interacting with PDF form
 It includes patterns for identifying different types of widgets (e.g., text fields,
 checkboxes, radio buttons, dropdowns, images, and signatures) based on their
 properties in the PDF's annotation dictionary. It also provides utility functions
-for updating and flattening these widgets.
+for updating these widgets.
 """
 
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
