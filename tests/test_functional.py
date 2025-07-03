@@ -361,6 +361,33 @@ def test_fill_sejda_flatten(sejda_template, pdf_samples, sejda_data, request):
         assert obj.read() == expected
 
 
+def test_fill_sejda_flatten_then_unflatten(
+    sejda_template, pdf_samples, sejda_data, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "test_fill_sejda_flatten_then_unflatten.pdf"
+    )
+    with open(
+        expected_path,
+        "rb+",
+    ) as f:
+        obj = PdfWrapper(sejda_template).fill(
+            sejda_data,
+            flatten=True,
+        )
+        obj.widgets["buyer_name"].readonly = False
+        obj.widgets["at_future_date"].readonly = False
+        obj.widgets["purchase_option"].readonly = False
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_draw_text_on_one_page(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_draw_text_on_one_page.pdf")
     with open(expected_path, "rb+") as f:
