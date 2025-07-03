@@ -136,3 +136,33 @@ form.widgets["dropdown_1"].choices = ["", "apple", "banana", "cherry", "dates"]
 
 form.write("output.pdf")
 ```
+
+## Change field editability
+
+The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. For example, the following code snippet shows how you can make different form fields editable in [this PDF form](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf) after they have been flattened:
+
+```python
+from PyPDFForm import PdfWrapper
+
+form = PdfWrapper("sample_template_with_dropdown.pdf")
+
+form.fill(
+    {
+        "test_1": "test_1",
+        "test_2": "test_2",
+        "test_3": "test_3",
+        "check_1": True,
+        "check_2": True,
+        "check_3": True,
+        "radio_1": 1,
+        "dropdown_1": 0,
+    },
+    flatten=True,
+)
+form.widgets["test_2"].readonly = False  # text
+form.widgets["check_3"].readonly = False  # checkbox
+form.widgets["radio_1"].readonly = False  # radio button group
+form.widgets["dropdown_1"].readonly = False  # dropdown
+
+form.write("output.pdf")
+```

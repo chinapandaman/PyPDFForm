@@ -262,21 +262,31 @@ def flatten_radio(annot: DictionaryObject, val: bool) -> None:
     Flattens a radio button annotation by setting or unsetting the ReadOnly flag,
     making it non-editable or editable based on the `val` parameter.
 
-    This function modifies the Ff (flags) entry in the radio button's parent
-    dictionary to set or unset the ReadOnly flag, preventing or allowing the user
-    from changing the selected option.
+    This function modifies the Ff (flags) entry in the radio button's annotation
+    dictionary or its parent dictionary if `Parent` exists in `annot`, to set or
+    unset the ReadOnly flag, preventing or allowing the user from changing the
+    selected option.
 
     Args:
         annot (DictionaryObject): The radio button annotation dictionary.
         val (bool): True to flatten (make read-only), False to unflatten (make editable).
     """
-    annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-        (
-            int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
-            if val
-            else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~READ_ONLY
+    if Parent in annot:
+        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
+            (
+                int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
+                if val
+                else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~READ_ONLY
+            )
         )
-    )
+    else:
+        annot[NameObject(Ff)] = NumberObject(
+            (
+                int(annot.get(NameObject(Ff), 0)) | READ_ONLY
+                if val
+                else int(annot.get(NameObject(Ff), 0)) & ~READ_ONLY
+            )
+        )
 
 
 def flatten_generic(annot: DictionaryObject, val: bool) -> None:

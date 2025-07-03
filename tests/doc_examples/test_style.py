@@ -154,3 +154,38 @@ def test_change_dropdown_choices(pdf_samples, request):
 
         assert len(form.read()) == len(expected)
         assert form.read() == expected
+
+
+def test_change_field_editability(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_change_field_editability.pdf")
+
+    form = PdfWrapper(
+        os.path.join(pdf_samples, "dropdown", "sample_template_with_dropdown.pdf")
+    )
+
+    form.fill(
+        {
+            "test_1": "test_1",
+            "test_2": "test_2",
+            "test_3": "test_3",
+            "check_1": True,
+            "check_2": True,
+            "check_3": True,
+            "radio_1": 1,
+            "dropdown_1": 0,
+        },
+        flatten=True,
+    )
+    form.widgets["test_2"].readonly = False  # text
+    form.widgets["check_3"].readonly = False  # checkbox
+    form.widgets["radio_1"].readonly = False  # radio button group
+    form.widgets["dropdown_1"].readonly = False  # dropdown
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(form.read()) == len(expected)
+        assert form.read() == expected
