@@ -22,7 +22,7 @@ class Widget:
     """
 
     SET_ATTR_TRIGGER_HOOK_MAP = {
-        "readonly": "flatten_radio",
+        "readonly": "flatten_generic",
     }
 
     def __init__(
