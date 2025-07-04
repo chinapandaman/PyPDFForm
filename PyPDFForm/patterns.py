@@ -12,7 +12,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
 from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, TU, A, Btn,
-                        Ch, I, N, Off, Opt, Parent, Sig, T, Tx, V, Yes)
+                        Ch, I, N, Off, Opt, Parent, Sig, T, Tx, V, Yes, SLASH)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -42,7 +42,7 @@ WIDGET_TYPE_PATTERNS = [
         (
             {FT: Btn},
             {Parent: {FT: Btn}},
-            {AS: (Yes, Off)},
+            {AS: (Yes, Off, SLASH)},
         ),
         Radio,
     ),
@@ -76,7 +76,7 @@ WIDGET_TYPE_PATTERNS = [
     (
         (
             {Parent: {FT: Btn}},
-            {AS: (Yes, Off)},
+            {AS: (Yes, Off, SLASH)},
         ),
         Radio,
     ),
@@ -114,7 +114,7 @@ def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
 
 
 def get_checkbox_value(annot: DictionaryObject) -> bool:
-    return True if annot[V] != Off else False
+    return True if annot.get(V, Off) != Off else False
 
 
 def update_radio_value(annot: DictionaryObject) -> None:
@@ -135,6 +135,14 @@ def update_radio_value(annot: DictionaryObject) -> None:
             annot[NameObject(AS)] = NameObject(each)
             annot[NameObject(Parent)][NameObject(V)] = NameObject(each)
             break
+
+
+def get_radio_value(annot: DictionaryObject) -> bool:
+    for each in annot.get(AP, {}).get(N, []):
+        if annot.get(Parent, {}).get(V) == each:
+            return True
+        
+    return False
 
 
 def update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
