@@ -156,8 +156,37 @@ def test_change_dropdown_choices(pdf_samples, request):
         assert form.read() == expected
 
 
+def test_change_dropdown_choices_with_export_values(pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_change_dropdown_choices_with_export_values.pdf"
+    )
+
+    form = PdfWrapper(
+        os.path.join(pdf_samples, "dropdown", "sample_template_with_dropdown.pdf")
+    )
+
+    form.widgets["dropdown_1"].choices = [
+        ("", "blank_export_value"),
+        ("apple", "apple_export_value"),
+        ("banana", "banana_export_value"),
+        ("cherry", "cherry_export_value"),
+        ("dates", "dates_export_value"),
+    ]
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(form.read()) == len(expected)
+        assert form.read() == expected
+
+
 def test_change_field_editability(pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_field_editability.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_change_field_editability.pdf"
+    )
 
     form = PdfWrapper(
         os.path.join(pdf_samples, "dropdown", "sample_template_with_dropdown.pdf")

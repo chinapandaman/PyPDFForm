@@ -138,6 +138,34 @@ def test_create_dropdown(pdf_samples, sample_font_stream, request):
         assert new_form.read() == expected
 
 
+def test_create_dropdown_with_export_values(pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_create_dropdown_with_export_values.pdf"
+    )
+
+    new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).create_widget(
+        widget_type="dropdown",
+        name="new_dropdown",
+        page_number=1,
+        x=57,
+        y=700,
+        options=[
+            ("option_1", "option_1_export_value"),
+            ("option_2", "option_2_export_value"),
+            ("option_3", "option_3_export_value"),
+        ],
+    )
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = new_form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(new_form.read()) == len(expected)
+        assert new_form.read() == expected
+
+
 def test_create_sig(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_sig.pdf")
 

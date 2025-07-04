@@ -128,6 +128,27 @@ new_form.write("output.pdf")
 
 To use a custom font, see how to register it [here](font.md).
 
+If you want different export values from the displayed options, you can specify a list of tuples for the `options` parameter, where the first value of each tuple is the displayed option and the second value is the export value:
+
+```python
+from PyPDFForm import PdfWrapper
+
+new_form = PdfWrapper("dummy.pdf").create_widget(
+    widget_type="dropdown",
+    name="new_dropdown",
+    page_number=1,
+    x=57,
+    y=700,
+    options=[
+        ("option_1", "option_1_export_value"),
+        ("option_2", "option_2_export_value"),
+        ("option_3", "option_3_export_value"),
+    ],
+)
+
+new_form.write("output.pdf")
+```
+
 ## Create a signature field
 
 A signature field is only interactive in tools that support it. Otherwise, it is displayed as a rectangle, and clicking it will not trigger any action:

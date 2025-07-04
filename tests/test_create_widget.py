@@ -832,6 +832,34 @@ def test_create_dropdown(template_stream, pdf_samples, sample_font_stream, reque
         assert obj.read() == expected
 
 
+def test_create_dropdown_with_export_values(template_stream, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_dropdown_with_export_values.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).create_widget(
+            widget_type="dropdown",
+            name="new_dropdown_widget",
+            page_number=1,
+            x=57,
+            y=700,
+            options=[
+                ("foo", "foo_export"),
+                ("bar", "bar_export"),
+                ("foobar", "foobar_export"),
+            ],
+        )
+        assert obj.schema["properties"]["new_dropdown_widget"]["type"] == "integer"
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_fill_cmyk_color(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "test_fill_cmyk_color.pdf")
     with open(expected_path, "rb+") as f:

@@ -137,6 +137,24 @@ form.widgets["dropdown_1"].choices = ["", "apple", "banana", "cherry", "dates"]
 form.write("output.pdf")
 ```
 
+If you want different export values from the displayed options, you can specify a list of tuples for the `.choices` attribute, where the first value of each tuple is the displayed option and the second value is the export value:
+
+```python
+from PyPDFForm import PdfWrapper
+
+form = PdfWrapper("sample_template_with_dropdown.pdf")
+
+form.widgets["dropdown_1"].choices = [
+    ("", "blank_export_value"),
+    ("apple", "apple_export_value"),
+    ("banana", "banana_export_value"),
+    ("cherry", "cherry_export_value"),
+    ("dates", "dates_export_value"),
+]
+
+form.write("output.pdf")
+```
+
 ## Change field editability
 
 The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. For example, the following code snippet shows how you can make different form fields editable in [this PDF form](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf) after they have been flattened:

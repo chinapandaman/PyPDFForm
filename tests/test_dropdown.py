@@ -416,3 +416,25 @@ def test_change_dropdown_choices(sample_template_with_dropdown, pdf_samples, req
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_change_dropdown_choices_with_export_values(
+    sample_template_with_dropdown, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples, "dropdown", "test_change_dropdown_choices_with_export_values.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_dropdown, adobe_mode=True)
+        obj.widgets["dropdown_1"].choices = [
+            ("apple", "apple_export"),
+            ("banana", "banana_export"),
+        ]
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
