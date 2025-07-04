@@ -11,8 +11,8 @@ for updating these widgets.
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
-from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, TU, A, Btn,
-                        Ch, I, N, Off, Opt, Parent, Sig, T, Tx, V, Yes, SLASH)
+from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, SLASH, TU,
+                        A, Btn, Ch, I, N, Off, Opt, Parent, Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -141,7 +141,7 @@ def get_radio_value(annot: DictionaryObject) -> bool:
     for each in annot.get(AP, {}).get(N, []):
         if annot.get(Parent, {}).get(V) == each:
             return True
-        
+
     return False
 
 
@@ -169,6 +169,17 @@ def update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         annot[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
 
 
+def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
+    if Parent in annot and T not in annot:
+        to_compare = annot.get(Parent, {}).get(V)
+    else:
+        to_compare = annot.get(V)
+
+    for i, each in enumerate(widget.choices):
+        if each == to_compare:
+            widget.value = i
+
+
 def update_text_value(annot: DictionaryObject, widget: Text) -> None:
     """
     Updates the value of a text annotation, setting the text content.
@@ -193,7 +204,6 @@ def get_text_value(annot: DictionaryObject, widget: Text) -> None:
         widget.value = annot[Parent].get(V)
     else:
         widget.value = annot.get(V)
-
 
 
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:

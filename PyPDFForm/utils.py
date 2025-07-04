@@ -23,7 +23,7 @@ from typing import Any, BinaryIO, List, Union
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
-from .constants import UNIQUE_SUFFIX_LENGTH, XFA, AcroForm, Annots, Root, SLASH
+from .constants import SLASH, UNIQUE_SUFFIX_LENGTH, XFA, AcroForm, Annots, Root
 
 
 @lru_cache
