@@ -176,6 +176,14 @@ def update_text_value(annot: DictionaryObject, widget: Text) -> None:
         annot[NameObject(AP)] = TextStringObject(widget.value)
 
 
+def get_text_value(annot: DictionaryObject, widget: Text) -> None:
+    if Parent in annot and T not in annot:
+        widget.value = annot[Parent].get(V)
+    else:
+        widget.value = annot.get(V)
+
+
+
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:
     """
     Updates the name of an annotation, setting the T (title) entry.
