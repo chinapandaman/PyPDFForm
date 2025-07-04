@@ -250,7 +250,7 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the dropdown field.
-        val (list): A list of strings representing the new choices for the dropdown.
+        val (list): A list of strings or tuples representing the new choices for the dropdown.
     """
     annot[NameObject(Opt)] = ArrayObject(
         [
