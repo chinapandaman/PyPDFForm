@@ -8,11 +8,14 @@ properties in the PDF's annotation dictionary. It also provides utility function
 for updating these widgets.
 """
 
+from typing import Union
+
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
-from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, TU, A, Btn,
-                        Ch, I, N, Off, Opt, Parent, Sig, T, Tx, V, Yes)
+from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, SLASH, TU,
+                        A, Btn, Ch, I, N, Off, Opt, Parent, Resources, Sig, T,
+                        Tx, V, XObject, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -21,6 +24,14 @@ from .middleware.signature import Signature
 from .middleware.text import Text
 
 WIDGET_TYPE_PATTERNS = [
+    # barcode? see pdf_samples/scenario/issues/1087.pdf
+    (
+        (
+            {FT: Tx},
+            {AP: {N: {Resources: {XObject: True}}}},
+        ),
+        None,
+    ),
     (
         ({A: {JS: IMAGE_FIELD_IDENTIFIER}},),
         Image,
@@ -42,7 +53,7 @@ WIDGET_TYPE_PATTERNS = [
         (
             {FT: Btn},
             {Parent: {FT: Btn}},
-            {AS: (Yes, Off)},
+            {AS: (Yes, Off, SLASH)},
         ),
         Radio,
     ),
@@ -76,7 +87,7 @@ WIDGET_TYPE_PATTERNS = [
     (
         (
             {Parent: {FT: Btn}},
-            {AS: (Yes, Off)},
+            {AS: (Yes, Off, SLASH)},
         ),
         Radio,
     ),
@@ -113,6 +124,23 @@ def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
             break
 
 
+def get_checkbox_value(annot: DictionaryObject) -> Union[bool, None]:
+    """
+    Retrieves the boolean value of a checkbox annotation.
+
+    This function checks the value (V) of the checkbox annotation. If the value
+    is not 'Off', it means the checkbox is checked, and True is returned.
+    Otherwise, if the value is 'Off' or not present, None is returned.
+
+    Args:
+        annot (DictionaryObject): The checkbox annotation dictionary.
+
+    Returns:
+        Union[bool, None]: True if the checkbox is checked, None otherwise.
+    """
+    return True if annot.get(V, Off) != Off else None
+
+
 def update_radio_value(annot: DictionaryObject) -> None:
     """
     Updates the value of a radio button annotation, selecting it.
@@ -131,6 +159,28 @@ def update_radio_value(annot: DictionaryObject) -> None:
             annot[NameObject(AS)] = NameObject(each)
             annot[NameObject(Parent)][NameObject(V)] = NameObject(each)
             break
+
+
+def get_radio_value(annot: DictionaryObject) -> bool:
+    """
+    Retrieves the boolean value of a radio button annotation.
+
+    This function iterates through the appearance states (AP) of the radio button
+    annotation. If the value (V) of the parent dictionary matches any of these
+    appearance states, it means the radio button is selected, and True is returned.
+    Otherwise, False is returned.
+
+    Args:
+        annot (DictionaryObject): The radio button annotation dictionary.
+
+    Returns:
+        bool: True if the radio button is selected, False otherwise.
+    """
+    for each in annot.get(AP, {}).get(N, []):
+        if annot.get(Parent, {}).get(V) == each:
+            return True
+
+    return False
 
 
 def update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
@@ -157,6 +207,29 @@ def update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         annot[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
 
 
+def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
+    """
+    Retrieves the selected value of a dropdown annotation and updates the widget.
+
+    This function determines the current value of the dropdown, considering
+    whether it's a child annotation or a top-level one. It then iterates
+    through the widget's choices to find a match and sets the widget's
+    value to the index of the matched choice.
+
+    Args:
+        annot (DictionaryObject): The dropdown annotation dictionary.
+        widget (Dropdown): The Dropdown widget object to update with the retrieved value.
+    """
+    if Parent in annot and T not in annot:
+        to_compare = annot.get(Parent, {}).get(V)
+    else:
+        to_compare = annot.get(V)
+
+    for i, each in enumerate(widget.choices):
+        if each == to_compare:
+            widget.value = i or None  # set None when 0
+
+
 def update_text_value(annot: DictionaryObject, widget: Text) -> None:
     """
     Updates the value of a text annotation, setting the text content.
@@ -174,6 +247,24 @@ def update_text_value(annot: DictionaryObject, widget: Text) -> None:
     else:
         annot[NameObject(V)] = TextStringObject(widget.value)
         annot[NameObject(AP)] = TextStringObject(widget.value)
+
+
+def get_text_value(annot: DictionaryObject, widget: Text) -> None:
+    """
+    Retrieves the text value of a text annotation and updates the widget.
+
+    This function determines the current text value of the annotation, considering
+    whether it's a child annotation or a top-level one, and then sets the
+    widget's value accordingly.
+
+    Args:
+        annot (DictionaryObject): The text annotation dictionary.
+        widget (Text): The Text widget object to update with the retrieved value.
+    """
+    if Parent in annot and T not in annot:
+        widget.value = annot[Parent].get(V)
+    else:
+        widget.value = annot.get(V)
 
 
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:

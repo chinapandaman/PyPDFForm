@@ -16,12 +16,14 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
 from .constants import WIDGET_TYPES, Annots, MaxLen, Parent, T
+from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
                        WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
-                       update_annotation_name)
+                       get_checkbox_value, get_dropdown_value, get_radio_value,
+                       get_text_value, update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
@@ -61,11 +63,16 @@ def build_widgets(
                 if isinstance(_widget, Text):
                     # mostly for schema for now
                     _widget.max_length = get_text_field_max_length(widget)
+                    get_text_value(widget, _widget)
+
+                if type(_widget) is Checkbox:
+                    _widget.value = get_checkbox_value(widget)
 
                 if isinstance(_widget, Dropdown):
                     # actually used for filling value
                     # doesn't trigger hook
                     _widget.__dict__["choices"] = get_dropdown_choices(widget)
+                    get_dropdown_value(widget, _widget)
 
                 if isinstance(_widget, Radio):
                     if key not in results:
@@ -73,6 +80,9 @@ def build_widgets(
 
                     # for schema
                     results[key].number_of_options += 1
+
+                    if get_radio_value(widget):
+                        results[key].value = results[key].number_of_options - 1
                     continue
 
                 results[key] = _widget
@@ -172,7 +182,7 @@ def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
         for pattern in patterns:
             check = check and find_pattern_match(pattern, widget)
         if check:
-            result = _type(key)
+            result = _type(key) if _type else None
             break
     return result
 

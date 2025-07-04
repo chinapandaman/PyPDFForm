@@ -67,6 +67,7 @@ Opt = "/Opt"
 AS = "/AS"
 Yes = "/Yes"
 Off = "/Off"
+XObject = "/XObject"
 
 # Font dict
 Length1 = "/Length1"
@@ -105,3 +106,5 @@ IMAGE_FIELD_IDENTIFIER = "event.target.buttonImportIcon();"
 
 COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO = DEFAULT_FONT_SIZE / 100
 UNIQUE_SUFFIX_LENGTH = 20
+
+SLASH = "/"

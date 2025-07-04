@@ -23,7 +23,7 @@ from typing import Any, BinaryIO, List, Union
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
-from .constants import UNIQUE_SUFFIX_LENGTH, XFA, AcroForm, Annots, Root
+from .constants import SLASH, UNIQUE_SUFFIX_LENGTH, XFA, AcroForm, Annots, Root
 
 
 @lru_cache
@@ -220,6 +220,10 @@ def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> 
             else:
                 if isinstance(pattern[key], tuple):
                     result = value in pattern[key]
+                    if not result and SLASH in pattern[key] and value.startswith(SLASH):
+                        result = True
+                elif pattern[key] is True:
+                    result = True
                 else:
                     result = pattern[key] == value
         if result:
