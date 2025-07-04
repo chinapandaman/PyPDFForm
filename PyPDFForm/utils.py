@@ -220,7 +220,7 @@ def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> 
             else:
                 if isinstance(pattern[key], tuple):
                     result = value in pattern[key]
-                    if SLASH in pattern[key] and value.startswith(SLASH):
+                    if not result and SLASH in pattern[key] and value.startswith(SLASH):
                         result = True
                 else:
                     result = pattern[key] == value
