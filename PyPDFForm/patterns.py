@@ -14,7 +14,8 @@ from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
 from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, SLASH, TU,
-                        A, Btn, Ch, I, N, Off, Opt, Parent, Sig, T, Tx, V, Yes)
+                        A, Btn, Ch, I, N, Off, Opt, Parent, Resources, Sig, T,
+                        Tx, V, XObject, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -23,6 +24,14 @@ from .middleware.signature import Signature
 from .middleware.text import Text
 
 WIDGET_TYPE_PATTERNS = [
+    # barcode? see pdf_samples/scenario/issues/1087.pdf
+    (
+        (
+            {FT: Tx},
+            {AP: {N: {Resources: {XObject: True}}}},
+        ),
+        None,
+    ),
     (
         ({A: {JS: IMAGE_FIELD_IDENTIFIER}},),
         Image,
