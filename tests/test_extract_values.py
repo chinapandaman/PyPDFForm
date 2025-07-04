@@ -57,3 +57,16 @@ def test_sejda_dropdown_values(pdf_samples):
     assert obj.widgets["dropdown_left"].value is None
     assert obj.widgets["dropdown_center"].value == 1
     assert obj.widgets["dropdown_right"].value == 2
+
+
+def test_addition_operator_3_times_values(template_stream, data_dict):
+    result = PdfWrapper()
+
+    for _ in range(3):
+        result += PdfWrapper(template_stream).fill(data_dict)
+
+    obj = PdfWrapper(result.read())
+
+    for k, v in obj.widgets.items():
+        if k.split("-")[0] in data_dict:
+            assert v.value or False == data_dict[k.split("-")[0]]
