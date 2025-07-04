@@ -427,8 +427,8 @@ def test_change_dropdown_choices_with_export_values(
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sample_template_with_dropdown, adobe_mode=True)
         obj.widgets["dropdown_1"].choices = [
-            ("apple_export", "apple"),
-            ("banana_export", "banana"),
+            ("apple", "apple_export"),
+            ("banana", "banana_export"),
         ]
 
         request.config.results["expected_path"] = expected_path

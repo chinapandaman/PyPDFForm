@@ -255,7 +255,7 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
     annot[NameObject(Opt)] = ArrayObject(
         [
             (
-                ArrayObject([TextStringObject(each[0]), TextStringObject(each[1])])
+                ArrayObject([TextStringObject(each[1]), TextStringObject(each[0])])
                 if isinstance(each, tuple)
                 else ArrayObject([TextStringObject(each), TextStringObject(each)])
             )
