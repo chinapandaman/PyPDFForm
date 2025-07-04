@@ -69,4 +69,4 @@ def test_addition_operator_3_times_values(template_stream, data_dict):
 
     for k, v in obj.widgets.items():
         if k.split("-")[0] in data_dict:
-            assert v.value or False == data_dict[k.split("-")[0]]
+            assert (v.value or False) == data_dict[k.split("-")[0]]
