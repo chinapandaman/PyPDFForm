@@ -128,7 +128,7 @@ new_form.write("output.pdf")
 
 To use a custom font, see how to register it [here](font.md).
 
-If you want different export values from the displayed options, you can specify a list of tuples for the `options` where the first value is the displayed option and the second value is the export value:
+If you want different export values from the displayed options, you can specify a list of tuples for the `options` parameter, where the first value of each tuple is the displayed option and the second value is the export value:
 
 ```python
 from PyPDFForm import PdfWrapper
