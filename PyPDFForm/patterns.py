@@ -125,6 +125,19 @@ def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
 
 
 def get_checkbox_value(annot: DictionaryObject) -> Union[bool, None]:
+    """
+    Retrieves the boolean value of a checkbox annotation.
+
+    This function checks the value (V) of the checkbox annotation. If the value
+    is not 'Off', it means the checkbox is checked, and True is returned.
+    Otherwise, if the value is 'Off' or not present, None is returned.
+
+    Args:
+        annot (DictionaryObject): The checkbox annotation dictionary.
+
+    Returns:
+        Union[bool, None]: True if the checkbox is checked, None otherwise.
+    """
     return True if annot.get(V, Off) != Off else None
 
 
@@ -149,6 +162,20 @@ def update_radio_value(annot: DictionaryObject) -> None:
 
 
 def get_radio_value(annot: DictionaryObject) -> bool:
+    """
+    Retrieves the boolean value of a radio button annotation.
+
+    This function iterates through the appearance states (AP) of the radio button
+    annotation. If the value (V) of the parent dictionary matches any of these
+    appearance states, it means the radio button is selected, and True is returned.
+    Otherwise, False is returned.
+
+    Args:
+        annot (DictionaryObject): The radio button annotation dictionary.
+
+    Returns:
+        bool: True if the radio button is selected, False otherwise.
+    """
     for each in annot.get(AP, {}).get(N, []):
         if annot.get(Parent, {}).get(V) == each:
             return True
@@ -181,6 +208,18 @@ def update_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
 
 
 def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
+    """
+    Retrieves the selected value of a dropdown annotation and updates the widget.
+
+    This function determines the current value of the dropdown, considering
+    whether it's a child annotation or a top-level one. It then iterates
+    through the widget's choices to find a match and sets the widget's
+    value to the index of the matched choice.
+
+    Args:
+        annot (DictionaryObject): The dropdown annotation dictionary.
+        widget (Dropdown): The Dropdown widget object to update with the retrieved value.
+    """
     if Parent in annot and T not in annot:
         to_compare = annot.get(Parent, {}).get(V)
     else:
@@ -211,6 +250,17 @@ def update_text_value(annot: DictionaryObject, widget: Text) -> None:
 
 
 def get_text_value(annot: DictionaryObject, widget: Text) -> None:
+    """
+    Retrieves the text value of a text annotation and updates the widget.
+
+    This function determines the current text value of the annotation, considering
+    whether it's a child annotation or a top-level one, and then sets the
+    widget's value accordingly.
+
+    Args:
+        annot (DictionaryObject): The text annotation dictionary.
+        widget (Text): The Text widget object to update with the retrieved value.
+    """
     if Parent in annot and T not in annot:
         widget.value = annot[Parent].get(V)
     else:
