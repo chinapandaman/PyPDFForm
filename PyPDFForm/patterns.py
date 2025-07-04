@@ -179,7 +179,7 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
 
     for i, each in enumerate(widget.choices):
         if each == to_compare:
-            widget.value = i
+            widget.value = i or None  # set None when 0
 
 
 def update_text_value(annot: DictionaryObject, widget: Text) -> None:
