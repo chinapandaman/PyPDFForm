@@ -128,6 +128,15 @@ def test_create_dropdown(pdf_samples, sample_font_stream, request):
         )
     )
 
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = new_form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(new_form.read()) == len(expected)
+        assert new_form.read() == expected
+
 
 def test_create_dropdown_with_export_values(pdf_samples, request):
     expected_path = os.path.join(
