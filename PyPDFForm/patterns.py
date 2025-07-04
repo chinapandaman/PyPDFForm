@@ -8,6 +8,8 @@ properties in the PDF's annotation dictionary. It also provides utility function
 for updating these widgets.
 """
 
+from typing import Union
+
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
@@ -113,8 +115,8 @@ def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
             break
 
 
-def get_checkbox_value(annot: DictionaryObject) -> bool:
-    return True if annot.get(V, Off) != Off else False
+def get_checkbox_value(annot: DictionaryObject) -> Union[bool, None]:
+    return True if annot.get(V, Off) != Off else None
 
 
 def update_radio_value(annot: DictionaryObject) -> None:
