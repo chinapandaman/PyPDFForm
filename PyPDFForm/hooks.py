@@ -253,7 +253,14 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
         val (list): A list of strings representing the new choices for the dropdown.
     """
     annot[NameObject(Opt)] = ArrayObject(
-        [ArrayObject([TextStringObject(each), TextStringObject(each)]) for each in val]
+        [
+            (
+                ArrayObject([TextStringObject(each[0]), TextStringObject(each[1])])
+                if isinstance(each, tuple)
+                else ArrayObject([TextStringObject(each), TextStringObject(each)])
+            )
+            for each in val
+        ]
     )
 
 
