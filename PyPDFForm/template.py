@@ -19,9 +19,10 @@ from .constants import WIDGET_TYPES, Annots, MaxLen, Parent, T
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
+from .middleware.checkbox import Checkbox
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
                        WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
-                       update_annotation_name, get_text_value)
+                       update_annotation_name, get_text_value, get_checkbox_value)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
@@ -62,6 +63,9 @@ def build_widgets(
                     # mostly for schema for now
                     _widget.max_length = get_text_field_max_length(widget)
                     get_text_value(widget, _widget)
+
+                if type(_widget) is Checkbox:
+                    _widget.value = get_checkbox_value(widget)
 
                 if isinstance(_widget, Dropdown):
                     # actually used for filling value

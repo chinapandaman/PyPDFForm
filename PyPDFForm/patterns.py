@@ -113,6 +113,10 @@ def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
             break
 
 
+def get_checkbox_value(annot: DictionaryObject) -> bool:
+    return True if annot[V] != Off else False
+
+
 def update_radio_value(annot: DictionaryObject) -> None:
     """
     Updates the value of a radio button annotation, selecting it.
