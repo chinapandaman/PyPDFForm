@@ -67,7 +67,6 @@ Opt = "/Opt"
 AS = "/AS"
 Yes = "/Yes"
 Off = "/Off"
-XObject = "/XObject"
 
 # Font dict
 Length1 = "/Length1"

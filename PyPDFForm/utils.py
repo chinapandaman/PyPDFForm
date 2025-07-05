@@ -222,8 +222,6 @@ def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> 
                     result = value in pattern[key]
                     if not result and SLASH in pattern[key] and value.startswith(SLASH):
                         result = True
-                elif pattern[key] is True:
-                    result = True
                 else:
                     result = pattern[key] == value
         if result:
