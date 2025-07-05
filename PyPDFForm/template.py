@@ -182,7 +182,7 @@ def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
         for pattern in patterns:
             check = check and find_pattern_match(pattern, widget)
         if check:
-            result = _type(key) if _type else None
+            result = _type(key)
             break
     return result
 
