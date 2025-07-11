@@ -40,9 +40,9 @@ class Widget:
         super().__init__()
         self._name = name
         self._value = value
-        self.desc = None
-        self.readonly = None
-        self.hooks_to_trigger = []
+        self.desc: str = None
+        self.readonly: bool = None
+        self.hooks_to_trigger: list = []
 
     def __setattr__(self, name: str, value: Any) -> None:
         """

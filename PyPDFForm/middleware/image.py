@@ -19,4 +19,4 @@ class Image(Signature):
     sets the preserve_aspect_ratio attribute to False by default.
     """
 
-    preserve_aspect_ratio = False
+    preserve_aspect_ratio: bool = False

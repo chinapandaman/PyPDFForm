@@ -41,7 +41,7 @@ class Radio(Checkbox):
         )
         super().__init__(name, value)
 
-        self.number_of_options = 0
+        self.number_of_options: int = 0
 
     @property
     def schema_definition(self) -> dict:

@@ -55,14 +55,14 @@ class Text(Widget):
         )
         super().__init__(name, value)
 
-        self.font = None
-        self.font_size = None
-        self.font_color = None
-        self.comb = None
-        self.alignment = None
-        self.multiline = None
+        self.font: str = None
+        self.font_size: float = None
+        self.font_color: tuple = None
+        self.comb: bool = None
+        self.alignment: int = None
+        self.multiline: bool = None
 
-        self.max_length = None
+        self.max_length: int = None
 
     @property
     def value(self) -> str:
