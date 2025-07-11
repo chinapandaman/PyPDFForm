@@ -24,7 +24,7 @@ class Signature(Widget):
     properties.
     """
 
-    preserve_aspect_ratio = True
+    preserve_aspect_ratio: bool = True
 
     @property
     def schema_definition(self) -> dict:

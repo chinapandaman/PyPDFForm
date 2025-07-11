@@ -51,7 +51,7 @@ class Dropdown(Widget):
         super().__init__(name, value)
 
         self.font: str = None
-        self.choices: list = None
+        self.choices: tuple = None
 
     @property
     def schema_definition(self) -> dict:

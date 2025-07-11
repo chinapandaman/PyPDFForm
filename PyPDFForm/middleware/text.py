@@ -62,7 +62,7 @@ class Text(Widget):
         self.alignment: int = None
         self.multiline: bool = None
 
-        self.max_length = None
+        self.max_length: int = None
 
     @property
     def value(self) -> str:
