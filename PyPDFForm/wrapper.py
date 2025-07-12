@@ -22,6 +22,7 @@ from functools import cached_property
 from typing import BinaryIO, Dict, List, Sequence, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
+from .compression import compress_pdf
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
@@ -349,6 +350,11 @@ class PdfWrapper:
             VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
             1,
         )
+
+        return self
+
+    def compress(self) -> PdfWrapper:
+        self._stream = compress_pdf(self.read())
 
         return self
 
