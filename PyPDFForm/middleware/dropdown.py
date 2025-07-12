@@ -6,6 +6,8 @@ This module defines the Dropdown class, which is a subclass of the
 Widget class. It represents a dropdown form field in a PDF document.
 """
 
+from typing import Union
+
 from .base import Widget
 
 
@@ -51,7 +53,7 @@ class Dropdown(Widget):
         super().__init__(name, value)
 
         self.font: str = None
-        self.choices: tuple = None
+        self.choices: Union[tuple, list] = None
 
     @property
     def schema_definition(self) -> dict:

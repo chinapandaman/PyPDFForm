@@ -9,6 +9,7 @@ for extracting font information from TTF streams and managing font names within 
 
 from functools import lru_cache
 from io import BytesIO
+from zlib import compress
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
@@ -17,9 +18,9 @@ from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from .constants import (DR, FONT_NAME_PREFIX, AcroForm, BaseFont, Encoding,
-                        Fields, Font, FontDescriptor, FontFile2, FontName,
-                        Length1, Resources, Subtype, TrueType, Type,
-                        WinAnsiEncoding)
+                        Fields, Filter, FlateDecode, Font, FontDescriptor,
+                        FontFile2, FontName, Length, Length1, Resources,
+                        Subtype, TrueType, Type, WinAnsiEncoding)
 from .utils import stream_to_io
 
 
@@ -119,10 +120,13 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes, adobe_mode: bool) -> t
         )
 
     font_file_stream = StreamObject()
-    font_file_stream.set_data(ttf_stream)
+    compressed_ttf = compress(ttf_stream)
+    font_file_stream.set_data(compressed_ttf)
     font_file_stream.update(
         {
             NameObject(Length1): NumberObject(len(ttf_stream)),
+            NameObject(Length): NumberObject(len(compressed_ttf)),
+            NameObject(Filter): NameObject(FlateDecode),
         }
     )
     font_file_ref = writer._add_object(font_file_stream)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212

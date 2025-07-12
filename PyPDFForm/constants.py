@@ -69,6 +69,7 @@ Yes = "/Yes"
 Off = "/Off"
 
 # Font dict
+Length = "/Length"
 Length1 = "/Length1"
 Type = "/Type"
 FontDescriptor = "/FontDescriptor"
@@ -78,6 +79,8 @@ Font = "/Font"
 Subtype = "/Subtype"
 TrueType = "/TrueType"
 BaseFont = "/BaseFont"
+Filter = "/Filter"
+FlateDecode = "/FlateDecode"
 Encoding = "/Encoding"
 WinAnsiEncoding = "/WinAnsiEncoding"
 
