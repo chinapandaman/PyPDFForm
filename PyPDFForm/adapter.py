@@ -9,6 +9,8 @@ filling operations, where the input PDF template can be provided in different
 forms. The module ensures that the input is properly converted into a byte
 stream before further processing.
 """
+# TODO: For large PDF files, reading the entire file into memory using `_file.read()` in `fp_or_f_obj_or_stream_to_stream` can be inefficient. Consider streaming or chunking if downstream processing allows.
+# TODO: Change `open(..., "rb+")` to `open(..., "rb")` in `fp_or_f_obj_or_stream_to_stream` if only reading is intended, as `rb+` allows both reading and writing.
 
 from os.path import isfile
 from typing import Any, BinaryIO, Union

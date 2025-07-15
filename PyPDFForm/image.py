@@ -6,6 +6,9 @@ It includes functions for rotating images, retrieving image dimensions, and
 calculating the resolutions for drawing an image on a PDF page, taking into
 account whether to preserve the aspect ratio.
 """
+# TODO: In `rotate_image` and `get_image_dimensions`, `BytesIO` is used to wrap the image stream. While necessary for PIL, consider if the `image_stream` is already a file-like object in some calling contexts, which could avoid redundant copying to `BytesIO`.
+# TODO: The `rotate_image` function creates a new `BytesIO` object and saves the image to it. For multiple rotations or image manipulations, consider keeping the `PIL.Image.Image` object in memory and performing operations on it directly before a final save to bytes, to avoid repeated I/O operations.
+# TODO: The `get_image_dimensions` function opens the image to get its size. If image dimensions are frequently needed for the same image, consider caching the dimensions to avoid re-opening and re-parsing the image data.
 
 from io import BytesIO
 from typing import Tuple, Union

@@ -6,6 +6,8 @@ This module provides functionality to generate coordinate grids on existing PDF 
 It allows developers to visualize the coordinate system of each page in a PDF, which can be helpful
 for debugging and precisely positioning elements when filling or drawing on PDF forms.
 """
+# TODO: The `PdfReader` object is initialized twice (lines 42 and implicitly within `create_watermarks_and_draw` if it re-reads the PDF). Consider initializing it once and passing the object or its relevant parts to avoid redundant parsing, especially for large PDFs.
+# TODO: Drawing operations for lines and texts are performed and merged separately. It might be more efficient to combine all drawing operations for a page into a single `create_watermarks_and_draw` call or to merge all watermarks in one final step to reduce PDF processing overhead.
 
 from typing import Tuple
 

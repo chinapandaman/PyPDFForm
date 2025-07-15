@@ -8,6 +8,10 @@ of checkbox and radio button widgets. It also provides functions for flattening
 generic and radio button widgets. These hooks are triggered during the PDF form
 filling process, allowing for customization of the form's appearance and behavior.
 """
+# TODO: In `trigger_widget_hooks`, the PDF is read and written in each call. If this function is part of a larger workflow, consider passing `PdfReader` and `PdfWriter` objects to avoid redundant parsing and writing, allowing modifications to be accumulated and written once.
+# TODO: String manipulations (split/join) in `update_text_field_font`, `update_text_field_font_size`, and `update_text_field_font_color` could be optimized for very long `DA` strings, potentially using more efficient string manipulation techniques or regex if the structure is consistent.
+# TODO: The `get_widget_key` function is called in a loop within `trigger_widget_hooks`. If its internal logic is complex, consider caching its results or optimizing its implementation to avoid redundant computations.
+# TODO: In `flatten_radio` and `flatten_generic`, `annot.get(NameObject(Ff), 0)` is called twice within the conditional. Store this value in a local variable to avoid redundant dictionary lookups.
 
 import sys
 from io import BytesIO

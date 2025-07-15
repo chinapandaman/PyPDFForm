@@ -3,6 +3,7 @@
 This module defines the DropdownWidget class, which is a subclass of the
 TextWidget class. It represents a dropdown form field in a PDF document.
 """
+# TODO: No obvious performance improvements in this file as it defines a simple class inheriting from `TextWidget` and sets class-level attributes and basic initialization parameters.
 
 from .text import TextWidget
 

@@ -6,6 +6,7 @@ This module defines the Radio class, which is a subclass of the
 Checkbox class. It represents a radio button form field in a PDF
 document, allowing users to select one option from a group of choices.
 """
+# TODO: No obvious performance improvements in this file as it defines a simple class inheriting from `Checkbox` with basic attribute setting and property access. The `schema_definition` and `sample_value` properties are simple lookups/calculations.
 
 from .checkbox import Checkbox
 

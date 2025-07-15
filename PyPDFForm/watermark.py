@@ -7,6 +7,13 @@ It supports drawing text, lines, and images as watermarks.
 The module also includes functions to merge these watermarks with the original PDF content
 and to copy specific widgets from the watermarks to the original PDF.
 """
+# TODO: In `draw_image`, `ImageReader(image_buff)` is created for each image. If the same image is drawn multiple times, consider caching `ImageReader` objects or passing pre-processed image data to avoid redundant processing.
+# TODO: In `create_watermarks_and_draw`, `PdfReader(stream_to_io(pdf))` is called, which re-parses the PDF. If this function is called repeatedly for the same PDF, consider passing the `PdfReader` object directly to avoid redundant parsing.
+# TODO: In `create_watermarks_and_draw`, the function returns a list of watermarks where only one element is populated. This can be inefficient for memory if there are many pages but only one watermark is created. Consider returning only the created watermark and its page number, and let the caller handle placement.
+# TODO: In `merge_watermarks_with_pdf`, `PdfReader(stream_to_io(pdf))` and `PdfReader(stream_to_io(watermarks[i]))` are called in a loop. This leads to repeated parsing of the base PDF and each watermark. It would be more efficient to parse the base PDF once and then merge watermark pages directly into the existing `PdfWriter` object.
+# TODO: In `copy_watermark_widgets`, the function reads the PDF and watermarks multiple times. Similar to `merge_watermarks_with_pdf`, optimize by parsing the base PDF and watermarks once and then manipulating the `PdfWriter` object.
+# TODO: The `copy_watermark_widgets` function has a `TODO: refactor duplicate logic with merge_two_pdfs` comment. This indicates a potential for code duplication and inefficiency. Refactoring this to a shared helper function would improve maintainability and potentially performance.
+# TODO: In `copy_watermark_widgets`, the nested loops iterating through `watermarks`, `watermark_file.pages`, and `page.get(Annots, [])` can be very inefficient for large numbers of watermarks, pages, or annotations. Consider creating a lookup structure for annotations by key to avoid repeated linear scans.
 
 from io import BytesIO
 from typing import List, Union
