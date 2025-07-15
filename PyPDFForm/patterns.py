@@ -7,6 +7,10 @@ checkboxes, radio buttons, dropdowns, images, and signatures) based on their
 properties in the PDF's annotation dictionary. It also provides utility functions
 for updating these widgets.
 """
+# TODO: The `WIDGET_TYPE_PATTERNS` list is iterated through to determine widget types. For very large numbers of annotations or complex pattern matching, consider optimizing this lookup, perhaps by pre-compiling regexes or using a more efficient data structure if the patterns allow.
+# TODO: In `update_checkbox_value` and `update_radio_value`, iterating through `annot[AP][N]` to find the correct appearance state might be slow if `N` contains many entries. If possible, a direct lookup or a more optimized search could improve performance.
+# TODO: In `update_dropdown_value`, the list comprehension for `ArrayObject` can be computationally intensive for dropdowns with many choices, as it creates new `TextStringObject` and `ArrayObject` instances for each choice. Consider optimizing this if dropdowns have a very large number of options.
+# TODO: The `get_checkbox_value` and `get_radio_value` functions involve dictionary lookups and comparisons. While generally fast, repeated calls in a tight loop for many widgets could accumulate overhead.
 
 from typing import Union
 

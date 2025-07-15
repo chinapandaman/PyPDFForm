@@ -7,6 +7,11 @@ It includes functions for handling various form field types, such as text fields
 checkboxes, radio buttons, dropdowns, images, and signatures. The module also
 supports flattening the filled form to prevent further modifications.
 """
+# TODO: In `fill` function, `PdfReader(stream_to_io(template))` and `out.append(pdf)` might involve re-parsing or copying the entire PDF. For very large PDFs, consider if `pypdf` offers more efficient ways to modify in-place or stream processing.
+# TODO: The `get_widget_key` function is called repeatedly in a loop. If its internal logic is complex, consider caching its results or optimizing its implementation to avoid redundant computations.
+# TODO: The `signature_image_handler` function involves `get_image_dimensions` and `get_draw_image_resolutions`. If image processing is a bottleneck, consider optimizing these image-related operations, perhaps by using faster image libraries or pre-calculating dimensions if images are reused.
+# TODO: Similar to `coordinate.py`, `get_drawn_stream` involves multiple `create_watermarks_and_draw` and `merge_watermarks_with_pdf` calls. Combining drawing operations or merging watermarks in a single pass could reduce overhead.
+# TODO: The `radio_button_tracker` logic involves iterating through all radio buttons. For forms with many radio buttons, consider optimizing the lookup or update mechanism if performance becomes an issue.
 
 from io import BytesIO
 from typing import Dict, Union, cast

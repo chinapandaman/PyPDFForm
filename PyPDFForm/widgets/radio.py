@@ -4,6 +4,7 @@ This module defines the RadioWidget class, which is a subclass of the
 CheckBoxWidget class. It represents a radio button form field in a PDF
 document.
 """
+# TODO: In `canvas_operations`, `self.acro_form_params.copy()` creates a shallow copy of the dictionary in each iteration of the loop. For a large number of radio buttons, this repeated copying can be inefficient. Consider modifying the dictionary in place and then reverting changes if necessary, or restructuring the data to avoid repeated copying.
 
 from typing import List
 

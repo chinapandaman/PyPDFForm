@@ -6,6 +6,7 @@ This module defines the Text class, which is a subclass of the
 Widget class. It represents a text field form field in a PDF document,
 allowing users to enter text.
 """
+# TODO: No obvious performance improvements in this file as it defines a simple class inheriting from `Widget` with basic attribute setting and property access. The `value` property's type conversion is minimal, and `schema_definition` and `sample_value` are simple lookups/calculations.
 
 from .base import Widget
 

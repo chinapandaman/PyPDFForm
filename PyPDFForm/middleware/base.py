@@ -7,6 +7,7 @@ represent form fields in a PDF document. The Widget class provides
 common attributes and methods for all form widgets, such as name, value,
 and schema definition.
 """
+# TODO: No obvious performance improvements in this file as it defines a base class with simple attribute setting and property access. The performance of `__setattr__` is generally negligible unless it involves complex computations or I/O.
 
 from typing import Any
 

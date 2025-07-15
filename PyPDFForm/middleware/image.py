@@ -6,6 +6,7 @@ This module defines the Image class, which is a subclass of the
 Signature class. It represents an image form field in a PDF document,
 allowing users to add images to the form.
 """
+# TODO: No obvious performance improvements in this file as it defines a simple class inheriting from `Signature` with a single attribute.
 
 from .signature import Signature
 

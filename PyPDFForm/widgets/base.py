@@ -7,6 +7,8 @@ such as text fields, checkboxes, and radio buttons. The Widget class handles
 basic properties like name, page number, and coordinates, and provides methods
 for rendering the widget on a PDF page.
 """
+# TODO: In `watermarks`, `PdfReader(stream_to_io(stream))` is called, which re-parses the PDF for each widget. If multiple widgets are being processed, consider passing the `PdfReader` object directly to avoid redundant parsing.
+# TODO: In `watermarks`, the list comprehension `[watermark.read() if i == self.page_number - 1 else b"" for i in range(page_count)]` creates a new `BytesIO` object and reads from it for each widget. If many widgets are created, this could be optimized by creating the `BytesIO` object once and passing it around, or by directly returning the watermark bytes and its page number.
 
 from io import BytesIO
 from typing import List, Union

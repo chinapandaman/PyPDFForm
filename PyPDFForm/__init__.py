@@ -19,6 +19,7 @@ The library supports various PDF form features, including:
 
 PyPDFForm aims to simplify PDF form manipulation, making it accessible to developers of all skill levels.
 """
+# TODO: No obvious performance improvements in this file as it mainly handles package initialization and imports.
 
 __version__ = "3.1.3"
 

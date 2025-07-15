@@ -3,6 +3,7 @@
 This module defines the CheckBoxWidget class, which is a subclass of the
 Widget class. It represents a checkbox form field in a PDF document.
 """
+# TODO: No obvious performance improvements in this file as it defines a simple class inheriting from `Widget` and sets class-level attributes.
 
 from .base import Widget
 
