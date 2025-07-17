@@ -5,7 +5,6 @@ SignatureWidget class. It represents an image field in a PDF document.
 The ImageWidget leverages the SignatureWidget's functionality to handle
 image insertion into PDF forms.
 """
-# TODO: No obvious performance improvements in this file as it defines a simple class inheriting from `SignatureWidget` and sets a class-level attribute.
 
 from .signature import SignatureWidget
 

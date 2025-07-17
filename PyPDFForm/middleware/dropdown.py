@@ -5,7 +5,6 @@ Module representing a dropdown widget.
 This module defines the Dropdown class, which is a subclass of the
 Widget class. It represents a dropdown form field in a PDF document.
 """
-# TODO: No obvious performance improvements in this file as it defines a simple class inheriting from `Widget` with basic attribute setting and property access. The `schema_definition` and `sample_value` properties are simple lookups/calculations.
 
 from typing import Union
 

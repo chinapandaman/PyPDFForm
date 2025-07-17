@@ -5,7 +5,6 @@ Module representing a checkbox widget.
 This module defines the Checkbox class, which is a subclass of the
 Widget class. It represents a checkbox form field in a PDF document.
 """
-# TODO: No obvious performance improvements in this file as it defines a simple class inheriting from `Widget` with basic attribute setting and property access.
 
 from typing import Union
 

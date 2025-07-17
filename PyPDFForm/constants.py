@@ -14,7 +14,6 @@ modules within the PyPDFForm library. These constants include:
 Using constants improves code readability and maintainability by providing
 meaningful names for frequently used values and reducing the risk of typos.
 """
-# TODO: No obvious performance improvements in this file as it only defines constants.
 
 from typing import Union
 
