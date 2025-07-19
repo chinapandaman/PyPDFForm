@@ -72,7 +72,7 @@ filled = PdfWrapper(
 filled.write("output.pdf")
 ```
 
-You can also specify the option using its `string` value:
+You can also specify a dropdown option by its `string` value:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -90,7 +90,7 @@ filled = PdfWrapper(
 filled.write("output.pdf")
 ```
 
-**NOTE:** If you fill a dropdown field using a `string` value that is not among its existing options, the new value will be added as the last option of the dropdown and automatically selected.
+**NOTE:** If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
 
 ## Fill signature field
 
