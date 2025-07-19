@@ -57,10 +57,27 @@ class Dropdown(Widget):
 
     @property
     def value(self) -> int:
+        """
+        Gets the current value of the dropdown.
+
+        Returns:
+            int: The index of the selected choice.
+        """
         return super().value
 
     @value.setter
     def value(self, value: Union[str, int]) -> None:
+        """
+        Sets the value of the dropdown.
+
+        If the value is a string, it attempts to find the corresponding
+        index in the choices list. If not found, the string value is
+        added to the choices, and its new index is used.
+
+        Args:
+            value (Union[str, int]): The value to set. Can be a string
+                                      (option text) or an integer (index).
+        """
         if isinstance(value, str):
             index = self._get_option_index(value)
             if index is None:
@@ -71,6 +88,15 @@ class Dropdown(Widget):
         self._value = value
 
     def _get_option_index(self, value: str) -> Union[int, None]:
+        """
+        Gets the index of a given option value in the dropdown's choices.
+
+        Args:
+            value (str): The option value to search for.
+
+        Returns:
+            Union[int, None]: The index of the option if found, otherwise None.
+        """
         for i, each in enumerate(self.choices):
             if value == each:
                 return i
