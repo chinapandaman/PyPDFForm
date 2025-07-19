@@ -6,7 +6,7 @@ This module defines the Dropdown class, which is a subclass of the
 Widget class. It represents a dropdown form field in a PDF document.
 """
 
-from typing import Any, Union
+from typing import Union
 
 from .base import Widget
 
@@ -56,11 +56,11 @@ class Dropdown(Widget):
         self.choices: Union[tuple, list] = None
 
     @property
-    def value(self) -> Any:
+    def value(self) -> int:
         return super().value
 
     @value.setter
-    def value(self, value: Any) -> None:
+    def value(self, value: Union[str, int]) -> None:
         if isinstance(value, str):
             index = self._get_option_index(value)
             if index is None:
@@ -69,7 +69,7 @@ class Dropdown(Widget):
             value = index
 
         self._value = value
-    
+
     def _get_option_index(self, value: str) -> Union[int, None]:
         for i, each in enumerate(self.choices):
             if not isinstance(each, tuple) and value == each:
