@@ -22,7 +22,7 @@ pip install -U PyPDFForm
 
 The main user interface of the library is the `PdfWrapper` class. It implements most PyPDFForm APIs and accepts various optional parameters, the most important of which is the PDF form template.
 
-For example, to use [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as a template, instantiate the `PdfWrapper` object as follows:
+For example, to use [this PDF](pdfs/sample_template.pdf) as a template, instantiate the `PdfWrapper` object as follows:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -68,7 +68,7 @@ pdf = PdfWrapper("sample_template.pdf", adobe_mode=True)
 
 According to section 12.7.3.2 of the [PDF standard](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf) (page 434), PDF form fields can have fully qualified names constructed using the pattern `<parent_field_name>.<field_name>`.
 
-PyPDFForm allows you to access fields by their full names by setting `use_full_widget_name` to `True` when instantiating `PdfWrapper`. For example, to use [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_with_full_key.pdf):
+PyPDFForm allows you to access fields by their full names by setting `use_full_widget_name` to `True` when instantiating `PdfWrapper`. For example, to use [this PDF](pdfs/sample_template_with_full_key.pdf):
 
 ```python
 from PyPDFForm import PdfWrapper
