@@ -72,9 +72,7 @@ class Dropdown(Widget):
 
     def _get_option_index(self, value: str) -> Union[int, None]:
         for i, each in enumerate(self.choices):
-            if not isinstance(each, tuple) and value == each:
-                return i
-            elif value == each[0]:
+            if value == each:
                 return i
 
         return None

@@ -174,7 +174,7 @@ def test_sample_template_library(
                     "new_text_field_widget": "test text",
                     "new_checkbox_widget": True,
                     "new_radio_group": 1,
-                    "new_dropdown_widget": 2,
+                    "new_dropdown_widget": "barfoo",
                     "new_image_widget": os.path.join(image_samples, "sample_image.jpg"),
                     "new_signature_wiget": os.path.join(
                         image_samples, "sample_signature.png"

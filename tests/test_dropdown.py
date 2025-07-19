@@ -111,6 +111,31 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
         assert obj.read() == expected
 
 
+def test_dropdown_two_via_str(sample_template_with_dropdown, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_two.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_dropdown).fill(
+            {
+                "test_1": "test_1",
+                "test_2": "test_2",
+                "test_3": "test_3",
+                "check_1": True,
+                "check_2": True,
+                "check_3": True,
+                "radio_1": 1,
+                "dropdown_1": "bar",
+            },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_dropdown_two_flatten(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "dropdown", "test_dropdown_two_flatten.pdf"
