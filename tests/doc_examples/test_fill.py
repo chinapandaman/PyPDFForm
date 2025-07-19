@@ -79,6 +79,27 @@ def test_fill_dropdown(pdf_samples, request):
         assert filled.read() == expected
 
 
+def test_fill_dropdown_via_str(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_fill_dropdown.pdf")
+
+    filled = PdfWrapper(
+        os.path.join(pdf_samples, "dropdown", "sample_template_with_dropdown.pdf"),
+        adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
+    ).fill(
+        {"dropdown_1": "bar"},
+        flatten=False,  # optional, set to True to flatten the filled PDF form
+    )
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = filled.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(filled.read()) == len(expected)
+        assert filled.read() == expected
+
+
 def test_fill_sig(pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig.pdf")
 
