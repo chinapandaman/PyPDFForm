@@ -230,6 +230,10 @@ class PdfWrapper:
         }
 
     @property
+    def data(self) -> dict:
+        return {key: value.value for key, value in self.widgets.items()}
+
+    @property
     def sample_data(self) -> dict:
         """
         Returns sample data for the PDF form, providing example values for each form field.
