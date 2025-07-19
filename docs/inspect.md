@@ -49,6 +49,28 @@ In this example, `sample_template.pdf` contains three text fields (`test`, `test
 
 You can use the PyPDFForm-generated JSON schema to validate the data used for filling a PDF form.
 
+## Inspect PDF form data
+
+To inspect the current filled data of a PDF form, use the `.data` attribute. For example, the following snippet inspects the current filled data for [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_filled.pdf):
+
+```python
+from pprint import pprint
+from PyPDFForm import PdfWrapper
+
+pprint(PdfWrapper("sample_template.pdf").data)
+```
+
+The above snippet will give you this dictionary:
+
+```sh
+{'check': True,
+ 'check_2': True,
+ 'check_3': True,
+ 'test': 'test',
+ 'test_2': 'test2',
+ 'test_3': 'test3'}
+```
+
 ## Generate sample data
 
 PyPDFForm can also generate sample data for filling a PDF form:

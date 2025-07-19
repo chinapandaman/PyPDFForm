@@ -230,6 +230,22 @@ class PdfWrapper:
         }
 
     @property
+    def data(self) -> dict:
+        """
+        Returns a dictionary of the current data in the PDF form fields.
+
+        The keys of the dictionary are the form field names, and the values are
+        the current values of those fields. This property provides a convenient
+        way to extract all filled data from the PDF.
+
+        Returns:
+            dict: A dictionary where keys are form field names (str) and values are
+                  their corresponding data (Union[str, bool, int, None]).
+        """
+
+        return {key: value.value for key, value in self.widgets.items()}
+
+    @property
     def sample_data(self) -> dict:
         """
         Returns sample data for the PDF form, providing example values for each form field.
