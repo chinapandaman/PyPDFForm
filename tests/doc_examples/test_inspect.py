@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 from PyPDFForm import PdfWrapper
 
 
@@ -16,6 +18,17 @@ def test_schema(template_stream):
             "test_3": {"type": "string"},
             "check_3": {"type": "boolean"},
         },
+    }
+
+
+def test_data(pdf_samples):
+    assert PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf")).data == {
+        "check": True,
+        "check_2": True,
+        "check_3": True,
+        "test": "test",
+        "test_2": "test2",
+        "test_3": "test3",
     }
 
 
