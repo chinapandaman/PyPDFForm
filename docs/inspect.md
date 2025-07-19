@@ -51,7 +51,7 @@ You can use the PyPDFForm-generated JSON schema to validate the data used for fi
 
 ## Inspect PDF form data
 
-If your PDF form has already been filled, you can view its current filled data via the `.data` attribute. For example, below snippet inspects the current filled data for [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_filled.pdf):
+To inspect the current filled data of a PDF form, use the `.data` attribute. For example, the following snippet inspects the current filled data for [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_filled.pdf):
 
 ```python
 from pprint import pprint
