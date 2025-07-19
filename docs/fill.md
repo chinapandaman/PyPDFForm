@@ -72,6 +72,26 @@ filled = PdfWrapper(
 filled.write("output.pdf")
 ```
 
+You can also specify a dropdown option by its `string` value:
+
+```python
+from PyPDFForm import PdfWrapper
+
+filled = PdfWrapper(
+    "sample_template_with_dropdown.pdf",
+    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
+).fill(
+    {
+        "dropdown_1": "bar"
+    },
+    flatten=False   # optional, set to True to flatten the filled PDF form
+)
+
+filled.write("output.pdf")
+```
+
+**NOTE:** If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
+
 ## Fill signature field
 
 A signature field enables signing a PDF form with a handwritten signature image.
