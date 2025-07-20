@@ -213,9 +213,7 @@ def test_create_image(pdf_samples, request):
 
 
 def test_update_key(static_pdfs):
-    new_form = PdfWrapper(
-        os.path.join(static_pdfs, "sample_template.pdf")
-    )
+    new_form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     assert "test" in new_form.widgets
     new_form.update_widget_key("test", "test_text")
     assert "test" not in new_form.widgets
@@ -225,9 +223,9 @@ def test_update_key(static_pdfs):
 def test_update_key_index(pdf_samples, static_pdfs, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_update_key_index.pdf")
 
-    new_form = PdfWrapper(
-        os.path.join(static_pdfs, "733.pdf")
-    ).update_widget_key("Description[0]", "Description[1]", index=1)
+    new_form = PdfWrapper(os.path.join(static_pdfs, "733.pdf")).update_widget_key(
+        "Description[0]", "Description[1]", index=1
+    )
 
     new_form.fill(new_form.sample_data)
 

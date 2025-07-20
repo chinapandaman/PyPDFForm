@@ -2,7 +2,7 @@
 
 After preparing a PDF form, use PyPDFForm to inspect its field names and determine the data required for filling it. You can choose from multiple inspection methods to suit your needs.
 
-This section of the documentation uses [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
+This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
 
 ## Generate a JSON schema that describes a PDF form
 
@@ -51,7 +51,7 @@ You can use the PyPDFForm-generated JSON schema to validate the data used for fi
 
 ## Inspect PDF form data
 
-To inspect the current filled data of a PDF form, use the `.data` attribute. For example, the following snippet inspects the current filled data for [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template_filled.pdf):
+To inspect the current filled data of a PDF form, use the `.data` attribute. For example, the following snippet inspects the current filled data for [this PDF](pdfs/sample_template_filled.pdf):
 
 ```python
 from pprint import pprint

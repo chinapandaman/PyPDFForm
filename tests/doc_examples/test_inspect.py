@@ -5,8 +5,10 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_schema(template_stream):
-    pdf_form_schema = PdfWrapper(template_stream).schema
+def test_schema(static_pdfs):
+    pdf_form_schema = PdfWrapper(
+        os.path.join(static_pdfs, "sample_template.pdf")
+    ).schema
 
     assert pdf_form_schema == {
         "type": "object",
@@ -21,8 +23,8 @@ def test_schema(template_stream):
     }
 
 
-def test_data(pdf_samples):
-    assert PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf")).data == {
+def test_data(static_pdfs):
+    assert PdfWrapper(os.path.join(static_pdfs, "sample_template_filled.pdf")).data == {
         "check": True,
         "check_2": True,
         "check_3": True,
@@ -32,8 +34,8 @@ def test_data(pdf_samples):
     }
 
 
-def test_sample_data(template_stream):
-    assert PdfWrapper(template_stream).sample_data == {
+def test_sample_data(static_pdfs):
+    assert PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).sample_data == {
         "check": True,
         "check_2": True,
         "check_3": True,
