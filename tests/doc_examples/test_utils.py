@@ -5,10 +5,12 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_extract_pages(template_stream, pdf_samples, request):
+def test_extract_pages(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_extract_pages.pdf")
 
-    first_page = PdfWrapper(template_stream).pages[0]
+    first_page = PdfWrapper(
+        os.path.join(static_pdfs, "sample_template.pdf")
+    ).pages[0]
     first_page.fill(
         {
             "test": "test_1",
@@ -26,11 +28,13 @@ def test_extract_pages(template_stream, pdf_samples, request):
         assert first_page.read() == expected
 
 
-def test_merge(template_stream, pdf_samples, request):
+def test_merge(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_merge.pdf")
 
     pdf_one = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
-    pdf_two = PdfWrapper(template_stream)
+    pdf_two = PdfWrapper(
+        os.path.join(static_pdfs, "sample_template.pdf")
+    )
     merged = pdf_one + pdf_two
 
     request.config.results["expected_path"] = expected_path
@@ -43,11 +47,13 @@ def test_merge(template_stream, pdf_samples, request):
         assert merged.read() == expected
 
 
-def test_reorg_pages(template_stream, pdf_samples, request):
+def test_reorg_pages(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_reorg_pages.pdf")
 
     pdf_one = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
-    pdf_two = PdfWrapper(template_stream)
+    pdf_two = PdfWrapper(
+        os.path.join(static_pdfs, "sample_template.pdf")
+    )
     merged = pdf_two.pages[0] + pdf_one + pdf_two.pages[1] + pdf_two.pages[2]
 
     request.config.results["expected_path"] = expected_path
@@ -60,7 +66,9 @@ def test_reorg_pages(template_stream, pdf_samples, request):
         assert merged.read() == expected
 
 
-def test_change_version(template_stream):
-    new_version = PdfWrapper(template_stream).change_version("2.0")
+def test_change_version(static_pdfs):
+    new_version = PdfWrapper(
+        os.path.join(static_pdfs, "sample_template.pdf")
+    ).change_version("2.0")
 
     assert new_version.version == "2.0"
