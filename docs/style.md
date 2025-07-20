@@ -2,7 +2,7 @@
 
 PyPDFForm enables you to modify some field styles through code, allowing you to change field appearances without altering the PDF form template.
 
-This section of the documentation will primarily use [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
+This section of the documentation will primarily use [this PDF](pdfs/sample_template.pdf) as an example.
 
 ## Change text field font
 
@@ -125,7 +125,7 @@ form.write("output.pdf")
 
 ## Change dropdown field choices
 
-To modify the options available in a dropdown field, assign a new list of strings to the `.choices` attribute of the corresponding field. For instance, the following code snippet updates the `dropdown_1` field in [this PDF form](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf) with a new set of choices:
+To modify the options available in a dropdown field, assign a new list of strings to the `.choices` attribute of the corresponding field. For instance, the following code snippet updates the `dropdown_1` field in [this PDF form](pdfs/sample_template_with_dropdown.pdf) with a new set of choices:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -157,7 +157,7 @@ form.write("output.pdf")
 
 ## Change field editability
 
-The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. For example, the following code snippet shows how you can make different form fields editable in [this PDF form](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/dropdown/sample_template_with_dropdown.pdf) after they have been flattened:
+The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. For example, the following code snippet shows how you can make different form fields editable in [this PDF form](pdfs/sample_template_with_dropdown.pdf) after they have been flattened:
 
 ```python
 from PyPDFForm import PdfWrapper

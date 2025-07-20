@@ -6,7 +6,7 @@ The PDF coordinate system originates at the bottom left of the page. The unit of
 
 To enhance the user experience with the coordinate system, PyPDFForm provides a grid view that helps determine the optimal placement of elements on a PDF.
 
-To generate a coordinate grid view for [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf), use the following code:
+To generate a coordinate grid view for [this PDF](pdfs/sample_template.pdf), use the following code:
 
 ```python
 from PyPDFForm import PdfWrapper

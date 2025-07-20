@@ -5,11 +5,11 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_fill_text_check(template_stream, pdf_samples, request):
+def test_fill_text_check(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
 
     filled = PdfWrapper(
-        template_stream,
+        os.path.join(static_pdfs, "sample_template.pdf"),
         adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {
@@ -33,11 +33,11 @@ def test_fill_text_check(template_stream, pdf_samples, request):
         assert filled.read() == expected
 
 
-def test_fill_radio(template_with_radiobutton_stream, pdf_samples, request):
+def test_fill_radio(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_radio.pdf")
 
     filled = PdfWrapper(
-        template_with_radiobutton_stream,
+        os.path.join(static_pdfs, "sample_template_with_radio_button.pdf"),
         adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {
@@ -58,11 +58,11 @@ def test_fill_radio(template_with_radiobutton_stream, pdf_samples, request):
         assert filled.read() == expected
 
 
-def test_fill_dropdown(pdf_samples, request):
+def test_fill_dropdown(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_dropdown.pdf")
 
     filled = PdfWrapper(
-        os.path.join(pdf_samples, "dropdown", "sample_template_with_dropdown.pdf"),
+        os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
         adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {"dropdown_1": 1},
@@ -79,11 +79,11 @@ def test_fill_dropdown(pdf_samples, request):
         assert filled.read() == expected
 
 
-def test_fill_dropdown_via_str(pdf_samples, request):
+def test_fill_dropdown_via_str(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_dropdown.pdf")
 
     filled = PdfWrapper(
-        os.path.join(pdf_samples, "dropdown", "sample_template_with_dropdown.pdf"),
+        os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
         adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {"dropdown_1": "bar"},
@@ -100,11 +100,11 @@ def test_fill_dropdown_via_str(pdf_samples, request):
         assert filled.read() == expected
 
 
-def test_fill_sig(pdf_samples, image_samples, request):
+def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig.pdf")
 
     filled = PdfWrapper(
-        os.path.join(pdf_samples, "signature", "sample_template_with_signature.pdf"),
+        os.path.join(static_pdfs, "sample_template_with_signature.pdf"),
         adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {"signature": os.path.join(image_samples, "sample_signature.png")},
@@ -122,11 +122,11 @@ def test_fill_sig(pdf_samples, image_samples, request):
             assert filled.read() == expected
 
 
-def test_fill_sig_ratio(pdf_samples, image_samples, request):
+def test_fill_sig_ratio(static_pdfs, pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig_ratio.pdf")
 
     pdf = PdfWrapper(
-        os.path.join(pdf_samples, "signature", "sample_template_with_signature.pdf"),
+        os.path.join(static_pdfs, "sample_template_with_signature.pdf"),
         adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     )
     pdf.widgets["signature"].preserve_aspect_ratio = False
@@ -146,13 +146,11 @@ def test_fill_sig_ratio(pdf_samples, image_samples, request):
             assert pdf.read() == expected
 
 
-def test_fill_image(
-    sample_template_with_image_field, pdf_samples, image_samples, request
-):
+def test_fill_image(static_pdfs, pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_image.pdf")
 
     filled = PdfWrapper(
-        sample_template_with_image_field,
+        os.path.join(static_pdfs, "sample_template_with_image_field.pdf"),
         adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {"image_1": os.path.join(image_samples, "sample_image.jpg")},
@@ -169,12 +167,10 @@ def test_fill_image(
         assert filled.read() == expected
 
 
-def test_fill_image_ratio(
-    sample_template_with_image_field, pdf_samples, image_samples, request
-):
+def test_fill_image_ratio(static_pdfs, pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_image_ratio.pdf")
 
-    pdf = PdfWrapper(sample_template_with_image_field)
+    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_image_field.pdf"))
     pdf.widgets["image_1"].preserve_aspect_ratio = True
     pdf.fill(
         {"image_1": os.path.join(image_samples, "sample_image.jpg")},

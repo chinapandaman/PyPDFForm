@@ -5,10 +5,10 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_draw_text(template_stream, pdf_samples, request):
+def test_draw_text(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_text.pdf")
 
-    pdf = PdfWrapper(template_stream).draw_text(
+    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw_text(
         text="random text",
         page_number=1,
         x=300,
@@ -28,10 +28,10 @@ def test_draw_text(template_stream, pdf_samples, request):
         assert pdf.read() == expected
 
 
-def test_draw_image(template_stream, image_samples, pdf_samples, request):
+def test_draw_image(static_pdfs, image_samples, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_image.pdf")
 
-    pdf = PdfWrapper(template_stream).draw_image(
+    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw_image(
         image=os.path.join(image_samples, "sample_image.jpg"),
         page_number=1,
         x=100,

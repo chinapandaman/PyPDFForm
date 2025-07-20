@@ -2,7 +2,7 @@
 
 PyPDFForm enables you to draw elements on a PDF, which is useful when a field is missing from your PDF form or when you need to add text or images.
 
-This section of the documentation uses [this PDF](https://github.com/chinapandaman/PyPDFForm/raw/master/pdf_samples/sample_template.pdf) as an example.
+This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
 
 Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
 

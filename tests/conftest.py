@@ -28,6 +28,11 @@ def pdf_samples():
 
 
 @pytest.fixture
+def static_pdfs():
+    return os.path.join(os.path.dirname(__file__), "..", "docs", "pdfs")
+
+
+@pytest.fixture
 def template_stream(pdf_samples):
     with open(os.path.join(pdf_samples, "sample_template.pdf"), "rb+") as f:
         return f.read()
