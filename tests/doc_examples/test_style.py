@@ -5,10 +5,10 @@ import os
 from PyPDFForm import PdfWrapper, Text
 
 
-def test_change_text_font(template_stream, sample_font_stream, pdf_samples, request):
+def test_change_text_font(static_pdfs, sample_font_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
 
-    form = PdfWrapper(template_stream)
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     form.register_font("new_font_name", sample_font_stream)
 
     # change globally by iterating each text field
@@ -40,10 +40,10 @@ def test_change_text_font(template_stream, sample_font_stream, pdf_samples, requ
         assert form.read() == expected
 
 
-def test_change_text_font_size(template_stream, pdf_samples, request):
+def test_change_text_font_size(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_size.pdf")
 
-    form = PdfWrapper(template_stream)
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
     # change globally by iterating each text field
     for field in form.widgets.values():
@@ -74,10 +74,10 @@ def test_change_text_font_size(template_stream, pdf_samples, request):
         assert form.read() == expected
 
 
-def test_change_text_font_color(template_stream, pdf_samples, request):
+def test_change_text_font_color(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_color.pdf")
 
-    form = PdfWrapper(template_stream)
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
     # change globally by iterating each text field
     for field in form.widgets.values():
@@ -108,10 +108,10 @@ def test_change_text_font_color(template_stream, pdf_samples, request):
         assert form.read() == expected
 
 
-def test_change_check_size(template_stream, pdf_samples, request):
+def test_change_check_size(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_check_size.pdf")
 
-    form = PdfWrapper(template_stream)
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
     form.widgets["check"].size = 50
     form.widgets["check_2"].size = 40
@@ -135,14 +135,12 @@ def test_change_check_size(template_stream, pdf_samples, request):
         assert form.read() == expected
 
 
-def test_change_dropdown_choices(pdf_samples, request):
+def test_change_dropdown_choices(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_choices.pdf"
     )
 
-    form = PdfWrapper(
-        os.path.join(pdf_samples, "dropdown", "sample_template_with_dropdown.pdf")
-    )
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
 
     form.widgets["dropdown_1"].choices = ["", "apple", "banana", "cherry", "dates"]
 
@@ -156,14 +154,12 @@ def test_change_dropdown_choices(pdf_samples, request):
         assert form.read() == expected
 
 
-def test_change_dropdown_choices_with_export_values(pdf_samples, request):
+def test_change_dropdown_choices_with_export_values(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_choices_with_export_values.pdf"
     )
 
-    form = PdfWrapper(
-        os.path.join(pdf_samples, "dropdown", "sample_template_with_dropdown.pdf")
-    )
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
 
     form.widgets["dropdown_1"].choices = [
         ("", "blank_export_value"),
@@ -183,14 +179,12 @@ def test_change_dropdown_choices_with_export_values(pdf_samples, request):
         assert form.read() == expected
 
 
-def test_change_field_editability(pdf_samples, request):
+def test_change_field_editability(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_editability.pdf"
     )
 
-    form = PdfWrapper(
-        os.path.join(pdf_samples, "dropdown", "sample_template_with_dropdown.pdf")
-    )
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
 
     form.fill(
         {
