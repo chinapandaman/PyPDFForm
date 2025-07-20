@@ -212,19 +212,21 @@ def test_create_image(pdf_samples, request):
         assert new_form.read() == expected
 
 
-def test_update_key(template_stream):
-    new_form = PdfWrapper(template_stream)
+def test_update_key(static_pdfs):
+    new_form = PdfWrapper(
+        os.path.join(static_pdfs, "sample_template.pdf")
+    )
     assert "test" in new_form.widgets
     new_form.update_widget_key("test", "test_text")
     assert "test" not in new_form.widgets
     assert "test_text" in new_form.widgets
 
 
-def test_update_key_index(pdf_samples, request):
+def test_update_key_index(pdf_samples, static_pdfs, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_update_key_index.pdf")
 
     new_form = PdfWrapper(
-        os.path.join(pdf_samples, "scenario", "issues", "733.pdf")
+        os.path.join(static_pdfs, "733.pdf")
     ).update_widget_key("Description[0]", "Description[1]", index=1)
 
     new_form.fill(new_form.sample_data)
@@ -239,10 +241,10 @@ def test_update_key_index(pdf_samples, request):
         assert new_form.read() == expected
 
 
-def test_update_key_bulk(pdf_samples, request):
+def test_update_key_bulk(pdf_samples, static_pdfs, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_update_key_bulk.pdf")
 
-    new_form = PdfWrapper(os.path.join(pdf_samples, "scenario", "issues", "733.pdf"))
+    new_form = PdfWrapper(os.path.join(static_pdfs, "733.pdf"))
     for i in range(1, 10):
         new_form.update_widget_key(
             "Description[0]", f"Description[{i}]", index=1, defer=True
