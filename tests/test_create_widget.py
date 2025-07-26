@@ -1189,6 +1189,15 @@ def test_create_required_fields(pdf_samples, request):
                 required=True,
                 options=["apple", "banana", "cherry"],
             )
+            .create_widget(
+                "image",
+                "new_image",
+                1,
+                300,
+                600,
+                required=True,
+            )
+            .create_widget("signature", "new_signature", 1, 100, 600, required=True)
         )
 
         request.config.results["expected_path"] = expected_path
@@ -1226,6 +1235,15 @@ def test_create_not_required_fields(pdf_samples, request):
                 required=False,
                 options=["apple", "banana", "cherry"],
             )
+            .create_widget(
+                "image",
+                "new_image",
+                1,
+                300,
+                600,
+                required=False,
+            )
+            .create_widget("signature", "new_signature", 1, 100, 600, required=False)
         )
 
         request.config.results["expected_path"] = expected_path
@@ -1262,6 +1280,22 @@ def test_create_fields_with_tooltips(pdf_samples, request):
                 400,
                 options=["apple", "banana", "cherry"],
                 tooltip="new_dropdown",
+            )
+            .create_widget(
+                "image",
+                "new_image",
+                1,
+                300,
+                600,
+                tooltip="new_image",
+            )
+            .create_widget(
+                "signature",
+                "new_signature",
+                1,
+                100,
+                600,
+                tooltip="new_signature",
             )
         )
 

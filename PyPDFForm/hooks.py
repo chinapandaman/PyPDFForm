@@ -22,7 +22,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
 from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
-                        MULTILINE, READ_ONLY, REQUIRED, Annots, Ff, Opt,
+                        MULTILINE, READ_ONLY, REQUIRED, TU, Annots, Ff, Opt,
                         Parent, Q, Rect)
 from .template import get_widget_key
 from .utils import stream_to_io
@@ -330,6 +330,21 @@ def flatten_generic(annot: DictionaryObject, val: bool) -> None:
                 else int(annot.get(NameObject(Ff), 0)) & ~READ_ONLY
             )
         )
+
+
+def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
+    """
+    Updates the tooltip (alternate field name) of a form field annotation.
+
+    This function sets the 'TU' entry in the annotation dictionary, which
+    provides a text string that can be used as a tooltip for the field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (str): The new tooltip string for the field.
+    """
+    if val:
+        annot[NameObject(TU)] = TextStringObject(val)
 
 
 def update_field_required(annot: DictionaryObject, val: bool) -> None:

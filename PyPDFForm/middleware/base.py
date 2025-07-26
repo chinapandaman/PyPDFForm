@@ -24,6 +24,7 @@ class Widget:
     SET_ATTR_TRIGGER_HOOK_MAP = {
         "readonly": "flatten_generic",
         "required": "update_field_required",
+        "tooltip": "update_field_tooltip",
     }
 
     def __init__(
@@ -42,6 +43,7 @@ class Widget:
         self._name = name
         self._value = value
         self.desc: str = None
+        self.tooltip: str = None  # TODO: sync tooltip and desc
         self.readonly: bool = None
         self.required: bool = None
         self.hooks_to_trigger: list = []

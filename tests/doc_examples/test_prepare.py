@@ -183,6 +183,8 @@ def test_create_sig(pdf_samples, request):
         page_number=1,
         x=100,
         y=100,
+        required=False,  # optional
+        tooltip="this is a signature",  # optional
         width=410,  # optional
         height=100,  # optional
     )
@@ -206,6 +208,8 @@ def test_create_image(pdf_samples, request):
         page_number=1,
         x=100,
         y=100,
+        required=False,  # optional
+        tooltip="this is an image",  # optional
         width=192,  # optional
         height=108,  # optional
     )
