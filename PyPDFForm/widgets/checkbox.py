@@ -25,6 +25,7 @@ class CheckBoxWidget(Widget):
     """
 
     USER_PARAMS = [
+        ("tooltip", "tooltip"),
         ("button_style", "buttonStyle"),
         ("tick_color", "textColor"),
         ("bg_color", "fillColor"),
