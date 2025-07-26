@@ -98,6 +98,18 @@ class Widget:
                 self.hook_params.append((each, kwargs.get(each)))
 
     def _required_handler(self, canvas: Canvas) -> None:
+        """
+        Handles the 'Required' flag for the widget's AcroForm field.
+
+        This method inspects the default flags of the AcroForm function associated
+        with the widget and modifies them based on the widget's 'required' parameter.
+        If the widget is marked as required, the 'required' flag is added to the
+        AcroForm field flags; otherwise, it is removed. This ensures the PDF form
+        field's required status is correctly reflected.
+
+        Args:
+            canvas (Canvas): The ReportLab canvas object used for PDF operations.
+        """
         default_flags = signature(
             getattr(canvas.acroForm, self.ACRO_FORM_FUNC)
         ).parameters.get(fieldFlags)
