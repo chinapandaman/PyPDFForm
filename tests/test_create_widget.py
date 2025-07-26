@@ -1235,3 +1235,40 @@ def test_create_not_required_fields(pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_create_fields_with_tooltips(pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_fields_with_tooltips.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = (
+            PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+            .create_widget("text", "new_text", 1, 100, 100, tooltip="new_text")
+            .create_widget("checkbox", "new_check", 1, 100, 200, tooltip="new_checkbox")
+            .create_widget(
+                "radio",
+                "new_radio_group",
+                1,
+                [300, 350, 400],
+                [100, 150, 200],
+                tooltip="new_radio_group",
+            )
+            .create_widget(
+                "dropdown",
+                "new_dropdown",
+                1,
+                400,
+                400,
+                options=["apple", "banana", "cherry"],
+                tooltip="new_dropdown",
+            )
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
