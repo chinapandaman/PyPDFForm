@@ -333,6 +333,17 @@ def flatten_generic(annot: DictionaryObject, val: bool) -> None:
 
 
 def update_field_required(annot: DictionaryObject, val: bool) -> None:
+    """
+    Updates the 'Required' flag of a form field annotation.
+
+    This function modifies the Ff (flags) entry in the annotation dictionary
+    (or its parent if applicable) to set or unset the 'Required' flag,
+    making the field mandatory or optional.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (bool): True to set the field as required, False to make it optional.
+    """
     if Parent in annot and Ff not in annot:
         annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
             (
