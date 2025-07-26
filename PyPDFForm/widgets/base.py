@@ -113,10 +113,10 @@ class Widget:
         default_flags = signature(
             getattr(canvas.acroForm, self.ACRO_FORM_FUNC)
         ).parameters.get(fieldFlags)
-        if not default_flags:
-            return
         default_flags = (
-            (default_flags.default or "").split(" ") if default_flags.default else []
+            default_flags.default.split(" ")
+            if default_flags and default_flags.default
+            else []
         )
 
         if self.acro_form_params.get(required):
