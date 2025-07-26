@@ -23,6 +23,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     page_number=1,
     x=57,
     y=700,
+    required=False, # optional
     width=120,  # optional
     height=40,  # optional
     max_length=5,   # optional
@@ -55,6 +56,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     page_number=1,
     x=57,
     y=700,
+    required=False, # optional
     size=30,    # optional
     button_style="check",   # optional
     tick_color=(0, 1, 0),   # optional
@@ -83,6 +85,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     page_number=1,
     x=[50, 100, 150],
     y=[50, 100, 150],
+    required=False, # optional
     size=30,    # optional
     button_style="check",   # optional
     shape="square", # optional, circle or square
@@ -113,6 +116,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
         "bar",
         "foobar",
     ],
+    required=False, # optional
     width=120,  # optional
     height=40,  # optional
     font="your_registered_font", # optional

@@ -23,6 +23,7 @@ class Widget:
 
     SET_ATTR_TRIGGER_HOOK_MAP = {
         "readonly": "flatten_generic",
+        "required": "update_field_required",
     }
 
     def __init__(
@@ -42,6 +43,7 @@ class Widget:
         self._value = value
         self.desc: str = None
         self.readonly: bool = None
+        self.required: bool = None
         self.hooks_to_trigger: list = []
 
     def __setattr__(self, name: str, value: Any) -> None:
