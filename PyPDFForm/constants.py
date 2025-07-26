@@ -95,6 +95,7 @@ XFA = "/XFA"
 
 # Field flag bits
 READ_ONLY = 1 << 0
+REQUIRED = 1 << 1
 MULTILINE = 1 << 12
 COMB = 1 << 24
 
