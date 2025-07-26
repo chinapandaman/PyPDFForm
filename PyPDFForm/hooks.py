@@ -333,6 +333,16 @@ def flatten_generic(annot: DictionaryObject, val: bool) -> None:
 
 
 def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
+    """
+    Updates the tooltip (alternate field name) of a form field annotation.
+
+    This function sets the 'TU' entry in the annotation dictionary, which
+    provides a text string that can be used as a tooltip for the field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (str): The new tooltip string for the field.
+    """
     if val:
         annot[NameObject(TU)] = TextStringObject(val)
 
