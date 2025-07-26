@@ -43,7 +43,7 @@ class SignatureWidget:
         ("width", 160),
         ("height", 90),
     ]
-    ALLOWED_HOOK_PARAMS = ["required"]
+    ALLOWED_HOOK_PARAMS = ["required", "tooltip"]
     BEDROCK_WIDGET_TO_COPY = "signature"
 
     def __init__(

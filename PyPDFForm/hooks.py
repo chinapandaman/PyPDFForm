@@ -22,7 +22,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
 from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
-                        MULTILINE, READ_ONLY, REQUIRED, Annots, Ff, Opt,
+                        MULTILINE, READ_ONLY, REQUIRED, TU, Annots, Ff, Opt,
                         Parent, Q, Rect)
 from .template import get_widget_key
 from .utils import stream_to_io
@@ -330,6 +330,11 @@ def flatten_generic(annot: DictionaryObject, val: bool) -> None:
                 else int(annot.get(NameObject(Ff), 0)) & ~READ_ONLY
             )
         )
+
+
+def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
+    if val:
+        annot[NameObject(TU)] = TextStringObject(val)
 
 
 def update_field_required(annot: DictionaryObject, val: bool) -> None:
