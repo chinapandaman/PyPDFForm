@@ -1281,6 +1281,22 @@ def test_create_fields_with_tooltips(pdf_samples, request):
                 options=["apple", "banana", "cherry"],
                 tooltip="new_dropdown",
             )
+            .create_widget(
+                "image",
+                "new_image",
+                1,
+                300,
+                600,
+                tooltip="new_image",
+            )
+            .create_widget(
+                "signature",
+                "new_signature",
+                1,
+                100,
+                600,
+                tooltip="new_signature",
+            )
         )
 
         request.config.results["expected_path"] = expected_path

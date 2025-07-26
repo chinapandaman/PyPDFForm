@@ -43,7 +43,7 @@ class Widget:
         self._name = name
         self._value = value
         self.desc: str = None
-        self.tooltip: str = None  # this is really just desc
+        self.tooltip: str = None  # TODO: sync tooltip and desc
         self.readonly: bool = None
         self.required: bool = None
         self.hooks_to_trigger: list = []
