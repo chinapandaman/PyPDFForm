@@ -25,6 +25,7 @@ class CheckBoxWidget(Widget):
     """
 
     USER_PARAMS = [
+        ("required", "required"),
         ("tooltip", "tooltip"),
         ("button_style", "buttonStyle"),
         ("tick_color", "textColor"),
@@ -33,5 +34,5 @@ class CheckBoxWidget(Widget):
         ("border_width", "borderWidth"),
     ]
     COLOR_PARAMS = ["tick_color", "bg_color", "border_color"]
-    ALLOWED_HOOK_PARAMS = ["required", "size"]
+    ALLOWED_HOOK_PARAMS = ["size"]
     ACRO_FORM_FUNC = "checkbox"

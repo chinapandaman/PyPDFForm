@@ -359,19 +359,20 @@ def update_field_required(annot: DictionaryObject, val: bool) -> None:
         annot (DictionaryObject): The annotation dictionary for the form field.
         val (bool): True to set the field as required, False to make it optional.
     """
-    if Parent in annot and Ff not in annot:
-        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-            (
-                int(annot.get(NameObject(Ff), 0)) | REQUIRED
-                if val
-                else int(annot.get(NameObject(Ff), 0)) & ~REQUIRED
-            )
+    # TODO: add a test case when supporting edit required
+    # if Parent in annot and Ff not in annot:
+    #     annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
+    #         (
+    #             int(annot.get(NameObject(Ff), 0)) | REQUIRED
+    #             if val
+    #             else int(annot.get(NameObject(Ff), 0)) & ~REQUIRED
+    #         )
+    #     )
+    # else:
+    annot[NameObject(Ff)] = NumberObject(
+        (
+            int(annot.get(NameObject(Ff), 0)) | REQUIRED
+            if val
+            else int(annot.get(NameObject(Ff), 0)) & ~REQUIRED
         )
-    else:
-        annot[NameObject(Ff)] = NumberObject(
-            (
-                int(annot.get(NameObject(Ff), 0)) | REQUIRED
-                if val
-                else int(annot.get(NameObject(Ff), 0)) & ~REQUIRED
-            )
-        )
+    )
