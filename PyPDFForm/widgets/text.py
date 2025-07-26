@@ -27,6 +27,7 @@ class TextWidget(Widget):
     """
 
     USER_PARAMS = [
+        ("tooltip", "tooltip"),
         ("width", "width"),
         ("height", "height"),
         ("font_size", "fontSize"),

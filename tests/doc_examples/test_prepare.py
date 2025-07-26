@@ -20,7 +20,8 @@ def test_create_text(pdf_samples, sample_font_stream, request):
             page_number=1,
             x=57,
             y=700,
-            required=False, # optional
+            required=False,  # optional
+            tooltip="this is a text field",  # optional
             width=120,  # optional
             height=40,  # optional
             max_length=10,  # optional
@@ -55,7 +56,8 @@ def test_create_check(pdf_samples, request):
         page_number=1,
         x=57,
         y=700,
-        required=False, # optional
+        required=False,  # optional
+        tooltip="this is a checkbox",  # optional
         size=50,  # optional
         button_style="cross",  # optional
         tick_color=(0, 1, 0),  # optional
@@ -83,7 +85,8 @@ def test_create_radio(pdf_samples, request):
         page_number=1,
         x=[50, 100, 150],
         y=[50, 100, 150],
-        required=False, # optional
+        required=False,  # optional
+        tooltip="this is a radio group",  # optional
         size=40,  # optional
         button_style="circle",  # optional
         shape="square",  # optional, circle or square
@@ -120,7 +123,8 @@ def test_create_dropdown(pdf_samples, sample_font_stream, request):
                 "bar",
                 "foobar",
             ],
-            required=False, # optional
+            required=False,  # optional
+            tooltip="this is a dropdown",  # optional
             width=120,  # optional
             height=40,  # optional
             font="your_registered_font",  # optional
