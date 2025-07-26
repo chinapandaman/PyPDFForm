@@ -97,9 +97,6 @@ class Widget:
                 self.hook_params.append((each, kwargs.get(each)))
 
     def _required_handler(self, canvas: Canvas) -> None:
-        if "required" not in self.acro_form_params:
-            return
-
         default_flags = signature(
             getattr(canvas.acroForm, self.ACRO_FORM_FUNC)
         ).parameters.get("fieldFlags")
@@ -117,8 +114,8 @@ class Widget:
 
         default_flags = " ".join(list(set(default_flags)))
         self.acro_form_params["fieldFlags"] = default_flags
-        del self.acro_form_params["required"]
-        print(default_flags)
+        if "required" in self.acro_form_params:
+            del self.acro_form_params["required"]
 
     def canvas_operations(self, canvas: Canvas) -> None:
         """
