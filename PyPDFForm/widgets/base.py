@@ -18,6 +18,7 @@ from pypdf import PdfReader
 from reportlab.lib.colors import Color
 from reportlab.pdfgen.canvas import Canvas
 
+from ..constants import fieldFlags, required
 from ..utils import stream_to_io
 
 
@@ -99,23 +100,23 @@ class Widget:
     def _required_handler(self, canvas: Canvas) -> None:
         default_flags = signature(
             getattr(canvas.acroForm, self.ACRO_FORM_FUNC)
-        ).parameters.get("fieldFlags")
+        ).parameters.get(fieldFlags)
         if not default_flags:
             return
         default_flags = (
             (default_flags.default or "").split(" ") if default_flags.default else []
         )
 
-        if self.acro_form_params.get("required"):
-            default_flags.append("required")
+        if self.acro_form_params.get(required):
+            default_flags.append(required)
         else:
-            if "required" in default_flags:
-                default_flags.remove("required")
+            if required in default_flags:
+                default_flags.remove(required)
 
         default_flags = " ".join(list(set(default_flags)))
-        self.acro_form_params["fieldFlags"] = default_flags
-        if "required" in self.acro_form_params:
-            del self.acro_form_params["required"]
+        self.acro_form_params[fieldFlags] = default_flags
+        if required in self.acro_form_params:
+            del self.acro_form_params[required]
 
     def canvas_operations(self, canvas: Canvas) -> None:
         """

@@ -99,6 +99,10 @@ REQUIRED = 1 << 1
 MULTILINE = 1 << 12
 COMB = 1 << 24
 
+# reportlab acroform func
+fieldFlags = "fieldFlags"
+required = "required"
+
 FONT_SIZE_IDENTIFIER = "Tf"
 FONT_COLOR_IDENTIFIER = " rg"
 DEFAULT_FONT = "Helvetica"
