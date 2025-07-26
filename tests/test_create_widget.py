@@ -1161,3 +1161,77 @@ def test_create_image_default_filled_flatten(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_create_required_fields(pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_required_fields.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = (
+            PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+            .create_widget("text", "new_text", 1, 100, 100, required=True)
+            .create_widget("checkbox", "new_check", 1, 100, 200, required=True)
+            .create_widget(
+                "radio",
+                "new_radio_group",
+                1,
+                [300, 350, 400],
+                [100, 150, 200],
+                required=True,
+            )
+            .create_widget(
+                "dropdown",
+                "new_dropdown",
+                1,
+                400,
+                400,
+                required=True,
+                options=["apple", "banana", "cherry"],
+            )
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_create_not_required_fields(pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_not_required_fields.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = (
+            PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+            .create_widget("text", "new_text", 1, 100, 100, required=False)
+            .create_widget("checkbox", "new_check", 1, 100, 200, required=False)
+            .create_widget(
+                "radio",
+                "new_radio_group",
+                1,
+                [300, 350, 400],
+                [100, 150, 200],
+                required=False,
+            )
+            .create_widget(
+                "dropdown",
+                "new_dropdown",
+                1,
+                400,
+                400,
+                required=False,
+                options=["apple", "banana", "cherry"],
+            )
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
