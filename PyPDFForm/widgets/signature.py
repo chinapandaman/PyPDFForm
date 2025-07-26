@@ -34,6 +34,8 @@ class SignatureWidget:
     Attributes:
         OPTIONAL_PARAMS (list): A list of tuples, where each tuple contains the
             parameter name and its default value.
+        ALLOWED_HOOK_PARAMS (list): A list of parameter names that can be
+            used as hooks to trigger dynamic modifications.
         BEDROCK_WIDGET_TO_COPY (str): The name of the bedrock widget to copy.
     """
 
@@ -41,6 +43,7 @@ class SignatureWidget:
         ("width", 160),
         ("height", 90),
     ]
+    ALLOWED_HOOK_PARAMS = ["required"]
     BEDROCK_WIDGET_TO_COPY = "signature"
 
     def __init__(
@@ -71,6 +74,9 @@ class SignatureWidget:
         self.optional_params = {
             each[0]: kwargs.get(each[0], each[1]) for each in self.OPTIONAL_PARAMS
         }
+        for each in self.ALLOWED_HOOK_PARAMS:
+            if each in kwargs:
+                self.hook_params.append((each, kwargs.get(each)))
 
     def watermarks(self, stream: bytes) -> List[bytes]:
         """
