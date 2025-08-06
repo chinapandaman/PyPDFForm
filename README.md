@@ -1,5 +1,8 @@
 <p align="center"><img src="https://github.com/chinapandaman/PyPDFForm/raw/master/docs/img/logo.png"></p>
 <p align="center">
+    <em>PDF Form Automation Simplified – Create, Merge, Style, and Fill Forms Programmatically.</em>
+</p>
+<p align="center">
     <a href="https://pypi.org/project/PyPDFForm/"><img src="https://img.shields.io/pypi/v/pypdfform?label=version&color=magenta"></a>
     <a href="https://chinapandaman.github.io/PyPDFForm/"><img src="https://img.shields.io/github/v/release/chinapandaman/pypdfform?label=docs&color=cyan"></a>
     <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml"><img src="https://img.shields.io/badge/coverage-100%25-green"></a>
