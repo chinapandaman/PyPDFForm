@@ -176,6 +176,44 @@ def test_set_text_field_max_length_sejda(pdf_samples, sejda_template, request):
         assert obj.read() == expected
 
 
+def test_set_text_field_comb(pdf_samples, template_stream, request):
+    expected_path = os.path.join(
+        pdf_samples, "test_widget_attr_trigger", "test_set_text_field_comb.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream)
+        obj.widgets["test"].max_length = 2
+        obj.widgets["test"].comb = True
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_set_text_field_comb_sejda(pdf_samples, sejda_template, request):
+    expected_path = os.path.join(
+        pdf_samples,
+        "test_widget_attr_trigger",
+        "test_set_text_field_comb_sejda.pdf",
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template)
+        obj.widgets["buyer_name"].max_length = 2
+        obj.widgets["buyer_name"].comb = True
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_set_checkbox_size(pdf_samples, template_stream, request):
     expected_path = os.path.join(
         pdf_samples, "test_widget_attr_trigger", "test_set_checkbox_size.pdf"
