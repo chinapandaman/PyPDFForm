@@ -99,6 +99,37 @@ form.fill(
 form.write("output.pdf")
 ```
 
+## Change text field max length
+
+You can change the maximum number of characters allowed in a text field:
+
+```python
+from PyPDFForm import PdfWrapper, Text
+
+form = PdfWrapper("sample_template.pdf")
+
+# change globally by iterating each text field
+for field in form.widgets.values():
+    if isinstance(field, Text):
+        field.max_length = 4
+
+# or change at each field's widget level
+form.widgets["test"].max_length = 2
+
+form.fill(
+    {
+        "test": "test_1",
+        "check": True,
+        "test_2": "test_2",
+        "check_2": False,
+        "test_3": "test_3",
+        "check_3": True,
+    },
+)
+
+form.write("output.pdf")
+```
+
 ## Change checkbox/radio button size
 
 You can change the size of a checkbox or a group of radio buttons using a `float` value:

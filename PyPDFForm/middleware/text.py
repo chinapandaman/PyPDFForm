@@ -51,6 +51,7 @@ class Text(Widget):
                 "comb": "update_text_field_comb",
                 "alignment": "update_text_field_alignment",
                 "multiline": "update_text_field_multiline",
+                "max_length": "update_text_field_max_length",
             }
         )
         super().__init__(name, value)
@@ -61,7 +62,6 @@ class Text(Widget):
         self.comb: bool = None
         self.alignment: int = None
         self.multiline: bool = None
-
         self.max_length: int = None
 
     @property

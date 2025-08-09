@@ -67,7 +67,8 @@ def build_widgets(
 
                 if isinstance(_widget, Text):
                     # mostly for schema for now
-                    _widget.max_length = get_text_field_max_length(widget)
+                    # doesn't trigger hook
+                    _widget.__dict__["max_length"] = get_text_field_max_length(widget)
                     get_text_value(widget, _widget)
 
                 if type(_widget) is Checkbox:

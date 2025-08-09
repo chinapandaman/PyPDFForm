@@ -22,8 +22,8 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
 from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
-                        MULTILINE, READ_ONLY, REQUIRED, TU, Annots, Ff, Opt,
-                        Parent, Q, Rect)
+                        MULTILINE, READ_ONLY, REQUIRED, TU, Annots, Ff, MaxLen,
+                        Opt, Parent, Q, Rect)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -221,6 +221,20 @@ def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
     """
     if val:
         annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | COMB)
+
+
+def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
+    """
+    Updates the maximum length of a text field annotation.
+
+    This function sets the 'MaxLen' entry in the annotation dictionary, which
+    specifies the maximum number of characters that can be entered into the text field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the text field.
+        val (int): The maximum number of characters allowed in the text field.
+    """
+    annot[NameObject(MaxLen)] = NumberObject(val)
 
 
 def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
