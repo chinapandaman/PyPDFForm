@@ -220,7 +220,9 @@ def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
         val (bool): True to enable comb, False to disable.
     """
     if val:
-        annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | COMB)
+        annot[NameObject(Ff)] = NumberObject(
+            int(annot[NameObject(Ff)] if Ff in annot else 0) | COMB
+        )
 
 
 def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
