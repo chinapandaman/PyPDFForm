@@ -142,6 +142,42 @@ def test_change_text_max_length(static_pdfs, pdf_samples, request):
         assert form.read() == expected
 
 
+def test_change_text_comb(static_pdfs, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_comb.pdf")
+
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
+
+    # change globally by iterating each text field
+    for field in form.widgets.values():
+        if isinstance(field, Text):
+            field.max_length = 4
+            field.comb = True
+
+    # or change at each field's widget level
+    form.widgets["test"].max_length = 2
+    form.widgets["test"].comb = True
+
+    form.fill(
+        {
+            "test": "test_1",
+            "check": True,
+            "test_2": "test_2",
+            "check_2": False,
+            "test_3": "test_3",
+            "check_3": True,
+        },
+    )
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(form.read()) == len(expected)
+        assert form.read() == expected
+
+
 def test_change_check_size(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_check_size.pdf")
 
