@@ -130,7 +130,7 @@ form.fill(
 form.write("output.pdf")
 ```
 
-## Enable Text Field Character Spacing (Combs)
+## Enable text field character spacing (combs)
 
 To enable character spacing in a text field, set its `.comb` property to `True`. This will evenly space out the characters of the text filled into the field. Note that this property only takes effect when the text field also has a `max_length` set.
 
