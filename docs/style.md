@@ -101,7 +101,7 @@ form.write("output.pdf")
 
 ## Change text field max length
 
-You can specify the maximum number of characters allowed in a text field:
+You can change the maximum number of characters allowed in a text field:
 
 ```python
 from PyPDFForm import PdfWrapper, Text
