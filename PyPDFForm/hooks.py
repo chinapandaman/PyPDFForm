@@ -224,6 +224,16 @@ def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
 
 
 def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
+    """
+    Updates the maximum length of a text field annotation.
+
+    This function sets the 'MaxLen' entry in the annotation dictionary, which
+    specifies the maximum number of characters that can be entered into the text field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the text field.
+        val (int): The maximum number of characters allowed in the text field.
+    """
     annot[NameObject(MaxLen)] = NumberObject(val)
 
 
