@@ -47,12 +47,14 @@ class Dropdown(Widget):
         self.SET_ATTR_TRIGGER_HOOK_MAP.update(
             {
                 "font": "update_text_field_font",
+                "font_size": "update_text_field_font_size",
                 "choices": "update_dropdown_choices",
             }
         )
         super().__init__(name, value)
 
         self.font: str = None
+        self.font_size: float = None
         self.choices: Union[tuple, list] = None
 
     @property
