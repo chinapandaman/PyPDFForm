@@ -99,6 +99,37 @@ form.fill(
 form.write("output.pdf")
 ```
 
+## Change text field alignment
+
+You can change the alignment of the text filled into a text field by specifying an integer value, where 0 is left, 1 is center, and 2 is right:
+
+```python
+from PyPDFForm import PdfWrapper, Text
+
+form = PdfWrapper("sample_template.pdf")
+
+# change globally by iterating each text field
+for field in form.widgets.values():
+    if isinstance(field, Text):
+        field.alignment = 1
+
+# or change at each field's widget level
+form.widgets["test"].alignment = 2
+
+form.fill(
+    {
+        "test": "test_1",
+        "check": True,
+        "test_2": "test_2",
+        "check_2": False,
+        "test_3": "test_3",
+        "check_3": True,
+    },
+)
+
+form.write("output.pdf")
+```
+
 ## Change text field max length
 
 You can change the maximum number of characters allowed in a text field:
