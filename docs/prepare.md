@@ -33,7 +33,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     font_size=15,   # optional
     font_color=(1, 0, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0), # optional
+    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
     border_width=5,  # optional
     alignment=0, # optional, 0=left, 1=center, 2=right
     multiline=True # optional
@@ -63,7 +63,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     button_style="check",   # optional
     tick_color=(0, 1, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0), # optional
+    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
     border_width=5  # optional
 )
 
@@ -71,6 +71,8 @@ new_form.write("output.pdf")
 ```
 
 The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
+
+**NOTE:** To remove the border of a checkbox, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
 
 ## Create a radio button group
 
@@ -94,12 +96,14 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     shape="square", # optional, circle or square
     tick_color=(0, 1, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0), # optional
+    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
     border_width=5  # optional
 )
 
 new_form.write("output.pdf")
 ```
+
+**NOTE:** To remove the border of a group of radio buttons, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
 
 ## Create a dropdown field
 
@@ -127,7 +131,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     font_size=15,   # optional
     font_color=(1, 0, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0), # optional
+    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
     border_width=5  # optional
 )
 
