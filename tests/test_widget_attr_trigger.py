@@ -392,3 +392,37 @@ def test_set_dropdown_font_sejda(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_set_dropdown_font_size(pdf_samples, sample_template_with_dropdown, request):
+    expected_path = os.path.join(
+        pdf_samples, "test_widget_attr_trigger", "test_set_dropdown_font_size.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sample_template_with_dropdown)
+        obj.widgets["dropdown_1"].font_size = 30
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_set_dropdown_font_size_sejda(pdf_samples, dropdown_alignment_sejda, request):
+    expected_path = os.path.join(
+        pdf_samples, "test_widget_attr_trigger", "test_set_dropdown_font_size_sejda.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(dropdown_alignment_sejda)
+        obj.widgets["dropdown_left"].font_size = 30
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
