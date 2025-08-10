@@ -108,6 +108,40 @@ def test_change_text_font_color(static_pdfs, pdf_samples, request):
         assert form.read() == expected
 
 
+def test_change_text_alignment(static_pdfs, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_alignment.pdf")
+
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
+
+    # change globally by iterating each text field
+    for field in form.widgets.values():
+        if isinstance(field, Text):
+            field.alignment = 1  # center
+
+    # or change at each field's widget level
+    form.widgets["test"].alignment = 2  # right
+
+    form.fill(
+        {
+            "test": "test_1",
+            "check": True,
+            "test_2": "test_2",
+            "check_2": False,
+            "test_3": "test_3",
+            "check_3": True,
+        },
+    )
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(form.read()) == len(expected)
+        assert form.read() == expected
+
+
 def test_change_text_max_length(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_max_length.pdf")
 
