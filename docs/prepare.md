@@ -72,6 +72,8 @@ new_form.write("output.pdf")
 
 The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
 
+**NOTE:** To remove the border of a checkbox, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
+
 ## Create a radio button group
 
 Unlike other field types, radio buttons must be created as a group. Therefore, for the coordinate parameters `x` and `y`, you must specify a list of coordinates for each radio button within the group, and the list must contain more than one coordinate.
@@ -100,6 +102,8 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
 
 new_form.write("output.pdf")
 ```
+
+**NOTE:** To remove the border of a group of radio buttons, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
 
 ## Create a dropdown field
 
