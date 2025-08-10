@@ -331,7 +331,9 @@ def test_change_dropdown_font(static_pdfs, pdf_samples, sample_font_stream, requ
 
 
 def test_change_dropdown_font_size(static_pdfs, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_font_size.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_change_dropdown_font_size.pdf"
+    )
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
 
