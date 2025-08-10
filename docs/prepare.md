@@ -33,7 +33,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     font_size=15,   # optional
     font_color=(1, 0, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0), # optional
+    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
     border_width=5,  # optional
     alignment=0, # optional, 0=left, 1=center, 2=right
     multiline=True # optional
@@ -63,7 +63,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     button_style="check",   # optional
     tick_color=(0, 1, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0), # optional
+    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
     border_width=5  # optional
 )
 
@@ -94,7 +94,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     shape="square", # optional, circle or square
     tick_color=(0, 1, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0), # optional
+    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
     border_width=5  # optional
 )
 
@@ -127,7 +127,7 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     font_size=15,   # optional
     font_color=(1, 0, 0),   # optional
     bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0), # optional
+    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
     border_width=5  # optional
 )
 
