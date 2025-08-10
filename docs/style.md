@@ -305,6 +305,20 @@ form.widgets["dropdown_1"].font_size = 30
 form.write("output.pdf")
 ```
 
+## Change dropdown field font color
+
+You can change a dropdown field's font color using an RGB `tuple`:
+
+```python
+from PyPDFForm import PdfWrapper
+
+form = PdfWrapper("sample_template_with_dropdown.pdf")
+
+form.widgets["dropdown_1"].font_color = (1, 0, 0)
+
+form.write("output.pdf")
+```
+
 ## Change field editability
 
 The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. For example, the following code snippet shows how you can make different form fields editable in [this PDF form](pdfs/sample_template_with_dropdown.pdf) after they have been flattened:
