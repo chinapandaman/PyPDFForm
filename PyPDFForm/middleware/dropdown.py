@@ -48,6 +48,7 @@ class Dropdown(Widget):
             {
                 "font": "update_text_field_font",
                 "font_size": "update_text_field_font_size",
+                "font_color": "update_text_field_font_color",
                 "choices": "update_dropdown_choices",
             }
         )
@@ -55,6 +56,7 @@ class Dropdown(Widget):
 
         self.font: str = None
         self.font_size: float = None
+        self.font_color: tuple = None
         self.choices: Union[tuple, list] = None
 
     @property
