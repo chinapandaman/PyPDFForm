@@ -101,7 +101,7 @@ form.write("output.pdf")
 
 ## Change text field alignment
 
-You can change the alignment of the text filled into a text field by specifying an integer value, where 0 is left, 1 is center, and 2 is right:
+You can change the alignment of the text filled into a text field by setting its `alignment` property to an integer value: `0` for left, `1` for center, and `2` for right.
 
 ```python
 from PyPDFForm import PdfWrapper, Text
@@ -111,10 +111,10 @@ form = PdfWrapper("sample_template.pdf")
 # change globally by iterating each text field
 for field in form.widgets.values():
     if isinstance(field, Text):
-        field.alignment = 1
+        field.alignment = 1 # center
 
 # or change at each field's widget level
-form.widgets["test"].alignment = 2
+form.widgets["test"].alignment = 2  # right
 
 form.fill(
     {

@@ -116,10 +116,10 @@ def test_change_text_alignment(static_pdfs, pdf_samples, request):
     # change globally by iterating each text field
     for field in form.widgets.values():
         if isinstance(field, Text):
-            field.alignment = 1
+            field.alignment = 1  # center
 
     # or change at each field's widget level
-    form.widgets["test"].alignment = 2
+    form.widgets["test"].alignment = 2  # right
 
     form.fill(
         {
