@@ -349,6 +349,25 @@ def test_change_dropdown_font_size(static_pdfs, pdf_samples, request):
         assert form.read() == expected
 
 
+def test_change_dropdown_font_color(static_pdfs, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_change_dropdown_font_color.pdf"
+    )
+
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
+
+    form.widgets["dropdown_1"].font_color = (1, 0, 0)
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(form.read()) == len(expected)
+        assert form.read() == expected
+
+
 def test_change_field_editability(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_editability.pdf"
