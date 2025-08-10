@@ -163,6 +163,31 @@ form.fill(
 form.write("output.pdf")
 ```
 
+## Enable multiline text field
+
+To enable multiline input for a text field, set its `.multiline` property to `True`. This effectively transforms it into a paragraph field:
+
+```python
+from PyPDFForm import PdfWrapper
+
+form = PdfWrapper("sample_template.pdf")
+
+form.widgets["test"].multiline = True
+
+form.fill(
+    {
+        "test": "test_1\ntest_1",
+        "check": True,
+        "test_2": "test_2\ntest_2",
+        "check_2": False,
+        "test_3": "test_3\ntest_3",
+        "check_3": True,
+    },
+)
+
+form.write("output.pdf")
+```
+
 ## Change checkbox/radio button size
 
 You can change the size of a checkbox or a group of radio buttons using a `float` value:

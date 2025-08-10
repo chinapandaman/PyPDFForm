@@ -204,7 +204,19 @@ def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
         val (bool): True to enable multiline, False to disable.
     """
     if val:
-        annot[NameObject(Ff)] = NumberObject(int(annot[NameObject(Ff)]) | MULTILINE)
+        if Parent in annot and Ff not in annot:
+            annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
+                int(
+                    annot[NameObject(Parent)][NameObject(Ff)]
+                    if Ff in annot[NameObject(Parent)]
+                    else 0
+                )
+                | MULTILINE
+            )
+        else:
+            annot[NameObject(Ff)] = NumberObject(
+                int(annot[NameObject(Ff)] if Ff in annot else 0) | MULTILINE
+            )
 
 
 def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
