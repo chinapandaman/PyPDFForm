@@ -24,7 +24,7 @@ def test_create_text(pdf_samples, sample_font_stream, request):
             tooltip="this is a text field",  # optional
             width=120,  # optional
             height=40,  # optional
-            max_length=10,  # optional
+            max_length=10,  # optional, number of characters
             comb=True,  # optional, when set to True, max_length must also be set
             font="your_registered_font",  # optional
             font_size=15,  # optional
