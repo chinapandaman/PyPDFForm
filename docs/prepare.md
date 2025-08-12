@@ -21,12 +21,12 @@ new_form = PdfWrapper("dummy.pdf").create_widget(
     widget_type="text",
     name="new_text_field",
     page_number=1,
-    x=57,
-    y=700,
+    x=57.5,
+    y=700.9,
     required=False, # optional
     tooltip="this is a text field", # optional
-    width=120,  # optional
-    height=40,  # optional
+    width=120.3,    # optional
+    height=40.7,    # optional
     max_length=5,   # optional, number of characters
     comb=True,  # optional, when set to True, max_length must also be set
     font="your_registered_font", # optional
@@ -43,6 +43,8 @@ new_form.write("output.pdf")
 ```
 
 To use a custom font, see how to register it [here](font.md).
+
+**NOTE:** For the `comb` option, refer to the documentation [here](style.md/#enable-text-field-character-spacing-combs).
 
 ## Create a checkbox
 
