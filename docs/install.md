@@ -2,9 +2,13 @@
 
 PyPDFForm is available on PyPI and can be installed using pip, which is the most common and recommended tool.
 
-## Install using pip
+## Prerequisites
 
-PyPDFForm requires Python 3.9+.
+PyPDFForm officially supports Python 3.9 and newer versions that are currently in their active life cycles. This typically includes the minimum supported version and the four major versions above it. For details on Python version life cycles, refer to [this page](https://devguide.python.org/versions/).
+
+**NOTE:** While official support is limited to active Python versions, PyPDFForm generally avoids features specific to particular major Python versions. It is expected to be functional with Python 3.7+ (due to its use of [Postponed Evaluation of Annotations](https://peps.python.org/pep-0563/) for type hints, introduced in Python 3.7), though these versions are not actively tested.
+
+## Install using pip
 
 It is highly recommended to create a virtual environment before installation. Then, run the following command to install PyPDFForm:
 
