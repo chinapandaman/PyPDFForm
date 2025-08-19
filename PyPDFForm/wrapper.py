@@ -50,7 +50,7 @@ from .utils import (enable_adobe_mode, generate_unique_suffix,
                     get_page_streams, merge_two_pdfs, remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
-from .widgets import Field
+from .widgets import FieldTypes
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
 from .widgets.image import ImageWidget
@@ -460,7 +460,7 @@ class PdfWrapper:
 
     def create_field(
         self,
-        field: Field,
+        field: FieldTypes,
     ) -> PdfWrapper:
 
         field_dict = asdict(field)

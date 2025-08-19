@@ -22,8 +22,16 @@ PyPDFForm aims to simplify PDF form manipulation, making it accessible to develo
 
 __version__ = "3.4.0"
 
-from . import widgets as Field
+from dataclasses import dataclass
+
 from .middleware.text import Text  # exposing for setting global font attrs
+from .widgets.text import TextField
 from .wrapper import PdfWrapper
 
-__all__ = ["PdfWrapper", "Text", "Field"]
+
+@dataclass
+class Fields:
+    TextField = TextField
+
+
+__all__ = ["PdfWrapper", "Text", "Fields"]
