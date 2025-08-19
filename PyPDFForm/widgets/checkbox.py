@@ -4,7 +4,22 @@ This module defines the CheckBoxWidget class, which is a subclass of the
 Widget class. It represents a checkbox form field in a PDF document.
 """
 
-from .base import Widget
+from dataclasses import dataclass
+from typing import Optional
+
+from .base import Field, Widget
+
+
+@dataclass
+class CheckBoxField(Field):
+    _field_type: str = "checkbox"
+
+    size: Optional[float] = None
+    button_style: Optional[str] = None
+    tick_color: Optional[tuple] = None
+    bg_color: Optional[tuple] = None
+    border_color: Optional[tuple] = None
+    border_width: Optional[float] = None
 
 
 class CheckBoxWidget(Widget):
