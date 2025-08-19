@@ -29,6 +29,7 @@ underlying PDF manipulation.
 
 from __future__ import annotations
 
+from dataclasses import asdict
 from functools import cached_property
 from typing import BinaryIO, Dict, List, Sequence, Tuple, Union
 
@@ -49,6 +50,7 @@ from .utils import (enable_adobe_mode, generate_unique_suffix,
                     get_page_streams, merge_two_pdfs, remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
+from .widgets import Field
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
 from .widgets.image import ImageWidget
@@ -455,6 +457,20 @@ class PdfWrapper:
             self._reregister_font()
 
         return self
+
+    def create_field(
+        self,
+        field: Field,
+    ) -> PdfWrapper:
+
+        field_dict = asdict(field)
+        widget_type = field_dict.pop("_field_type")
+        name = field_dict.pop("name")
+        page_number = field_dict.pop("page_number")
+        x = field_dict.pop("x")
+        y = field_dict.pop("y")
+
+        return self.create_widget(widget_type, name, page_number, x, y, **field_dict)
 
     def create_widget(
         self,

@@ -6,11 +6,14 @@ Widget class. It represents a text field in a PDF document.
 
 from dataclasses import dataclass
 from typing import Optional
-from .base import Widget, Field
+
+from .base import Field, Widget
 
 
 @dataclass
 class TextField(Field):
+    _field_type: str = "text"
+
     width: Optional[float] = None
     height: Optional[float] = None
     max_length: Optional[int] = None

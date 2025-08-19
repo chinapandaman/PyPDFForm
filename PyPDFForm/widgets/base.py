@@ -13,7 +13,7 @@ for rendering the widget on a PDF page.
 from dataclasses import dataclass
 from inspect import signature
 from io import BytesIO
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 
 from pypdf import PdfReader
 from reportlab.lib.colors import Color
