@@ -4,7 +4,25 @@ This module defines the TextWidget class, which is a subclass of the
 Widget class. It represents a text field in a PDF document.
 """
 
-from .base import Widget
+from dataclasses import dataclass
+from typing import Optional
+from .base import Widget, Field
+
+
+@dataclass
+class TextField(Field):
+    width: Optional[float] = None
+    height: Optional[float] = None
+    max_length: Optional[int] = None
+    comb: Optional[bool] = None
+    font: Optional[str] = None
+    font_size: Optional[float] = None
+    font_color: Optional[tuple] = None
+    bg_color: Optional[tuple] = None
+    border_color: Optional[tuple] = None
+    border_width: Optional[float] = None
+    alignment: Optional[int] = None
+    multiline: Optional[bool] = None
 
 
 class TextWidget(Widget):
