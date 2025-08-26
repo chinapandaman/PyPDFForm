@@ -31,7 +31,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from functools import cached_property
-from typing import BinaryIO, Dict, List, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, BinaryIO, Dict, List, Sequence, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
@@ -50,13 +50,15 @@ from .utils import (enable_adobe_mode, generate_unique_suffix,
                     get_page_streams, merge_two_pdfs, remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
-from .widgets import FieldTypes
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
 from .widgets.image import ImageWidget
 from .widgets.radio import RadioWidget
 from .widgets.signature import SignatureWidget
 from .widgets.text import TextWidget
+
+if TYPE_CHECKING:
+    from .widgets import FieldTypes
 
 
 class PdfWrapper:
