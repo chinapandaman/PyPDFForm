@@ -5,7 +5,7 @@ Widget class. It represents a text field in a PDF document.
 """
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
 from .base import Field, Widget
 
@@ -20,9 +20,9 @@ class TextField(Field):
     comb: Optional[bool] = None
     font: Optional[str] = None
     font_size: Optional[float] = None
-    font_color: Optional[tuple] = None
-    bg_color: Optional[tuple] = None
-    border_color: Optional[tuple] = None
+    font_color: Optional[Tuple[float, ...]] = None
+    bg_color: Optional[Tuple[float, ...]] = None
+    border_color: Optional[Tuple[float, ...]] = None
     border_width: Optional[float] = None
     alignment: Optional[int] = None
     multiline: Optional[bool] = None

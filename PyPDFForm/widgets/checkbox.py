@@ -5,7 +5,7 @@ Widget class. It represents a checkbox form field in a PDF document.
 """
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
 from .base import Field, Widget
 
@@ -16,9 +16,9 @@ class CheckBoxField(Field):
 
     size: Optional[float] = None
     button_style: Optional[str] = None
-    tick_color: Optional[tuple] = None
-    bg_color: Optional[tuple] = None
-    border_color: Optional[tuple] = None
+    tick_color: Optional[Tuple[float, ...]] = None
+    bg_color: Optional[Tuple[float, ...]] = None
+    border_color: Optional[Tuple[float, ...]] = None
     border_width: Optional[float] = None
 
 

@@ -5,7 +5,7 @@ TextWidget class. It represents a dropdown form field in a PDF document.
 """
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import List, Optional, Tuple, Union
 
 from .base import Field
 from .text import TextWidget
@@ -15,14 +15,14 @@ from .text import TextWidget
 class DropdownField(Field):
     _field_type: str = "dropdown"
 
-    options: Optional[list] = None
+    options: Optional[List[Union[str, Tuple[str, str]]]] = None
     width: Optional[float] = None
     height: Optional[float] = None
     font: Optional[str] = None
     font_size: Optional[float] = None
-    font_color: Optional[tuple] = None
-    bg_color: Optional[tuple] = None
-    border_color: Optional[tuple] = None
+    font_color: Optional[Tuple[float, ...]] = None
+    bg_color: Optional[Tuple[float, ...]] = None
+    border_color: Optional[Tuple[float, ...]] = None
     border_width: Optional[float] = None
 
 
