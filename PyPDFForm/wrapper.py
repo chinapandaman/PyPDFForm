@@ -470,7 +470,14 @@ class PdfWrapper:
         x = field_dict.pop("x")
         y = field_dict.pop("y")
 
-        return self.create_widget(widget_type, name, page_number, x, y, **field_dict)
+        return self.create_widget(
+            widget_type,
+            name,
+            page_number,
+            x,
+            y,
+            **{k: v for k, v in field_dict.items() if v is not None},
+        )
 
     def create_widget(
         self,
