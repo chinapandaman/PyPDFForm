@@ -15,7 +15,7 @@ from .checkbox import CheckBoxField, CheckBoxWidget
 
 
 @dataclass
-class RadioField(CheckBoxField):
+class RadioGroup(CheckBoxField):
     _field_type: str = "radio"
 
     x: List[float]

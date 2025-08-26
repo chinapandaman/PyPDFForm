@@ -4,12 +4,12 @@ from typing import Union
 from .checkbox import CheckBoxField
 from .dropdown import DropdownField
 from .image import ImageField
-from .radio import RadioField
+from .radio import RadioGroup
 from .signature import SignatureField
 from .text import TextField
 
 FieldTypes = Union[
-    TextField, CheckBoxField, RadioField, DropdownField, SignatureField, ImageField
+    TextField, CheckBoxField, RadioGroup, DropdownField, SignatureField, ImageField
 ]
 
 
@@ -17,7 +17,7 @@ FieldTypes = Union[
 class Fields:
     TextField = TextField
     CheckBoxField = CheckBoxField
-    RadioField = RadioField
+    RadioGroup = RadioGroup
     DropdownField = DropdownField
     SignatureField = SignatureField
     ImageField = ImageField
