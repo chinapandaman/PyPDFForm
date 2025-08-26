@@ -6,7 +6,14 @@ The ImageWidget leverages the SignatureWidget's functionality to handle
 image insertion into PDF forms.
 """
 
-from .signature import SignatureWidget
+from dataclasses import dataclass
+
+from .signature import SignatureField, SignatureWidget
+
+
+@dataclass
+class ImageField(SignatureField):
+    _field_type: str = "image"
 
 
 class ImageWidget(SignatureWidget):
