@@ -4,7 +4,26 @@ This module defines the DropdownWidget class, which is a subclass of the
 TextWidget class. It represents a dropdown form field in a PDF document.
 """
 
+from dataclasses import dataclass
+from typing import Optional
+
+from .base import Field
 from .text import TextWidget
+
+
+@dataclass
+class DropdownField(Field):
+    _field_type: str = "dropdown"
+
+    options: Optional[list] = None
+    width: Optional[float] = None
+    height: Optional[float] = None
+    font: Optional[str] = None
+    font_size: Optional[float] = None
+    font_color: Optional[tuple] = None
+    bg_color: Optional[tuple] = None
+    border_color: Optional[tuple] = None
+    border_width: Optional[float] = None
 
 
 class DropdownWidget(TextWidget):
