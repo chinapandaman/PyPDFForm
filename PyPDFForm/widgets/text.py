@@ -1,10 +1,60 @@
 # -*- coding: utf-8 -*-
 """
-This module defines the TextWidget class, which is a subclass of the
-Widget class. It represents a text field in a PDF document.
+This module defines the `TextField` and `TextWidget` classes, which are used to
+represent and manipulate text fields within PDF documents.
+
+The `TextField` class is a dataclass that encapsulates the properties of a text
+field, such as its dimensions, styling, and behavior.
+
+The `TextWidget` class extends the base `Widget` class to provide specific
+functionality for interacting with text form fields in PDFs.
 """
 
-from .base import Widget
+from dataclasses import dataclass
+from typing import Optional, Tuple
+
+from .base import Field, Widget
+
+
+@dataclass
+class TextField(Field):
+    """
+    Represents a text field in a PDF document.
+
+    This dataclass extends the `Field` base class and defines the specific
+    attributes that can be configured for a text input field.
+
+    Attributes:
+        _field_type (str): The type of the field, fixed as "text".
+        width (Optional[float]): The width of the text field.
+        height (Optional[float]): The height of the text field.
+        max_length (Optional[int]): The maximum number of characters allowed in the text field.
+        comb (Optional[bool]): If True, the text field will display characters
+            individually in a row of boxes.
+        font (Optional[str]): The font to use for the text field.
+        font_size (Optional[float]): The font size for the text.
+        font_color (Optional[Tuple[float, ...]]): The color of the font as an RGB or RGBA tuple.
+        bg_color (Optional[Tuple[float, ...]]): The background color of the text field.
+        border_color (Optional[Tuple[float, ...]]): The color of the text field's border.
+        border_width (Optional[float]): The width of the text field's border.
+        alignment (Optional[int]): The text alignment within the field (e.g., 0 for left, 1 for center, 2 for right).
+        multiline (Optional[bool]): If True, the text field can display multiple lines of text.
+    """
+
+    _field_type: str = "text"
+
+    width: Optional[float] = None
+    height: Optional[float] = None
+    max_length: Optional[int] = None
+    comb: Optional[bool] = None
+    font: Optional[str] = None
+    font_size: Optional[float] = None
+    font_color: Optional[Tuple[float, ...]] = None
+    bg_color: Optional[Tuple[float, ...]] = None
+    border_color: Optional[Tuple[float, ...]] = None
+    border_width: Optional[float] = None
+    alignment: Optional[int] = None
+    multiline: Optional[bool] = None
 
 
 class TextWidget(Widget):

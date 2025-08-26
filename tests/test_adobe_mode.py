@@ -2,7 +2,7 @@
 
 import os
 
-from PyPDFForm import PdfWrapper
+from PyPDFForm import Fields, PdfWrapper
 
 
 def test_fill(template_stream, pdf_samples, data_dict, request):
@@ -121,53 +121,59 @@ def test_sample_template_library(
         obj = (
             PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"), adobe_mode=True)
             .register_font("new_font", sample_font_stream)
-            .create_widget(
-                widget_type="text",
-                name="new_text_field_widget",
-                page_number=1,
-                x=60,
-                y=710,
+            .create_field(
+                Fields.TextField(
+                    name="new_text_field_widget",
+                    page_number=1,
+                    x=60,
+                    y=710,
+                )
             )
-            .create_widget(
-                widget_type="checkbox",
-                name="new_checkbox_widget",
-                page_number=1,
-                x=100,
-                y=600,
+            .create_field(
+                Fields.CheckBoxField(
+                    name="new_checkbox_widget",
+                    page_number=1,
+                    x=100,
+                    y=600,
+                )
             )
-            .create_widget(
-                widget_type="radio",
-                name="new_radio_group",
-                page_number=1,
-                x=[50, 100, 150],
-                y=[50, 100, 150],
+            .create_field(
+                Fields.RadioGroup(
+                    name="new_radio_group",
+                    page_number=1,
+                    x=[50, 100, 150],
+                    y=[50, 100, 150],
+                )
             )
-            .create_widget(
-                widget_type="dropdown",
-                name="new_dropdown_widget",
-                page_number=1,
-                x=300,
-                y=710,
-                options=[
-                    "foo",
-                    "bar",
-                    "foobar",
-                ],
-                font="new_font",
+            .create_field(
+                Fields.DropdownField(
+                    name="new_dropdown_widget",
+                    page_number=1,
+                    x=300,
+                    y=710,
+                    options=[
+                        "foo",
+                        "bar",
+                        "foobar",
+                    ],
+                    font="new_font",
+                )
             )
-            .create_widget(
-                widget_type="image",
-                name="new_image_widget",
-                page_number=1,
-                x=300,
-                y=200,
+            .create_field(
+                Fields.ImageField(
+                    name="new_image_widget",
+                    page_number=1,
+                    x=300,
+                    y=200,
+                )
             )
-            .create_widget(
-                widget_type="signature",
-                name="new_signature_wiget",
-                page_number=1,
-                x=300,
-                y=400,
+            .create_field(
+                Fields.SignatureField(
+                    name="new_signature_wiget",
+                    page_number=1,
+                    x=300,
+                    y=400,
+                )
             )
             .fill(
                 {

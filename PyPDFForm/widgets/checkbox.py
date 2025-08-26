@@ -1,10 +1,48 @@
 # -*- coding: utf-8 -*-
 """
-This module defines the CheckBoxWidget class, which is a subclass of the
-Widget class. It represents a checkbox form field in a PDF document.
+This module defines the `CheckBoxField` and `CheckBoxWidget` classes, which are
+used to represent and manipulate checkbox form fields within PDF documents.
+
+The `CheckBoxField` class is a dataclass that encapsulates the properties of a
+checkbox field, such as its size, style, and colors.
+
+The `CheckBoxWidget` class extends the base `Widget` class to provide specific
+functionality for interacting with checkbox form fields in PDFs.
 """
 
-from .base import Widget
+from dataclasses import dataclass
+from typing import Optional, Tuple
+
+from .base import Field, Widget
+
+
+@dataclass
+class CheckBoxField(Field):
+    """
+    Represents a checkbox field in a PDF document.
+
+    This dataclass extends the `Field` base class and defines the specific
+    attributes that can be configured for a checkbox field.
+
+    Attributes:
+        _field_type (str): The type of the field, fixed as "checkbox".
+        size (Optional[float]): The size of the checkbox.
+        button_style (Optional[str]): The visual style of the checkbox button
+            (e.g., "check", "circle", "cross").
+        tick_color (Optional[Tuple[float, ...]]): The color of the checkmark or tick.
+        bg_color (Optional[Tuple[float, ...]]): The background color of the checkbox.
+        border_color (Optional[Tuple[float, ...]]): The color of the checkbox's border.
+        border_width (Optional[float]): The width of the checkbox's border.
+    """
+
+    _field_type: str = "checkbox"
+
+    size: Optional[float] = None
+    button_style: Optional[str] = None
+    tick_color: Optional[Tuple[float, ...]] = None
+    bg_color: Optional[Tuple[float, ...]] = None
+    border_color: Optional[Tuple[float, ...]] = None
+    border_width: Optional[float] = None
 
 
 class CheckBoxWidget(Widget):

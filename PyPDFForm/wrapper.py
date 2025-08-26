@@ -29,8 +29,9 @@ underlying PDF manipulation.
 
 from __future__ import annotations
 
+from dataclasses import asdict
 from functools import cached_property
-from typing import BinaryIO, Dict, List, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, BinaryIO, Dict, List, Sequence, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
@@ -55,6 +56,9 @@ from .widgets.image import ImageWidget
 from .widgets.radio import RadioWidget
 from .widgets.signature import SignatureWidget
 from .widgets.text import TextWidget
+
+if TYPE_CHECKING:
+    from .widgets import FieldTypes
 
 
 class PdfWrapper:
@@ -455,6 +459,41 @@ class PdfWrapper:
             self._reregister_font()
 
         return self
+
+    def create_field(
+        self,
+        field: FieldTypes,
+    ) -> PdfWrapper:
+        """
+        Creates a new form field (widget) on the PDF using a `FieldTypes` object.
+
+        This method simplifies widget creation by taking a `FieldTypes` object,
+        extracting its properties, and then delegating to the `create_widget` method.
+
+        Args:
+            field (FieldTypes): An object representing the field to create.
+                This object encapsulates all necessary properties like name,
+                page number, coordinates, and type of the field.
+
+        Returns:
+            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
+        """
+
+        field_dict = asdict(field)
+        widget_type = field_dict.pop("_field_type")
+        name = field_dict.pop("name")
+        page_number = field_dict.pop("page_number")
+        x = field_dict.pop("x")
+        y = field_dict.pop("y")
+
+        return self.create_widget(
+            widget_type,
+            name,
+            page_number,
+            x,
+            y,
+            **{k: v for k, v in field_dict.items() if v is not None},
+        )
 
     def create_widget(
         self,
