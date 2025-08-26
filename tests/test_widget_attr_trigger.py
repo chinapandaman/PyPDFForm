@@ -2,7 +2,7 @@
 
 import os
 
-from PyPDFForm import PdfWrapper
+from PyPDFForm import Fields, PdfWrapper
 
 
 def test_register_font_no_form_fields(pdf_samples, sample_font_stream, request):
@@ -11,8 +11,8 @@ def test_register_font_no_form_fields(pdf_samples, sample_font_stream, request):
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
-        obj.register_font("new_font", sample_font_stream).create_widget(
-            "text", "foo", 1, 100, 100, font="new_font"
+        obj.register_font("new_font", sample_font_stream).create_field(
+            Fields.TextField(name="foo", page_number=1, x=100, y=100, font="new_font")
         )
         obj.draw_text("foo", 1, 200, 200, font="new_font")
 
