@@ -6,11 +6,21 @@ document.
 """
 # TODO: In `canvas_operations`, `self.acro_form_params.copy()` creates a shallow copy of the dictionary in each iteration of the loop. For a large number of radio buttons, this repeated copying can be inefficient. Consider modifying the dictionary in place and then reverting changes if necessary, or restructuring the data to avoid repeated copying.
 
-from typing import List
+from dataclasses import dataclass
+from typing import List, Optional
 
 from reportlab.pdfgen.canvas import Canvas
 
-from .checkbox import CheckBoxWidget
+from .checkbox import CheckBoxField, CheckBoxWidget
+
+
+@dataclass
+class RadioField(CheckBoxField):
+    _field_type: str = "radio"
+
+    x: List[float]
+    y: List[float]
+    shape: Optional[str] = None
 
 
 class RadioWidget(CheckBoxWidget):
