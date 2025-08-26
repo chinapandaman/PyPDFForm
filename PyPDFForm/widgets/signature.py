@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-This module defines the SignatureWidget class, which is responsible for
-representing signature fields in a PDF form. It handles the creation and
-rendering of signature widgets, as well as the integration of signatures
-into the PDF document.
+This module defines the `SignatureField` and `SignatureWidget` classes, which are
+used to represent and manipulate signature form fields within PDF documents.
+
+The `SignatureField` class is a dataclass that encapsulates the properties of a
+signature field, such as its dimensions.
+
+The `SignatureWidget` class provides specific functionality for interacting with
+signature form fields in PDFs, including handling their creation, rendering, and
+integration into the document.
 """
+
 # TODO: In `watermarks`, `PdfReader(stream_to_io(BEDROCK_PDF))` is called every time the method is invoked. If `BEDROCK_PDF` is static, consider parsing it once and caching the `PdfReader` object to avoid redundant I/O and parsing.
 # TODO: In `watermarks`, the list comprehension `[f.read() if i == self.page_number - 1 else b"" for i in range(page_count)]` reads the entire `BytesIO` object `f` multiple times if `page_count` is large. Read `f` once into a variable and then use that variable in the list comprehension.
 # TODO: The `input_pdf` is created in `watermarks` but only its page count is used. If the `PdfReader` object is not needed for other operations, consider a lighter way to get the page count or pass the `PdfReader` object from the caller if it's already available.
@@ -26,6 +32,18 @@ from .bedrock import BEDROCK_PDF
 
 @dataclass
 class SignatureField(Field):
+    """
+    Represents a signature field in a PDF document.
+
+    This dataclass extends the `Field` base class and defines the specific
+    attributes that can be configured for a signature input field.
+
+    Attributes:
+        _field_type (str): The type of the field, fixed as "signature".
+        width (Optional[float]): The width of the signature field.
+        height (Optional[float]): The height of the signature field.
+    """
+
     _field_type: str = "signature"
 
     width: Optional[float] = None

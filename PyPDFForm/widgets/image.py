@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-This module defines the ImageWidget class, which is a subclass of the
-SignatureWidget class. It represents an image field in a PDF document.
-The ImageWidget leverages the SignatureWidget's functionality to handle
-image insertion into PDF forms.
+This module defines the `ImageField` and `ImageWidget` classes, which are used
+to represent and manipulate image form fields within PDF documents.
+
+The `ImageField` class is a dataclass that encapsulates the properties of an
+image field, inheriting from `SignatureField` for its dimensional attributes.
+
+The `ImageWidget` class extends the base `SignatureWidget` class to provide
+specific functionality for interacting with image form fields in PDFs,
+leveraging the existing infrastructure for positioning and rendering.
 """
 
 from dataclasses import dataclass
@@ -13,6 +18,17 @@ from .signature import SignatureField, SignatureWidget
 
 @dataclass
 class ImageField(SignatureField):
+    """
+    Represents an image field in a PDF document.
+
+    This dataclass extends the `SignatureField` base class and defines the
+    specific attributes for an image input field. It inherits `width` and
+    `height` from `SignatureField` as images also have dimensions.
+
+    Attributes:
+        _field_type (str): The type of the field, fixed as "image".
+    """
+
     _field_type: str = "image"
 
 

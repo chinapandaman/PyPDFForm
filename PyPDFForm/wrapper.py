@@ -462,6 +462,20 @@ class PdfWrapper:
         self,
         field: FieldTypes,
     ) -> PdfWrapper:
+        """
+        Creates a new form field (widget) on the PDF using a `FieldTypes` object.
+
+        This method simplifies widget creation by taking a `FieldTypes` object,
+        extracting its properties, and then delegating to the `create_widget` method.
+
+        Args:
+            field (FieldTypes): An object representing the field to create.
+                This object encapsulates all necessary properties like name,
+                page number, coordinates, and type of the field.
+
+        Returns:
+            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
+        """
 
         field_dict = asdict(field)
         widget_type = field_dict.pop("_field_type")

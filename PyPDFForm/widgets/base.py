@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-This module defines the base class for all widgets in PyPDFForm.
+This module defines the base classes for all form fields and widgets in PyPDFForm.
 
-It provides a common interface for interacting with different types of form fields,
-such as text fields, checkboxes, and radio buttons. The Widget class handles
-basic properties like name, page number, and coordinates, and provides methods
-for rendering the widget on a PDF page.
+It provides a foundational structure for representing and interacting with
+different types of PDF form elements, such as text fields, checkboxes,
+and radio buttons.
+
+Classes:
+    - `Field`: A dataclass representing the common properties of a PDF form field.
+    - `Widget`: A base class for all widget implementations, providing core
+      functionality for rendering and manipulation.
 """
+
 # TODO: In `watermarks`, `PdfReader(stream_to_io(stream))` is called, which re-parses the PDF for each widget. If multiple widgets are being processed, consider passing the `PdfReader` object directly to avoid redundant parsing.
 # TODO: In `watermarks`, the list comprehension `[watermark.read() if i == self.page_number - 1 else b"" for i in range(page_count)]` creates a new `BytesIO` object and reads from it for each widget. If many widgets are created, this could be optimized by creating the `BytesIO` object once and passing it around, or by directly returning the watermark bytes and its page number.
 
@@ -25,6 +30,25 @@ from ..utils import stream_to_io
 
 @dataclass
 class Field:
+    """
+    Base dataclass for all PDF form fields.
+
+    This class defines the common properties that all types of form fields
+    (e.g., text fields, checkboxes, radio buttons) share. Specific field types
+    will extend this class to add their unique attributes.
+
+    Attributes:
+        name (str): The name of the form field. This is used to identify the
+            field within the PDF document.
+        page_number (int): The 1-based page number on which the field is located.
+        x (float): The x-coordinate of the field's position on the page.
+        y (float): The y-coordinate of the field's position on the page.
+        required (Optional[bool]): Indicates whether the field is required to be
+            filled by the user. Defaults to None, meaning not explicitly set.
+        tooltip (Optional[str]): A tooltip message that appears when the user
+            hovers over the field. Defaults to None.
+    """
+
     name: str
     page_number: int
     x: float

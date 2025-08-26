@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-This module defines the RadioWidget class, which is a subclass of the
-CheckBoxWidget class. It represents a radio button form field in a PDF
-document.
+This module defines the `RadioGroup` and `RadioWidget` classes, which are used
+to represent and manipulate radio button groups within PDF documents.
+
+The `RadioGroup` class is a dataclass that encapsulates the properties of a
+radio button group, such as its coordinates and shape.
+
+The `RadioWidget` class extends the base `CheckBoxWidget` class to provide
+specific functionality for interacting with radio button form fields in PDFs.
 """
+
 # TODO: In `canvas_operations`, `self.acro_form_params.copy()` creates a shallow copy of the dictionary in each iteration of the loop. For a large number of radio buttons, this repeated copying can be inefficient. Consider modifying the dictionary in place and then reverting changes if necessary, or restructuring the data to avoid repeated copying.
 
 from dataclasses import dataclass
@@ -16,6 +22,22 @@ from .checkbox import CheckBoxField, CheckBoxWidget
 
 @dataclass
 class RadioGroup(CheckBoxField):
+    """
+    Represents a group of radio buttons in a PDF document.
+
+    This dataclass extends the `CheckBoxField` base class and defines the specific
+    attributes that can be configured for a radio button group. Unlike a single
+    checkbox, a radio group allows for multiple positions (x, y coordinates)
+    where individual radio buttons can be placed, but only one can be selected.
+
+    Attributes:
+        _field_type (str): The type of the field, fixed as "radio".
+        x (List[float]): A list of x-coordinates for each radio button in the group.
+        y (List[float]): A list of y-coordinates for each radio button in the group.
+        shape (Optional[str]): The shape of the radio button. Valid values are
+            "circle" or "square". Defaults to None, which typically means a default circle shape.
+    """
+
     _field_type: str = "radio"
 
     x: List[float]

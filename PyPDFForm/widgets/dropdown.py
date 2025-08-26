@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-This module defines the DropdownWidget class, which is a subclass of the
-TextWidget class. It represents a dropdown form field in a PDF document.
+This module defines the `DropdownField` and `DropdownWidget` classes, which are
+used to represent and manipulate dropdown form fields within PDF documents.
+
+The `DropdownField` class is a dataclass that encapsulates the properties of a
+dropdown field, such as its options, dimensions, and styling.
+
+The `DropdownWidget` class extends the base `TextWidget` class to provide
+specific functionality for interacting with dropdown form fields in PDFs.
 """
 
 from dataclasses import dataclass
@@ -13,6 +19,27 @@ from .text import TextWidget
 
 @dataclass
 class DropdownField(Field):
+    """
+    Represents a dropdown field in a PDF document.
+
+    This dataclass extends the `Field` base class and defines the specific
+    attributes that can be configured for a dropdown selection field.
+
+    Attributes:
+        _field_type (str): The type of the field, fixed as "dropdown".
+        options (Optional[List[Union[str, Tuple[str, str]]]]): A list of options
+            available in the dropdown. Each option can be a string (display value)
+            or a tuple of strings (display value, export value).
+        width (Optional[float]): The width of the dropdown field.
+        height (Optional[float]): The height of the dropdown field.
+        font (Optional[str]): The font to use for the dropdown text.
+        font_size (Optional[float]): The font size for the dropdown text.
+        font_color (Optional[Tuple[float, ...]]): The color of the font as an RGB or RGBA tuple.
+        bg_color (Optional[Tuple[float, ...]]): The background color of the dropdown field.
+        border_color (Optional[Tuple[float, ...]]): The color of the dropdown's border.
+        border_width (Optional[float]): The width of the dropdown's border.
+    """
+
     _field_type: str = "dropdown"
 
     options: Optional[List[Union[str, Tuple[str, str]]]] = None
