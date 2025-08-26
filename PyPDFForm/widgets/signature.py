@@ -9,8 +9,9 @@ into the PDF document.
 # TODO: In `watermarks`, the list comprehension `[f.read() if i == self.page_number - 1 else b"" for i in range(page_count)]` reads the entire `BytesIO` object `f` multiple times if `page_count` is large. Read `f` once into a variable and then use that variable in the list comprehension.
 # TODO: The `input_pdf` is created in `watermarks` but only its page count is used. If the `PdfReader` object is not needed for other operations, consider a lighter way to get the page count or pass the `PdfReader` object from the caller if it's already available.
 
+from dataclasses import dataclass
 from io import BytesIO
-from typing import List
+from typing import List, Optional
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, FloatObject, NameObject,
@@ -19,7 +20,16 @@ from pypdf.generic import (ArrayObject, FloatObject, NameObject,
 from ..constants import Annots, Rect, T
 from ..template import get_widget_key
 from ..utils import stream_to_io
+from .base import Field
 from .bedrock import BEDROCK_PDF
+
+
+@dataclass
+class SignatureField(Field):
+    _field_type: str = "signature"
+
+    width: Optional[float] = None
+    height: Optional[float] = None
 
 
 class SignatureWidget:

@@ -4,9 +4,10 @@ from typing import Union
 from .checkbox import CheckBoxField
 from .dropdown import DropdownField
 from .radio import RadioField
+from .signature import SignatureField
 from .text import TextField
 
-FieldTypes = Union[TextField, CheckBoxField, RadioField, DropdownField]
+FieldTypes = Union[TextField, CheckBoxField, RadioField, DropdownField, SignatureField]
 
 
 @dataclass
@@ -15,3 +16,4 @@ class Fields:
     CheckBoxField = CheckBoxField
     RadioField = RadioField
     DropdownField = DropdownField
+    SignatureField = SignatureField
