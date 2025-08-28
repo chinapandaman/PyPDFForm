@@ -199,6 +199,6 @@ def test_sample_template_library(
         request.config.results["stream"] = obj.read()
 
         expected = f.read()
-        
+
         delta_int = widths_byte_delta_sample_template_library
         assert len(obj.read()) == len(expected) + delta_int
