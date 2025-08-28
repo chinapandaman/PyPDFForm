@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from io import BytesIO
 import os
 import pytest
+from unittest.mock import MagicMock, patch
+from io import BytesIO
 from PyPDFForm import PdfWrapper
 from PyPDFForm.font import compute_font_glyph_widths
 from PyPDFForm.constants import DEFAULT_ASSUMED_GLYPH_WIDTH, ENCODING_TABLE_SIZE
@@ -40,6 +41,23 @@ def test_compute_font_widths_raises_for_invalid_ttf():
     with pytest.raises(TTLibError):
         compute_font_glyph_widths(broken_stream, missing_width=DEFAULT_ASSUMED_GLYPH_WIDTH)
 
+def test_compute_font_glyph_widths_with_missing_tables():
+    missing_width = 500.0
+
+    # Patch TTFont before it's instantiated
+    with patch("PyPDFForm.font.FT_TTFont") as mock_ttfont:
+        mock_font = MagicMock()
+        mock_font.get.side_effect = lambda table: None  # simulate missing tables
+        mock_ttfont.return_value = mock_font
+
+        # Now it's safe to pass dummy data
+        dummy_stream = BytesIO(b"anything")  # won't be parsed due to mocking
+        widths = compute_font_glyph_widths(dummy_stream, missing_width)
+
+    assert isinstance(widths, list)
+    assert len(widths) == 256  # or ENCODING_TABLE_SIZE
+    assert all(w == missing_width for w in widths)
+
 def test_pdf_widths_array_has_256_entries(pdf_font_widths_and_missing):
     pdf_widths_array, _ = pdf_font_widths_and_missing
     assert len(pdf_widths_array) == ENCODING_TABLE_SIZE
@@ -47,12 +65,12 @@ def test_pdf_widths_array_has_256_entries(pdf_font_widths_and_missing):
 def test_pdf_widths_match_computed_font_widths(pdf_font_widths_and_missing, sample_font_stream):
     pdf_widths_array, missing_width = pdf_font_widths_and_missing
     computed_widths_array = compute_font_glyph_widths(BytesIO(sample_font_stream), missing_width)
-    
+
     assert len(pdf_widths_array) == len(computed_widths_array)
-    
+
     # Assume that rounding floats to 3 decimal is accurate for most cases
     assert all(round(pdf_width, 3) == round(computed_width, 3) for pdf_width, computed_width in zip(pdf_widths_array, computed_widths_array))
-    
+
 def test_pdf_widths_use_missing_width_for_unmapped_glyphs(pdf_font_widths_and_missing):
     pdf_widths_array, missing_width = pdf_font_widths_and_missing
 
