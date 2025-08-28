@@ -22,17 +22,15 @@ from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, StreamObject, FloatObject)
 from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
-
+from fontTools.ttLib import TTFont as FT_TTFont
 from .constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR, FONT_NAME_PREFIX, AcroForm, BaseFont, Encoding,
                         Fields, Filter, FlateDecode, Font, FontDescriptor,
                         FontFile2, FontName, Length, Length1, MissingWidth, Resources,
-                        Subtype, TrueType, Type, WinAnsiEncoding, Widths, 
-                        FirstChat, LastChar, FontHmtx, FontHead, FontCmap, FontNotdef, 
+                        Subtype, TrueType, Type, WinAnsiEncoding, Widths,
+                        FirstChat, LastChar, FontHmtx, FontHead, FontCmap, FontNotdef,
                         EM_TO_PDF_FACTOR, FIRST_CHAR_CODE, LAST_CHAR_CODE, ENCODING_TABLE_SIZE)
 
 from .utils import stream_to_io
-from fontTools.ttLib import TTFont as FT_TTFont
-
 
 @lru_cache
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
@@ -88,8 +86,9 @@ def get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
     font_descriptor_params = {}
     font_dict_params = {}
     reader = PdfReader(stream_to_io(pdf))
+    first_page = reader.get_page(0)
 
-    for font in reader.pages[0][Resources][Font].values():
+    for font in first_page[Resources][Font].values():
         if base_font_name.replace("/", "") in font[BaseFont]:
             font_descriptor_params = dict(font[FontDescriptor])
             font_dict_params = dict(font)
@@ -186,19 +185,17 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes, adobe_mode: bool) -> t
     font_descriptor_ref = writer._add_object(font_descriptor)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 
     font_dict = DictionaryObject()
-    font_dict.update(
-        {
+    font_dict.update({
             NameObject(Type): NameObject(Font),
             NameObject(Subtype): NameObject(TrueType),
             NameObject(BaseFont): NameObject(base_font_name),
             NameObject(FontDescriptor): font_descriptor_ref,
             NameObject(Encoding): NameObject(WinAnsiEncoding),
-        }
-    )
-    
+    })
+
     font_dict.update({k: v for k, v in font_dict_params.items() if k not in font_dict})
 
-    if font_dict and Widths in font_dict:        
+    if font_dict and Widths in font_dict:
         ttf_bytes_io = BytesIO(ttf_stream)
         missing_width = font_descriptor.get(MissingWidth, DEFAULT_ASSUMED_GLYPH_WIDTH)
         widths = compute_font_glyph_widths(ttf_bytes_io, missing_width)
