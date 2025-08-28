@@ -19,7 +19,7 @@ from zlib import compress
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
-                           NumberObject, StreamObject)
+                           NumberObject, StreamObject, FloatObject)
 from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
@@ -206,7 +206,7 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes, adobe_mode: bool) -> t
         font_dict.update({
             NameObject(FirstChat): NumberObject(FIRST_CHAR_CODE),
             NameObject(LastChar): NumberObject(LAST_CHAR_CODE),
-            NameObject(Widths): ArrayObject(NumberObject(width) for width in widths)
+            NameObject(Widths): ArrayObject(FloatObject(width) for width in widths)
         })
 
     font_dict_ref = writer._add_object(font_dict)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
