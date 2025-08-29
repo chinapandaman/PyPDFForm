@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # https://github.com/chinapandaman/PyPDFForm/issues/1142
+# https://github.com/chinapandaman/PyPDFForm/pull/1154
 
 import os
 from io import BytesIO
@@ -11,8 +12,9 @@ from fontTools.ttLib import TTLibError
 from pypdf import PdfWriter
 
 from PyPDFForm import PdfWrapper
-from PyPDFForm.constants import (DEFAULT_ASSUMED_GLYPH_WIDTH,
-                                 ENCODING_TABLE_SIZE)
+from PyPDFForm.constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR,
+                                 ENCODING_TABLE_SIZE, AcroForm, Font,
+                                 FontDescriptor, MissingWidth, Widths)
 from PyPDFForm.font import compute_font_glyph_widths
 
 
@@ -23,12 +25,12 @@ def pdf_font_widths_and_missing(static_pdfs, sample_font_stream):
     obj.register_font("new_font_name", sample_font_stream)
 
     writer = PdfWriter(BytesIO(obj.read()))
-    fonts = writer._root_object["/AcroForm"]["/DR"]["/Font"]  # type: ignore # noqa: SLF001
+    fonts = writer._root_object[AcroForm][DR][Font]  # type: ignore # noqa: SLF001
     font_obj = fonts[obj._available_fonts["new_font_name"]].get_object()  # type: ignore # noqa: SLF001
 
-    pdf_widths_array = font_obj.get("/Widths", [])
-    descriptor_obj = font_obj["/FontDescriptor"].get_object()
-    missing_width = descriptor_obj.get("/MissingWidth", DEFAULT_ASSUMED_GLYPH_WIDTH)
+    pdf_widths_array = font_obj.get(Widths, [])
+    descriptor_obj = font_obj[FontDescriptor].get_object()
+    missing_width = descriptor_obj.get(MissingWidth, DEFAULT_ASSUMED_GLYPH_WIDTH)
 
     return pdf_widths_array, missing_width
 
