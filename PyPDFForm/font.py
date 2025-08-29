@@ -101,15 +101,30 @@ def get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
 
 def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float):
     """
-    Compute glyph advance widths from a TrueType font.
+    Computes the advance widths for all glyphs in a TrueType font, scaled for PDF text space.
+
+    This function utilizes the `fontTools` library to parse the provided TTF stream
+    and extract necessary metrics from the 'head', 'cmap', and 'hmtx' tables.
+    It calculates the width for each glyph based on its advance width and the font's
+    `unitsPerEm`, then scales these widths to a 1000-unit text space, which is standard
+    for PDF font metrics.
+
+    If any of the required font tables ('head', 'cmap', 'hmtx') are missing or
+    cannot be accessed, the function returns a list populated with a specified
+    `missing_width` for all expected glyphs, ensuring a fallback mechanism.
 
     Args:
-        ttf_file (BytesIO): Stream containing the TTF font data.
-        missing_width (float): Width to use if the font tables are missing.
+        ttf_file (BytesIO): A BytesIO stream containing the TrueType Font (TTF) data.
+                            This stream should be seekable and readable.
+        missing_width (float): The default width to be used for all glyphs if the
+                                necessary font tables (head, cmap, hmtx) are not found
+                                within the TTF file.
 
     Returns:
-        list[float]: Widths scaled to PDF text space units (1000/em).
-                     Returns a list filled with `missing_width` if tables are missing.
+        list[float]: A list of floats, where each float represents the scaled advance
+                     width of a glyph in PDF text space units (1000 units per EM).
+                     The list covers glyphs from `FIRST_CHAR_CODE` to `LAST_CHAR_CODE`.
+                     If font tables are missing, the list will be filled with `missing_width`.
     """
     font = FT_TTFont(ttf_file)
     head_table = font.get(FontHead)
