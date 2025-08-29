@@ -14,7 +14,6 @@ for extracting font information from TTF streams and managing font names within 
 
 from functools import lru_cache
 from io import BytesIO
-from typing import Any
 from zlib import compress
 
 from fontTools.ttLib import TTFont as FT_TTFont
@@ -113,13 +112,13 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float):
                      Returns a list filled with `missing_width` if tables are missing.
     """
     font = FT_TTFont(ttf_file)
-    head_table: Any = font.get(FontHead)
-    cmap_table: Any = font.get(FontCmap)
-    hmtx_table: Any = font.get(FontHmtx)
+    head_table = font.get(FontHead)
+    cmap_table = font.get(FontCmap)
+    hmtx_table = font.get(FontHmtx)
 
     widths: list[float] = []
     if head_table and cmap_table and hmtx_table:
-        cmap: Any = cmap_table.getBestCmap()
+        cmap = cmap_table.getBestCmap()
         units_per_em: int = head_table.unitsPerEm or 1
 
         for codepoint in range(ENCODING_TABLE_SIZE):
