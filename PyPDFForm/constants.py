@@ -83,6 +83,20 @@ Filter = "/Filter"
 FlateDecode = "/FlateDecode"
 Encoding = "/Encoding"
 WinAnsiEncoding = "/WinAnsiEncoding"
+Widths = "/Widths"
+FirstChar = "/FirstChar"
+LastChar = "/LastChar"
+MissingWidth = "/MissingWidth"
+FontHead = "head"
+FontCmap = "cmap"
+FontHmtx = "hmtx"
+FontNotdef = ".notdef"
+
+FIRST_CHAR_CODE = 0
+LAST_CHAR_CODE = 255
+ENCODING_TABLE_SIZE = 256
+EM_TO_PDF_FACTOR = 1000
+DEFAULT_ASSUMED_GLYPH_WIDTH = 300
 
 Resources = "/Resources"
 FONT_NAME_PREFIX = "/F"

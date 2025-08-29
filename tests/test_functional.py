@@ -683,7 +683,7 @@ def test_merge_preserve_font_and_data(template_stream, sample_font_stream):
         for widget in widgets:
             if widget[T] == "test":
                 assert widget[V] == "test_0"
-                assert widget["/DA"].startswith("/F1")
+                assert widget[DA].startswith("/F1")
             elif widget[T].startswith("test-"):
                 assert widget[V] == f"test_{page // 3}"
                 assert widget[DA].startswith("/F1")
