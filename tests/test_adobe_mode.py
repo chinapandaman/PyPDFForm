@@ -111,7 +111,11 @@ def test_issue_613(pdf_samples, request):
 
 
 def test_sample_template_library(
-    pdf_samples, image_samples, sample_font_stream, request, widths_byte_delta_sample_template_library
+    pdf_samples,
+    image_samples,
+    sample_font_stream,
+    request,
+    widths_byte_delta_sample_template_library,
 ):
     expected_path = os.path.join(
         pdf_samples, "adobe_mode", "test_sample_template_library.pdf"

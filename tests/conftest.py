@@ -2,19 +2,23 @@
 
 import io
 import os
+
+import pytest
 from pypdf import PdfWriter
-from pypdf.generic import ArrayObject, NameObject, FloatObject
-from PyPDFForm.font import compute_font_glyph_widths
+from pypdf.generic import ArrayObject, FloatObject, NameObject
+
 from PyPDFForm import PdfWrapper
 from PyPDFForm.constants import DEFAULT_ASSUMED_GLYPH_WIDTH
-import pytest
+from PyPDFForm.font import compute_font_glyph_widths
 
 
 def pytest_configure(config):
     config.results = {}
 
+
 def pytest_addoption(parser):
     parser.addoption("--regenerate", action="store", default="0")
+
 
 @pytest.fixture(autouse=True)
 def _generate_new_pdf_samples(request):
@@ -270,16 +274,20 @@ def max_length_expected_directory():
         "max_length_text_field_related",
     )
 
+
 def widths_byte_delta(pdf_path, font_name, ttf_file_bytes):
     wrapper_original = PdfWrapper(pdf_path)
-    font_resource_name = wrapper_original._available_fonts[font_name] # type: ignore  # noqa: SLF001
+    font_resource_name = wrapper_original._available_fonts[font_name]  # type: ignore  # noqa: SLF001
 
     new_pdf = PdfWriter(pdf_path)
-    new_widths = ArrayObject(FloatObject(w) for w in compute_font_glyph_widths(io.BytesIO(ttf_file_bytes), DEFAULT_ASSUMED_GLYPH_WIDTH))
-    font_object = new_pdf._root_object["/AcroForm"]["/DR"]["/Font"][font_resource_name].get_object() # type: ignore  # noqa: SLF001
-    font_object.update({
-        NameObject("/Widths"): new_widths
-    })
+    new_widths = ArrayObject(
+        FloatObject(w)
+        for w in compute_font_glyph_widths(
+            io.BytesIO(ttf_file_bytes), DEFAULT_ASSUMED_GLYPH_WIDTH
+        )
+    )
+    font_object = new_pdf._root_object["/AcroForm"]["/DR"]["/Font"][font_resource_name].get_object()  # type: ignore  # noqa: SLF001
+    font_object.update({NameObject("/Widths"): new_widths})
 
     output_stream = io.BytesIO()
     new_pdf.write(output_stream)
@@ -288,6 +296,7 @@ def widths_byte_delta(pdf_path, font_name, ttf_file_bytes):
     original_bytes = wrapper_original.read()
 
     return len(new_pdf_bytes) - len(original_bytes)
+
 
 @pytest.fixture
 def widths_byte_delta_sample_template_library(pdf_samples, sample_font_stream):

@@ -17,20 +17,23 @@ from io import BytesIO
 from typing import Any
 from zlib import compress
 
+from fontTools.ttLib import TTFont as FT_TTFont
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
-                           NumberObject, StreamObject, FloatObject)
+from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
+                           NameObject, NumberObject, StreamObject)
 from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
-from fontTools.ttLib import TTFont as FT_TTFont
-from .constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR, FONT_NAME_PREFIX, AcroForm, BaseFont, Encoding,
-                        Fields, Filter, FlateDecode, Font, FontDescriptor,
-                        FontFile2, FontName, Length, Length1, MissingWidth, Resources,
-                        Subtype, TrueType, Type, WinAnsiEncoding, Widths,
-                        FirstChat, LastChar, FontHmtx, FontHead, FontCmap, FontNotdef,
-                        EM_TO_PDF_FACTOR, FIRST_CHAR_CODE, LAST_CHAR_CODE, ENCODING_TABLE_SIZE)
 
+from .constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR, EM_TO_PDF_FACTOR,
+                        ENCODING_TABLE_SIZE, FIRST_CHAR_CODE, FONT_NAME_PREFIX,
+                        LAST_CHAR_CODE, AcroForm, BaseFont, Encoding, Fields,
+                        Filter, FirstChar, FlateDecode, Font, FontCmap,
+                        FontDescriptor, FontFile2, FontHead, FontHmtx,
+                        FontName, FontNotdef, LastChar, Length, Length1,
+                        MissingWidth, Resources, Subtype, TrueType, Type,
+                        Widths, WinAnsiEncoding)
 from .utils import stream_to_io
+
 
 @lru_cache
 def register_font(font_name: str, ttf_stream: bytes) -> bool:
@@ -96,6 +99,7 @@ def get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
 
     return font_descriptor_params, font_dict_params
 
+
 def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float):
     """
     Compute glyph advance widths from a TrueType font.
@@ -127,6 +131,7 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float):
         widths: list[float] = [missing_width] * ENCODING_TABLE_SIZE
 
     return widths
+
 
 def register_font_acroform(pdf: bytes, ttf_stream: bytes, adobe_mode: bool) -> tuple:
     """
@@ -185,13 +190,15 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes, adobe_mode: bool) -> t
     font_descriptor_ref = writer._add_object(font_descriptor)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 
     font_dict = DictionaryObject()
-    font_dict.update({
+    font_dict.update(
+        {
             NameObject(Type): NameObject(Font),
             NameObject(Subtype): NameObject(TrueType),
             NameObject(BaseFont): NameObject(base_font_name),
             NameObject(FontDescriptor): font_descriptor_ref,
             NameObject(Encoding): NameObject(WinAnsiEncoding),
-    })
+        }
+    )
 
     font_dict.update({k: v for k, v in font_dict_params.items() if k not in font_dict})
 
@@ -200,11 +207,13 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes, adobe_mode: bool) -> t
         missing_width = font_descriptor.get(MissingWidth, DEFAULT_ASSUMED_GLYPH_WIDTH)
         widths = compute_font_glyph_widths(ttf_bytes_io, missing_width)
 
-        font_dict.update({
-            NameObject(FirstChat): NumberObject(FIRST_CHAR_CODE),
-            NameObject(LastChar): NumberObject(LAST_CHAR_CODE),
-            NameObject(Widths): ArrayObject(FloatObject(width) for width in widths)
-        })
+        font_dict.update(
+            {
+                NameObject(FirstChar): NumberObject(FIRST_CHAR_CODE),
+                NameObject(LastChar): NumberObject(LAST_CHAR_CODE),
+                NameObject(Widths): ArrayObject(FloatObject(width) for width in widths),
+            }
+        )
 
     font_dict_ref = writer._add_object(font_dict)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 
