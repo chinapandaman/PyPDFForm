@@ -115,7 +115,6 @@ def test_sample_template_library(
     image_samples,
     sample_font_stream,
     request,
-    widths_byte_delta_sample_template_library,
 ):
     expected_path = os.path.join(
         pdf_samples, "adobe_mode", "test_sample_template_library.pdf"
@@ -204,5 +203,5 @@ def test_sample_template_library(
 
         expected = f.read()
 
-        delta_int = widths_byte_delta_sample_template_library
-        assert len(obj.read()) == len(expected) + delta_int
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
