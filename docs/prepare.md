@@ -15,28 +15,29 @@ All optional parameters will have a comment `# optional` after each of them.
 A text field can be created by downloading the PDF and running the following snippet:
 
 ```python
-from PyPDFForm import PdfWrapper
+from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").create_widget(
-    widget_type="text",
-    name="new_text_field",
-    page_number=1,
-    x=57.5,
-    y=700.9,
-    required=False, # optional
-    tooltip="this is a text field", # optional
-    width=120.3,    # optional
-    height=40.7,    # optional
-    max_length=5,   # optional, number of characters
-    comb=True,  # optional, when set to True, max_length must also be set
-    font="your_registered_font", # optional
-    font_size=15,   # optional
-    font_color=(1, 0, 0),   # optional
-    bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
-    border_width=5,  # optional
-    alignment=0, # optional, 0=left, 1=center, 2=right
-    multiline=True # optional
+new_form = PdfWrapper("dummy.pdf").create_field(
+    Fields.TextField(
+        name="new_text_field",
+        page_number=1,
+        x=57.5,
+        y=700.9,
+        required=False,  # optional
+        tooltip="this is a text field",  # optional
+        width=120.3,  # optional
+        height=40.7,  # optional
+        max_length=5,  # optional, number of characters
+        comb=True,  # optional, when set to True, max_length must also be set
+        font="your_registered_font",  # optional
+        font_size=15,  # optional
+        font_color=(1, 0, 0),  # optional
+        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+        border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+        border_width=5,  # optional
+        alignment=0,  # optional, 0=left, 1=center, 2=right
+        multiline=True,  # optional
+    )
 )
 
 new_form.write("output.pdf")
@@ -51,22 +52,23 @@ To use a custom font, see how to register it [here](font.md).
 A checkbox can be created using the same method with some changes to the parameters:
 
 ```python
-from PyPDFForm import PdfWrapper
+from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").create_widget(
-    widget_type="checkbox",
-    name="new_checkbox",
-    page_number=1,
-    x=57,
-    y=700,
-    required=False, # optional
-    tooltip="this is a checkbox", # optional
-    size=30,    # optional
-    button_style="check",   # optional
-    tick_color=(0, 1, 0),   # optional
-    bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
-    border_width=5  # optional
+new_form = PdfWrapper("dummy.pdf").create_field(
+    Fields.CheckBoxField(
+        name="new_checkbox",
+        page_number=1,
+        x=57,
+        y=700,
+        required=False,  # optional
+        tooltip="this is a checkbox",  # optional
+        size=30,  # optional
+        button_style="check",  # optional
+        tick_color=(0, 1, 0),  # optional
+        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+        border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+        border_width=5,  # optional
+    )
 )
 
 new_form.write("output.pdf")
@@ -83,23 +85,24 @@ Unlike other field types, radio buttons must be created as a group. Therefore, f
 Otherwise, radio button creation shares almost the same parameters as a checkbox:
 
 ```python
-from PyPDFForm import PdfWrapper
+from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").create_widget(
-    widget_type="radio",
-    name="new_radio_group",
-    page_number=1,
-    x=[50, 100, 150],
-    y=[50, 100, 150],
-    required=False, # optional
-    tooltip="this is a radio group", # optional
-    size=30,    # optional
-    button_style="check",   # optional
-    shape="square", # optional, circle or square
-    tick_color=(0, 1, 0),   # optional
-    bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
-    border_width=5  # optional
+new_form = PdfWrapper("dummy.pdf").create_field(
+    Fields.RadioGroup(
+        name="new_radio_group",
+        page_number=1,
+        x=[50, 100, 150],
+        y=[50, 100, 150],
+        required=False,  # optional
+        tooltip="this is a radio group",  # optional
+        size=30,  # optional
+        button_style="check",  # optional
+        shape="square",  # optional, circle or square
+        tick_color=(0, 1, 0),  # optional
+        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+        border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+        border_width=5,  # optional
+    )
 )
 
 new_form.write("output.pdf")
@@ -112,29 +115,30 @@ new_form.write("output.pdf")
 A dropdown field shares a similar set of parameters as a text field. The only significant difference is that a list of `options` needs to be specified:
 
 ```python
-from PyPDFForm import PdfWrapper
+from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").create_widget(
-    widget_type="dropdown",
-    name="new_dropdown",
-    page_number=1,
-    x=57,
-    y=700,
-    options=[
-        "foo",
-        "bar",
-        "foobar",
-    ],
-    required=False, # optional
-    tooltip="this is a dropdown", # optional
-    width=120,  # optional
-    height=40,  # optional
-    font="your_registered_font", # optional
-    font_size=15,   # optional
-    font_color=(1, 0, 0),   # optional
-    bg_color=(0, 0, 1, 1), # optional, (r, g, b, alpha)
-    border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
-    border_width=5  # optional
+new_form = PdfWrapper("dummy.pdf").create_field(
+    Fields.DropdownField(
+        name="new_dropdown",
+        page_number=1,
+        x=57,
+        y=700,
+        options=[
+            "foo",
+            "bar",
+            "foobar",
+        ],
+        required=False,  # optional
+        tooltip="this is a dropdown",  # optional
+        width=120,  # optional
+        height=40,  # optional
+        font="your_registered_font",  # optional
+        font_size=15,  # optional
+        font_color=(1, 0, 0),  # optional
+        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+        border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+        border_width=5,  # optional
+    )
 )
 
 new_form.write("output.pdf")
@@ -145,19 +149,20 @@ To use a custom font, see how to register it [here](font.md).
 If you want different export values from the displayed options, you can specify a list of tuples for the `options` parameter, where the first value of each tuple is the displayed option and the second value is the export value:
 
 ```python
-from PyPDFForm import PdfWrapper
+from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").create_widget(
-    widget_type="dropdown",
-    name="new_dropdown",
-    page_number=1,
-    x=57,
-    y=700,
-    options=[
-        ("option_1", "option_1_export_value"),
-        ("option_2", "option_2_export_value"),
-        ("option_3", "option_3_export_value"),
-    ],
+new_form = PdfWrapper("dummy.pdf").create_field(
+    Fields.DropdownField(
+        name="new_dropdown",
+        page_number=1,
+        x=57,
+        y=700,
+        options=[
+            ("option_1", "option_1_export_value"),
+            ("option_2", "option_2_export_value"),
+            ("option_3", "option_3_export_value"),
+        ],
+    )
 )
 
 new_form.write("output.pdf")
@@ -168,18 +173,19 @@ new_form.write("output.pdf")
 A signature field is only interactive in tools that support it. Otherwise, it is displayed as a rectangle, and clicking it will not trigger any action:
 
 ```python
-from PyPDFForm import PdfWrapper
+from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").create_widget(
-    widget_type="signature",
-    name="new_signature",
-    page_number=1,
-    x=100,
-    y=100,
-    required=False, # optional
-    tooltip="this is a signature", # optional
-    width=410,  # optional
-    height=100,  # optional
+new_form = PdfWrapper("dummy.pdf").create_field(
+    Fields.SignatureField(
+        name="new_signature",
+        page_number=1,
+        x=100,
+        y=100,
+        required=False,  # optional
+        tooltip="this is a signature",  # optional
+        width=410,  # optional
+        height=100,  # optional
+    )
 )
 
 new_form.write("output.pdf")
@@ -190,18 +196,19 @@ new_form.write("output.pdf")
 Similar to a signature field, an image field is also only interactive in tools that support it:
 
 ```python
-from PyPDFForm import PdfWrapper
+from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").create_widget(
-    widget_type="image",
-    name="new_image",
-    page_number=1,
-    x=100,
-    y=100,
-    required=False, # optional
-    tooltip="this is an image", # optional
-    width=192,  # optional
-    height=108,  # optional
+new_form = PdfWrapper("dummy.pdf").create_field(
+    Fields.ImageField(
+        name="new_image",
+        page_number=1,
+        x=100,
+        y=100,
+        required=False,  # optional
+        tooltip="this is an image",  # optional
+        width=192,  # optional
+        height=108,  # optional
+    )
 )
 
 new_form.write("output.pdf")
