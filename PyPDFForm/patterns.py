@@ -14,37 +14,11 @@ for updating these widgets.
 
 from typing import Union
 
-from pypdf.generic import (
-    ArrayObject,
-    DictionaryObject,
-    NameObject,
-    NumberObject,
-    TextStringObject,
-)
+from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
+                           NumberObject, TextStringObject)
 
-from .constants import (
-    AP,
-    AS,
-    DV,
-    FT,
-    IMAGE_FIELD_IDENTIFIER,
-    JS,
-    SLASH,
-    TU,
-    A,
-    Btn,
-    Ch,
-    I,
-    N,
-    Off,
-    Opt,
-    Parent,
-    Sig,
-    T,
-    Tx,
-    V,
-    Yes,
-)
+from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, SLASH, TU,
+                        A, Btn, Ch, I, N, Off, Opt, Parent, Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -118,8 +92,6 @@ WIDGET_KEY_PATTERNS = [
     {T: True},
     {Parent: {T: True}},
 ]
-
-WIDGET_KEY_PATTERN_NO_PARENT = [{T: True}]
 
 WIDGET_DESCRIPTION_PATTERNS = [{TU: True}, {Parent: {TU: True}}]
 

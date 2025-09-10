@@ -25,18 +25,10 @@ from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
-from .patterns import (
-    DROPDOWN_CHOICE_PATTERNS,
-    WIDGET_DESCRIPTION_PATTERNS,
-    WIDGET_KEY_PATTERNS,
-    WIDGET_KEY_PATTERN_NO_PARENT,
-    WIDGET_TYPE_PATTERNS,
-    get_checkbox_value,
-    get_dropdown_value,
-    get_radio_value,
-    get_text_value,
-    update_annotation_name,
-)
+from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
+                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
+                       get_checkbox_value, get_dropdown_value, get_radio_value,
+                       get_text_value, update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
@@ -160,19 +152,21 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
     """
     if not use_full_widget_name:
         return extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
-    else:
-        key = widget[T] if T in widget else None
-        if (
-            Parent in widget
-            and T in widget[Parent].get_object()
-            and widget[Parent].get_object()[T] != key  # sejda case
-        ):
-            if key is None:
-                return get_widget_key(widget[Parent].get_object(), use_full_widget_name)
-            else:
-                return f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
-        else:
-            return key or ""
+
+    key = widget.get(T)
+    if (
+        Parent in widget
+        and T in widget[Parent].get_object()
+        and widget[Parent].get_object()[T] != key  # sejda case
+    ):
+        if key is None:
+            return get_widget_key(widget[Parent].get_object(), use_full_widget_name)
+
+        return (
+            f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
+        )
+
+    return key or ""
 
 
 def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
