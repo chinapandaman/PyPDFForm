@@ -162,7 +162,9 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
         if key is None:
             return get_widget_key(widget[Parent].get_object(), use_full_widget_name)
 
-        return f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
+        return (
+            f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
+        )
 
     return key or ""
 

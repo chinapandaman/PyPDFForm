@@ -498,3 +498,11 @@ def test_xfa_to_regular_form(issue_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_full_widget_name(issue_pdf_directory):
+    obj = PdfWrapper(
+        os.path.join(issue_pdf_directory, "PPF-1159.pdf"), use_full_widget_name=True
+    )
+
+    assert "Ancestry.Page 1" in obj.widgets
