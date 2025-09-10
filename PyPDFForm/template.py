@@ -25,18 +25,10 @@ from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
-from .patterns import (
-    DROPDOWN_CHOICE_PATTERNS,
-    WIDGET_DESCRIPTION_PATTERNS,
-    WIDGET_KEY_PATTERNS,
-    WIDGET_KEY_PATTERN_NO_PARENT,
-    WIDGET_TYPE_PATTERNS,
-    get_checkbox_value,
-    get_dropdown_value,
-    get_radio_value,
-    get_text_value,
-    update_annotation_name,
-)
+from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
+                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
+                       get_checkbox_value, get_dropdown_value, get_radio_value,
+                       get_text_value, update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
