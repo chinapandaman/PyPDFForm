@@ -89,13 +89,22 @@ def update_text_field_font(annot: DictionaryObject, val: str) -> None:
         annot (DictionaryObject): The annotation dictionary for the text field.
         val (str): The new font name to use for the text field.
     """
+    if not val.startswith("/"):
+        return
     if Parent in annot and DA not in annot:
         text_appearance = annot[Parent][DA]
     else:
         text_appearance = annot[DA]
 
     text_appearance = text_appearance.split(" ")
-    text_appearance[0] = val
+
+    index_to_update = 0
+    for i, each in enumerate(text_appearance):
+        if each.startswith("/"):
+            index_to_update = i
+            break
+
+    text_appearance[index_to_update] = val
     new_text_appearance = " ".join(text_appearance)
 
     if Parent in annot and DA not in annot:
