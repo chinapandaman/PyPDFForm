@@ -83,19 +83,31 @@ def update_text_field_font(annot: DictionaryObject, val: str) -> None:
     Updates the font of a text field annotation.
 
     This function modifies the appearance string (DA) in the annotation dictionary
-    to change the font used for the text field.
+    to change the font used for the text field. It ensures that the provided font
+    name is a proper PDF font by checking if it starts with a slash "/".
+    The function then correctly identifies and updates the font in the appearance
+    stream by locating the existing font identifier (which also starts with a slash).
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
-        val (str): The new font name to use for the text field.
+        val (str): The new font name to use for the text field. Must start with "/".
     """
+    if not val.startswith("/"):
+        return
     if Parent in annot and DA not in annot:
         text_appearance = annot[Parent][DA]
     else:
         text_appearance = annot[DA]
 
     text_appearance = text_appearance.split(" ")
-    text_appearance[0] = val
+
+    index_to_update = 0
+    for i, each in enumerate(text_appearance):
+        if each.startswith("/"):
+            index_to_update = i
+            break
+
+    text_appearance[index_to_update] = val
     new_text_appearance = " ".join(text_appearance)
 
     if Parent in annot and DA not in annot:
