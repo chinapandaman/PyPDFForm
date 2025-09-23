@@ -28,7 +28,8 @@ from .middleware.text import Text
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
                        WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
                        get_checkbox_value, get_dropdown_value, get_radio_value,
-                       get_text_value, update_annotation_name)
+                       get_text_field_multiline, get_text_value,
+                       update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
@@ -69,6 +70,7 @@ def build_widgets(
                     # mostly for schema for now
                     # doesn't trigger hook
                     _widget.__dict__["max_length"] = get_text_field_max_length(widget)
+                    _widget.__dict__["multiline"] = get_text_field_multiline(widget)
                     get_text_value(widget, _widget)
 
                 if type(_widget) is Checkbox:

@@ -17,8 +17,9 @@ from typing import Union
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
-from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, SLASH, TU,
-                        A, Btn, Ch, I, N, Off, Opt, Parent, Sig, T, Tx, V, Yes)
+from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, MULTILINE,
+                        SLASH, TU, A, Btn, Ch, Ff, I, N, Off, Opt, Parent, Sig,
+                        T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -277,3 +278,17 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
         annot[NameObject(Parent)][NameObject(T)] = TextStringObject(val)
     else:
         annot[NameObject(T)] = TextStringObject(val)
+
+
+def get_text_field_multiline(annot: DictionaryObject) -> bool:
+    if Parent in annot and Ff not in annot:
+        return bool(
+            int(
+                annot[NameObject(Parent)][NameObject(Ff)]
+                if Ff in annot[NameObject(Parent)]
+                else 0
+            )
+            & MULTILINE
+        )
+    else:
+        return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & MULTILINE)
