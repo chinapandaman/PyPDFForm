@@ -281,6 +281,19 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
 
 
 def get_text_field_multiline(annot: DictionaryObject) -> bool:
+    """
+    Checks if a text field annotation is multiline.
+
+    This function inspects the 'Ff' (field flags) entry of the text annotation
+    dictionary (or its parent if it's a child annotation) to determine if the
+    Multiline flag is set.
+
+    Args:
+        annot (DictionaryObject): The text annotation dictionary.
+
+    Returns:
+        bool: True if the text field is multiline, False otherwise.
+    """
     if Parent in annot and Ff not in annot:
         return bool(
             int(
@@ -290,5 +303,4 @@ def get_text_field_multiline(annot: DictionaryObject) -> bool:
             )
             & MULTILINE
         )
-    else:
-        return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & MULTILINE)
+    return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & MULTILINE)
