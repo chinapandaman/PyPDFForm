@@ -506,3 +506,11 @@ def test_full_widget_name(issue_pdf_directory):
     )
 
     assert "Ancestry.Page 1" in obj.widgets
+
+
+def test_extract_multiline_property(issue_pdf_directory):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-1162.pdf"))
+
+    for k, v in obj.widgets.items():
+        if "AdditionalInfo" in k:
+            assert v.multiline

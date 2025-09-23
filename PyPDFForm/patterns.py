@@ -17,8 +17,9 @@ from typing import Union
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
-from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, SLASH, TU,
-                        A, Btn, Ch, I, N, Off, Opt, Parent, Sig, T, Tx, V, Yes)
+from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, MULTILINE,
+                        SLASH, TU, A, Btn, Ch, Ff, I, N, Off, Opt, Parent, Sig,
+                        T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -277,3 +278,29 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
         annot[NameObject(Parent)][NameObject(T)] = TextStringObject(val)
     else:
         annot[NameObject(T)] = TextStringObject(val)
+
+
+def get_text_field_multiline(annot: DictionaryObject) -> bool:
+    """
+    Checks if a text field annotation is multiline.
+
+    This function inspects the 'Ff' (field flags) entry of the text annotation
+    dictionary (or its parent if it's a child annotation) to determine if the
+    Multiline flag is set.
+
+    Args:
+        annot (DictionaryObject): The text annotation dictionary.
+
+    Returns:
+        bool: True if the text field is multiline, False otherwise.
+    """
+    if Parent in annot and Ff not in annot:
+        return bool(
+            int(
+                annot[NameObject(Parent)][NameObject(Ff)]
+                if Ff in annot[NameObject(Parent)]
+                else 0
+            )
+            & MULTILINE
+        )
+    return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & MULTILINE)
