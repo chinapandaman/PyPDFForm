@@ -216,7 +216,10 @@ def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
         val (bool): True to enable multiline, False to disable.
     """
     if val:
-        if Parent in annot and Ff not in annot:
+        # TODO: investigate this more
+        # may need to change everywhere how feature flags precedence work
+        # https://github.com/chinapandaman/PyPDFForm/issues/1162#issuecomment-3326233842
+        if Parent in annot and Ff in annot[Parent]:
             annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
                 int(
                     annot[NameObject(Parent)][NameObject(Ff)]
