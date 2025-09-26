@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Change form field styles - Welcome to PyPDFForm - PyPDFForm Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Change form field styles";
+        var mkdocs_page_input_path = "style.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="..">
+          <img src="../img/logo.png" class="logo" alt="Logo"/>
+        </a>
+        <div class="version">
+          v3.5.3
+        </div><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../install/">Installation and setup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../coordinate/">PDF coordinate system</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../font/">Register fonts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../prepare/">Create form fields</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inspect/">Inspect form field data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../fill/">Fill PDF forms</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Change form field styles</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#change-text-field-font">Change text field font</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#change-text-field-font-size">Change text field font size</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#change-text-field-font-color">Change text field font color</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#change-text-field-alignment">Change text field alignment</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#change-text-field-max-length">Change text field max length</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#enable-text-field-character-spacing-combs">Enable text field character spacing (combs)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#enable-multiline-text-field">Enable multiline text field</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#change-checkboxradio-button-size">Change checkbox/radio button size</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#change-dropdown-field-choices">Change dropdown field choices</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#change-dropdown-field-font">Change dropdown field font</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#change-dropdown-field-font-size">Change dropdown field font size</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#change-dropdown-field-font-color">Change dropdown field font color</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#change-field-editability">Change field editability</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Draw elements</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../utils/">Other utilities</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Guide</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_intro/">Developer Intro</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_changes/">Pull Request Requirements</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_doc/">Hosting Docs Locally</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_test/">Testing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev_release/">Releasing</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">News</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../news/2025-05-24/">2025-05-24: V3 Announcements</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../news/2025-03-29/">2025-03-29: Announcements</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../news/2024-01-01/">2024-01-01: API Changes</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Welcome to PyPDFForm - PyPDFForm Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+      <li class="breadcrumb-item active">Change form field styles</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/chinapandaman/PyPDFForm/edit/master/docs/style.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="change-form-field-styles">Change form field styles</h1>
+<p>PyPDFForm enables you to modify some field styles through code, allowing you to change field appearances without altering the PDF form template.</p>
+<p>This section of the documentation will primarily use <a href="../pdfs/sample_template.pdf">this PDF</a> as an example.</p>
+<h2 id="change-text-field-font">Change text field font</h2>
+<p>Before changing a text field's font, you must first <a href="../font/">register</a> the desired font.</p>
+<p>After registration, you can apply the registered font to any text field:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper, Text
+
+form = PdfWrapper(&quot;sample_template.pdf&quot;)
+
+# change globally by iterating each text field
+for field in form.widgets.values():
+    if isinstance(field, Text):
+        field.font = &quot;your_registered_font&quot;
+
+# or change at each field's widget level
+form.widgets[&quot;test&quot;].font = &quot;your_registered_font&quot;
+
+form.fill(
+    {
+        &quot;test&quot;: &quot;test_1&quot;,
+        &quot;check&quot;: True,
+        &quot;test_2&quot;: &quot;test_2&quot;,
+        &quot;check_2&quot;: False,
+        &quot;test_3&quot;: &quot;test_3&quot;,
+        &quot;check_3&quot;: True,
+    },
+)
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="change-text-field-font-size">Change text field font size</h2>
+<p>You can change the font size using a <code>float</code> value in PyPDFForm:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper, Text
+
+form = PdfWrapper(&quot;sample_template.pdf&quot;)
+
+# change globally by iterating each text field
+for field in form.widgets.values():
+    if isinstance(field, Text):
+        field.font_size = 20
+
+# or change at each field's widget level
+form.widgets[&quot;test&quot;].font_size = 30.5
+
+form.fill(
+    {
+        &quot;test&quot;: &quot;test_1&quot;,
+        &quot;check&quot;: True,
+        &quot;test_2&quot;: &quot;test_2&quot;,
+        &quot;check_2&quot;: False,
+        &quot;test_3&quot;: &quot;test_3&quot;,
+        &quot;check_3&quot;: True,
+    },
+)
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="change-text-field-font-color">Change text field font color</h2>
+<p>You can change the font color using an RGB <code>tuple</code>:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper, Text
+
+form = PdfWrapper(&quot;sample_template.pdf&quot;)
+
+# change globally by iterating each text field
+for field in form.widgets.values():
+    if isinstance(field, Text):
+        field.font_color = (1, 0, 0)
+
+# or change at each field's widget level
+form.widgets[&quot;test&quot;].font_color = (0.2, 0, 0.5)
+
+form.fill(
+    {
+        &quot;test&quot;: &quot;test_1&quot;,
+        &quot;check&quot;: True,
+        &quot;test_2&quot;: &quot;test_2&quot;,
+        &quot;check_2&quot;: False,
+        &quot;test_3&quot;: &quot;test_3&quot;,
+        &quot;check_3&quot;: True,
+    },
+)
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="change-text-field-alignment">Change text field alignment</h2>
+<p>You can change the alignment of the text filled into a text field by setting its <code>alignment</code> property to an integer value: <code>0</code> for left, <code>1</code> for center, and <code>2</code> for right.</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper, Text
+
+form = PdfWrapper(&quot;sample_template.pdf&quot;)
+
+# change globally by iterating each text field
+for field in form.widgets.values():
+    if isinstance(field, Text):
+        field.alignment = 1 # center
+
+# or change at each field's widget level
+form.widgets[&quot;test&quot;].alignment = 2  # right
+
+form.fill(
+    {
+        &quot;test&quot;: &quot;test_1&quot;,
+        &quot;check&quot;: True,
+        &quot;test_2&quot;: &quot;test_2&quot;,
+        &quot;check_2&quot;: False,
+        &quot;test_3&quot;: &quot;test_3&quot;,
+        &quot;check_3&quot;: True,
+    },
+)
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="change-text-field-max-length">Change text field max length</h2>
+<p>You can change the maximum number of characters allowed in a text field:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper, Text
+
+form = PdfWrapper(&quot;sample_template.pdf&quot;)
+
+# change globally by iterating each text field
+for field in form.widgets.values():
+    if isinstance(field, Text):
+        field.max_length = 4
+
+# or change at each field's widget level
+form.widgets[&quot;test&quot;].max_length = 2
+
+form.fill(
+    {
+        &quot;test&quot;: &quot;test_1&quot;,
+        &quot;check&quot;: True,
+        &quot;test_2&quot;: &quot;test_2&quot;,
+        &quot;check_2&quot;: False,
+        &quot;test_3&quot;: &quot;test_3&quot;,
+        &quot;check_3&quot;: True,
+    },
+)
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="enable-text-field-character-spacing-combs">Enable text field character spacing (combs)</h2>
+<p>To enable character spacing in a text field, set its <code>.comb</code> property to <code>True</code>. This will evenly space out the characters of the text filled into the field. Note that this property only takes effect when the text field also has a <code>max_length</code> set.</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper, Text
+
+form = PdfWrapper(&quot;sample_template.pdf&quot;)
+
+# change globally by iterating each text field
+for field in form.widgets.values():
+    if isinstance(field, Text):
+        field.max_length = 4
+        field.comb = True
+
+# or change at each field's widget level
+form.widgets[&quot;test&quot;].max_length = 2
+form.widgets[&quot;test&quot;].comb = True
+
+form.fill(
+    {
+        &quot;test&quot;: &quot;test_1&quot;,
+        &quot;check&quot;: True,
+        &quot;test_2&quot;: &quot;test_2&quot;,
+        &quot;check_2&quot;: False,
+        &quot;test_3&quot;: &quot;test_3&quot;,
+        &quot;check_3&quot;: True,
+    },
+)
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="enable-multiline-text-field">Enable multiline text field</h2>
+<p>To enable multiline input for a text field, set its <code>.multiline</code> property to <code>True</code>. This effectively transforms it into a paragraph field:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+form = PdfWrapper(&quot;sample_template.pdf&quot;)
+
+form.widgets[&quot;test&quot;].multiline = True
+
+form.fill(
+    {
+        &quot;test&quot;: &quot;test_1\ntest_1&quot;,
+        &quot;check&quot;: True,
+        &quot;test_2&quot;: &quot;test_2\ntest_2&quot;,
+        &quot;check_2&quot;: False,
+        &quot;test_3&quot;: &quot;test_3\ntest_3&quot;,
+        &quot;check_3&quot;: True,
+    },
+)
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="change-checkboxradio-button-size">Change checkbox/radio button size</h2>
+<p>You can change the size of a checkbox or a group of radio buttons using a <code>float</code> value:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+form = PdfWrapper(&quot;sample_template.pdf&quot;)
+
+form.widgets[&quot;check&quot;].size = 50
+form.widgets[&quot;check_2&quot;].size = 40
+form.widgets[&quot;check_3&quot;].size = 60
+
+form.fill(
+    {
+        &quot;check&quot;: True,
+        &quot;check_2&quot;: True,
+        &quot;check_3&quot;: True,
+    },
+)
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="change-dropdown-field-choices">Change dropdown field choices</h2>
+<p>To modify the options available in a dropdown field, assign a new list of strings to the <code>.choices</code> attribute of the corresponding field. For instance, the following code snippet updates the <code>dropdown_1</code> field in <a href="../pdfs/sample_template_with_dropdown.pdf">this PDF form</a> with a new set of choices:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+form = PdfWrapper(&quot;sample_template_with_dropdown.pdf&quot;)
+
+form.widgets[&quot;dropdown_1&quot;].choices = [&quot;&quot;, &quot;apple&quot;, &quot;banana&quot;, &quot;cherry&quot;, &quot;dates&quot;]
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<p>If you want different export values from the displayed options, you can specify a list of tuples for the <code>.choices</code> attribute, where the first value of each tuple is the displayed option and the second value is the export value:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+form = PdfWrapper(&quot;sample_template_with_dropdown.pdf&quot;)
+
+form.widgets[&quot;dropdown_1&quot;].choices = [
+    (&quot;&quot;, &quot;blank_export_value&quot;),
+    (&quot;apple&quot;, &quot;apple_export_value&quot;),
+    (&quot;banana&quot;, &quot;banana_export_value&quot;),
+    (&quot;cherry&quot;, &quot;cherry_export_value&quot;),
+    (&quot;dates&quot;, &quot;dates_export_value&quot;),
+]
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="change-dropdown-field-font">Change dropdown field font</h2>
+<p>Before changing a dropdown field's font, you must first <a href="../font/">register</a> the desired font.</p>
+<p>After registration, you can apply the registered font to any dropdown field:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+form = PdfWrapper(&quot;sample_template_with_dropdown.pdf&quot;)
+
+form.widgets[&quot;dropdown_1&quot;].font = &quot;your_registered_font&quot;
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="change-dropdown-field-font-size">Change dropdown field font size</h2>
+<p>You can change a dropdown field's font size using a <code>float</code> value in PyPDFForm:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+form = PdfWrapper(&quot;sample_template_with_dropdown.pdf&quot;)
+
+form.widgets[&quot;dropdown_1&quot;].font_size = 30
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="change-dropdown-field-font-color">Change dropdown field font color</h2>
+<p>You can change a dropdown field's font color using an RGB <code>tuple</code>:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+form = PdfWrapper(&quot;sample_template_with_dropdown.pdf&quot;)
+
+form.widgets[&quot;dropdown_1&quot;].font_color = (1, 0, 0)
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+<h2 id="change-field-editability">Change field editability</h2>
+<p>The <code>readonly</code> property of each form field controls its editability. Setting <code>readonly</code> to <code>True</code> flattens the field, making it uneditable, while setting it to <code>False</code> unflattens it, making it editable. For example, the following code snippet shows how you can make different form fields editable in <a href="../pdfs/sample_template_with_dropdown.pdf">this PDF form</a> after they have been flattened:</p>
+<pre><code class="language-python">from PyPDFForm import PdfWrapper
+
+form = PdfWrapper(&quot;sample_template_with_dropdown.pdf&quot;)
+
+form.fill(
+    {
+        &quot;test_1&quot;: &quot;test_1&quot;,
+        &quot;test_2&quot;: &quot;test_2&quot;,
+        &quot;test_3&quot;: &quot;test_3&quot;,
+        &quot;check_1&quot;: True,
+        &quot;check_2&quot;: True,
+        &quot;check_3&quot;: True,
+        &quot;radio_1&quot;: 1,
+        &quot;dropdown_1&quot;: 0,
+    },
+    flatten=True,
+)
+form.widgets[&quot;test_2&quot;].readonly = False  # text
+form.widgets[&quot;check_3&quot;].readonly = False  # checkbox
+form.widgets[&quot;radio_1&quot;].readonly = False  # radio button group
+form.widgets[&quot;dropdown_1&quot;].readonly = False  # dropdown
+
+form.write(&quot;output.pdf&quot;)
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../fill/" class="btn btn-neutral float-left" title="Fill PDF forms"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../draw/" class="btn btn-neutral float-right" title="Draw elements">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/chinapandaman/PyPDFForm" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../fill/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../draw/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
