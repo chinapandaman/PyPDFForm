@@ -95,19 +95,39 @@ class Widget:
 
     @property
     def desc(self) -> str:
+        """Gets the description of the widget.
+
+        This property retrieves the internal description string for the widget.
+        The description is often used interchangeably with the tooltip.
+        """
         return self._desc
 
     @desc.setter
     def desc(self, value: str) -> None:
+        """Sets the description of the widget.
+
+        When the description is set, the internal `_desc` attribute is updated,
+        and the `_tooltip` attribute is also automatically updated to the same value.
+        """
         self._desc = value
         self._tooltip = value
 
     @property
     def tooltip(self) -> str:
+        """Gets the tooltip text for the widget.
+
+        This property retrieves the internal tooltip string for the widget.
+        The tooltip is often used interchangeably with the description.
+        """
         return self._tooltip
 
     @tooltip.setter
     def tooltip(self, value: str) -> None:
+        """Sets the tooltip text for the widget.
+
+        When the tooltip is set, the internal `_tooltip` attribute is updated,
+        and the `_desc` attribute is also automatically updated to the same value.
+        """
         self._tooltip = value
         self._desc = value
 
