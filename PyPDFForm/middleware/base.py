@@ -42,8 +42,8 @@ class Widget:
         super().__init__()
         self._name = name
         self._value = value
-        self.desc: str = None
-        self.tooltip: str = None  # TODO: sync tooltip and desc
+        self._desc: str = None
+        self._tooltip: str = None
         self.readonly: bool = None
         self.required: bool = None
         self.hooks_to_trigger: list = []
@@ -92,6 +92,24 @@ class Widget:
             value (Any): The value to set.
         """
         self._value = value
+
+    @property
+    def desc(self) -> str:
+        return self._desc
+
+    @desc.setter
+    def desc(self, value: str) -> None:
+        self._desc = value
+        self._tooltip = value
+
+    @property
+    def tooltip(self) -> str:
+        return self._tooltip
+
+    @tooltip.setter
+    def tooltip(self, value: str) -> None:
+        self._tooltip = value
+        self._desc = value
 
     @property
     def schema_definition(self) -> dict:
