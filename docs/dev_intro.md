@@ -9,7 +9,7 @@ To get started, create a virtual environment and install the development depende
 The command below uses [uv](https://docs.astral.sh/uv/):
 
 ```shell
-uv pip install -r pyproject.toml --extra dev
+uv pip install -U -r pyproject.toml --extra dev
 ```
 
 PyPDFForm also offers a development container. To build it, run the following command in the project's root directory:
