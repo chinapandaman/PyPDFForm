@@ -62,7 +62,7 @@ def build_widgets(
             key = get_widget_key(widget, use_full_widget_name)
             _widget = construct_widget(widget, key)
             if _widget is not None:
-                _widget.desc = extract_widget_property(
+                _widget.__dict__["tooltip"] = extract_widget_property(
                     widget, WIDGET_DESCRIPTION_PATTERNS, None, str
                 )
 

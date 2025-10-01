@@ -329,7 +329,7 @@ def test_get_desc_in_schema_radio(issue_pdf_directory):
 
     keys_to_check = []
     for key, value in obj.widgets.items():
-        if isinstance(value, Radio) and value.desc is not None:
+        if isinstance(value, Radio) and value.tooltip is not None:
             keys_to_check.append(key)
 
     for widgets in get_widgets_by_page(obj.read()).values():
