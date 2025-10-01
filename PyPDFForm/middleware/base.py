@@ -42,8 +42,7 @@ class Widget:
         super().__init__()
         self._name = name
         self._value = value
-        self._desc: str = None
-        self._tooltip: str = None
+        self.tooltip: str = None
         self.readonly: bool = None
         self.required: bool = None
         self.hooks_to_trigger: list = []
@@ -94,44 +93,6 @@ class Widget:
         self._value = value
 
     @property
-    def desc(self) -> str:
-        """Gets the description of the widget.
-
-        This property retrieves the internal description string for the widget.
-        The description is often used interchangeably with the tooltip.
-        """
-        return self._desc
-
-    @desc.setter
-    def desc(self, value: str) -> None:
-        """Sets the description of the widget.
-
-        When the description is set, the internal `_desc` attribute is updated,
-        and the `_tooltip` attribute is also automatically updated to the same value.
-        """
-        self._desc = value
-        self._tooltip = value
-
-    @property
-    def tooltip(self) -> str:
-        """Gets the tooltip text for the widget.
-
-        This property retrieves the internal tooltip string for the widget.
-        The tooltip is often used interchangeably with the description.
-        """
-        return self._tooltip
-
-    @tooltip.setter
-    def tooltip(self, value: str) -> None:
-        """Sets the tooltip text for the widget.
-
-        When the tooltip is set, the internal `_tooltip` attribute is updated,
-        and the `_desc` attribute is also automatically updated to the same value.
-        """
-        self._tooltip = value
-        self._desc = value
-
-    @property
     def schema_definition(self) -> dict:
         """
         Get the schema definition of the widget.
@@ -145,8 +106,8 @@ class Widget:
         """
         result = {}
 
-        if self.desc is not None:
-            result["description"] = self.desc
+        if self.tooltip is not None:
+            result["description"] = self.tooltip
 
         return result
 
