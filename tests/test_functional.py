@@ -1188,3 +1188,13 @@ def test_uncheck_checkbox_flatten(pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_widget_tooltip_desc_sync(template_stream):
+    obj = PdfWrapper(template_stream)
+
+    obj.widgets["test"].desc = "foo"
+    assert obj.widgets["test"].tooltip == "foo"
+
+    obj.widgets["test_2"].tooltip = "bar"
+    assert obj.widgets["test_2"].desc == "bar"
