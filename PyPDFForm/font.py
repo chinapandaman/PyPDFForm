@@ -6,11 +6,6 @@ It includes functions for registering fonts with ReportLab and within the PDF's 
 allowing these fonts to be used when filling form fields. The module also provides utilities
 for extracting font information from TTF streams and managing font names within a PDF.
 """
-# TODO: In `get_additional_font_params`, iterating through `reader.pages[0][Resources][Font].values()` can be inefficient for PDFs with many fonts. Consider building a font lookup dictionary once per PDF or caching results if this function is called frequently with the same PDF.
-# TODO: In `register_font_acroform`, `PdfReader(stream_to_io(pdf))` and `writer.append(reader)` involve re-parsing and appending the PDF. For large PDFs, passing `PdfReader` and `PdfWriter` objects directly could reduce overhead.
-# TODO: In `register_font_acroform`, `compress(ttf_stream)` can be CPU-intensive. If the same font stream is registered multiple times within a single PDF processing session, consider caching the compressed stream to avoid redundant compression.
-# TODO: In `get_new_font_name`, while `existing` is a set, if `n` needs to increment many times due to a dense range of existing font names, the `while` loop could be slow. However, this is likely a minor bottleneck in typical scenarios.
-# TODO: In `get_all_available_fonts`, the `replace("/", "")` operation on `BaseFont` could be avoided if font names are consistently handled with or without the leading slash to prevent string manipulation overhead in a loop.
 
 from functools import lru_cache
 from io import BytesIO
