@@ -12,14 +12,6 @@ It includes functions for:
 - Generating unique suffixes for internal use.
 - Enabling Adobe-specific settings in the PDF to ensure proper rendering of form fields.
 """
-# TODO: In `enable_adobe_mode`, `PdfReader(stream_to_io(pdf))` and `writer.append(reader)` involve re-parsing and appending the PDF. For large PDFs, passing `PdfReader` and `PdfWriter` objects directly could reduce overhead.
-# TODO: In `remove_all_widgets`, `PdfReader(stream_to_io(pdf))` and iterating through pages to add them to a new writer can be inefficient for large PDFs. Consider if `pypdf` offers a more direct way to remove annotations without reconstructing the entire PDF.
-# TODO: In `get_page_streams`, `PdfReader(stream_to_io(pdf))` and then creating a new `PdfWriter` for each page can be very inefficient. It would be more performant to iterate through the pages of a single `PdfReader` and extract their content streams directly if possible, or to use a single `PdfWriter` to extract multiple pages.
-# TODO: In `merge_two_pdfs`, the function reads and writes PDFs multiple times (`PdfReader`, `PdfWriter`, `remove_all_widgets`, then another `PdfReader` and `PdfWriter`). This is highly inefficient. The PDF objects should be passed around and modified in-place as much as possible, with a single final write operation.
-# TODO: The `merge_two_pdfs` function has a `TODO: refactor duplicate logic with copy_watermark_widgets` comment. This indicates a potential for code duplication and inefficiency. Refactoring this to a shared helper function would improve maintainability and potentially performance.
-# TODO: In `find_pattern_match` and `traverse_pattern`, the recursive nature and repeated dictionary lookups (`widget.items()`, `value.get_object()`) can be slow for deeply nested or complex widget structures. Consider optimizing these traversals, perhaps by pre-flattening the widget dictionary or using a more direct access method if `pypdf` allows.
-# TODO: In `extract_widget_property`, the loop iterates through `patterns` and calls `traverse_pattern` for each. If `patterns` is long or `traverse_pattern` is expensive, this could be a bottleneck. Consider optimizing the pattern matching or lookup.
-# TODO: `generate_unique_suffix` uses `choice` in a loop. While generally fast, for extremely high call volumes, pre-generating a pool of characters or using a faster random string generation method might offer minor improvements.
 
 from collections.abc import Callable
 from functools import lru_cache

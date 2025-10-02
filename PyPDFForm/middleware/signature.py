@@ -6,7 +6,6 @@ This module defines the Signature class, which is a subclass of the
 Widget class. It represents a signature form field in a PDF document,
 allowing users to add their signature as an image.
 """
-# TODO: In the `stream` property, `fp_or_f_obj_or_stream_to_stream` is called every time the property is accessed. If the signature image is large or the property is accessed frequently, consider caching the result of `fp_or_f_obj_or_stream_to_stream` to avoid redundant file reads.
 
 from os.path import expanduser
 from typing import Union

@@ -10,8 +10,6 @@ The `RadioWidget` class extends the base `CheckBoxWidget` class to provide
 specific functionality for interacting with radio button form fields in PDFs.
 """
 
-# TODO: In `canvas_operations`, `self.acro_form_params.copy()` creates a shallow copy of the dictionary in each iteration of the loop. For a large number of radio buttons, this repeated copying can be inefficient. Consider modifying the dictionary in place and then reverting changes if necessary, or restructuring the data to avoid repeated copying.
-
 from dataclasses import dataclass
 from typing import List, Optional
 

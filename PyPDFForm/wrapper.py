@@ -15,17 +15,6 @@ methods for interacting with its form fields and content. It leverages
 lower-level modules within the `PyPDFForm` library to handle the
 underlying PDF manipulation.
 """
-# TODO: The `__add__` method (merging PDFs) involves multiple `self.read()` and `other.read()` calls, leading to redundant PDF parsing. Consider optimizing by passing `PdfReader` objects directly or by performing a single read and then merging.
-# TODO: In `_init_helper`, `build_widgets` and `get_all_available_fonts` both call `self.read()`, causing the PDF to be parsed multiple times. Optimize by parsing the PDF once and passing the `PdfReader` object to these functions.
-# TODO: The `pages` property's implementation involves `get_page_streams(remove_all_widgets(self.read()))` and `copy_watermark_widgets(each, self.read(), None, i)`. This leads to excessive PDF parsing, widget removal, and copying for each page. Refactor to minimize PDF I/O operations, possibly by working with `pypdf` page objects directly.
-# TODO: The `read` method triggers `trigger_widget_hooks` and `enable_adobe_mode`, both of which can involve PDF parsing and writing. Since `read` is called frequently, this can be a performance bottleneck. Consider a more granular dirty-flag system to only apply changes when necessary, or accumulate changes and apply them in a single PDF write operation.
-# TODO: The `write` method calls `self.read()`, which in turn triggers all pending operations. This can lead to redundant processing if `read()` has already been called or if multiple `write()` calls are made.
-# TODO: In `change_version`, replacing a byte string in the entire PDF stream can be inefficient for very large PDFs. Consider if `pypdf` offers a more direct way to update the PDF version without full stream manipulation.
-# TODO: In `generate_coordinate_grid`, `self.read()` is called multiple times, and then `remove_all_widgets`, `generate_coordinate_grid`, and `copy_watermark_widgets` are called, all of which involve PDF parsing and manipulation. Optimize by minimizing PDF I/O and object re-creation.
-# TODO: In `fill`, `self.read()` is called, and then `fill` (from `filler.py`), `remove_all_widgets`, and `copy_watermark_widgets` are called. This is a major operation and likely a performance hotspot due to repeated PDF processing. Streamline the PDF modification workflow to reduce redundant parsing and writing.
-# TODO: In `create_widget`, `obj.watermarks(self.read())` and `copy_watermark_widgets(self.read(), watermarks, [name], None)` involve reading the PDF multiple times. Optimize by passing the PDF stream or `PdfReader` object more efficiently.
-# TODO: The `commit_widget_key_updates` method calls `update_widget_keys`, which involves re-parsing and writing the PDF. For bulk updates, consider a mechanism to apply all key changes in a single PDF modification operation.
-# TODO: General: Many methods repeatedly call `self.read()`, which re-parses the PDF. Consider maintaining a persistent `pypdf.PdfReader` and `pypdf.PdfWriter` object internally and only writing to a byte stream when explicitly requested (e.g., by the `read()` or `write()` methods) to avoid redundant I/O and parsing overhead.
 
 from __future__ import annotations
 

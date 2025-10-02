@@ -7,11 +7,6 @@ in PDF form templates. It leverages the pypdf library for PDF manipulation
 and defines specific patterns for identifying and constructing different
 types of widgets.
 """
-# TODO: In `build_widgets`, the `get_widgets_by_page` function is called, which then iterates through pages and annotations. For very large PDFs, this initial parsing and iteration can be a bottleneck. Consider optimizing the widget extraction process if possible, perhaps by using a more direct method to access annotations if `pypdf` allows.
-# TODO: The `construct_widget` function iterates through `WIDGET_TYPE_PATTERNS` for each widget. If there are many patterns or many widgets, this repeated iteration could be optimized by pre-compiling patterns or using a more efficient lookup mechanism.
-# TODO: In `get_widget_key`, the recursive call for `Parent` can lead to deep recursion for deeply nested widgets, potentially impacting performance or hitting recursion limits for extremely complex forms. Consider an iterative approach if deep nesting is common.
-# TODO: In `update_widget_keys`, the nested loops iterating through `old_keys`, `out.pages`, and `page.get(Annots, [])` can be very inefficient for large numbers of keys, pages, or annotations. Consider creating a lookup structure for annotations by key to avoid repeated linear scans.
-# TODO: In `update_widget_keys`, `PdfReader(stream_to_io(template))` and `out.append(pdf)` involve re-parsing and appending the PDF. For large PDFs, passing `PdfReader` and `PdfWriter` objects directly could reduce overhead.
 
 from functools import lru_cache
 from io import BytesIO
