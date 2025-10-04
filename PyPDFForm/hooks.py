@@ -212,9 +212,7 @@ def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
         val (bool): True to enable multiline, False to disable.
     """
     if val:
-        # TODO: investigate this more
-        # may need to change everywhere how feature flags precedence work
-        # https://github.com/chinapandaman/PyPDFForm/issues/1162#issuecomment-3326233842
+        # Ff in annot[Parent] only in hooks.py, or when editing instead of retrieving
         if Parent in annot and Ff in annot[Parent]:
             annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
                 int(
@@ -243,7 +241,7 @@ def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
         val (bool): True to enable comb, False to disable.
     """
     if val:
-        if Parent in annot and Ff not in annot:
+        if Parent in annot and Ff in annot[Parent]:
             annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
                 int(
                     annot[NameObject(Parent)][NameObject(Ff)]
@@ -363,7 +361,7 @@ def flatten_generic(annot: DictionaryObject, val: bool) -> None:
         annot (DictionaryObject): The annotation dictionary.
         val (bool): True to flatten (make read-only), False to unflatten (make editable).
     """
-    if Parent in annot and Ff not in annot:
+    if Parent in annot and (Ff in annot[Parent] or Ff not in annot):
         annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
             (
                 int(annot.get(NameObject(Ff), 0)) | READ_ONLY
