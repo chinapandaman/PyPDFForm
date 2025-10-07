@@ -99,7 +99,9 @@ def test_pdf_widths_match_computed_font_widths(
     # Assume that rounding floats to 3 decimal is accurate for most cases
     assert all(
         round(pdf_width, 3) == round(computed_width, 3)
-        for pdf_width, computed_width in zip(pdf_widths_array, computed_widths_array)
+        for pdf_width, computed_width in zip(
+            pdf_widths_array, computed_widths_array, strict=True
+        )
     )
 
 
