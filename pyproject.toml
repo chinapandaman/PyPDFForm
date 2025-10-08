@@ -132,3 +132,8 @@ version = {attr = "PyPDFForm.__version__"}
 
 [tool.setuptools.packages.find]
 include = ["PyPDFForm*"]
+
+[tool.pytest.ini_options]
+markers = [
+    "windows",
+]
