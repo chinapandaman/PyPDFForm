@@ -20,7 +20,7 @@ The library supports various PDF form features, including:
 PyPDFForm aims to simplify PDF form manipulation, making it accessible to developers of all skill levels.
 """
 
-__version__ = "3.5.3"
+__version__ = "3.5.4"
 
 from .middleware.text import Text  # exposing for setting global font attrs
 from .widgets import Fields
