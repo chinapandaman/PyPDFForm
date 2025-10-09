@@ -2,6 +2,8 @@
 
 import os
 
+import pytest
+
 from PyPDFForm import Fields, PdfWrapper
 
 
@@ -110,6 +112,7 @@ def test_issue_613(pdf_samples, request):
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
 def test_sample_template_library(
     pdf_samples, image_samples, sample_font_stream, request
 ):

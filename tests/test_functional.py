@@ -82,6 +82,7 @@ def test_register_bad_fonts():
     assert "foo" not in obj.fonts
 
 
+@pytest.mark.posix_only
 def test_register_global_font_fill(
     template_stream, pdf_samples, sample_font_stream, data_dict, request
 ):
@@ -111,6 +112,7 @@ def test_register_global_font_fill(
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
 def test_register_global_font_fill_flatten(
     template_stream, pdf_samples, sample_font_stream, data_dict, request
 ):
@@ -233,6 +235,7 @@ def test_fill_font_color_red_flatten(template_stream, pdf_samples, data_dict, re
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
 def test_fill_with_customized_widgets(
     template_stream, pdf_samples, sample_font_stream, data_dict, request
 ):
@@ -262,6 +265,7 @@ def test_fill_with_customized_widgets(
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
 def test_fill_with_customized_widgets_flatten(
     template_stream, pdf_samples, sample_font_stream, data_dict, request
 ):
@@ -593,6 +597,7 @@ def test_draw_image_on_sejda_template(
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
 def test_draw_png_image_on_one_page(
     template_stream, image_samples, pdf_samples, request
 ):
@@ -615,6 +620,7 @@ def test_draw_png_image_on_one_page(
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
 def test_draw_transparent_png_image_on_one_page(
     template_stream, image_samples, pdf_samples, request
 ):
@@ -937,6 +943,7 @@ def test_pages(template_stream, pdf_samples, request):
         assert obj.pages[0].read() == f.read()
 
 
+@pytest.mark.posix_only
 def test_pages_preserve_font(template_stream, pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "pages", "test_pages_preserve_font.pdf")
     obj = PdfWrapper(template_stream)
