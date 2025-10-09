@@ -469,3 +469,22 @@ def test_set_dropdown_font_color_sejda(pdf_samples, dropdown_alignment_sejda, re
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_set_text_field_required_sejda(pdf_samples, sejda_template, request):
+    expected_path = os.path.join(
+        pdf_samples,
+        "test_widget_attr_trigger",
+        "test_set_text_field_required_sejda.pdf",
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template)
+        obj.widgets["buyer_address"].required = True
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
