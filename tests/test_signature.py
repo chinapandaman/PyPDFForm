@@ -7,7 +7,7 @@ import pytest
 from PyPDFForm import PdfWrapper
 
 
-@pytest.mark.windows
+@pytest.mark.posix_only
 def test_fill_signature(pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "signature", "test_fill_signature.pdf")
     with open(expected_path, "rb+") as f:

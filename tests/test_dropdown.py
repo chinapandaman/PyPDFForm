@@ -272,7 +272,7 @@ def test_dropdown_four_flatten(sample_template_with_dropdown, pdf_samples, reque
         assert obj.read() == expected
 
 
-@pytest.mark.windows
+@pytest.mark.posix_only
 def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_alignment.pdf")
     with open(expected_path, "rb+") as f:
@@ -293,7 +293,7 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.windows
+@pytest.mark.posix_only
 def test_dropdown_alignment_flatten(dropdown_alignment, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "dropdown", "test_dropdown_alignment_flatten.pdf"
@@ -317,7 +317,7 @@ def test_dropdown_alignment_flatten(dropdown_alignment, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.windows
+@pytest.mark.posix_only
 def test_dropdown_alignment_flatten_then_unflatten(
     dropdown_alignment, pdf_samples, request
 ):

@@ -92,7 +92,7 @@ def test_filling_soda_pdf_form(tool_pdf_directory, request):
         assert result.read() == expected
 
 
-@pytest.mark.windows
+@pytest.mark.posix_only
 def test_filling_pdfgear_sig(tool_pdf_directory, image_samples, request):
     expected_path = os.path.join(tool_pdf_directory, "test_filling_pdfgear_sig.pdf")
     with open(expected_path, "rb+") as f:

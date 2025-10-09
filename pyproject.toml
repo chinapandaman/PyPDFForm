@@ -135,5 +135,5 @@ include = ["PyPDFForm*"]
 
 [tool.pytest.ini_options]
 markers = [
-    "windows",
+    "posix_only",
 ]

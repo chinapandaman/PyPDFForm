@@ -102,7 +102,7 @@ def test_fill_dropdown_via_str(static_pdfs, pdf_samples, request):
         assert filled.read() == expected
 
 
-@pytest.mark.windows
+@pytest.mark.posix_only
 def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig.pdf")
 
@@ -124,7 +124,7 @@ def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
         assert filled.read() == expected
 
 
-@pytest.mark.windows
+@pytest.mark.posix_only
 def test_fill_sig_ratio(static_pdfs, pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig_ratio.pdf")
 
