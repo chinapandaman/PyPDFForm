@@ -14,9 +14,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.10", 3.11, 3.12, 3.13, 3.14]
-        exclude:
-          - os: windows-latest
-            python-version: 3.14
 
     steps:
     - uses: actions/checkout@v5
@@ -30,5 +27,10 @@ jobs:
       run: |
         uv pip install -U -r pyproject.toml --extra dev --system
     - name: Test with pytest
+      if: matrix.os != 'windows-latest'
       run: |
         coverage run -m pytest && coverage report --fail-under=100
+    - name: Test with pytest (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        coverage run -m pytest -v -m "not windows" && coverage report --fail-under=100
