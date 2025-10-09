@@ -2,9 +2,12 @@
 
 import os
 
+import pytest
+
 from PyPDFForm import PdfWrapper, Text
 
 
+@pytest.mark.posix_only
 def test_change_text_font(static_pdfs, sample_font_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
 
@@ -311,6 +314,7 @@ def test_change_dropdown_choices_with_export_values(static_pdfs, pdf_samples, re
         assert form.read() == expected
 
 
+@pytest.mark.posix_only
 def test_change_dropdown_font(static_pdfs, pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_font.pdf")
 

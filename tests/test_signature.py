@@ -2,9 +2,12 @@
 
 import os
 
+import pytest
+
 from PyPDFForm import PdfWrapper
 
 
+@pytest.mark.posix_only
 def test_fill_signature(pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "signature", "test_fill_signature.pdf")
     with open(expected_path, "rb+") as f:
@@ -17,9 +20,8 @@ def test_fill_signature(pdf_samples, image_samples, request):
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_signature_schema(pdf_samples):
@@ -40,6 +42,7 @@ def test_signature_sample_value(pdf_samples):
     )
 
 
+@pytest.mark.posix_only
 def test_fill_signature_overlap(pdf_samples, image_samples, request):
     expected_path = os.path.join(
         pdf_samples, "signature", "test_fill_signature_overlap.pdf"
@@ -60,6 +63,7 @@ def test_fill_signature_overlap(pdf_samples, image_samples, request):
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
 def test_fill_signature_overlap_not_preserve_aspect_ratio(
     pdf_samples, image_samples, request
 ):
@@ -86,6 +90,7 @@ def test_fill_signature_overlap_not_preserve_aspect_ratio(
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
 def test_fill_small_icon(pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "signature", "test_fill_small_icon.pdf")
     with open(expected_path, "rb+") as f:
@@ -105,6 +110,7 @@ def test_fill_small_icon(pdf_samples, image_samples, request):
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
 def test_fill_small_icon_not_preserve_aspect_ratio(pdf_samples, image_samples, request):
     expected_path = os.path.join(
         pdf_samples, "signature", "test_fill_small_icon_not_preserve_aspect_ratio.pdf"

@@ -2,9 +2,12 @@
 
 import os
 
+import pytest
+
 from PyPDFForm import Fields, PdfWrapper
 
 
+@pytest.mark.posix_only
 def test_create_text(pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_text.pdf")
 
@@ -48,6 +51,7 @@ def test_create_text(pdf_samples, sample_font_stream, request):
         assert new_form.read() == expected
 
 
+@pytest.mark.posix_only
 def test_create_check(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_check.pdf")
 
@@ -78,6 +82,7 @@ def test_create_check(pdf_samples, request):
         assert new_form.read() == expected
 
 
+@pytest.mark.posix_only
 def test_create_radio(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_radio.pdf")
 
@@ -109,6 +114,7 @@ def test_create_radio(pdf_samples, request):
         assert new_form.read() == expected
 
 
+@pytest.mark.posix_only
 def test_create_dropdown(pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_dropdown.pdf")
 
@@ -150,6 +156,7 @@ def test_create_dropdown(pdf_samples, sample_font_stream, request):
         assert new_form.read() == expected
 
 
+@pytest.mark.posix_only
 def test_create_dropdown_with_export_values(pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_create_dropdown_with_export_values.pdf"
