@@ -2,6 +2,8 @@
 
 import os
 
+import pytest
+
 from PyPDFForm import PdfWrapper
 
 
@@ -100,6 +102,7 @@ def test_fill_dropdown_via_str(static_pdfs, pdf_samples, request):
         assert filled.read() == expected
 
 
+@pytest.mark.windows
 def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig.pdf")
 
@@ -117,11 +120,11 @@ def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(filled.read()) == len(expected)
-            assert filled.read() == expected
+        assert len(filled.read()) == len(expected)
+        assert filled.read() == expected
 
 
+@pytest.mark.windows
 def test_fill_sig_ratio(static_pdfs, pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig_ratio.pdf")
 
@@ -141,9 +144,8 @@ def test_fill_sig_ratio(static_pdfs, pdf_samples, image_samples, request):
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(pdf.read()) == len(expected)
-            assert pdf.read() == expected
+        assert len(pdf.read()) == len(expected)
+        assert pdf.read() == expected
 
 
 def test_fill_image(static_pdfs, pdf_samples, image_samples, request):

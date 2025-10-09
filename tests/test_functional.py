@@ -2,6 +2,7 @@
 
 import os
 
+import pytest
 from jsonschema import ValidationError, validate
 
 from PyPDFForm import PdfWrapper
@@ -816,6 +817,7 @@ def test_version(pdf_samples):
     assert obj.version is None
 
 
+@pytest.mark.windows
 def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_fill_font_color.pdf")
     with open(expected_path, "rb+") as f:
@@ -833,11 +835,11 @@ def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request)
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
+@pytest.mark.windows
 def test_fill_font_color_flatten(
     sample_template_with_font_colors, pdf_samples, request
 ):
@@ -858,11 +860,11 @@ def test_fill_font_color_flatten(
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
+@pytest.mark.windows
 def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_fill_complex_fonts.pdf")
     with open(expected_path, "rb+") as f:
@@ -888,11 +890,11 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
+@pytest.mark.windows
 def test_fill_complex_fonts_flatten(
     sample_template_with_complex_fonts, pdf_samples, request
 ):
@@ -921,9 +923,8 @@ def test_fill_complex_fonts_flatten(
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_pages(template_stream, pdf_samples, request):

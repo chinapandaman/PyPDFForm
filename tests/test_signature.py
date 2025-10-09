@@ -2,9 +2,12 @@
 
 import os
 
+import pytest
+
 from PyPDFForm import PdfWrapper
 
 
+@pytest.mark.windows
 def test_fill_signature(pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "signature", "test_fill_signature.pdf")
     with open(expected_path, "rb+") as f:
@@ -17,9 +20,8 @@ def test_fill_signature(pdf_samples, image_samples, request):
 
         expected = f.read()
 
-        if os.name != "nt":
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
 
 
 def test_signature_schema(pdf_samples):

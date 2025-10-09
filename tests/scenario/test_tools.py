@@ -2,6 +2,8 @@
 
 import os
 
+import pytest
+
 from PyPDFForm import PdfWrapper
 
 
@@ -90,6 +92,7 @@ def test_filling_soda_pdf_form(tool_pdf_directory, request):
         assert result.read() == expected
 
 
+@pytest.mark.windows
 def test_filling_pdfgear_sig(tool_pdf_directory, image_samples, request):
     expected_path = os.path.join(tool_pdf_directory, "test_filling_pdfgear_sig.pdf")
     with open(expected_path, "rb+") as f:
@@ -100,6 +103,5 @@ def test_filling_pdfgear_sig(tool_pdf_directory, image_samples, request):
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = result.read()
 
-        if os.name != "nt":
-            assert len(result.read()) == len(expected)
-            assert result.read() == expected
+        assert len(result.read()) == len(expected)
+        assert result.read() == expected
