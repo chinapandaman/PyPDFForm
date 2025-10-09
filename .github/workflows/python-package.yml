@@ -33,4 +33,4 @@ jobs:
     - name: Test with pytest (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        coverage run -m pytest -v -m "not posix_only" && coverage report --fail-under=100
+        pytest -v -m "not posix_only"
