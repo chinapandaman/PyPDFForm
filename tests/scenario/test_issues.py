@@ -2,6 +2,7 @@
 
 import os
 
+import pytest
 from pypdf import PdfReader
 
 from PyPDFForm import PdfWrapper
@@ -47,6 +48,7 @@ def test_pdf_form_with_central_aligned_text_fields_void(issue_pdf_directory):
     assert PdfWrapper(os.path.join(issue_pdf_directory, "PPF-285.pdf")).fill({}).read()
 
 
+@pytest.mark.posix_only
 def test_pdf_form_with_paragraph_fields_new_line_symbol_text(
     issue_pdf_directory, request
 ):
@@ -101,6 +103,7 @@ def test_521(issue_pdf_directory, request):
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
 def test_pdf_form_with_paragraph_fields_new_line_symbol_short_text(
     issue_pdf_directory, request
 ):
