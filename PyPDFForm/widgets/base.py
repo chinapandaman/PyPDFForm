@@ -25,35 +25,6 @@ from ..constants import fieldFlags, required
 from ..utils import stream_to_io
 
 
-@dataclass
-class Field:
-    """
-    Base dataclass for all PDF form fields.
-
-    This class defines the common properties that all types of form fields
-    (e.g., text fields, checkboxes, radio buttons) share. Specific field types
-    will extend this class to add their unique attributes.
-
-    Attributes:
-        name (str): The name of the form field. This is used to identify the
-            field within the PDF document.
-        page_number (int): The 1-based page number on which the field is located.
-        x (float): The x-coordinate of the field's position on the page.
-        y (float): The y-coordinate of the field's position on the page.
-        required (Optional[bool]): Indicates whether the field is required to be
-            filled by the user. Defaults to None, meaning not explicitly set.
-        tooltip (Optional[str]): A tooltip message that appears when the user
-            hovers over the field. Defaults to None.
-    """
-
-    name: str
-    page_number: int
-    x: float
-    y: float
-    required: Optional[bool] = None
-    tooltip: Optional[str] = None
-
-
 class Widget:
     """
     Base class for all widgets in PyPDFForm.
@@ -219,3 +190,32 @@ class Widget:
             watermark.read() if i == self.page_number - 1 else b""
             for i in range(page_count)
         ]
+
+
+@dataclass
+class Field:
+    """
+    Base dataclass for all PDF form fields.
+
+    This class defines the common properties that all types of form fields
+    (e.g., text fields, checkboxes, radio buttons) share. Specific field types
+    will extend this class to add their unique attributes.
+
+    Attributes:
+        name (str): The name of the form field. This is used to identify the
+            field within the PDF document.
+        page_number (int): The 1-based page number on which the field is located.
+        x (float): The x-coordinate of the field's position on the page.
+        y (float): The y-coordinate of the field's position on the page.
+        required (Optional[bool]): Indicates whether the field is required to be
+            filled by the user. Defaults to None, meaning not explicitly set.
+        tooltip (Optional[str]): A tooltip message that appears when the user
+            hovers over the field. Defaults to None.
+    """
+
+    name: str
+    page_number: int
+    x: float
+    y: float
+    required: Optional[bool] = None
+    tooltip: Optional[str] = None
