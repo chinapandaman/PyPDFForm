@@ -16,22 +16,6 @@ from dataclasses import dataclass
 from .signature import SignatureField, SignatureWidget
 
 
-@dataclass
-class ImageField(SignatureField):
-    """
-    Represents an image field in a PDF document.
-
-    This dataclass extends the `SignatureField` base class and defines the
-    specific attributes for an image input field. It inherits `width` and
-    `height` from `SignatureField` as images also have dimensions.
-
-    Attributes:
-        _field_type (str): The type of the field, fixed as "image".
-    """
-
-    _field_type: str = "image"
-
-
 class ImageWidget(SignatureWidget):
     """
     Represents an image widget in a PDF form.
@@ -47,3 +31,19 @@ class ImageWidget(SignatureWidget):
     """
 
     BEDROCK_WIDGET_TO_COPY = "image"
+
+
+@dataclass
+class ImageField(SignatureField):
+    """
+    Represents an image field in a PDF document.
+
+    This dataclass extends the `SignatureField` base class and defines the
+    specific attributes for an image input field. It inherits `width` and
+    `height` from `SignatureField` as images also have dimensions.
+
+    Attributes:
+        _field_type (str): The type of the field, fixed as "image".
+    """
+
+    _field_type: str = "image"

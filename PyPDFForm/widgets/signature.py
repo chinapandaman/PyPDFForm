@@ -26,26 +26,6 @@ from .base import Field
 from .bedrock import BEDROCK_PDF
 
 
-@dataclass
-class SignatureField(Field):
-    """
-    Represents a signature field in a PDF document.
-
-    This dataclass extends the `Field` base class and defines the specific
-    attributes that can be configured for a signature input field.
-
-    Attributes:
-        _field_type (str): The type of the field, fixed as "signature".
-        width (Optional[float]): The width of the signature field.
-        height (Optional[float]): The height of the signature field.
-    """
-
-    _field_type: str = "signature"
-
-    width: Optional[float] = None
-    height: Optional[float] = None
-
-
 class SignatureWidget:
     """
     Represents a signature widget in a PDF form.
@@ -151,3 +131,23 @@ class SignatureWidget:
                 f.read() if i == self.page_number - 1 else b""
                 for i in range(page_count)
             ]
+
+
+@dataclass
+class SignatureField(Field):
+    """
+    Represents a signature field in a PDF document.
+
+    This dataclass extends the `Field` base class and defines the specific
+    attributes that can be configured for a signature input field.
+
+    Attributes:
+        _field_type (str): The type of the field, fixed as "signature".
+        width (Optional[float]): The width of the signature field.
+        height (Optional[float]): The height of the signature field.
+    """
+
+    _field_type: str = "signature"
+
+    width: Optional[float] = None
+    height: Optional[float] = None

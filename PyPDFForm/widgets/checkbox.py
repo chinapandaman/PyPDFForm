@@ -16,35 +16,6 @@ from typing import Optional, Tuple
 from .base import Field, Widget
 
 
-@dataclass
-class CheckBoxField(Field):
-    """
-    Represents a checkbox field in a PDF document.
-
-    This dataclass extends the `Field` base class and defines the specific
-    attributes that can be configured for a checkbox field.
-
-    Attributes:
-        _field_type (str): The type of the field, fixed as "checkbox".
-        size (Optional[float]): The size of the checkbox.
-        button_style (Optional[str]): The visual style of the checkbox button
-            (e.g., "check", "circle", "cross").
-        tick_color (Optional[Tuple[float, ...]]): The color of the checkmark or tick.
-        bg_color (Optional[Tuple[float, ...]]): The background color of the checkbox.
-        border_color (Optional[Tuple[float, ...]]): The color of the checkbox's border.
-        border_width (Optional[float]): The width of the checkbox's border.
-    """
-
-    _field_type: str = "checkbox"
-
-    size: Optional[float] = None
-    button_style: Optional[str] = None
-    tick_color: Optional[Tuple[float, ...]] = None
-    bg_color: Optional[Tuple[float, ...]] = None
-    border_color: Optional[Tuple[float, ...]] = None
-    border_width: Optional[float] = None
-
-
 class CheckBoxWidget(Widget):
     """
     Represents a checkbox widget in a PDF form.
@@ -74,3 +45,32 @@ class CheckBoxWidget(Widget):
     COLOR_PARAMS = ["tick_color", "bg_color", "border_color"]
     ALLOWED_HOOK_PARAMS = ["size"]
     ACRO_FORM_FUNC = "checkbox"
+
+
+@dataclass
+class CheckBoxField(Field):
+    """
+    Represents a checkbox field in a PDF document.
+
+    This dataclass extends the `Field` base class and defines the specific
+    attributes that can be configured for a checkbox field.
+
+    Attributes:
+        _field_type (str): The type of the field, fixed as "checkbox".
+        size (Optional[float]): The size of the checkbox.
+        button_style (Optional[str]): The visual style of the checkbox button
+            (e.g., "check", "circle", "cross").
+        tick_color (Optional[Tuple[float, ...]]): The color of the checkmark or tick.
+        bg_color (Optional[Tuple[float, ...]]): The background color of the checkbox.
+        border_color (Optional[Tuple[float, ...]]): The color of the checkbox's border.
+        border_width (Optional[float]): The width of the checkbox's border.
+    """
+
+    _field_type: str = "checkbox"
+
+    size: Optional[float] = None
+    button_style: Optional[str] = None
+    tick_color: Optional[Tuple[float, ...]] = None
+    bg_color: Optional[Tuple[float, ...]] = None
+    border_color: Optional[Tuple[float, ...]] = None
+    border_width: Optional[float] = None

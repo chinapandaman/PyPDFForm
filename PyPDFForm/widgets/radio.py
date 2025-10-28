@@ -18,31 +18,6 @@ from reportlab.pdfgen.canvas import Canvas
 from .checkbox import CheckBoxField, CheckBoxWidget
 
 
-@dataclass
-class RadioGroup(CheckBoxField):
-    """
-    Represents a group of radio buttons in a PDF document.
-
-    This dataclass extends the `CheckBoxField` base class and defines the specific
-    attributes that can be configured for a radio button group. Unlike a single
-    checkbox, a radio group allows for multiple positions (x, y coordinates)
-    where individual radio buttons can be placed, but only one can be selected.
-
-    Attributes:
-        _field_type (str): The type of the field, fixed as "radio".
-        x (List[float]): A list of x-coordinates for each radio button in the group.
-        y (List[float]): A list of y-coordinates for each radio button in the group.
-        shape (Optional[str]): The shape of the radio button. Valid values are
-            "circle" or "square". Defaults to None, which typically means a default circle shape.
-    """
-
-    _field_type: str = "radio"
-
-    x: List[float]
-    y: List[float]
-    shape: Optional[str] = None
-
-
 class RadioWidget(CheckBoxWidget):
     """
     Represents a radio button widget in a PDF form.
@@ -97,3 +72,28 @@ class RadioWidget(CheckBoxWidget):
             new_acro_form_params["y"] = y
             new_acro_form_params["value"] = str(i)
             getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**new_acro_form_params)
+
+
+@dataclass
+class RadioGroup(CheckBoxField):
+    """
+    Represents a group of radio buttons in a PDF document.
+
+    This dataclass extends the `CheckBoxField` base class and defines the specific
+    attributes that can be configured for a radio button group. Unlike a single
+    checkbox, a radio group allows for multiple positions (x, y coordinates)
+    where individual radio buttons can be placed, but only one can be selected.
+
+    Attributes:
+        _field_type (str): The type of the field, fixed as "radio".
+        x (List[float]): A list of x-coordinates for each radio button in the group.
+        y (List[float]): A list of y-coordinates for each radio button in the group.
+        shape (Optional[str]): The shape of the radio button. Valid values are
+            "circle" or "square". Defaults to None, which typically means a default circle shape.
+    """
+
+    _field_type: str = "radio"
+
+    x: List[float]
+    y: List[float]
+    shape: Optional[str] = None
