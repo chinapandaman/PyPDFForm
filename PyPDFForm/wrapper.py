@@ -18,6 +18,7 @@ underlying PDF manipulation.
 
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import asdict
 from functools import cached_property
 from typing import TYPE_CHECKING, BinaryIO, Dict, List, Sequence, Tuple, Union
@@ -41,6 +42,7 @@ from .utils import (enable_adobe_mode, generate_unique_suffix,
                     get_page_streams, merge_two_pdfs, remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
+from .widgets import CheckBoxField
 from .widgets.base import Widget
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
@@ -453,6 +455,23 @@ class PdfWrapper:
         return self
 
     def bulk_create_fields(self, fields: List[BulkFieldTypes]) -> PdfWrapper:
+        needs_separate_creation = [CheckBoxField]
+        needs_separate_creation_dict = defaultdict(list)
+        general_creation = []
+
+        for each in fields:
+            if type(each) in needs_separate_creation:
+                needs_separate_creation_dict[type(each)].append(each)
+            else:
+                general_creation.append(each)
+
+        for each in needs_separate_creation_dict.values():
+            self._bulk_create_fields(each)
+        self._bulk_create_fields(general_creation)
+
+        return self
+
+    def _bulk_create_fields(self, fields: List[BulkFieldTypes]) -> PdfWrapper:
         """
         Creates multiple new form fields (widgets) on the PDF in a single operation.
 
