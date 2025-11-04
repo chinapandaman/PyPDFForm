@@ -245,7 +245,7 @@ class Widget:
             )
 
             for widget in widgets_by_page[page_num]:
-                widget._required_handler(canvas)
+                getattr(widget, "_required_handler")(canvas)
                 widget.canvas_operations(canvas)
 
             canvas.showPage()
