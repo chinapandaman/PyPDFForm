@@ -67,6 +67,7 @@ class CheckBoxField(Field):
     """
 
     _field_type: str = "checkbox"
+    _widget_class = CheckBoxWidget
 
     size: Optional[float] = None
     button_style: Optional[str] = None

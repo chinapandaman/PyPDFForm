@@ -93,6 +93,7 @@ class RadioGroup(CheckBoxField):
     """
 
     _field_type: str = "radio"
+    _widget_class = RadioWidget
 
     x: List[float]
     y: List[float]

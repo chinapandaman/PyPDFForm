@@ -79,6 +79,7 @@ class TextField(Field):
     """
 
     _field_type: str = "text"
+    _widget_class = TextWidget
 
     width: Optional[float] = None
     height: Optional[float] = None

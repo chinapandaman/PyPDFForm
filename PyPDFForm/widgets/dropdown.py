@@ -83,6 +83,7 @@ class DropdownField(Field):
     """
 
     _field_type: str = "dropdown"
+    _widget_class = DropdownWidget
 
     options: Optional[List[Union[str, Tuple[str, str]]]] = None
     width: Optional[float] = None
