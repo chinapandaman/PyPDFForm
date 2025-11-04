@@ -195,6 +195,27 @@ class Widget:
 
     @staticmethod
     def bulk_watermarks(widgets: List[Widget], stream: bytes) -> List[bytes]:
+        """
+        Generates watermarks for multiple widgets in bulk.
+
+        This static method processes a list of widgets and a PDF stream to create
+        a list of watermark streams, one for each page of the PDF. Widgets are
+        grouped by their page number, and all widgets for a given page are drawn
+        onto a single ReportLab canvas, which is then returned as the watermark
+        stream for that page. This is more efficient than generating watermarks
+        for each widget individually.
+
+        Args:
+            widgets (List[Widget]): A list of Widget objects to be watermarked.
+            stream (bytes): The PDF stream to be watermarked.
+
+        Returns:
+            List[bytes]: A list of watermark streams (bytes), where the index
+                         corresponds to the 0-based page index of the original PDF.
+                         Each element is a byte stream representing the combined
+                         watermark for that page. Pages without any widgets will
+                         have an empty byte string (b"").
+        """
         result = []
 
         pdf = PdfReader(stream_to_io(stream))
