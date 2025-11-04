@@ -455,6 +455,23 @@ class PdfWrapper:
         return self
 
     def bulk_create_fields(self, fields: List[BulkFieldTypes]) -> PdfWrapper:
+        """
+        Creates multiple new form fields (widgets) on the PDF in a single operation.
+
+        This method takes a list of field definition objects (`BulkFieldTypes`),
+        groups them by type (if necessary for specific widget handling, like CheckBoxField),
+        and then delegates the creation to the internal `_bulk_create_fields` method.
+        This is the preferred method for creating multiple fields as it minimizes
+        PDF manipulation overhead.
+
+        Args:
+            fields (List[BulkFieldTypes]): A list of field definition objects
+                (e.g., `TextField`, `CheckBoxField`, etc.) to be created.
+
+        Returns:
+            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
+        """
+
         needs_separate_creation = [CheckBoxField]
         needs_separate_creation_dict = defaultdict(list)
         general_creation = []
@@ -473,12 +490,12 @@ class PdfWrapper:
 
     def _bulk_create_fields(self, fields: List[BulkFieldTypes]) -> PdfWrapper:
         """
-        Creates multiple new form fields (widgets) on the PDF in a single operation.
+        Internal method to create multiple new form fields (widgets) on the PDF in a single operation.
 
         This method takes a list of field definition objects (`BulkFieldTypes`),
         converts them into `Widget` objects, and efficiently draws them onto the
-        PDF using bulk watermarking. This is the preferred method for creating
-        multiple fields as it minimizes PDF manipulation overhead.
+        PDF using bulk watermarking. It is designed to be called by the public
+        `bulk_create_fields` method after fields have been grouped for creation.
 
         Args:
             fields (List[BulkFieldTypes]): A list of field definition objects
