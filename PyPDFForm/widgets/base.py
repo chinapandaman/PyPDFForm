@@ -12,6 +12,8 @@ Classes:
       functionality for rendering and manipulation.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from inspect import signature
 from io import BytesIO
@@ -190,6 +192,47 @@ class Widget:
             watermark.read() if i == self.page_number - 1 else b""
             for i in range(page_count)
         ]
+
+    @staticmethod
+    def bulk_watermarks(widgets: List[Widget], stream: bytes) -> List[bytes]:
+        result = []
+
+        pdf = PdfReader(stream_to_io(stream))
+        watermark = BytesIO()
+
+        widgets_by_page = {}
+        for widget in widgets:
+            if widget.page_number not in widgets_by_page:
+                widgets_by_page[widget.page_number] = []
+            widgets_by_page[widget.page_number].append(widget)
+
+        for i, page in enumerate(pdf.pages):
+            page_num = i + 1
+            if page_num not in widgets_by_page:
+                result.append(b"")
+                continue
+
+            watermark.seek(0)
+            watermark.flush()
+
+            canvas = Canvas(
+                watermark,
+                pagesize=(
+                    float(page.mediabox[2]),
+                    float(page.mediabox[3]),
+                ),
+            )
+
+            for widget in widgets_by_page[page_num]:
+                widget._required_handler(canvas)
+                widget.canvas_operations(canvas)
+
+            canvas.showPage()
+            canvas.save()
+            watermark.seek(0)
+            result.append(watermark.read())
+
+        return result
 
 
 @dataclass
