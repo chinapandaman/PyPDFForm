@@ -238,6 +238,7 @@ def test_create_image(pdf_samples, request):
         assert new_form.read() == expected
 
 
+@pytest.mark.posix_only
 def test_bulk_create_fields(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_bulk_create_fields.pdf")
 

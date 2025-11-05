@@ -2,9 +2,12 @@
 
 import os
 
+import pytest
+
 from PyPDFForm import Fields, PdfWrapper
 
 
+@pytest.mark.posix_only
 def test_bulk_create_fields_stress(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "bulk_create_fields", "test_bulk_create_fields_stress.pdf"
