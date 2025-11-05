@@ -214,6 +214,48 @@ new_form = PdfWrapper("dummy.pdf").create_field(
 new_form.write("output.pdf")
 ```
 
+## Bulk create fields (beta)
+
+**NOTE:** This is a beta feature that requires further testing with various PDF forms and may not be compatible with all forms.
+
+**NOTE:** Bulk create fields does NOT work for `ImageField` and `SignatureField`.
+
+When you need to create a large number of fields, using the `bulk_create_fields` method is more performant than creating them one by one with the `create_field` method:
+
+```python
+from PyPDFForm import Fields, PdfWrapper
+
+fields = [
+    Fields.TextField(
+        name="new_text_field_1",
+        page_number=1,
+        x=100,
+        y=100,
+    ),
+    Fields.TextField(
+        name="new_text_field_2",
+        page_number=1,
+        x=100,
+        y=300,
+    ),
+    Fields.CheckBoxField(
+        name="new_checkbox_1",
+        page_number=1,
+        x=300,
+        y=100,
+    ),
+    Fields.CheckBoxField(
+        name="new_checkbox_2",
+        page_number=1,
+        x=300,
+        y=300,
+    ),
+]
+
+new_form = PdfWrapper("dummy.pdf").bulk_create_fields(fields)
+new_form.write("output.pdf")
+```
+
 ## Modify the key of a field
 
 PyPDFForm allows you to modify the keys of existing fields. For example, to change the key of the first text field, `test`, to `test_text` using [this PDF](pdfs/sample_template.pdf), use the following code:
