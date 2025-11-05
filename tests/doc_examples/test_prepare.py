@@ -238,6 +238,51 @@ def test_create_image(pdf_samples, request):
         assert new_form.read() == expected
 
 
+@pytest.mark.posix_only
+def test_bulk_create_fields(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_bulk_create_fields.pdf")
+
+    fields = [
+        Fields.TextField(
+            name="new_text_field_1",
+            page_number=1,
+            x=100,
+            y=100,
+        ),
+        Fields.TextField(
+            name="new_text_field_2",
+            page_number=1,
+            x=100,
+            y=300,
+        ),
+        Fields.CheckBoxField(
+            name="new_checkbox_1",
+            page_number=1,
+            x=300,
+            y=100,
+        ),
+        Fields.CheckBoxField(
+            name="new_checkbox_2",
+            page_number=1,
+            x=300,
+            y=300,
+        ),
+    ]
+
+    new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
+        fields
+    )
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = new_form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(new_form.read()) == len(expected)
+        assert new_form.read() == expected
+
+
 def test_update_key(static_pdfs):
     new_form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     assert "test" in new_form.widgets

@@ -11,7 +11,7 @@ functionality for interacting with text form fields in PDFs.
 """
 
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Type
 
 from .base import Field, Widget
 
@@ -63,6 +63,7 @@ class TextField(Field):
 
     Attributes:
         _field_type (str): The type of the field, fixed as "text".
+        _widget_class (Type[Widget]): The widget class associated with this field type.
         width (Optional[float]): The width of the text field.
         height (Optional[float]): The height of the text field.
         max_length (Optional[int]): The maximum number of characters allowed in the text field.
@@ -79,6 +80,7 @@ class TextField(Field):
     """
 
     _field_type: str = "text"
+    _widget_class: Type[Widget] = TextWidget
 
     width: Optional[float] = None
     height: Optional[float] = None

@@ -12,6 +12,8 @@ Classes:
       functionality for rendering and manipulation.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from inspect import signature
 from io import BytesIO
@@ -190,6 +192,68 @@ class Widget:
             watermark.read() if i == self.page_number - 1 else b""
             for i in range(page_count)
         ]
+
+    @staticmethod
+    def bulk_watermarks(widgets: List[Widget], stream: bytes) -> List[bytes]:
+        """
+        Generates watermarks for multiple widgets in bulk.
+
+        This static method processes a list of widgets and a PDF stream to create
+        a list of watermark streams, one for each page of the PDF. Widgets are
+        grouped by their page number, and all widgets for a given page are drawn
+        onto a single ReportLab canvas, which is then returned as the watermark
+        stream for that page. This is more efficient than generating watermarks
+        for each widget individually.
+
+        Args:
+            widgets (List[Widget]): A list of Widget objects to be watermarked.
+            stream (bytes): The PDF stream to be watermarked.
+
+        Returns:
+            List[bytes]: A list of watermark streams (bytes), where the index
+                         corresponds to the 0-based page index of the original PDF.
+                         Each element is a byte stream representing the combined
+                         watermark for that page. Pages without any widgets will
+                         have an empty byte string (b"").
+        """
+        result = []
+
+        pdf = PdfReader(stream_to_io(stream))
+        watermark = BytesIO()
+
+        widgets_by_page = {}
+        for widget in widgets:
+            if widget.page_number not in widgets_by_page:
+                widgets_by_page[widget.page_number] = []
+            widgets_by_page[widget.page_number].append(widget)
+
+        for i, page in enumerate(pdf.pages):
+            page_num = i + 1
+            if page_num not in widgets_by_page:
+                result.append(b"")
+                continue
+
+            watermark.seek(0)
+            watermark.flush()
+
+            canvas = Canvas(
+                watermark,
+                pagesize=(
+                    float(page.mediabox[2]),
+                    float(page.mediabox[3]),
+                ),
+            )
+
+            for widget in widgets_by_page[page_num]:
+                getattr(widget, "_required_handler")(canvas)
+                widget.canvas_operations(canvas)
+
+            canvas.showPage()
+            canvas.save()
+            watermark.seek(0)
+            result.append(watermark.read())
+
+        return result
 
 
 @dataclass

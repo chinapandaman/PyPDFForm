@@ -11,10 +11,11 @@ specific functionality for interacting with radio button form fields in PDFs.
 """
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Type
 
 from reportlab.pdfgen.canvas import Canvas
 
+from .base import Widget
 from .checkbox import CheckBoxField, CheckBoxWidget
 
 
@@ -86,6 +87,7 @@ class RadioGroup(CheckBoxField):
 
     Attributes:
         _field_type (str): The type of the field, fixed as "radio".
+        _widget_class (Type[Widget]): The widget class associated with this field type.
         x (List[float]): A list of x-coordinates for each radio button in the group.
         y (List[float]): A list of y-coordinates for each radio button in the group.
         shape (Optional[str]): The shape of the radio button. Valid values are
@@ -93,6 +95,7 @@ class RadioGroup(CheckBoxField):
     """
 
     _field_type: str = "radio"
+    _widget_class: Type[Widget] = RadioWidget
 
     x: List[float]
     y: List[float]

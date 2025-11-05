@@ -11,7 +11,7 @@ functionality for interacting with checkbox form fields in PDFs.
 """
 
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Type
 
 from .base import Field, Widget
 
@@ -57,6 +57,7 @@ class CheckBoxField(Field):
 
     Attributes:
         _field_type (str): The type of the field, fixed as "checkbox".
+        _widget_class (Type[Widget]): The widget class associated with this field type.
         size (Optional[float]): The size of the checkbox.
         button_style (Optional[str]): The visual style of the checkbox button
             (e.g., "check", "circle", "cross").
@@ -67,6 +68,7 @@ class CheckBoxField(Field):
     """
 
     _field_type: str = "checkbox"
+    _widget_class: Type[Widget] = CheckBoxWidget
 
     size: Optional[float] = None
     button_style: Optional[str] = None
