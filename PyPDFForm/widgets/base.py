@@ -76,6 +76,7 @@ class Widget:
         """
         super().__init__()
         self.page_number = page_number
+        self.name = name
         self.acro_form_params = {
             "name": name,
             "x": x,

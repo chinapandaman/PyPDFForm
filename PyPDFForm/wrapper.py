@@ -531,14 +531,7 @@ class PdfWrapper:
         self._stream = copy_watermark_widgets(
             self.read(),
             watermarks,
-            [
-                (
-                    widget.acro_form_params["name"]
-                    if not isinstance(widget, SignatureWidget)
-                    else widget.name
-                )
-                for widget in widgets
-            ],
+            [widget.name for widget in widgets],
             None,
         )
 
@@ -546,13 +539,7 @@ class PdfWrapper:
 
         for widget in widgets:
             for k, v in widget.hook_params:
-                self.widgets[
-                    (
-                        widget.acro_form_params["name"]
-                        if not isinstance(widget, SignatureWidget)
-                        else widget.name
-                    )
-                ].__setattr__(k, v)
+                self.widgets[widget.name].__setattr__(k, v)
 
         return self
 
