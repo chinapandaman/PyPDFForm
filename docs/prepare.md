@@ -216,11 +216,9 @@ new_form.write("output.pdf")
 
 ## Bulk create fields (beta)
 
-**NOTE:** This is a beta feature that requires further testing with various PDF forms and may not be compatible with all forms.
+**NOTE:** This is a beta feature that requires further testing.
 
-**NOTE:** Bulk create fields does NOT work for `ImageField` and `SignatureField`.
-
-When you need to create a large number of fields, using the `bulk_create_fields` method is more performant than creating them one by one with the `create_field` method:
+The `bulk_create_fields` method is more performant than creating fields one by one with the `create_field` method, especially when dealing with a large number of fields:
 
 ```python
 from PyPDFForm import Fields, PdfWrapper

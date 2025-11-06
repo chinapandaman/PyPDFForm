@@ -21,12 +21,6 @@ from .text import TextField
 FieldTypes = Union[
     TextField, CheckBoxField, RadioGroup, DropdownField, SignatureField, ImageField
 ]
-BulkFieldTypes = Union[
-    TextField,
-    CheckBoxField,
-    RadioGroup,
-    DropdownField,
-]
 
 
 @dataclass
