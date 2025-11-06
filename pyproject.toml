@@ -57,6 +57,7 @@ dev = [
 omit = [
     "venv/*",
     "tests/*",
+    "conftest.py",
 ]
 
 [tool.pylint."MESSAGES CONTROL"]
