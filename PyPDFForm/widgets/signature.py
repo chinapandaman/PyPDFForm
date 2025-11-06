@@ -166,13 +166,14 @@ class SignatureWidget:
         bedrock = PdfReader(stream_to_io(BEDROCK_PDF))
         page = bedrock.pages[0]
         annot_type_to_annot = {}
-        for annot in page.get(Annots, []):
+        for annot in page.get(Annots, []):  # pylint: disable=E1101
             key = get_widget_key(annot.get_object(), False)
             annot_type_to_annot[key] = annot.get_object()
 
         watermark = BytesIO()
 
         for i, p in enumerate(input_pdf.pages):
+            # pylint: disable=R0801
             watermark.seek(0)
             watermark.flush()
             canvas = Canvas(
@@ -211,7 +212,9 @@ class SignatureWidget:
 
                 widgets_to_copy.append(widget_to_copy)
 
-            out.pages[0][NameObject(Annots)] = ArrayObject(widgets_to_copy)
+            out.pages[0][NameObject(Annots)] = ArrayObject(  # pylint: disable=E1137
+                widgets_to_copy
+            )
 
             with BytesIO() as f:
                 out.write(f)
