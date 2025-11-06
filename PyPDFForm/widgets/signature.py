@@ -11,6 +11,8 @@ signature form fields in PDFs, including handling their creation, rendering, and
 integration into the document.
 """
 
+from __future__ import annotations
+
 from collections import defaultdict
 from dataclasses import dataclass
 from io import BytesIO
@@ -135,7 +137,7 @@ class SignatureWidget:
             ]
 
     @staticmethod
-    def bulk_watermarks(widgets: list, stream: bytes) -> List[bytes]:
+    def bulk_watermarks(widgets: List[SignatureWidget], stream: bytes) -> List[bytes]:
         result = []
 
         page_to_widgets = defaultdict(list)
@@ -143,7 +145,6 @@ class SignatureWidget:
             page_to_widgets[widget.page_number].append(widget)
 
         input_pdf = PdfReader(stream_to_io(stream))
-        page_count = len(input_pdf.pages)
 
         bedrock = PdfReader(stream_to_io(BEDROCK_PDF))
         page = bedrock.pages[0]
@@ -154,14 +155,14 @@ class SignatureWidget:
 
         watermark = BytesIO()
 
-        for i in range(page_count):
+        for i, p in enumerate(input_pdf.pages):
             watermark.seek(0)
             watermark.flush()
             canvas = Canvas(
                 watermark,
                 pagesize=(
-                    float(input_pdf.pages[i].mediabox[2]),
-                    float(input_pdf.pages[i].mediabox[3]),
+                    float(p.mediabox[2]),
+                    float(p.mediabox[3]),
                 ),
             )
             canvas.showPage()
@@ -177,6 +178,8 @@ class SignatureWidget:
                 widget_to_copy = annot_type_to_annot[
                     widget.BEDROCK_WIDGET_TO_COPY
                 ].clone(out, force_duplicate=True)
+
+                # TODO: refactor duplicate logic with watermarks
                 widget_to_copy.get_object()[NameObject(T)] = TextStringObject(
                     widget.name
                 )
@@ -188,6 +191,7 @@ class SignatureWidget:
                         FloatObject(widget.y + widget.optional_params.get("height")),
                     ]
                 )
+
                 widgets_to_copy.append(widget_to_copy)
 
             out.pages[0][NameObject(Annots)] = ArrayObject(widgets_to_copy)
