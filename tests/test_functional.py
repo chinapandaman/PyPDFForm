@@ -1206,9 +1206,11 @@ def test_get_text_field_multiline_with_keyerror_in_parent():
     when the parent reference cannot be resolved properly.
     """
     from unittest.mock import MagicMock, patch
+
     from pypdf.generic import DictionaryObject, IndirectObject, NameObject
-    from PyPDFForm.patterns import get_text_field_multiline
+
     from PyPDFForm.constants import Parent
+    from PyPDFForm.patterns import get_text_field_multiline
 
     annot = DictionaryObject()
 
