@@ -11,6 +11,7 @@ signature form fields in PDFs, including handling their creation, rendering, and
 integration into the document.
 """
 
+from collections import defaultdict
 from dataclasses import dataclass
 from io import BytesIO
 from typing import List, Optional
@@ -18,6 +19,7 @@ from typing import List, Optional
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, FloatObject, NameObject,
                            TextStringObject)
+from reportlab.pdfgen.canvas import Canvas
 
 from ..constants import Annots, Rect, T
 from ..template import get_widget_key
@@ -131,6 +133,71 @@ class SignatureWidget:
                 f.read() if i == self.page_number - 1 else b""
                 for i in range(page_count)
             ]
+
+    @staticmethod
+    def bulk_watermarks(widgets: list, stream: bytes) -> List[bytes]:
+        result = []
+
+        page_to_widgets = defaultdict(list)
+        for widget in widgets:
+            page_to_widgets[widget.page_number].append(widget)
+
+        input_pdf = PdfReader(stream_to_io(stream))
+        page_count = len(input_pdf.pages)
+
+        bedrock = PdfReader(stream_to_io(BEDROCK_PDF))
+        page = bedrock.pages[0]
+        annot_type_to_annot = {}
+        for annot in page.get(Annots, []):
+            key = get_widget_key(annot.get_object(), False)
+            annot_type_to_annot[key] = annot.get_object()
+
+        watermark = BytesIO()
+
+        for i in range(page_count):
+            watermark.seek(0)
+            watermark.flush()
+            canvas = Canvas(
+                watermark,
+                pagesize=(
+                    float(input_pdf.pages[i].mediabox[2]),
+                    float(input_pdf.pages[i].mediabox[3]),
+                ),
+            )
+            canvas.showPage()
+            canvas.save()
+            watermark.seek(0)
+
+            out = PdfWriter(watermark)
+
+            page_widgets = page_to_widgets.get(i + 1, [])
+
+            widgets_to_copy = []
+            for widget in page_widgets:
+                widget_to_copy = annot_type_to_annot[
+                    widget.BEDROCK_WIDGET_TO_COPY
+                ].clone(out, force_duplicate=True)
+                widget_to_copy.get_object()[NameObject(T)] = TextStringObject(
+                    widget.name
+                )
+                widget_to_copy.get_object()[NameObject(Rect)] = ArrayObject(
+                    [
+                        FloatObject(widget.x),
+                        FloatObject(widget.y),
+                        FloatObject(widget.x + widget.optional_params.get("width")),
+                        FloatObject(widget.y + widget.optional_params.get("height")),
+                    ]
+                )
+                widgets_to_copy.append(widget_to_copy)
+
+            out.pages[0][NameObject(Annots)] = ArrayObject(widgets_to_copy)
+
+            with BytesIO() as f:
+                out.write(f)
+                f.seek(0)
+                result.append(f.read())
+
+        return result
 
 
 @dataclass
