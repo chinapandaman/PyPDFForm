@@ -1196,3 +1196,28 @@ def test_uncheck_checkbox_flatten(pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_get_text_field_multiline_with_keyerror_in_parent():
+    """
+    Test that get_text_field_multiline handles KeyError when accessing parent object.
+
+    This reproduces the bug where annot[NameObject(Parent)] raises KeyError: 0
+    when the parent reference cannot be resolved properly.
+    """
+    from unittest.mock import MagicMock, patch
+    from pypdf.generic import DictionaryObject, IndirectObject, NameObject
+    from PyPDFForm.patterns import get_text_field_multiline
+    from PyPDFForm.constants import Parent
+
+    annot = DictionaryObject()
+
+    # Create an IndirectObject that will raise KeyError when accessed
+    mock_parent = IndirectObject(0, 0, MagicMock())
+    annot[NameObject(Parent)] = mock_parent
+
+    # Patch get_object to raise KeyError
+    with patch.object(mock_parent, "get_object", side_effect=KeyError(0)):
+        # This should not raise an exception and should return False
+        result = get_text_field_multiline(annot)
+        assert result is False

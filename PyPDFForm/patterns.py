@@ -291,12 +291,16 @@ def get_text_field_multiline(annot: DictionaryObject) -> bool:
         bool: True if the text field is multiline, False otherwise.
     """
     if Parent in annot and Ff not in annot:
-        return bool(
-            int(
-                annot[NameObject(Parent)][NameObject(Ff)]
-                if Ff in annot[NameObject(Parent)]
-                else 0
+        try:
+            parent_obj = annot[NameObject(Parent)]
+            return bool(
+                int(
+                    parent_obj[NameObject(Ff)]
+                    if Ff in parent_obj
+                    else 0
+                )
+                & MULTILINE
             )
-            & MULTILINE
-        )
+        except (KeyError, AttributeError, TypeError):
+            return False
     return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & MULTILINE)
