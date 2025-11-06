@@ -42,8 +42,7 @@ from .utils import (enable_adobe_mode, generate_unique_suffix,
                     get_page_streams, merge_two_pdfs, remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
-from .widgets import CheckBoxField
-from .widgets.base import Widget
+from .widgets import CheckBoxField, ImageField, SignatureField
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
 from .widgets.image import ImageWidget
@@ -52,7 +51,7 @@ from .widgets.signature import SignatureWidget
 from .widgets.text import TextWidget
 
 if TYPE_CHECKING:
-    from .widgets import BulkFieldTypes, FieldTypes
+    from .widgets import FieldTypes
 
 
 class PdfWrapper:
@@ -454,7 +453,7 @@ class PdfWrapper:
 
         return self
 
-    def bulk_create_fields(self, fields: List[BulkFieldTypes]) -> PdfWrapper:
+    def bulk_create_fields(self, fields: List[FieldTypes]) -> PdfWrapper:
         """
         Creates multiple new form fields (widgets) on the PDF in a single operation.
 
@@ -472,7 +471,7 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        needs_separate_creation = [CheckBoxField]
+        needs_separate_creation = [CheckBoxField, SignatureField, ImageField]
         needs_separate_creation_dict = defaultdict(list)
         general_creation = []
 
@@ -482,13 +481,17 @@ class PdfWrapper:
             else:
                 general_creation.append(each)
 
-        for each in needs_separate_creation_dict.values():
-            self._bulk_create_fields(each)
-        self._bulk_create_fields(general_creation)
+        needs_separate_creation_dict[SignatureField] = needs_separate_creation_dict.pop(
+            SignatureField, []
+        ) + needs_separate_creation_dict.pop(ImageField, [])
+
+        for each in list(needs_separate_creation_dict.values()) + [general_creation]:
+            if each:
+                self._bulk_create_fields(each)
 
         return self
 
-    def _bulk_create_fields(self, fields: List[BulkFieldTypes]) -> PdfWrapper:
+    def _bulk_create_fields(self, fields: List[FieldTypes]) -> PdfWrapper:
         """
         Internal method to create multiple new form fields (widgets) on the PDF in a single operation.
 
@@ -506,6 +509,7 @@ class PdfWrapper:
         """
 
         widgets = []
+        widget_class = None
         for field in fields:
             field_dict = asdict(field)
             widget_class = getattr(field, "_widget_class")
@@ -523,11 +527,18 @@ class PdfWrapper:
                 )
             )
 
-        watermarks = Widget.bulk_watermarks(widgets, self.read())
+        watermarks = getattr(widget_class, "bulk_watermarks")(widgets, self.read())
         self._stream = copy_watermark_widgets(
             self.read(),
             watermarks,
-            [widget.acro_form_params["name"] for widget in widgets],
+            [
+                (
+                    widget.acro_form_params["name"]
+                    if not isinstance(widget, SignatureWidget)
+                    else widget.name
+                )
+                for widget in widgets
+            ],
             None,
         )
 
@@ -535,7 +546,13 @@ class PdfWrapper:
 
         for widget in widgets:
             for k, v in widget.hook_params:
-                self.widgets[widget.acro_form_params["name"]].__setattr__(k, v)
+                self.widgets[
+                    (
+                        widget.acro_form_params["name"]
+                        if not isinstance(widget, SignatureWidget)
+                        else widget.name
+                    )
+                ].__setattr__(k, v)
 
         return self
 

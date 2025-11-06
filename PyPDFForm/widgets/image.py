@@ -12,6 +12,7 @@ leveraging the existing infrastructure for positioning and rendering.
 """
 
 from dataclasses import dataclass
+from typing import Type
 
 from .signature import SignatureField, SignatureWidget
 
@@ -47,3 +48,4 @@ class ImageField(SignatureField):
     """
 
     _field_type: str = "image"
+    _widget_class: Type[SignatureWidget] = ImageWidget

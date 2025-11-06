@@ -16,7 +16,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from io import BytesIO
-from typing import List, Optional
+from typing import List, Optional, Type
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, FloatObject, NameObject,
@@ -219,6 +219,7 @@ class SignatureField(Field):
     """
 
     _field_type: str = "signature"
+    _widget_class: Type[SignatureWidget] = SignatureWidget
 
     width: Optional[float] = None
     height: Optional[float] = None
