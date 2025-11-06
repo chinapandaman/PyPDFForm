@@ -45,6 +45,7 @@ class ImageField(SignatureField):
 
     Attributes:
         _field_type (str): The type of the field, fixed as "image".
+        _widget_class (Type[SignatureWidget]): The widget class associated with this field type.
     """
 
     _field_type: str = "image"

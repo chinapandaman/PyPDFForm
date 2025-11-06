@@ -138,6 +138,23 @@ class SignatureWidget:
 
     @staticmethod
     def bulk_watermarks(widgets: List[SignatureWidget], stream: bytes) -> List[bytes]:
+        """
+        Generates watermarks for multiple signature widgets in bulk.
+
+        This static method processes a list of SignatureWidget objects and a PDF stream
+        to create a list of watermark PDF streams, one for each page of the input PDF.
+        Each watermark PDF contains all the signature widgets that belong to that page.
+        This is more efficient than generating watermarks one by one.
+
+        Args:
+            widgets (List[SignatureWidget]): A list of SignatureWidget objects to be
+                added as watermarks.
+            stream (bytes): The PDF stream of the document to be watermarked.
+
+        Returns:
+            List[bytes]: A list of watermark PDF streams. Each element corresponds to
+            a page in the input PDF.
+        """
         result = []
 
         page_to_widgets = defaultdict(list)
@@ -214,6 +231,7 @@ class SignatureField(Field):
 
     Attributes:
         _field_type (str): The type of the field, fixed as "signature".
+        _widget_class (Type[SignatureWidget]): The widget class associated with this field type.
         width (Optional[float]): The width of the signature field.
         height (Optional[float]): The height of the signature field.
     """
