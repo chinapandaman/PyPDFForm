@@ -517,3 +517,22 @@ def test_extract_multiline_property(issue_pdf_directory):
     for k, v in obj.widgets.items():
         if "AdditionalInfo" in k:
             assert v.multiline
+
+
+def test_get_dropdown_choices(issue_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-1213.pdf")).fill(
+        {
+            "Dropdown8": 1,
+            "Dropdown9": 2,
+            "Dropdown10": 3,
+            "Dropdown11": 4,
+        }
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-1213_expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
