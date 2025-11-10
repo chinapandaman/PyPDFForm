@@ -488,6 +488,9 @@ class PdfWrapper:
         needs_separate_creation_dict[SignatureField] = needs_separate_creation_dict.pop(
             SignatureField, []
         ) + needs_separate_creation_dict.pop(ImageField, [])
+        needs_separate_creation_dict[CheckBoxField] = needs_separate_creation_dict.pop(
+            CheckBoxField, []
+        ) + needs_separate_creation_dict.pop(RadioGroup, [])
 
         for each in list(needs_separate_creation_dict.values()) + [general_creation]:
             if each:
