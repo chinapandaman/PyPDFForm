@@ -58,6 +58,7 @@ omit = [
     "venv/*",
     "tests/*",
     "conftest.py",
+    "PyPDFForm/deprecation.py",
 ]
 
 [tool.pylint."MESSAGES CONTROL"]

@@ -22,13 +22,12 @@ from collections import defaultdict
 from dataclasses import asdict
 from functools import cached_property
 from typing import TYPE_CHECKING, BinaryIO, Dict, List, Sequence, Tuple, Union
-from warnings import warn
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
-                        DEPRECATION_NOTICE, VERSION_IDENTIFIER_PREFIX,
-                        VERSION_IDENTIFIERS)
+                        VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
+from .deprecation import deprecation_notice
 from .filler import fill
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
@@ -42,7 +41,7 @@ from .utils import (enable_adobe_mode, generate_unique_suffix,
                     get_page_streams, merge_two_pdfs, remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
-from .widgets import CheckBoxField, ImageField, SignatureField
+from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
 from .widgets.checkbox import CheckBoxWidget
 from .widgets.dropdown import DropdownWidget
 from .widgets.image import ImageWidget
@@ -471,7 +470,12 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        needs_separate_creation = [CheckBoxField, SignatureField, ImageField]
+        needs_separate_creation = [
+            CheckBoxField,
+            RadioGroup,
+            SignatureField,
+            ImageField,
+        ]
         needs_separate_creation_dict = defaultdict(list)
         general_creation = []
 
@@ -484,6 +488,9 @@ class PdfWrapper:
         needs_separate_creation_dict[SignatureField] = needs_separate_creation_dict.pop(
             SignatureField, []
         ) + needs_separate_creation_dict.pop(ImageField, [])
+        needs_separate_creation_dict[CheckBoxField] = needs_separate_creation_dict.pop(
+            CheckBoxField, []
+        ) + needs_separate_creation_dict.pop(RadioGroup, [])
 
         for each in list(needs_separate_creation_dict.values()) + [general_creation]:
             if each:
@@ -612,13 +619,9 @@ class PdfWrapper:
         """
 
         if not kwargs.get("suppress_deprecation_notice"):
-            warn(
-                DEPRECATION_NOTICE.format(
-                    f"{self.__class__.__name__}.create_widget()",
-                    f"{self.__class__.__name__}.create_field()",
-                ),
-                DeprecationWarning,  # noqa: PT030
-                stacklevel=2,
+            deprecation_notice(
+                f"{self.__class__.__name__}.create_widget()",
+                f"{self.__class__.__name__}.create_field()",
             )
 
         _class = None
