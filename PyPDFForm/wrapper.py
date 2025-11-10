@@ -22,13 +22,12 @@ from collections import defaultdict
 from dataclasses import asdict
 from functools import cached_property
 from typing import TYPE_CHECKING, BinaryIO, Dict, List, Sequence, Tuple, Union
-from warnings import warn
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
-                        DEPRECATION_NOTICE, VERSION_IDENTIFIER_PREFIX,
-                        VERSION_IDENTIFIERS)
+                        VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
+from .deprecation import deprecation_notice
 from .filler import fill
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
@@ -612,13 +611,9 @@ class PdfWrapper:
         """
 
         if not kwargs.get("suppress_deprecation_notice"):
-            warn(
-                DEPRECATION_NOTICE.format(
-                    f"{self.__class__.__name__}.create_widget()",
-                    f"{self.__class__.__name__}.create_field()",
-                ),
-                DeprecationWarning,  # noqa: PT030
-                stacklevel=2,
+            deprecation_notice(
+                f"{self.__class__.__name__}.create_widget()",
+                f"{self.__class__.__name__}.create_field()",
             )
 
         _class = None
