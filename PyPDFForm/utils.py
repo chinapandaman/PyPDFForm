@@ -20,6 +20,7 @@ from secrets import choice
 from string import ascii_letters, digits, punctuation
 from typing import Any, BinaryIO, List, Union
 
+from pikepdf import Pdf
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
@@ -79,6 +80,17 @@ def enable_adobe_mode(pdf: bytes) -> bytes:
         writer.write(f)
         f.seek(0)
         return f.read()
+
+
+@lru_cache
+def generate_appearance_streams(pdf: bytes) -> bytes:
+    with Pdf.open(stream_to_io(pdf)) as f:
+        f.generate_appearance_streams()
+
+        with BytesIO() as result:
+            f.save(result)
+            result.seek(0)
+            return result.read()
 
 
 @lru_cache
