@@ -116,8 +116,8 @@ class PdfWrapper:
             setattr(self, attr, kwargs.get(attr, default))
 
         if getattr(self, "generate_appearance_streams") is True:
-            setattr(self, "need_appearances", True)
-            setattr(self, "adobe_mode", True)
+            self.need_appearances = True
+            self.adobe_mode = True
 
         self._init_helper()
 
