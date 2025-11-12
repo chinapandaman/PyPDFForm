@@ -69,7 +69,9 @@ class PdfWrapper:
             These parameters can be set during initialization using keyword arguments.
             Current parameters include:
                 - `use_full_widget_name` (bool): Whether to use the full widget name when filling the form.
-                - `adobe_mode` (bool): Whether to enable Adobe-specific compatibility mode.
+                - `adobe_mode` (bool): Whether to enable Adobe-specific compatibility mode (deprecated, use `need_appearances`).
+                - `need_appearances` (bool): Whether to set the `NeedAppearances` flag in the PDF's AcroForm dictionary.
+                - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
 
     """
 
@@ -319,7 +321,9 @@ class PdfWrapper:
         Reads the PDF content from the underlying stream.
 
         This method returns the current state of the PDF as a byte string.
-        It also triggers any pending widget hooks and applies Adobe mode if enabled.
+        It also triggers any pending widget hooks and applies necessary PDF settings
+        like setting the `NeedAppearances` flag or generating appearance streams
+        if configured.
 
         Returns:
             bytes: The PDF content as bytes.
