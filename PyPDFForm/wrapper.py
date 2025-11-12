@@ -37,8 +37,9 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .template import build_widgets, update_widget_keys
-from .utils import (enable_adobe_mode, generate_unique_suffix,
-                    get_page_streams, merge_two_pdfs, remove_all_widgets)
+from .utils import (generate_appearance_streams, generate_unique_suffix,
+                    get_page_streams, merge_two_pdfs, remove_all_widgets,
+                    set_need_appearances)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
 from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
@@ -68,13 +69,17 @@ class PdfWrapper:
             These parameters can be set during initialization using keyword arguments.
             Current parameters include:
                 - `use_full_widget_name` (bool): Whether to use the full widget name when filling the form.
-                - `adobe_mode` (bool): Whether to enable Adobe-specific compatibility mode.
+                - `adobe_mode` (bool): Whether to enable Adobe-specific compatibility mode (deprecated, use `need_appearances`).
+                - `need_appearances` (bool): Whether to set the `NeedAppearances` flag in the PDF's AcroForm dictionary.
+                - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
 
     """
 
     USER_PARAMS = [
         ("use_full_widget_name", False),
         ("adobe_mode", False),
+        ("need_appearances", False),
+        ("generate_appearance_streams", False),
     ]
 
     def __init__(
@@ -109,6 +114,10 @@ class PdfWrapper:
         # sets attrs from kwargs
         for attr, default in self.USER_PARAMS:
             setattr(self, attr, kwargs.get(attr, default))
+
+        if getattr(self, "generate_appearance_streams") is True:
+            self.need_appearances = True
+            self.adobe_mode = True
 
         self._init_helper()
 
@@ -312,7 +321,9 @@ class PdfWrapper:
         Reads the PDF content from the underlying stream.
 
         This method returns the current state of the PDF as a byte string.
-        It also triggers any pending widget hooks and applies Adobe mode if enabled.
+        It also triggers any pending widget hooks and applies necessary PDF settings
+        like setting the `NeedAppearances` flag or generating appearance streams
+        if configured.
 
         Returns:
             bytes: The PDF content as bytes.
@@ -335,8 +346,12 @@ class PdfWrapper:
                 getattr(self, "use_full_widget_name"),
             )
 
-        if getattr(self, "adobe_mode") and self._stream:
-            self._stream = enable_adobe_mode(self._stream)  # cached
+        if (
+            getattr(self, "adobe_mode") or getattr(self, "need_appearances")
+        ) and self._stream:
+            self._stream = set_need_appearances(self._stream)  # cached
+        if getattr(self, "generate_appearance_streams") and self._stream:
+            self._stream = generate_appearance_streams(self._stream)  # cached
 
         return self._stream
 

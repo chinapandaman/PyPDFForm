@@ -54,19 +54,31 @@ with open("sample_template.pdf", "rb+") as template:
 
 This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
 
-## Create an Adobe Acrobat compatible PDF wrapper
+**NOTE:** The `PdfWrapper` class does not handle appearance streams by default. For details, see [Handling Appearance Streams](#handling-appearance-streams).
 
-Adobe Acrobat has known issues displaying PDF forms with filled text fields. Specifically, the text content may only be visible when the text field is selected. This issue is not present in browsers like Chrome or PDF viewers such as Document Viewer (the default PDF application on Ubuntu).
+## Handling Appearance Streams
 
-By setting the optional parameter `adobe_mode` (default value is `False`) to `True` when instantiating the `PdfWrapper` object, you ensure that the PDF can be processed and displayed correctly by Adobe Acrobat:
+To display PDF form fields filled programmatically, especially text fields, each field requires an appearance stream. This stream dictates how a PDF viewer renders the field's content.
+
+PyPDFForm supports two flags for handling appearance streams, which you set when instantiating the `PdfWrapper` object.
+
+The first flag is `need_appearances`. Setting this flag to `True` tells the PDF viewer/editor opening the generated PDF form to generate appearance streams for each field, if the viewer is capable:
 
 ```python
 from PyPDFForm import PdfWrapper
 
-pdf = PdfWrapper("sample_template.pdf", adobe_mode=True)
+pdf = PdfWrapper("sample_template.pdf", need_appearances=True)
 ```
 
-**NOTE:** PDF objects with `adobe_mode` enabled are optimized for viewing in Adobe Acrobat. Other PDF viewers might experience rendering issues with certain field styles, such as text font or field borders. Therefore, only enable `adobe_mode` when the generated PDFs are intended to be viewed with Adobe Acrobat.
+Alternatively, use PyPDFForm's internal appearance stream generation functionality by setting the `generate_appearance_streams` flag to `True`:
+
+```python
+from PyPDFForm import PdfWrapper
+
+pdf = PdfWrapper("sample_template.pdf", generate_appearance_streams=True)
+```
+
+The choice between these two flags is situational. Use `need_appearances=True` when the output PDF is viewed in proprietary software like Adobe Acrobat, as these viewers typically have sophisticated appearance stream generation logic. If the PDF viewer does not support generating appearance streams, set `generate_appearance_streams=True` to allow PyPDFForm to handle the generation. Note that PyPDFForm's internal generation functionality is still undergoing testing and refinement.
 
 ## Use full name for PDF form fields
 
