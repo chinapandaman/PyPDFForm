@@ -52,7 +52,7 @@ def stream_to_io(stream: bytes) -> BinaryIO:
 
 
 @lru_cache
-def enable_adobe_mode(pdf: bytes) -> bytes:
+def set_need_appearances(pdf: bytes) -> bytes:
     """Enables Adobe-specific settings in the PDF to ensure proper rendering of form fields.
 
     This function modifies the PDF's AcroForm dictionary to include the `NeedAppearances` flag,

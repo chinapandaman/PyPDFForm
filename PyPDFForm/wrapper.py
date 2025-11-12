@@ -37,9 +37,9 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .template import build_widgets, update_widget_keys
-from .utils import (enable_adobe_mode, generate_appearance_streams,
-                    generate_unique_suffix, get_page_streams, merge_two_pdfs,
-                    remove_all_widgets)
+from .utils import (generate_appearance_streams, generate_unique_suffix,
+                    get_page_streams, merge_two_pdfs, remove_all_widgets,
+                    set_need_appearances)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
 from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
@@ -76,6 +76,7 @@ class PdfWrapper:
     USER_PARAMS = [
         ("use_full_widget_name", False),
         ("adobe_mode", False),
+        ("need_appearances", False),
         ("generate_appearance_streams", False),
     ]
 
@@ -113,6 +114,7 @@ class PdfWrapper:
             setattr(self, attr, kwargs.get(attr, default))
 
         if getattr(self, "generate_appearance_streams") is True:
+            setattr(self, "need_appearances", True)
             setattr(self, "adobe_mode", True)
 
         self._init_helper()
@@ -340,8 +342,10 @@ class PdfWrapper:
                 getattr(self, "use_full_widget_name"),
             )
 
-        if getattr(self, "adobe_mode") and self._stream:
-            self._stream = enable_adobe_mode(self._stream)  # cached
+        if (
+            getattr(self, "adobe_mode") or getattr(self, "need_appearances")
+        ) and self._stream:
+            self._stream = set_need_appearances(self._stream)  # cached
         if getattr(self, "generate_appearance_streams") and self._stream:
             self._stream = generate_appearance_streams(self._stream)  # cached
 
