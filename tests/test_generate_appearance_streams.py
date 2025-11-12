@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# -*- coding: utf-8 -*-
+# TODO: why does pikepdf randomize final streams?
 
 import os
 
