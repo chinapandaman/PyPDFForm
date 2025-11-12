@@ -430,6 +430,7 @@ class PdfWrapper:
         filled_stream, image_drawn_stream = fill(
             self.read(),
             self.widgets,
+            adobe_mode=getattr(self, "adobe_mode"),
             use_full_widget_name=getattr(self, "use_full_widget_name"),
             flatten=kwargs.get("flatten", False),
         )
