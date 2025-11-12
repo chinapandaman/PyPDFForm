@@ -58,7 +58,7 @@ This file adaptation applies to all PyPDFForm APIs. You can replace file path pa
 
 ## Handling Appearance Streams
 
-In order for PDF forms filled programmatically to be displayed properly, especially for text fields, an appearance stream, which tells any PDF viewers how a PDF form field should be rendered in a raw way, needs to be generated for each field.
+For PDF forms filled programmatically to display correctly, especially text fields, an appearance stream must be generated for each field. This stream dictates how a PDF viewer should render the field's content.
 
 PyPDFForm supports two different flags for handling appearance streams, both of which are set when instantiating the `PdfWrapper` object.
 
@@ -78,9 +78,7 @@ from PyPDFForm import PdfWrapper
 pdf = PdfWrapper("sample_template.pdf", generate_appearance_streams=True)
 ```
 
-Exactly which one to use is situational. In many cases, `need_appearances` is superior when you are viewing the output PDF forms in proprietary PDF softwares like Adobe Acrobat, as they likely provide very sophisticated appearance stream generation logics.
-
-On the other hand, if you are viewing the output PDF forms in PDF softwares that do not support generating appearance streams, it is better to set the `generate_appearance_streams` flag and have PyPDFForm do it. Please note though the functionality offered by PyPDFForm as its current state is not perfect and still requires further testing and refinement.
+The choice between these two flags is situational. `need_appearances` is often superior when the output PDF is viewed in proprietary software like Adobe Acrobat, as these viewers typically have sophisticated appearance stream generation logic. Conversely, if the PDF viewer does not support generating appearance streams, setting `generate_appearance_streams=True` is recommended, allowing PyPDFForm to handle the generation. Note that PyPDFForm's internal generation functionality is still undergoing testing and refinement.
 
 ## Use full name for PDF form fields
 
