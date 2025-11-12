@@ -20,9 +20,26 @@ def test_create_pdf_wrapper(static_pdfs):
     assert pdf.read() == pdf_3.read()
 
 
-def test_create_adobe_mode_wrapper(static_pdfs):
-    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"), adobe_mode=True)
+def test_create_need_appearances_wrapper(static_pdfs):
+    pdf = PdfWrapper(
+        os.path.join(static_pdfs, "sample_template.pdf"), need_appearances=True
+    )
 
+    assert getattr(pdf, "need_appearances")
+    assert (
+        pdf.read()
+        != PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).read()
+    )
+
+
+def test_create_generate_appearance_streams_wrapper(static_pdfs):
+    pdf = PdfWrapper(
+        os.path.join(static_pdfs, "sample_template.pdf"),
+        generate_appearance_streams=True,
+    )
+
+    assert getattr(pdf, "generate_appearance_streams")
+    assert getattr(pdf, "need_appearances")
     assert getattr(pdf, "adobe_mode")
     assert (
         pdf.read()
