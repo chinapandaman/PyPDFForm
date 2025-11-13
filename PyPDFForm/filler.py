@@ -101,7 +101,7 @@ def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
 def fill(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
-    adobe_mode: bool,
+    need_appearances: bool,
     use_full_widget_name: bool,
     flatten: bool = False,
 ) -> tuple:
@@ -117,7 +117,7 @@ def fill(
         template (bytes): The PDF template as bytes.
         widgets (Dict[str, WIDGET_TYPES]): A dictionary of widgets to fill, where the keys are the
                                             widget names and the values are the widget objects.
-        adobe_mode (bool): If True, skips updating the appearance stream (AP) for
+        need_appearances (bool): If True, skips updating the appearance stream (AP) for
             text and dropdown fields to maintain compatibility with Adobe Reader's
             behavior for certain fields.
         use_full_widget_name (bool): Whether to use the full widget name when looking up widgets
@@ -168,9 +168,9 @@ def fill(
                 if widget.value == radio_button_tracker[key] - 1:
                     update_radio_value(annot)
             elif isinstance(widget, Dropdown):
-                update_dropdown_value(annot, widget, adobe_mode)
+                update_dropdown_value(annot, widget, need_appearances)
             elif isinstance(widget, Text):
-                update_text_value(annot, widget, adobe_mode)
+                update_text_value(annot, widget, need_appearances)
 
     with BytesIO() as f:
         out.write(f)
