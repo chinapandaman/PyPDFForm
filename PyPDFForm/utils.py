@@ -53,6 +53,26 @@ def stream_to_io(stream: bytes) -> BinaryIO:
 
 @lru_cache
 def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) -> bytes:
+    """
+    Handles appearance streams and the /NeedAppearances flag for a PDF form.
+
+    This function prepares a PDF for form filling by:
+    1. Removing the XFA dictionary if present, as it can interfere with standard
+       AcroForm processing.
+    2. Setting the /NeedAppearances flag in the AcroForm dictionary, which instructs
+       PDF viewers to generate appearance streams for form fields.
+    3. Optionally generating appearance streams explicitly using pikepdf if
+       `generate_appearance_streams` is True.
+
+    The result is cached using lru_cache for performance.
+
+    Args:
+        pdf (bytes): The PDF file content as a bytes stream.
+        generate_appearance_streams (bool): Whether to explicitly generate appearance streams for all form fields.
+
+    Returns:
+        bytes: The modified PDF content as a bytes stream.
+    """
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
 
