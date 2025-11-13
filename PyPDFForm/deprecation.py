@@ -26,5 +26,5 @@ def deprecation_notice(to_deprecate: str, to_replace: str) -> None:
             to_replace,
         ),
         DeprecationWarning,  # noqa: PT030
-        stacklevel=2,
+        stacklevel=3,
     )
