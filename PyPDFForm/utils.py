@@ -52,21 +52,7 @@ def stream_to_io(stream: bytes) -> BinaryIO:
 
 
 @lru_cache
-def set_need_appearances(pdf: bytes) -> bytes:
-    """Sets the `NeedAppearances` flag in the PDF's AcroForm dictionary.
-
-    This function modifies the PDF's AcroForm dictionary to include the `NeedAppearances` flag,
-    which forces PDF viewers (like Adobe Reader) to generate appearance streams for form fields.
-    It also handles XFA (XML Forms Architecture) forms by removing the XFA entry from the AcroForm
-    dictionary if it exists, ensuring compatibility and proper rendering. This ensures that the
-    form fields are rendered correctly, especially when the form is filled programmatically.
-
-    Args:
-        pdf (bytes): The PDF content as bytes.
-
-    Returns:
-        bytes: The modified PDF content with the `NeedAppearances` flag set.
-    """
+def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) -> bytes:
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
 
@@ -79,31 +65,17 @@ def set_need_appearances(pdf: bytes) -> bytes:
     with BytesIO() as f:
         writer.write(f)
         f.seek(0)
-        return f.read()
+        result = f.read()
 
+    if generate_appearance_streams:
+        with Pdf.open(stream_to_io(result)) as f:
+            f.generate_appearance_streams()
+            with BytesIO() as r:
+                f.save(r)
+                r.seek(0)
+                result = r.read()
 
-@lru_cache
-def generate_appearance_streams(pdf: bytes) -> bytes:
-    """Generates appearance streams for all form fields in the PDF.
-
-    This function uses pikepdf to explicitly generate appearance streams for all
-    interactive form fields (widgets) in the PDF. This is often necessary to ensure
-    that form field values are visible and rendered correctly across different PDF viewers,
-    especially after programmatic filling.
-
-    Args:
-        pdf (bytes): The PDF content as bytes.
-
-    Returns:
-        bytes: The modified PDF content with appearance streams generated.
-    """
-    with Pdf.open(stream_to_io(pdf)) as f:
-        f.generate_appearance_streams()
-
-        with BytesIO() as result:
-            f.save(result)
-            result.seek(0)
-            return result.read()
+    return result
 
 
 @lru_cache

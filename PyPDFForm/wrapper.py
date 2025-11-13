@@ -37,9 +37,8 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .template import build_widgets, update_widget_keys
-from .utils import (generate_appearance_streams, generate_unique_suffix,
-                    get_page_streams, merge_two_pdfs, remove_all_widgets,
-                    set_need_appearances)
+from .utils import (appearance_streams_handler, generate_unique_suffix,
+                    get_page_streams, merge_two_pdfs, remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
 from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
@@ -353,9 +352,9 @@ class PdfWrapper:
             )
 
         if getattr(self, "need_appearances") and self._stream:
-            self._stream = set_need_appearances(self._stream)  # cached
-        if getattr(self, "generate_appearance_streams") and self._stream:
-            self._stream = generate_appearance_streams(self._stream)  # cached
+            self._stream = appearance_streams_handler(
+                self._stream, getattr(self, "generate_appearance_streams")
+            )  # cached
 
         return self._stream
 
