@@ -19,6 +19,8 @@ def test_adobe_mode_deprecated(template_stream):
         assert obj.adobe_mode
         assert obj.need_appearances
 
+        assert r
+
 
 def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
