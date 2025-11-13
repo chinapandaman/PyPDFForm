@@ -10,10 +10,7 @@ When filling [this PDF](pdfs/sample_template.pdf), note that text fields are fil
 ```python
 from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper(
-    "sample_template.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
-).fill(
+filled = PdfWrapper("sample_template.pdf").fill(
     {
         "test": "test_1",
         "check": True,
@@ -37,10 +34,7 @@ A [PDF form](pdfs/sample_template_with_radio_button.pdf) with radio button group
 ```python
 from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper(
-    "sample_template_with_radio_button.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
-).fill(
+filled = PdfWrapper("sample_template_with_radio_button.pdf").fill(
     {
         "radio_1": 0,
         "radio_2": 1,
@@ -59,10 +53,7 @@ As with radio buttons, select a dropdown choice by specifying its `integer` valu
 ```python
 from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper(
-    "sample_template_with_dropdown.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
-).fill(
+filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
     {
         "dropdown_1": 1
     },
@@ -77,10 +68,7 @@ You can also specify a dropdown option by its `string` value:
 ```python
 from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper(
-    "sample_template_with_dropdown.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
-).fill(
+filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
     {
         "dropdown_1": "bar"
     },
@@ -101,10 +89,7 @@ To fill a signature field, consider [this PDF](pdfs/sample_template_with_signatu
 ```python
 from PyPDFForm import PdfWrapper
 
-signed = PdfWrapper(
-    "sample_template_with_signature.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
-).fill(
+signed = PdfWrapper("sample_template_with_signature.pdf").fill(
     {
         "signature": "sample_signature.png"
     },
@@ -141,10 +126,7 @@ To fill an image field, consider [this PDF](pdfs/sample_template_with_image_fiel
 ```python
 from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper(
-    "sample_template_with_image_field.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
-).fill(
+filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
     {
         "image_1": "sample_image.jpg"
     },

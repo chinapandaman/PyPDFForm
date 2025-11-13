@@ -176,7 +176,7 @@ def get_radio_value(annot: DictionaryObject) -> bool:
 
 
 def update_dropdown_value(
-    annot: DictionaryObject, widget: Dropdown, adobe_mode: bool
+    annot: DictionaryObject, widget: Dropdown, need_appearances: bool
 ) -> None:
     """
     Updates the value of a dropdown annotation, selecting an option from the list.
@@ -188,7 +188,7 @@ def update_dropdown_value(
     Args:
         annot (DictionaryObject): The dropdown annotation dictionary.
         widget (Dropdown): The Dropdown widget object containing the selected value.
-        adobe_mode (bool): If True, skips updating the appearance stream (AP) to
+        need_appearances (bool): If True, skips updating the appearance stream (AP) to
             maintain compatibility with Adobe Reader's behavior for certain fields.
     """
     choices = widget.choices or []
@@ -196,12 +196,12 @@ def update_dropdown_value(
         annot[NameObject(Parent)][NameObject(V)] = TextStringObject(
             choices[widget.value]
         )
-        if not adobe_mode:
+        if not need_appearances:
             annot[NameObject(AP)] = TextStringObject(choices[widget.value])
     else:
         annot[NameObject(V)] = TextStringObject(choices[widget.value])
         annot[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
-        if not adobe_mode:
+        if not need_appearances:
             annot[NameObject(AP)] = TextStringObject(choices[widget.value])
 
 
@@ -228,7 +228,9 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
             widget.value = i or None  # set None when 0
 
 
-def update_text_value(annot: DictionaryObject, widget: Text, adobe_mode: bool) -> None:
+def update_text_value(
+    annot: DictionaryObject, widget: Text, need_appearances: bool
+) -> None:
     """
     Updates the value of a text annotation, setting the text content.
 
@@ -238,16 +240,16 @@ def update_text_value(annot: DictionaryObject, widget: Text, adobe_mode: bool) -
     Args:
         annot (DictionaryObject): The text annotation dictionary.
         widget (Text): The Text widget object containing the text value.
-        adobe_mode (bool): If True, skips updating the appearance stream (AP) to
+        need_appearances (bool): If True, skips updating the appearance stream (AP) to
             maintain compatibility with Adobe Reader's behavior for certain fields.
     """
     if Parent in annot and T not in annot:
         annot[NameObject(Parent)][NameObject(V)] = TextStringObject(widget.value)
-        if not adobe_mode:
+        if not need_appearances:
             annot[NameObject(AP)] = TextStringObject(widget.value)
     else:
         annot[NameObject(V)] = TextStringObject(widget.value)
-        if not adobe_mode:
+        if not need_appearances:
             annot[NameObject(AP)] = TextStringObject(widget.value)
 
 

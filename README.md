@@ -38,7 +38,7 @@ A sample PDF form can be found [here](https://chinapandaman.github.io/PyPDFForm/
 ```python
 from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper("sample_template.pdf", adobe_mode=True).fill(
+filled = PdfWrapper("sample_template.pdf", generate_appearance_streams=True).fill(
     {
         "test": "test_1",
         "check": True,

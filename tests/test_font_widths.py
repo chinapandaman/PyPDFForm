@@ -21,7 +21,7 @@ from PyPDFForm.font import compute_font_glyph_widths
 @pytest.fixture
 def pdf_font_widths_and_missing(static_pdfs, sample_font_stream):
     path = os.path.join(static_pdfs, "sample_template.pdf")
-    obj = PdfWrapper(path, adobe_mode=True)
+    obj = PdfWrapper(path, need_appearances=True)
     obj.register_font("new_font_name", sample_font_stream)
 
     writer = PdfWriter(BytesIO(obj.read()))

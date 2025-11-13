@@ -12,6 +12,16 @@ from PyPDFForm.middleware.text import Text
 from PyPDFForm.template import get_widgets_by_page
 
 
+def test_adobe_mode_deprecated(template_stream):
+    with pytest.warns(DeprecationWarning) as r:  # noqa: PT030, PT031
+        obj = PdfWrapper(template_stream, adobe_mode=True)
+
+        assert obj.adobe_mode
+        assert obj.need_appearances
+
+        assert r
+
+
 def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
 
