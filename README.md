@@ -13,8 +13,7 @@
 
 ## Introduction
 
-PyPDFForm is a free and open source pure-Python 3 library for PDF form processing. It contains the essential 
-functionalities needed to interact with PDF forms:
+PyPDFForm is a Python library for PDF form processing. It contains the essential functionalities needed to interact with PDF forms:
 
 * Inspect what data a PDF form needs to be filled with.
 * Fill a PDF form by simply creating a Python dictionary.
@@ -24,7 +23,7 @@ It also supports other common utilities such as extracting pages and merging mul
 
 ## Installing
 
-Install using [pip](https://pip.pypa.io/en/stable/):
+Install using [pip](https://pypi.org/project/PyPDFForm/):
 
 ```shell script
 pip install PyPDFForm
