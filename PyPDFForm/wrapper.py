@@ -115,9 +115,15 @@ class PdfWrapper:
         for attr, default in self.USER_PARAMS:
             setattr(self, attr, kwargs.get(attr, default))
 
+        if kwargs.get("adobe_mode"):
+            deprecation_notice(
+                f"{self.__class__.__name__}.adobe_mode",
+                f"{self.__class__.__name__}.need_appearances",
+            )
+            self.need_appearances = self.need_appearances or self.adobe_mode
+
         if getattr(self, "generate_appearance_streams") is True:
             self.need_appearances = True
-            self.adobe_mode = True
 
         self._init_helper()
 
@@ -346,9 +352,7 @@ class PdfWrapper:
                 getattr(self, "use_full_widget_name"),
             )
 
-        if (
-            getattr(self, "adobe_mode") or getattr(self, "need_appearances")
-        ) and self._stream:
+        if getattr(self, "need_appearances") and self._stream:
             self._stream = set_need_appearances(self._stream)  # cached
         if getattr(self, "generate_appearance_streams") and self._stream:
             self._stream = generate_appearance_streams(self._stream)  # cached
