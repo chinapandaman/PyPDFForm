@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+"""
+A module for handling PDF appearance streams.
+
+This module provides functionality to manage appearance streams in PDF forms,
+which are necessary for form fields to display correctly after being filled.
+It uses both pypdf and pikepdf for manipulation.
+"""
 
 from functools import lru_cache
 from io import BytesIO
