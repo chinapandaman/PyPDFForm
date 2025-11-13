@@ -100,7 +100,7 @@ class PdfWrapper:
                 Defaults to an empty byte string (b""), which creates a blank PDF.
             **kwargs: Additional keyword arguments to configure the `PdfWrapper`.
                 These arguments are used to set the user-configurable parameters defined in `USER_PARAMS`.
-                For example: `use_full_widget_name=True` or `adobe_mode=False`.
+                For example: `use_full_widget_name=True` or `need_appearances=False`.
         """
 
         super().__init__()
@@ -445,7 +445,7 @@ class PdfWrapper:
         filled_stream, image_drawn_stream = fill(
             self.read(),
             self.widgets,
-            need_appearances=getattr(self, "adobe_mode"),
+            need_appearances=getattr(self, "need_appearances"),
             use_full_widget_name=getattr(self, "use_full_widget_name"),
             flatten=kwargs.get("flatten", False),
         )
@@ -851,7 +851,7 @@ class PdfWrapper:
                 - str: The file path to the TTF file.
                 - BinaryIO: An open file-like object containing the TTF file data.
             first_time (bool): Whether this is the first time the font is being registered (default: True).
-                If True and `adobe_mode` is enabled, a blank text string is drawn to ensure the font is properly embedded in the PDF.
+                If True and `need_appearances` is enabled, a blank text string is drawn to ensure the font is properly embedded in the PDF.
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
@@ -860,10 +860,10 @@ class PdfWrapper:
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         if register_font(font_name, ttf_file) if ttf_file is not None else False:
-            if first_time and getattr(self, "adobe_mode"):
+            if first_time and getattr(self, "need_appearances"):
                 self.draw_text(" ", 1, 0, 0, font=font_name)
             self._stream, new_font_name = register_font_acroform(
-                self.read(), ttf_file, getattr(self, "adobe_mode")
+                self.read(), ttf_file, getattr(self, "need_appearances")
             )
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))

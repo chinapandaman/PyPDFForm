@@ -464,11 +464,11 @@ def test_merge_sejda_pdf_forms(issue_pdf_directory):
         {"name": "Dan", "dob": "1988-12-30", "note": "test3"},
     ]
 
-    obj = PdfWrapper(adobe_mode=True)
+    obj = PdfWrapper(need_appearances=True)
 
     for i in range(3):
         obj += PdfWrapper(
-            os.path.join(issue_pdf_directory, "PPF-884.pdf"), adobe_mode=True
+            os.path.join(issue_pdf_directory, "PPF-884.pdf"), need_appearances=True
         ).fill(data[i])
 
     result = PdfReader(stream_to_io(obj.read()))
@@ -484,7 +484,7 @@ def test_merge_sejda_pdf_forms(issue_pdf_directory):
 
 def test_xfa_to_regular_form(issue_pdf_directory, request):
     obj = PdfWrapper(
-        os.path.join(issue_pdf_directory, "1087.pdf"), adobe_mode=True
+        os.path.join(issue_pdf_directory, "1087.pdf"), need_appearances=True
     ).fill(
         {
             "G28CheckBox[0]": True,

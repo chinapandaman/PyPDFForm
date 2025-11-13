@@ -452,7 +452,7 @@ def test_change_dropdown_choices_with_export_values(
         pdf_samples, "dropdown", "test_change_dropdown_choices_with_export_values.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sample_template_with_dropdown, adobe_mode=True)
+        obj = PdfWrapper(sample_template_with_dropdown, need_appearances=True)
         obj.widgets["dropdown_1"].choices = [
             ("apple", "apple_export"),
             ("banana", "banana_export"),

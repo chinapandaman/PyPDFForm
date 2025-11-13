@@ -8,9 +8,9 @@ from PyPDFForm import Fields, PdfWrapper
 
 
 def test_fill(template_stream, pdf_samples, data_dict, request):
-    expected_path = os.path.join(pdf_samples, "adobe_mode", "sample_filled.pdf")
+    expected_path = os.path.join(pdf_samples, "need_appearances", "sample_filled.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream, adobe_mode=True).fill(
+        obj = PdfWrapper(template_stream, need_appearances=True).fill(
             data_dict,
         )
 
@@ -25,10 +25,10 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
 
 def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(
-        pdf_samples, "adobe_mode", "dropdown", "dropdown_two.pdf"
+        pdf_samples, "need_appearances", "dropdown", "dropdown_two.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sample_template_with_dropdown, adobe_mode=True).fill(
+        obj = PdfWrapper(sample_template_with_dropdown, need_appearances=True).fill(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -52,10 +52,10 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
 
 def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
     expected_path = os.path.join(
-        pdf_samples, "adobe_mode", "paragraph", "sample_filled_sejda_complex.pdf"
+        pdf_samples, "need_appearances", "paragraph", "sample_filled_sejda_complex.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sejda_template_complex, adobe_mode=True).fill(
+        obj = PdfWrapper(sejda_template_complex, need_appearances=True).fill(
             {
                 "checkbox": True,
                 "radio": 0,
@@ -91,11 +91,12 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
 
 def test_issue_613(pdf_samples, request):
     expected_path = os.path.join(
-        pdf_samples, "adobe_mode", "issues", "613_expected.pdf"
+        pdf_samples, "need_appearances", "issues", "613_expected.pdf"
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(
-            os.path.join(pdf_samples, "scenario", "issues", "613.pdf"), adobe_mode=True
+            os.path.join(pdf_samples, "scenario", "issues", "613.pdf"),
+            need_appearances=True,
         ).fill(
             {
                 "301 Full name": "John Smith",
@@ -117,12 +118,12 @@ def test_sample_template_library(
     pdf_samples, image_samples, sample_font_stream, request
 ):
     expected_path = os.path.join(
-        pdf_samples, "adobe_mode", "test_sample_template_library.pdf"
+        pdf_samples, "need_appearances", "test_sample_template_library.pdf"
     )
 
     with open(expected_path, "rb+") as f:
         obj = (
-            PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"), adobe_mode=True)
+            PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"), need_appearances=True)
             .register_font("new_font", sample_font_stream)
             .create_field(
                 Fields.TextField(

@@ -40,7 +40,6 @@ def test_create_generate_appearance_streams_wrapper(static_pdfs):
 
     assert getattr(pdf, "generate_appearance_streams")
     assert getattr(pdf, "need_appearances")
-    assert getattr(pdf, "adobe_mode")
     assert (
         pdf.read()
         != PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).read()
