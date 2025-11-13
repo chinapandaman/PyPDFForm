@@ -12,7 +12,6 @@ def test_fill_text_check(static_pdfs, pdf_samples, request):
 
     filled = PdfWrapper(
         os.path.join(static_pdfs, "sample_template.pdf"),
-        adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {
             "test": "test_1",
@@ -40,7 +39,6 @@ def test_fill_radio(static_pdfs, pdf_samples, request):
 
     filled = PdfWrapper(
         os.path.join(static_pdfs, "sample_template_with_radio_button.pdf"),
-        adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {
             "radio_1": 0,
@@ -65,7 +63,6 @@ def test_fill_dropdown(static_pdfs, pdf_samples, request):
 
     filled = PdfWrapper(
         os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
-        adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {"dropdown_1": 1},
         flatten=False,  # optional, set to True to flatten the filled PDF form
@@ -86,7 +83,6 @@ def test_fill_dropdown_via_str(static_pdfs, pdf_samples, request):
 
     filled = PdfWrapper(
         os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
-        adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {"dropdown_1": "bar"},
         flatten=False,  # optional, set to True to flatten the filled PDF form
@@ -108,7 +104,6 @@ def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
 
     filled = PdfWrapper(
         os.path.join(static_pdfs, "sample_template_with_signature.pdf"),
-        adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {"signature": os.path.join(image_samples, "sample_signature.png")},
         flatten=False,  # optional, set to True to flatten the filled PDF form
@@ -130,7 +125,6 @@ def test_fill_sig_ratio(static_pdfs, pdf_samples, image_samples, request):
 
     pdf = PdfWrapper(
         os.path.join(static_pdfs, "sample_template_with_signature.pdf"),
-        adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     )
     pdf.widgets["signature"].preserve_aspect_ratio = False
     pdf.fill(
@@ -153,7 +147,6 @@ def test_fill_image(static_pdfs, pdf_samples, image_samples, request):
 
     filled = PdfWrapper(
         os.path.join(static_pdfs, "sample_template_with_image_field.pdf"),
-        adobe_mode=False,  # optional, set to True for Adobe Acrobat compatibility
     ).fill(
         {"image_1": os.path.join(image_samples, "sample_image.jpg")},
         flatten=False,  # optional, set to True to flatten the filled PDF form

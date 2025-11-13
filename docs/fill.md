@@ -12,7 +12,6 @@ from PyPDFForm import PdfWrapper
 
 filled = PdfWrapper(
     "sample_template.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
 ).fill(
     {
         "test": "test_1",
@@ -39,7 +38,6 @@ from PyPDFForm import PdfWrapper
 
 filled = PdfWrapper(
     "sample_template_with_radio_button.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
 ).fill(
     {
         "radio_1": 0,
@@ -61,7 +59,6 @@ from PyPDFForm import PdfWrapper
 
 filled = PdfWrapper(
     "sample_template_with_dropdown.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
 ).fill(
     {
         "dropdown_1": 1
@@ -79,7 +76,6 @@ from PyPDFForm import PdfWrapper
 
 filled = PdfWrapper(
     "sample_template_with_dropdown.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
 ).fill(
     {
         "dropdown_1": "bar"
@@ -103,7 +99,6 @@ from PyPDFForm import PdfWrapper
 
 signed = PdfWrapper(
     "sample_template_with_signature.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
 ).fill(
     {
         "signature": "sample_signature.png"
@@ -143,7 +138,6 @@ from PyPDFForm import PdfWrapper
 
 filled = PdfWrapper(
     "sample_template_with_image_field.pdf",
-    adobe_mode=False    # optional, set to True for Adobe Acrobat compatibility
 ).fill(
     {
         "image_1": "sample_image.jpg"
