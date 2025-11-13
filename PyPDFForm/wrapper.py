@@ -120,7 +120,7 @@ class PdfWrapper:
                 f"{self.__class__.__name__}.adobe_mode",
                 f"{self.__class__.__name__}.need_appearances",
             )
-            self.need_appearances = self.need_appearances or self.adobe_mode
+            self.need_appearances = self.need_appearances or kwargs.get("adobe_mode")
 
         if getattr(self, "generate_appearance_streams") is True:
             self.need_appearances = True
