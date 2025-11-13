@@ -142,7 +142,9 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float):
     return widths
 
 
-def register_font_acroform(pdf: bytes, ttf_stream: bytes, adobe_mode: bool) -> tuple:
+def register_font_acroform(
+    pdf: bytes, ttf_stream: bytes, need_appearances: bool
+) -> tuple:
     """
     Registers a TrueType font within the PDF's AcroForm dictionary.
 
@@ -155,7 +157,9 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes, adobe_mode: bool) -> t
             will be modified to include the new font.
         ttf_stream (bytes): The font file data in TTF format as bytes. This is the
             raw data of the TrueType font file.
-        adobe_mode (bool): A flag indicating whether to use Adobe-specific font parameters.
+        need_appearances (bool): If True, attempts to retrieve existing font parameters
+            from the PDF's resources to ensure compatibility when appearance streams are
+            required.
 
     Returns:
         tuple: A tuple containing the modified PDF data as bytes and the new font name
@@ -168,7 +172,7 @@ def register_font_acroform(pdf: bytes, ttf_stream: bytes, adobe_mode: bool) -> t
 
     font_descriptor_params = {}
     font_dict_params = {}
-    if adobe_mode:
+    if need_appearances:
         font_descriptor_params, font_dict_params = get_additional_font_params(
             pdf, base_font_name
         )
