@@ -23,6 +23,7 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
+        request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
 
 
 def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
@@ -51,6 +52,7 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
+        request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
 
 
 def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
@@ -92,6 +94,7 @@ def test_fill_sejda_complex(sejda_template_complex, pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
+        request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
 
 
 def test_issue_613(pdf_samples, request):
@@ -115,6 +118,7 @@ def test_issue_613(pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
+        request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
 
 
 @pytest.mark.posix_only
@@ -213,3 +217,4 @@ def test_sample_template_library(
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
+        request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)

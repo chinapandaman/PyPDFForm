@@ -16,3 +16,5 @@ if [ "$VIRTUAL_ENV" == "" ] && [ "$PYPDFFORM_ENV" != "container" ]; then
 fi
 
 uv pip install -U -r pyproject.toml --extra dev
+
+mkdir -p temp
