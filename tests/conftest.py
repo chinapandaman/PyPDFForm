@@ -17,7 +17,11 @@ def pytest_addoption(parser):
 def _generate_new_pdf_samples(request):
     request.config.results = {}
     yield
-    if request.config.getoption("--regenerate") == "1" and request.config.results:
+    if (
+        request.config.getoption("--regenerate") == "1"
+        and request.config.results
+        and not request.config.results.get("skip_regenerate")
+    ):
         with open(request.config.results["expected_path"], "wb+") as f:
             f.write(request.config.results["stream"])
 
