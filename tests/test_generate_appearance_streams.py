@@ -122,6 +122,40 @@ def test_issue_613(pdf_samples, request):
 
 
 @pytest.mark.posix_only
+def test_default_font_reportlab_text_alignment(pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples,
+        "generate_appearance_streams",
+        "test_default_font_reportlab_text_alignment.pdf",
+    )
+    with open(expected_path, "rb+") as f:
+        obj = (
+            PdfWrapper(
+                os.path.join(pdf_samples, "dummy.pdf"),
+                generate_appearance_streams=True,
+            )
+            .create_field(
+                Fields.TextField(
+                    "new_text_field_widget",
+                    1,
+                    100,
+                    100,
+                    alignment=1,
+                )
+            )
+            .fill({"new_text_field_widget": "foo"})
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
+
+
+@pytest.mark.posix_only
 def test_sample_template_library(
     pdf_samples, image_samples, sample_font_stream, request
 ):
@@ -205,9 +239,7 @@ def test_sample_template_library(
 
         obj.widgets["new_text_field_widget"].font = "new_font"
         obj.widgets["new_text_field_widget"].font_color = (1, 0, 0)
-        obj.widgets["new_text_field_widget"].alignment = (
-            2  # TODO: why is alignment not rendered right in the appearance stream?
-        )
+        obj.widgets["new_text_field_widget"].alignment = 2
         obj.widgets["new_checkbox_widget"].size = 40
         obj.widgets["new_radio_group"].size = 50
 
