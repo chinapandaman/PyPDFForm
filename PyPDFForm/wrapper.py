@@ -326,9 +326,11 @@ class PdfWrapper:
         """
         Returns the current PDF content as a byte string.
 
-        This method ensures all necessary post-processing steps, such as
-        generating appearance streams for form fields (if configured), are
-        applied before returning the final PDF data.
+        This method retrieves the PDF content, ensuring all necessary pre-read
+        operations (like widget hook execution and setting /NeedAppearances) are
+        complete. If appearance streams were explicitly generated (via
+        `generate_appearance_streams=True`), it performs post-processing, such as
+        correcting text alignment, before returning the final PDF data.
 
         Returns:
             bytes: The byte string representation of the PDF document.
