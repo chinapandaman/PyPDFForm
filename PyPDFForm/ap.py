@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-A module for handling PDF appearance streams.
+Contains functions for handling and post-processing PDF appearance streams (AP).
 
-This module provides functionality to manage appearance streams in PDF forms,
-which are necessary for form fields to display correctly after being filled.
-It uses both pypdf and pikepdf for manipulation.
+This module is responsible for:
+1. Preparing a PDF form by removing XFA data and setting the /NeedAppearances flag.
+2. Optionally generating appearance streams explicitly using pikepdf.
+3. Post-processing appearance streams, specifically adjusting text alignment for
+   ReportLab-generated text fields.
 """
 
+from contextlib import suppress
 from functools import lru_cache
 from io import BytesIO
 
@@ -100,15 +103,13 @@ def appearance_streams_post_processing(
             key = get_widget_key(annot, use_full_widget_name)
             widget = widgets[key]
 
-            try:
+            with suppress(Exception):
                 needs_update = (
                     needs_update
                     or ap_processing_reportlab_text_field_alignment(
                         annot, widget, available_fonts
                     )
                 )
-            except Exception:
-                pass
 
     if not needs_update:
         return pdf
