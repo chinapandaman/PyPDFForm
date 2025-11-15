@@ -365,6 +365,7 @@ class PdfWrapper:
                 getattr(self, "use_full_widget_name"),
             )
 
+        # TODO: move to public .read()
         if getattr(self, "need_appearances") and self._stream:
             self._stream = appearance_streams_handler(
                 self._stream, getattr(self, "generate_appearance_streams")

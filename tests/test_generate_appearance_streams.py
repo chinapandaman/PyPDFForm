@@ -205,9 +205,7 @@ def test_sample_template_library(
 
         obj.widgets["new_text_field_widget"].font = "new_font"
         obj.widgets["new_text_field_widget"].font_color = (1, 0, 0)
-        obj.widgets["new_text_field_widget"].alignment = (
-            2  # TODO: why is alignment not rendered right in the appearance stream?
-        )
+        obj.widgets["new_text_field_widget"].alignment = 2
         obj.widgets["new_checkbox_widget"].size = 40
         obj.widgets["new_radio_group"].size = 50
 

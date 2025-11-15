@@ -108,7 +108,9 @@ def ap_processing_reportlab_text_field_alignment(
         return False
 
     ap_stream = annot[AP][N].get_data()
+    bbox = annot[AP][N][BBox]
 
+    # calculate width
     font_size = float(
         ap_stream.split(bytes(" " + FONT_SIZE_IDENTIFIER, encoding="utf-8"))[0].split(
             b" "
@@ -123,8 +125,7 @@ def ap_processing_reportlab_text_field_alignment(
     else:
         width = getFont(DEFAULT_FONT).stringWidth(widget.value, font_size)
 
-    bbox = annot[AP][N][BBox]
-
+    # new alignment coordinate stream
     alignment_coord = b" ".join(
         ap_stream.split(b" " + Td)[0].split(b" ")[-2:] + [Td]
     ).split(b"\n")[1]
@@ -139,6 +140,7 @@ def ap_processing_reportlab_text_field_alignment(
         ]
         + alignment_coord.split(b" ")[1:]
     )
+
     annot[AP][N].set_data(ap_stream.replace(alignment_coord, new_alignment_coord))
 
     return True
