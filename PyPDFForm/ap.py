@@ -101,9 +101,6 @@ def appearance_streams_post_processing(
     for page in writer.pages:
         for annot in page.get(Annots, []):
             key = get_widget_key(annot, use_full_widget_name)
-            if key not in widgets:
-                continue
-
             with suppress(Exception):
                 needs_update = (
                     needs_update
