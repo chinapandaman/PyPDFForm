@@ -323,6 +323,17 @@ class PdfWrapper:
         return result
 
     def read(self) -> bytes:
+        """
+        Returns the current PDF content as a byte string.
+
+        This method ensures all necessary post-processing steps, such as
+        generating appearance streams for form fields (if configured), are
+        applied before returning the final PDF data.
+
+        Returns:
+            bytes: The byte string representation of the PDF document.
+        """
+
         result = self._read()
 
         if getattr(self, "generate_appearance_streams") and result:
@@ -337,15 +348,15 @@ class PdfWrapper:
 
     def _read(self) -> bytes:
         """
-        Reads the PDF content from the underlying stream.
+        Internal method to retrieve the raw PDF content stream.
 
-        This method returns the current state of the PDF as a byte string.
-        It also triggers any pending widget hooks and applies necessary PDF settings
-        like setting the `NeedAppearances` flag or generating appearance streams
-        if configured.
+        This method applies necessary pre-read modifications to the PDF stream,
+        such as triggering widget hooks for dynamic content and ensuring
+        appearance stream handling (setting the NeedAppearances flag) is
+        performed if configured.
 
         Returns:
-            bytes: The PDF content as bytes.
+            bytes: The raw byte string of the PDF document stream.
         """
 
         if any(widget.hooks_to_trigger for widget in self.widgets.values()):
