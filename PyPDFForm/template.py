@@ -8,6 +8,7 @@ and defines specific patterns for identifying and constructing different
 types of widgets.
 """
 
+import warnings
 from functools import lru_cache
 from io import BytesIO
 from typing import Dict, List, Tuple, Union, cast
@@ -20,11 +21,18 @@ from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
-from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
-                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
-                       get_checkbox_value, get_dropdown_value, get_radio_value,
-                       get_text_field_multiline, get_text_value,
-                       update_annotation_name)
+from .patterns import (
+    DROPDOWN_CHOICE_PATTERNS,
+    WIDGET_DESCRIPTION_PATTERNS,
+    WIDGET_KEY_PATTERNS,
+    WIDGET_TYPE_PATTERNS,
+    get_checkbox_value,
+    get_dropdown_value,
+    get_radio_value,
+    get_text_field_multiline,
+    get_text_value,
+    update_annotation_name,
+)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
@@ -54,41 +62,55 @@ def build_widgets(
 
     for widgets in get_widgets_by_page(pdf_stream).values():
         for widget in widgets:
-            key = get_widget_key(widget, use_full_widget_name)
-            _widget = construct_widget(widget, key)
-            if _widget is not None:
-                _widget.__dict__["tooltip"] = extract_widget_property(
-                    widget, WIDGET_DESCRIPTION_PATTERNS, None, str
+            try:
+                key = get_widget_key(widget, use_full_widget_name)
+                _widget = construct_widget(widget, key)
+                if _widget is not None:
+                    _widget.__dict__["tooltip"] = extract_widget_property(
+                        widget, WIDGET_DESCRIPTION_PATTERNS, None, str
+                    )
+
+                    if isinstance(_widget, Text):
+                        # mostly for schema for now
+                        # doesn't trigger hook
+                        _widget.__dict__["max_length"] = get_text_field_max_length(
+                            widget
+                        )
+                        _widget.__dict__["multiline"] = get_text_field_multiline(widget)
+                        get_text_value(widget, _widget)
+
+                    if type(_widget) is Checkbox:
+                        _widget.value = get_checkbox_value(widget)
+
+                    if isinstance(_widget, Dropdown):
+                        # actually used for filling value
+                        # doesn't trigger hook
+                        _widget.__dict__["choices"] = get_dropdown_choices(widget)
+                        get_dropdown_value(widget, _widget)
+
+                    if isinstance(_widget, Radio):
+                        if key not in results:
+                            results[key] = _widget
+
+                        # for schema
+                        results[key].number_of_options += 1
+
+                        if get_radio_value(widget):
+                            results[key].value = results[key].number_of_options - 1
+                        continue
+
+                    results[key] = _widget
+            except (
+                Exception
+            ) as e:  # noqa: BLE001  # pylint: disable=broad-exception-caught
+                # Catch all exceptions to prevent one faulty widget from crashing the entire PDF processing
+                widget_name = widget.get(T, "unknown")
+                warnings.warn(
+                    f"Failed to process widget '{widget_name}': {str(e)}. Skipping this widget.",
+                    RuntimeWarning,
+                    stacklevel=2,
                 )
-
-                if isinstance(_widget, Text):
-                    # mostly for schema for now
-                    # doesn't trigger hook
-                    _widget.__dict__["max_length"] = get_text_field_max_length(widget)
-                    _widget.__dict__["multiline"] = get_text_field_multiline(widget)
-                    get_text_value(widget, _widget)
-
-                if type(_widget) is Checkbox:
-                    _widget.value = get_checkbox_value(widget)
-
-                if isinstance(_widget, Dropdown):
-                    # actually used for filling value
-                    # doesn't trigger hook
-                    _widget.__dict__["choices"] = get_dropdown_choices(widget)
-                    get_dropdown_value(widget, _widget)
-
-                if isinstance(_widget, Radio):
-                    if key not in results:
-                        results[key] = _widget
-
-                    # for schema
-                    results[key].number_of_options += 1
-
-                    if get_radio_value(widget):
-                        results[key].value = results[key].number_of_options - 1
-                    continue
-
-                results[key] = _widget
+                continue
 
     return results
 
