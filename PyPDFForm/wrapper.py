@@ -24,7 +24,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING, BinaryIO, Dict, List, Sequence, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
-from .ap import appearance_streams_handler
+from .ap import appearance_streams_handler, appearance_streams_post_processing
 from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
                         VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS)
 from .coordinate import generate_coordinate_grid
@@ -324,6 +324,14 @@ class PdfWrapper:
 
     def read(self) -> bytes:
         result = self._read()
+
+        if getattr(self, "generate_appearance_streams") and result:
+            result = appearance_streams_post_processing(
+                result,
+                self.widgets,
+                getattr(self, "use_full_widget_name"),
+                self._available_fonts,
+            )
 
         return result
 
