@@ -368,6 +368,12 @@ def test_create_text_default(template_stream, pdf_samples, request):
         )
         assert obj.schema["properties"]["foo"]["type"] == "string"
 
+        for k, v in obj.widgets.items():
+            if k != "foo":
+                assert not v.created_by_pypdfform
+            else:
+                assert v.created_by_pypdfform
+
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
 
