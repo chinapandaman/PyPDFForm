@@ -101,11 +101,13 @@ def appearance_streams_post_processing(
     for page in writer.pages:
         for annot in page.get(Annots, []):
             key = get_widget_key(annot, use_full_widget_name)
+            widget = widgets[key]
+
             with suppress(Exception):
                 needs_update = (
                     needs_update
                     or ap_processing_reportlab_text_field_alignment(
-                        annot, widgets[key], available_fonts
+                        annot, widget, available_fonts
                     )
                 )
 
