@@ -209,9 +209,6 @@ def test_bulk_create_fields_stress_max(pdf_samples, request):
             obj += PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
         obj.bulk_create_fields(fields)
 
-        for each in obj.widgets.values():
-            assert each.created_by_pypdfform
-
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
 

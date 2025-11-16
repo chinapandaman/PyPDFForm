@@ -46,7 +46,6 @@ class Widget:
         self.readonly: bool = None
         self.required: bool = None
         self.hooks_to_trigger: list = []
-        self.created_by_pypdfform: bool = False
 
     def __setattr__(self, name: str, value: Any) -> None:
         """

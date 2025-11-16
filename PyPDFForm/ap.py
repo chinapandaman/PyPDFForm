@@ -138,14 +138,7 @@ def ap_processing_reportlab_text_field_alignment(
     Returns:
         bool: True if the appearance stream was modified, False otherwise.
     """
-    if any(
-        [
-            not widget.created_by_pypdfform,
-            not isinstance(widget, Text),
-            not widget.alignment,
-            not widget.value,
-        ]
-    ):
+    if (not widget.alignment) or (not widget.value):
         return False
 
     ap_stream = annot[AP][N].get_data()
