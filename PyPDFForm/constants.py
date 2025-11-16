@@ -92,10 +92,6 @@ FontCmap = "cmap"
 FontHmtx = "hmtx"
 FontNotdef = ".notdef"
 
-# AP stream
-BBox = "/BBox"
-Td = b"Td"
-
 FIRST_CHAR_CODE = 0
 LAST_CHAR_CODE = 255
 ENCODING_TABLE_SIZE = 256
