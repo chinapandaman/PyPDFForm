@@ -10,7 +10,7 @@ def test_fill(static_pdfs, request):
 
     filled = PdfWrapper(
         os.path.join(static_pdfs, "sample_template.pdf"),
-        generate_appearance_streams=True,
+        need_appearances=True,
     ).fill(
         {
             "test": "test_1",
@@ -29,4 +29,4 @@ def test_fill(static_pdfs, request):
         expected = f.read()
 
         assert len(filled.read()) == len(expected)
-        request.config.results["skip_regenerate"] = len(filled.read()) == len(expected)
+        assert filled.read() == expected
