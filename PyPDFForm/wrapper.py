@@ -594,7 +594,6 @@ class PdfWrapper:
         for widget in widgets:
             for k, v in widget.hook_params:
                 self.widgets[widget.name].__setattr__(k, v)
-            self.widgets[widget.name].created_by_pypdfform = True
 
         return self
 
@@ -697,8 +696,6 @@ class PdfWrapper:
         self._init_helper()
         for k, v in hook_params:
             self.widgets[name].__setattr__(k, v)
-
-        self.widgets[name].created_by_pypdfform = True
 
         return self
 
