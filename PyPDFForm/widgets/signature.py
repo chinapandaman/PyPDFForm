@@ -23,11 +23,11 @@ from pypdf.generic import (ArrayObject, FloatObject, NameObject,
                            TextStringObject)
 from reportlab.pdfgen.canvas import Canvas
 
+from ..assets.bedrock import BEDROCK_PDF
 from ..constants import Annots, Rect, T
 from ..template import get_widget_key
 from ..utils import stream_to_io
 from .base import Field
-from .bedrock import BEDROCK_PDF
 
 
 class SignatureWidget:
