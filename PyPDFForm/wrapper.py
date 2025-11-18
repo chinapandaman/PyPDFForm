@@ -21,7 +21,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import asdict
 from functools import cached_property
-from typing import TYPE_CHECKING, BinaryIO, Dict, List, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, BinaryIO, Dict, List, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .ap import appearance_streams_handler
@@ -297,14 +297,14 @@ class PdfWrapper:
         return list(self._available_fonts.keys())
 
     @cached_property
-    def pages(self) -> Sequence[PdfWrapper]:
+    def pages(self) -> PdfWrapperList:
         """
-        Returns a sequence of `PdfWrapper` objects, each representing a single page in the PDF document.
+        Returns a list of `PdfWrapper` objects, each representing a single page in the PDF document.
 
         This allows you to work with individual pages of the PDF, for example, to extract text or images from a specific page.
 
         Returns:
-            Sequence[PdfWrapper]: A sequence of `PdfWrapper` objects, one for each page in the PDF.
+            PdfWrapperList: A list of `PdfWrapper` objects, one for each page in the PDF.
         """
 
         result = [
