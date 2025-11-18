@@ -142,10 +142,10 @@ class PdfWrapper:
             PdfWrapper: A new `PdfWrapper` object containing the merged PDFs.
         """
 
-        if not self.read():
+        if not self or not self.read():
             return other
 
-        if not other.read():
+        if not other or not other.read():
             return self
 
         unique_suffix = generate_unique_suffix()

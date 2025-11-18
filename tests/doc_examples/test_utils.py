@@ -48,7 +48,7 @@ def test_reorg_pages(static_pdfs, pdf_samples, request):
 
     pdf_one = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
     pdf_two = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
-    merged = pdf_two.pages[0] + pdf_one + pdf_two.pages[1] + pdf_two.pages[2]
+    merged = pdf_two.pages[0] + pdf_one + pdf_two.pages[1:]
 
     request.config.results["expected_path"] = expected_path
     request.config.results["stream"] = merged.read()
