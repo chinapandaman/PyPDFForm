@@ -38,6 +38,7 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .template import build_widgets, update_widget_keys
+from .types import PdfWrapperList
 from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
                     remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
@@ -320,7 +321,7 @@ class PdfWrapper:
                 for page in result:
                     page.register_font(event[0], event[1])
 
-        return result
+        return PdfWrapperList(result)
 
     def read(self) -> bytes:
         """
