@@ -43,7 +43,7 @@ from PyPDFForm import PdfWrapper
 
 pdf_one = PdfWrapper("dummy.pdf")
 pdf_two = PdfWrapper("sample_template.pdf")
-merged = pdf_two.pages[0] + pdf_one + pdf_two.pages[1] + pdf_two.pages[2]
+merged = pdf_two.pages[0] + pdf_one + pdf_two.pages[1:]
 
 merged.write("output.pdf")
 ```
