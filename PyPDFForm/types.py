@@ -38,13 +38,12 @@ class PdfWrapperList(list):
 
         if isinstance(key, slice):
             result = None
-            l = super().__getitem__(key)
-            for each in l:
+            wrappers = super().__getitem__(key)
+            for each in wrappers:
                 if not result:
                     result = each
                 else:
                     result += each
 
             return result
-        else:
-            return super().__getitem__(key)
+        return super().__getitem__(key)
