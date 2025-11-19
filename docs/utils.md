@@ -4,6 +4,38 @@ PyPDFForm offers additional utilities similar to other PDF libraries.
 
 This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
 
+## Blank PDFs
+
+Use the `BlankPage` class with `PdfWrapper` to create new blank PDFs. The following example generates a PDF with a single blank page:
+
+```python
+from PyPDFForm import BlankPage, PdfWrapper
+
+blank_pdf = PdfWrapper(BlankPage())
+
+blank_pdf.write("output.pdf")
+```
+
+By default, `BlankPage` generates a letter-size (612 x 792 points or 8.5 x 11 inches) blank PDF page. To change the dimensions, specify `width` and `height` (in points) when you instantiate the object:
+
+```python
+from PyPDFForm import BlankPage, PdfWrapper
+
+blank_pdf = PdfWrapper(BlankPage(width=595.35, height=841.995)) # A4 size
+
+blank_pdf.write("output.pdf")
+```
+
+To create a blank PDF with multiple pages, multiply the `BlankPage` object by the number of pages you need:
+
+```python
+from PyPDFForm import BlankPage, PdfWrapper
+
+blank_pdf = PdfWrapper(BlankPage() * 3) # 3 pages of letter size
+
+blank_pdf.write("output.pdf")
+```
+
 ## Extract pages
 
 The `PdfWrapper` object has a `.pages` attribute, which is a list of `PdfWrapper` objects representing individual pages:

@@ -5,7 +5,7 @@ import os
 import pytest
 from jsonschema import ValidationError, validate
 
-from PyPDFForm import PdfWrapper
+from PyPDFForm import BlankPage, PdfWrapper
 from PyPDFForm.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
 from PyPDFForm.middleware.base import Widget
 from PyPDFForm.middleware.text import Text
@@ -1206,3 +1206,35 @@ def test_uncheck_checkbox_flatten(pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+@pytest.mark.posix_only
+def test_blank_page(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_blank_page.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(BlankPage() * 1)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
+
+
+@pytest.mark.posix_only
+def test_blank_page_custom_size_multiply(pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "test_blank_page_custom_size_multiply.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(BlankPage(595.35, 841.995) * 3)
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)

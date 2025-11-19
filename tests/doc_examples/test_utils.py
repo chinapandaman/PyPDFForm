@@ -2,7 +2,65 @@
 
 import os
 
-from PyPDFForm import PdfWrapper
+import pytest
+
+from PyPDFForm import BlankPage, PdfWrapper
+
+
+@pytest.mark.posix_only
+def test_blank_page(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_blank_page.pdf")
+
+    blank_pdf = PdfWrapper(BlankPage())
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = blank_pdf.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(blank_pdf.read()) == len(expected)
+        request.config.results["skip_regenerate"] = len(blank_pdf.read()) == len(
+            expected
+        )
+
+
+@pytest.mark.posix_only
+def test_blank_page_custom_dimensions(pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_blank_page_custom_dimensions.pdf"
+    )
+
+    blank_pdf = PdfWrapper(BlankPage(width=595.35, height=841.995))  # A4 size
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = blank_pdf.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(blank_pdf.read()) == len(expected)
+        request.config.results["skip_regenerate"] = len(blank_pdf.read()) == len(
+            expected
+        )
+
+
+@pytest.mark.posix_only
+def test_blank_page_multiply(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_blank_page_multiply.pdf")
+
+    blank_pdf = PdfWrapper(BlankPage() * 3)  # 3 pages of letter size
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = blank_pdf.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(blank_pdf.read()) == len(expected)
+        request.config.results["skip_regenerate"] = len(blank_pdf.read()) == len(
+            expected
+        )
 
 
 def test_extract_pages(static_pdfs, pdf_samples, request):
