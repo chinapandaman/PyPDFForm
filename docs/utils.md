@@ -6,7 +6,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
 ## Blank PDFs
 
-You can use the `BlankPage` class together with `PdfWrapper` to generate blank PDFs. For instance, the below snippet generates a PDF with a single blank page:
+The `BlankPage` class can be used with `PdfWrapper` to create new blank PDFs. For example, the following snippet generates a PDF with a single blank page:
 
 ```python
 from PyPDFForm import BlankPage, PdfWrapper
@@ -16,7 +16,7 @@ blank_pdf = PdfWrapper(BlankPage())
 blank_pdf.write("output.pdf")
 ```
 
-By default the `BlankPage` object will generate a letter size (612 x 792 points or 8.5 x 11 inches) blank PDF page. If you wish to change its resolution, you can specify the `width` and `height` (in points) when instantiating the object:
+By default, a `BlankPage` object generates a letter size (612 x 792 points or 8.5 x 11 inches) blank PDF page. To change its dimensions, specify the desired `width` and `height` (in points) when instantiating the object:
 
 ```python
 from PyPDFForm import BlankPage, PdfWrapper
@@ -26,7 +26,7 @@ blank_pdf = PdfWrapper(BlankPage(width=595.35, height=841.995)) # A4 size
 blank_pdf.write("output.pdf")
 ```
 
-If you want more than one page of the blank PDF, you can simply multiply the `BlankPage` by the number of pages you need:
+To generate a blank PDF with multiple pages, multiply the `BlankPage` object by the desired number of pages:
 
 ```python
 from PyPDFForm import BlankPage, PdfWrapper
