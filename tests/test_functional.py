@@ -1211,7 +1211,7 @@ def test_uncheck_checkbox_flatten(pdf_samples, request):
 def test_blank_page(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_blank_page.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(BlankPage())
+        obj = PdfWrapper(BlankPage() * 1)
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
