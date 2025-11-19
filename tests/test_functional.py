@@ -1208,6 +1208,7 @@ def test_uncheck_checkbox_flatten(pdf_samples, request):
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
 def test_blank_page(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_blank_page.pdf")
     with open(expected_path, "rb+") as f:
@@ -1222,6 +1223,7 @@ def test_blank_page(pdf_samples, request):
         request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
 
 
+@pytest.mark.posix_only
 def test_blank_page_custom_size_multiply(pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "test_blank_page_custom_size_multiply.pdf"
