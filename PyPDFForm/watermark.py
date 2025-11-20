@@ -116,39 +116,6 @@ def draw_image(canvas: Canvas, **kwargs) -> None:
     image_buff.close()
 
 
-def merge_watermarks_with_pdf(
-    pdf: bytes,
-    watermarks: List[bytes],
-) -> bytes:
-    """
-    Merges the generated watermarks with the original PDF content.
-
-    This function takes a PDF file and a list of watermarks as input.
-    It then merges each watermark with its corresponding page in the PDF.
-
-    Args:
-        pdf (bytes): The PDF file as a byte stream.
-        watermarks (List[bytes]): A list of byte streams, where each element represents the watermark for a specific page.
-
-    Returns:
-        bytes: A byte stream representing the merged PDF with watermarks applied.
-    """
-    result = BytesIO()
-    pdf_file = PdfReader(stream_to_io(pdf))
-    output = PdfWriter()
-
-    for i, page in enumerate(pdf_file.pages):
-        if watermarks[i]:
-            watermark = PdfReader(stream_to_io(watermarks[i]))
-            if watermark.pages:
-                page.merge_page(watermark.pages[0])
-        output.add_page(page)
-
-    output.write(result)
-    result.seek(0)
-    return result.read()
-
-
 def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
     type_to_func = {
         "image": draw_image,
@@ -190,6 +157,39 @@ def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
         result.append(buff.read())
 
     return result
+
+
+def merge_watermarks_with_pdf(
+    pdf: bytes,
+    watermarks: List[bytes],
+) -> bytes:
+    """
+    Merges the generated watermarks with the original PDF content.
+
+    This function takes a PDF file and a list of watermarks as input.
+    It then merges each watermark with its corresponding page in the PDF.
+
+    Args:
+        pdf (bytes): The PDF file as a byte stream.
+        watermarks (List[bytes]): A list of byte streams, where each element represents the watermark for a specific page.
+
+    Returns:
+        bytes: A byte stream representing the merged PDF with watermarks applied.
+    """
+    result = BytesIO()
+    pdf_file = PdfReader(stream_to_io(pdf))
+    output = PdfWriter()
+
+    for i, page in enumerate(pdf_file.pages):
+        if watermarks[i]:
+            watermark = PdfReader(stream_to_io(watermarks[i]))
+            if watermark.pages:
+                page.merge_page(watermark.pages[0])
+        output.add_page(page)
+
+    output.write(result)
+    result.seek(0)
+    return result.read()
 
 
 def copy_watermark_widgets(
