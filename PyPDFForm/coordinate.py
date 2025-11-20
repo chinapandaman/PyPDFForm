@@ -42,7 +42,6 @@ def generate_coordinate_grid(
     pdf_file = PdfReader(stream_to_io(pdf))
     lines_by_page = {}
     texts_by_page = {}
-    watermarks = []
 
     for i, page in enumerate(pdf_file.pages):
         lines_by_page[i + 1] = []
@@ -96,16 +95,15 @@ def generate_coordinate_grid(
                 y += margin
             x += margin
 
+    to_draw = []
+
     for page, lines in lines_by_page.items():
-        watermarks.append(
-            create_watermarks_and_draw(pdf, page, "line", lines)[page - 1]
+        to_draw.extend(
+            [{"page_number": page, "type": "line", **line} for line in lines]
         )
-
-    result = merge_watermarks_with_pdf(pdf, watermarks)
-    watermarks = []
     for page, texts in texts_by_page.items():
-        watermarks.append(
-            create_watermarks_and_draw(pdf, page, "text", texts)[page - 1]
+        to_draw.extend(
+            [{"page_number": page, "type": "text", **text} for text in texts]
         )
 
-    return merge_watermarks_with_pdf(result, watermarks)
+    return merge_watermarks_with_pdf(pdf, create_watermarks_and_draw(pdf, to_draw))

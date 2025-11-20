@@ -8,6 +8,7 @@ The module also includes functions to merge these watermarks with the original P
 and to copy specific widgets from the watermarks to the original PDF.
 """
 
+from collections import defaultdict
 from io import BytesIO
 from typing import List, Union
 
@@ -115,58 +116,64 @@ def draw_image(canvas: Canvas, **kwargs) -> None:
     image_buff.close()
 
 
-def create_watermarks_and_draw(
-    pdf: bytes,
-    page_number: int,
-    action_type: str,
-    actions: List[dict],
-) -> List[bytes]:
+def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
     """
-    Creates watermarks for a specific page in the PDF based on the provided actions and draws them.
+    Creates a watermark PDF for each page of the input PDF based on the drawing instructions.
 
-    This function takes a PDF file, a page number, an action type, and a list of actions as input.
-    It then creates a watermark for the specified page by drawing the specified actions on a Canvas object.
+    This function reads the input PDF to determine page sizes, then uses ReportLab
+    to create a separate, single-page PDF (a watermark) for each page that has
+    drawing instructions.
 
     Args:
-        pdf (bytes): The PDF file as a byte stream.
-        page_number (int): The page number to which the watermark should be applied (1-indexed).
-        action_type (str): The type of action to perform when creating the watermark (e.g., "image", "text", "line").
-        actions (List[dict]): A list of dictionaries, where each dictionary represents an action to be performed on the watermark.
+        pdf (bytes): The original PDF file as a byte stream.
+        to_draw (List[dict]): A list of drawing instructions, where each dictionary
+            must contain a "page_number" key (1-based) and a "type" key ("image", "text", or "line")
+            along with type-specific parameters.
 
     Returns:
-        List[bytes]: A list of byte streams, where the element at index (page_number - 1) contains the watermark for the specified page,
-                     and all other elements are empty byte streams.
+        List[bytes]: A list of watermark PDF byte streams. An empty byte string (b"")
+            is used for pages without any drawing instructions.
     """
-    pdf_file = PdfReader(stream_to_io(pdf))
-    buff = BytesIO()
-
-    canvas = Canvas(
-        buff,
-        pagesize=(
-            float(pdf_file.pages[page_number - 1].mediabox[2]),
-            float(pdf_file.pages[page_number - 1].mediabox[3]),
-        ),
-    )
-
-    action_type_to_func = {
+    type_to_func = {
         "image": draw_image,
         "text": draw_text,
         "line": draw_line,
     }
 
-    if action_type_to_func.get(action_type):
-        for each in actions:
-            action_type_to_func[action_type](canvas, **each)
+    result = []
 
-    canvas.save()
-    buff.seek(0)
+    page_to_to_draw = defaultdict(list)
+    for each in to_draw:
+        page_to_to_draw[each["page_number"]].append(each)
 
-    watermark = buff.read()
-    buff.close()
+    pdf_file = PdfReader(stream_to_io(pdf))
+    buff = BytesIO()
 
-    return [
-        watermark if i == page_number - 1 else b"" for i in range(len(pdf_file.pages))
-    ]
+    for i, page in enumerate(pdf_file.pages):
+        elements = page_to_to_draw[i + 1]
+        if not elements:
+            result.append(b"")
+            continue
+
+        buff.seek(0)
+        buff.flush()
+
+        canvas = Canvas(
+            buff,
+            pagesize=(
+                float(page.mediabox[2]),
+                float(page.mediabox[3]),
+            ),
+        )
+
+        for element in elements:
+            type_to_func[element["type"]](canvas, **element)
+
+        canvas.save()
+        buff.seek(0)
+        result.append(buff.read())
+
+    return result
 
 
 def merge_watermarks_with_pdf(

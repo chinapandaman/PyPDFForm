@@ -771,10 +771,10 @@ class PdfWrapper:
 
         watermarks = create_watermarks_and_draw(
             self.read(),
-            page_number,
-            "text",
             [
                 {
+                    "page_number": page_number,
+                    "type": "text",
                     "widget": new_widget,
                     "x": x,
                     "y": y,
@@ -825,9 +825,17 @@ class PdfWrapper:
         image = rotate_image(image, rotation)
         watermarks = create_watermarks_and_draw(
             self.read(),
-            page_number,
-            "image",
-            [{"stream": image, "x": x, "y": y, "width": width, "height": height}],
+            [
+                {
+                    "page_number": page_number,
+                    "type": "image",
+                    "stream": image,
+                    "x": x,
+                    "y": y,
+                    "width": width,
+                    "height": height,
+                }
+            ],
         )
 
         stream_with_widgets = self.read()
