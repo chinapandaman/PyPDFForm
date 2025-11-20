@@ -739,6 +739,20 @@ class PdfWrapper:
         return self
 
     def draw(self, elements: List[RawTypes]) -> PdfWrapper:
+        """
+        Draws raw elements (text, images, etc.) directly onto the PDF pages.
+
+        This method is the primary mechanism for drawing non-form field content.
+        It takes a list of `RawText` or `RawImage` objects and renders them
+        onto the PDF document as watermarks.
+
+        Args:
+            elements (List[RawTypes]): A list of raw elements to draw (e.g., [RawText(...), RawImage(...)]).
+
+        Returns:
+            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
+        """
+
         watermarks = create_watermarks_and_draw(
             self.read(), [each.to_draw for each in elements]
         )
