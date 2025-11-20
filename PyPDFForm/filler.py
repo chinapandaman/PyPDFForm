@@ -101,6 +101,7 @@ def fill(
                The image drawn stream is only returned if there are any image or signature widgets
                in the form.
     """
+    # pylint: disable=R0912
     pdf = PdfReader(stream_to_io(template))
     out = PdfWriter()
     out.append(pdf)
@@ -154,8 +155,9 @@ def fill(
 
     images = []
     for page, elements in images_to_draw.items():
-        for element in elements:
-            images.append({"page_number": page, "type": "image", **element})
+        images.extend(
+            [{"page_number": page, "type": "image", **element} for element in elements]
+        )
 
     return result, (
         merge_watermarks_with_pdf(result, create_watermarks_and_draw(result, images))

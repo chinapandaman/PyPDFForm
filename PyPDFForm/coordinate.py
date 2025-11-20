@@ -98,10 +98,12 @@ def generate_coordinate_grid(
     to_draw = []
 
     for page, lines in lines_by_page.items():
-        for line in lines:
-            to_draw.append({"page_number": page, "type": "line", **line})
+        to_draw.extend(
+            [{"page_number": page, "type": "line", **line} for line in lines]
+        )
     for page, texts in texts_by_page.items():
-        for text in texts:
-            to_draw.append({"page_number": page, "type": "text", **text})
+        to_draw.extend(
+            [{"page_number": page, "type": "text", **text} for text in texts]
+        )
 
     return merge_watermarks_with_pdf(pdf, create_watermarks_and_draw(pdf, to_draw))
