@@ -33,11 +33,10 @@ from .filler import fill
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
 from .hooks import trigger_widget_hooks
-from .image import rotate_image
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .raw import RawText
+from .raw import RawImage, RawText
 from .template import build_widgets, update_widget_keys
 from .types import PdfWrapperList
 from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
@@ -818,21 +817,9 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        image = fp_or_f_obj_or_stream_to_stream(image)
-        image = rotate_image(image, rotation)
         watermarks = create_watermarks_and_draw(
             self.read(),
-            [
-                {
-                    "page_number": page_number,
-                    "type": "image",
-                    "stream": image,
-                    "x": x,
-                    "y": y,
-                    "width": width,
-                    "height": height,
-                }
-            ],
+            [RawImage(image, page_number, x, y, width, height, rotation).to_draw],
         )
 
         stream_with_widgets = self.read()
