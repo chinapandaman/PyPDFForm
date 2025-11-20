@@ -23,9 +23,10 @@ PyPDFForm aims to simplify PDF form manipulation, making it accessible to develo
 __version__ = "3.7.4"
 
 from .assets.blank import BlankPage
-from .middleware.text import Text  # exposing for setting global font attrs
+from .middleware import Widgets
+from .middleware.text import Text  # TODO: deprecate in v4.0.0
 from .raw import RawElements
 from .widgets import Fields
 from .wrapper import PdfWrapper
 
-__all__ = ["PdfWrapper", "Text", "Fields", "BlankPage", "RawElements"]
+__all__ = ["PdfWrapper", "Text", "Fields", "BlankPage", "RawElements", "Widgets"]
