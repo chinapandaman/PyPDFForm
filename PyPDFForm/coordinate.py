@@ -15,7 +15,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from .constants import COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT
 from .middleware.text import Text
 from .utils import stream_to_io
-from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
+from .watermark import bulk_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def generate_coordinate_grid(
@@ -42,7 +42,6 @@ def generate_coordinate_grid(
     pdf_file = PdfReader(stream_to_io(pdf))
     lines_by_page = {}
     texts_by_page = {}
-    watermarks = []
 
     for i, page in enumerate(pdf_file.pages):
         lines_by_page[i + 1] = []
@@ -96,16 +95,13 @@ def generate_coordinate_grid(
                 y += margin
             x += margin
 
+    to_draw = []
+
     for page, lines in lines_by_page.items():
-        watermarks.append(
-            create_watermarks_and_draw(pdf, page, "line", lines)[page - 1]
-        )
-
-    result = merge_watermarks_with_pdf(pdf, watermarks)
-    watermarks = []
+        for line in lines:
+            to_draw.append({"page_number": page, "type": "line", **line})
     for page, texts in texts_by_page.items():
-        watermarks.append(
-            create_watermarks_and_draw(pdf, page, "text", texts)[page - 1]
-        )
+        for text in texts:
+            to_draw.append({"page_number": page, "type": "text", **text})
 
-    return merge_watermarks_with_pdf(result, watermarks)
+    return merge_watermarks_with_pdf(pdf, bulk_watermarks_and_draw(pdf, to_draw))

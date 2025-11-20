@@ -116,60 +116,6 @@ def draw_image(canvas: Canvas, **kwargs) -> None:
     image_buff.close()
 
 
-def create_watermarks_and_draw(
-    pdf: bytes,
-    page_number: int,
-    action_type: str,
-    actions: List[dict],
-) -> List[bytes]:
-    """
-    Creates watermarks for a specific page in the PDF based on the provided actions and draws them.
-
-    This function takes a PDF file, a page number, an action type, and a list of actions as input.
-    It then creates a watermark for the specified page by drawing the specified actions on a Canvas object.
-
-    Args:
-        pdf (bytes): The PDF file as a byte stream.
-        page_number (int): The page number to which the watermark should be applied (1-indexed).
-        action_type (str): The type of action to perform when creating the watermark (e.g., "image", "text", "line").
-        actions (List[dict]): A list of dictionaries, where each dictionary represents an action to be performed on the watermark.
-
-    Returns:
-        List[bytes]: A list of byte streams, where the element at index (page_number - 1) contains the watermark for the specified page,
-                     and all other elements are empty byte streams.
-    """
-    pdf_file = PdfReader(stream_to_io(pdf))
-    buff = BytesIO()
-
-    canvas = Canvas(
-        buff,
-        pagesize=(
-            float(pdf_file.pages[page_number - 1].mediabox[2]),
-            float(pdf_file.pages[page_number - 1].mediabox[3]),
-        ),
-    )
-
-    action_type_to_func = {
-        "image": draw_image,
-        "text": draw_text,
-        "line": draw_line,
-    }
-
-    if action_type_to_func.get(action_type):
-        for each in actions:
-            action_type_to_func[action_type](canvas, **each)
-
-    canvas.save()
-    buff.seek(0)
-
-    watermark = buff.read()
-    buff.close()
-
-    return [
-        watermark if i == page_number - 1 else b"" for i in range(len(pdf_file.pages))
-    ]
-
-
 def merge_watermarks_with_pdf(
     pdf: bytes,
     watermarks: List[bytes],
