@@ -13,17 +13,30 @@ All optional parameters will have a comment `# optional` after each of them.
 To use a custom font, see how to register it [here](font.md).
 
 ```python
-from PyPDFForm import PdfWrapper
+from PyPDFForm import PdfWrapper, RawElements
 
-pdf = PdfWrapper("sample_template.pdf").draw_text(
-    text="random text",
-    page_number=1,
-    x=300,
-    y=225,
-    font="your_registered_font",    # optional
-    font_size=12,   # optional
-    font_color=(1, 0, 0)    # optional
-)
+texts = [
+    RawElements.RawText(
+        text="random text",
+        page_number=1,
+        x=300,
+        y=225,
+        font="your_registered_font",  # optional
+        font_size=12,  # optional
+        font_color=(1, 0, 0),  # optional
+    ),
+    RawElements.RawText(
+        text="random text on page 2",
+        page_number=2,
+        x=300,
+        y=225,
+        font="your_registered_font",  # optional
+        font_size=12,  # optional
+        font_color=(1, 0, 0),  # optional
+    ),
+]
+
+pdf = PdfWrapper("sample_template.pdf").draw(texts)
 
 pdf.write("output.pdf")
 ```
@@ -33,17 +46,30 @@ pdf.write("output.pdf")
 For the rotation parameter, a positive value rotates the image counter-clockwise, and a negative value rotates it clockwise.
 
 ```python
-from PyPDFForm import PdfWrapper
+from PyPDFForm import PdfWrapper, RawElements
 
-pdf = PdfWrapper("sample_template.pdf").draw_image(
-    image="sample_image.jpg",
-    page_number=1,
-    x=100,
-    y=100,
-    width=400,
-    height=225,
-    rotation=0  # optional
-)
+images = [
+    RawElements.RawImage(
+        image="sample_image.jpg",
+        page_number=1,
+        x=100,
+        y=100,
+        width=400,
+        height=225,
+        rotation=0,  # optional
+    ),
+    RawElements.RawImage(
+        image="sample_image.jpg",
+        page_number=2,
+        x=100,
+        y=100,
+        width=400,
+        height=225,
+        rotation=180,  # optional
+    ),
+]
+
+pdf = PdfWrapper("sample_template.pdf").draw(images)
 
 pdf.write("output.pdf")
 ```
