@@ -116,6 +116,7 @@ class PdfWrapper:
         for attr, default in self.USER_PARAMS:
             setattr(self, attr, kwargs.get(attr, default))
 
+        # TODO: deprecate in v4.0.0
         if kwargs.get("adobe_mode"):
             deprecation_notice(
                 f"{self.__class__.__name__}.adobe_mode",
@@ -639,6 +640,7 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
+        # TODO: deprecate in v4.0.0
         if not kwargs.get("suppress_deprecation_notice"):
             deprecation_notice(
                 f"{self.__class__.__name__}.create_widget()",
@@ -792,6 +794,7 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
+        # TODO: deprecate in v4.0.0
         deprecation_notice(
             f"{self.__class__.__name__}.draw_text()",
             f"{self.__class__.__name__}.draw()",
@@ -839,6 +842,7 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
+        # TODO: deprecate in v4.0.0
         deprecation_notice(
             f"{self.__class__.__name__}.draw_image()",
             f"{self.__class__.__name__}.draw()",
