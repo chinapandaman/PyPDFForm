@@ -33,10 +33,10 @@ from .filler import fill
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
 from .hooks import trigger_widget_hooks
-from .image import rotate_image
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
+from .raw import RawImage, RawText, RawTypes
 from .template import build_widgets, update_widget_keys
 from .types import PdfWrapperList
 from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
@@ -738,6 +738,35 @@ class PdfWrapper:
 
         return self
 
+    def draw(self, elements: List[RawTypes]) -> PdfWrapper:
+        """
+        Draws raw elements (text, images, etc.) directly onto the PDF pages.
+
+        This method is the primary mechanism for drawing non-form field content.
+        It takes a list of `RawText` or `RawImage` objects and renders them
+        onto the PDF document as watermarks.
+
+        Args:
+            elements (List[RawTypes]): A list of raw elements to draw (e.g., [RawText(...), RawImage(...)]).
+
+        Returns:
+            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
+        """
+
+        watermarks = create_watermarks_and_draw(
+            self.read(), [each.to_draw for each in elements]
+        )
+
+        stream_with_widgets = self.read()
+        self._stream = merge_watermarks_with_pdf(self.read(), watermarks)
+        self._stream = copy_watermark_widgets(
+            remove_all_widgets(self.read()), stream_with_widgets, None, None
+        )
+        # because copy_watermark_widgets and remove_all_widgets
+        self._reregister_font()
+
+        return self
+
     def draw_text(
         self,
         text: str,
@@ -763,34 +792,19 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        new_widget = Text("new")
-        new_widget.value = text
-        new_widget.font = kwargs.get("font", DEFAULT_FONT)
-        new_widget.font_size = kwargs.get("font_size", DEFAULT_FONT_SIZE)
-        new_widget.font_color = kwargs.get("font_color", DEFAULT_FONT_COLOR)
-
-        watermarks = create_watermarks_and_draw(
-            self.read(),
+        return self.draw(
             [
-                {
-                    "page_number": page_number,
-                    "type": "text",
-                    "widget": new_widget,
-                    "x": x,
-                    "y": y,
-                }
-            ],
+                RawText(
+                    text,
+                    page_number,
+                    x,
+                    y,
+                    kwargs.get("font", DEFAULT_FONT),
+                    kwargs.get("font_size", DEFAULT_FONT_SIZE),
+                    kwargs.get("font_color", DEFAULT_FONT_COLOR),
+                )
+            ]
         )
-
-        stream_with_widgets = self.read()
-        self._stream = merge_watermarks_with_pdf(self.read(), watermarks)
-        self._stream = copy_watermark_widgets(
-            remove_all_widgets(self.read()), stream_with_widgets, None, None
-        )
-        # because copy_watermark_widgets and remove_all_widgets
-        self._reregister_font()
-
-        return self
 
     def draw_image(
         self,
@@ -821,32 +835,7 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        image = fp_or_f_obj_or_stream_to_stream(image)
-        image = rotate_image(image, rotation)
-        watermarks = create_watermarks_and_draw(
-            self.read(),
-            [
-                {
-                    "page_number": page_number,
-                    "type": "image",
-                    "stream": image,
-                    "x": x,
-                    "y": y,
-                    "width": width,
-                    "height": height,
-                }
-            ],
-        )
-
-        stream_with_widgets = self.read()
-        self._stream = merge_watermarks_with_pdf(self.read(), watermarks)
-        self._stream = copy_watermark_widgets(
-            remove_all_widgets(self.read()), stream_with_widgets, None, None
-        )
-        # because copy_watermark_widgets and remove_all_widgets
-        self._reregister_font()
-
-        return self
+        return self.draw([RawImage(image, page_number, x, y, width, height, rotation)])
 
     def register_font(
         self,
