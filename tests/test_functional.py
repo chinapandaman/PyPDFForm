@@ -22,6 +22,22 @@ def test_adobe_mode_deprecated(template_stream):
         assert r
 
 
+def test_draw_text_deprecated(template_stream):
+    with pytest.warns(DeprecationWarning) as r:  # noqa: PT030, PT031
+        PdfWrapper(template_stream).draw_text("foo", 1, 100, 100)
+
+        assert r
+
+
+def test_draw_image_deprecated(template_stream, image_samples):
+    with pytest.warns(DeprecationWarning) as r:  # noqa: PT030, PT031
+        PdfWrapper(template_stream).draw_image(
+            os.path.join(image_samples, "sample_image.jpg"), 1, 100, 100, 400, 350
+        )
+
+        assert r
+
+
 def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
 

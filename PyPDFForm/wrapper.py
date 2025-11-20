@@ -792,6 +792,10 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
+        deprecation_notice(
+            f"{self.__class__.__name__}.draw_text()",
+            f"{self.__class__.__name__}.draw()",
+        )
         return self.draw(
             [
                 RawText(
@@ -835,6 +839,10 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
+        deprecation_notice(
+            f"{self.__class__.__name__}.draw_image()",
+            f"{self.__class__.__name__}.draw()",
+        )
         return self.draw([RawImage(image, page_number, x, y, width, height, rotation)])
 
     def register_font(
