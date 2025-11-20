@@ -8,6 +8,7 @@ The module also includes functions to merge these watermarks with the original P
 and to copy specific widgets from the watermarks to the original PDF.
 """
 
+from collections import defaultdict
 from io import BytesIO
 from typing import List, Union
 
@@ -200,6 +201,49 @@ def merge_watermarks_with_pdf(
     output.write(result)
     result.seek(0)
     return result.read()
+
+
+def bulk_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
+    type_to_func = {
+        "image": draw_image,
+        "text": draw_text,
+        "line": draw_line,
+    }
+
+    result = []
+
+    page_to_to_draw = defaultdict(list)
+    for each in to_draw:
+        page_to_to_draw[each["page_number"]].append(each)
+
+    pdf_file = PdfReader(stream_to_io(pdf))
+    buff = BytesIO()
+
+    for i, page in enumerate(pdf_file.pages):
+        elements = page_to_to_draw[i + 1]
+        if not elements:
+            result.append(b"")
+            continue
+
+        buff.seek(0)
+        buff.flush()
+
+        canvas = Canvas(
+            buff,
+            pagesize=(
+                float(page.mediabox[2]),
+                float(page.mediabox[3]),
+            ),
+        )
+
+        for element in elements:
+            type_to_func[element["type"]](canvas, **element)
+
+        canvas.save()
+        buff.seek(0)
+        result.append(buff.read())
+
+    return result
 
 
 def copy_watermark_widgets(
