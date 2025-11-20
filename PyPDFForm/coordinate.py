@@ -15,7 +15,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from .constants import COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT
 from .middleware.text import Text
 from .utils import stream_to_io
-from .watermark import bulk_watermarks_and_draw, merge_watermarks_with_pdf
+from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def generate_coordinate_grid(
@@ -104,4 +104,4 @@ def generate_coordinate_grid(
         for text in texts:
             to_draw.append({"page_number": page, "type": "text", **text})
 
-    return merge_watermarks_with_pdf(pdf, bulk_watermarks_and_draw(pdf, to_draw))
+    return merge_watermarks_with_pdf(pdf, create_watermarks_and_draw(pdf, to_draw))

@@ -149,7 +149,7 @@ def merge_watermarks_with_pdf(
     return result.read()
 
 
-def bulk_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
+def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
     type_to_func = {
         "image": draw_image,
         "text": draw_text,

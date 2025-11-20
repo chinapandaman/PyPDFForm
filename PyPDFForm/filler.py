@@ -27,7 +27,7 @@ from .patterns import (update_checkbox_value, update_dropdown_value,
                        update_radio_value, update_text_value)
 from .template import get_widget_key
 from .utils import stream_to_io
-from .watermark import bulk_watermarks_and_draw, merge_watermarks_with_pdf
+from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def signature_image_handler(
@@ -158,5 +158,5 @@ def fill(
             images.append({"page_number": page, "type": "image", **element})
 
     return result, (
-        merge_watermarks_with_pdf(result, bulk_watermarks_and_draw(result, images))
+        merge_watermarks_with_pdf(result, create_watermarks_and_draw(result, images))
     )

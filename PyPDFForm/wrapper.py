@@ -41,7 +41,7 @@ from .template import build_widgets, update_widget_keys
 from .types import PdfWrapperList
 from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
                     remove_all_widgets)
-from .watermark import (bulk_watermarks_and_draw, copy_watermark_widgets,
+from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
 from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
 from .widgets.checkbox import CheckBoxWidget
@@ -769,7 +769,7 @@ class PdfWrapper:
         new_widget.font_size = kwargs.get("font_size", DEFAULT_FONT_SIZE)
         new_widget.font_color = kwargs.get("font_color", DEFAULT_FONT_COLOR)
 
-        watermarks = bulk_watermarks_and_draw(
+        watermarks = create_watermarks_and_draw(
             self.read(),
             [
                 {
@@ -823,7 +823,7 @@ class PdfWrapper:
 
         image = fp_or_f_obj_or_stream_to_stream(image)
         image = rotate_image(image, rotation)
-        watermarks = bulk_watermarks_and_draw(
+        watermarks = create_watermarks_and_draw(
             self.read(),
             [
                 {
