@@ -117,6 +117,23 @@ def draw_image(canvas: Canvas, **kwargs) -> None:
 
 
 def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
+    """
+    Creates a watermark PDF for each page of the input PDF based on the drawing instructions.
+
+    This function reads the input PDF to determine page sizes, then uses ReportLab
+    to create a separate, single-page PDF (a watermark) for each page that has
+    drawing instructions.
+
+    Args:
+        pdf (bytes): The original PDF file as a byte stream.
+        to_draw (List[dict]): A list of drawing instructions, where each dictionary
+            must contain a "page_number" key (1-based) and a "type" key ("image", "text", or "line")
+            along with type-specific parameters.
+
+    Returns:
+        List[bytes]: A list of watermark PDF byte streams. An empty byte string (b"")
+            is used for pages without any drawing instructions.
+    """
     type_to_func = {
         "image": draw_image,
         "text": draw_text,
