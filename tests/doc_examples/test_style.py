@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from PyPDFForm import PdfWrapper, Text
+from PyPDFForm import PdfWrapper, Widgets
 
 
 @pytest.mark.posix_only
@@ -16,7 +16,7 @@ def test_change_text_font(static_pdfs, sample_font_stream, pdf_samples, request)
 
     # change globally by iterating each text field
     for field in form.widgets.values():
-        if isinstance(field, Text):
+        if isinstance(field, Widgets.Text):
             field.font = "new_font_name"
 
     # or change at each field's widget level
@@ -50,7 +50,7 @@ def test_change_text_font_size(static_pdfs, pdf_samples, request):
 
     # change globally by iterating each text field
     for field in form.widgets.values():
-        if isinstance(field, Text):
+        if isinstance(field, Widgets.Text):
             field.font_size = 20
 
     # or change at each field's widget level
@@ -84,7 +84,7 @@ def test_change_text_font_color(static_pdfs, pdf_samples, request):
 
     # change globally by iterating each text field
     for field in form.widgets.values():
-        if isinstance(field, Text):
+        if isinstance(field, Widgets.Text):
             field.font_color = (1, 0, 0)
 
     # or change at each field's widget level
@@ -118,7 +118,7 @@ def test_change_text_alignment(static_pdfs, pdf_samples, request):
 
     # change globally by iterating each text field
     for field in form.widgets.values():
-        if isinstance(field, Text):
+        if isinstance(field, Widgets.Text):
             field.alignment = 1  # center
 
     # or change at each field's widget level
@@ -152,7 +152,7 @@ def test_change_text_max_length(static_pdfs, pdf_samples, request):
 
     # change globally by iterating each text field
     for field in form.widgets.values():
-        if isinstance(field, Text):
+        if isinstance(field, Widgets.Text):
             field.max_length = 4
 
     # or change at each field's widget level
@@ -186,7 +186,7 @@ def test_change_text_comb(static_pdfs, pdf_samples, request):
 
     # change globally by iterating each text field
     for field in form.widgets.values():
-        if isinstance(field, Text):
+        if isinstance(field, Widgets.Text):
             field.max_length = 4
             field.comb = True
 
