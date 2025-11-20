@@ -11,13 +11,13 @@ Before changing a text field's font, you must first [register](font.md) the desi
 After registration, you can apply the registered font to any text field:
 
 ```python
-from PyPDFForm import PdfWrapper, Text
+from PyPDFForm import PdfWrapper, Widgets
 
 form = PdfWrapper("sample_template.pdf")
 
 # change globally by iterating each text field
 for field in form.widgets.values():
-    if isinstance(field, Text):
+    if isinstance(field, Widgets.Text):
         field.font = "your_registered_font"
 
 # or change at each field's widget level
@@ -42,13 +42,13 @@ form.write("output.pdf")
 You can change the font size using a `float` value in PyPDFForm:
 
 ```python
-from PyPDFForm import PdfWrapper, Text
+from PyPDFForm import PdfWrapper, Widgets
 
 form = PdfWrapper("sample_template.pdf")
 
 # change globally by iterating each text field
 for field in form.widgets.values():
-    if isinstance(field, Text):
+    if isinstance(field, Widgets.Text):
         field.font_size = 20
 
 # or change at each field's widget level
@@ -73,13 +73,13 @@ form.write("output.pdf")
 You can change the font color using an RGB `tuple`:
 
 ```python
-from PyPDFForm import PdfWrapper, Text
+from PyPDFForm import PdfWrapper, Widgets
 
 form = PdfWrapper("sample_template.pdf")
 
 # change globally by iterating each text field
 for field in form.widgets.values():
-    if isinstance(field, Text):
+    if isinstance(field, Widgets.Text):
         field.font_color = (1, 0, 0)
 
 # or change at each field's widget level
@@ -104,13 +104,13 @@ form.write("output.pdf")
 You can change the alignment of the text filled into a text field by setting its `alignment` property to an integer value: `0` for left, `1` for center, and `2` for right.
 
 ```python
-from PyPDFForm import PdfWrapper, Text
+from PyPDFForm import PdfWrapper, Widgets
 
 form = PdfWrapper("sample_template.pdf")
 
 # change globally by iterating each text field
 for field in form.widgets.values():
-    if isinstance(field, Text):
+    if isinstance(field, Widgets.Text):
         field.alignment = 1 # center
 
 # or change at each field's widget level
@@ -135,13 +135,13 @@ form.write("output.pdf")
 You can change the maximum number of characters allowed in a text field:
 
 ```python
-from PyPDFForm import PdfWrapper, Text
+from PyPDFForm import PdfWrapper, Widgets
 
 form = PdfWrapper("sample_template.pdf")
 
 # change globally by iterating each text field
 for field in form.widgets.values():
-    if isinstance(field, Text):
+    if isinstance(field, Widgets.Text):
         field.max_length = 4
 
 # or change at each field's widget level
@@ -166,13 +166,13 @@ form.write("output.pdf")
 To enable character spacing in a text field, set its `.comb` property to `True`. This will evenly space out the characters of the text filled into the field. Note that this property only takes effect when the text field also has a `max_length` set.
 
 ```python
-from PyPDFForm import PdfWrapper, Text
+from PyPDFForm import PdfWrapper, Widgets
 
 form = PdfWrapper("sample_template.pdf")
 
 # change globally by iterating each text field
 for field in form.widgets.values():
-    if isinstance(field, Text):
+    if isinstance(field, Widgets.Text):
         field.max_length = 4
         field.comb = True
 
