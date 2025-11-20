@@ -27,7 +27,7 @@ from .patterns import (update_checkbox_value, update_dropdown_value,
                        update_radio_value, update_text_value)
 from .template import get_widget_key
 from .utils import stream_to_io
-from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
+from .watermark import bulk_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def signature_image_handler(
@@ -68,34 +68,6 @@ def signature_image_handler(
         )
 
     return any_image_to_draw
-
-
-def get_drawn_stream(to_draw: dict, stream: bytes, action: str) -> bytes:
-    """Applies watermarks to specific pages of a PDF based on the provided drawing instructions.
-
-    This function takes a dictionary of drawing instructions and applies watermarks to the
-    specified pages of a PDF. It iterates through the drawing instructions, creates watermarks
-    for each page, and merges the watermarks with the original PDF content. The function
-    supports various drawing actions, such as adding images or text.
-
-    Args:
-        to_draw (dict): A dictionary containing page numbers as keys and lists of drawing instructions as values.
-                         Each drawing instruction specifies the type of drawing, position, dimensions, and content.
-        stream (bytes): The PDF content as bytes.
-        action (str): The type of action to perform (e.g., "image", "text").
-
-    Returns:
-        bytes: The modified PDF content with watermarks applied.
-    """
-    watermark_list = []
-    for page, stuffs in to_draw.items():
-        watermark_list.append(b"")
-        watermarks = create_watermarks_and_draw(stream, page, action, stuffs)
-        for i, watermark in enumerate(watermarks):
-            if watermark:
-                watermark_list[i] = watermark
-
-    return merge_watermarks_with_pdf(stream, watermark_list)
 
 
 def fill(
@@ -177,6 +149,14 @@ def fill(
         f.seek(0)
         result = f.read()
 
+    if not any_image_to_draw:
+        return result, None
+
+    images = []
+    for page, elements in images_to_draw.items():
+        for element in elements:
+            images.append({"page_number": page, "type": "image", **element})
+
     return result, (
-        get_drawn_stream(images_to_draw, result, "image") if any_image_to_draw else None
+        merge_watermarks_with_pdf(result, bulk_watermarks_and_draw(result, images))
     )
