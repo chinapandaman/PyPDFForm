@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 The `widgets` package provides a collection of classes representing various types of PDF form fields (widgets).
 

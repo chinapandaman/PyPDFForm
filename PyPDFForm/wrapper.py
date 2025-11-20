@@ -37,6 +37,7 @@ from .image import rotate_image
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
+from .raw import RawText
 from .template import build_widgets, update_widget_keys
 from .types import PdfWrapperList
 from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
@@ -763,22 +764,18 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        new_widget = Text("new")
-        new_widget.value = text
-        new_widget.font = kwargs.get("font", DEFAULT_FONT)
-        new_widget.font_size = kwargs.get("font_size", DEFAULT_FONT_SIZE)
-        new_widget.font_color = kwargs.get("font_color", DEFAULT_FONT_COLOR)
-
         watermarks = create_watermarks_and_draw(
             self.read(),
             [
-                {
-                    "page_number": page_number,
-                    "type": "text",
-                    "widget": new_widget,
-                    "x": x,
-                    "y": y,
-                }
+                RawText(
+                    text,
+                    page_number,
+                    x,
+                    y,
+                    kwargs.get("font", DEFAULT_FONT),
+                    kwargs.get("font_size", DEFAULT_FONT_SIZE),
+                    kwargs.get("font_color", DEFAULT_FONT_COLOR),
+                ).to_draw
             ],
         )
 
