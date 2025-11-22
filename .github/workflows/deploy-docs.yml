@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.x'
       - name: Install mkdocs
-        run: uv pip install mkdocs --system
+        run: uv pip install -U mkdocs --system
       - name: Deploy docs to GitHub page
         run: |
           mkdocs gh-deploy --force --clean --verbose
