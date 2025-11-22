@@ -22,6 +22,29 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
         run: python scripts/close_staled_issues.py
 
+  nightly-linting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        uv pip install -U -r pyproject.toml --extra dev --system
+    - name: Analyze code with pylint
+      run: |
+        pylint PyPDFForm
+    - name: Analyze code with pyright
+      run: |
+        pyright .
+    - name: Analyze code with ruff
+      run: |
+        ruff check .
+
   nightly-tests:
     runs-on: ubuntu-latest
     steps:
