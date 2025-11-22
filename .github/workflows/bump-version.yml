@@ -29,6 +29,9 @@ jobs:
           python-version: '3.x'
       - name: Install dependencies
         run: uv pip install -U -r pyproject.toml --extra dev --system
+      - name: Run another round of tests
+        run: |
+          coverage run -m pytest && coverage report --fail-under=100
       - name: If needed, format the code, then bump version based on the input
         run: |
           black .
