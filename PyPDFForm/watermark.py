@@ -100,7 +100,6 @@ def draw_image(canvas: Canvas, **kwargs) -> None:
     width = kwargs["width"]
     height = kwargs["height"]
 
-    # TODO: optimize this
     image_buff = BytesIO()
     image_buff.write(image_stream)
     image_buff.seek(0)
