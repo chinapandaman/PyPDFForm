@@ -10,7 +10,7 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     versioning-strategy: "increase"
     commit-message:
       prefix: "chore"
