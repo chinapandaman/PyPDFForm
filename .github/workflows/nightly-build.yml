@@ -22,6 +22,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
         run: python scripts/close_staled_issues.py
 
+  check-lowest-compatibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+      - name: Install lowest direct dependencies
+        run: uv pip install --resolution=lowest-direct -r pyproject.toml --extra dev --system
+      - name: Run tests against lowest direct dependencies
+        run: |
+          coverage run -m pytest && coverage report --fail-under=100
+
   nightly-tests:
     runs-on: ubuntu-latest
     steps:
