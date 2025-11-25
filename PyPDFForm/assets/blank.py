@@ -17,7 +17,7 @@ from io import BytesIO
 from reportlab.pdfgen.canvas import Canvas
 
 from ..constants import BLANK_PAGE_DEFAULT_HEIGHT, BLANK_PAGE_DEFAULT_WIDTH
-from ..utils import merge_two_pdfs
+from ..utils import merge_pdfs
 
 
 class BlankPage:
@@ -52,7 +52,8 @@ class BlankPage:
         Multiplication operator to merge multiple blank pages into one PDF.
 
         This allows syntax like `BlankPage() * 3` to create a 3-page PDF.
-        It merges copies of the current blank page asset using `merge_two_pdfs`.
+        It merges copies of the current blank page asset using the efficient
+        pairwise merging strategy implemented in `merge_pdfs`.
 
         Args:
             count (int): The number of blank pages to merge. Must be an integer >= 1.
@@ -63,15 +64,7 @@ class BlankPage:
         if count == 1:
             return self.read()
 
-        result = b""
-
-        for _ in range(count - 1):
-            if not result:
-                result = merge_two_pdfs(self.read(), self.read())
-            else:
-                result = merge_two_pdfs(result, self.read())
-
-        return result
+        return merge_pdfs([self.read() for _ in range(count)])
 
     def read(self) -> bytes:
         """
