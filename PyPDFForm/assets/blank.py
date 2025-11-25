@@ -17,7 +17,7 @@ from io import BytesIO
 from reportlab.pdfgen.canvas import Canvas
 
 from ..constants import BLANK_PAGE_DEFAULT_HEIGHT, BLANK_PAGE_DEFAULT_WIDTH
-from ..utils import merge_two_pdfs
+from ..utils import merge_pdfs
 
 
 class BlankPage:
@@ -63,15 +63,7 @@ class BlankPage:
         if count == 1:
             return self.read()
 
-        result = b""
-
-        for _ in range(count - 1):
-            if not result:
-                result = merge_two_pdfs(self.read(), self.read())
-            else:
-                result = merge_two_pdfs(result, self.read())
-
-        return result
+        return merge_pdfs([self.read() for _ in range(count)])
 
     def read(self) -> bytes:
         """

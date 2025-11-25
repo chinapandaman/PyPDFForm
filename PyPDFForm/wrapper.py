@@ -39,7 +39,7 @@ from .middleware.text import Text
 from .raw import RawImage, RawText, RawTypes
 from .template import build_widgets, update_widget_keys
 from .types import PdfWrapperList
-from .utils import (generate_unique_suffix, get_page_streams, merge_two_pdfs,
+from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
@@ -158,7 +158,7 @@ class PdfWrapper:
 
         # user params are based on the first object
         result = self.__class__(
-            merge_two_pdfs(self.read(), other.read()),
+            merge_pdfs([self.read(), other.read()]),
             **{each[0]: getattr(self, each[0], each[1]) for each in self.USER_PARAMS},
         )
 

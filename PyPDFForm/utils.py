@@ -105,6 +105,19 @@ def get_page_streams(pdf: bytes) -> List[bytes]:
     return result
 
 
+def merge_pdfs(pdf_list: list[bytes]) -> bytes:
+    while len(pdf_list) > 2:
+        groups = [pdf_list[i : i + 2] for i in range(0, len(pdf_list), 2)]
+        pdf_list = []
+        for each in groups:
+            if len(each) == 2:
+                pdf_list.append(merge_two_pdfs(each[0], each[1]))
+            else:
+                pdf_list += each
+
+    return merge_two_pdfs(pdf_list[0], pdf_list[1])
+
+
 def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     """
     Merges two PDF files into a single PDF file.
