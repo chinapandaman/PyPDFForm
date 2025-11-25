@@ -106,6 +106,22 @@ def get_page_streams(pdf: bytes) -> List[bytes]:
 
 
 def merge_pdfs(pdf_list: list[bytes]) -> bytes:
+    """
+    Merges a list of PDF byte streams into a single PDF byte stream.
+
+    This function uses a pairwise merging strategy (similar to a merge sort's merge phase)
+    to combine multiple PDF files efficiently. Instead of iteratively merging the result
+    with the next PDF (O(n^2) complexity where n is the number of pages), this approach
+    merges all available PDFs in pairs in a single pass. This process repeats until
+    only a single merged PDF remains, offering better performance for large lists of
+    PDFs.
+
+    Args:
+        pdf_list (list[bytes]): A list of PDF files as byte streams to be merged.
+
+    Returns:
+        bytes: The merged PDF file as a single byte stream.
+    """
     while len(pdf_list) > 2:
         groups = [pdf_list[i : i + 2] for i in range(0, len(pdf_list), 2)]
         pdf_list = []

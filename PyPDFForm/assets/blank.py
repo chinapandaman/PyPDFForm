@@ -52,7 +52,8 @@ class BlankPage:
         Multiplication operator to merge multiple blank pages into one PDF.
 
         This allows syntax like `BlankPage() * 3` to create a 3-page PDF.
-        It merges copies of the current blank page asset using `merge_two_pdfs`.
+        It merges copies of the current blank page asset using the efficient
+        pairwise merging strategy implemented in `merge_pdfs`.
 
         Args:
             count (int): The number of blank pages to merge. Must be an integer >= 1.
