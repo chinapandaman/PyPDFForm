@@ -27,12 +27,12 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "cryptography>=46.0.3,<47.0.0",
-    "fonttools>=4.60.1,<5.0.0",
-    "pikepdf>=10.0.2,<11.0.0",
-    "pillow>=12.0.0,<13.0.0",
-    "pypdf>=6.3.0,<7.0.0",
-    "reportlab>=4.4.5,<5.0.0",
+    "cryptography",
+    "fonttools",
+    "pikepdf",
+    "pillow",
+    "pypdf",
+    "reportlab",
 ]
 
 [project.urls]
@@ -41,17 +41,17 @@ Documentation = "https://chinapandaman.github.io/PyPDFForm/"
 
 [project.optional-dependencies]
 dev = [
-    "black>=25.11.0,<25.12.0",
-    "coverage>=7.12.0,<7.13.0",
-    "isort>=7.0.0,<7.1.0",
-    "jsonschema>=4.25.1,<4.26.0",
-    "mkdocs>=1.6.1,<1.7.0",
-    "pudb>=2025.1.3,<2025.2.0",
-    "pylint>=4.0.3,<4.1.0",
-    "pyright>=1.1.407,<1.2.0",
-    "pytest>=9.0.1,<9.1.0",
-    "requests>=2.32.5,<2.33.0",
-    "ruff>=0.14.6,<0.15.0",
+    "black",
+    "coverage",
+    "isort",
+    "jsonschema",
+    "mkdocs",
+    "pudb",
+    "pylint",
+    "pyright",
+    "pytest",
+    "requests",
+    "ruff",
 ]
 
 [tool.coverage.run]
