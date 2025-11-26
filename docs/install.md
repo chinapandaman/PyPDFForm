@@ -1,6 +1,6 @@
 # Installation and setup
 
-PyPDFForm is available on PyPI and can be installed using pip, which is the most common and recommended tool.
+PyPDFForm is available on [PyPI](https://pypi.org/project/PyPDFForm/) and can be installed using any preferred package manager, such as pip, Poetry, or uv.
 
 ## Prerequisites
 
