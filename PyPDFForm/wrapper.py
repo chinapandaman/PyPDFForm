@@ -70,7 +70,6 @@ class PdfWrapper:
             These parameters can be set during initialization using keyword arguments.
             Current parameters include:
                 - `use_full_widget_name` (bool): Whether to use the full widget name when filling the form.
-                - `adobe_mode` (bool): Whether to enable Adobe-specific compatibility mode (deprecated, use `need_appearances`).
                 - `need_appearances` (bool): Whether to set the `NeedAppearances` flag in the PDF's AcroForm dictionary.
                 - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
 
@@ -78,7 +77,6 @@ class PdfWrapper:
 
     USER_PARAMS = [
         ("use_full_widget_name", False),
-        ("adobe_mode", False),
         ("need_appearances", False),
         ("generate_appearance_streams", False),
     ]
@@ -115,14 +113,6 @@ class PdfWrapper:
         # sets attrs from kwargs
         for attr, default in self.USER_PARAMS:
             setattr(self, attr, kwargs.get(attr, default))
-
-        # TODO: deprecate in v4.0.0
-        if kwargs.get("adobe_mode"):
-            deprecation_notice(
-                f"{self.__class__.__name__}.adobe_mode",
-                f"{self.__class__.__name__}.need_appearances",
-            )
-            self.need_appearances = self.need_appearances or kwargs.get("adobe_mode")
 
         if getattr(self, "generate_appearance_streams") is True:
             self.need_appearances = True
