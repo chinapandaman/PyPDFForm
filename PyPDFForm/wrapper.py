@@ -25,8 +25,7 @@ from typing import TYPE_CHECKING, BinaryIO, Dict, List, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .ap import appearance_streams_handler
-from .constants import (DEFAULT_FONT, DEFAULT_FONT_COLOR, DEFAULT_FONT_SIZE,
-                        VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS)
+from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
 from .deprecation import deprecation_notice
 from .filler import fill
@@ -759,50 +758,6 @@ class PdfWrapper:
 
         return self
 
-    def draw_text(
-        self,
-        text: str,
-        page_number: int,
-        x: Union[float, int],
-        y: Union[float, int],
-        **kwargs,
-    ) -> PdfWrapper:
-        """
-        Draws text on the PDF.
-
-        Args:
-            text (str): The text to draw.
-            page_number (int): The page number to draw on.
-            x (Union[float, int]): The x coordinate of the text.
-            y (Union[float, int]): The y coordinate of the text.
-            **kwargs: Additional keyword arguments:
-                - `font` (str): The name of the font to use (default: DEFAULT_FONT).
-                - `font_size` (float): The font size in points (default: DEFAULT_FONT_SIZE).
-                - `font_color` (Tuple[float, float, float]): The font color as an RGB tuple (default: DEFAULT_FONT_COLOR).
-
-        Returns:
-            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
-        """
-
-        # TODO: deprecate in v4.0.0
-        deprecation_notice(
-            f"{self.__class__.__name__}.draw_text()",
-            f"{self.__class__.__name__}.draw()",
-        )
-        return self.draw(
-            [
-                RawText(
-                    text,
-                    page_number,
-                    x,
-                    y,
-                    kwargs.get("font", DEFAULT_FONT),
-                    kwargs.get("font_size", DEFAULT_FONT_SIZE),
-                    kwargs.get("font_color", DEFAULT_FONT_COLOR),
-                )
-            ]
-        )
-
     def draw_image(
         self,
         image: Union[bytes, str, BinaryIO],
@@ -865,7 +820,7 @@ class PdfWrapper:
 
         if register_font(font_name, ttf_file) if ttf_file is not None else False:
             if first_time and getattr(self, "need_appearances"):
-                self.draw_text(" ", 1, 0, 0, font=font_name)
+                self.draw([RawText(" ", 1, 0, 0, font=font_name)])
             self._stream, new_font_name = register_font_acroform(
                 self.read(), ttf_file, getattr(self, "need_appearances")
             )
