@@ -12,15 +12,6 @@ from PyPDFForm.middleware.text import Text
 from PyPDFForm.template import get_widgets_by_page
 
 
-def test_draw_image_deprecated(template_stream, image_samples):
-    with pytest.warns(DeprecationWarning) as r:  # noqa: PT030, PT031
-        PdfWrapper(template_stream).draw_image(
-            os.path.join(image_samples, "sample_image.jpg"), 1, 100, 100, 400, 350
-        )
-
-        assert r
-
-
 def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
 
@@ -557,13 +548,17 @@ def test_draw_image_on_one_page(template_stream, image_samples, pdf_samples, req
     expected_path = os.path.join(pdf_samples, "test_draw_image_on_one_page.pdf")
     with open(expected_path, "rb+") as f:
         with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
-            obj = PdfWrapper(template_stream).draw_image(
-                _f,
-                2,
-                100,
-                100,
-                400,
-                225,
+            obj = PdfWrapper(template_stream).draw(
+                [
+                    RawElements.RawImage(
+                        _f,
+                        2,
+                        100,
+                        100,
+                        400,
+                        225,
+                    )
+                ]
             )
 
         expected = f.read()
@@ -580,13 +575,17 @@ def test_draw_image_on_radio_template(
     expected_path = os.path.join(pdf_samples, "test_draw_image_on_radio_template.pdf")
     with open(expected_path, "rb+") as f:
         with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
-            obj = PdfWrapper(template_with_radiobutton_stream).draw_image(
-                _f,
-                2,
-                100,
-                100,
-                400,
-                225,
+            obj = PdfWrapper(template_with_radiobutton_stream).draw(
+                [
+                    RawElements.RawImage(
+                        _f,
+                        2,
+                        100,
+                        100,
+                        400,
+                        225,
+                    )
+                ]
             )
 
         expected = f.read()
@@ -604,13 +603,17 @@ def test_draw_image_on_sejda_template(
     expected_path = os.path.join(pdf_samples, "test_draw_image_on_sejda_template.pdf")
     with open(expected_path, "rb+") as f:
         with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
-            obj = PdfWrapper(sejda_template).draw_image(
-                _f,
-                2,
-                100,
-                100,
-                400,
-                225,
+            obj = PdfWrapper(sejda_template).draw(
+                [
+                    RawElements.RawImage(
+                        _f,
+                        2,
+                        100,
+                        100,
+                        400,
+                        225,
+                    )
+                ]
             )
 
         expected = f.read()
@@ -628,13 +631,17 @@ def test_draw_png_image_on_one_page(
 ):
     expected_path = os.path.join(pdf_samples, "test_draw_png_image_on_one_page.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).draw_image(
-            os.path.join(image_samples, "sample_png_image.png"),
-            2,
-            100,
-            100,
-            400,
-            225,
+        obj = PdfWrapper(template_stream).draw(
+            [
+                RawElements.RawImage(
+                    os.path.join(image_samples, "sample_png_image.png"),
+                    2,
+                    100,
+                    100,
+                    400,
+                    225,
+                )
+            ]
         )
 
         expected = f.read()
@@ -653,13 +660,17 @@ def test_draw_transparent_png_image_on_one_page(
         pdf_samples, "test_draw_transparent_png_image_on_one_page.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).draw_image(
-            os.path.join(image_samples, "sample_transparent_png.png"),
-            1,
-            100,
-            100,
-            400,
-            225,
+        obj = PdfWrapper(template_stream).draw(
+            [
+                RawElements.RawImage(
+                    os.path.join(image_samples, "sample_transparent_png.png"),
+                    1,
+                    100,
+                    100,
+                    400,
+                    225,
+                )
+            ]
         )
 
         expected = f.read()

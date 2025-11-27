@@ -35,7 +35,7 @@ from .hooks import trigger_widget_hooks
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .raw import RawImage, RawText, RawTypes
+from .raw import RawText, RawTypes
 from .template import build_widgets, update_widget_keys
 from .types import PdfWrapperList
 from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
@@ -757,42 +757,6 @@ class PdfWrapper:
         self._reregister_font()
 
         return self
-
-    def draw_image(
-        self,
-        image: Union[bytes, str, BinaryIO],
-        page_number: int,
-        x: Union[float, int],
-        y: Union[float, int],
-        width: Union[float, int],
-        height: Union[float, int],
-        rotation: Union[float, int] = 0,
-    ) -> PdfWrapper:
-        """
-        Draws an image on the PDF.
-
-        Args:
-            image (Union[bytes, str, BinaryIO]): The image data, provided as either:
-                - bytes: The raw image data as a byte string.
-                - str: The file path to the image.
-                - BinaryIO: An open file-like object containing the image data.
-            page_number (int): The page number to draw the image on.
-            x (Union[float, int]): The x coordinate of the image.
-            y (Union[float, int]): The y coordinate of the image.
-            width (Union[float, int]): The width of the image.
-            height (Union[float, int]): The height of the image.
-            rotation (Union[float, int]): The rotation of the image in degrees (default: 0).
-
-        Returns:
-            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
-        """
-
-        # TODO: deprecate in v4.0.0
-        deprecation_notice(
-            f"{self.__class__.__name__}.draw_image()",
-            f"{self.__class__.__name__}.draw()",
-        )
-        return self.draw([RawImage(image, page_number, x, y, width, height, rotation)])
 
     def register_font(
         self,
