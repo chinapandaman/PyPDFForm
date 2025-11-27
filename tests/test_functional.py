@@ -5,10 +5,9 @@ import os
 import pytest
 from jsonschema import ValidationError, validate
 
-from PyPDFForm import BlankPage, PdfWrapper, RawElements
+from PyPDFForm import BlankPage, PdfWrapper, RawElements, Widgets
 from PyPDFForm.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
 from PyPDFForm.middleware.base import Widget
-from PyPDFForm.middleware.text import Text
 from PyPDFForm.template import get_widgets_by_page
 
 
@@ -97,7 +96,7 @@ def test_register_global_font_fill(
         )
         assert "new_font" in obj.fonts
         for v in obj.widgets.values():
-            if isinstance(v, Text):
+            if isinstance(v, Widgets.Text):
                 v.font = "new_font"
         obj.fill(
             data_dict,
@@ -128,7 +127,7 @@ def test_register_global_font_fill_flatten(
             sample_font_stream,
         )
         for v in obj.widgets.values():
-            if isinstance(v, Text):
+            if isinstance(v, Widgets.Text):
                 v.font = "new_font"
         obj.fill(
             data_dict,
@@ -152,7 +151,7 @@ def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
     ) as f:
         obj = PdfWrapper(template_stream)
         for v in obj.widgets.values():
-            if isinstance(v, Text):
+            if isinstance(v, Widgets.Text):
                 v.font_size = 20
         obj.fill(
             data_dict,
@@ -175,7 +174,7 @@ def test_fill_font_20_flatten(template_stream, pdf_samples, data_dict, request):
     ) as f:
         obj = PdfWrapper(template_stream)
         for v in obj.widgets.values():
-            if isinstance(v, Text):
+            if isinstance(v, Widgets.Text):
                 v.font_size = 20
         obj.fill(
             data_dict,
@@ -199,7 +198,7 @@ def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
     ) as f:
         obj = PdfWrapper(template_stream)
         for v in obj.widgets.values():
-            if isinstance(v, Text):
+            if isinstance(v, Widgets.Text):
                 v.font_color = (1, 0, 0)
         obj.fill(
             data_dict,
@@ -222,7 +221,7 @@ def test_fill_font_color_red_flatten(template_stream, pdf_samples, data_dict, re
     ) as f:
         obj = PdfWrapper(template_stream)
         for v in obj.widgets.values():
-            if isinstance(v, Text):
+            if isinstance(v, Widgets.Text):
                 v.font_color = (1, 0, 0)
         obj.fill(data_dict, flatten=True)
 

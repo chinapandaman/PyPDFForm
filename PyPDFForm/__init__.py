@@ -24,9 +24,8 @@ __version__ = "3.8.2"
 
 from .assets.blank import BlankPage
 from .middleware import Widgets
-from .middleware.text import Text  # TODO: deprecate in v4.0.0
 from .raw import RawElements
 from .widgets import Fields
 from .wrapper import PdfWrapper
 
-__all__ = ["PdfWrapper", "Text", "Fields", "BlankPage", "RawElements", "Widgets"]
+__all__ = ["PdfWrapper", "Fields", "BlankPage", "RawElements", "Widgets"]
