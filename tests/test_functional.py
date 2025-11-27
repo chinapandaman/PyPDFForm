@@ -12,13 +12,6 @@ from PyPDFForm.middleware.text import Text
 from PyPDFForm.template import get_widgets_by_page
 
 
-def test_draw_text_deprecated(template_stream):
-    with pytest.warns(DeprecationWarning) as r:  # noqa: PT030, PT031
-        PdfWrapper(template_stream).draw_text("foo", 1, 100, 100)
-
-        assert r
-
-
 def test_draw_image_deprecated(template_stream, image_samples):
     with pytest.warns(DeprecationWarning) as r:  # noqa: PT030, PT031
         PdfWrapper(template_stream).draw_image(
@@ -459,13 +452,17 @@ def test_fill_sejda_flatten_then_unflatten(
 def test_draw_text_on_one_page(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_draw_text_on_one_page.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).draw_text(
-            "drawn_text",
-            1,
-            300,
-            225,
-            font_size=20,
-            font_color=(1, 0, 0),
+        obj = PdfWrapper(template_stream).draw(
+            [
+                RawElements.RawText(
+                    "drawn_text",
+                    1,
+                    300,
+                    225,
+                    font_size=20,
+                    font_color=(1, 0, 0),
+                )
+            ]
         )
 
         request.config.results["expected_path"] = expected_path
@@ -482,13 +479,17 @@ def test_draw_multiline_text_on_one_page(template_stream, pdf_samples, request):
         pdf_samples, "test_draw_multiline_text_on_one_page.pdf"
     )
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).draw_text(
-            "drawn_text\ndrawn_text\ndrawn_text",
-            1,
-            300,
-            225,
-            font_size=20,
-            font_color=(1, 0, 0),
+        obj = PdfWrapper(template_stream).draw(
+            [
+                RawElements.RawText(
+                    "drawn_text\ndrawn_text\ndrawn_text",
+                    1,
+                    300,
+                    225,
+                    font_size=20,
+                    font_color=(1, 0, 0),
+                )
+            ]
         )
 
         request.config.results["expected_path"] = expected_path
@@ -505,13 +506,17 @@ def test_draw_text_on_radio_template(
 ):
     expected_path = os.path.join(pdf_samples, "test_draw_text_on_radio_template.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_with_radiobutton_stream).draw_text(
-            "drawn_text",
-            1,
-            300,
-            225,
-            font_size=20,
-            font_color=(1, 0, 0),
+        obj = PdfWrapper(template_with_radiobutton_stream).draw(
+            [
+                RawElements.RawText(
+                    "drawn_text",
+                    1,
+                    300,
+                    225,
+                    font_size=20,
+                    font_color=(1, 0, 0),
+                )
+            ]
         )
 
         request.config.results["expected_path"] = expected_path
@@ -526,13 +531,17 @@ def test_draw_text_on_radio_template(
 def test_draw_text_on_sejda_template(sejda_template, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_draw_text_on_sejda_template.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sejda_template).draw_text(
-            "drawn_text",
-            1,
-            300,
-            225,
-            font_size=20,
-            font_color=(1, 0, 0),
+        obj = PdfWrapper(sejda_template).draw(
+            [
+                RawElements.RawText(
+                    "drawn_text",
+                    1,
+                    300,
+                    225,
+                    font_size=20,
+                    font_color=(1, 0, 0),
+                )
+            ]
         )
 
         request.config.results["expected_path"] = expected_path
