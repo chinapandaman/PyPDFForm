@@ -56,7 +56,9 @@ class DropdownWidget(TextWidget):
         ]
         super().__init__(name, page_number, x, y, **kwargs)
         self.acro_form_params["wkind"] = "choice"
-        self.acro_form_params["value"] = self.acro_form_params["options"][0]
+        self.acro_form_params["value"] = (
+            self.acro_form_params["options"][0] or " "  # reportlab bug
+        )
 
 
 @dataclass
