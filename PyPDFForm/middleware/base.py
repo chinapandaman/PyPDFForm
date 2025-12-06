@@ -47,6 +47,12 @@ class Widget:
         self.required: bool = None
         self.hooks_to_trigger: list = []
 
+        # coordinate & resolution
+        self.x: float = None
+        self.y: float = None
+        self.width: float = None
+        self.height: float = None
+
     def __setattr__(self, name: str, value: Any) -> None:
         """
         Set an attribute on the widget.

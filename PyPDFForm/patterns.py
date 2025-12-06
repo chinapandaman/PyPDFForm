@@ -14,8 +14,8 @@ from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
 from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, MULTILINE,
-                        SLASH, TU, A, Btn, Ch, Ff, I, N, Off, Opt, Parent, Sig,
-                        T, Tx, V, Yes)
+                        SLASH, TU, A, Btn, Ch, Ff, I, N, Off, Opt, Parent,
+                        Rect, Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -312,3 +312,14 @@ def get_text_field_multiline(annot: DictionaryObject) -> bool:
             & MULTILINE
         )
     return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & MULTILINE)
+
+
+def get_field_rect(annot: DictionaryObject) -> tuple:
+    rect = annot[Rect]
+
+    return (
+        float(rect[0]),
+        float(rect[1]),
+        float(abs(rect[2] - rect[0])),
+        float(abs(rect[3] - rect[1])),
+    )
