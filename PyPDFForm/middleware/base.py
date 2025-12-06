@@ -8,7 +8,7 @@ common attributes and methods for all form widgets, such as name, value,
 and schema definition.
 """
 
-from typing import Any
+from typing import Any, Union
 
 
 class Widget:
@@ -48,10 +48,10 @@ class Widget:
         self.hooks_to_trigger: list = []
 
         # coordinate & resolution
-        self.x: float = None
-        self.y: float = None
-        self.width: float = None
-        self.height: float = None
+        self.x: Union[float, list] = None
+        self.y: Union[float, list] = None
+        self.width: Union[float, list] = None
+        self.height: Union[float, list] = None
 
     def __setattr__(self, name: str, value: Any) -> None:
         """

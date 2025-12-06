@@ -315,6 +315,18 @@ def get_text_field_multiline(annot: DictionaryObject) -> bool:
 
 
 def get_field_rect(annot: DictionaryObject) -> tuple:
+    """
+    Retrieves the normalized rectangular bounding box of a field annotation.
+
+    The PDF 'Rect' entry contains [llx, lly, urx, ury] (lower-left x, y, upper-right x, y).
+    This function converts it to a normalized tuple of (x, y, width, height) in float format.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary containing the 'Rect' key.
+
+    Returns:
+        tuple: A tuple (x, y, width, height) representing the field's bounding box.
+    """
     rect = annot[Rect]
 
     return (
