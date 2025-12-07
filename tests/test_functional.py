@@ -5,7 +5,7 @@ import os
 import pytest
 from jsonschema import ValidationError, validate
 
-from PyPDFForm import BlankPage, PdfWrapper, RawElements, Widgets
+from PyPDFForm import BlankPage, Fields, PdfWrapper, RawElements, Widgets
 from PyPDFForm.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
 from PyPDFForm.middleware.base import Widget
 from PyPDFForm.template import get_widgets_by_page
@@ -1284,3 +1284,22 @@ def test_blank_page_custom_size_multiply(pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
+
+
+def test_widget_coord_resolution():
+    obj = PdfWrapper(BlankPage()).bulk_create_fields(
+        [
+            Fields.TextField("text", 1, 50, 100, width=200, height=150),
+            Fields.CheckBoxField("check", 1, 150, 200, size=60),
+        ]
+    )
+
+    assert obj.widgets["text"].x == 50
+    assert obj.widgets["text"].y == 100
+    assert obj.widgets["text"].width == 200
+    assert obj.widgets["text"].height == 150
+
+    assert obj.widgets["check"].x == 150
+    assert obj.widgets["check"].y == 200
+    assert obj.widgets["check"].width == 60
+    assert obj.widgets["check"].height == 60
