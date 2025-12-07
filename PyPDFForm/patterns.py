@@ -8,7 +8,7 @@ properties in the PDF's annotation dictionary. It also provides utility function
 for updating these widgets.
 """
 
-from typing import Union
+from typing import Tuple, Union
 
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
@@ -314,7 +314,7 @@ def get_text_field_multiline(annot: DictionaryObject) -> bool:
     return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & MULTILINE)
 
 
-def get_field_rect(annot: DictionaryObject) -> tuple:
+def get_field_rect(annot: DictionaryObject) -> Tuple[float, float, float, float]:
     """
     Retrieves the normalized rectangular bounding box of a field annotation.
 

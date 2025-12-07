@@ -6,7 +6,7 @@ This module defines the Checkbox class, which is a subclass of the
 Widget class. It represents a checkbox form field in a PDF document.
 """
 
-from typing import Union
+from typing import Any, Union
 
 from .base import Widget
 
@@ -44,7 +44,7 @@ class Checkbox(Widget):
 
         self.size: float = None
 
-    def __setattr__(self, name: str, value: bool) -> None:
+    def __setattr__(self, name: str, value: Any) -> None:
         """
         Custom attribute setter for the Checkbox class.
 
@@ -54,7 +54,7 @@ class Checkbox(Widget):
 
         Args:
             name (str): The name of the attribute to set.
-            value (bool): The value to set for the attribute.
+            value (Any): The value to set for the attribute.
         """
         if name == "size":
             super().__setattr__("width", value)
