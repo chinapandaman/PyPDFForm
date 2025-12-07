@@ -22,9 +22,9 @@ from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
                        WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
-                       get_checkbox_value, get_dropdown_value, get_radio_value,
-                       get_text_field_multiline, get_text_value,
-                       update_annotation_name)
+                       get_checkbox_value, get_dropdown_value, get_field_rect,
+                       get_radio_value, get_text_field_multiline,
+                       get_text_value, update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
@@ -61,6 +61,9 @@ def build_widgets(
                     widget, WIDGET_DESCRIPTION_PATTERNS, None, str
                 )
 
+                field_rect = get_field_rect(widget)
+                _widget.x, _widget.y, _widget.width, _widget.height = field_rect
+
                 if isinstance(_widget, Text):
                     # mostly for schema for now
                     # doesn't trigger hook
@@ -79,10 +82,19 @@ def build_widgets(
 
                 if isinstance(_widget, Radio):
                     if key not in results:
+                        _widget.x = []
+                        _widget.y = []
+                        _widget.width = []
+                        _widget.height = []
                         results[key] = _widget
 
                     # for schema
                     results[key].number_of_options += 1
+
+                    results[key].x.append(field_rect[0])
+                    results[key].y.append(field_rect[1])
+                    results[key].width.append(field_rect[2])
+                    results[key].height.append(field_rect[3])
 
                     if get_radio_value(widget):
                         results[key].value = results[key].number_of_options - 1

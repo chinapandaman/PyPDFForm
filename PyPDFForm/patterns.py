@@ -8,14 +8,14 @@ properties in the PDF's annotation dictionary. It also provides utility function
 for updating these widgets.
 """
 
-from typing import Union
+from typing import Tuple, Union
 
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
 from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, MULTILINE,
-                        SLASH, TU, A, Btn, Ch, Ff, I, N, Off, Opt, Parent, Sig,
-                        T, Tx, V, Yes)
+                        SLASH, TU, A, Btn, Ch, Ff, I, N, Off, Opt, Parent,
+                        Rect, Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -312,3 +312,26 @@ def get_text_field_multiline(annot: DictionaryObject) -> bool:
             & MULTILINE
         )
     return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & MULTILINE)
+
+
+def get_field_rect(annot: DictionaryObject) -> Tuple[float, float, float, float]:
+    """
+    Retrieves the normalized rectangular bounding box of a field annotation.
+
+    The PDF 'Rect' entry contains [llx, lly, urx, ury] (lower-left x, y, upper-right x, y).
+    This function converts it to a normalized tuple of (x, y, width, height) in float format.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary containing the 'Rect' key.
+
+    Returns:
+        tuple: A tuple (x, y, width, height) representing the field's bounding box.
+    """
+    rect = annot[Rect]
+
+    return (
+        float(rect[0]),
+        float(rect[1]),
+        float(abs(rect[2] - rect[0])),
+        float(abs(rect[3] - rect[1])),
+    )

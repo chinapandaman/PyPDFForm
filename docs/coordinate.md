@@ -20,3 +20,18 @@ grid_view_pdf.write("output.pdf")
 ```
 
 The `generate_coordinate_grid` method accepts two optional parameters: `color` and `margin`. The `color` parameter sets the grid view color (defaulting to red), and the `margin` parameter adjusts the coordinate grid view's margin in points (defaulting to 100 points).
+
+## Inspect form field coordinates & dimensions
+
+You can inspect the coordinates and dimensions of a PDF form field's rectangular bounding box by accessing its widget object:
+
+```python
+from PyPDFForm import PdfWrapper
+
+form = PdfWrapper("sample_template.pdf")
+
+print(form.widgets["test"].x)
+print(form.widgets["test"].y)
+print(form.widgets["test"].width)
+print(form.widgets["test"].height)
+```
