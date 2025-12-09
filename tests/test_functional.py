@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from io import BytesIO
 
 import pytest
 from jsonschema import ValidationError, validate
@@ -19,6 +20,14 @@ def test_write(template_stream, pdf_samples):
     assert PdfWrapper(template_stream).write(
         os.path.join(pdf_samples, "sample_template.pdf")
     )
+
+
+def test_write_io(template_stream):
+    buff = BytesIO()
+    PdfWrapper(template_stream).write(buff)
+    buff.seek(0)
+
+    assert buff.read() == template_stream
 
 
 def test_fill(template_stream, pdf_samples, data_dict, request):
