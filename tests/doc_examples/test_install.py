@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from io import BytesIO
 
 from PyPDFForm import PdfWrapper
 
@@ -55,3 +56,14 @@ def test_use_full_widget_name(static_pdfs):
     assert getattr(pdf, "use_full_widget_name")
     assert "Gain de 2 classes.0" in pdf.widgets
     assert "0" not in pdf.widgets
+
+
+def test_write_io(static_pdfs):
+    buff = BytesIO()
+
+    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
+    pdf.write(buff)
+
+    buff.seek(0)
+
+    assert buff.read() == pdf.read()

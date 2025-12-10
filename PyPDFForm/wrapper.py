@@ -350,19 +350,23 @@ class PdfWrapper:
 
         return self._stream
 
-    def write(self, path: str) -> PdfWrapper:
+    def write(self, dest: Union[str, BinaryIO]) -> PdfWrapper:
         """
-        Writes the PDF content to a file.
+        Writes the PDF to a file.
 
         Args:
-            path (str): The file path to write the PDF to.
+            dest (Union[str, BinaryIO]): The destination to write the PDF to.
+                Can be a file path (str) or a file-like object (BinaryIO).
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        with open(path, "wb+") as f:
-            f.write(self.read())
+        if isinstance(dest, str):
+            with open(dest, "wb+") as f:
+                f.write(self.read())
+        else:
+            dest.write(self.read())
 
         return self
 
