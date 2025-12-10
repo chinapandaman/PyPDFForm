@@ -130,7 +130,7 @@ pdf = PdfWrapper("sample_template.pdf")
 pdf.write("output.pdf")
 ```
 
-Alternatively, you can provide a memory IO buffer:
+Alternatively, you can provide a memory buffer:
 
 ```python
 from io import BytesIO
