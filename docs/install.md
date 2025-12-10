@@ -98,7 +98,7 @@ This enables accessing fields by their full names. For instance, you can access 
 
 ## Write to a file
 
-`PdfWrapper` behaves like an open file object, allowing you to write the PDF to another file object. For example, to write to a disk file:
+The `PdfWrapper` acts as a file-like object, enabling you to write the processed PDF to another file-like object. For instance, to save to a disk file:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -121,11 +121,26 @@ with BytesIO() as output:
     output.write(pdf.read())
 ```
 
-In addition to behaving like a file object, `PdfWrapper` also implements a `write` method that allows you to write the PDF to a disk file by specifying the path:
+Additionally, `PdfWrapper` offers a convenient `write` method to save the PDF directly. You can specify a disk file path:
 
 ```python
 from PyPDFForm import PdfWrapper
 
 pdf = PdfWrapper("sample_template.pdf")
 pdf.write("output.pdf")
+```
+
+Alternatively, you can provide a memory IO buffer:
+
+```python
+from io import BytesIO
+
+from PyPDFForm import PdfWrapper
+
+buff = BytesIO()
+
+pdf = PdfWrapper("sample_template.pdf")
+pdf.write(buff)
+
+buff.seek(0)
 ```
