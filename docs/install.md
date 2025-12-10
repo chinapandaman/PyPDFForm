@@ -134,7 +134,6 @@ Alternatively, you can provide a memory IO buffer:
 
 ```python
 from io import BytesIO
-
 from PyPDFForm import PdfWrapper
 
 buff = BytesIO()
