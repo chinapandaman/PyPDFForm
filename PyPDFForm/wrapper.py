@@ -21,6 +21,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import asdict
 from functools import cached_property
+from os import PathLike
 from typing import TYPE_CHECKING, BinaryIO, Dict, List, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
@@ -362,7 +363,7 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        if isinstance(dest, str):
+        if isinstance(dest, (str, bytes, PathLike)):
             with open(dest, "wb+") as f:
                 f.write(self.read())
         else:
