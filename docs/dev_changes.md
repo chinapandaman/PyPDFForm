@@ -8,7 +8,7 @@ PyPDFForm welcomes contributions from developers of all levels and doesn't enfor
 
 Your PR should follow these conventions:
 
-* Prefer small, incremental changes. For large changes, request a feature branch in your issue and open your PR against that branch, as they will likely need revision before merging into master.
+* Try to submit small, incremental changes. For large changes, request a feature branch in your issue and open your PR against that branch, as they will likely need revision before merging into master.
 * Ensure your changes pass all linters. PyPDFForm uses rules from [pylint](https://www.pylint.org/), [ruff](https://docs.astral.sh/ruff/), and [pyright](https://microsoft.github.io/pyright/#/). Run `linting` inside the development container to check.
 * Your changes must pass all tests and have 100% coverage. You can read more about testing [here](dev_test.md).
 * If you are changing the user APIs or any other parts of the code that are relevant, please update the appropriate documentation too.
