@@ -75,7 +75,7 @@ For a PDF viewer to display content in a form field (especially text fields), it
     ```
 
 ???+ warning
-    PyPDFForm's internal appearance stream generation relies on [qpdf](https://github.com/qpdf/qpdf) and shares its limitations. Notably, it only works for:
+    PyPDFForm's internal appearance stream generation relies on [qpdf](https://github.com/qpdf/qpdf) and shares its limitations. Some known limitations include:
 
     * ASCII text.
     * Single-line text fields.
