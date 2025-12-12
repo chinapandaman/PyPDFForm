@@ -100,48 +100,46 @@ This enables accessing fields by their full names. For instance, you can access 
 
 ## Write to a file
 
-The `PdfWrapper` acts as a file-like object, enabling you to write the processed PDF to another file-like object. For instance, to save to a disk file:
+The `PdfWrapper` acts as a file-like object, enabling you to write the processed PDF to another file-like object:
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Write to Disk File"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-pdf = PdfWrapper("sample_template.pdf")
+    pdf = PdfWrapper("sample_template.pdf")
 
-with open("output.pdf", "wb+") as output:
-    output.write(pdf.read())
-```
+    with open("output.pdf", "wb+") as output:
+        output.write(pdf.read())
+    ```
+=== "Write to Memory Buffer"
+    ```python
+    from io import BytesIO
+    from PyPDFForm import PdfWrapper
 
-It doesn't have to be a disk file; it can be a memory buffer as well:
+    pdf = PdfWrapper("sample_template.pdf")
 
-```python
-from io import BytesIO
-from PyPDFForm import PdfWrapper
+    with BytesIO() as output:
+        output.write(pdf.read())
+    ```
 
-pdf = PdfWrapper("sample_template.pdf")
+Additionally, `PdfWrapper` offers a convenient `write` method to save the PDF directly.
 
-with BytesIO() as output:
-    output.write(pdf.read())
-```
+=== "Write to Disk File"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-Additionally, `PdfWrapper` offers a convenient `write` method to save the PDF directly. You can specify a disk file path:
+    pdf = PdfWrapper("sample_template.pdf")
+    pdf.write("output.pdf")
+    ```
+=== "Write to Memory Buffer"
+    ```python
+    from io import BytesIO
+    from PyPDFForm import PdfWrapper
 
-```python
-from PyPDFForm import PdfWrapper
+    buff = BytesIO()
 
-pdf = PdfWrapper("sample_template.pdf")
-pdf.write("output.pdf")
-```
+    pdf = PdfWrapper("sample_template.pdf")
+    pdf.write(buff)
 
-Alternatively, you can provide a memory buffer:
-
-```python
-from io import BytesIO
-from PyPDFForm import PdfWrapper
-
-buff = BytesIO()
-
-pdf = PdfWrapper("sample_template.pdf")
-pdf.write(buff)
-
-buff.seek(0)
-```
+    buff.seek(0)
+    ```
