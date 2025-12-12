@@ -6,21 +6,21 @@ PyPDFForm is available on [PyPI](https://pypi.org/project/PyPDFForm/) and can be
 
 PyPDFForm officially supports Python 3.10 and newer versions that are currently in their active life cycles. This typically includes the minimum supported version and the four major versions above it. For details on Python version life cycles, refer to [this page](https://devguide.python.org/versions/).
 
-**NOTE:** While official support is limited to active Python versions, PyPDFForm generally avoids features specific to particular major Python versions. It is expected to be functional with Python 3.7+ (due to its use of [Postponed Evaluation of Annotations](https://peps.python.org/pep-0563/) for type hints, introduced in Python 3.7), though these versions are not actively tested.
+???+ info
+    While official support is limited to active Python versions, PyPDFForm generally avoids features specific to particular major Python versions. It is expected to be functional with Python 3.7+ (due to its use of [Postponed Evaluation of Annotations](https://peps.python.org/pep-0563/) for type hints, introduced in Python 3.7), though these versions are not actively tested.
 
 ## Install using pip
 
 It is highly recommended to create a virtual environment before installation. Then, run the following command to install PyPDFForm:
 
-```shell
-pip install PyPDFForm
-```
-
-To upgrade PyPDFForm and all its dependencies, run:
-
-```shell
-pip install -U PyPDFForm
-```
+=== "Install"
+    ```shell
+    pip install PyPDFForm
+    ```
+=== "Install & Upgrade Dependencies"
+    ```shell
+    pip install -U PyPDFForm
+    ```
 
 ## Create a PDF wrapper
 
@@ -28,57 +28,58 @@ The main user interface of the library is the `PdfWrapper` class. It implements 
 
 For example, to use [this PDF](pdfs/sample_template.pdf) as a template, instantiate the `PdfWrapper` object as follows:
 
-```python
-from PyPDFForm import PdfWrapper
+=== "File Path"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-pdf = PdfWrapper("sample_template.pdf")
-```
+    pdf = PdfWrapper("sample_template.pdf")
+    ```
+=== "Open File Object"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-PyPDFForm provides an adapter for different file interaction methods in Python, which allows you to pass your PDF form to `PdfWrapper` as a file path, an open file object, or a `bytes` file stream.
+    with open("sample_template.pdf", "rb+") as template:
+        pdf = PdfWrapper(template)
+    ```
+=== "Bytes File Stream"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-This means the following two snippets are equivalent to the above:
+    with open("sample_template.pdf", "rb+") as template:
+        pdf = PdfWrapper(template.read())
+    ```
 
-```python
-from PyPDFForm import PdfWrapper
-
-with open("sample_template.pdf", "rb+") as template:
-    pdf = PdfWrapper(template)
-```
-
-```python
-from PyPDFForm import PdfWrapper
-
-with open("sample_template.pdf", "rb+") as template:
-    pdf = PdfWrapper(template.read())
-```
-
-This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
-
-**NOTE:** The `PdfWrapper` class does not handle appearance streams by default. For details, see [Handling Appearance Streams](#handling-appearance-streams).
+???+ tip
+    PyPDFForm provides an adapter for different file interaction methods in Python, which allows you to pass your PDF form to `PdfWrapper` as a file path, an open file object, or a `bytes` file stream. This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
 
 ## Handling Appearance Streams
 
-To display PDF form fields filled programmatically, especially text fields, each field requires an appearance stream. This stream dictates how a PDF viewer renders the field's content.
+For a PDF viewer to display content in a form field (especially text fields), it needs an "appearance stream." This stream defines how the field's content is rendered. PyPDFForm offers two ways to handle this, set via flags during `PdfWrapper` instantiation.
 
-PyPDFForm supports two flags for handling appearance streams, which you set when instantiating the `PdfWrapper` object.
+=== "Let the Viewer Generate Appearances"
+    Set `need_appearances=True` to instruct the PDF viewer to generate appearance streams. This is often the best choice when you expect the PDF to be opened in powerful, proprietary software like Adobe Acrobat, which has sophisticated rendering capabilities.
 
-The first flag is `need_appearances`. Setting this flag to `True` tells the PDF viewer/editor opening the generated PDF form to generate appearance streams for each field, if the viewer is capable:
+    ```python
+    from PyPDFForm import PdfWrapper
 
-```python
-from PyPDFForm import PdfWrapper
+    pdf = PdfWrapper("sample_template.pdf", need_appearances=True)
+    ```
 
-pdf = PdfWrapper("sample_template.pdf", need_appearances=True)
-```
+=== "Let PyPDFForm Generate Appearances"
+    Set `generate_appearance_streams=True` to use PyPDFForm's built-in generator. This is a good fallback if the PDF viewer lacks the ability to generate its own appearance streams.
 
-Alternatively, use PyPDFForm's internal appearance stream generation functionality by setting the `generate_appearance_streams` flag to `True`:
+    ```python
+    from PyPDFForm import PdfWrapper
 
-```python
-from PyPDFForm import PdfWrapper
+    pdf = PdfWrapper("sample_template.pdf", generate_appearance_streams=True)
+    ```
 
-pdf = PdfWrapper("sample_template.pdf", generate_appearance_streams=True)
-```
+???+ warning
+    PyPDFForm's internal appearance stream generation relies on [qpdf](https://github.com/qpdf/qpdf) and shares its limitations. Some known limitations include:
 
-The choice between these two flags is situational. Use `need_appearances=True` when the output PDF is viewed in proprietary software like Adobe Acrobat, as these viewers typically have sophisticated appearance stream generation logic. If the PDF viewer does not support generating appearance streams, set `generate_appearance_streams=True` to allow PyPDFForm to handle the generation. Note that PyPDFForm's internal generation functionality is still undergoing testing and refinement.
+    * ASCII text.
+    * Single-line text fields.
+    * It does not handle text alignment.
 
 ## Use full name for PDF form fields
 
@@ -94,52 +95,51 @@ pdf = PdfWrapper("sample_template_with_full_key.pdf", use_full_widget_name=True)
 
 This enables accessing fields by their full names. For instance, you can access the checkbox labeled `Gain de 2 classes` using its full name `Gain de 2 classes.0` instead of its partial name `0`.
 
-**NOTE:** When using full names, the `update_widget_key` and `commit_widget_key_updates` methods of `PdfWrapper` are disabled and raise a `NotImplementedError` because full names involve both the field and its parent.
+???+ warning
+    When using full names, the `update_widget_key` and `commit_widget_key_updates` methods of `PdfWrapper` are disabled and raise a `NotImplementedError` because full names involve both the field and its parent.
 
 ## Write to a file
 
-The `PdfWrapper` acts as a file-like object, enabling you to write the processed PDF to another file-like object. For instance, to save to a disk file:
+The `PdfWrapper` acts as a file-like object, enabling you to write the processed PDF to another file-like object:
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Write to Disk File"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-pdf = PdfWrapper("sample_template.pdf")
+    pdf = PdfWrapper("sample_template.pdf")
 
-with open("output.pdf", "wb+") as output:
-    output.write(pdf.read())
-```
+    with open("output.pdf", "wb+") as output:
+        output.write(pdf.read())
+    ```
+=== "Write to Memory Buffer"
+    ```python
+    from io import BytesIO
+    from PyPDFForm import PdfWrapper
 
-It doesn't have to be a disk file; it can be a memory buffer as well:
+    pdf = PdfWrapper("sample_template.pdf")
 
-```python
-from io import BytesIO
-from PyPDFForm import PdfWrapper
+    with BytesIO() as output:
+        output.write(pdf.read())
+    ```
 
-pdf = PdfWrapper("sample_template.pdf")
+Additionally, `PdfWrapper` offers a convenient `write` method to save the PDF directly.
 
-with BytesIO() as output:
-    output.write(pdf.read())
-```
+=== "Write to Disk File"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-Additionally, `PdfWrapper` offers a convenient `write` method to save the PDF directly. You can specify a disk file path:
+    pdf = PdfWrapper("sample_template.pdf")
+    pdf.write("output.pdf")
+    ```
+=== "Write to Memory Buffer"
+    ```python
+    from io import BytesIO
+    from PyPDFForm import PdfWrapper
 
-```python
-from PyPDFForm import PdfWrapper
+    buff = BytesIO()
 
-pdf = PdfWrapper("sample_template.pdf")
-pdf.write("output.pdf")
-```
+    pdf = PdfWrapper("sample_template.pdf")
+    pdf.write(buff)
 
-Alternatively, you can provide a memory buffer:
-
-```python
-from io import BytesIO
-from PyPDFForm import PdfWrapper
-
-buff = BytesIO()
-
-pdf = PdfWrapper("sample_template.pdf")
-pdf.write(buff)
-
-buff.seek(0)
-```
+    buff.seek(0)
+    ```

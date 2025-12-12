@@ -43,9 +43,8 @@ new_form = PdfWrapper("dummy.pdf").create_field(
 new_form.write("output.pdf")
 ```
 
-To use a custom font, see how to register it [here](font.md).
-
-**NOTE:** For the `comb` option, refer to the documentation [here](style.md/#enable-text-field-character-spacing-combs).
+???+ tip
+    To use a custom font, see how to register it [here](font.md).
 
 ## Create a checkbox
 
@@ -76,7 +75,8 @@ new_form.write("output.pdf")
 
 The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
 
-**NOTE:** To remove the border of a checkbox, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
+???+ bug
+    To remove the border of a checkbox, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
 
 ## Create a radio button group
 
@@ -108,65 +108,68 @@ new_form = PdfWrapper("dummy.pdf").create_field(
 new_form.write("output.pdf")
 ```
 
-**NOTE:** To remove the border of a group of radio buttons, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
+???+ bug
+    To remove the border of a group of radio buttons, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
 
 ## Create a dropdown field
 
 A dropdown field shares a similar set of parameters as a text field. The only significant difference is that a list of `options` needs to be specified:
 
-```python
-from PyPDFForm import Fields, PdfWrapper
+=== "Default"
+    ```python
+    from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").create_field(
-    Fields.DropdownField(
-        name="new_dropdown",
-        page_number=1,
-        x=57,
-        y=700,
-        options=[
-            "foo",
-            "bar",
-            "foobar",
-        ],
-        required=False,  # optional
-        tooltip="this is a dropdown",  # optional
-        width=120,  # optional
-        height=40,  # optional
-        font="your_registered_font",  # optional
-        font_size=15,  # optional
-        font_color=(1, 0, 0),  # optional
-        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-        border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
-        border_width=5,  # optional
+    new_form = PdfWrapper("dummy.pdf").create_field(
+        Fields.DropdownField(
+            name="new_dropdown",
+            page_number=1,
+            x=57,
+            y=700,
+            options=[
+                "foo",
+                "bar",
+                "foobar",
+            ],
+            required=False,  # optional
+            tooltip="this is a dropdown",  # optional
+            width=120,  # optional
+            height=40,  # optional
+            font="your_registered_font",  # optional
+            font_size=15,  # optional
+            font_color=(1, 0, 0),  # optional
+            bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+            border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+            border_width=5,  # optional
+        )
     )
-)
 
-new_form.write("output.pdf")
-```
+    new_form.write("output.pdf")
+    ```
+=== "Custom Export Values"
+    If you want different export values from the displayed options, you can specify a list of tuples for the `options` parameter, where the first value of each tuple is the displayed option and the second value is the export value:
 
-To use a custom font, see how to register it [here](font.md).
+    ```python
+    from PyPDFForm import Fields, PdfWrapper
 
-If you want different export values from the displayed options, you can specify a list of tuples for the `options` parameter, where the first value of each tuple is the displayed option and the second value is the export value:
-
-```python
-from PyPDFForm import Fields, PdfWrapper
-
-new_form = PdfWrapper("dummy.pdf").create_field(
-    Fields.DropdownField(
-        name="new_dropdown",
-        page_number=1,
-        x=57,
-        y=700,
-        options=[
-            ("option_1", "option_1_export_value"),
-            ("option_2", "option_2_export_value"),
-            ("option_3", "option_3_export_value"),
-        ],
+    new_form = PdfWrapper("dummy.pdf").create_field(
+        Fields.DropdownField(
+            name="new_dropdown",
+            page_number=1,
+            x=57,
+            y=700,
+            options=[
+                ("option_1", "option_1_export_value"),
+                ("option_2", "option_2_export_value"),
+                ("option_3", "option_3_export_value"),
+            ],
+        )
     )
-)
 
-new_form.write("output.pdf")
-```
+    new_form.write("output.pdf")
+    ```
+
+???+ tip
+    To use a custom font, see how to register it [here](font.md).
 
 ## Create a signature field
 
@@ -214,9 +217,7 @@ new_form = PdfWrapper("dummy.pdf").create_field(
 new_form.write("output.pdf")
 ```
 
-## Bulk create fields (beta)
-
-**NOTE:** This is a beta feature that requires further testing.
+## Bulk create fields
 
 The `bulk_create_fields` method is more performant than creating fields one by one with the `create_field` method, especially when dealing with a large number of fields:
 
@@ -256,43 +257,46 @@ new_form.write("output.pdf")
 
 ## Modify the key of a field
 
-PyPDFForm allows you to modify the keys of existing fields. For example, to change the key of the first text field, `test`, to `test_text` using [this PDF](pdfs/sample_template.pdf), use the following code:
+PyPDFForm allows you to modify the keys of existing fields.
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Default"
+    For example, to change the key of the first text field, `test`, to `test_text` using [this PDF](pdfs/sample_template.pdf), use the following code:
 
-new_form = PdfWrapper("sample_template.pdf").update_widget_key(
-    "test", "test_text"
-)
+    ```python
+    from PyPDFForm import PdfWrapper
 
-new_form.write("output.pdf")
-```
-
-If multiple fields share the same key, use the `index` parameter to specify which one to update. For instance, to change the key of the second row's text field with the key `Description[0]` to `Description[1]` using [this PDF](pdfs/733.pdf), use the following code:
-
-```python
-from PyPDFForm import PdfWrapper
-
-new_form = PdfWrapper("733.pdf").update_widget_key(
-    "Description[0]", "Description[1]", index=1
-)
-
-new_form.write("output.pdf")
-```
-
-For bulk updates, improve performance by setting `defer=True` when updating each key, then call `commit_widget_key_updates()` at the end to commit all changes.
-
-To change the key of each row's text field with the key `Description[0]` to `Description[i]`, where `i` is the index of each row, using [this PDF](pdfs/733.pdf), use the following code:
-
-```python
-from PyPDFForm import PdfWrapper
-
-new_form = PdfWrapper("733.pdf")
-
-for i in range(1, 10):
-    new_form.update_widget_key(
-        "Description[0]", f"Description[{i}]", index=1, defer=True
+    new_form = PdfWrapper("sample_template.pdf").update_widget_key(
+        "test", "test_text"
     )
 
-new_form.commit_widget_key_updates().write("output.pdf")
-```
+    new_form.write("output.pdf")
+    ```
+=== "Using Index for Fields with Same Key"
+    If multiple fields share the same key, use the `index` parameter to specify which one to update. For instance, to change the key of the second row's text field with the key `Description[0]` to `Description[1]` using [this PDF](pdfs/733.pdf), use the following code:
+
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    new_form = PdfWrapper("733.pdf").update_widget_key(
+        "Description[0]", "Description[1]", index=1
+    )
+
+    new_form.write("output.pdf")
+    ```
+=== "Bulk Updates"
+    For bulk updates, improve performance by setting `defer=True` when updating each key, then call `commit_widget_key_updates()` at the end to commit all changes.
+
+    To change the key of each row's text field with the key `Description[0]` to `Description[i]`, where `i` is the index of each row, using [this PDF](pdfs/733.pdf), use the following code:
+
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    new_form = PdfWrapper("733.pdf")
+
+    for i in range(1, 10):
+        new_form.update_widget_key(
+            "Description[0]", f"Description[{i}]", index=1, defer=True
+        )
+
+    new_form.commit_widget_key_updates().write("output.pdf")
+    ```

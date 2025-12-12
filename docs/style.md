@@ -163,7 +163,7 @@ form.write("output.pdf")
 
 ## Enable text field character spacing (combs)
 
-To enable character spacing in a text field, set its `.comb` property to `True`. This will evenly space out the characters of the text filled into the field. Note that this property only takes effect when the text field also has a `max_length` set.
+To enable character spacing in a text field, set its `.comb` property to `True`. This will evenly space out the characters of the text filled into the field.
 
 ```python
 from PyPDFForm import PdfWrapper, Widgets
@@ -193,6 +193,9 @@ form.fill(
 
 form.write("output.pdf")
 ```
+
+???+ warning
+    This property only takes effect when the text field also has a `max_length` set.
 
 ## Enable multiline text field
 
@@ -247,33 +250,34 @@ form.write("output.pdf")
 
 To modify the options available in a dropdown field, assign a new list of strings to the `.choices` attribute of the corresponding field. For instance, the following code snippet updates the `dropdown_1` field in [this PDF form](pdfs/sample_template_with_dropdown.pdf) with a new set of choices:
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Default"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-form = PdfWrapper("sample_template_with_dropdown.pdf")
+    form = PdfWrapper("sample_template_with_dropdown.pdf")
 
-form.widgets["dropdown_1"].choices = ["", "apple", "banana", "cherry", "dates"]
+    form.widgets["dropdown_1"].choices = ["", "apple", "banana", "cherry", "dates"]
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "Custom Export Values"
+    If you want different export values from the displayed options, you can specify a list of tuples for the `.choices` attribute, where the first value of each tuple is the displayed option and the second value is the export value:
 
-If you want different export values from the displayed options, you can specify a list of tuples for the `.choices` attribute, where the first value of each tuple is the displayed option and the second value is the export value:
+    ```python
+    from PyPDFForm import PdfWrapper
 
-```python
-from PyPDFForm import PdfWrapper
+    form = PdfWrapper("sample_template_with_dropdown.pdf")
 
-form = PdfWrapper("sample_template_with_dropdown.pdf")
+    form.widgets["dropdown_1"].choices = [
+        ("", "blank_export_value"),
+        ("apple", "apple_export_value"),
+        ("banana", "banana_export_value"),
+        ("cherry", "cherry_export_value"),
+        ("dates", "dates_export_value"),
+    ]
 
-form.widgets["dropdown_1"].choices = [
-    ("", "blank_export_value"),
-    ("apple", "apple_export_value"),
-    ("banana", "banana_export_value"),
-    ("cherry", "cherry_export_value"),
-    ("dates", "dates_export_value"),
-]
-
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
 
 ## Change dropdown field font
 

@@ -4,25 +4,26 @@ PyPDFForm is designed for Python developers. This documentation section is inten
 
 ## Setup
 
-To get started, create a virtual environment and install the development dependencies using your preferred package manager.
+=== "Virtual Environment"
+    To get started, create a virtual environment and install the development dependencies using your preferred package manager.
 
-The command below uses [uv](https://docs.astral.sh/uv/):
+    The command below uses [uv](https://docs.astral.sh/uv/):
 
-```shell
-uv pip install -U -r pyproject.toml --extra dev
-```
+    ```shell
+    uv pip install -U -r pyproject.toml --extra dev
+    ```
+=== "Development Container"
+    PyPDFForm also offers a development container. To build it, run the following command in the project's root directory:
 
-PyPDFForm also offers a development container. To build it, run the following command in the project's root directory:
+    ```shell
+    docker build -t pypdfform-dev .
+    ```
 
-```shell
-docker build -t pypdfform-dev .
-```
+    Once successfully built, you can open a shell inside the container by running:
 
-Once successfully built, you can open a shell inside the container by running:
-
-```shell
-docker run -it --rm -p 8000:8000 -v ${PWD}:/pypdfform pypdfform-dev
-```
+    ```shell
+    docker run -it --rm -p 8000:8000 -v ${PWD}:/pypdfform pypdfform-dev
+    ```
 
 ## Running tests
 

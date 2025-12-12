@@ -8,42 +8,41 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
 You can describe the dictionary used to fill a PDF form using a JSON schema. For example:
 
-```python
-import json
-from PyPDFForm import PdfWrapper
+=== "Code"
+    ```python
+    import json
+    from PyPDFForm import PdfWrapper
 
-pdf_form_schema = PdfWrapper("sample_template.pdf").schema
+    pdf_form_schema = PdfWrapper("sample_template.pdf").schema
 
-print(json.dumps(pdf_form_schema, indent=4, sort_keys=True))
-```
-
-The above snippet will yield the following output:
-
-```json
-{
-    "properties": {
-        "check": {
-            "type": "boolean"
+    print(json.dumps(pdf_form_schema, indent=4, sort_keys=True))
+    ```
+=== "Output"
+    ```json
+    {
+        "properties": {
+            "check": {
+                "type": "boolean"
+            },
+            "check_2": {
+                "type": "boolean"
+            },
+            "check_3": {
+                "type": "boolean"
+            },
+            "test": {
+                "type": "string"
+            },
+            "test_2": {
+                "type": "string"
+            },
+            "test_3": {
+                "type": "string"
+            }
         },
-        "check_2": {
-            "type": "boolean"
-        },
-        "check_3": {
-            "type": "boolean"
-        },
-        "test": {
-            "type": "string"
-        },
-        "test_2": {
-            "type": "string"
-        },
-        "test_3": {
-            "type": "string"
-        }
-    },
-    "type": "object"
-}
-```
+        "type": "object"
+    }
+    ```
 
 In this example, `sample_template.pdf` contains three text fields (`test`, `test_2`, and `test_3`) of type `string` and three checkboxes (`check`, `check_2`, and `check_3`) of type `boolean`.
 
@@ -53,42 +52,40 @@ You can use the PyPDFForm-generated JSON schema to validate the data used for fi
 
 To inspect the current filled data of a PDF form, use the `.data` attribute. For example, the following snippet inspects the current filled data for [this PDF](pdfs/sample_template_filled.pdf):
 
-```python
-from pprint import pprint
-from PyPDFForm import PdfWrapper
+=== "Code"
+    ```python
+    from pprint import pprint
+    from PyPDFForm import PdfWrapper
 
-pprint(PdfWrapper("sample_template.pdf").data)
-```
-
-The above snippet will give you this dictionary:
-
-```sh
-{'check': True,
- 'check_2': True,
- 'check_3': True,
- 'test': 'test',
- 'test_2': 'test2',
- 'test_3': 'test3'}
-```
+    pprint(PdfWrapper("sample_template_filled.pdf").data)
+    ```
+=== "Output"
+    ```sh
+    {'check': True,
+    'check_2': True,
+    'check_3': True,
+    'test': 'test',
+    'test_2': 'test2',
+    'test_3': 'test3'}
+    ```
 
 ## Generate sample data
 
 PyPDFForm can also generate sample data for filling a PDF form:
 
-```python
-from pprint import pprint
-from PyPDFForm import PdfWrapper
+=== "Code"
+    ```python
+    from pprint import pprint
+    from PyPDFForm import PdfWrapper
 
-pprint(PdfWrapper("sample_template.pdf").sample_data)
-```
-
-The above snippet will give you a sample dictionary:
-
-```sh
-{'check': True,
- 'check_2': True,
- 'check_3': True,
- 'test': 'test',
- 'test_2': 'test_2',
- 'test_3': 'test_3'}
-```
+    pprint(PdfWrapper("sample_template.pdf").sample_data)
+    ```
+=== "Output"
+    ```sh
+    {'check': True,
+    'check_2': True,
+    'check_3': True,
+    'test': 'test',
+    'test_2': 'test_2',
+    'test_3': 'test_3'}
+    ```

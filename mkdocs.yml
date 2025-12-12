@@ -1,4 +1,4 @@
-site_name: Welcome to PyPDFForm - PyPDFForm Documentation
+site_name: PyPDFForm Documentation
 repo_url: https://github.com/chinapandaman/PyPDFForm
 nav:
   - 'User Guide':
@@ -22,8 +22,63 @@ nav:
     - news/2025-05-24.md
     - news/2025-03-29.md
     - news/2024-01-01.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
 theme:
-  name: readthedocs
+  name: material
+  features:
+    - content.code.copy
+    - content.code.select
+    - navigation.footer
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
   logo: img/logo.png
+  favicon: img/favicon.ico
+
+extra_css:
+  - stylesheets/extra.css
+
 extra:
   version: v3.8.2
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/chinapandaman
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/jinge-li-a2296a135/
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/user/chinapandaman/
+
+copyright: Copyright &copy; 2020 - 2026 Jinge Li

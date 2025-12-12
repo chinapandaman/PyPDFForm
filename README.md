@@ -17,6 +17,8 @@ Hello fellow Python developers!
 
 Please read [this article](https://chinapandaman.github.io/PyPDFForm/news/2025-11-22/) about the upcoming v4.0.0 release and official deprecations of some old APIs.
 
+Additionally, the [documentation site](https://chinapandaman.github.io/PyPDFForm/) will be migrated to use [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) in the new release.
+
 Happy hacking!
 
 ## Introduction
