@@ -50,36 +50,36 @@ filled.write("output.pdf")
 
 As with radio buttons, select a dropdown choice by specifying its `integer` value. For example, to fill [this PDF](pdfs/sample_template_with_dropdown.pdf):
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Default"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
-    {
-        "dropdown_1": 1
-    },
-    flatten=False   # optional, set to True to flatten the filled PDF form
-)
+    filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
+        {
+            "dropdown_1": 1
+        },
+        flatten=False   # optional, set to True to flatten the filled PDF form
+    )
 
-filled.write("output.pdf")
-```
+    filled.write("output.pdf")
+    ```
+=== "Using String Value"
+    You can also specify a dropdown option by its `string` value:
 
-You can also specify a dropdown option by its `string` value:
+    ```python
+    from PyPDFForm import PdfWrapper
 
-```python
-from PyPDFForm import PdfWrapper
+    filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
+        {
+            "dropdown_1": "bar"
+        },
+        flatten=False   # optional, set to True to flatten the filled PDF form
+    )
 
-filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
-    {
-        "dropdown_1": "bar"
-    },
-    flatten=False   # optional, set to True to flatten the filled PDF form
-)
-
-filled.write("output.pdf")
-```
-
-???+ note
-    If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
+    filled.write("output.pdf")
+    ```
+    ???+ note
+        If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
 
 ## Fill signature field
 
@@ -87,37 +87,38 @@ A signature field enables signing a PDF form with a handwritten signature image.
 
 To fill a signature field, consider [this PDF](pdfs/sample_template_with_signature.pdf) and [this signature image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png):
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Default"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-signed = PdfWrapper("sample_template_with_signature.pdf").fill(
-    {
-        "signature": "sample_signature.png"
-    },
-    flatten=False   # optional, set to True to flatten the filled PDF form
-)
+    signed = PdfWrapper("sample_template_with_signature.pdf").fill(
+        {
+            "signature": "sample_signature.png"
+        },
+        flatten=False   # optional, set to True to flatten the filled PDF form
+    )
 
-signed.write("output.pdf")
-```
+    signed.write("output.pdf")
+    ```
+=== "Aspect Ratio"
+    By default, the library preserves the aspect ratio of the signature image when filling it. You can disable this by setting the `preserve_aspect_ratio` property to `False` on the signature field:
+
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    pdf = PdfWrapper("sample_template_with_signature.pdf")
+    pdf.widgets["signature"].preserve_aspect_ratio = False
+    pdf.fill(
+        {
+            "signature": "sample_signature.png"
+        },
+    )
+
+    pdf.write("output.pdf")
+    ```
 
 ???+ tip
     The signature value in your dictionary can be a file path, an open file object, or a `bytes` file stream, as described [here](install.md/#create-a-pdf-wrapper).
-
-By default, the library preserves the aspect ratio of the signature image when filling it. You can disable this by setting the `preserve_aspect_ratio` property to `False` on the signature field:
-
-```python
-from PyPDFForm import PdfWrapper
-
-pdf = PdfWrapper("sample_template_with_signature.pdf")
-pdf.widgets["signature"].preserve_aspect_ratio = False
-pdf.fill(
-    {
-        "signature": "sample_signature.png"
-    },
-)
-
-pdf.write("output.pdf")
-```
 
 ## Fill image field
 
@@ -125,31 +126,35 @@ Fill an image field similarly to a signature field, using a file path, file obje
 
 To fill an image field, consider [this PDF](pdfs/sample_template_with_image_field.pdf) and [this image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_image.jpg):
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Default"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
-    {
-        "image_1": "sample_image.jpg"
-    },
-    flatten=False   # optional, set to True to flatten the filled PDF form
-)
+    filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
+        {
+            "image_1": "sample_image.jpg"
+        },
+        flatten=False   # optional, set to True to flatten the filled PDF form
+    )
 
-filled.write("output.pdf")
-```
+    filled.write("output.pdf")
+    ```
+=== "Aspect Ratio"
+    Unlike the signature field, the library does not preserve the aspect ratio of a regular image by default. You can enable this by setting the `preserve_aspect_ratio` property to `True` on the image field:
 
-Unlike the signature field, the library does not preserve the aspect ratio of a regular image by default. You can enable this by setting the `preserve_aspect_ratio` property to `True` on the image field:
+    ```python
+    from PyPDFForm import PdfWrapper
 
-```python
-from PyPDFForm import PdfWrapper
+    pdf = PdfWrapper("sample_template_with_image_field.pdf")
+    pdf.widgets["image_1"].preserve_aspect_ratio = True
+    pdf.fill(
+        {
+            "image_1": "sample_image.jpg"
+        },
+    )
 
-pdf = PdfWrapper("sample_template_with_image_field.pdf")
-pdf.widgets["image_1"].preserve_aspect_ratio = True
-pdf.fill(
-    {
-        "image_1": "sample_image.jpg"
-    },
-)
+    pdf.write("output.pdf")
+    ```
 
-pdf.write("output.pdf")
-```
+???+ tip
+    The image value in your dictionary can be a file path, an open file object, or a `bytes` file stream, as described [here](install.md/#create-a-pdf-wrapper).
