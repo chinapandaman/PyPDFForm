@@ -257,43 +257,46 @@ new_form.write("output.pdf")
 
 ## Modify the key of a field
 
-PyPDFForm allows you to modify the keys of existing fields. For example, to change the key of the first text field, `test`, to `test_text` using [this PDF](pdfs/sample_template.pdf), use the following code:
+PyPDFForm allows you to modify the keys of existing fields.
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Default"
+    For example, to change the key of the first text field, `test`, to `test_text` using [this PDF](pdfs/sample_template.pdf), use the following code:
 
-new_form = PdfWrapper("sample_template.pdf").update_widget_key(
-    "test", "test_text"
-)
+    ```python
+    from PyPDFForm import PdfWrapper
 
-new_form.write("output.pdf")
-```
-
-If multiple fields share the same key, use the `index` parameter to specify which one to update. For instance, to change the key of the second row's text field with the key `Description[0]` to `Description[1]` using [this PDF](pdfs/733.pdf), use the following code:
-
-```python
-from PyPDFForm import PdfWrapper
-
-new_form = PdfWrapper("733.pdf").update_widget_key(
-    "Description[0]", "Description[1]", index=1
-)
-
-new_form.write("output.pdf")
-```
-
-For bulk updates, improve performance by setting `defer=True` when updating each key, then call `commit_widget_key_updates()` at the end to commit all changes.
-
-To change the key of each row's text field with the key `Description[0]` to `Description[i]`, where `i` is the index of each row, using [this PDF](pdfs/733.pdf), use the following code:
-
-```python
-from PyPDFForm import PdfWrapper
-
-new_form = PdfWrapper("733.pdf")
-
-for i in range(1, 10):
-    new_form.update_widget_key(
-        "Description[0]", f"Description[{i}]", index=1, defer=True
+    new_form = PdfWrapper("sample_template.pdf").update_widget_key(
+        "test", "test_text"
     )
 
-new_form.commit_widget_key_updates().write("output.pdf")
-```
+    new_form.write("output.pdf")
+    ```
+=== "Using Index for Fields with Same Key"
+    If multiple fields share the same key, use the `index` parameter to specify which one to update. For instance, to change the key of the second row's text field with the key `Description[0]` to `Description[1]` using [this PDF](pdfs/733.pdf), use the following code:
+
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    new_form = PdfWrapper("733.pdf").update_widget_key(
+        "Description[0]", "Description[1]", index=1
+    )
+
+    new_form.write("output.pdf")
+    ```
+=== "Bulk Updates"
+    For bulk updates, improve performance by setting `defer=True` when updating each key, then call `commit_widget_key_updates()` at the end to commit all changes.
+
+    To change the key of each row's text field with the key `Description[0]` to `Description[i]`, where `i` is the index of each row, using [this PDF](pdfs/733.pdf), use the following code:
+
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    new_form = PdfWrapper("733.pdf")
+
+    for i in range(1, 10):
+        new_form.update_widget_key(
+            "Description[0]", f"Description[{i}]", index=1, defer=True
+        )
+
+    new_form.commit_widget_key_updates().write("output.pdf")
+    ```
