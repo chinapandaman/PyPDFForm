@@ -3,33 +3,31 @@
 PyPDFForm uses [pytest](https://pytest.org/) for testing and [coverage.py](https://coverage.readthedocs.io/)
 for measuring test coverage. To run the tests, execute:
 
-```shell
-coverage run -m pytest && coverage report --fail-under=100
-```
-
-Alternatively, in the development container, run:
-
-```shell
-test
-```
+=== "Virtual Environment"
+    ```shell
+    coverage run -m pytest && coverage report --fail-under=100
+    ```
+=== "Development Container"
+    ```shell
+    test
+    ```
 
 ## Generate coverage report
 
 To generate a test coverage report, run:
 
-```shell
-coverage run -m pytest && coverage html
-```
+=== "Virtual Environment"
+    ```shell
+    coverage run -m pytest && coverage html
+    ```
 
-View the coverage report by opening `htmlcov/index.html` in a browser.
+    View the coverage report by opening `htmlcov/index.html` in a browser.
+=== "Development Container"
+    ```shell
+    coverage
+    ```
 
-Alternatively, in the development container, run:
-
-```shell
-coverage
-```
-
-And the coverage report can be found at `http://localhost:8000/htmlcov/index.html`.
+    View the coverage report at [http://localhost:8000/htmlcov/index.html](http://localhost:8000/htmlcov/index.html).
 
 ## Test breakdown
 
