@@ -78,7 +78,8 @@ filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
 filled.write("output.pdf")
 ```
 
-**NOTE:** If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
+???+ note
+    If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
 
 ## Fill signature field
 
@@ -99,7 +100,8 @@ signed = PdfWrapper("sample_template_with_signature.pdf").fill(
 signed.write("output.pdf")
 ```
 
-**NOTE:** The signature value in your dictionary can be a file path, an open file object, or a `bytes` file stream, as described [here](install.md/#create-a-pdf-wrapper).
+???+ tip
+    The signature value in your dictionary can be a file path, an open file object, or a `bytes` file stream, as described [here](install.md/#create-a-pdf-wrapper).
 
 By default, the library preserves the aspect ratio of the signature image when filling it. You can disable this by setting the `preserve_aspect_ratio` property to `False` on the signature field:
 

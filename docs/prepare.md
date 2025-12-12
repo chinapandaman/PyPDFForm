@@ -43,9 +43,8 @@ new_form = PdfWrapper("dummy.pdf").create_field(
 new_form.write("output.pdf")
 ```
 
-To use a custom font, see how to register it [here](font.md).
-
-**NOTE:** For the `comb` option, refer to the documentation [here](style.md/#enable-text-field-character-spacing-combs).
+???+ tip
+    To use a custom font, see how to register it [here](font.md).
 
 ## Create a checkbox
 
@@ -76,7 +75,8 @@ new_form.write("output.pdf")
 
 The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
 
-**NOTE:** To remove the border of a checkbox, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
+???+ tip
+    To remove the border of a checkbox, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
 
 ## Create a radio button group
 
@@ -108,7 +108,8 @@ new_form = PdfWrapper("dummy.pdf").create_field(
 new_form.write("output.pdf")
 ```
 
-**NOTE:** To remove the border of a group of radio buttons, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
+???+ tip
+    To remove the border of a group of radio buttons, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
 
 ## Create a dropdown field
 
@@ -216,7 +217,8 @@ new_form.write("output.pdf")
 
 ## Bulk create fields (beta)
 
-**NOTE:** This is a beta feature that requires further testing.
+???+ warning
+    This is a beta feature that requires further testing.
 
 The `bulk_create_fields` method is more performant than creating fields one by one with the `create_field` method, especially when dealing with a large number of fields:
 

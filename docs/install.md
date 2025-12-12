@@ -6,7 +6,8 @@ PyPDFForm is available on [PyPI](https://pypi.org/project/PyPDFForm/) and can be
 
 PyPDFForm officially supports Python 3.10 and newer versions that are currently in their active life cycles. This typically includes the minimum supported version and the four major versions above it. For details on Python version life cycles, refer to [this page](https://devguide.python.org/versions/).
 
-**NOTE:** While official support is limited to active Python versions, PyPDFForm generally avoids features specific to particular major Python versions. It is expected to be functional with Python 3.7+ (due to its use of [Postponed Evaluation of Annotations](https://peps.python.org/pep-0563/) for type hints, introduced in Python 3.7), though these versions are not actively tested.
+???+ info
+    While official support is limited to active Python versions, PyPDFForm generally avoids features specific to particular major Python versions. It is expected to be functional with Python 3.7+ (due to its use of [Postponed Evaluation of Annotations](https://peps.python.org/pep-0563/) for type hints, introduced in Python 3.7), though these versions are not actively tested.
 
 ## Install using pip
 
@@ -54,8 +55,6 @@ with open("sample_template.pdf", "rb+") as template:
 
 This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
 
-**NOTE:** The `PdfWrapper` class does not handle appearance streams by default. For details, see [Handling Appearance Streams](#handling-appearance-streams).
-
 ## Handling Appearance Streams
 
 To display PDF form fields filled programmatically, especially text fields, each field requires an appearance stream. This stream dictates how a PDF viewer renders the field's content.
@@ -94,7 +93,8 @@ pdf = PdfWrapper("sample_template_with_full_key.pdf", use_full_widget_name=True)
 
 This enables accessing fields by their full names. For instance, you can access the checkbox labeled `Gain de 2 classes` using its full name `Gain de 2 classes.0` instead of its partial name `0`.
 
-**NOTE:** When using full names, the `update_widget_key` and `commit_widget_key_updates` methods of `PdfWrapper` are disabled and raise a `NotImplementedError` because full names involve both the field and its parent.
+???+ warning
+    When using full names, the `update_widget_key` and `commit_widget_key_updates` methods of `PdfWrapper` are disabled and raise a `NotImplementedError` because full names involve both the field and its parent.
 
 ## Write to a file
 
