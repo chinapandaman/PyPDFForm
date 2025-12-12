@@ -13,15 +13,14 @@ PyPDFForm officially supports Python 3.10 and newer versions that are currently 
 
 It is highly recommended to create a virtual environment before installation. Then, run the following command to install PyPDFForm:
 
-```shell
-pip install PyPDFForm
-```
-
-To upgrade PyPDFForm and all its dependencies, run:
-
-```shell
-pip install -U PyPDFForm
-```
+=== "Install"
+    ```shell
+    pip install PyPDFForm
+    ```
+=== "Install & Upgrade Dependencies"
+    ```shell
+    pip install -U PyPDFForm
+    ```
 
 ## Create a PDF wrapper
 
@@ -29,31 +28,29 @@ The main user interface of the library is the `PdfWrapper` class. It implements 
 
 For example, to use [this PDF](pdfs/sample_template.pdf) as a template, instantiate the `PdfWrapper` object as follows:
 
-```python
-from PyPDFForm import PdfWrapper
+=== "File Path"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-pdf = PdfWrapper("sample_template.pdf")
-```
+    pdf = PdfWrapper("sample_template.pdf")
+    ```
+=== "Open File Object"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-PyPDFForm provides an adapter for different file interaction methods in Python, which allows you to pass your PDF form to `PdfWrapper` as a file path, an open file object, or a `bytes` file stream.
+    with open("sample_template.pdf", "rb+") as template:
+        pdf = PdfWrapper(template)
+    ```
+=== "Bytes File Stream"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-This means the following two snippets are equivalent to the above:
+    with open("sample_template.pdf", "rb+") as template:
+        pdf = PdfWrapper(template.read())
+    ```
 
-```python
-from PyPDFForm import PdfWrapper
-
-with open("sample_template.pdf", "rb+") as template:
-    pdf = PdfWrapper(template)
-```
-
-```python
-from PyPDFForm import PdfWrapper
-
-with open("sample_template.pdf", "rb+") as template:
-    pdf = PdfWrapper(template.read())
-```
-
-This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
+???+ tip
+    PyPDFForm provides an adapter for different file interaction methods in Python, which allows you to pass your PDF form to `PdfWrapper` as a file path, an open file object, or a `bytes` file stream. This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
 
 ## Handling Appearance Streams
 
@@ -61,23 +58,31 @@ To display PDF form fields filled programmatically, especially text fields, each
 
 PyPDFForm supports two flags for handling appearance streams, which you set when instantiating the `PdfWrapper` object.
 
-The first flag is `need_appearances`. Setting this flag to `True` tells the PDF viewer/editor opening the generated PDF form to generate appearance streams for each field, if the viewer is capable:
+=== "Have PDF Softwares Handle Appearance Streams"
+    The first flag is `need_appearances`. Setting this flag to `True` tells the PDF viewer/editor opening the generated PDF form to generate appearance streams for each field, if the viewer is capable:
 
-```python
-from PyPDFForm import PdfWrapper
+    ```python
+    from PyPDFForm import PdfWrapper
 
-pdf = PdfWrapper("sample_template.pdf", need_appearances=True)
-```
+    pdf = PdfWrapper("sample_template.pdf", need_appearances=True)
+    ```
+=== "Have PyPDFForm Handle Appearance Streams"
+    Alternatively, use PyPDFForm's internal appearance stream generation functionality by setting the `generate_appearance_streams` flag to `True`:
 
-Alternatively, use PyPDFForm's internal appearance stream generation functionality by setting the `generate_appearance_streams` flag to `True`:
+    ```python
+    from PyPDFForm import PdfWrapper
 
-```python
-from PyPDFForm import PdfWrapper
+    pdf = PdfWrapper("sample_template.pdf", generate_appearance_streams=True)
+    ```
 
-pdf = PdfWrapper("sample_template.pdf", generate_appearance_streams=True)
-```
+The choice between these two flags is situational. Use `need_appearances=True` when the output PDF is viewed in proprietary software like Adobe Acrobat, as these viewers typically have sophisticated appearance stream generation logic. If the PDF viewer does not support generating appearance streams, set `generate_appearance_streams=True` to allow PyPDFForm to handle the generation.
 
-The choice between these two flags is situational. Use `need_appearances=True` when the output PDF is viewed in proprietary software like Adobe Acrobat, as these viewers typically have sophisticated appearance stream generation logic. If the PDF viewer does not support generating appearance streams, set `generate_appearance_streams=True` to allow PyPDFForm to handle the generation. Note that PyPDFForm's internal generation functionality is still undergoing testing and refinement.
+???+ warning
+    PyPDFForm's internal generation functionality comes from [qpdf](https://github.com/qpdf/qpdf) and share its limitations. Some known ones:
+
+    * It only works for ASCII only texts.
+    * It only works for non-multiline text fields.
+    * It cannot handle text field alignments.
 
 ## Use full name for PDF form fields
 
