@@ -96,7 +96,7 @@ new_form = PdfWrapper("dummy.pdf").create_field(
         required=False,  # optional
         tooltip="this is a radio group",  # optional
         size=30,  # optional
-        button_style="check",  # optional
+        button_style="check",  # optional (1)
         shape="square",  # optional, circle or square
         tick_color=(0, 1, 0),  # optional
         bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
@@ -107,6 +107,8 @@ new_form = PdfWrapper("dummy.pdf").create_field(
 
 new_form.write("output.pdf")
 ```
+
+1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
 
 ???+ bug
     To remove the border of a group of radio buttons, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
