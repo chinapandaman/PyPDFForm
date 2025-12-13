@@ -83,7 +83,7 @@ For a PDF viewer to display content in a form field (especially text fields), it
 
 ## Use full name for PDF form fields
 
-According to section 12.7.3.2 of the [PDF standard](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf) (page 434), PDF form fields can have fully qualified names constructed using the pattern `<parent_field_name>.<field_name>`.
+According to section 12.7.3.2 of the [PDF standard](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf#page=442), PDF form fields can have fully qualified names constructed using the pattern `<parent_field_name>.<field_name>`.
 
 PyPDFForm allows you to access fields by their full names by setting `use_full_widget_name` to `True` when instantiating `PdfWrapper`. For example, to use [this PDF](pdfs/sample_template_with_full_key.pdf):
 
