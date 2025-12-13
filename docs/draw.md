@@ -10,7 +10,7 @@ All optional parameters will have a comment `# optional` after each of them.
 
 ## Draw text
 
-To use a custom font, see how to register it [here](font.md).
+When drawing multiple elements, it is more performant to create a list of those elements and draw them in a single operation.
 
 ```python
 from PyPDFForm import PdfWrapper, RawElements
@@ -21,7 +21,7 @@ texts = [
         page_number=1,
         x=300,
         y=225,
-        font="your_registered_font",  # optional
+        font="your_registered_font",  # optional (1)
         font_size=12,  # optional
         font_color=(1, 0, 0),  # optional
     ),
@@ -30,7 +30,7 @@ texts = [
         page_number=2,
         x=300,
         y=225,
-        font="your_registered_font",  # optional
+        font="your_registered_font",  # optional (2)
         font_size=12,  # optional
         font_color=(1, 0, 0),  # optional
     ),
@@ -41,35 +41,97 @@ pdf = PdfWrapper("sample_template.pdf").draw(texts)
 pdf.write("output.pdf")
 ```
 
+1.  To use a custom font, see how to register it [here](font.md).
+2.  To use a custom font, see how to register it [here](font.md).
+
 ## Draw image
 
-For the rotation parameter, a positive value rotates the image counter-clockwise, and a negative value rotates it clockwise.
+For the `rotation` parameter, a positive value rotates the image counter-clockwise, and a negative value rotates it clockwise.
 
-```python
-from PyPDFForm import PdfWrapper, RawElements
+=== "File Path"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
 
-images = [
-    RawElements.RawImage(
-        image="sample_image.jpg",
-        page_number=1,
-        x=100,
-        y=100,
-        width=400,
-        height=225,
-        rotation=0,  # optional
-    ),
-    RawElements.RawImage(
-        image="sample_image.jpg",
-        page_number=2,
-        x=100,
-        y=100,
-        width=400,
-        height=225,
-        rotation=180,  # optional
-    ),
-]
+    images = [
+        RawElements.RawImage(
+            image="sample_image.jpg",
+            page_number=1,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=0,  # optional
+        ),
+        RawElements.RawImage(
+            image="sample_image.jpg",
+            page_number=2,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=180,  # optional
+        ),
+    ]
 
-pdf = PdfWrapper("sample_template.pdf").draw(images)
+    pdf = PdfWrapper("sample_template.pdf").draw(images)
 
-pdf.write("output.pdf")
-```
+    pdf.write("output.pdf")
+    ```
+=== "Open File Object"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
+
+    images = [
+        RawElements.RawImage(
+            image=open("sample_image.jpg", "rb+"),
+            page_number=1,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=0,  # optional
+        ),
+        RawElements.RawImage(
+            image=open("sample_image.jpg", "rb+"),
+            page_number=2,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=180,  # optional
+        ),
+    ]
+
+    pdf = PdfWrapper("sample_template.pdf").draw(images)
+
+    pdf.write("output.pdf")
+    ```
+=== "Bytes File Stream"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
+
+    images = [
+        RawElements.RawImage(
+            image=open("sample_image.jpg", "rb+").read(),
+            page_number=1,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=0,  # optional
+        ),
+        RawElements.RawImage(
+            image=open("sample_image.jpg", "rb+").read(),
+            page_number=2,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=180,  # optional
+        ),
+    ]
+
+    pdf = PdfWrapper("sample_template.pdf").draw(images)
+
+    pdf.write("output.pdf")
+    ```

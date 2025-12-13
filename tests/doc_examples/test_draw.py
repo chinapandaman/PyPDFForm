@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# ruff: noqa: SIM115
 
 import os
 
@@ -75,3 +76,53 @@ def test_draw_image(static_pdfs, image_samples, pdf_samples, request):
 
         assert len(pdf.read()) == len(expected)
         assert pdf.read() == expected
+
+    images = [
+        RawElements.RawImage(
+            image=open(os.path.join(image_samples, "sample_image.jpg"), "rb+"),
+            page_number=1,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=0,  # optional
+        ),
+        RawElements.RawImage(
+            image=open(os.path.join(image_samples, "sample_image.jpg"), "rb+"),
+            page_number=2,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=180,  # optional
+        ),
+    ]
+
+    pdf2 = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(images)
+
+    assert pdf2.read() == pdf.read()
+
+    images = [
+        RawElements.RawImage(
+            image=open(os.path.join(image_samples, "sample_image.jpg"), "rb+").read(),
+            page_number=1,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=0,  # optional
+        ),
+        RawElements.RawImage(
+            image=open(os.path.join(image_samples, "sample_image.jpg"), "rb+").read(),
+            page_number=2,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=180,  # optional
+        ),
+    ]
+
+    pdf3 = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(images)
+
+    assert pdf3.read() == pdf.read()

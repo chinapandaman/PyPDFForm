@@ -129,13 +129,14 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float):
     widths: list[float] = []
     if head_table and cmap_table and hmtx_table:
         cmap = cmap_table.getBestCmap()
-        units_per_em: int = head_table.unitsPerEm or 1
+        if cmap:
+            units_per_em: int = head_table.unitsPerEm or 1
 
-        for codepoint in range(ENCODING_TABLE_SIZE):
-            glyph_name: str = cmap.get(codepoint, FontNotdef)
-            advance_width, _ = hmtx_table[glyph_name]
-            pdf_width: float = (advance_width / units_per_em) * EM_TO_PDF_FACTOR
-            widths.append(pdf_width)
+            for codepoint in range(ENCODING_TABLE_SIZE):
+                glyph_name: str = cmap.get(codepoint, FontNotdef)
+                advance_width, _ = hmtx_table[glyph_name]
+                pdf_width: float = (advance_width / units_per_em) * EM_TO_PDF_FACTOR
+                widths.append(pdf_width)
     else:
         widths: list[float] = [missing_width] * ENCODING_TABLE_SIZE
 

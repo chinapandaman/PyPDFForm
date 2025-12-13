@@ -118,6 +118,26 @@ def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
         assert len(filled.read()) == len(expected)
         assert filled.read() == expected
 
+    with open(os.path.join(image_samples, "sample_signature.png"), "rb+") as sig:
+        filled2 = PdfWrapper(
+            os.path.join(static_pdfs, "sample_template_with_signature.pdf"),
+        ).fill(
+            {"signature": sig},
+            flatten=False,  # optional, set to True to flatten the filled PDF form
+        )
+
+    assert filled2.read() == filled.read()
+
+    with open(os.path.join(image_samples, "sample_signature.png"), "rb+") as sig:
+        filled3 = PdfWrapper(
+            os.path.join(static_pdfs, "sample_template_with_signature.pdf"),
+        ).fill(
+            {"signature": sig.read()},
+            flatten=False,  # optional, set to True to flatten the filled PDF form
+        )
+
+    assert filled3.read() == filled.read()
+
 
 @pytest.mark.posix_only
 def test_fill_sig_ratio(static_pdfs, pdf_samples, image_samples, request):
@@ -160,6 +180,26 @@ def test_fill_image(static_pdfs, pdf_samples, image_samples, request):
 
         assert len(filled.read()) == len(expected)
         assert filled.read() == expected
+
+    with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as img:
+        filled2 = PdfWrapper(
+            os.path.join(static_pdfs, "sample_template_with_image_field.pdf"),
+        ).fill(
+            {"image_1": img},
+            flatten=False,  # optional, set to True to flatten the filled PDF form
+        )
+
+    assert filled2.read() == filled.read()
+
+    with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as img:
+        filled3 = PdfWrapper(
+            os.path.join(static_pdfs, "sample_template_with_image_field.pdf"),
+        ).fill(
+            {"image_1": img.read()},
+            flatten=False,  # optional, set to True to flatten the filled PDF form
+        )
+
+    assert filled3.read() == filled.read()
 
 
 def test_fill_image_ratio(static_pdfs, pdf_samples, image_samples, request):

@@ -28,8 +28,8 @@ new_form = PdfWrapper("dummy.pdf").create_field(
         width=120.3,  # optional
         height=40.7,  # optional
         max_length=5,  # optional, number of characters
-        comb=True,  # optional, when set to True, max_length must also be set
-        font="your_registered_font",  # optional
+        comb=True,  # optional, when set to True, max_length must also be set (1)
+        font="your_registered_font",  # optional (2)
         font_size=15,  # optional
         font_color=(1, 0, 0),  # optional
         bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
@@ -43,8 +43,8 @@ new_form = PdfWrapper("dummy.pdf").create_field(
 new_form.write("output.pdf")
 ```
 
-???+ tip
-    To use a custom font, see how to register it [here](font.md).
+1.  For the `comb` option, refer to the documentation [here](style.md/#enable-text-field-character-spacing-combs).
+2.  To use a custom font, see how to register it [here](font.md).
 
 ## Create a checkbox
 
@@ -62,7 +62,7 @@ new_form = PdfWrapper("dummy.pdf").create_field(
         required=False,  # optional
         tooltip="this is a checkbox",  # optional
         size=30,  # optional
-        button_style="check",  # optional
+        button_style="check",  # optional (1)
         tick_color=(0, 1, 0),  # optional
         bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
         border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
@@ -73,7 +73,7 @@ new_form = PdfWrapper("dummy.pdf").create_field(
 new_form.write("output.pdf")
 ```
 
-The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
+1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
 
 ???+ bug
     To remove the border of a checkbox, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
@@ -96,7 +96,7 @@ new_form = PdfWrapper("dummy.pdf").create_field(
         required=False,  # optional
         tooltip="this is a radio group",  # optional
         size=30,  # optional
-        button_style="check",  # optional
+        button_style="check",  # optional (1)
         shape="square",  # optional, circle or square
         tick_color=(0, 1, 0),  # optional
         bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
@@ -108,6 +108,8 @@ new_form = PdfWrapper("dummy.pdf").create_field(
 new_form.write("output.pdf")
 ```
 
+1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
+
 ???+ bug
     To remove the border of a group of radio buttons, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
 
@@ -115,7 +117,7 @@ new_form.write("output.pdf")
 
 A dropdown field shares a similar set of parameters as a text field. The only significant difference is that a list of `options` needs to be specified:
 
-=== "Default"
+=== "Default Export Values"
     ```python
     from PyPDFForm import Fields, PdfWrapper
 
@@ -134,7 +136,7 @@ A dropdown field shares a similar set of parameters as a text field. The only si
             tooltip="this is a dropdown",  # optional
             width=120,  # optional
             height=40,  # optional
-            font="your_registered_font",  # optional
+            font="your_registered_font",  # optional (1)
             font_size=15,  # optional
             font_color=(1, 0, 0),  # optional
             bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
@@ -145,6 +147,9 @@ A dropdown field shares a similar set of parameters as a text field. The only si
 
     new_form.write("output.pdf")
     ```
+    { .annotate }
+
+    1.  To use a custom font, see how to register it [here](font.md).
 === "Custom Export Values"
     If you want different export values from the displayed options, you can specify a list of tuples for the `options` parameter, where the first value of each tuple is the displayed option and the second value is the export value:
 
@@ -167,9 +172,6 @@ A dropdown field shares a similar set of parameters as a text field. The only si
 
     new_form.write("output.pdf")
     ```
-
-???+ tip
-    To use a custom font, see how to register it [here](font.md).
 
 ## Create a signature field
 
@@ -259,7 +261,7 @@ new_form.write("output.pdf")
 
 PyPDFForm allows you to modify the keys of existing fields.
 
-=== "Default"
+=== "Single Update"
     For example, to change the key of the first text field, `test`, to `test_text` using [this PDF](pdfs/sample_template.pdf), use the following code:
 
     ```python
