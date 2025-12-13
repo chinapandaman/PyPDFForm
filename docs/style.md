@@ -250,7 +250,7 @@ form.write("output.pdf")
 
 To modify the options available in a dropdown field, assign a new list of strings to the `.choices` attribute of the corresponding field. For instance, the following code snippet updates the `dropdown_1` field in [this PDF form](pdfs/sample_template_with_dropdown.pdf) with a new set of choices:
 
-=== "Default"
+=== "Default Export Values"
     ```python
     from PyPDFForm import PdfWrapper
 
