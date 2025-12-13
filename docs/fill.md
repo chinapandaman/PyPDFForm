@@ -50,7 +50,7 @@ filled.write("output.pdf")
 
 As with radio buttons, select a dropdown choice by specifying its `integer` value. For example, to fill [this PDF](pdfs/sample_template_with_dropdown.pdf):
 
-=== "Default"
+=== "Using Option Index"
     ```python
     from PyPDFForm import PdfWrapper
 
@@ -87,7 +87,7 @@ A signature field enables signing a PDF form with a handwritten signature image.
 
 To fill a signature field, consider [this PDF](pdfs/sample_template_with_signature.pdf) and [this signature image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png):
 
-=== "Default"
+=== "File Path"
     ```python
     from PyPDFForm import PdfWrapper
 
@@ -97,6 +97,34 @@ To fill a signature field, consider [this PDF](pdfs/sample_template_with_signatu
         },
         flatten=False   # optional, set to True to flatten the filled PDF form
     )
+
+    signed.write("output.pdf")
+    ```
+=== "Open File Object"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    with open("sample_signature.png", "rb+") as sig:
+        signed = PdfWrapper("sample_template_with_signature.pdf").fill(
+            {
+                "signature": sig
+            },
+            flatten=False   # optional, set to True to flatten the filled PDF form
+        )
+
+    signed.write("output.pdf")
+    ```
+=== "Bytes File Stream"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    with open("sample_signature.png", "rb+") as sig:
+        signed = PdfWrapper("sample_template_with_signature.pdf").fill(
+            {
+                "signature": sig.read()
+            },
+            flatten=False   # optional, set to True to flatten the filled PDF form
+        )
 
     signed.write("output.pdf")
     ```
@@ -117,16 +145,13 @@ To fill a signature field, consider [this PDF](pdfs/sample_template_with_signatu
     pdf.write("output.pdf")
     ```
 
-???+ tip
-    The signature value in your dictionary can be a file path, an open file object, or a `bytes` file stream, as described [here](install.md/#create-a-pdf-wrapper).
-
 ## Fill image field
 
 Fill an image field similarly to a signature field, using a file path, file object, or file stream.
 
 To fill an image field, consider [this PDF](pdfs/sample_template_with_image_field.pdf) and [this image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_image.jpg):
 
-=== "Default"
+=== "File Path"
     ```python
     from PyPDFForm import PdfWrapper
 
@@ -136,6 +161,34 @@ To fill an image field, consider [this PDF](pdfs/sample_template_with_image_fiel
         },
         flatten=False   # optional, set to True to flatten the filled PDF form
     )
+
+    filled.write("output.pdf")
+    ```
+=== "Open File Object"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    with open("sample_image.jpg", "rb+") as img:
+        filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
+            {
+                "image_1": img
+            },
+            flatten=False   # optional, set to True to flatten the filled PDF form
+        )
+
+    filled.write("output.pdf")
+    ```
+=== "Bytes File Stream"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    with open("sample_image.jpg", "rb+") as img:
+        filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
+            {
+                "image_1": img.read()
+            },
+            flatten=False   # optional, set to True to flatten the filled PDF form
+        )
 
     filled.write("output.pdf")
     ```
@@ -155,6 +208,3 @@ To fill an image field, consider [this PDF](pdfs/sample_template_with_image_fiel
 
     pdf.write("output.pdf")
     ```
-
-???+ tip
-    The image value in your dictionary can be a file path, an open file object, or a `bytes` file stream, as described [here](install.md/#create-a-pdf-wrapper).
