@@ -8,29 +8,63 @@ PyPDFForm is a Python library for PDF form processing. It contains the essential
 
 It also supports other common utilities such as extracting pages and merging multiple PDFs together.
 
-## User Guide
+## Quickstart
 
-* [Installation and setup](install.md)
-* [PDF coordinate system](coordinate.md)
-* [Register fonts](font.md)
-* [Create form fields](prepare.md)
-* [Inspect form field data](inspect.md)
-* [Fill PDF forms](fill.md)
-* [Change form field styles](style.md)
-* [Draw elements](draw.md)
-* [Other utilities](utils.md)
+Here's a quick look at how PyPDFForm works:
 
-## Developer Guide
+=== "Install"
+    ```shell
+    pip install PyPDFForm
+    ```
+=== "Instantiate"
+    ```python
+    from PyPDFForm import BlankPage, PdfWrapper
 
-* [Developer Intro](dev_intro.md)
-* [Pull Request Requirements](dev_changes.md)
-* [Hosting Docs Locally](dev_doc.md)
-* [Testing](dev_test.md)
-* [Releasing](dev_release.md)
+    pdf = PdfWrapper(BlankPage())
+    ```
+=== "Create"
+    ```python
+    from PyPDFForm import Fields, RawElements
 
-## News
+    pdf.draw([
+        RawElements.RawText("My Textfield:", 1, 100, 600),
+        RawElements.RawText("My Checkbox:", 1, 100, 550),
+    ])
+    pdf.bulk_create_fields([
+        Fields.TextField("my_textfield", 1, 180, 596, height=16),
+        Fields.CheckBoxField("my_checkbox", 1, 180, 546, size=16),
+    ])
+    ```
+=== "Inspect"
+    ```python
+    from pprint import pprint
 
-* [2025-11-22: V4 Announcements](news/2025-11-22.md)
-* [2025-05-24: V3 Announcements](news/2025-05-24.md)
-* [2025-03-29: Announcements](news/2025-03-29.md)
-* [2024-01-01: API Changes](news/2024-01-01.md)
+    pprint(pdf.schema)
+    ```
+=== "Style"
+    ```python
+    pdf.widgets["my_textfield"].font_color = (1, 0, 0)
+    pdf.widgets["my_textfield"].alignment = 1
+    ```
+=== "Fill"
+    ```python
+    pdf.fill({
+        "my_textfield": "this is a text field",
+        "my_checkbox": True,
+    })
+    ```
+=== "Save"
+    ```python
+    pdf.write("output.pdf")
+    ```
+
+## What's next?
+
+<div class="grid cards" markdown>
+
+- :material-file-document-outline: Read the [__User Guide__](install.md) for detailed usage guides.
+- :material-code-braces: Read the [__Developer Guide__](dev_intro.md) if you want to contribute.
+- :fontawesome-solid-bug: Open [__GitHub Issues__](https://github.com/chinapandaman/PyPDFForm/issues) for bugs.
+- :fontawesome-regular-star: [__Star__](https://github.com/chinapandaman/PyPDFForm/stargazers) to support this project.
+
+</div>
