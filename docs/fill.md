@@ -48,7 +48,7 @@ filled.write("output.pdf")
 
 ## Fill dropdown field
 
-As with radio buttons, select a dropdown choice by specifying its `integer` value. For example, to fill [this PDF](pdfs/sample_template_with_dropdown.pdf):
+As with radio buttons, a dropdown choice can be selected by specifying its `integer` value. For example, to fill [this PDF](pdfs/sample_template_with_dropdown.pdf):
 
 === "Using Option Index"
     ```python
