@@ -2,9 +2,12 @@
 
 import os
 
+import pytest
+
 from PyPDFForm import BlankPage, Fields, PdfWrapper, RawElements
 
 
+@pytest.mark.posix_only
 def test_index_snippets(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
 
