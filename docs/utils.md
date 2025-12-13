@@ -61,7 +61,7 @@ first_page.write("output.pdf")
 
 You can merge multiple PDF files by adding their `PdfWrapper` objects. For example, to merge [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) and [this PDF](pdfs/sample_template.pdf):
 
-=== "Default"
+=== "Default Page Order"
     ```python
     from PyPDFForm import PdfWrapper
 

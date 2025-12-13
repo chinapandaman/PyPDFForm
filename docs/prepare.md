@@ -117,7 +117,7 @@ new_form.write("output.pdf")
 
 A dropdown field shares a similar set of parameters as a text field. The only significant difference is that a list of `options` needs to be specified:
 
-=== "Default"
+=== "Default Export Values"
     ```python
     from PyPDFForm import Fields, PdfWrapper
 
@@ -261,7 +261,7 @@ new_form.write("output.pdf")
 
 PyPDFForm allows you to modify the keys of existing fields.
 
-=== "Default"
+=== "Single Key Update"
     For example, to change the key of the first text field, `test`, to `test_text` using [this PDF](pdfs/sample_template.pdf), use the following code:
 
     ```python
