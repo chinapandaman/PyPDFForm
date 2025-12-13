@@ -1,6 +1,6 @@
 # Inspect form field data
 
-After preparing a PDF form, use PyPDFForm to inspect its field names and determine the data required for filling it. You can choose from multiple inspection methods to suit your needs.
+Once a PDF form is prepared, PyPDFForm can help you inspect its fields to determine the data needed to fill it. Several inspection methods are available to choose from.
 
 This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
 

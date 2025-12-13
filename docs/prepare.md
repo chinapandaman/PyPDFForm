@@ -286,7 +286,7 @@ PyPDFForm allows you to modify the keys of existing fields.
     new_form.write("output.pdf")
     ```
 === "Bulk Updates"
-    For bulk updates, improve performance by setting `defer=True` when updating each key, then call `commit_widget_key_updates()` at the end to commit all changes.
+    To improve performance for bulk updates, you can set `defer=True` on each key update. This stages the change without immediately applying it. A final call to `commit_widget_key_updates()` will then apply all staged changes at once.
 
     To change the key of each row's text field with the key `Description[0]` to `Description[i]`, where `i` is the index of each row, using [this PDF](pdfs/733.pdf), use the following code:
 

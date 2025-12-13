@@ -1,6 +1,6 @@
 # Developer Intro
 
-PyPDFForm is designed for Python developers. This documentation section is intended for contributors to PyPDFForm, not its end-users.
+PyPDFForm is a library built with Python. This part of the documentation is specifically for those who want to contribute to the project's development.
 
 ## Setup
 
