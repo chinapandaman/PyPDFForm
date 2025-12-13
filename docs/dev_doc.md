@@ -7,7 +7,7 @@ PyPDFForm uses [MkDocs](https://www.mkdocs.org/) to build its documentation. You
 === "Virtual Environment"
     To host the documentation locally, run:
     ```shell
-    mkdocs serve
+    mkdocs serve -a 0.0.0.0:8080
     ```
 
 === "Development Container"
@@ -16,4 +16,4 @@ PyPDFForm uses [MkDocs](https://www.mkdocs.org/) to build its documentation. You
     docs
     ```
 
-The documentation will be available at [http://localhost:8000/](http://localhost:8000/).
+The documentation will be available at [http://localhost:8080/](http://localhost:8080/).

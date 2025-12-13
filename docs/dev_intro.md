@@ -22,7 +22,7 @@ PyPDFForm is a library built with Python. This part of the documentation is spec
     Once successfully built, you can open a shell inside the container by running:
 
     ```shell
-    docker run -it --rm -p 8000:8000 -v ${PWD}:/pypdfform pypdfform-dev
+    docker run -it --rm -p 8000:8000 -p 8080:8080 -v ${PWD}:/pypdfform pypdfform-dev
     ```
 
 ## Running tests
