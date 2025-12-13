@@ -23,11 +23,15 @@ nav:
     - news/2025-05-24.md
     - news/2025-03-29.md
     - news/2024-01-01.md
+not_in_nav: |
+  /index.md
 
 plugins:
   - search
 
 markdown_extensions:
+  - attr_list
+  - md_in_html
   - admonition
   - pymdownx.details
   - pymdownx.superfences
@@ -37,7 +41,6 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
   - toc:
@@ -47,9 +50,11 @@ theme:
   name: material
   icon:
     repo: fontawesome/brands/github
+    annotation: material/plus-circle
   features:
     - content.code.copy
     - content.code.select
+    - content.code.annotate
     - navigation.footer
     - navigation.instant
     - navigation.instant.progress
