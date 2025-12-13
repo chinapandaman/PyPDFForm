@@ -10,7 +10,7 @@ It also supports other common utilities such as extracting pages and merging mul
 
 ## Quickstart
 
-Try some code snippets to get a flavor of how PyPDFForm works:
+Here's a quick look at how PyPDFForm works:
 
 === "Install"
     ```shell
@@ -62,9 +62,9 @@ Try some code snippets to get a flavor of how PyPDFForm works:
 
 <div class="grid cards" markdown>
 
-- :material-file-document-outline: [__User Guide__](install.md) for detailed usages
-- :material-code-braces: [__Developer Guide__](dev_intro.md) if you wish to contribute to the project
-- :fontawesome-solid-question: [__Open Issue__](https://github.com/chinapandaman/PyPDFForm/issues) for questions
-- :fontawesome-regular-star: [__Star__](https://github.com/chinapandaman/PyPDFForm/stargazers) to support this project
+- :material-file-document-outline: Read the [__User Guide__](install.md) for detailed usage guides.
+- :material-code-braces: Read the [__Developer Guide__](dev_intro.md) if you want to contribute.
+- :fontawesome-solid-bug: Open [__GitHub Issues__](https://github.com/chinapandaman/PyPDFForm/issues) for bugs.
+- :fontawesome-regular-star: [__Star__](https://github.com/chinapandaman/PyPDFForm/stargazers) to support this project.
 
 </div>
