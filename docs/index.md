@@ -28,11 +28,11 @@ Try some code snippets to get a flavor of how PyPDFForm works:
 
     pdf.draw([
         RawElements.RawText("My Textfield:", 1, 100, 600),
-        RawElements.RawText("My Checkbox:", 1, 100, 550)
+        RawElements.RawText("My Checkbox:", 1, 100, 550),
     ])
     pdf.bulk_create_fields([
         Fields.TextField("my_textfield", 1, 180, 596, height=16),
-        Fields.CheckBoxField("my_checkbox", 1, 180, 546, size=16)
+        Fields.CheckBoxField("my_checkbox", 1, 180, 546, size=16),
     ])
     ```
 === "Inspect"
@@ -50,10 +50,21 @@ Try some code snippets to get a flavor of how PyPDFForm works:
     ```python
     pdf.fill({
         "my_textfield": "this is a text field",
-        "my_checkbox": True
+        "my_checkbox": True,
     })
     ```
 === "Save"
     ```python
     pdf.write("output.pdf")
     ```
+
+## What's next?
+
+<div class="grid cards" markdown>
+
+- :material-file-document-outline: [__User Guide__](install.md) for detailed usages
+- :material-code-braces: [__Developer Guide__](dev_intro.md) if you wish to contribute to the project
+- :fontawesome-solid-question: [__Open Issue__](https://github.com/chinapandaman/PyPDFForm/issues) for questions
+- :fontawesome-regular-star: [__Star__](https://github.com/chinapandaman/PyPDFForm/stargazers) to support this project
+
+</div>
