@@ -5,7 +5,7 @@ The filled form is editable by default. When you call the `fill` method, you can
 
 ## Fill text field and checkbox
 
-When filling [this PDF](pdfs/sample_template.pdf), note that text fields are filled with `string` values and checkboxes with `boolean` values:
+To fill a text field, provide a `string` value, and for a checkbox, use a `boolean` value. The following example demonstrates how to fill [this PDF](pdfs/sample_template.pdf):
 
 ```python
 from PyPDFForm import PdfWrapper
