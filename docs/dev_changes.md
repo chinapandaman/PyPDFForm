@@ -6,7 +6,7 @@ When submitting a pull request, follow these guidelines for a smooth review proc
 
 PyPDFForm welcomes contributions from developers of all levels and doesn't enforce strict coding rules.
 
-Your PR should follow these conventions:
+That said, your PR should follow these conventions:
 
 * Try to submit small, incremental changes. For large changes, request a feature branch in your issue and open your PR against that branch, as they will likely need revision before merging into master.
 * Ensure your changes pass all linters. PyPDFForm uses rules from [pylint](https://www.pylint.org/), [ruff](https://docs.astral.sh/ruff/), and [pyright](https://microsoft.github.io/pyright/#/). Run `linting` inside the development container to check.
