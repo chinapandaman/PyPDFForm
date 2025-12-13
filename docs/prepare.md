@@ -261,7 +261,7 @@ new_form.write("output.pdf")
 
 PyPDFForm allows you to modify the keys of existing fields.
 
-=== "Single Key Update"
+=== "Single Update"
     For example, to change the key of the first text field, `test`, to `test_text` using [this PDF](pdfs/sample_template.pdf), use the following code:
 
     ```python
