@@ -46,33 +46,92 @@ pdf.write("output.pdf")
 
 ## Draw image
 
-For the rotation parameter, a positive value rotates the image counter-clockwise, and a negative value rotates it clockwise.
+For the `rotation` parameter, a positive value rotates the image counter-clockwise, and a negative value rotates it clockwise.
 
-```python
-from PyPDFForm import PdfWrapper, RawElements
+=== "File Path"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
 
-images = [
-    RawElements.RawImage(
-        image="sample_image.jpg",
-        page_number=1,
-        x=100,
-        y=100,
-        width=400,
-        height=225,
-        rotation=0,  # optional
-    ),
-    RawElements.RawImage(
-        image="sample_image.jpg",
-        page_number=2,
-        x=100,
-        y=100,
-        width=400,
-        height=225,
-        rotation=180,  # optional
-    ),
-]
+    images = [
+        RawElements.RawImage(
+            image="sample_image.jpg",
+            page_number=1,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=0,  # optional
+        ),
+        RawElements.RawImage(
+            image="sample_image.jpg",
+            page_number=2,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=180,  # optional
+        ),
+    ]
 
-pdf = PdfWrapper("sample_template.pdf").draw(images)
+    pdf = PdfWrapper("sample_template.pdf").draw(images)
 
-pdf.write("output.pdf")
-```
+    pdf.write("output.pdf")
+    ```
+=== "Open File Object"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
+
+    images = [
+        RawElements.RawImage(
+            image=open("sample_image.jpg", "rb+"),
+            page_number=1,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=0,  # optional
+        ),
+        RawElements.RawImage(
+            image=open("sample_image.jpg", "rb+"),
+            page_number=2,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=180,  # optional
+        ),
+    ]
+
+    pdf = PdfWrapper("sample_template.pdf").draw(images)
+
+    pdf.write("output.pdf")
+    ```
+=== "Bytes File Stream"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
+
+    images = [
+        RawElements.RawImage(
+            image=open("sample_image.jpg", "rb+").read(),
+            page_number=1,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=0,  # optional
+        ),
+        RawElements.RawImage(
+            image=open("sample_image.jpg", "rb+").read(),
+            page_number=2,
+            x=100,
+            y=100,
+            width=400,
+            height=225,
+            rotation=180,  # optional
+        ),
+    ]
+
+    pdf = PdfWrapper("sample_template.pdf").draw(images)
+
+    pdf.write("output.pdf")
+    ```
