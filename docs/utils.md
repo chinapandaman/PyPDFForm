@@ -71,7 +71,7 @@ You can merge multiple PDF files by adding their `PdfWrapper` objects. For examp
 
     merged.write("output.pdf")
     ```
-=== "Rearrange Pages"
+=== "Rearrange Page Order"
     ```python
     from PyPDFForm import PdfWrapper
 
