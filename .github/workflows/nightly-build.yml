@@ -1,5 +1,8 @@
 name: Nightly Build
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
   schedule:
@@ -7,6 +10,9 @@ on:
 
 jobs:
   close-staled-issues:
+    permissions:
+      contents: read
+      issues: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
