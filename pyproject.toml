@@ -59,7 +59,6 @@ dev = [
 omit = [
     "venv/*",
     "tests/*",
-    "conftest.py",
     "PyPDFForm/deprecation.py",
 ]
 
