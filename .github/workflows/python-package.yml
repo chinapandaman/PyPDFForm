@@ -35,4 +35,4 @@ jobs:
     - name: Test with pytest (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        pytest -v -m "not posix_only"
+        coverage run -m pytest -v -m "not posix_only"
