@@ -36,3 +36,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         coverage run -m pytest -v -m "not posix_only"
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v5
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
