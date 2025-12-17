@@ -3,11 +3,11 @@
     <em>PDF Form Automation Simplified – Create, Merge, Style, and Fill Forms Programmatically.</em>
 </p>
 <p align="center">
-    <a href="https://pypi.org/project/PyPDFForm/"><img src="https://img.shields.io/pypi/v/pypdfform?label=version&color=magenta&logo=pypi&logoColor=white"></a>
+    <a href="https://pypi.org/project/PyPDFForm/"><img src="https://img.shields.io/pypi/v/pypdfform?label=version&color=magenta&logo=pypi&logoColor=pink"></a>
     <a href="https://chinapandaman.github.io/PyPDFForm/"><img src="https://img.shields.io/github/v/release/chinapandaman/pypdfform?label=docs&color=cyan&logo=readthedocs&logoColor=white"></a>
-    <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml"><img src="https://img.shields.io/badge/coverage-100%25-green"></a>
-    <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/pypi/pyversions/pypdfform?label=python&color=gold&logo=python&logoColor=white"></a>
-    <a href="https://pypistats.org/packages/pypdfform"><img src="https://img.shields.io/pypi/dm/pypdfform?color=blue&logo=pypi&logoColor=white"></a>
+    <a href="https://codecov.io/gh/chinapandaman/PyPDFForm"><img src="https://codecov.io/gh/chinapandaman/PyPDFForm/graph/badge.svg?token=CSRLN14IFE"/></a>
+    <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/pypi/pyversions/pypdfform?label=python&color=gold&logo=python&logoColor=orange"></a>
+    <a href="https://pypistats.org/packages/pypdfform"><img src="https://img.shields.io/pypi/dm/pypdfform?color=blue&logo=pypi&logoColor=lightblue"></a>
 </p>
 
 ## Important Announcement
