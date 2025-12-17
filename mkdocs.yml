@@ -58,6 +58,8 @@ theme:
     - content.code.copy
     - content.code.select
     - content.code.annotate
+    - content.action.edit
+    - content.action.view
     - navigation.footer
     - navigation.instant
     - navigation.instant.progress
