@@ -70,3 +70,8 @@ def de(multi_language_pdf_samples):
 @pytest.fixture
 def fr(multi_language_pdf_samples):
     return os.path.join(multi_language_pdf_samples, "fr")
+
+
+@pytest.fixture
+def jv(multi_language_pdf_samples):
+    return os.path.join(multi_language_pdf_samples, "jv")
