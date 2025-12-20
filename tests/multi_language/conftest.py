@@ -20,3 +20,8 @@ def zh_cn(multi_language_pdf_samples):
 @pytest.fixture
 def ko(multi_language_pdf_samples):
     return os.path.join(multi_language_pdf_samples, "ko")
+
+
+@pytest.fixture
+def ja(multi_language_pdf_samples):
+    return os.path.join(multi_language_pdf_samples, "ja")

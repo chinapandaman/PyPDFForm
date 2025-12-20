@@ -2,7 +2,7 @@
 
 import os
 
-from PyPDFForm import PdfWrapper
+from PyPDFForm import Fields, PdfWrapper
 
 
 def test_zh_cn(zh_cn, request):
@@ -32,6 +32,24 @@ def test_ko(ko, request):
                 "상호": "한국",
                 "성명": "홍길동",
             },
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_ja(ja, pdf_samples, request):
+    expected_path = os.path.join(ja, "test_ja.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = (
+            PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+            .create_field(Fields.TextField("こんにちは", 1, 100, 100))
+            .fill({"こんにちは": "さよなら"})
         )
 
         request.config.results["expected_path"] = expected_path
