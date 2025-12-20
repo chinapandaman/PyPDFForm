@@ -40,3 +40,8 @@ def vi(multi_language_pdf_samples):
 @pytest.fixture
 def es(multi_language_pdf_samples):
     return os.path.join(multi_language_pdf_samples, "es")
+
+
+@pytest.fixture
+def it(multi_language_pdf_samples):
+    return os.path.join(multi_language_pdf_samples, "it")
