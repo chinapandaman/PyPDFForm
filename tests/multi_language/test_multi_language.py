@@ -131,3 +131,21 @@ def test_it(it, pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_hi(hi, pdf_samples, request):
+    expected_path = os.path.join(hi, "test_hi.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = (
+            PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+            .create_field(Fields.TextField("नमस्ते", 1, 100, 100))
+            .fill({"नमस्ते": "अलविदा"})
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
