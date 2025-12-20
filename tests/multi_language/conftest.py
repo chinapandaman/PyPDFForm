@@ -55,3 +55,8 @@ def hi(multi_language_pdf_samples):
 @pytest.fixture
 def tr(multi_language_pdf_samples):
     return os.path.join(multi_language_pdf_samples, "tr")
+
+
+@pytest.fixture
+def ar(multi_language_pdf_samples):
+    return os.path.join(multi_language_pdf_samples, "ar")
