@@ -30,3 +30,8 @@ def ja(multi_language_pdf_samples):
 @pytest.fixture
 def ru(multi_language_pdf_samples):
     return os.path.join(multi_language_pdf_samples, "ru")
+
+
+@pytest.fixture
+def vi(multi_language_pdf_samples):
+    return os.path.join(multi_language_pdf_samples, "vi")
