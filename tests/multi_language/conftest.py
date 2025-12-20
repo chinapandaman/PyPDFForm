@@ -50,3 +50,8 @@ def it(multi_language_pdf_samples):
 @pytest.fixture
 def hi(multi_language_pdf_samples):
     return os.path.join(multi_language_pdf_samples, "hi")
+
+
+@pytest.fixture
+def tr(multi_language_pdf_samples):
+    return os.path.join(multi_language_pdf_samples, "tr")
