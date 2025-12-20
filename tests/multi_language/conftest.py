@@ -75,3 +75,8 @@ def fr(multi_language_pdf_samples):
 @pytest.fixture
 def jv(multi_language_pdf_samples):
     return os.path.join(multi_language_pdf_samples, "jv")
+
+
+@pytest.fixture
+def th(multi_language_pdf_samples):
+    return os.path.join(multi_language_pdf_samples, "th")
