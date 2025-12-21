@@ -100,3 +100,8 @@ def pl(multi_language_pdf_samples):
 @pytest.fixture
 def sr(multi_language_pdf_samples):
     return os.path.join(multi_language_pdf_samples, "sr")
+
+
+@pytest.fixture
+def ms(multi_language_pdf_samples):
+    return os.path.join(multi_language_pdf_samples, "ms")
