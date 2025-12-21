@@ -120,3 +120,8 @@ def da(multi_language_pdf_samples):
 @pytest.fixture
 def fi(multi_language_pdf_samples):
     return os.path.join(multi_language_pdf_samples, "fi")
+
+
+@pytest.fixture
+def el(multi_language_pdf_samples):
+    return os.path.join(multi_language_pdf_samples, "el")
