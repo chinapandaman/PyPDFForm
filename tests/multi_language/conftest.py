@@ -130,3 +130,8 @@ def el(multi_language_pdf_samples):
 @pytest.fixture
 def mn(multi_language_pdf_samples):
     return os.path.join(multi_language_pdf_samples, "mn")
+
+
+@pytest.fixture
+def is_(multi_language_pdf_samples):
+    return os.path.join(multi_language_pdf_samples, "is")
