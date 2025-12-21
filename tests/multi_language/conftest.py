@@ -105,3 +105,8 @@ def sr(multi_language_pdf_samples):
 @pytest.fixture
 def ms(multi_language_pdf_samples):
     return os.path.join(multi_language_pdf_samples, "ms")
+
+
+@pytest.fixture
+def no(multi_language_pdf_samples):
+    return os.path.join(multi_language_pdf_samples, "no")
