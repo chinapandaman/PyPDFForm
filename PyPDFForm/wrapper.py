@@ -133,10 +133,10 @@ class PdfWrapper:
             PdfWrapper: A new `PdfWrapper` object containing the merged PDFs.
         """
 
-        if not self or not self.read():
+        if not self or not self._read():
             return other
 
-        if not other or not other.read():
+        if not other or not other._read():
             return self
 
         unique_suffix = generate_unique_suffix()
@@ -148,7 +148,7 @@ class PdfWrapper:
 
         # user params are based on the first object
         result = self.__class__(
-            merge_pdfs([self.read(), other.read()]),
+            merge_pdfs([self._read(), other._read()]),
             **{each[0]: getattr(self, each[0], each[1]) for each in self.USER_PARAMS},
         )
 
@@ -169,10 +169,10 @@ class PdfWrapper:
 
         new_widgets = (
             build_widgets(
-                self.read(),
+                self._read(),
                 getattr(self, "use_full_widget_name"),
             )
-            if self.read()
+            if self._read()
             else {}
         )
         # ensure old widgets don't get overwritten
@@ -192,8 +192,8 @@ class PdfWrapper:
 
         self.widgets = new_widgets
 
-        if self.read():
-            self._available_fonts.update(**get_all_available_fonts(self.read()))
+        if self._read():
+            self._available_fonts.update(**get_all_available_fonts(self._read()))
 
     def _reregister_font(self) -> PdfWrapper:
         """
@@ -271,7 +271,7 @@ class PdfWrapper:
         """
 
         for each in VERSION_IDENTIFIERS:
-            if self.read().startswith(each):
+            if self._read().startswith(each):
                 return each.replace(VERSION_IDENTIFIER_PREFIX, b"").decode()
 
         return None
@@ -300,10 +300,10 @@ class PdfWrapper:
 
         result = [
             self.__class__(
-                copy_watermark_widgets(each, self.read(), None, i),
+                copy_watermark_widgets(each, self._read(), None, i),
                 **{param: getattr(self, param) for param, _ in self.USER_PARAMS},
             )
-            for i, each in enumerate(get_page_streams(remove_all_widgets(self.read())))
+            for i, each in enumerate(get_page_streams(remove_all_widgets(self._read())))
         ]
 
         # because copy_watermark_widgets and remove_all_widgets
@@ -316,15 +316,33 @@ class PdfWrapper:
 
     def read(self) -> bytes:
         """
-        Reads the PDF content from the underlying stream.
+        Reads the current state of the PDF document.
 
-        This method returns the current state of the PDF as a byte string.
-        It also triggers any pending widget hooks and applies necessary PDF settings
-        like setting the `NeedAppearances` flag or generating appearance streams
-        if configured.
+        This method triggers any pending widget updates, applies changes, and
+        returns the finalized PDF content as a byte string. It is the standard
+        way to retrieve the modified PDF after performing operations like
+        filling fields or drawing text.
 
         Returns:
-            bytes: The PDF content as bytes.
+            bytes: The raw PDF data as a byte string.
+        """
+
+        return self._read()
+
+    def _read(self) -> bytes:
+        """
+        Internal method to process and retrieve the PDF stream.
+
+        This method performs several critical steps to finalize the PDF:
+        1. Triggers any registered widget hooks to apply updates.
+        2. Maps user-friendly font names to internal PDF font resource names (e.g., '/F1').
+        3. Handles appearance stream generation if `need_appearances` is enabled,
+           ensuring that form fields are rendered correctly in all viewers.
+
+        It updates `self._stream` with the latest content before returning it.
+
+        Returns:
+            bytes: The processed PDF data as a byte string.
         """
 
         if any(widget.hooks_to_trigger for widget in self.widgets.values()):
@@ -382,7 +400,7 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        self._stream = self.read().replace(
+        self._stream = self._read().replace(
             VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
             VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
             1,
@@ -404,10 +422,10 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        stream_with_widgets = self.read()
+        stream_with_widgets = self._read()
         self._stream = copy_watermark_widgets(
             generate_coordinate_grid(
-                remove_all_widgets(self.read()),
+                remove_all_widgets(self._read()),
                 color,
                 margin,
             ),
@@ -443,7 +461,7 @@ class PdfWrapper:
                 self.widgets[key].value = value
 
         filled_stream, image_drawn_stream = fill(
-            self.read(),
+            self._read(),
             self.widgets,
             need_appearances=getattr(self, "need_appearances"),
             use_full_widget_name=getattr(self, "use_full_widget_name"),
@@ -550,9 +568,9 @@ class PdfWrapper:
                 )
             )
 
-        watermarks = getattr(widget_class, "bulk_watermarks")(widgets, self.read())
+        watermarks = getattr(widget_class, "bulk_watermarks")(widgets, self._read())
         self._stream = copy_watermark_widgets(
-            self.read(),
+            self._read(),
             watermarks,
             [widget.name for widget in widgets],
             None,
@@ -658,9 +676,9 @@ class PdfWrapper:
             return self
 
         obj = _class(name=name, page_number=page_number, x=x, y=y, **kwargs)
-        watermarks = obj.watermarks(self.read())
+        watermarks = obj.watermarks(self._read())
 
-        self._stream = copy_watermark_widgets(self.read(), watermarks, [name], None)
+        self._stream = copy_watermark_widgets(self._read(), watermarks, [name], None)
         hook_params = obj.hook_params
 
         self._init_helper()
@@ -699,7 +717,7 @@ class PdfWrapper:
 
         self._key_update_tracker[new_key] = old_key
         self._stream = update_widget_keys(
-            self.read(), self.widgets, [old_key], [new_key], [index]
+            self._read(), self.widgets, [old_key], [new_key], [index]
         )
         self._init_helper()
 
@@ -724,7 +742,7 @@ class PdfWrapper:
         indices = [each[2] for each in self._keys_to_update]
 
         self._stream = update_widget_keys(
-            self.read(), self.widgets, old_keys, new_keys, indices
+            self._read(), self.widgets, old_keys, new_keys, indices
         )
 
         for each in self._keys_to_update:
@@ -750,13 +768,13 @@ class PdfWrapper:
         """
 
         watermarks = create_watermarks_and_draw(
-            self.read(), [each.to_draw for each in elements]
+            self._read(), [each.to_draw for each in elements]
         )
 
-        stream_with_widgets = self.read()
-        self._stream = merge_watermarks_with_pdf(self.read(), watermarks)
+        stream_with_widgets = self._read()
+        self._stream = merge_watermarks_with_pdf(self._read(), watermarks)
         self._stream = copy_watermark_widgets(
-            remove_all_widgets(self.read()), stream_with_widgets, None, None
+            remove_all_widgets(self._read()), stream_with_widgets, None, None
         )
         # because copy_watermark_widgets and remove_all_widgets
         self._reregister_font()
@@ -791,7 +809,7 @@ class PdfWrapper:
             if first_time and getattr(self, "need_appearances"):
                 self.draw([RawText(" ", 1, 0, 0, font=font_name)])
             self._stream, new_font_name = register_font_acroform(
-                self.read(), ttf_file, getattr(self, "need_appearances")
+                self._read(), ttf_file, getattr(self, "need_appearances")
             )
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))
