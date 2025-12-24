@@ -315,19 +315,34 @@ class PdfWrapper:
         return PdfWrapperList(result)
 
     def read(self) -> bytes:
+        """
+        Reads the current state of the PDF document.
+
+        This method triggers any pending widget updates, applies changes, and
+        returns the finalized PDF content as a byte string. It is the standard
+        way to retrieve the modified PDF after performing operations like
+        filling fields or drawing text.
+
+        Returns:
+            bytes: The raw PDF data as a byte string.
+        """
+
         return self._read()
 
     def _read(self) -> bytes:
         """
-        Reads the PDF content from the underlying stream.
+        Internal method to process and retrieve the PDF stream.
 
-        This method returns the current state of the PDF as a byte string.
-        It also triggers any pending widget hooks and applies necessary PDF settings
-        like setting the `NeedAppearances` flag or generating appearance streams
-        if configured.
+        This method performs several critical steps to finalize the PDF:
+        1. Triggers any registered widget hooks to apply updates.
+        2. Maps user-friendly font names to internal PDF font resource names (e.g., '/F1').
+        3. Handles appearance stream generation if `need_appearances` is enabled,
+           ensuring that form fields are rendered correctly in all viewers.
+
+        It updates `self._stream` with the latest content before returning it.
 
         Returns:
-            bytes: The PDF content as bytes.
+            bytes: The processed PDF data as a byte string.
         """
 
         if any(widget.hooks_to_trigger for widget in self.widgets.values()):
