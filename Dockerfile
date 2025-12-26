@@ -2,9 +2,7 @@ FROM python:3.12-slim
 
 WORKDIR /pypdfform
 
-EXPOSE 8000
-
-EXPOSE 8080
+EXPOSE 8000 8080
 
 RUN apt-get update && \
     apt-get install -y make dos2unix bash-completion git libatomic1
