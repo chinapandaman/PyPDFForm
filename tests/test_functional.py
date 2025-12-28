@@ -8,8 +8,19 @@ from jsonschema import ValidationError, validate
 
 from PyPDFForm import BlankPage, Fields, PdfWrapper, RawElements, Widgets
 from PyPDFForm.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
+from PyPDFForm.deprecation import deprecation_notice
 from PyPDFForm.middleware.base import Widget
 from PyPDFForm.template import get_widgets_by_page
+
+
+def test_deprecation_warning():
+    with pytest.warns(
+        DeprecationWarning, match="foo will be deprecated soon. Use bar instead."
+    ):
+        deprecation_notice(
+            "foo",
+            "bar",
+        )
 
 
 def test_base_schema_definition():

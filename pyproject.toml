@@ -59,7 +59,6 @@ dev = [
 omit = [
     "venv/*",
     "tests/*",
-    "PyPDFForm/deprecation.py",
 ]
 
 [tool.pylint."MESSAGES CONTROL"]
