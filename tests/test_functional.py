@@ -14,12 +14,13 @@ from PyPDFForm.template import get_widgets_by_page
 
 
 def test_deprecation_warning():
-    with pytest.warns(DeprecationWarning) as r:
+    with pytest.warns(
+        DeprecationWarning, match="foo will be deprecated soon. Use bar instead."
+    ) as r:
         deprecation_notice(
             "foo",
             "bar",
         )
-        assert str(r.list[0].message) == "foo will be deprecated soon. Use bar instead."
 
 
 def test_base_schema_definition():
