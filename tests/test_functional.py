@@ -16,7 +16,7 @@ from PyPDFForm.template import get_widgets_by_page
 def test_deprecation_warning():
     with pytest.warns(
         DeprecationWarning, match="foo will be deprecated soon. Use bar instead."
-    ) as r:
+    ):
         deprecation_notice(
             "foo",
             "bar",
