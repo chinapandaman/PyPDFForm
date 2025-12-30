@@ -536,3 +536,25 @@ def test_get_dropdown_choices(issue_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_sejda_multiline(issue_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-1349.pdf")).fill(
+        {
+            "Nombre corp": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas rhoncus est turpis, vitae hendrerit magna vestibulum in. Nulla maximus consectetur varius. Ut lectus nulla, malesuada at felis dictum, tristique lacinia lacus. Phasellus vehicula dui a orci aliquam, at tempus orci consequat. Maecenas sagittis auctor magna, a scelerisque urna ullamcorper at. Nam pellentesque faucibus condimentum. In hac habitasse platea dictumst.",
+            "Nombre rep": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas rhoncus est turpis, vitae hendrerit magna vestibulum in. Nulla maximus consectetur varius. Ut lectus nulla, malesuada at felis dictum, tristique lacinia lacus. Phasellus vehicula dui a orci aliquam, at tempus orci consequat. Maecenas sagittis auctor magna, a scelerisque urna ullamcorper at. Nam pellentesque faucibus condimentum. In hac habitasse platea dictumst.",
+            "Nombre bnf": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas rhoncus est turpis, vitae hendrerit magna vestibulum in. Nulla maximus consectetur varius. Ut lectus nulla, malesuada at felis dictum, tristique lacinia lacus. Phasellus vehicula dui a orci aliquam, at tempus orci consequat. Maecenas sagittis auctor magna, a scelerisque urna ullamcorper at. Nam pellentesque faucibus condimentum. In hac habitasse platea dictumst.",
+            "Poblacion CERREM corp": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas rhoncus est turpis, vitae hendrerit magna vestibulum in. Nulla maximus consectetur varius. Ut lectus nulla, malesuada at felis dictum, tristique lacinia lacus. Phasellus vehicula dui a orci aliquam, at tempus orci consequat. Maecenas sagittis auctor magna, a scelerisque urna ullamcorper at. Nam pellentesque faucibus condimentum. In hac habitasse platea dictumst.",
+            "Poblacion CERREM rep": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas rhoncus est turpis, vitae hendrerit magna vestibulum in. Nulla maximus consectetur varius. Ut lectus nulla, malesuada at felis dictum, tristique lacinia lacus. Phasellus vehicula dui a orci aliquam, at tempus orci consequat. Maecenas sagittis auctor magna, a scelerisque urna ullamcorper at. Nam pellentesque faucibus condimentum. In hac habitasse platea dictumst.",
+            "Poblacion CERREM bnf": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas rhoncus est turpis, vitae hendrerit magna vestibulum in. Nulla maximus consectetur varius. Ut lectus nulla, malesuada at felis dictum, tristique lacinia lacus. Phasellus vehicula dui a orci aliquam, at tempus orci consequat. Maecenas sagittis auctor magna, a scelerisque urna ullamcorper at. Nam pellentesque faucibus condimentum. In hac habitasse platea dictumst.",
+        },
+        flatten=True,
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-1349_expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
