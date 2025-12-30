@@ -2,6 +2,8 @@ site_name: PyPDFForm Documentation
 repo_url: https://github.com/chinapandaman/PyPDFForm
 repo_name: chinapandaman/PyPDFForm
 nav:
+  - 'Getting Started':
+    - index.md
   - 'User Guide':
     - install.md
     - coordinate.md
@@ -23,8 +25,6 @@ nav:
     - news/2025-05-24.md
     - news/2025-03-29.md
     - news/2024-01-01.md
-not_in_nav: |
-  /index.md
 
 plugins:
   - search
@@ -61,6 +61,7 @@ theme:
     - content.action.edit
     - content.action.view
     - navigation.footer
+    - navigation.indexes
     - navigation.instant
     - navigation.instant.progress
     - navigation.tracking
