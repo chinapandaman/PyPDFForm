@@ -62,7 +62,6 @@ class TextField(Field):
     attributes that can be configured for a text input field.
 
     Attributes:
-        _field_type (str): The type of the field, fixed as "text".
         _widget_class (Type[Widget]): The widget class associated with this field type.
         width (Optional[float]): The width of the text field.
         height (Optional[float]): The height of the text field.
@@ -79,7 +78,6 @@ class TextField(Field):
         multiline (Optional[bool]): If True, the text field can display multiple lines of text.
     """
 
-    _field_type: str = "text"
     _widget_class: Type[Widget] = TextWidget
 
     width: Optional[float] = None

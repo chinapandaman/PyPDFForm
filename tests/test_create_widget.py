@@ -7,24 +7,6 @@ import pytest
 from PyPDFForm import Fields, PdfWrapper
 
 
-def test_create_not_supported_type_not_working(template_stream):
-    obj = PdfWrapper(template_stream)
-    stream = obj.read()
-
-    with pytest.warns(DeprecationWarning) as r:  # noqa: PT030, PT031
-        assert (
-            obj.create_widget(
-                "foo",
-                "foo",
-                1,
-                100,
-                100,
-            ).read()
-            == stream
-        )
-        assert r
-
-
 @pytest.mark.posix_only
 def test_create_checkbox_default(template_stream, pdf_samples, request):
     expected_path = os.path.join(
