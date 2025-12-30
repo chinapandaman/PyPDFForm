@@ -327,7 +327,13 @@ class PdfWrapper:
             bytes: The raw PDF data as a byte string.
         """
 
-        return self._read()
+        result = self._read()
+        if getattr(self, "need_appearances") and result:
+            result = appearance_streams_handler(
+                result, getattr(self, "generate_appearance_streams")
+            )  # cached
+
+        return result
 
     def _read(self) -> bytes:
         """
@@ -361,11 +367,6 @@ class PdfWrapper:
                 self.widgets,
                 getattr(self, "use_full_widget_name"),
             )
-
-        if getattr(self, "need_appearances") and self._stream:
-            self._stream = appearance_streams_handler(
-                self._stream, getattr(self, "generate_appearance_streams")
-            )  # cached
 
         return self._stream
 
