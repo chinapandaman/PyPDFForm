@@ -364,9 +364,9 @@ def flatten_generic(annot: DictionaryObject, val: bool) -> None:
     if Parent in annot and (Ff in annot[Parent] or Ff not in annot):
         annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
             (
-                int(annot.get(NameObject(Ff), 0)) | READ_ONLY
+                int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
                 if val
-                else int(annot.get(NameObject(Ff), 0)) & ~READ_ONLY
+                else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~READ_ONLY
             )
         )
     else:
@@ -409,9 +409,9 @@ def update_field_required(annot: DictionaryObject, val: bool) -> None:
     if Parent in annot and Ff in annot[Parent]:
         annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
             (
-                int(annot.get(NameObject(Ff), 0)) | REQUIRED
+                int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | REQUIRED
                 if val
-                else int(annot.get(NameObject(Ff), 0)) & ~REQUIRED
+                else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~REQUIRED
             )
         )
     else:
