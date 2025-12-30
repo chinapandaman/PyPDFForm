@@ -364,9 +364,9 @@ def flatten_generic(annot: DictionaryObject, val: bool) -> None:
     if Parent in annot and (Ff in annot[Parent] or Ff not in annot):
         annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
             (
-                int(annot[Parent].get(NameObject(Ff), 0)) | READ_ONLY
+                int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
                 if val
-                else int(annot[Parent].get(NameObject(Ff), 0)) & ~READ_ONLY
+                else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~READ_ONLY
             )
         )
     else:
