@@ -152,48 +152,6 @@ class Widget:
         """
         getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**self.acro_form_params)
 
-    def watermarks(self, stream: bytes) -> List[bytes]:
-        """
-        Generates watermarks for the widget.
-
-        This method takes a PDF stream as input and generates watermarks for each
-        page of the PDF. The watermark is created by drawing the widget on a
-        ReportLab canvas and then embedding the canvas as a watermark on the
-        specified page.
-
-        Args:
-            stream (bytes): PDF stream.
-
-        Returns:
-            List[bytes]: List of watermarks for each page. Each element in the list
-                         is a byte stream representing the watermark for that page.
-                         If a page does not need a watermark, the corresponding
-                         element will be an empty byte string.
-        """
-        pdf = PdfReader(stream_to_io(stream))
-        page_count = len(pdf.pages)
-        watermark = BytesIO()
-
-        canvas = Canvas(
-            watermark,
-            pagesize=(
-                float(pdf.pages[self.page_number - 1].mediabox[2]),
-                float(pdf.pages[self.page_number - 1].mediabox[3]),
-            ),
-        )
-
-        self._required_handler(canvas)
-        self.canvas_operations(canvas)
-
-        canvas.showPage()
-        canvas.save()
-        watermark.seek(0)
-
-        return [
-            watermark.read() if i == self.page_number - 1 else b""
-            for i in range(page_count)
-        ]
-
     @staticmethod
     def bulk_watermarks(widgets: List[Widget], stream: bytes) -> List[bytes]:
         """

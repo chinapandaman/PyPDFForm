@@ -86,56 +86,6 @@ class SignatureWidget:
             if each in kwargs:
                 self.hook_params.append((each, kwargs.get(each)))
 
-    def watermarks(self, stream: bytes) -> List[bytes]:
-        """
-        Generates watermarks for the signature widget.
-
-        This method takes a PDF stream as input, reads a "bedrock" PDF, and
-        creates a new PDF with the signature widget added as a watermark on the
-        specified page. The signature's name and rectangle are then added to the
-        new PDF.
-
-        Args:
-            stream (bytes): The PDF stream.
-
-        Returns:
-            List[bytes]: A list of watermarks for the signature widget. Each
-            element in the list represents a page in the PDF. If the current
-            page matches the signature's page number, the corresponding element
-            will contain the watermark data. Otherwise, the element will be an
-            empty byte string.
-        """
-        input_pdf = PdfReader(stream_to_io(stream))
-        page_count = len(input_pdf.pages)
-        pdf = PdfReader(stream_to_io(BEDROCK_PDF))
-        out = PdfWriter()
-        out.append(pdf)
-
-        for page in out.pages:
-            for annot in page.get(Annots, []):
-                key = get_widget_key(annot.get_object(), False)
-
-                if key != self.BEDROCK_WIDGET_TO_COPY:
-                    continue
-
-                annot.get_object()[NameObject(T)] = TextStringObject(self.name)
-                annot.get_object()[NameObject(Rect)] = ArrayObject(
-                    [
-                        FloatObject(self.x),
-                        FloatObject(self.y),
-                        FloatObject(self.x + self.optional_params.get("width")),
-                        FloatObject(self.y + self.optional_params.get("height")),
-                    ]
-                )
-
-        with BytesIO() as f:
-            out.write(f)
-            f.seek(0)
-            return [
-                f.read() if i == self.page_number - 1 else b""
-                for i in range(page_count)
-            ]
-
     @staticmethod
     def bulk_watermarks(widgets: List[SignatureWidget], stream: bytes) -> List[bytes]:
         """
@@ -197,7 +147,6 @@ class SignatureWidget:
                     widget.BEDROCK_WIDGET_TO_COPY
                 ].clone(out, force_duplicate=True)
 
-                # TODO: refactor duplicate logic with watermarks
                 widget_to_copy.get_object()[NameObject(T)] = TextStringObject(
                     widget.name
                 )
@@ -233,13 +182,11 @@ class SignatureField(Field):
     attributes that can be configured for a signature input field.
 
     Attributes:
-        _field_type (str): The type of the field, fixed as "signature".
         _widget_class (Type[SignatureWidget]): The widget class associated with this field type.
         width (Optional[float]): The width of the signature field.
         height (Optional[float]): The height of the signature field.
     """
 
-    _field_type: str = "signature"
     _widget_class: Type[SignatureWidget] = SignatureWidget
 
     width: Optional[float] = None

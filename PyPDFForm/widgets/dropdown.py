@@ -70,7 +70,6 @@ class DropdownField(Field):
     attributes that can be configured for a dropdown selection field.
 
     Attributes:
-        _field_type (str): The type of the field, fixed as "dropdown".
         _widget_class (Type[Widget]): The widget class associated with this field type.
         options (Optional[List[Union[str, Tuple[str, str]]]]): A list of options
             available in the dropdown. Each option can be a string (display value)
@@ -85,7 +84,6 @@ class DropdownField(Field):
         border_width (Optional[float]): The width of the dropdown's border.
     """
 
-    _field_type: str = "dropdown"
     _widget_class: Type[Widget] = DropdownWidget
 
     options: Optional[List[Union[str, Tuple[str, str]]]] = None

@@ -86,7 +86,6 @@ class RadioGroup(CheckBoxField):
     where individual radio buttons can be placed, but only one can be selected.
 
     Attributes:
-        _field_type (str): The type of the field, fixed as "radio".
         _widget_class (Type[Widget]): The widget class associated with this field type.
         x (List[float]): A list of x-coordinates for each radio button in the group.
         y (List[float]): A list of y-coordinates for each radio button in the group.
@@ -94,7 +93,6 @@ class RadioGroup(CheckBoxField):
             "circle" or "square". Defaults to None, which typically means a default circle shape.
     """
 
-    _field_type: str = "radio"
     _widget_class: Type[Widget] = RadioWidget
 
     x: List[float]

@@ -28,7 +28,6 @@ from .adapter import fp_or_f_obj_or_stream_to_stream
 from .ap import appearance_streams_handler
 from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
-from .deprecation import deprecation_notice
 from .filler import fill
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
@@ -44,12 +43,6 @@ from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
 from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
-from .widgets.checkbox import CheckBoxWidget
-from .widgets.dropdown import DropdownWidget
-from .widgets.image import ImageWidget
-from .widgets.radio import RadioWidget
-from .widgets.signature import SignatureWidget
-from .widgets.text import TextWidget
 
 if TYPE_CHECKING:
     from .widgets import FieldTypes
@@ -598,89 +591,7 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        field_dict = asdict(field)
-        widget_type = field_dict.pop("_field_type")
-        name = field_dict.pop("name")
-        page_number = field_dict.pop("page_number")
-        x = field_dict.pop("x")
-        y = field_dict.pop("y")
-
-        field_dict["suppress_deprecation_notice"] = True
-        return self.create_widget(
-            widget_type,
-            name,
-            page_number,
-            x,
-            y,
-            **{k: v for k, v in field_dict.items() if v is not None},
-        )
-
-    def create_widget(
-        self,
-        widget_type: str,
-        name: str,
-        page_number: int,
-        x: Union[float, List[float]],
-        y: Union[float, List[float]],
-        **kwargs,
-    ) -> PdfWrapper:
-        """
-        Creates a new form field (widget) on the PDF.
-
-        Args:
-            widget_type (str): The type of widget to create.  Valid values are:
-                - "text": A text field.
-                - "checkbox": A checkbox field.
-                - "dropdown": A dropdown field.
-                - "radio": A radio button field.
-                - "signature": A signature field.
-                - "image": An image field.
-            name (str): The name of the widget.  This name will be used to identify the widget when filling the form.
-            page_number (int): The page number to create the widget on (1-based).
-            x (Union[float, List[float]]): The x coordinate(s) of the widget.
-                If a list is provided, it specifies the x coordinates of multiple instances of the widget.
-            y (Union[float, List[float]]): The y coordinate(s) of the widget.
-                If a list is provided, it specifies the y coordinates of multiple instances of the widget.
-            **kwargs: Additional keyword arguments specific to the widget type.
-
-        Returns:
-            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
-        """
-
-        # TODO: deprecate in v4.0.0
-        if not kwargs.get("suppress_deprecation_notice"):
-            deprecation_notice(
-                f"{self.__class__.__name__}.create_widget()",
-                f"{self.__class__.__name__}.create_field()",
-            )
-
-        _class = None
-        if widget_type == "text":
-            _class = TextWidget
-        if widget_type == "checkbox":
-            _class = CheckBoxWidget
-        if widget_type == "dropdown":
-            _class = DropdownWidget
-        if widget_type == "radio":
-            _class = RadioWidget
-        if widget_type == "signature":
-            _class = SignatureWidget
-        if widget_type == "image":
-            _class = ImageWidget
-        if _class is None:
-            return self
-
-        obj = _class(name=name, page_number=page_number, x=x, y=y, **kwargs)
-        watermarks = obj.watermarks(self._read())
-
-        self._stream = copy_watermark_widgets(self._read(), watermarks, [name], None)
-        hook_params = obj.hook_params
-
-        self._init_helper()
-        for k, v in hook_params:
-            self.widgets[name].__setattr__(k, v)
-
-        return self
+        return self._bulk_create_fields([field])
 
     def update_widget_key(
         self, old_key: str, new_key: str, index: int = 0, defer: bool = False

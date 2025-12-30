@@ -56,7 +56,6 @@ class CheckBoxField(Field):
     attributes that can be configured for a checkbox field.
 
     Attributes:
-        _field_type (str): The type of the field, fixed as "checkbox".
         _widget_class (Type[Widget]): The widget class associated with this field type.
         size (Optional[float]): The size of the checkbox.
         button_style (Optional[str]): The visual style of the checkbox button
@@ -67,7 +66,6 @@ class CheckBoxField(Field):
         border_width (Optional[float]): The width of the checkbox's border.
     """
 
-    _field_type: str = "checkbox"
     _widget_class: Type[Widget] = CheckBoxWidget
 
     size: Optional[float] = None
