@@ -56,10 +56,7 @@ dev = [
 ]
 
 [tool.coverage.run]
-omit = [
-    "venv/*",
-    "tests/*",
-]
+include = ["PyPDFForm/*"]
 
 [tool.pylint."MESSAGES CONTROL"]
 disable = [

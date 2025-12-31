@@ -8,6 +8,8 @@ python ./scripts/diff_widget.py $1 $2 $3 $4
 if [ "$PYPDFFORM_ENV" == "container" ]; then
   echo "Diff view: http://localhost:8000/temp/diff.html"
   bash ./scripts/http_server.sh > /dev/null 2>&1
+elif [[ "$OSTYPE" == darwin* ]]; then
+  open -a "Google Chrome" temp/diff.html
 else
   google-chrome temp/diff.html
 fi
