@@ -14,6 +14,25 @@ if __name__ == "__main__":
     file_name = "_".join(before_path.split("/"))
     after_path = os.path.join(os.path.dirname(__file__), "..", "temp", file_name)
 
+    before = os.path.join(os.path.dirname(__file__), "..", "temp", "before.png")
+    after = os.path.join(os.path.dirname(__file__), "..", "temp", "after.png")
+    pdf_diff = os.path.join(os.path.dirname(__file__), "..", "temp", "pdf_diff.png")
+
+    subprocess.run(["pdftoppm", "-png", before_path, "temp/before"])
+    subprocess.run(["pdftoppm", "-png", after_path, "temp/after"])
+
+    magick = ["convert"]
+    if sys.platform == "darwin":
+        magick = ["magick"]
+
+    subprocess.run(magick + ["temp/before-*.png", "-append", before])
+    subprocess.run(magick + ["temp/after-*.png", "-append", after])
+
+    pdf_diff_count = subprocess.run(
+        ["compare", "-metric", "AE", before, after, pdf_diff], capture_output=True
+    )
+
+    base_url = "./"
     if (
         os.environ.get("CODESPACES") == "true"
         or os.environ.get("PYPDFFORM_ENV") == "container"
@@ -23,14 +42,17 @@ if __name__ == "__main__":
         )
         if os.environ.get("PYPDFFORM_ENV") == "container":
             base_url = "http://localhost:8000/"
-        print("Before:", base_url + before_path.split(f"{project_root}/")[1])
-        print("After:", base_url + after_path.split(f"{project_root}/./scripts/../")[1])
     else:
         if sys.platform == "darwin":
-            subprocess.run(["open", "-a", "Adobe Acrobat", before_path])
-            subprocess.run(["open", "-a", "Adobe Acrobat", after_path])
+            subprocess.run(["open", "-a", "Google Chrome", before_path])
+            subprocess.run(["open", "-a", "Google Chrome", after_path])
+            subprocess.run(["open", "-a", "Google Chrome", pdf_diff])
         else:
             webbrowser.get("/usr/bin/google-chrome %s").open(before_path)
             webbrowser.get("/usr/bin/google-chrome %s").open(after_path)
+            webbrowser.get("/usr/bin/google-chrome %s").open(pdf_diff)
 
-        print("Checking", before_path)
+    print("Before:", base_url + before_path.split(f"{project_root}/")[1])
+    print("After:", base_url + after_path.split(f"{project_root}/./scripts/../")[1])
+    print("Diff:", base_url + pdf_diff.split(f"{project_root}/./scripts/../")[1])
+    print("Diff Count:", pdf_diff_count.stderr or 0)

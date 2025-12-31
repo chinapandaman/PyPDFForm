@@ -5,7 +5,7 @@ WORKDIR /pypdfform
 EXPOSE 8000 8080
 
 RUN apt-get update && \
-    apt-get install -y make dos2unix bash-completion git libatomic1
+    apt-get install -y make dos2unix bash-completion git libatomic1 poppler-utils imagemagick
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
