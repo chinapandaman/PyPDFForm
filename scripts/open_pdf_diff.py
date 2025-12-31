@@ -32,6 +32,7 @@ if __name__ == "__main__":
         ["compare", "-metric", "AE", before, after, pdf_diff], capture_output=True
     )
 
+    base_url = "./"
     if (
         os.environ.get("CODESPACES") == "true"
         or os.environ.get("PYPDFFORM_ENV") == "container"
@@ -41,9 +42,6 @@ if __name__ == "__main__":
         )
         if os.environ.get("PYPDFFORM_ENV") == "container":
             base_url = "http://localhost:8000/"
-        print("Before:", base_url + before_path.split(f"{project_root}/")[1])
-        print("After:", base_url + after_path.split(f"{project_root}/./scripts/../")[1])
-        print("Diff:", base_url + pdf_diff.split(f"{project_root}/./scripts/../")[1])
     else:
         if sys.platform == "darwin":
             subprocess.run(["open", "-a", "Google Chrome", before_path])
@@ -54,4 +52,7 @@ if __name__ == "__main__":
             webbrowser.get("/usr/bin/google-chrome %s").open(after_path)
             webbrowser.get("/usr/bin/google-chrome %s").open(pdf_diff)
 
+    print("Before:", base_url + before_path.split(f"{project_root}/")[1])
+    print("After:", base_url + after_path.split(f"{project_root}/./scripts/../")[1])
+    print("Diff:", base_url + pdf_diff.split(f"{project_root}/./scripts/../")[1])
     print("Diff Count:", pdf_diff_count.stderr or 0)
