@@ -24,7 +24,9 @@ if __name__ == "__main__":
     subprocess.run(["magick", "temp/before-*.png", "-append", before])
     subprocess.run(["magick", "temp/after-*.png", "-append", after])
 
-    subprocess.run(["compare", "-metric", "AE", before, after, pdf_diff])
+    pdf_diff_count = subprocess.run(
+        ["compare", "-metric", "AE", before, after, pdf_diff], capture_output=True
+    )
 
     if (
         os.environ.get("CODESPACES") == "true"
@@ -48,4 +50,4 @@ if __name__ == "__main__":
             webbrowser.get("/usr/bin/google-chrome %s").open(after_path)
             webbrowser.get("/usr/bin/google-chrome %s").open(pdf_diff)
 
-        print("Checking", before_path)
+    print("Diff Count:", pdf_diff_count.stderr or 0)
