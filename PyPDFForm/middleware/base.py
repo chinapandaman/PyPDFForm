@@ -126,3 +126,17 @@ class Widget:
             NotImplementedError: This method must be implemented by subclasses.
         """
         raise NotImplementedError
+
+    @property
+    def js_patch_value(self) -> Union[str, None]:
+        """
+        Get the value that should be used for a JavaScript patch.
+
+        This property returns the value that should be set for the widget
+        using JavaScript when the PDF is opened. If no JavaScript patch
+        is required for this widget, it returns None.
+
+        Returns:
+            Union[str, None]: The JavaScript patch value or None.
+        """
+        return None

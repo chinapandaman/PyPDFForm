@@ -136,3 +136,15 @@ class Dropdown(Widget):
             int: A sample value for the dropdown.
         """
         return len(self.choices) - 1
+
+    @property
+    def js_patch_value(self) -> Union[str, None]:
+        """
+        Returns the choice text of the dropdown to be used for a JavaScript patch.
+
+        Returns:
+            Union[str, None]: The JavaScript patch value or None.
+        """
+        return (
+            self.choices[self.value] if isinstance(self.value, int) else self.value
+        ) or None
