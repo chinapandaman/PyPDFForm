@@ -71,3 +71,9 @@ The official documentation can be found on [the GitHub page](https://chinapandam
 ## Other Resources
 
 [Chicago Python User Group - Dec 14, 2023](https://youtu.be/8t1RdAKwr9w?si=TLgumBNXv9H8szSn)
+
+## Star History
+
+This project is maintained entirely in my spare time. If you like the project please consider starring the GitHub repository. It is the best way to keep me motivated and continue making the project better.
+
+[![Stargazers over time](https://starchart.cc/chinapandaman/PyPDFForm.svg?variant=adaptive)](https://starchart.cc/chinapandaman/PyPDFForm)
