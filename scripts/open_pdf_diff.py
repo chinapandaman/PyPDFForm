@@ -37,6 +37,7 @@ if __name__ == "__main__":
             base_url = "http://localhost:8000/"
         print("Before:", base_url + before_path.split(f"{project_root}/")[1])
         print("After:", base_url + after_path.split(f"{project_root}/./scripts/../")[1])
+        print("Diff:", base_url + pdf_diff.split(f"{project_root}/./scripts/../")[1])
     else:
         if sys.platform == "darwin":
             subprocess.run(["open", "-a", "Adobe Acrobat", before_path])
