@@ -2,6 +2,7 @@
 """Opens a diff of a PDF between changes."""
 
 import os
+import subprocess
 import sys
 import webbrowser
 
@@ -25,7 +26,11 @@ if __name__ == "__main__":
         print("Before:", base_url + before_path.split(f"{project_root}/")[1])
         print("After:", base_url + after_path.split(f"{project_root}/./scripts/../")[1])
     else:
-        webbrowser.get("/usr/bin/google-chrome %s").open(before_path)
-        webbrowser.get("/usr/bin/google-chrome %s").open(after_path)
+        if sys.platform == "darwin":
+            subprocess.run(["open", "-a", "Adobe Acrobat", before_path])
+            subprocess.run(["open", "-a", "Adobe Acrobat", after_path])
+        else:
+            webbrowser.get("/usr/bin/google-chrome %s").open(before_path)
+            webbrowser.get("/usr/bin/google-chrome %s").open(after_path)
 
         print("Checking", before_path)
