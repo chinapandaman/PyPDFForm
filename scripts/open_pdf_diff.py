@@ -21,8 +21,8 @@ if __name__ == "__main__":
     subprocess.run(["pdftoppm", "-png", before_path, "temp/before"])
     subprocess.run(["pdftoppm", "-png", after_path, "temp/after"])
 
-    subprocess.run(["convert", "temp/before-*.png", "-append", before])
-    subprocess.run(["convert", "temp/after-*.png", "-append", after])
+    subprocess.run(["magick", "temp/before-*.png", "-append", before])
+    subprocess.run(["magick", "temp/after-*.png", "-append", after])
 
     subprocess.run(["compare", "-metric", "AE", before, after, pdf_diff])
 
