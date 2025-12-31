@@ -25,7 +25,7 @@ from os import PathLike
 from typing import TYPE_CHECKING, BinaryIO, Dict, List, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
-from .ap import appearance_streams_handler, apply_js_patch
+from .ap import appearance_streams_handler
 from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
 from .filler import fill
@@ -311,22 +311,18 @@ class PdfWrapper:
         """
         Reads the PDF document and returns its content as bytes.
 
-        This method retrieves the PDF stream and either generates appearance
-        streams for form fields if `need_appearances` is enabled, or applies
-        a JavaScript patch to set field values if it is disabled.
+        This method retrieves the PDF stream and optionally generates appearance
+        streams for form fields if `need_appearances` is enabled.
 
         Returns:
             bytes: The PDF document content as a byte string.
         """
 
         result = self._read()
-        if result:
-            if getattr(self, "need_appearances"):
-                result = appearance_streams_handler(
-                    result, getattr(self, "generate_appearance_streams")
-                )  # cached
-            else:
-                result = apply_js_patch(result, self.widgets)
+        if getattr(self, "need_appearances") and result:
+            result = appearance_streams_handler(
+                result, getattr(self, "generate_appearance_streams")
+            )  # cached
 
         return result
 

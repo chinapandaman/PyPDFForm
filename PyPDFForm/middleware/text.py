@@ -7,8 +7,6 @@ Widget class. It represents a text field form field in a PDF document,
 allowing users to enter text.
 """
 
-from typing import Union
-
 from .base import Widget
 
 
@@ -124,13 +122,3 @@ class Text(Widget):
         return (
             self.name[: self.max_length] if self.max_length is not None else self.name
         )
-
-    @property
-    def js_patch_value(self) -> Union[str, None]:
-        """
-        Returns the value of the text field to be used for a JavaScript patch.
-
-        Returns:
-            Union[str, None]: The JavaScript patch value or None.
-        """
-        return self.value or None
