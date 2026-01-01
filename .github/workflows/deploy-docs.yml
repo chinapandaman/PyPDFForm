@@ -25,4 +25,6 @@ jobs:
         run: uv pip install -U mkdocs mkdocs-material mike --system
       - name: Deploy docs to GitHub page
         run: |
+          git config --global user.name 'release-bot'
+          git config --global user.email 'bot@domain.com'
           mike deploy --push --update-aliases $(tag=$(git describe --tags --abbrev=0) && echo "${tag%.*}") latest
