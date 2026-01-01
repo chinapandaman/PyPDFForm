@@ -138,7 +138,7 @@ For the `rotation` parameter, a positive value rotates the image counter-clockwi
 
 ## Draw line
 
-A line can be drawn by specifying a starting coordinate and ending coordinate, and optionally its color.
+A line can be drawn by specifying starting and ending coordinates, and optionally its color.
 
 ```python
 from PyPDFForm import PdfWrapper, RawElements
