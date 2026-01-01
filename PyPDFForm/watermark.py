@@ -78,6 +78,42 @@ def draw_line(canvas: Canvas, **kwargs) -> None:
     canvas.line(src_x, src_y, dest_x, dest_y)
 
 
+def draw_rect(canvas: Canvas, **kwargs) -> None:
+    """
+    Draws a rectangle on the given canvas with the specified coordinates, dimensions, and color.
+
+    Args:
+        canvas (Canvas): The ReportLab Canvas object to draw on.
+        **kwargs: Keyword arguments containing the rectangle's properties and coordinates.
+            - x (float): The x-coordinate of the rectangle's bottom-left corner.
+            - y (float): The y-coordinate of the rectangle's bottom-left corner.
+            - width (float): The width of the rectangle.
+            - height (float): The height of the rectangle.
+            - color (tuple): A tuple representing the RGB color of the rectangle's outline.
+            - fill_color (tuple): A tuple representing the RGB color of the rectangle's fill.
+
+    Returns:
+        None
+    """
+    x = kwargs["x"]
+    y = kwargs["y"]
+    width = kwargs["width"]
+    height = kwargs["height"]
+    color = kwargs["color"]
+    fill_color = kwargs["fill_color"]
+
+    canvas.setStrokeColorRGB(*(color))
+
+    fill = 0
+    canvas.saveState()
+    if fill_color:
+        canvas.setFillColorRGB(*(fill_color))
+        fill = 1
+
+    canvas.rect(x, y, width, height, fill=fill)
+    canvas.restoreState()
+
+
 def draw_image(canvas: Canvas, **kwargs) -> None:
     """
     Draws an image on the given canvas, scaling it to fit within the specified width and height.
@@ -138,6 +174,7 @@ def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
         "image": draw_image,
         "text": draw_text,
         "line": draw_line,
+        "rect": draw_rect,
     }
 
     result = []

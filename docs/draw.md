@@ -165,3 +165,34 @@ pdf = PdfWrapper("sample_template.pdf").draw(lines)
 
 pdf.write("output.pdf")
 ```
+
+## Draw rectangle
+
+A rectangle can be drawn by specifying its coordinates and dimensions, and optionally its color and fill color.
+
+```python
+from PyPDFForm import PdfWrapper, RawElements
+
+rectangles = [
+    RawElements.RawRectangle(
+        page_number=1,
+        x=100,
+        y=100,
+        width=200,
+        height=100,
+    ),
+    RawElements.RawRectangle(
+        page_number=1,
+        x=400,
+        y=100,
+        width=100,
+        height=200,
+        color=(0, 0, 1),  # optional
+        fill_color=(0, 1, 0),  # optional
+    ),
+]
+
+pdf = PdfWrapper("sample_template.pdf").draw(rectangles)
+
+pdf.write("output.pdf")
+```

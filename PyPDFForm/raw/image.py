@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=R0801
 """
 Contains the RawImage class, which represents an image that can be drawn
 directly onto a PDF page at a specified position and size.
