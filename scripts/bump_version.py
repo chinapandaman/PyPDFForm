@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     new_version = f"{major}.{minor}.{patch}"
 
-    files_to_update = ["PyPDFForm/__init__.py", "mkdocs.yml", "SECURITY.md"]
+    files_to_update = ["PyPDFForm/__init__.py", "SECURITY.md"]
 
     for each in files_to_update:
         with open(each, encoding="utf8") as f:
