@@ -13,6 +13,7 @@ class RawRectangle:
         width: float,
         height: float,
         color: tuple = DEFAULT_FONT_COLOR,
+        fill_color: tuple = None,
     ) -> None:
         super().__init__()
 
@@ -22,6 +23,7 @@ class RawRectangle:
         self.width = width
         self.height = height
         self.color = color
+        self.fill_color = fill_color
 
     @property
     def to_draw(self) -> dict:
@@ -33,4 +35,5 @@ class RawRectangle:
             "width": self.width,
             "height": self.height,
             "color": self.color,
+            "fill_color": self.fill_color,
         }
