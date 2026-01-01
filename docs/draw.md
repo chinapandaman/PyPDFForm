@@ -168,7 +168,7 @@ pdf.write("output.pdf")
 
 ## Draw rectangle
 
-A rectangle can be drawn by its coordinates and resolutions, and optionally its color and/or fill color.
+A rectangle can be drawn by specifying its coordinates and dimensions, and optionally its color and fill color.
 
 ```python
 from PyPDFForm import PdfWrapper, RawElements
