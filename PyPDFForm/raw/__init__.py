@@ -15,7 +15,7 @@ from .line import RawLine
 from .rect import RawRectangle
 from .text import RawText
 
-RawTypes = Union[RawText, RawImage, RawLine]
+RawTypes = Union[RawText, RawImage, RawLine, RawRectangle]
 
 
 @dataclass
