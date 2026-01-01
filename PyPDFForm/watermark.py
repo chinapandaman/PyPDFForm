@@ -79,6 +79,22 @@ def draw_line(canvas: Canvas, **kwargs) -> None:
 
 
 def draw_rect(canvas: Canvas, **kwargs) -> None:
+    """
+    Draws a rectangle on the given canvas with the specified coordinates, dimensions, and color.
+
+    Args:
+        canvas (Canvas): The ReportLab Canvas object to draw on.
+        **kwargs: Keyword arguments containing the rectangle's properties and coordinates.
+            - x (float): The x-coordinate of the rectangle's bottom-left corner.
+            - y (float): The y-coordinate of the rectangle's bottom-left corner.
+            - width (float): The width of the rectangle.
+            - height (float): The height of the rectangle.
+            - color (tuple): A tuple representing the RGB color of the rectangle's outline.
+            - fill_color (tuple): A tuple representing the RGB color of the rectangle's fill.
+
+    Returns:
+        None
+    """
     x = kwargs["x"]
     y = kwargs["y"]
     width = kwargs["width"]
@@ -95,7 +111,7 @@ def draw_rect(canvas: Canvas, **kwargs) -> None:
         fill = 1
 
     canvas.rect(x, y, width, height, fill=fill)
-    canvas.restoreState
+    canvas.restoreState()
 
 
 def draw_image(canvas: Canvas, **kwargs) -> None:
