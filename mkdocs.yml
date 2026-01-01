@@ -100,7 +100,7 @@ extra_css:
   - stylesheets/extra.css
 
 extra:
-  version: v3.8.2
+  version: v4.0.0
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/chinapandaman
