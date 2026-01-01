@@ -32,17 +32,17 @@ cat << "EOF"
 
 Welcome to the PyPDFForm development container!
 
-| Command  | Usage                                                   | Documentation                                                                |
------------------------------------------------------------------------------------------------------------------------------------------------------
-| clean    | Remove any temporarily generated PDFs.                  | N/A                                                                          |
-| compare  | Compare PDF samples before and after changing the code. | N/A                                                                          |
-| coverage | Run all tests and generate HTML coverage reports.       | https://chinapandaman.github.io/PyPDFForm/dev_test/#generate-coverage-report |
-| docs     | Host the documentation site locally.                    | https://chinapandaman.github.io/PyPDFForm/dev_doc/                           |
-| format   | Format the code with black and isort.                   | N/A                                                                          |
-| server   | Start an HTTP file server from the root of the code.    | N/A                                                                          |
-| linting  | Run all linters on the code.                            | N/A                                                                          |
-| test     | Run all tests and enforce 100% coverage.                | https://chinapandaman.github.io/PyPDFForm/dev_test/                          |
-| update   | Update PDF samples after changing the code.             | N/A                                                                          |
+| Command  | Usage                                                   | Documentation                                                                       |
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+| clean    | Remove any temporarily generated PDFs.                  | N/A                                                                                 |
+| compare  | Compare PDF samples before and after changing the code. | N/A                                                                                 |
+| coverage | Run all tests and generate HTML coverage reports.       | https://chinapandaman.github.io/PyPDFForm/latest/dev_test/#generate-coverage-report |
+| docs     | Host the documentation site locally.                    | https://chinapandaman.github.io/PyPDFForm/latest/dev_doc/                           |
+| format   | Format the code with black and isort.                   | N/A                                                                                 |
+| server   | Start an HTTP file server from the root of the code.    | N/A                                                                                 |
+| linting  | Run all linters on the code.                            | N/A                                                                                 |
+| test     | Run all tests and enforce 100% coverage.                | https://chinapandaman.github.io/PyPDFForm/latest/dev_test/                          |
+| update   | Update PDF samples after changing the code.             | N/A                                                                                 |
 
 EOF
 
