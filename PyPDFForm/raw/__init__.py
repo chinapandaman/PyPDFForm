@@ -12,6 +12,7 @@ from typing import Union
 
 from .image import RawImage
 from .line import RawLine
+from .rect import RawRectangle
 from .text import RawText
 
 RawTypes = Union[RawText, RawImage, RawLine]
@@ -29,3 +30,4 @@ class RawElements:
     RawText = RawText
     RawImage = RawImage
     RawLine = RawLine
+    RawRectangle = RawRectangle

@@ -78,6 +78,17 @@ def draw_line(canvas: Canvas, **kwargs) -> None:
     canvas.line(src_x, src_y, dest_x, dest_y)
 
 
+def draw_rect(canvas: Canvas, **kwargs) -> None:
+    x = kwargs["x"]
+    y = kwargs["y"]
+    width = kwargs["width"]
+    height = kwargs["height"]
+    color = kwargs["color"]
+
+    canvas.setStrokeColorRGB(*(color))
+    canvas.rect(x, y, width, height)
+
+
 def draw_image(canvas: Canvas, **kwargs) -> None:
     """
     Draws an image on the given canvas, scaling it to fit within the specified width and height.
@@ -138,6 +149,7 @@ def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
         "image": draw_image,
         "text": draw_text,
         "line": draw_line,
+        "rect": draw_rect,
     }
 
     result = []
