@@ -89,15 +89,13 @@ def draw_rect(canvas: Canvas, **kwargs) -> None:
     canvas.setStrokeColorRGB(*(color))
 
     fill = 0
+    canvas.saveState()
     if fill_color:
-        canvas.saveState()
         canvas.setFillColorRGB(*(fill_color))
         fill = 1
 
     canvas.rect(x, y, width, height, fill=fill)
-
-    if fill_color:
-        canvas.restoreState
+    canvas.restoreState
 
 
 def draw_image(canvas: Canvas, **kwargs) -> None:
