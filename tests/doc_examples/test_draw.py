@@ -159,3 +159,37 @@ def test_draw_line(static_pdfs, pdf_samples, request):
 
         assert len(pdf.read()) == len(expected)
         assert pdf.read() == expected
+
+
+def test_draw_rect(static_pdfs, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_draw_rect.pdf")
+
+    rectangles = [
+        RawElements.RawRectangle(
+            page_number=1,
+            x=100,
+            y=100,
+            width=200,
+            height=100,
+        ),
+        RawElements.RawRectangle(
+            page_number=1,
+            x=400,
+            y=100,
+            width=100,
+            height=200,
+            color=(0, 0, 1),  # optional
+            fill_color=(0, 1, 0),  # optional
+        ),
+    ]
+
+    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(rectangles)
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = pdf.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(pdf.read()) == len(expected)
+        assert pdf.read() == expected
