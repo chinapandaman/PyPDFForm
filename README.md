@@ -11,16 +11,6 @@
     <a href="https://pepy.tech/projects/pypdfform"><img src="https://static.pepy.tech/badge/pypdfform/month"></a>
 </p>
 
-## Important Announcement
-
-Hello fellow Python developers!
-
-Please read [this article](https://chinapandaman.github.io/PyPDFForm/news/2025-11-22/) about the upcoming v4.0.0 release and official deprecations of some old APIs.
-
-Additionally, the [documentation site](https://chinapandaman.github.io/PyPDFForm/) will be migrated to use [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) in the new release.
-
-Happy hacking!
-
 ## Introduction
 
 PyPDFForm is a Python library for PDF form processing. It contains the essential functionalities needed to interact with PDF forms:

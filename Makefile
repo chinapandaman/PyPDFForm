@@ -33,4 +33,4 @@ fix-permission:
 	git checkout -- ./pdf_samples ./PyPDFForm ./tests ./scripts
 
 clean-temp:
-	rm ./temp/*.pdf ./temp/*.png
+	rm -f ./temp/*.pdf ./temp/*.png
