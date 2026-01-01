@@ -267,3 +267,19 @@ def test_draw_text_and_image(template_stream, image_samples, pdf_samples, reques
         request.config.results["stream"] = obj.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_draw_line(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_draw_line.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).draw(
+            [RawElements.RawLine(1, 100, 100, 200, 200, (1, 0, 0))]
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
