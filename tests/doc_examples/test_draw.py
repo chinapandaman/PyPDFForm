@@ -126,3 +126,36 @@ def test_draw_image(static_pdfs, image_samples, pdf_samples, request):
     pdf3 = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(images)
 
     assert pdf3.read() == pdf.read()
+
+
+def test_draw_line(static_pdfs, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_draw_line.pdf")
+
+    lines = [
+        RawElements.RawLine(
+            page_number=1,
+            src_x=100,
+            src_y=100,
+            dest_x=100,
+            dest_y=200,
+        ),
+        RawElements.RawLine(
+            page_number=1,
+            src_x=100,
+            src_y=100,
+            dest_x=200,
+            dest_y=100,
+            color=(0, 0, 1),  # optional
+        ),
+    ]
+
+    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(lines)
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = pdf.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(pdf.read()) == len(expected)
+        assert pdf.read() == expected

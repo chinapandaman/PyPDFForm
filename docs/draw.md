@@ -135,3 +135,33 @@ For the `rotation` parameter, a positive value rotates the image counter-clockwi
 
     pdf.write("output.pdf")
     ```
+
+## Draw line
+
+A line can be drawn by specifying starting and ending coordinates, and optionally its color.
+
+```python
+from PyPDFForm import PdfWrapper, RawElements
+
+lines = [
+    RawElements.RawLine(
+        page_number=1,
+        src_x=100,
+        src_y=100,
+        dest_x=100,
+        dest_y=200,
+    ),
+    RawElements.RawLine(
+        page_number=1,
+        src_x=100,
+        src_y=100,
+        dest_x=200,
+        dest_y=100,
+        color=(0, 0, 1),  # optional
+    ),
+]
+
+pdf = PdfWrapper("sample_template.pdf").draw(lines)
+
+pdf.write("output.pdf")
+```
