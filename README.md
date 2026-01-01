@@ -32,7 +32,7 @@ pip install PyPDFForm
 ## Quick Example
 ![Check out the GitHub repository for a live demo if you can't see it here.](https://github.com/chinapandaman/PyPDFForm/raw/master/docs/img/demo.gif)
 
-A sample PDF form can be found [here](https://chinapandaman.github.io/PyPDFForm/pdfs/sample_template.pdf). Download it and try:
+A sample PDF form can be found [here](https://chinapandaman.github.io/PyPDFForm/latest/pdfs/sample_template.pdf). Download it and try:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -52,7 +52,7 @@ filled.write("output.pdf")
 ```
 
 After running the above code snippet you can find `output.pdf` at the location you specified, 
-and it should look like [this](https://chinapandaman.github.io/PyPDFForm/pdfs/sample_filled.pdf).
+and it should look like [this](https://chinapandaman.github.io/PyPDFForm/latest/pdfs/sample_filled.pdf).
 
 ## Documentation
 

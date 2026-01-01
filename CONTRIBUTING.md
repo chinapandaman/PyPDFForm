@@ -1,6 +1,6 @@
 ## How to Contribute Code
 
-Check out the developer guide on how to contribute to PyPDFForm: https://chinapandaman.github.io/PyPDFForm/dev_intro/
+Check out the developer guide on how to contribute to PyPDFForm: https://chinapandaman.github.io/PyPDFForm/latest/dev_intro/
 
 ## Other Ways to Contribute
 
