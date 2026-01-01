@@ -15,8 +15,8 @@ PyPDFForm follows the conventions defined by [Semantic Versioning](https://semve
 
 A GitHub release triggers two CIs:
 
-* [Deploy](https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-publish.yml), which will create the distribution and upload it to [PyPI](https://pypi.org/project/PyPDFForm/).
-* [Deploy Docs](https://github.com/chinapandaman/PyPDFForm/actions/workflows/deploy-docs.yml), which will tear down and rebuild the [GitHub page](https://chinapandaman.github.io/PyPDFForm/) where the doc site is hosted.
+* [Deploy](https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-publish.yml), which creates the distribution and uploads it to [PyPI](https://pypi.org/project/PyPDFForm/).
+* [Deploy Docs](https://github.com/chinapandaman/PyPDFForm/actions/workflows/deploy-docs.yml), which updates the [doc site](https://chinapandaman.github.io/PyPDFForm/) or creates a new version for minor/major releases.
 
 ## When are releases done?
 
