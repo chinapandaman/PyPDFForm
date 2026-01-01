@@ -1,4 +1,5 @@
 site_name: PyPDFForm Documentation
+site_url: https://chinapandaman.github.io/PyPDFForm/
 repo_url: https://github.com/chinapandaman/PyPDFForm
 repo_name: chinapandaman/PyPDFForm
 nav:
@@ -100,7 +101,9 @@ extra_css:
   - stylesheets/extra.css
 
 extra:
-  version: v4.0.0
+  version:
+    provider: mike
+    alias: true
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/chinapandaman
