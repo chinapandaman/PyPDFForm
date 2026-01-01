@@ -11,9 +11,10 @@ from dataclasses import dataclass
 from typing import Union
 
 from .image import RawImage
+from .line import RawLine
 from .text import RawText
 
-RawTypes = Union[RawText, RawImage]
+RawTypes = Union[RawText, RawImage, RawLine]
 
 
 @dataclass
@@ -27,3 +28,4 @@ class RawElements:
 
     RawText = RawText
     RawImage = RawImage
+    RawLine = RawLine
