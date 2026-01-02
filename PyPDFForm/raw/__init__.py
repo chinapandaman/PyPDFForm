@@ -11,12 +11,13 @@ from dataclasses import dataclass
 from typing import Union
 
 from .circle import RawCircle
+from .ellipse import RawEllipse
 from .image import RawImage
 from .line import RawLine
 from .rect import RawRectangle
 from .text import RawText
 
-RawTypes = Union[RawText, RawImage, RawLine, RawRectangle, RawCircle]
+RawTypes = Union[RawText, RawImage, RawLine, RawRectangle, RawCircle, RawEllipse]
 
 
 @dataclass
@@ -33,3 +34,4 @@ class RawElements:
     RawLine = RawLine
     RawRectangle = RawRectangle
     RawCircle = RawCircle
+    RawEllipse = RawEllipse

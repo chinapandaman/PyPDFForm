@@ -148,6 +148,26 @@ def draw_circle(canvas: Canvas, **kwargs) -> None:
     canvas.restoreState()
 
 
+def draw_ellipse(canvas: Canvas, **kwargs) -> None:
+    x1 = kwargs["x1"]
+    y1 = kwargs["y1"]
+    x2 = kwargs["x2"]
+    y2 = kwargs["y2"]
+    color = kwargs["color"]
+    fill_color = kwargs["fill_color"]
+
+    canvas.setStrokeColorRGB(*(color))
+
+    fill = 0
+    canvas.saveState()
+    if fill_color:
+        canvas.setFillColorRGB(*(fill_color))
+        fill = 1
+
+    canvas.ellipse(x1, y1, x2, y2, fill=fill)
+    canvas.restoreState()
+
+
 def draw_image(canvas: Canvas, **kwargs) -> None:
     """
     Draws an image on the given canvas, scaling it to fit within the specified width and height.
@@ -210,6 +230,7 @@ def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
         "line": draw_line,
         "rect": draw_rect,
         "circle": draw_circle,
+        "ellipse": draw_ellipse,
     }
 
     result = []
