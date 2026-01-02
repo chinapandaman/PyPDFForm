@@ -10,12 +10,13 @@ type hinting in methods that handle drawing onto the PDF.
 from dataclasses import dataclass
 from typing import Union
 
+from .circle import RawCircle
 from .image import RawImage
 from .line import RawLine
 from .rect import RawRectangle
 from .text import RawText
 
-RawTypes = Union[RawText, RawImage, RawLine, RawRectangle]
+RawTypes = Union[RawText, RawImage, RawLine, RawRectangle, RawCircle]
 
 
 @dataclass
@@ -31,3 +32,4 @@ class RawElements:
     RawImage = RawImage
     RawLine = RawLine
     RawRectangle = RawRectangle
+    RawCircle = RawCircle

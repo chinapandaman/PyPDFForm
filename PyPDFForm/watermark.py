@@ -114,6 +114,40 @@ def draw_rect(canvas: Canvas, **kwargs) -> None:
     canvas.restoreState()
 
 
+def draw_circle(canvas: Canvas, **kwargs) -> None:
+    """
+    Draws a circle on the given canvas with the specified center coordinates, radius, and color.
+
+    Args:
+        canvas (Canvas): The ReportLab Canvas object to draw on.
+        **kwargs: Keyword arguments containing the circle's properties and coordinates.
+            - center_x (float): The x-coordinate of the circle's center.
+            - center_y (float): The y-coordinate of the circle's center.
+            - radius (float): The radius of the circle.
+            - color (tuple): A tuple representing the RGB color of the circle's outline.
+            - fill_color (tuple): A tuple representing the RGB color of the circle's fill.
+
+    Returns:
+        None
+    """
+    center_x = kwargs["center_x"]
+    center_y = kwargs["center_y"]
+    radius = kwargs["radius"]
+    color = kwargs["color"]
+    fill_color = kwargs["fill_color"]
+
+    canvas.setStrokeColorRGB(*(color))
+
+    fill = 0
+    canvas.saveState()
+    if fill_color:
+        canvas.setFillColorRGB(*(fill_color))
+        fill = 1
+
+    canvas.circle(center_x, center_y, radius, fill=fill)
+    canvas.restoreState()
+
+
 def draw_image(canvas: Canvas, **kwargs) -> None:
     """
     Draws an image on the given canvas, scaling it to fit within the specified width and height.
@@ -175,6 +209,7 @@ def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
         "text": draw_text,
         "line": draw_line,
         "rect": draw_rect,
+        "circle": draw_circle,
     }
 
     result = []

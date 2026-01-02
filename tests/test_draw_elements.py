@@ -309,3 +309,28 @@ def test_draw_rect(template_stream, pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_draw_circle(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_draw_circle.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).draw(
+            [
+                RawElements.RawCircle(
+                    page_number=1,
+                    center_x=100,
+                    center_y=100,
+                    radius=50,
+                    color=(1, 0, 0),
+                    fill_color=(0, 1, 0),
+                ),
+            ]
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected

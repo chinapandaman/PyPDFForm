@@ -196,3 +196,32 @@ pdf = PdfWrapper("sample_template.pdf").draw(rectangles)
 
 pdf.write("output.pdf")
 ```
+
+## Draw circle
+
+A circle can be drawn by specifying its center coordinates and radius, and optionally its color and fill color.
+
+```python
+from PyPDFForm import PdfWrapper, RawElements
+
+circles = [
+    RawElements.RawCircle(
+        page_number=1,
+        center_x=100,
+        center_y=100,
+        radius=50,
+    ),
+    RawElements.RawCircle(
+        page_number=1,
+        center_x=250,
+        center_y=100,
+        radius=100,
+        color=(1, 0, 0),  # optional
+        fill_color=(0, 1, 0),  # optional
+    ),
+]
+
+pdf = PdfWrapper("sample_template.pdf").draw(circles)
+
+pdf.write("output.pdf")
+```
