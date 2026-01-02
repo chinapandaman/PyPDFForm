@@ -225,3 +225,34 @@ pdf = PdfWrapper("sample_template.pdf").draw(circles)
 
 pdf.write("output.pdf")
 ```
+
+## Draw ellipse
+
+An ellipse can be drawn by specifying its bounding box coordinates, and optionally its color and fill color.
+
+```python
+from PyPDFForm import PdfWrapper, RawElements
+
+ellipses = [
+    RawElements.RawEllipse(
+        page_number=1,
+        x1=100,
+        y1=100,
+        x2=250,
+        y2=200,
+    ),
+    RawElements.RawEllipse(
+        page_number=1,
+        x1=300,
+        y1=100,
+        x2=500,
+        y2=250,
+        color=(1, 0, 0),  # optional
+        fill_color=(0, 1, 0),  # optional
+    ),
+]
+
+pdf = PdfWrapper("sample_template.pdf").draw(ellipses)
+
+pdf.write("output.pdf")
+```
