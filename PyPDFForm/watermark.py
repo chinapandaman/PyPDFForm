@@ -149,6 +149,22 @@ def draw_circle(canvas: Canvas, **kwargs) -> None:
 
 
 def draw_ellipse(canvas: Canvas, **kwargs) -> None:
+    """
+    Draws an ellipse on the given canvas defined by its bounding box coordinates and color.
+
+    Args:
+        canvas (Canvas): The ReportLab Canvas object to draw on.
+        **kwargs: Keyword arguments containing the ellipse's properties and coordinates.
+            - x1 (float): The x-coordinate of the first corner of the bounding box.
+            - y1 (float): The y-coordinate of the first corner of the bounding box.
+            - x2 (float): The x-coordinate of the second corner of the bounding box.
+            - y2 (float): The y-coordinate of the second corner of the bounding box.
+            - color (tuple): A tuple representing the RGB color of the ellipse's outline.
+            - fill_color (tuple): A tuple representing the RGB color of the ellipse's fill.
+
+    Returns:
+        None
+    """
     x1 = kwargs["x1"]
     y1 = kwargs["y1"]
     x2 = kwargs["x2"]
