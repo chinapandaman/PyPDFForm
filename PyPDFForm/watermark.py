@@ -115,6 +115,21 @@ def draw_rect(canvas: Canvas, **kwargs) -> None:
 
 
 def draw_circle(canvas: Canvas, **kwargs) -> None:
+    """
+    Draws a circle on the given canvas with the specified center coordinates, radius, and color.
+
+    Args:
+        canvas (Canvas): The ReportLab Canvas object to draw on.
+        **kwargs: Keyword arguments containing the circle's properties and coordinates.
+            - center_x (float): The x-coordinate of the circle's center.
+            - center_y (float): The y-coordinate of the circle's center.
+            - radius (float): The radius of the circle.
+            - color (tuple): A tuple representing the RGB color of the circle's outline.
+            - fill_color (tuple): A tuple representing the RGB color of the circle's fill.
+
+    Returns:
+        None
+    """
     center_x = kwargs["center_x"]
     center_y = kwargs["center_y"]
     radius = kwargs["radius"]
