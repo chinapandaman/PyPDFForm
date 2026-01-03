@@ -17,9 +17,10 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
-from .constants import (COMB, DA, FONT_COLOR_IDENTIFIER, FONT_SIZE_IDENTIFIER,
-                        MULTILINE, READ_ONLY, REQUIRED, TU, Annots, Ff, MaxLen,
-                        Opt, Parent, Q, Rect)
+from .constants import (AA, COMB, DA, FONT_COLOR_IDENTIFIER,
+                        FONT_SIZE_IDENTIFIER, JS, MULTILINE, READ_ONLY,
+                        REQUIRED, TU, Action, Annots, E, Ff, JavaScript,
+                        MaxLen, Opt, Parent, Q, Rect, S, Type)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -422,3 +423,25 @@ def update_field_required(annot: DictionaryObject, val: bool) -> None:
                 else int(annot.get(NameObject(Ff), 0)) & ~REQUIRED
             )
         )
+
+
+def _update_field_javascript(
+    annot: DictionaryObject, trigger_event: str, val: str
+) -> None:
+    if AA not in annot:
+        annot[NameObject(AA)] = DictionaryObject()
+
+    annot[NameObject(AA)][NameObject(trigger_event)] = DictionaryObject()
+    annot[NameObject(AA)][NameObject(trigger_event)][NameObject(Type)] = NameObject(
+        Action
+    )
+    annot[NameObject(AA)][NameObject(trigger_event)][NameObject(S)] = NameObject(
+        JavaScript
+    )
+    annot[NameObject(AA)][NameObject(trigger_event)][NameObject(JS)] = TextStringObject(
+        val
+    )
+
+
+def update_field_on_hover_over_javascript(annot: DictionaryObject, val: str) -> None:
+    _update_field_javascript(annot, E, val)

@@ -25,6 +25,7 @@ class Widget:
         "readonly": "flatten_generic",
         "required": "update_field_required",
         "tooltip": "update_field_tooltip",
+        "on_hover_over_javascript": "update_field_on_hover_over_javascript",
     }
 
     def __init__(
@@ -52,6 +53,9 @@ class Widget:
         self.y: Union[float, List[float]] = None
         self.width: Union[float, List[float]] = None
         self.height: Union[float, List[float]] = None
+
+        # javascript
+        self.on_hover_over_javascript: str = None
 
     def __setattr__(self, name: str, value: Any) -> None:
         """
