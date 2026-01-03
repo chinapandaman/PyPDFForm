@@ -90,3 +90,21 @@ def test_mouse_pressed(static_pdfs, pdf_samples, js_samples, request):
 
         assert len(form.read()) == len(expected)
         assert form.read() == expected
+
+
+def test_mouse_released(static_pdfs, pdf_samples, js_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_mouse_released.pdf")
+
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
+    form.widgets["test"].on_mouse_released_javascript = os.path.join(
+        js_samples, "doc_examples", "test_mouse_released.js"
+    )
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(form.read()) == len(expected)
+        assert form.read() == expected
