@@ -20,7 +20,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
 from .constants import (AA, COMB, DA, FONT_COLOR_IDENTIFIER,
                         FONT_SIZE_IDENTIFIER, JS, MULTILINE, READ_ONLY,
                         REQUIRED, TU, Action, Annots, E, Ff, JavaScript,
-                        MaxLen, Opt, Parent, Q, Rect, S, Type)
+                        MaxLen, Opt, Parent, Q, Rect, S, Type, X)
 from .template import get_widget_key
 from .utils import stream_to_io
 
@@ -445,3 +445,7 @@ def _update_field_javascript(
 
 def update_field_on_hover_over_javascript(annot: DictionaryObject, val: str) -> None:
     _update_field_javascript(annot, E, val)
+
+
+def update_field_on_hover_off_javascript(annot: DictionaryObject, val: str) -> None:
+    _update_field_javascript(annot, X, val)

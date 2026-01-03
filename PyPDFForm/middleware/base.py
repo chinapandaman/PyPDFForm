@@ -26,6 +26,7 @@ class Widget:
         "required": "update_field_required",
         "tooltip": "update_field_tooltip",
         "on_hover_over_javascript": "update_field_on_hover_over_javascript",
+        "on_hover_off_javascript": "update_field_on_hover_off_javascript",
     }
 
     def __init__(
@@ -56,6 +57,7 @@ class Widget:
 
         # javascript
         self.on_hover_over_javascript: str = None
+        self.on_hover_off_javascript: str = None
 
     def __setattr__(self, name: str, value: Any) -> None:
         """

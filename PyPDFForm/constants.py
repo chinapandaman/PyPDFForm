@@ -74,6 +74,7 @@ S = "/S"
 JavaScript = "/JavaScript"
 JS = "/JS"
 E = "/E"
+X = "/X"
 
 # Font dict
 Length = "/Length"
