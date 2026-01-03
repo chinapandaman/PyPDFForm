@@ -7,7 +7,7 @@ the standard list to provide custom behavior for slicing operations, particularl
 for merging PdfWrapper objects.
 """
 
-from typing import Union
+from typing import Any, Union
 
 
 class PdfWrapperList(list):
@@ -20,7 +20,7 @@ class PdfWrapperList(list):
     For non-slice indexing, it behaves like a standard list.
     """
 
-    def __getitem__(self, key: any) -> Union[list, any]:
+    def __getitem__(self, key: Any) -> Union[list, Any]:
         """
         Retrieves an item or a slice of items from the list.
 
@@ -32,7 +32,7 @@ class PdfWrapperList(list):
             key (Union[int, slice]): The index or slice to retrieve.
 
         Returns:
-            Union[PdfWrapper, list, any]: A single merged PdfWrapper if sliced,
+            Union[PdfWrapper, list, Any]: A single merged PdfWrapper if sliced,
                                           or the item at the index if indexed.
         """
 
