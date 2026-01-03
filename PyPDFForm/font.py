@@ -94,7 +94,7 @@ def get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
     return font_descriptor_params, font_dict_params
 
 
-def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float):
+def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float) -> list[float]:
     """
     Computes the advance widths for all glyphs in a TrueType font, scaled for PDF text space.
 
