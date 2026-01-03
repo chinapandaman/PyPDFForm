@@ -30,6 +30,7 @@ class Widget:
         "on_mouse_pressed_javascript": "update_field_on_mouse_pressed_javascript",
         "on_mouse_released_javascript": "update_field_on_mouse_released_javascript",
         "on_focused_javascript": "update_field_on_focused_javascript",
+        "off_focused_javascript": "update_field_off_focused_javascript",
     }
 
     def __init__(
@@ -64,6 +65,7 @@ class Widget:
         self.on_mouse_pressed_javascript: Union[str, BinaryIO] = None
         self.on_mouse_released_javascript: Union[str, BinaryIO] = None
         self.on_focused_javascript: Union[str, BinaryIO] = None
+        self.off_focused_javascript: Union[str, BinaryIO] = None
 
     def __setattr__(self, name: str, value: Any) -> None:
         """
