@@ -27,6 +27,7 @@ class Widget:
         "tooltip": "update_field_tooltip",
         "on_hover_over_javascript": "update_field_on_hover_over_javascript",
         "on_hover_off_javascript": "update_field_on_hover_off_javascript",
+        "on_mouse_pressed_javascript": "update_field_on_mouse_pressed_javascript",
     }
 
     def __init__(
@@ -58,6 +59,7 @@ class Widget:
         # javascript
         self.on_hover_over_javascript: Union[str, BinaryIO] = None
         self.on_hover_off_javascript: Union[str, BinaryIO] = None
+        self.on_mouse_pressed_javascript: Union[str, BinaryIO] = None
 
     def __setattr__(self, name: str, value: Any) -> None:
         """
