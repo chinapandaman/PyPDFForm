@@ -66,3 +66,38 @@ def fp_or_f_obj_or_stream_to_stream(
             with open(fp_or_f_obj_or_stream, "rb") as _file:
                 result = _file.read()
     return result
+
+
+def fp_or_f_obj_or_f_content_to_content(
+    fp_or_f_obj_or_f_content: Union[str, BinaryIO],
+) -> str:
+    """
+    Adapt a file path, file object, or file content to file content.
+
+    This function takes a file path, a file object, or file content and adapts it to a consistent string.
+    It handles different input types, including:
+        - file content (str)
+        - file paths (str)
+        - file-like objects with a read() method (BinaryIO)
+
+    Args:
+        fp_or_f_obj_or_f_content (Union[str, BinaryIO]): The input to adapt.
+            It can be file content, a file path (string), or a file object.
+
+    Returns:
+        str: The file content representation of the input.
+    """
+    result = ""
+    if readable(fp_or_f_obj_or_f_content):
+        result = fp_or_f_obj_or_f_content.read()
+        if isinstance(result, bytes):
+            result = result.decode("utf-8")
+
+    elif isinstance(fp_or_f_obj_or_f_content, str):
+        if isfile(fp_or_f_obj_or_f_content):
+            with open(fp_or_f_obj_or_f_content, "r", encoding="utf-8") as _file:
+                result = _file.read()
+        else:
+            result = fp_or_f_obj_or_f_content
+
+    return result

@@ -11,12 +11,13 @@ filling process, allowing for customization of the form's appearance and behavio
 
 import sys
 from io import BytesIO
-from typing import cast
+from typing import BinaryIO, Union, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
+from .adapter import fp_or_f_obj_or_f_content_to_content
 from .constants import (AA, COMB, DA, FONT_COLOR_IDENTIFIER,
                         FONT_SIZE_IDENTIFIER, JS, MULTILINE, READ_ONLY,
                         REQUIRED, TU, Action, Annots, E, Ff, JavaScript,
@@ -426,7 +427,7 @@ def update_field_required(annot: DictionaryObject, val: bool) -> None:
 
 
 def _update_field_javascript(
-    annot: DictionaryObject, trigger_event: str, val: str
+    annot: DictionaryObject, trigger_event: str, val: Union[str, BinaryIO]
 ) -> None:
     if AA not in annot:
         annot[NameObject(AA)] = DictionaryObject()
@@ -439,13 +440,17 @@ def _update_field_javascript(
         JavaScript
     )
     annot[NameObject(AA)][NameObject(trigger_event)][NameObject(JS)] = TextStringObject(
-        val
+        fp_or_f_obj_or_f_content_to_content(val)
     )
 
 
-def update_field_on_hover_over_javascript(annot: DictionaryObject, val: str) -> None:
+def update_field_on_hover_over_javascript(
+    annot: DictionaryObject, val: Union[str, BinaryIO]
+) -> None:
     _update_field_javascript(annot, E, val)
 
 
-def update_field_on_hover_off_javascript(annot: DictionaryObject, val: str) -> None:
+def update_field_on_hover_off_javascript(
+    annot: DictionaryObject, val: Union[str, BinaryIO]
+) -> None:
     _update_field_javascript(annot, X, val)

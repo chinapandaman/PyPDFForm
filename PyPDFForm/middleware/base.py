@@ -8,7 +8,7 @@ common attributes and methods for all form widgets, such as name, value,
 and schema definition.
 """
 
-from typing import Any, List, Union
+from typing import Any, BinaryIO, List, Union
 
 
 class Widget:
@@ -56,8 +56,8 @@ class Widget:
         self.height: Union[float, List[float]] = None
 
         # javascript
-        self.on_hover_over_javascript: str = None
-        self.on_hover_off_javascript: str = None
+        self.on_hover_over_javascript: Union[str, BinaryIO] = None
+        self.on_hover_off_javascript: Union[str, BinaryIO] = None
 
     def __setattr__(self, name: str, value: Any) -> None:
         """
