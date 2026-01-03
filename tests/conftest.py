@@ -32,6 +32,11 @@ def pdf_samples():
 
 
 @pytest.fixture
+def js_samples():
+    return os.path.join(os.path.dirname(__file__), "..", "js_samples")
+
+
+@pytest.fixture
 def static_pdfs():
     return os.path.join(os.path.dirname(__file__), "..", "docs", "pdfs")
 

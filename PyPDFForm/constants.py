@@ -42,8 +42,6 @@ WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown, Signature, Image]
 DEPRECATION_NOTICE = "{} will be deprecated soon. Use {} instead."
 
 Annots = "/Annots"
-A = "/A"
-JS = "/JS"
 T = "/T"
 TU = "/TU"
 Rect = "/Rect"
@@ -67,6 +65,20 @@ Opt = "/Opt"
 AS = "/AS"
 Yes = "/Yes"
 Off = "/Off"
+
+# javascript
+A = "/A"
+AA = "/AA"
+Action = "/Action"
+S = "/S"
+JavaScript = "/JavaScript"
+JS = "/JS"
+E = "/E"
+X = "/X"
+D = "/D"
+U = "/U"
+Fo = "/Fo"
+Bl = "/Bl"
 
 # Font dict
 Length = "/Length"
