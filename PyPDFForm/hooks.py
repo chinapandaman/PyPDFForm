@@ -430,6 +430,19 @@ def update_field_required(annot: DictionaryObject, val: bool) -> None:
 def _update_field_javascript(
     annot: DictionaryObject, trigger_event: str, val: Union[str, BinaryIO]
 ) -> None:
+    """
+    Updates a specific JavaScript action for a form field annotation.
+
+    This internal helper function adds or updates a JavaScript action in the
+    annotation's additional actions dictionary (AA) for a specific trigger event.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        trigger_event (str): The event that triggers the JavaScript action
+            (e.g., E for enter, X for exit, D for down, U for up, Fo for focus, Bl for blur).
+        val (Union[str, BinaryIO]): The JavaScript code to execute. Can be a string
+            containing the code or a file-like object/path to a file containing the code.
+    """
     if AA not in annot:
         annot[NameObject(AA)] = DictionaryObject()
 
@@ -448,34 +461,94 @@ def _update_field_javascript(
 def update_field_on_hovered_over_javascript(
     annot: DictionaryObject, val: Union[str, BinaryIO]
 ) -> None:
+    """
+    Updates the JavaScript action triggered when the mouse enters the field area.
+
+    This function sets the 'E' (Enter) entry in the annotation's additional actions
+    dictionary, specifying JavaScript code to execute when the cursor enters the field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (Union[str, BinaryIO]): The JavaScript code to execute.
+    """
     _update_field_javascript(annot, E, val)
 
 
 def update_field_on_hovered_off_javascript(
     annot: DictionaryObject, val: Union[str, BinaryIO]
 ) -> None:
+    """
+    Updates the JavaScript action triggered when the mouse exits the field area.
+
+    This function sets the 'X' (Exit) entry in the annotation's additional actions
+    dictionary, specifying JavaScript code to execute when the cursor leaves the field.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (Union[str, BinaryIO]): The JavaScript code to execute.
+    """
     _update_field_javascript(annot, X, val)
 
 
 def update_field_on_mouse_pressed_javascript(
     annot: DictionaryObject, val: Union[str, BinaryIO]
 ) -> None:
+    """
+    Updates the JavaScript action triggered when the mouse button is pressed down inside the field.
+
+    This function sets the 'D' (Down) entry in the annotation's additional actions
+    dictionary, specifying JavaScript code to execute when the mouse button is pressed.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (Union[str, BinaryIO]): The JavaScript code to execute.
+    """
     _update_field_javascript(annot, D, val)
 
 
 def update_field_on_mouse_released_javascript(
     annot: DictionaryObject, val: Union[str, BinaryIO]
 ) -> None:
+    """
+    Updates the JavaScript action triggered when the mouse button is released inside the field.
+
+    This function sets the 'U' (Up) entry in the annotation's additional actions
+    dictionary, specifying JavaScript code to execute when the mouse button is released.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (Union[str, BinaryIO]): The JavaScript code to execute.
+    """
     _update_field_javascript(annot, U, val)
 
 
 def update_field_on_focused_javascript(
     annot: DictionaryObject, val: Union[str, BinaryIO]
 ) -> None:
+    """
+    Updates the JavaScript action triggered when the field receives input focus.
+
+    This function sets the 'Fo' (Focus) entry in the annotation's additional actions
+    dictionary, specifying JavaScript code to execute when the field gains focus.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (Union[str, BinaryIO]): The JavaScript code to execute.
+    """
     _update_field_javascript(annot, Fo, val)
 
 
 def update_field_off_focused_javascript(
     annot: DictionaryObject, val: Union[str, BinaryIO]
 ) -> None:
+    """
+    Updates the JavaScript action triggered when the field loses input focus.
+
+    This function sets the 'Bl' (Blur) entry in the annotation's additional actions
+    dictionary, specifying JavaScript code to execute when the field loses focus.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (Union[str, BinaryIO]): The JavaScript code to execute.
+    """
     _update_field_javascript(annot, Bl, val)
