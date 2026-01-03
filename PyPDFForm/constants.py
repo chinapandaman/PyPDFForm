@@ -77,6 +77,7 @@ E = "/E"
 X = "/X"
 D = "/D"
 U = "/U"
+Fo = "/Fo"
 
 # Font dict
 Length = "/Length"

@@ -20,7 +20,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
 from .adapter import fp_or_f_obj_or_f_content_to_content
 from .constants import (AA, COMB, DA, FONT_COLOR_IDENTIFIER,
                         FONT_SIZE_IDENTIFIER, JS, MULTILINE, READ_ONLY,
-                        REQUIRED, TU, Action, Annots, D, E, Ff, JavaScript,
+                        REQUIRED, TU, Action, Annots, D, E, Ff, Fo, JavaScript,
                         MaxLen, Opt, Parent, Q, Rect, S, Type, U, X)
 from .template import get_widget_key
 from .utils import stream_to_io
@@ -466,3 +466,9 @@ def update_field_on_mouse_released_javascript(
     annot: DictionaryObject, val: Union[str, BinaryIO]
 ) -> None:
     _update_field_javascript(annot, U, val)
+
+
+def update_field_on_focused_javascript(
+    annot: DictionaryObject, val: Union[str, BinaryIO]
+) -> None:
+    _update_field_javascript(annot, Fo, val)
