@@ -137,3 +137,36 @@ def test_radio_scripts(template_with_radiobutton_stream, pdf_samples, request):
 
         assert len(pdf.read()) == len(expected)
         assert pdf.read() == expected
+
+
+def test_dropdown_scripts(template_with_radiobutton_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "js", "test_dropdown_scripts.pdf")
+    with open(expected_path, "rb+") as f:
+        pdf = PdfWrapper(template_with_radiobutton_stream)
+        pdf.widgets["dropdown_1"].on_hovered_over_javascript = (
+            'this.getField("test_1").value = "hoverover";'
+        )
+        pdf.widgets["dropdown_1"].on_hovered_off_javascript = (
+            'this.getField("test_1").value = "hoveroff";'
+        )
+        pdf.widgets["dropdown_1"].on_mouse_pressed_javascript = (
+            'this.getField("test_1").value = "pressed";'
+        )
+        pdf.widgets["dropdown_1"].on_mouse_released_javascript = (
+            'this.getField("test_1").value = "released";'
+        )
+
+        pdf.widgets["dropdown_1"].on_focused_javascript = (
+            'this.getField("test_2").value = "focused";'
+        )
+        pdf.widgets["dropdown_1"].off_focused_javascript = (
+            'this.getField("test_2").value = "defocused";'
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = pdf.read()
+
+        expected = f.read()
+
+        assert len(pdf.read()) == len(expected)
+        assert pdf.read() == expected
