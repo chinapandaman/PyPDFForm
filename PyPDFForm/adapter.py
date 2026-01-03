@@ -89,9 +89,7 @@ def fp_or_f_obj_or_f_content_to_content(
     """
     result = ""
     if readable(fp_or_f_obj_or_f_content):
-        result = fp_or_f_obj_or_f_content.read()
-        if isinstance(result, bytes):
-            result = result.decode("utf-8")
+        result = str(fp_or_f_obj_or_f_content.read())
 
     elif isinstance(fp_or_f_obj_or_f_content, str):
         if isfile(fp_or_f_obj_or_f_content):
