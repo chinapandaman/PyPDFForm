@@ -36,3 +36,21 @@ def test_js_adapting(static_pdfs, pdf_samples, js_samples, request):
     ).read()
 
     assert form3.read() == form.read()
+
+
+def test_on_hover(static_pdfs, pdf_samples, js_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_on_hover.pdf")
+
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
+    form.widgets["test"].on_hovered_over_javascript = os.path.join(
+        js_samples, "doc_examples", "test_on_hover.js"
+    )
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(form.read()) == len(expected)
+        assert form.read() == expected
