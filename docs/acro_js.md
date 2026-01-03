@@ -1,16 +1,16 @@
 # Embed field JavaScript (beta)
 
 ???+ info
-    This section contains beta features, which means both the features themselves and the documentations are undergoing constant changes. Please use these features with caution as they may be changed or even rollback in the future and they may not work for some PDF forms.
+    These beta features and their documentation are subject to change. Use with caution; they may be modified, rolled back, or fail in some PDF forms.
 
 ???+ warning
-    When embedding arbitrary JavaScript code, please do NOT trust any user input and sanitize them. Despite the fact that JavaScript code embedded into PDF forms are executed in a sandbox environment, it is still extremely dangerous to allow any code to run and may introduce serious remote code execution vulnerabilities.
+    Do NOT trust user input; always sanitize it. Although PDF JavaScript runs in a sandbox, arbitrary execution is dangerous and can lead to remote code execution vulnerabilities.
 
-This section of the documentation will primarily use [this PDF](pdfs/sample_template.pdf) as an example.
+This documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
 
-PDF form fields allow executions of JavaScript when certain interactions happen, if the viewer/editor supports. PyPDFForm provides a simple set of APIs that enables embedding JavaScript code into each form field.
+PDF form fields can execute JavaScript during interactions if supported by the viewer. PyPDFForm provides APIs to embed scripts into form fields.
 
-For example, the following snippet shows how you can embed a script that, when the text field `test` is hovered over, pops up an alert box:
+For example, this snippet embeds a script that triggers an alert when the `test` field is hovered:
 
 === "alert.js"
     ```javascript
@@ -45,11 +45,11 @@ For example, the following snippet shows how you can embed a script that, when t
     ```
 
 ???+ tip
-    Please refer [here](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/jsapiref/index.html) for JavaScript that can be executed in PDF forms.
+    Please refer to [this link](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/jsapiref/index.html) for JavaScript that can be executed in PDF forms.
 
-## Execute JavaScript on hovered over
+## Execute JavaScript on hover
 
-As seen in the previous example, you can embed your JavaScript code to the `on_hovered_over_javascript` attribute of each field, which will make it run when the field is hovered over by the mouse cursor:
+Set the `on_hovered_over_javascript` attribute to run code when a field is hovered over:
 
 === "script.js"
     ```javascript
@@ -65,9 +65,9 @@ As seen in the previous example, you can embed your JavaScript code to the `on_h
     form.write("output.pdf")
     ```
 
-## Execute JavaScript on hovered off
+## Execute JavaScript on hover off
 
-Setting the `on_hovered_off_javascript` attribute runs the JavaScript code embedded to a form field when the mouse cursor moves away from it:
+Set the `on_hovered_off_javascript` attribute to run code when the mouse moves away from a field:
 
 === "script.js"
     ```javascript
@@ -85,7 +85,7 @@ Setting the `on_hovered_off_javascript` attribute runs the JavaScript code embed
 
 ## Execute JavaScript on mouse pressed
 
-Setting the `on_mouse_pressed_javascript` attribute runs the JavaScript code embedded to a form field when the mouse button is pressed down within the field:
+Set the `on_mouse_pressed_javascript` attribute to run code when a mouse button is pressed within a field:
 
 === "script.js"
     ```javascript
@@ -103,7 +103,7 @@ Setting the `on_mouse_pressed_javascript` attribute runs the JavaScript code emb
 
 ## Execute JavaScript on mouse released
 
-Setting the `on_mouse_released_javascript` attribute runs the JavaScript code embedded to a form field when the mouse button is released within the field:
+Set the `on_mouse_released_javascript` attribute to run code when a mouse button is released within a field:
 
 === "script.js"
     ```javascript
@@ -119,9 +119,9 @@ Setting the `on_mouse_released_javascript` attribute runs the JavaScript code em
     form.write("output.pdf")
     ```
 
-## Execute JavaScript on focused
+## Execute JavaScript on focus
 
-Setting the `on_focused_javascript` attribute runs the JavaScript code embedded to a form field when the it's focused, as in selected by your mouse:
+Set the `on_focused_javascript` attribute to run code when a field gains focus:
 
 === "script.js"
     ```javascript
@@ -137,9 +137,9 @@ Setting the `on_focused_javascript` attribute runs the JavaScript code embedded 
     form.write("output.pdf")
     ```
 
-## Execute JavaScript off focused
+## Execute JavaScript on blur
 
-Setting the `off_focused_javascript` attribute runs the JavaScript code embedded to a form field when the it's no longer focused:
+Set the `off_focused_javascript` attribute to run code when a field loses focus:
 
 === "script.js"
     ```javascript
