@@ -28,3 +28,4 @@ jobs:
           git config --global user.name 'release-bot'
           git config --global user.email 'bot@domain.com'
           mike deploy --push --update-aliases $(tag=$(git describe --tags --abbrev=0) && echo "${tag%.*}") latest
+          mike set-default --push $(tag=$(git describe --tags --abbrev=0) && echo "${tag%.*}")
