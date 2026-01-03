@@ -115,3 +115,39 @@ Setting the `on_mouse_released_javascript` attribute runs the JavaScript code em
 
     form.write("output.pdf")
     ```
+
+## Execute JavaScript on focused
+
+Setting the `on_focused_javascript` attribute runs the JavaScript code embedded to a form field when the it's focused, as in selected by your mouse:
+
+=== "script.js"
+    ```javascript
+    this.getField("test").value = "focused";
+    ```
+=== "main.py"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    form = PdfWrapper("sample_template.pdf")
+    form.widgets["test"].on_focused_javascript = "./script.js"
+
+    form.write("output.pdf")
+    ```
+
+## Execute JavaScript off focused
+
+Setting the `off_focused_javascript` attribute runs the JavaScript code embedded to a form field when the it's no longer focused:
+
+=== "script.js"
+    ```javascript
+    this.getField("test").value = "not focused";
+    ```
+=== "main.py"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    form = PdfWrapper("sample_template.pdf")
+    form.widgets["test"].off_focused_javascript = "./script.js"
+
+    form.write("output.pdf")
+    ```
