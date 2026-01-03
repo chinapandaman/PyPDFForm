@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# TODO: add tests for image and sig
 
 import os
 
