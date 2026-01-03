@@ -140,10 +140,10 @@ def test_radio_scripts(template_with_radiobutton_stream, pdf_samples, request):
         assert pdf.read() == expected
 
 
-def test_dropdown_scripts(template_with_radiobutton_stream, pdf_samples, request):
+def test_dropdown_scripts(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "js", "test_dropdown_scripts.pdf")
     with open(expected_path, "rb+") as f:
-        pdf = PdfWrapper(template_with_radiobutton_stream)
+        pdf = PdfWrapper(sample_template_with_dropdown)
         pdf.widgets["dropdown_1"].on_hovered_over_javascript = (
             'this.getField("test_1").value = "hoverover";'
         )
