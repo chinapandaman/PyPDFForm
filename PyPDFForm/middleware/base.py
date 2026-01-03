@@ -25,8 +25,8 @@ class Widget:
         "readonly": "flatten_generic",
         "required": "update_field_required",
         "tooltip": "update_field_tooltip",
-        "on_hover_over_javascript": "update_field_on_hover_over_javascript",
-        "on_hover_off_javascript": "update_field_on_hover_off_javascript",
+        "on_hovered_over_javascript": "update_field_on_hovered_over_javascript",
+        "on_hovered_off_javascript": "update_field_on_hovered_off_javascript",
         "on_mouse_pressed_javascript": "update_field_on_mouse_pressed_javascript",
         "on_mouse_released_javascript": "update_field_on_mouse_released_javascript",
         "on_focused_javascript": "update_field_on_focused_javascript",
@@ -60,8 +60,8 @@ class Widget:
         self.height: Union[float, List[float]] = None
 
         # javascript
-        self.on_hover_over_javascript: Union[str, BinaryIO] = None
-        self.on_hover_off_javascript: Union[str, BinaryIO] = None
+        self.on_hovered_over_javascript: Union[str, BinaryIO] = None
+        self.on_hovered_off_javascript: Union[str, BinaryIO] = None
         self.on_mouse_pressed_javascript: Union[str, BinaryIO] = None
         self.on_mouse_released_javascript: Union[str, BinaryIO] = None
         self.on_focused_javascript: Union[str, BinaryIO] = None

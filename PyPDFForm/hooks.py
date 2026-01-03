@@ -445,13 +445,13 @@ def _update_field_javascript(
     )
 
 
-def update_field_on_hover_over_javascript(
+def update_field_on_hovered_over_javascript(
     annot: DictionaryObject, val: Union[str, BinaryIO]
 ) -> None:
     _update_field_javascript(annot, E, val)
 
 
-def update_field_on_hover_off_javascript(
+def update_field_on_hovered_off_javascript(
     annot: DictionaryObject, val: Union[str, BinaryIO]
 ) -> None:
     _update_field_javascript(annot, X, val)
