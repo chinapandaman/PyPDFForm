@@ -64,7 +64,7 @@ As seen in the previous example, you can embed your JavaScript code to the `on_h
 
 ## Execute JavaScript on hovered off
 
-Setting the `on_hovered_off_javascript` attribute runs the JavaScript code embedded to it when the mouse cursor moves away from it:
+Setting the `on_hovered_off_javascript` attribute runs the JavaScript code embedded to a form field when the mouse cursor moves away from it:
 
 === "script.js"
     ```javascript
@@ -76,6 +76,42 @@ Setting the `on_hovered_off_javascript` attribute runs the JavaScript code embed
 
     form = PdfWrapper("sample_template.pdf")
     form.widgets["test"].on_hovered_off_javascript = "./script.js"
+
+    form.write("output.pdf")
+    ```
+
+## Execute JavaScript on mouse pressed
+
+Setting the `on_mouse_pressed_javascript` attribute runs the JavaScript code embedded to a form field when the mouse button is pressed down within the field:
+
+=== "script.js"
+    ```javascript
+    this.getField("test").value = "mouse pressed";
+    ```
+=== "main.py"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    form = PdfWrapper("sample_template.pdf")
+    form.widgets["test"].on_mouse_pressed_javascript = "./script.js"
+
+    form.write("output.pdf")
+    ```
+
+## Execute JavaScript on mouse released
+
+Setting the `on_mouse_released_javascript` attribute runs the JavaScript code embedded to a form field when the mouse button is released within the field:
+
+=== "script.js"
+    ```javascript
+    this.getField("test").value = "mouse released";
+    ```
+=== "main.py"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    form = PdfWrapper("sample_template.pdf")
+    form.widgets["test"].on_mouse_released_javascript = "./script.js"
 
     form.write("output.pdf")
     ```
