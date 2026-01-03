@@ -5,6 +5,23 @@ import os
 from PyPDFForm import PdfWrapper
 
 
+def test_file_path_scripts(template_stream, pdf_samples, js_samples, request):
+    expected_path = os.path.join(pdf_samples, "js", "test_file_path_scripts.pdf")
+    with open(expected_path, "rb+") as f:
+        pdf = PdfWrapper(template_stream)
+        pdf.widgets["test"].on_mouse_pressed_javascript = os.path.join(
+            js_samples, "test_file_path_scripts.js"
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = pdf.read()
+
+        expected = f.read()
+
+        assert len(pdf.read()) == len(expected)
+        assert pdf.read() == expected
+
+
 def test_text_field_scripts(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "js", "test_text_field_scripts.pdf")
     with open(expected_path, "rb+") as f:
