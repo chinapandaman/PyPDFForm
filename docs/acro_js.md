@@ -43,3 +43,39 @@ For example, the following snippet shows how you can embed a script that, when t
 
 ???+ tip
     Please refer [here](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/jsapiref/index.html) for JavaScript that can be executed in PDF forms.
+
+## Execute JavaScript on hovered over
+
+As seen in the previous example, you can embed your JavaScript code to the `on_hovered_over_javascript` attribute of each field, which will make it run when the field is hovered over by the mouse cursor:
+
+=== "script.js"
+    ```javascript
+    this.getField("test").value = "hovered over";
+    ```
+=== "main.py"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    form = PdfWrapper("sample_template.pdf")
+    form.widgets["test"].on_hovered_over_javascript = "./script.js"
+
+    form.write("output.pdf")
+    ```
+
+## Execute JavaScript on hovered off
+
+Setting the `on_hovered_off_javascript` attribute runs the JavaScript code embedded to it when the mouse cursor moves away from it:
+
+=== "script.js"
+    ```javascript
+    this.getField("test").value = "hovered off";
+    ```
+=== "main.py"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    form = PdfWrapper("sample_template.pdf")
+    form.widgets["test"].on_hovered_off_javascript = "./script.js"
+
+    form.write("output.pdf")
+    ```
