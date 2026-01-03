@@ -76,6 +76,7 @@ JS = "/JS"
 E = "/E"
 X = "/X"
 D = "/D"
+U = "/U"
 
 # Font dict
 Length = "/Length"
