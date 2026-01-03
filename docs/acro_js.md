@@ -3,6 +3,9 @@
 ???+ info
     This section contains beta features, which means both the features themselves and the documentations are undergoing constant changes. Please use these features with caution as they may be changed or even rollback in the future and they may not work for some PDF forms.
 
+???+ warning
+    When embedding arbitrary JavaScript code, please do NOT trust any user input and sanitize them. Despite the fact that JavaScript code embedded into PDF forms are executed in a sandbox environment, it is still extremely dangerous to allow any code to run and may introduce serious remote code execution vulnerabilities.
+
 This section of the documentation will primarily use [this PDF](pdfs/sample_template.pdf) as an example.
 
 PDF form fields allow executions of JavaScript when certain interactions happen, if the viewer/editor supports. PyPDFForm provides a simple set of APIs that enables embedding JavaScript code into each form field.
