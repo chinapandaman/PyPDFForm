@@ -22,7 +22,7 @@ from collections import defaultdict
 from dataclasses import asdict
 from functools import cached_property
 from os import PathLike
-from typing import TYPE_CHECKING, BinaryIO, Dict, List, Tuple, Union
+from typing import TYPE_CHECKING, BinaryIO, Dict, List, Sequence, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .ap import appearance_streams_handler
@@ -45,6 +45,7 @@ from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
 from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
 
 if TYPE_CHECKING:
+    from .assets.blank import BlankPage
     from .widgets import FieldTypes
 
 
@@ -76,7 +77,7 @@ class PdfWrapper:
 
     def __init__(
         self,
-        template: Union[bytes, str, BinaryIO] = b"",
+        template: Union[bytes, str, BinaryIO, BlankPage] = b"",
         **kwargs,
     ) -> None:
         """
@@ -428,7 +429,7 @@ class PdfWrapper:
 
     def fill(
         self,
-        data: Dict[str, Union[str, bool, int]],
+        data: Dict[str, Union[str, bool, int, BinaryIO, bytes]],
         **kwargs,
     ) -> PdfWrapper:
         """
@@ -474,7 +475,7 @@ class PdfWrapper:
 
         return self
 
-    def bulk_create_fields(self, fields: List[FieldTypes]) -> PdfWrapper:
+    def bulk_create_fields(self, fields: Sequence[FieldTypes]) -> PdfWrapper:
         """
         Creates multiple new form fields (widgets) on the PDF in a single operation.
 
@@ -658,7 +659,7 @@ class PdfWrapper:
 
         return self
 
-    def draw(self, elements: List[RawTypes]) -> PdfWrapper:
+    def draw(self, elements: Sequence[RawTypes]) -> PdfWrapper:
         """
         Draws raw elements (text, images, etc.) directly onto the PDF pages.
 
