@@ -22,7 +22,7 @@ from collections import defaultdict
 from dataclasses import asdict
 from functools import cached_property
 from os import PathLike
-from typing import TYPE_CHECKING, BinaryIO, Dict, List, Tuple, Union
+from typing import TYPE_CHECKING, BinaryIO, Dict, Sequence, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .ap import appearance_streams_handler
@@ -45,6 +45,7 @@ from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
 from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
 
 if TYPE_CHECKING:
+    from .assets.blank import BlankPage
     from .widgets import FieldTypes
 
 
@@ -76,7 +77,7 @@ class PdfWrapper:
 
     def __init__(
         self,
-        template: Union[bytes, str, BinaryIO] = b"",
+        template: Union[bytes, str, BinaryIO, BlankPage] = b"",
         **kwargs,
     ) -> None:
         """
@@ -85,10 +86,11 @@ class PdfWrapper:
         Initializes a new `PdfWrapper` object with the given template PDF and optional keyword arguments.
 
         Args:
-            template (Union[bytes, str, BinaryIO]): The template PDF, provided as either:
+            template (Union[bytes, str, BinaryIO, BlankPage]): The template PDF, provided as either:
                 - bytes: The raw PDF data as a byte string.
                 - str: The file path to the PDF.
                 - BinaryIO: An open file-like object containing the PDF data.
+                - BlankPage: A blank page object.
                 Defaults to an empty byte string (b""), which creates a blank PDF.
             **kwargs: Additional keyword arguments to configure the `PdfWrapper`.
                 These arguments are used to set the user-configurable parameters defined in `USER_PARAMS`.
@@ -125,6 +127,7 @@ class PdfWrapper:
         Returns:
             PdfWrapper: A new `PdfWrapper` object containing the merged PDFs.
         """
+        # TODO: overload addition with PdfWrapperList to fix type hint for https://chinapandaman.github.io/PyPDFForm/v4.1/utils/#__tabbed_2_2
 
         if not self or not self._read():
             return other
@@ -281,14 +284,14 @@ class PdfWrapper:
         return list(self._available_fonts.keys())
 
     @cached_property
-    def pages(self) -> PdfWrapperList:
+    def pages(self) -> Sequence[PdfWrapper]:
         """
         Returns a list of `PdfWrapper` objects, each representing a single page in the PDF document.
 
         This allows you to work with individual pages of the PDF, for example, to extract text or images from a specific page.
 
         Returns:
-            PdfWrapperList: A list of `PdfWrapper` objects, one for each page in the PDF.
+            Sequence[PdfWrapper]: A list of `PdfWrapper` objects, one for each page in the PDF.
         """
 
         result = [
@@ -428,15 +431,16 @@ class PdfWrapper:
 
     def fill(
         self,
-        data: Dict[str, Union[str, bool, int]],
+        data: Dict[str, Union[str, bool, int, BinaryIO, bytes]],
         **kwargs,
     ) -> PdfWrapper:
         """
         Fills the PDF form with data from a dictionary.
 
         Args:
-            data (Dict[str, Union[str, bool, int]]): A dictionary where keys are form field names
-                and values are the data to fill the fields with.  Values can be strings, booleans, or integers.
+            data (Dict[str, Union[str, bool, int, BinaryIO, bytes]]): A dictionary where keys
+                are form field names and values are the data to fill the fields with.
+                Values can be strings, booleans, integers, file-like objects, or bytes.
             **kwargs: Additional keyword arguments:
                 - `flatten` (bool): Whether to flatten the form after filling, making the fields read-only (default: False).
 
@@ -474,7 +478,7 @@ class PdfWrapper:
 
         return self
 
-    def bulk_create_fields(self, fields: List[FieldTypes]) -> PdfWrapper:
+    def bulk_create_fields(self, fields: Sequence[FieldTypes]) -> PdfWrapper:
         """
         Creates multiple new form fields (widgets) on the PDF in a single operation.
 
@@ -485,7 +489,7 @@ class PdfWrapper:
         PDF manipulation overhead.
 
         Args:
-            fields (List[FieldTypes]): A list of field definition objects
+            fields (Sequence[FieldTypes]): A list of field definition objects
                 (e.g., `TextField`, `CheckBoxField`, etc.) to be created.
 
         Returns:
@@ -520,7 +524,7 @@ class PdfWrapper:
 
         return self
 
-    def _bulk_create_fields(self, fields: List[FieldTypes]) -> PdfWrapper:
+    def _bulk_create_fields(self, fields: Sequence[FieldTypes]) -> PdfWrapper:
         """
         Internal method to create multiple new form fields (widgets) on the PDF in a single operation.
 
@@ -530,7 +534,7 @@ class PdfWrapper:
         `bulk_create_fields` method after fields have been grouped for creation.
 
         Args:
-            fields (List[FieldTypes]): A list of field definition objects
+            fields (Sequence[FieldTypes]): A list of field definition objects
                 (e.g., `TextField`, `CheckBoxField`, etc.) to be created.
 
         Returns:
@@ -658,7 +662,7 @@ class PdfWrapper:
 
         return self
 
-    def draw(self, elements: List[RawTypes]) -> PdfWrapper:
+    def draw(self, elements: Sequence[RawTypes]) -> PdfWrapper:
         """
         Draws raw elements (text, images, etc.) directly onto the PDF pages.
 
@@ -667,7 +671,7 @@ class PdfWrapper:
         onto the PDF document as watermarks.
 
         Args:
-            elements (List[RawTypes]): A list of raw elements to draw (e.g., [RawText(...), RawImage(...)]).
+            elements (Sequence[RawTypes]): A list of raw elements to draw (e.g., [RawText(...), RawImage(...)]).
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
