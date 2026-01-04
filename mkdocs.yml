@@ -53,6 +53,7 @@ markdown_extensions:
 
 theme:
   name: material
+  custom_dir: overrides
   icon:
     repo: fontawesome/brands/github
     annotation: material/plus-circle
