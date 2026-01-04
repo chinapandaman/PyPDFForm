@@ -22,7 +22,7 @@ from collections import defaultdict
 from dataclasses import asdict
 from functools import cached_property
 from os import PathLike
-from typing import TYPE_CHECKING, BinaryIO, Dict, List, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, BinaryIO, Dict, Sequence, Tuple, Union
 
 from .adapter import fp_or_f_obj_or_stream_to_stream
 from .ap import appearance_streams_handler
@@ -486,7 +486,7 @@ class PdfWrapper:
         PDF manipulation overhead.
 
         Args:
-            fields (List[FieldTypes]): A list of field definition objects
+            fields (Sequence[FieldTypes]): A list of field definition objects
                 (e.g., `TextField`, `CheckBoxField`, etc.) to be created.
 
         Returns:
@@ -521,7 +521,7 @@ class PdfWrapper:
 
         return self
 
-    def _bulk_create_fields(self, fields: List[FieldTypes]) -> PdfWrapper:
+    def _bulk_create_fields(self, fields: Sequence[FieldTypes]) -> PdfWrapper:
         """
         Internal method to create multiple new form fields (widgets) on the PDF in a single operation.
 
@@ -531,7 +531,7 @@ class PdfWrapper:
         `bulk_create_fields` method after fields have been grouped for creation.
 
         Args:
-            fields (List[FieldTypes]): A list of field definition objects
+            fields (Sequence[FieldTypes]): A list of field definition objects
                 (e.g., `TextField`, `CheckBoxField`, etc.) to be created.
 
         Returns:
@@ -668,7 +668,7 @@ class PdfWrapper:
         onto the PDF document as watermarks.
 
         Args:
-            elements (List[RawTypes]): A list of raw elements to draw (e.g., [RawText(...), RawImage(...)]).
+            elements (Sequence[RawTypes]): A list of raw elements to draw (e.g., [RawText(...), RawImage(...)]).
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
