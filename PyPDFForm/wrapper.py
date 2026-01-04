@@ -114,20 +114,27 @@ class PdfWrapper:
 
         self._init_helper()
 
-    def __add__(self, other: PdfWrapper) -> PdfWrapper:
+    def __add__(self, other: Union[PdfWrapper, Sequence[PdfWrapper]]) -> PdfWrapper:
         """
-        Merges two PDF wrappers together, creating a new `PdfWrapper` containing the combined content.
+        Merges PDF wrappers together, creating a new `PdfWrapper` containing the combined content.
 
-        This method allows you to combine two PDF forms into a single form.  It handles potential
-        naming conflicts between form fields by adding a unique suffix to the field names in the second form.
+        This method allows you to combine PDF forms into a single form. It handles potential
+        naming conflicts between form fields by adding a unique suffix to the field names in the
+        form being merged.
 
         Args:
-            other (PdfWrapper): The other `PdfWrapper` object to merge with.
+            other (Union[PdfWrapper, Sequence[PdfWrapper]]): The other `PdfWrapper` object or
+                a sequence of `PdfWrapper` objects to merge with.
 
         Returns:
             PdfWrapper: A new `PdfWrapper` object containing the merged PDFs.
         """
-        # TODO: overload addition with PdfWrapperList to fix type hint for https://chinapandaman.github.io/PyPDFForm/v4.1/utils/#__tabbed_2_2
+
+        if isinstance(other, Sequence):
+            result = self
+            for each in other:
+                result += each
+            return result
 
         if not self or not self._read():
             return other
