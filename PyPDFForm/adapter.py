@@ -11,7 +11,10 @@ stream before further processing.
 """
 
 from os.path import isfile
-from typing import Any, BinaryIO, Union
+from typing import TYPE_CHECKING, Any, BinaryIO, Union
+
+if TYPE_CHECKING:
+    from .assets.blank import BlankPage
 
 
 def readable(obj: Any) -> bool:
@@ -32,7 +35,7 @@ def readable(obj: Any) -> bool:
 
 
 def fp_or_f_obj_or_stream_to_stream(
-    fp_or_f_obj_or_stream: Union[bytes, str, BinaryIO],
+    fp_or_f_obj_or_stream: Union[bytes, str, BinaryIO, BlankPage],
 ) -> bytes:
     """
     Adapt a file path, file object, or stream to a byte stream.
