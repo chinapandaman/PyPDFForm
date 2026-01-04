@@ -127,6 +127,7 @@ class PdfWrapper:
         Returns:
             PdfWrapper: A new `PdfWrapper` object containing the merged PDFs.
         """
+        # TODO: overload addition with PdfWrapperList to fix type hint for https://chinapandaman.github.io/PyPDFForm/v4.1/utils/#__tabbed_2_2
 
         if not self or not self._read():
             return other
@@ -283,14 +284,14 @@ class PdfWrapper:
         return list(self._available_fonts.keys())
 
     @cached_property
-    def pages(self) -> PdfWrapperList:
+    def pages(self) -> Sequence[PdfWrapper]:
         """
         Returns a list of `PdfWrapper` objects, each representing a single page in the PDF document.
 
         This allows you to work with individual pages of the PDF, for example, to extract text or images from a specific page.
 
         Returns:
-            PdfWrapperList: A list of `PdfWrapper` objects, one for each page in the PDF.
+            Sequence[PdfWrapper]: A list of `PdfWrapper` objects, one for each page in the PDF.
         """
 
         result = [
