@@ -38,17 +38,18 @@ def fp_or_f_obj_or_stream_to_stream(
     fp_or_f_obj_or_stream: Union[bytes, str, BinaryIO, BlankPage],
 ) -> bytes:
     """
-    Adapt a file path, file object, or stream to a byte stream.
+    Adapt a file path, file object, stream, or blank page to a byte stream.
 
-    This function takes a file path, a file object, or a byte stream and adapts it to a consistent byte stream.
-    It handles different input types, including:
+    This function takes a file path, a file object, a byte stream, or a blank page and adapts it
+    to a consistent byte stream. It handles different input types, including:
         - byte streams (bytes)
         - file paths (str)
         - file-like objects with a read() method (BinaryIO)
+        - blank pages (BlankPage)
 
     Args:
-        fp_or_f_obj_or_stream (Union[bytes, str, BinaryIO]): The input to adapt.
-            It can be a byte stream, a file path (string), or a file object.
+        fp_or_f_obj_or_stream (Union[bytes, str, BinaryIO, BlankPage]): The input to adapt.
+            It can be a byte stream, a file path (string), a file object, or a blank page.
 
     Returns:
         bytes: The byte stream representation of the input.

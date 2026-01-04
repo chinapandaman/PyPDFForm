@@ -86,10 +86,11 @@ class PdfWrapper:
         Initializes a new `PdfWrapper` object with the given template PDF and optional keyword arguments.
 
         Args:
-            template (Union[bytes, str, BinaryIO]): The template PDF, provided as either:
+            template (Union[bytes, str, BinaryIO, BlankPage]): The template PDF, provided as either:
                 - bytes: The raw PDF data as a byte string.
                 - str: The file path to the PDF.
                 - BinaryIO: An open file-like object containing the PDF data.
+                - BlankPage: A blank page object.
                 Defaults to an empty byte string (b""), which creates a blank PDF.
             **kwargs: Additional keyword arguments to configure the `PdfWrapper`.
                 These arguments are used to set the user-configurable parameters defined in `USER_PARAMS`.
