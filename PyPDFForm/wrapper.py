@@ -437,8 +437,9 @@ class PdfWrapper:
         Fills the PDF form with data from a dictionary.
 
         Args:
-            data (Dict[str, Union[str, bool, int]]): A dictionary where keys are form field names
-                and values are the data to fill the fields with.  Values can be strings, booleans, or integers.
+            data (Dict[str, Union[str, bool, int, BinaryIO, bytes]]): A dictionary where keys
+                are form field names and values are the data to fill the fields with.
+                Values can be strings, booleans, integers, file-like objects, or bytes.
             **kwargs: Additional keyword arguments:
                 - `flatten` (bool): Whether to flatten the form after filling, making the fields read-only (default: False).
 
