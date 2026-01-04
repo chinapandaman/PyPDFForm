@@ -469,6 +469,13 @@ def test_addition_operator_3_times(template_stream, data_dict):
     assert (result + PdfWrapper()).read() == result.read()
     assert len(result.pages) == len(PdfWrapper(template_stream).pages) * 3
 
+    result_2 = PdfWrapper()
+
+    for _ in range(3):
+        result_2 += PdfWrapper(template_stream).fill(data_dict).pages
+
+    assert len(result.pages) == len(result.pages)
+
 
 def test_merging_unique_suffix(template_stream):
     result = PdfWrapper()
