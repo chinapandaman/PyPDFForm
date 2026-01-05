@@ -33,3 +33,6 @@ jobs:
     - name: Analyze code with ruff
       run: |
         ruff check .
+    - name: Type check doc examples
+      run: |
+        python ./scripts/doc_examples_type_check.py
