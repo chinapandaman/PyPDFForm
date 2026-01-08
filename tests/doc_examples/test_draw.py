@@ -79,7 +79,9 @@ def test_draw_image(static_pdfs, image_samples, pdf_samples, request):
 
     images = [
         RawElements.RawImage(
-            image=open(os.path.join(image_samples, "sample_image.jpg"), "rb+"),
+            image=open(
+                os.path.join(image_samples, "sample_image.jpg"), "rb+"
+            ),  # in practice, use a context manager
             page_number=1,
             x=100,
             y=100,
@@ -88,7 +90,9 @@ def test_draw_image(static_pdfs, image_samples, pdf_samples, request):
             rotation=0,  # optional
         ),
         RawElements.RawImage(
-            image=open(os.path.join(image_samples, "sample_image.jpg"), "rb+"),
+            image=open(
+                os.path.join(image_samples, "sample_image.jpg"), "rb+"
+            ),  # in practice, use a context manager
             page_number=2,
             x=100,
             y=100,
@@ -104,7 +108,9 @@ def test_draw_image(static_pdfs, image_samples, pdf_samples, request):
 
     images = [
         RawElements.RawImage(
-            image=open(os.path.join(image_samples, "sample_image.jpg"), "rb+").read(),
+            image=open(
+                os.path.join(image_samples, "sample_image.jpg"), "rb+"
+            ).read(),  # in practice, use a context manager
             page_number=1,
             x=100,
             y=100,
@@ -113,7 +119,9 @@ def test_draw_image(static_pdfs, image_samples, pdf_samples, request):
             rotation=0,  # optional
         ),
         RawElements.RawImage(
-            image=open(os.path.join(image_samples, "sample_image.jpg"), "rb+").read(),
+            image=open(
+                os.path.join(image_samples, "sample_image.jpg"), "rb+"
+            ).read(),  # in practice, use a context manager
             page_number=2,
             x=100,
             y=100,
