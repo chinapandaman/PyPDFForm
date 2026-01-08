@@ -26,14 +26,14 @@ def test_js_adapting(static_pdfs, pdf_samples, js_samples, request):
     form2 = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     form2.widgets["test"].on_hovered_over_javascript = open(
         os.path.join(js_samples, "doc_examples", "test_js_adapting.js")
-    )
+    )  # in practice, use a context manager
 
     assert form2.read() == form.read()
 
     form3 = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     form3.widgets["test"].on_hovered_over_javascript = open(
         os.path.join(js_samples, "doc_examples", "test_js_adapting.js")
-    ).read()
+    ).read()  # in practice, use a context manager
 
     assert form3.read() == form.read()
 

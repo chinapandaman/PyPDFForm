@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+"""
+This script extracts Python code snippets from the documentation files (specifically those listed
+under the 'User Guide' in mkdocs.yml) and runs pyright on them to ensure type correctness.
+
+It performs the following steps:
+1. Creates a temporary 'ci_artifacts' directory.
+2. Identifies 'User Guide' documentation files from mkdocs.yml.
+3. Extracts all python code blocks from these files and saves them as standalone .py files.
+4. Executes pyright on these generated files.
+5. Maps any reported diagnostics back to the original documentation files and line numbers.
+6. Cleans up the temporary artifacts.
+7. Exits with a non-zero status if type errors are detected.
+"""
+
 import json
 import os
 import re

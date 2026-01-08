@@ -9,7 +9,9 @@ These steps trigger the deployment CI.
 
 ## Versioning
 
-PyPDFForm follows the conventions defined by [Semantic Versioning](https://semver.org/).
+PyPDFForm follows [Semantic Versioning](https://semver.org/).
+
+Documentation versioning follows a slightly different strategy, tracking only major and minor versions. For example, a release of `v1.2.3` updates the documentation for `v1.2`, whereas a release of `v1.3.0` creates documentation for `v1.3`.
 
 ## Deploy process
 

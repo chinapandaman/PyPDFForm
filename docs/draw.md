@@ -83,7 +83,7 @@ For the `rotation` parameter, a positive value rotates the image counter-clockwi
 
     images = [
         RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+"),
+            image=open("sample_image.jpg", "rb+"),  # in practice, use a context manager
             page_number=1,
             x=100,
             y=100,
@@ -92,7 +92,7 @@ For the `rotation` parameter, a positive value rotates the image counter-clockwi
             rotation=0,  # optional
         ),
         RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+"),
+            image=open("sample_image.jpg", "rb+"),  # in practice, use a context manager
             page_number=2,
             x=100,
             y=100,
@@ -112,7 +112,7 @@ For the `rotation` parameter, a positive value rotates the image counter-clockwi
 
     images = [
         RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+").read(),
+            image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
             page_number=1,
             x=100,
             y=100,
@@ -121,7 +121,7 @@ For the `rotation` parameter, a positive value rotates the image counter-clockwi
             rotation=0,  # optional
         ),
         RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+").read(),
+            image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
             page_number=2,
             x=100,
             y=100,

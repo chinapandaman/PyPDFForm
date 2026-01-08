@@ -30,7 +30,7 @@ For example, this snippet embeds a script that triggers an alert when the `test`
     from PyPDFForm import PdfWrapper
 
     form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_hovered_over_javascript = open("./alert.js")
+    form.widgets["test"].on_hovered_over_javascript = open("./alert.js")  # in practice, use a context manager
 
     form.write("output.pdf")
     ```
@@ -39,7 +39,7 @@ For example, this snippet embeds a script that triggers an alert when the `test`
     from PyPDFForm import PdfWrapper
 
     form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_hovered_over_javascript = open("./alert.js").read()
+    form.widgets["test"].on_hovered_over_javascript = open("./alert.js").read()  # in practice, use a context manager
 
     form.write("output.pdf")
     ```
