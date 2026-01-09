@@ -139,7 +139,7 @@ Set the `on_focused_javascript` attribute to run code when a field gains focus:
 
 ## Execute JavaScript on blur
 
-Set the `off_focused_javascript` attribute to run code when a field loses focus:
+Set the `on_blurred_javascript` attribute to run code when a field loses focus:
 
 === "script.js"
     ```javascript
@@ -150,7 +150,7 @@ Set the `off_focused_javascript` attribute to run code when a field loses focus:
     from PyPDFForm import PdfWrapper
 
     form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].off_focused_javascript = "./script.js"
+    form.widgets["test"].on_blurred_javascript = "./script.js"
 
     form.write("output.pdf")
     ```

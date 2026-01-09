@@ -538,7 +538,7 @@ def update_field_on_focused_javascript(
     _update_field_javascript(annot, Fo, val)
 
 
-def update_field_off_focused_javascript(
+def update_field_on_blurred_javascript(
     annot: DictionaryObject, val: Union[str, TextIO]
 ) -> None:
     """

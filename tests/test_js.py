@@ -60,7 +60,7 @@ def test_text_field_scripts(template_stream, pdf_samples, request):
         pdf.widgets["test_2"].on_focused_javascript = (
             'this.getField("test_2").value = "focused";'
         )
-        pdf.widgets["test_2"].off_focused_javascript = (
+        pdf.widgets["test_2"].on_blurred_javascript = (
             'this.getField("test_2").value = "defocused";'
         )
 
@@ -93,7 +93,7 @@ def test_checkbox_scripts(template_stream, pdf_samples, request):
         pdf.widgets["check_2"].on_focused_javascript = (
             'this.getField("test_2").value = "focused";'
         )
-        pdf.widgets["check_2"].off_focused_javascript = (
+        pdf.widgets["check_2"].on_blurred_javascript = (
             'this.getField("test_2").value = "defocused";'
         )
 
@@ -126,7 +126,7 @@ def test_radio_scripts(template_with_radiobutton_stream, pdf_samples, request):
         pdf.widgets["radio_2"].on_focused_javascript = (
             'this.getField("test_2").value = "focused";'
         )
-        pdf.widgets["radio_2"].off_focused_javascript = (
+        pdf.widgets["radio_2"].on_blurred_javascript = (
             'this.getField("test_2").value = "defocused";'
         )
 
@@ -159,7 +159,7 @@ def test_dropdown_scripts(sample_template_with_dropdown, pdf_samples, request):
         pdf.widgets["dropdown_1"].on_focused_javascript = (
             'this.getField("test_2").value = "focused";'
         )
-        pdf.widgets["dropdown_1"].off_focused_javascript = (
+        pdf.widgets["dropdown_1"].on_blurred_javascript = (
             'this.getField("test_2").value = "defocused";'
         )
 
@@ -192,7 +192,7 @@ def test_image_scripts(sample_template_with_image_field, pdf_samples, request):
         pdf.widgets["image_1"].on_focused_javascript = (
             'this.getField("test_2").value = "focused";'
         )
-        pdf.widgets["image_1"].off_focused_javascript = (
+        pdf.widgets["image_1"].on_blurred_javascript = (
             'this.getField("test_2").value = "defocused";'
         )
 
