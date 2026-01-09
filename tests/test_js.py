@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# TODO: add tests for image and sig
 
 import os
 
@@ -161,6 +160,39 @@ def test_dropdown_scripts(sample_template_with_dropdown, pdf_samples, request):
             'this.getField("test_2").value = "focused";'
         )
         pdf.widgets["dropdown_1"].off_focused_javascript = (
+            'this.getField("test_2").value = "defocused";'
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = pdf.read()
+
+        expected = f.read()
+
+        assert len(pdf.read()) == len(expected)
+        assert pdf.read() == expected
+
+
+def test_image_scripts(sample_template_with_image_field, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "js", "test_image_scripts.pdf")
+    with open(expected_path, "rb+") as f:
+        pdf = PdfWrapper(sample_template_with_image_field)
+        pdf.widgets["image_1"].on_hovered_over_javascript = (
+            'this.getField("test").value = "hoverover";'
+        )
+        pdf.widgets["image_1"].on_hovered_off_javascript = (
+            'this.getField("test").value = "hoveroff";'
+        )
+        pdf.widgets["image_1"].on_mouse_pressed_javascript = (
+            'this.getField("test").value = "pressed";'
+        )
+        pdf.widgets["image_1"].on_mouse_released_javascript = (
+            'this.getField("test").value = "released";'
+        )
+
+        pdf.widgets["image_1"].on_focused_javascript = (
+            'this.getField("test_2").value = "focused";'
+        )
+        pdf.widgets["image_1"].off_focused_javascript = (
             'this.getField("test_2").value = "defocused";'
         )
 
