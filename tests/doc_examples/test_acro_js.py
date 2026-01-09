@@ -132,7 +132,7 @@ def test_off_focused(static_pdfs, pdf_samples, js_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_off_focused.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
-    form.widgets["test"].off_focused_javascript = os.path.join(
+    form.widgets["test"].on_blurred_javascript = os.path.join(
         js_samples, "doc_examples", "test_off_focused.js"
     )
 
