@@ -1312,9 +1312,6 @@
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">pdf</span> <span class="o">=</span> <span class="n">PdfWrapper</span><span class="p">(</span><span class="s2">&quot;sample_template.pdf&quot;</span><span class="p">,</span> <span class="n">generate_appearance_streams</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
 <details class="warning" open="open">
 <summary>Warning</summary>
 <p>PyPDFForm's internal appearance stream generation relies on <a href="https://github.com/qpdf/qpdf">qpdf</a> and shares its limitations. Some known limitations include:</p>
@@ -1324,6 +1321,9 @@
 <li><strong>No text alignment handling:</strong> Text alignment (left, center, right) is not preserved or applied.</li>
 </ul>
 </details>
+</div>
+</div>
+</div>
 <h2 id="use-full-name-for-pdf-form-fields">Use full name for PDF form fields<a class="headerlink" href="#use-full-name-for-pdf-form-fields" title="Permanent link">⚓︎</a></h2>
 <p>According to section 12.7.3.2 of the <a href="https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf#page=442">PDF standard</a>, PDF form fields can have fully qualified names constructed using the pattern <code>&lt;parent_field_name&gt;.&lt;field_name&gt;</code>.</p>
 <p>PyPDFForm allows you to access fields by their full names by setting <code>use_full_widget_name</code> to <code>True</code> when instantiating <code>PdfWrapper</code>. For example, to use <a href="../pdfs/sample_template_with_full_key.pdf">this PDF</a>:</p>
