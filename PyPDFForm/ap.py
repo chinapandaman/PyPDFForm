@@ -81,10 +81,7 @@ def preserve_title(src: bytes, dest: bytes) -> bytes:
         bytes: The modified destination PDF content as a bytes stream.
     """
     title = get_pdf_title(src)
-    if title:
-        return set_pdf_title(dest, title)
-
-    return dest
+    return set_pdf_title(dest, title)
 
 
 def preserve_on_open_javascript(src: bytes, dest: bytes) -> bytes:
@@ -99,7 +96,4 @@ def preserve_on_open_javascript(src: bytes, dest: bytes) -> bytes:
         bytes: The modified destination PDF content as a bytes stream.
     """
     script = get_on_open_javascript(src)
-    if script:
-        return set_on_open_javascript(dest, script)
-
-    return dest
+    return set_on_open_javascript(dest, script)

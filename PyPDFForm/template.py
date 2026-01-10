@@ -272,6 +272,9 @@ def set_on_open_javascript(pdf: bytes, script: str) -> bytes:
     Returns:
         bytes: The modified PDF content as a bytes stream.
     """
+    if not script:
+        return pdf
+
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
     writer.append(reader)
