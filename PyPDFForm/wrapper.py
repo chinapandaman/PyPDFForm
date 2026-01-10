@@ -67,6 +67,7 @@ class PdfWrapper:
                 - `use_full_widget_name` (bool): Whether to use the full widget name when filling the form.
                 - `need_appearances` (bool): Whether to set the `NeedAppearances` flag in the PDF's AcroForm dictionary.
                 - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
+                - `title` (str): The title of the PDF document.
 
     """
 
@@ -221,10 +222,24 @@ class PdfWrapper:
 
     @property
     def title(self) -> Union[str, None]:
+        """
+        Returns the title of the PDF document.
+
+        Returns:
+            Union[str, None]: The title of the PDF, or None if it's not set.
+        """
+
         return get_pdf_title(self._read())
 
     @title.setter
     def title(self, value: str) -> None:
+        """
+        Sets the title of the PDF document.
+
+        Args:
+            value (str): The new title for the PDF document.
+        """
+
         self._stream = set_pdf_title(self._read(), value)
 
     @property

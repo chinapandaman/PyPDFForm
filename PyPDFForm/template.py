@@ -244,11 +244,30 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
 
 
 def get_pdf_title(pdf: bytes) -> Union[str, None]:
+    """
+    Retrieves the title of a PDF from its metadata.
+
+    Args:
+        pdf (bytes): The PDF file content as a bytes stream.
+
+    Returns:
+        Union[str, None]: The title of the PDF, or None if it's not present.
+    """
     reader = PdfReader(stream_to_io(pdf))
     return (reader.metadata or {}).get(Title)
 
 
 def set_pdf_title(pdf: bytes, title: str) -> bytes:
+    """
+    Sets the title of a PDF in its metadata.
+
+    Args:
+        pdf (bytes): The PDF file content as a bytes stream.
+        title (str): The new title for the PDF.
+
+    Returns:
+        bytes: The modified PDF content as a bytes stream.
+    """
     if not title:
         return pdf
 
