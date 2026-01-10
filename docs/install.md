@@ -52,6 +52,31 @@ For example, to use [this PDF](pdfs/sample_template.pdf) as a template, instanti
 ???+ tip
     PyPDFForm provides an adapter for different file interaction methods in Python, which allows you to pass your PDF form to `PdfWrapper` as a file path, an open file object, or a `bytes` file stream. This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
 
+## Change PDF title
+
+The PDF title can be set during `PdfWrapper` instantiation or via the `.title` property. Accessing it retrieves the current title.
+
+=== "Instantiate"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf", title="My PDF")
+    ```
+=== "Set Title"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf")
+    pdf.title = "My PDF"
+    ```
+=== "Get Title"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf", title="My PDF")
+    print(pdf.title)
+    ```
+
 ## Handling appearance streams
 
 For a PDF viewer to display content in a form field (especially text fields), it needs an "appearance stream." This stream defines how the field's content is rendered. PyPDFForm offers two ways to handle this, set via flags during `PdfWrapper` instantiation.

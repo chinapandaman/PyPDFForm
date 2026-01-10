@@ -41,6 +41,7 @@ WIDGET_TYPES = Union[Text, Checkbox, Radio, Dropdown, Signature, Image]
 
 DEPRECATION_NOTICE = "{} will be deprecated soon. Use {} instead."
 
+Title = "/Title"
 Annots = "/Annots"
 T = "/T"
 TU = "/TU"

@@ -27,7 +27,8 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
        AcroForm processing.
     2. Setting the /NeedAppearances flag in the AcroForm dictionary, which instructs
        PDF viewers to generate appearance streams for form fields.
-    3. Optionally generating appearance streams explicitly using pikepdf if
+    3. Preserving the metadata from the original PDF.
+    4. Optionally generating appearance streams explicitly using pikepdf if
        `generate_appearance_streams` is True.
 
     The result is cached using lru_cache for performance.
@@ -48,6 +49,8 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     writer.append(reader)
     writer.set_need_appearances_writer()
 
+    preserve_metadata(reader, writer)
+
     with BytesIO() as f:
         writer.write(f)
         f.seek(0)
@@ -62,3 +65,14 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
                 result = r.read()
 
     return result
+
+
+def preserve_metadata(reader: PdfReader, writer: PdfWriter) -> None:
+    """
+    Preserves the metadata from the reader to the writer.
+
+    Args:
+        reader (PdfReader): The reader object of the original PDF.
+        writer (PdfWriter): The writer object of the modified PDF.
+    """
+    writer.add_metadata(reader.metadata or {})
