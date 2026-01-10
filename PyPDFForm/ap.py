@@ -81,9 +81,6 @@ def preserve_pdf_properties(pdf: bytes, title: str, script: str) -> bytes:
     Returns:
         bytes: The modified PDF content as a bytes stream.
     """
-    if all([not title, not script]):
-        return pdf
-
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
     writer.append(reader)

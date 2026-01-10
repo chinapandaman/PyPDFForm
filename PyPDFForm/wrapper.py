@@ -369,7 +369,7 @@ class PdfWrapper:
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
 
-        if self.title or self.on_open_javascript:
+        if any([self.title, self.on_open_javascript]):
             result = preserve_pdf_properties(
                 result,
                 self.title,
