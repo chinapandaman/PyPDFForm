@@ -15,7 +15,8 @@ from typing import Dict, List, Tuple, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject, NameObject, TextStringObject
 
-from .constants import WIDGET_TYPES, Annots, MaxLen, Parent, T, Title
+from .constants import (JS, WIDGET_TYPES, Annots, JavaScript, MaxLen,
+                        OpenAction, Parent, S, T, Title)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -241,6 +242,53 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
             widget, DROPDOWN_CHOICE_PATTERNS, None, None
         )
     )
+
+
+def get_on_open_javascript(pdf: bytes) -> Union[str, None]:
+    """
+    Retrieves the JavaScript that runs when the PDF is opened.
+
+    Args:
+        pdf (bytes): The PDF file content as a bytes stream.
+
+    Returns:
+        Union[str, None]: The JavaScript that runs when the PDF is opened, or None if it's not present.
+    """
+    reader = PdfReader(stream_to_io(pdf))
+    try:
+        return reader.root_object[OpenAction][JS]
+    except KeyError:
+        return None
+
+
+def set_on_open_javascript(pdf: bytes, script: str) -> bytes:
+    """
+    Sets the JavaScript that runs when the PDF is opened.
+
+    Args:
+        pdf (bytes): The PDF file content as a bytes stream.
+        script (str): The JavaScript to run when the PDF is opened.
+
+    Returns:
+        bytes: The modified PDF content as a bytes stream.
+    """
+    if not script:
+        return pdf
+
+    reader = PdfReader(stream_to_io(pdf))
+    writer = PdfWriter()
+    writer.append(reader)
+
+    open_action = DictionaryObject()
+    open_action[NameObject(S)] = NameObject(JavaScript)
+    open_action[NameObject(JS)] = TextStringObject(script)
+
+    writer._root_object.update({NameObject(OpenAction): open_action})  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
 
 
 def get_pdf_title(pdf: bytes) -> Union[str, None]:

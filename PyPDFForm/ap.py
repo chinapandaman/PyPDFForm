@@ -14,6 +14,8 @@ from pikepdf import Pdf
 from pypdf import PdfReader, PdfWriter
 
 from .constants import XFA, AcroForm, Root
+from .template import (get_on_open_javascript, get_pdf_title,
+                       set_on_open_javascript, set_pdf_title)
 from .utils import stream_to_io
 
 
@@ -27,9 +29,10 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
        AcroForm processing.
     2. Setting the /NeedAppearances flag in the AcroForm dictionary, which instructs
        PDF viewers to generate appearance streams for form fields.
-    3. Preserving the metadata from the original PDF.
-    4. Optionally generating appearance streams explicitly using pikepdf if
+    3. Optionally generating appearance streams explicitly using pikepdf if
        `generate_appearance_streams` is True.
+    4. Preserving the title from the original PDF.
+    5. Preserving the on-open JavaScript from the original PDF.
 
     The result is cached using lru_cache for performance.
 
@@ -49,8 +52,6 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     writer.append(reader)
     writer.set_need_appearances_writer()
 
-    preserve_metadata(reader, writer)
-
     with BytesIO() as f:
         writer.write(f)
         f.seek(0)
@@ -64,15 +65,35 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
                 r.seek(0)
                 result = r.read()
 
-    return result
+    result = preserve_title(pdf, result)
+    return preserve_on_open_javascript(pdf, result)
 
 
-def preserve_metadata(reader: PdfReader, writer: PdfWriter) -> None:
+def preserve_title(src: bytes, dest: bytes) -> bytes:
     """
-    Preserves the metadata from the reader to the writer.
+    Preserves the title from the source PDF to the destination PDF.
 
     Args:
-        reader (PdfReader): The reader object of the original PDF.
-        writer (PdfWriter): The writer object of the modified PDF.
+        src (bytes): The source PDF file content as a bytes stream.
+        dest (bytes): The destination PDF file content as a bytes stream.
+
+    Returns:
+        bytes: The modified destination PDF content as a bytes stream.
     """
-    writer.add_metadata(reader.metadata or {})
+    title = get_pdf_title(src)
+    return set_pdf_title(dest, title)
+
+
+def preserve_on_open_javascript(src: bytes, dest: bytes) -> bytes:
+    """
+    Preserves the on-open JavaScript from the source PDF to the destination PDF.
+
+    Args:
+        src (bytes): The source PDF file content as a bytes stream.
+        dest (bytes): The destination PDF file content as a bytes stream.
+
+    Returns:
+        bytes: The modified destination PDF content as a bytes stream.
+    """
+    script = get_on_open_javascript(src)
+    return set_on_open_javascript(dest, script)
