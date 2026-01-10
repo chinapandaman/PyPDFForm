@@ -220,3 +220,30 @@ def test_on_open_script(template_stream, pdf_samples, request):
 
         assert len(pdf.read()) == len(expected)
         assert pdf.read() == expected
+
+
+def test_on_open_script_title_coexist(template_stream, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "js", "test_on_open_script_title_coexist.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        pdf = PdfWrapper(template_stream, title="My PDF")
+        pdf.on_open_javascript = 'this.getField("test").value = "opened";'
+
+        assert pdf.title == "My PDF"
+        assert pdf.on_open_javascript == 'this.getField("test").value = "opened";'
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = pdf.read()
+
+        expected = f.read()
+
+        assert len(pdf.read()) == len(expected)
+        assert pdf.read() == expected
+
+        pdf2 = PdfWrapper(template_stream)
+        pdf2.on_open_javascript = 'this.getField("test").value = "opened";'
+        pdf2.title = "My PDF"
+
+        assert len(pdf2.read()) == len(expected)
+        assert pdf2.read() == expected
