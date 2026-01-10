@@ -12,10 +12,10 @@ from io import BytesIO
 
 from pikepdf import Pdf
 from pypdf import PdfReader, PdfWriter
+from pypdf.generic import DictionaryObject, NameObject, TextStringObject
 
-from .constants import XFA, AcroForm, Root
-from .template import (get_on_open_javascript, get_pdf_title,
-                       set_on_open_javascript, set_pdf_title)
+from .constants import (JS, XFA, AcroForm, JavaScript, OpenAction, Root, S,
+                        Title)
 from .utils import stream_to_io
 
 
@@ -31,8 +31,6 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
        PDF viewers to generate appearance streams for form fields.
     3. Optionally generating appearance streams explicitly using pikepdf if
        `generate_appearance_streams` is True.
-    4. Preserving the title from the original PDF.
-    5. Preserving the on-open JavaScript from the original PDF.
 
     The result is cached using lru_cache for performance.
 
@@ -65,35 +63,31 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
                 r.seek(0)
                 result = r.read()
 
-    result = preserve_title(pdf, result)
-    return preserve_on_open_javascript(pdf, result)
+    return result
 
 
-def preserve_title(src: bytes, dest: bytes) -> bytes:
-    """
-    Preserves the title from the source PDF to the destination PDF.
+def preserve_pdf_properties(pdf: bytes, title: str, script: str) -> bytes:
+    if all([not title, not script]):
+        return pdf
 
-    Args:
-        src (bytes): The source PDF file content as a bytes stream.
-        dest (bytes): The destination PDF file content as a bytes stream.
+    reader = PdfReader(stream_to_io(pdf))
+    writer = PdfWriter()
+    writer.append(reader)
 
-    Returns:
-        bytes: The modified destination PDF content as a bytes stream.
-    """
-    title = get_pdf_title(src)
-    return set_pdf_title(dest, title)
+    if title:
+        metadata = reader.metadata or {}
+        metadata[NameObject(Title)] = TextStringObject(title)
 
+        writer.add_metadata(metadata)
 
-def preserve_on_open_javascript(src: bytes, dest: bytes) -> bytes:
-    """
-    Preserves the on-open JavaScript from the source PDF to the destination PDF.
+    if script:
+        open_action = DictionaryObject()
+        open_action[NameObject(S)] = NameObject(JavaScript)
+        open_action[NameObject(JS)] = TextStringObject(script)
 
-    Args:
-        src (bytes): The source PDF file content as a bytes stream.
-        dest (bytes): The destination PDF file content as a bytes stream.
+        writer._root_object.update({NameObject(OpenAction): open_action})  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 
-    Returns:
-        bytes: The modified destination PDF content as a bytes stream.
-    """
-    script = get_on_open_javascript(src)
-    return set_on_open_javascript(dest, script)
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()

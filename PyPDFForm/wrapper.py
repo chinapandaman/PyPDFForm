@@ -27,7 +27,7 @@ from typing import (TYPE_CHECKING, BinaryIO, Dict, Sequence, TextIO, Tuple,
 
 from .adapter import (fp_or_f_obj_or_f_content_to_content,
                       fp_or_f_obj_or_stream_to_stream)
-from .ap import appearance_streams_handler
+from .ap import appearance_streams_handler, preserve_pdf_properties
 from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
 from .filler import fill
@@ -38,9 +38,7 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .raw import RawText, RawTypes
-from .template import (build_widgets, get_on_open_javascript, get_pdf_title,
-                       set_on_open_javascript, set_pdf_title,
-                       update_widget_keys)
+from .template import build_widgets, update_widget_keys
 from .types import PdfWrapperList
 from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
@@ -106,6 +104,8 @@ class PdfWrapper:
         super().__init__()
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
+        self.title = None
+        self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._font_register_events = []  # for reregister
         self._key_update_tracker = {}  # for update key preserve old key attrs
@@ -224,28 +224,6 @@ class PdfWrapper:
         return self
 
     @property
-    def title(self) -> Union[str, None]:
-        """
-        Returns the title of the PDF document.
-
-        Returns:
-            Union[str, None]: The title of the PDF, or None if it's not set.
-        """
-
-        return get_pdf_title(self._read())
-
-    @title.setter
-    def title(self, value: str) -> None:
-        """
-        Sets the title of the PDF document.
-
-        Args:
-            value (str): The new title for the PDF document.
-        """
-
-        self._stream = set_pdf_title(self._read(), value)
-
-    @property
     def schema(self) -> dict:
         """
         Returns the JSON schema of the PDF form, describing the structure and data types of the form fields.
@@ -347,28 +325,11 @@ class PdfWrapper:
 
     @property
     def on_open_javascript(self) -> Union[str, None]:
-        """
-        Returns the JavaScript that runs when the PDF is opened.
-
-        Returns:
-            Union[str, None]: The JavaScript that runs when the PDF is opened, or None if it's not set.
-        """
-
-        return get_on_open_javascript(self._read())
+        return self._on_open_javascript
 
     @on_open_javascript.setter
     def on_open_javascript(self, value: Union[str, TextIO]) -> None:
-        """
-        Sets the JavaScript that runs when the PDF is opened.
-
-        Args:
-            value (Union[str, TextIO]): The JavaScript to run when the PDF is opened.
-                Can be a string or a text file-like object.
-        """
-
-        self._stream = set_on_open_javascript(
-            self._read(), fp_or_f_obj_or_f_content_to_content(value)
-        )
+        self._on_open_javascript = fp_or_f_obj_or_f_content_to_content(value)
 
     def read(self) -> bytes:
         """
@@ -386,6 +347,13 @@ class PdfWrapper:
             result = appearance_streams_handler(
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
+
+        if self.title or self.on_open_javascript:
+            result = preserve_pdf_properties(
+                result,
+                self.title,
+                fp_or_f_obj_or_f_content_to_content(self.on_open_javascript),
+            )
 
         return result
 
