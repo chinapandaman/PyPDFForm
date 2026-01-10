@@ -245,6 +245,15 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
 
 
 def get_on_open_javascript(pdf: bytes) -> Union[str, None]:
+    """
+    Retrieves the JavaScript that runs when the PDF is opened.
+
+    Args:
+        pdf (bytes): The PDF file content as a bytes stream.
+
+    Returns:
+        Union[str, None]: The JavaScript that runs when the PDF is opened, or None if it's not present.
+    """
     reader = PdfReader(stream_to_io(pdf))
     try:
         return reader.root_object[OpenAction][JS]
@@ -253,6 +262,16 @@ def get_on_open_javascript(pdf: bytes) -> Union[str, None]:
 
 
 def set_on_open_javascript(pdf: bytes, script: str) -> bytes:
+    """
+    Sets the JavaScript that runs when the PDF is opened.
+
+    Args:
+        pdf (bytes): The PDF file content as a bytes stream.
+        script (str): The JavaScript to run when the PDF is opened.
+
+    Returns:
+        bytes: The modified PDF content as a bytes stream.
+    """
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
     writer.append(reader)

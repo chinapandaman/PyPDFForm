@@ -347,10 +347,25 @@ class PdfWrapper:
 
     @property
     def on_open_javascript(self) -> Union[str, None]:
+        """
+        Returns the JavaScript that runs when the PDF is opened.
+
+        Returns:
+            Union[str, None]: The JavaScript that runs when the PDF is opened, or None if it's not set.
+        """
+
         return get_on_open_javascript(self._read())
 
     @on_open_javascript.setter
     def on_open_javascript(self, value: Union[str, TextIO]) -> None:
+        """
+        Sets the JavaScript that runs when the PDF is opened.
+
+        Args:
+            value (Union[str, TextIO]): The JavaScript to run when the PDF is opened.
+                Can be a string or a text file-like object.
+        """
+
         self._stream = set_on_open_javascript(
             self._read(), fp_or_f_obj_or_f_content_to_content(value)
         )

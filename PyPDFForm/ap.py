@@ -29,9 +29,10 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
        AcroForm processing.
     2. Setting the /NeedAppearances flag in the AcroForm dictionary, which instructs
        PDF viewers to generate appearance streams for form fields.
-    3. Preserving the metadata from the original PDF.
-    4. Optionally generating appearance streams explicitly using pikepdf if
+    3. Optionally generating appearance streams explicitly using pikepdf if
        `generate_appearance_streams` is True.
+    4. Preserving the title from the original PDF.
+    5. Preserving the on-open JavaScript from the original PDF.
 
     The result is cached using lru_cache for performance.
 
@@ -70,6 +71,16 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
 
 
 def preserve_title(src: bytes, dest: bytes) -> bytes:
+    """
+    Preserves the title from the source PDF to the destination PDF.
+
+    Args:
+        src (bytes): The source PDF file content as a bytes stream.
+        dest (bytes): The destination PDF file content as a bytes stream.
+
+    Returns:
+        bytes: The modified destination PDF content as a bytes stream.
+    """
     title = get_pdf_title(src)
     if title:
         return set_pdf_title(dest, title)
@@ -78,6 +89,16 @@ def preserve_title(src: bytes, dest: bytes) -> bytes:
 
 
 def preserve_on_open_javascript(src: bytes, dest: bytes) -> bytes:
+    """
+    Preserves the on-open JavaScript from the source PDF to the destination PDF.
+
+    Args:
+        src (bytes): The source PDF file content as a bytes stream.
+        dest (bytes): The destination PDF file content as a bytes stream.
+
+    Returns:
+        bytes: The modified destination PDF content as a bytes stream.
+    """
     script = get_on_open_javascript(src)
     if script:
         return set_on_open_javascript(dest, script)
