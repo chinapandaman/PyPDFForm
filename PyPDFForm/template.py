@@ -13,9 +13,9 @@ from io import BytesIO
 from typing import Dict, List, Tuple, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject
+from pypdf.generic import DictionaryObject, NameObject, TextStringObject
 
-from .constants import WIDGET_TYPES, Annots, MaxLen, Parent, T
+from .constants import WIDGET_TYPES, Annots, MaxLen, Parent, T, Title
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -241,6 +241,27 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
             widget, DROPDOWN_CHOICE_PATTERNS, None, None
         )
     )
+
+
+def get_pdf_title(pdf: bytes) -> Union[str, None]:
+    reader = PdfReader(stream_to_io(pdf))
+    return (reader.metadata or {}).get(Title)
+
+
+def set_pdf_title(pdf: bytes, title: str) -> bytes:
+    reader = PdfReader(stream_to_io(pdf))
+    writer = PdfWriter()
+    writer.append(reader)
+
+    metadata = reader.metadata or {}
+    metadata[NameObject(Title)] = TextStringObject(title)
+
+    writer.add_metadata(metadata)
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
 
 
 def update_widget_keys(

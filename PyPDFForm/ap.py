@@ -48,6 +48,8 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     writer.append(reader)
     writer.set_need_appearances_writer()
 
+    preserve_metadata(reader, writer)
+
     with BytesIO() as f:
         writer.write(f)
         f.seek(0)
@@ -62,3 +64,7 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
                 result = r.read()
 
     return result
+
+
+def preserve_metadata(reader: PdfReader, writer: PdfWriter) -> None:
+    writer.add_metadata(reader.metadata or {})

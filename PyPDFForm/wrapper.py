@@ -36,7 +36,8 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .raw import RawText, RawTypes
-from .template import build_widgets, update_widget_keys
+from .template import (build_widgets, get_pdf_title, set_pdf_title,
+                       update_widget_keys)
 from .types import PdfWrapperList
 from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
@@ -216,6 +217,14 @@ class PdfWrapper:
         ]
 
         return self
+
+    @property
+    def title(self) -> Union[str, None]:
+        return get_pdf_title(self._read())
+
+    @title.setter
+    def title(self, value: str) -> None:
+        self._stream = set_pdf_title(self._read(), value)
 
     @property
     def schema(self) -> dict:
