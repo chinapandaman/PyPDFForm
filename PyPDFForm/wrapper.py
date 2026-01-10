@@ -74,6 +74,7 @@ class PdfWrapper:
         ("use_full_widget_name", False),
         ("need_appearances", False),
         ("generate_appearance_streams", False),
+        ("title", None),
     ]
 
     def __init__(

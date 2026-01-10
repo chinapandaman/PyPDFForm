@@ -249,6 +249,9 @@ def get_pdf_title(pdf: bytes) -> Union[str, None]:
 
 
 def set_pdf_title(pdf: bytes, title: str) -> bytes:
+    if not title:
+        return pdf
+
     reader = PdfReader(stream_to_io(pdf))
     writer = PdfWriter()
     writer.append(reader)
