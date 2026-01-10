@@ -1,4 +1,4 @@
-# Embed field JavaScript (beta)
+# Embed PDF JavaScript (beta)
 
 ???+ info
     These beta features and their documentation are subject to change. Use with caution; they may be modified, rolled back, or fail in some PDF forms.
@@ -8,7 +8,7 @@
 
 This documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
 
-PDF form fields can execute JavaScript during interactions if supported by the viewer. PyPDFForm provides APIs to embed scripts into form fields.
+PDFs can execute JavaScript during interactions if supported by the viewer. PyPDFForm provides APIs to embed scripts into both the PDF document and its form fields.
 
 For example, this snippet embeds a script that triggers an alert when the `test` field is hovered:
 
@@ -157,7 +157,7 @@ Set the `on_blurred_javascript` attribute to run code when a field loses focus:
 
 ## Execute JavaScript on PDF open
 
-Set the `on_open_javascript` attribute of the `PdfWrapper` object to run code when the PDF is opened:
+The `PdfWrapper.on_open_javascript` property sets or retrieves the script executed when the PDF opens:
 
 === "script.js"
     ```javascript
@@ -169,6 +169,7 @@ Set the `on_open_javascript` attribute of the `PdfWrapper` object to run code wh
 
     form = PdfWrapper("sample_template.pdf")
     form.on_open_javascript = "./script.js"
+    print(form.on_open_javascript)
 
     form.write("output.pdf")
     ```
