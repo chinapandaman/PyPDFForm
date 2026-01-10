@@ -14,6 +14,8 @@ from pikepdf import Pdf
 from pypdf import PdfReader, PdfWriter
 
 from .constants import XFA, AcroForm, Root
+from .template import (get_on_open_javascript, get_pdf_title,
+                       set_on_open_javascript, set_pdf_title)
 from .utils import stream_to_io
 
 
@@ -49,8 +51,6 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     writer.append(reader)
     writer.set_need_appearances_writer()
 
-    preserve_metadata(reader, writer)
-
     with BytesIO() as f:
         writer.write(f)
         f.seek(0)
@@ -64,15 +64,22 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
                 r.seek(0)
                 result = r.read()
 
+    result = preserve_title(pdf, result)
+    result = preserve_on_open_javascript(pdf, result)
     return result
 
 
-def preserve_metadata(reader: PdfReader, writer: PdfWriter) -> None:
-    """
-    Preserves the metadata from the reader to the writer.
+def preserve_title(src: bytes, dest: bytes) -> bytes:
+    title = get_pdf_title(src)
+    if title:
+        return set_pdf_title(dest, title)
 
-    Args:
-        reader (PdfReader): The reader object of the original PDF.
-        writer (PdfWriter): The writer object of the modified PDF.
-    """
-    writer.add_metadata(reader.metadata or {})
+    return dest
+
+
+def preserve_on_open_javascript(src: bytes, dest: bytes) -> bytes:
+    script = get_on_open_javascript(src)
+    if script:
+        return set_on_open_javascript(dest, script)
+
+    return dest
