@@ -21,6 +21,16 @@ def test_create_pdf_wrapper(static_pdfs):
     assert pdf.read() == pdf_3.read()
 
 
+def test_change_title(static_pdfs):
+    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"), title="My PDF")
+
+    assert pdf.title == "My PDF"
+
+    pdf.title = "My PDF"
+
+    assert pdf.title == "My PDF"
+
+
 def test_create_need_appearances_wrapper(static_pdfs):
     pdf = PdfWrapper(
         os.path.join(static_pdfs, "sample_template.pdf"), need_appearances=True
