@@ -352,7 +352,7 @@ class PdfWrapper:
             result = preserve_pdf_properties(
                 result,
                 self.title,
-                fp_or_f_obj_or_f_content_to_content(self.on_open_javascript),
+                self.on_open_javascript,
             )
 
         return result
