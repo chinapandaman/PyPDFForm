@@ -66,8 +66,7 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
                 result = r.read()
 
     result = preserve_title(pdf, result)
-    result = preserve_on_open_javascript(pdf, result)
-    return result
+    return preserve_on_open_javascript(pdf, result)
 
 
 def preserve_title(src: bytes, dest: bytes) -> bytes:
