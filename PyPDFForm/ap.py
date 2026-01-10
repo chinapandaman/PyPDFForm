@@ -67,6 +67,20 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
 
 
 def preserve_pdf_properties(pdf: bytes, title: str, script: str) -> bytes:
+    """
+    Preserves and updates PDF properties such as title and OpenAction scripts.
+
+    This function allows setting or updating the PDF's title in its metadata and
+    attaching a JavaScript script that executes when the PDF is opened.
+
+    Args:
+        pdf (bytes): The PDF file content as a bytes stream.
+        title (str): The title to be set in the PDF metadata.
+        script (str): JavaScript code to be executed when the PDF is opened.
+
+    Returns:
+        bytes: The modified PDF content as a bytes stream.
+    """
     if all([not title, not script]):
         return pdf
 

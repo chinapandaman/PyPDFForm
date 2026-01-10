@@ -104,7 +104,7 @@ class PdfWrapper:
         super().__init__()
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
-        self.title = None
+        self.title: str = None
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._font_register_events = []  # for reregister
@@ -325,21 +325,42 @@ class PdfWrapper:
 
     @property
     def on_open_javascript(self) -> Union[str, None]:
+        """
+        Returns the JavaScript script that executes when the PDF is opened.
+
+        Returns:
+            Union[str, None]: The JavaScript script, or None if no script is set.
+        """
+
         return self._on_open_javascript
 
     @on_open_javascript.setter
     def on_open_javascript(self, value: Union[str, TextIO]) -> None:
+        """
+        Sets the JavaScript script that executes when the PDF is opened.
+
+        Args:
+            value (Union[str, TextIO]): The JavaScript script, provided as either:
+                - str: The JavaScript code as a string, or a file path to a .js file.
+                - TextIO: An open file-like object containing the JavaScript code.
+        """
+
         self._on_open_javascript = fp_or_f_obj_or_f_content_to_content(value)
 
     def read(self) -> bytes:
         """
         Reads the PDF document and returns its content as bytes.
 
-        This method retrieves the PDF stream and optionally generates appearance
-        streams for form fields if `need_appearances` is enabled.
+        This method retrieves the PDF stream and performs several processing steps:
+        1. Triggers widget hooks and updates font mappings (via `_read`).
+        2. If `need_appearances` is enabled, it handles appearance streams and the
+           `/NeedAppearances` flag, which may include removing XFA and explicitly
+           generating appearance streams.
+        3. If a title or on-open JavaScript is set, it updates the PDF properties
+           accordingly.
 
         Returns:
-            bytes: The PDF document content as a byte string.
+            bytes: The processed PDF document content as a byte string.
         """
 
         result = self._read()
