@@ -154,3 +154,21 @@ Set the `on_blurred_javascript` attribute to run code when a field loses focus:
 
     form.write("output.pdf")
     ```
+
+## Execute JavaScript on PDF open
+
+Set the `on_open_javascript` attribute of the `PdfWrapper` object to run code when the PDF is opened:
+
+=== "script.js"
+    ```javascript
+    this.getField("test").value = "opened";
+    ```
+=== "main.py"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    form = PdfWrapper("sample_template.pdf")
+    form.on_open_javascript = "./script.js"
+
+    form.write("output.pdf")
+    ```
