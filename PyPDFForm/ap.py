@@ -66,6 +66,7 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     return result
 
 
+@lru_cache
 def preserve_pdf_properties(pdf: bytes, title: str, script: str) -> bytes:
     """
     Preserves and updates PDF properties such as title and OpenAction scripts.
