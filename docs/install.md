@@ -56,20 +56,20 @@ For example, to use [this PDF](pdfs/sample_template.pdf) as a template, instanti
 
 The PDF title can be set during `PdfWrapper` instantiation or via the `.title` property. Accessing it retrieves the current title.
 
-=== "Instantiate"
+=== "Instantiate with Title"
     ```python
     from PyPDFForm import PdfWrapper
 
     pdf = PdfWrapper("sample_template.pdf", title="My PDF")
     ```
-=== "Set Title"
+=== "Set Title via Attribute"
     ```python
     from PyPDFForm import PdfWrapper
 
     pdf = PdfWrapper("sample_template.pdf")
     pdf.title = "My PDF"
     ```
-=== "Get Title"
+=== "Get Title via Attribute"
     ```python
     from PyPDFForm import PdfWrapper
 
