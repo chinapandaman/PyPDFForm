@@ -305,13 +305,13 @@ def merge_watermarks_with_pdf(
     result = BytesIO()
     pdf_file = PdfReader(stream_to_io(pdf))
     output = PdfWriter()
+    output.append(pdf_file)
 
-    for i, page in enumerate(pdf_file.pages):
+    for i, page in enumerate(output.pages):
         if watermarks[i]:
             watermark = PdfReader(stream_to_io(watermarks[i]))
             if watermark.pages:
                 page.merge_page(watermark.pages[0])
-        output.add_page(page)
 
     output.write(result)
     result.seek(0)
