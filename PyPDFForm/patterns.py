@@ -330,8 +330,8 @@ def get_field_rect(annot: DictionaryObject) -> Tuple[float, float, float, float]
     rect = annot[Rect]
 
     return (
-        float(rect[0]),
-        float(rect[1]),
-        float(abs(rect[2] - rect[0])),
-        float(abs(rect[3] - rect[1])),
+        float(rect[0].get_object()),
+        float(rect[1].get_object()),
+        float(abs(rect[2].get_object() - rect[0].get_object())),
+        float(abs(rect[3].get_object() - rect[1].get_object())),
     )
