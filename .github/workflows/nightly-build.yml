@@ -29,6 +29,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
         run: python scripts/close_staled_issues.py
 
+  backup-on-codeberg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Setup Git Configs
+        run: |
+          git config --global user.name 'release-bot'
+          git config --global user.email 'bot@domain.com'
+      - name: Push mirror to Codeberg
+        env:
+          CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+        run: |
+          CODEBERG_REPO="https://$CODEBERG_TOKEN@codeberg.org/chinapandaman/PyPDFForm-mirror.git"
+          git remote add codeberg $CODEBERG_REPO
+          git push --mirror codeberg
+
   check-lowest-compatibility:
     runs-on: ubuntu-latest
     steps:
