@@ -1131,6 +1131,21 @@ def test_hidden_text_check(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
+def test_hidden_radio(template_with_radiobutton_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_hidden_radio.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_with_radiobutton_stream)
+        obj.widgets["radio_2"].hidden = True
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_merge(template_stream):
     pdf_list = PdfArray()
     for i in range(20):
