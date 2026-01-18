@@ -428,6 +428,16 @@ def update_field_required(annot: DictionaryObject, val: bool) -> None:
 
 
 def update_field_hidden(annot: DictionaryObject, val: bool) -> None:
+    """
+    Updates the 'Hidden' flag of a form field annotation.
+
+    This function modifies the F entry in the annotation dictionary to set
+    or unset the 'Hidden' flag, making the field invisible or visible.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (bool): True to hide the field, False to make it visible.
+    """
     annot[NameObject(F)] = NumberObject(
         (
             int(annot.get(NameObject(F), 0)) | HIDDEN
