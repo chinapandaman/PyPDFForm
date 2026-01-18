@@ -51,4 +51,13 @@ class PdfArray(list):
         return super().__getitem__(key)
 
     def merge(self) -> Any:
+        """
+        Merges all PdfWrapper objects in the list into a single PdfWrapper.
+
+        This method uses a pairwise merging strategy to combine all PdfWrapper
+        objects contained in the list into one.
+
+        Returns:
+            Any: A single merged PdfWrapper object.
+        """
         return generic_merge(list(self), lambda x, y: x + y)
