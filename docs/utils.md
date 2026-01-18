@@ -87,11 +87,13 @@ You can merge multiple PDF files by adding their `PdfWrapper` objects. For examp
     ```python
     from PyPDFForm import PdfArray, PdfWrapper
 
-    pdfs = PdfArray([
-        PdfWrapper("dummy.pdf"),
-        PdfWrapper("sample_template.pdf"),
-        # can get very large
-    ])
+    pdfs = PdfArray(
+        [
+            PdfWrapper("dummy.pdf"),
+            PdfWrapper("sample_template.pdf"),
+            # can get very large
+        ]
+    )
     merged = pdfs.merge()
 
     merged.write("output.pdf")
