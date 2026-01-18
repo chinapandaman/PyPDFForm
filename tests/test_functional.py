@@ -1146,6 +1146,23 @@ def test_hidden_radio(template_with_radiobutton_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
+def test_hidden_sejda(sejda_template, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_hidden_sejda.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template)
+        obj.widgets["buyer_name"].hidden = True
+        obj.widgets["purchase_option"].hidden = True
+        obj.widgets["at_future_date"].hidden = True
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_merge(template_stream):
     pdf_list = PdfArray()
     for i in range(20):
