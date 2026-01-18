@@ -103,6 +103,34 @@ def get_page_streams(pdf: bytes) -> List[bytes]:
     return result
 
 
+def generic_merge(items: list, merger: Callable[[Any, Any], Any]) -> Any:
+    """
+    Merges a list of items using a pairwise merging strategy.
+
+    This function takes a list of items and a merger function. It merges the items
+    in pairs until only a single merged item remains. This is efficient for
+    combining multiple items.
+
+    Args:
+        items (list): The list of items to merge.
+        merger (Callable[[Any, Any], Any]): A function that takes two items and returns their merged result.
+
+    Returns:
+        Any: The final merged item.
+    """
+    curr_list = items[:]
+    while len(curr_list) > 2:
+        groups = [curr_list[i : i + 2] for i in range(0, len(curr_list), 2)]
+        curr_list = []
+        for each in groups:
+            if len(each) == 2:
+                curr_list.append(merger(each[0], each[1]))
+            else:
+                curr_list += each
+
+    return merger(curr_list[0], curr_list[1])
+
+
 def merge_pdfs(pdf_list: list[bytes]) -> bytes:
     """
     Merges a list of PDF byte streams into a single PDF byte stream.
@@ -120,16 +148,7 @@ def merge_pdfs(pdf_list: list[bytes]) -> bytes:
     Returns:
         bytes: The merged PDF file as a single byte stream.
     """
-    while len(pdf_list) > 2:
-        groups = [pdf_list[i : i + 2] for i in range(0, len(pdf_list), 2)]
-        pdf_list = []
-        for each in groups:
-            if len(each) == 2:
-                pdf_list.append(merge_two_pdfs(each[0], each[1]))
-            else:
-                pdf_list += each
-
-    return merge_two_pdfs(pdf_list[0], pdf_list[1])
+    return generic_merge(pdf_list, merge_two_pdfs)
 
 
 def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:

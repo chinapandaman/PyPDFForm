@@ -9,6 +9,8 @@ for merging PdfWrapper objects.
 
 from typing import Any, Union
 
+from .utils import generic_merge
+
 
 class PdfArray(list):
     """
@@ -49,13 +51,4 @@ class PdfArray(list):
         return super().__getitem__(key)
 
     def merge(self) -> Any:
-        pdf_list = list(self)
-        while len(pdf_list) > 2:
-            groups = [pdf_list[i : i + 2] for i in range(0, len(pdf_list), 2)]
-            pdf_list = []
-            for each in groups:
-                if len(each) == 2:
-                    pdf_list.append(each[0] + each[1])
-                else:
-                    pdf_list += each
-        return pdf_list[0] + pdf_list[1]
+        return generic_merge(list(self), lambda x, y: x + y)
