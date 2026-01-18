@@ -352,3 +352,16 @@ form.widgets["dropdown_1"].readonly = False  # dropdown
 
 form.write("output.pdf")
 ```
+
+## Hide field
+
+To hide a field, set its `hidden` property to `True`:
+
+```python
+from PyPDFForm import PdfWrapper
+
+form = PdfWrapper("sample_template.pdf")
+form.widgets["test"].hidden = True
+
+form.write("output.pdf")
+```
