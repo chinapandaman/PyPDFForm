@@ -1115,6 +1115,22 @@ def test_title(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
+def test_hidden_text_check(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_hidden_text_check.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream)
+        obj.widgets["test"].hidden = True
+        obj.widgets["check_2"].hidden = True
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_merge(template_stream):
     pdf_list = PdfArray()
     for i in range(20):
