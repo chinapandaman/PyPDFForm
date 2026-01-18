@@ -49,6 +49,7 @@ Rect = "/Rect"
 FT = "/FT"
 Parent = "/Parent"
 Ff = "/Ff"
+F = "/F"
 Tx = "/Tx"
 V = "/V"
 AP = "/AP"
@@ -126,6 +127,9 @@ READ_ONLY = 1 << 0
 REQUIRED = 1 << 1
 MULTILINE = 1 << 12
 COMB = 1 << 24
+
+# annotation flag bits
+HIDDEN = 1 << 1
 
 # reportlab acroform func
 fieldFlags = "fieldFlags"

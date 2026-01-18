@@ -19,8 +19,8 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
 
 from .adapter import fp_or_f_obj_or_f_content_to_content
 from .constants import (AA, COMB, DA, FONT_COLOR_IDENTIFIER,
-                        FONT_SIZE_IDENTIFIER, JS, MULTILINE, READ_ONLY,
-                        REQUIRED, TU, Action, Annots, Bl, D, E, Ff, Fo,
+                        FONT_SIZE_IDENTIFIER, HIDDEN, JS, MULTILINE, READ_ONLY,
+                        REQUIRED, TU, Action, Annots, Bl, D, E, F, Ff, Fo,
                         JavaScript, MaxLen, Opt, Parent, Q, Rect, S, Type, U,
                         X)
 from .template import get_widget_key
@@ -425,6 +425,26 @@ def update_field_required(annot: DictionaryObject, val: bool) -> None:
                 else int(annot.get(NameObject(Ff), 0)) & ~REQUIRED
             )
         )
+
+
+def update_field_hidden(annot: DictionaryObject, val: bool) -> None:
+    """
+    Updates the 'Hidden' flag of a form field annotation.
+
+    This function modifies the F entry in the annotation dictionary to set
+    or unset the 'Hidden' flag, making the field invisible or visible.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (bool): True to hide the field, False to make it visible.
+    """
+    annot[NameObject(F)] = NumberObject(
+        (
+            int(annot.get(NameObject(F), 0)) | HIDDEN
+            if val
+            else int(annot.get(NameObject(F), 0)) & ~HIDDEN
+        )
+    )
 
 
 def _update_field_javascript(
