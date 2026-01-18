@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from PyPDFForm import BlankPage, PdfWrapper
+from PyPDFForm import BlankPage, PdfArray, PdfWrapper
 
 
 @pytest.mark.posix_only
@@ -107,6 +107,28 @@ def test_reorg_pages(static_pdfs, pdf_samples, request):
     pdf_one = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
     pdf_two = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     merged = pdf_two.pages[0] + pdf_one + pdf_two.pages[1:]
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = merged.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(merged.read()) == len(expected)
+        assert merged.read() == expected
+
+
+def test_merge_using_pdf_array(static_pdfs, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_merge.pdf")
+
+    pdfs = PdfArray(
+        [
+            PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")),
+            PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")),
+            # can get very large
+        ]
+    )
+    merged = pdfs.merge()
 
     request.config.results["expected_path"] = expected_path
     request.config.results["stream"] = merged.read()

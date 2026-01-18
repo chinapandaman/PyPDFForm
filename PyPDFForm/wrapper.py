@@ -39,7 +39,7 @@ from .middleware.signature import Signature
 from .middleware.text import Text
 from .raw import RawText, RawTypes
 from .template import build_widgets, update_widget_keys
-from .types import PdfWrapperList
+from .types import PdfArray
 from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
@@ -321,7 +321,7 @@ class PdfWrapper:
                 for page in result:
                     page.register_font(event[0], event[1])
 
-        return PdfWrapperList(result)
+        return PdfArray(result)
 
     @property
     def on_open_javascript(self) -> Union[str, None]:

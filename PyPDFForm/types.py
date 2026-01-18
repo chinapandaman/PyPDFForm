@@ -2,15 +2,17 @@
 """
 A module for custom type definitions used throughout the PyPDFForm library.
 
-This includes specialized container types like PdfWrapperList, which extends
+This includes specialized container types like PdfArray, which extends
 the standard list to provide custom behavior for slicing operations, particularly
 for merging PdfWrapper objects.
 """
 
 from typing import Any, Union
 
+from .utils import generic_merge
 
-class PdfWrapperList(list):
+
+class PdfArray(list):
     """
     A specialized list subclass designed to hold PdfWrapper objects.
 
@@ -47,3 +49,15 @@ class PdfWrapperList(list):
 
             return result
         return super().__getitem__(key)
+
+    def merge(self) -> Any:
+        """
+        Merges all PdfWrapper objects in the list into a single PdfWrapper.
+
+        This method uses a pairwise merging strategy to combine all PdfWrapper
+        objects contained in the list into one.
+
+        Returns:
+            Any: A single merged PdfWrapper object.
+        """
+        return generic_merge(list(self), lambda x, y: x + y)

@@ -41,7 +41,7 @@ Use the `BlankPage` class with `PdfWrapper` to create new blank PDFs.
 
 ## Extract pages
 
-The `PdfWrapper` object has a `.pages` attribute, which is a list of `PdfWrapper` objects representing individual pages:
+The `PdfWrapper` object has a `.pages` attribute, which is a `PdfArray` of `PdfWrapper` objects representing individual pages:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -78,6 +78,23 @@ You can merge multiple PDF files by adding their `PdfWrapper` objects. For examp
     pdf_one = PdfWrapper("dummy.pdf")
     pdf_two = PdfWrapper("sample_template.pdf")
     merged = pdf_two.pages[0] + pdf_one + pdf_two.pages[1:]
+
+    merged.write("output.pdf")
+    ```
+=== "Bulk Merge"
+    When merging a large number of PDF files, it is more performant to use the `PdfArray.merge` method:
+
+    ```python
+    from PyPDFForm import PdfArray, PdfWrapper
+
+    pdfs = PdfArray(
+        [
+            PdfWrapper("dummy.pdf"),
+            PdfWrapper("sample_template.pdf"),
+            # can get very large
+        ]
+    )
+    merged = pdfs.merge()
 
     merged.write("output.pdf")
     ```
