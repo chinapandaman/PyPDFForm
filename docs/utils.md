@@ -81,6 +81,21 @@ You can merge multiple PDF files by adding their `PdfWrapper` objects. For examp
 
     merged.write("output.pdf")
     ```
+=== "Bulk Merge"
+    When merging a large number of PDF files, it is more performant to create a `PdfArray` and call the `PdfArray.merge` method:
+
+    ```python
+    from PyPDFForm import PdfArray, PdfWrapper
+
+    pdfs = PdfArray([
+        PdfWrapper("dummy.pdf"),
+        PdfWrapper("sample_template.pdf"),
+        # can get very large
+    ])
+    merged = pdfs.merge()
+
+    merged.write("output.pdf")
+    ```
 
 ## Change PDF version
 
