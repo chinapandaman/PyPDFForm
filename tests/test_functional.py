@@ -1115,7 +1115,7 @@ def test_title(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_merge_stress(template_stream):
+def test_merge(template_stream):
     pdf_list = PdfArray()
     for i in range(20):
         pdf_list.append(
