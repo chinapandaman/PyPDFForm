@@ -6,7 +6,7 @@ from io import BytesIO
 import pytest
 from jsonschema import ValidationError, validate
 
-from PyPDFForm import BlankPage, Fields, PdfWrapper, Widgets
+from PyPDFForm import BlankPage, Fields, PdfArray, PdfWrapper, Widgets
 from PyPDFForm.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
 from PyPDFForm.deprecation import deprecation_notice
 from PyPDFForm.middleware.base import Widget
@@ -1113,3 +1113,33 @@ def test_title(template_stream, pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_merge_stress(template_stream):
+    pdf_list = PdfArray()
+    for i in range(20):
+        pdf_list.append(
+            PdfWrapper(template_stream).fill(
+                {
+                    "test": f"test_1_{i}",
+                    "check": True,
+                    "test_2": f"test_2_{i}",
+                    "check_2": False,
+                    "test_3": f"test_3_{i}",
+                    "check_3": True,
+                }
+            )
+        )
+
+    result = pdf_list.merge()
+    assert len(result.pages) == 60
+
+    for page, fields in get_widgets_by_page(result.read()).items():
+        for field in fields:
+            key = field[T]
+            if key.startswith("test-"):
+                assert field[V] == f"test_1_{int(page / 3)}"
+            elif key.startswith("test_2-"):
+                assert field[V] == f"test_2_{int(page / 3)}"
+            elif key.startswith("test_3-"):
+                assert field[V] == f"test_3_{int(page / 3 - 0.5)}"

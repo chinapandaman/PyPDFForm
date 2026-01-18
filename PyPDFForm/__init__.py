@@ -25,7 +25,8 @@ __version__ = "4.2.4"
 from .assets.blank import BlankPage
 from .middleware import Widgets
 from .raw import RawElements
+from .types import PdfArray
 from .widgets import Fields
 from .wrapper import PdfWrapper
 
-__all__ = ["PdfWrapper", "Fields", "BlankPage", "RawElements", "Widgets"]
+__all__ = ["PdfWrapper", "PdfArray", "Fields", "BlankPage", "RawElements", "Widgets"]
