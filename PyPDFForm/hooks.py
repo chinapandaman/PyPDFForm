@@ -18,9 +18,9 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, TextStringObject)
 
 from .adapter import fp_or_f_obj_or_f_content_to_content
-from .constants import (AA, COMB, DA, FONT_COLOR_IDENTIFIER, FONT_NAME_PREFIX,
+from .constants import (AA, COMB, DA, FONT_COLOR_IDENTIFIER,
                         FONT_SIZE_IDENTIFIER, HIDDEN, JS, MULTILINE, READ_ONLY,
-                        REQUIRED, TU, Action, Annots, Bl, D, E, Ff, Fo,
+                        REQUIRED, TU, Action, Annots, Bl, D, E, F, Ff, Fo,
                         JavaScript, MaxLen, Opt, Parent, Q, Rect, S, Type, U,
                         X)
 from .template import get_widget_key
@@ -428,11 +428,11 @@ def update_field_required(annot: DictionaryObject, val: bool) -> None:
 
 
 def update_field_hidden(annot: DictionaryObject, val: bool) -> None:
-    annot[NameObject(FONT_NAME_PREFIX)] = NumberObject(
+    annot[NameObject(F)] = NumberObject(
         (
-            int(annot.get(NameObject(FONT_NAME_PREFIX), 0)) | HIDDEN
+            int(annot.get(NameObject(F), 0)) | HIDDEN
             if val
-            else int(annot.get(NameObject(FONT_NAME_PREFIX), 0)) & ~HIDDEN
+            else int(annot.get(NameObject(F), 0)) & ~HIDDEN
         )
     )
 
