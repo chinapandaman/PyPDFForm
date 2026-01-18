@@ -24,6 +24,7 @@ class Widget:
     SET_ATTR_TRIGGER_HOOK_MAP = {
         "readonly": "flatten_generic",
         "required": "update_field_required",
+        "hidden": "update_field_hidden",
         "tooltip": "update_field_tooltip",
         "on_hovered_over_javascript": "update_field_on_hovered_over_javascript",
         "on_hovered_off_javascript": "update_field_on_hovered_off_javascript",
@@ -51,6 +52,7 @@ class Widget:
         self.tooltip: str = None
         self.readonly: bool = None
         self.required: bool = None
+        self.hidden: bool = None
         self.hooks_to_trigger: list = []
 
         # coordinate & dimension

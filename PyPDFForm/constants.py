@@ -127,6 +127,9 @@ REQUIRED = 1 << 1
 MULTILINE = 1 << 12
 COMB = 1 << 24
 
+# annotation flag bits
+HIDDEN = 1 << 1
+
 # reportlab acroform func
 fieldFlags = "fieldFlags"
 required = "required"
