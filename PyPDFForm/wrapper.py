@@ -109,7 +109,7 @@ class PdfWrapper:
         self.widgets = {}
         self.title: str = None
         self._metadata = (
-            get_metadata(self._read()) if getattr(self, "preserve_metadata") else {}
+            get_metadata(self._read()) if kwargs.get("preserve_metadata") else {}
         )
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1

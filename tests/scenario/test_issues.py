@@ -579,3 +579,5 @@ def test_preserve_metadata():
     metadata = reader.metadata or {}
     assert metadata["/test_key"] == "test_value"
     assert metadata["/other_key"] == "other_value"
+
+    assert PdfWrapper(preserve_metadata=True)

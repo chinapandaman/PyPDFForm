@@ -43,7 +43,6 @@ def get_metadata(pdf: bytes) -> dict:
         return {}
 
     reader = PdfReader(stream_to_io(pdf))
-
     return reader.metadata or {}
 
 
