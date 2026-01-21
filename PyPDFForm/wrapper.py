@@ -69,6 +69,7 @@ class PdfWrapper:
                 - `use_full_widget_name` (bool): Whether to use the full widget name when filling the form.
                 - `need_appearances` (bool): Whether to set the `NeedAppearances` flag in the PDF's AcroForm dictionary.
                 - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
+                - `preserve_metadata` (bool): Whether to preserve the original metadata of the PDF.
                 - `title` (str): The title of the PDF document.
 
     """
@@ -359,7 +360,8 @@ class PdfWrapper:
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
            generating appearance streams.
-        3. If a title or on-open JavaScript is set, it updates the PDF properties
+        3. If `preserve_metadata` is enabled, it preserves the original metadata of the PDF.
+        4. If a title or on-open JavaScript is set, it updates the PDF properties
            accordingly.
 
         Returns:
