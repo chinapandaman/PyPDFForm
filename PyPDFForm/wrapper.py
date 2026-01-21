@@ -38,7 +38,8 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .raw import RawText, RawTypes
-from .template import build_widgets, update_widget_keys
+from .template import (build_widgets, get_metadata, set_metadata,
+                       update_widget_keys)
 from .types import PdfArray
 from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
@@ -76,6 +77,7 @@ class PdfWrapper:
         ("use_full_widget_name", False),
         ("need_appearances", False),
         ("generate_appearance_streams", False),
+        ("preserve_metadata", False),
         ("title", None),
     ]
 
@@ -105,6 +107,7 @@ class PdfWrapper:
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
         self.title: str = None
+        self._metadata = get_metadata(self._read())
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._font_register_events = []  # for reregister
@@ -368,6 +371,10 @@ class PdfWrapper:
             result = appearance_streams_handler(
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
+
+        if getattr(self, "preserve_metadata"):
+            # TODO: refactor with preserve_pdf_properties
+            result = set_metadata(result, self._metadata)
 
         if any([self.title, self.on_open_javascript]):
             result = preserve_pdf_properties(
