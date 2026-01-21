@@ -34,8 +34,8 @@ from .filler import fill
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
 from .hooks import trigger_widget_hooks
-from .middleware.signature import Signature
 from .middleware.dropdown import Dropdown
+from .middleware.signature import Signature
 from .middleware.text import Text
 from .raw import RawText, RawTypes
 from .template import (build_widgets, get_metadata, set_metadata,
