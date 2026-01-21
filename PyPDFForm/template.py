@@ -28,6 +28,45 @@ from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
+@lru_cache
+def get_metadata(pdf: bytes) -> dict:
+    """
+    Retrieves the metadata of a PDF.
+
+    Args:
+        pdf (bytes): The PDF stream to extract metadata from.
+
+    Returns:
+        dict: A dictionary containing the PDF's metadata.
+    """
+    if not pdf:
+        return {}
+
+    reader = PdfReader(stream_to_io(pdf))
+    return reader.metadata or {}
+
+
+def set_metadata(pdf: bytes, metadata: dict) -> bytes:
+    """
+    Sets the metadata of a PDF.
+
+    Args:
+        pdf (bytes): The PDF stream to set metadata for.
+        metadata (dict): A dictionary containing the metadata to be set.
+
+    Returns:
+        bytes: The updated PDF stream with the new metadata.
+    """
+    reader = PdfReader(stream_to_io(pdf))
+    writer = PdfWriter(clone_from=reader)
+    writer.add_metadata(metadata)
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
+
+
 def build_widgets(
     pdf_stream: bytes,
     use_full_widget_name: bool,

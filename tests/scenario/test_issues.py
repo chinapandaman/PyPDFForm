@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
+from io import BytesIO
 
 import pytest
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter
 
-from PyPDFForm import PdfWrapper
+from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.constants import TU, Parent, V
 from PyPDFForm.middleware.radio import Radio
 from PyPDFForm.template import get_widget_key, get_widgets_by_page
@@ -558,3 +559,25 @@ def test_sejda_multiline(issue_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_preserve_metadata():
+    pdf_stream = BytesIO(PdfWrapper(BlankPage()).read())
+    writer = PdfWriter(pdf_stream)
+    writer.add_metadata(
+        {
+            "/test_key": "test_value",
+            "/other_key": "other_value",
+        }
+    )
+    writer.write(pdf_stream)
+    pdf_stream.seek(0)
+    wrapper = PdfWrapper(pdf_stream, preserve_metadata=True)
+    wrapper.create_field(Fields.TextField(name="Test", page_number=1, x=100, y=400))
+    new_stream = BytesIO(wrapper.read())
+    reader = PdfReader(new_stream)
+    metadata = reader.metadata or {}
+    assert metadata["/test_key"] == "test_value"
+    assert metadata["/other_key"] == "other_value"
+
+    assert PdfWrapper(preserve_metadata=True)

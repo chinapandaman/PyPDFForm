@@ -34,11 +34,12 @@ from .filler import fill
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
 from .hooks import trigger_widget_hooks
-from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
+from .middleware.dropdown import Dropdown
 from .middleware.text import Text
 from .raw import RawText, RawTypes
-from .template import build_widgets, update_widget_keys
+from .template import (build_widgets, get_metadata, set_metadata,
+                       update_widget_keys)
 from .types import PdfArray
 from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
@@ -68,6 +69,7 @@ class PdfWrapper:
                 - `use_full_widget_name` (bool): Whether to use the full widget name when filling the form.
                 - `need_appearances` (bool): Whether to set the `NeedAppearances` flag in the PDF's AcroForm dictionary.
                 - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
+                - `preserve_metadata` (bool): Whether to preserve the original metadata of the PDF.
                 - `title` (str): The title of the PDF document.
 
     """
@@ -76,6 +78,7 @@ class PdfWrapper:
         ("use_full_widget_name", False),
         ("need_appearances", False),
         ("generate_appearance_streams", False),
+        ("preserve_metadata", False),  # TODO: (maybe) document this
         ("title", None),
     ]
 
@@ -105,6 +108,9 @@ class PdfWrapper:
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
         self.title: str = None
+        self._metadata = (
+            get_metadata(self._read()) if kwargs.get("preserve_metadata") else {}
+        )
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._font_register_events = []  # for reregister
@@ -356,7 +362,8 @@ class PdfWrapper:
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
            generating appearance streams.
-        3. If a title or on-open JavaScript is set, it updates the PDF properties
+        3. If `preserve_metadata` is enabled, it preserves the original metadata of the PDF.
+        4. If a title or on-open JavaScript is set, it updates the PDF properties
            accordingly.
 
         Returns:
@@ -368,6 +375,10 @@ class PdfWrapper:
             result = appearance_streams_handler(
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
+
+        if getattr(self, "preserve_metadata"):
+            # TODO: refactor with preserve_pdf_properties
+            result = set_metadata(result, self._metadata)
 
         if any([self.title, self.on_open_javascript]):
             result = preserve_pdf_properties(
