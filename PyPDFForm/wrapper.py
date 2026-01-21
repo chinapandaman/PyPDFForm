@@ -108,7 +108,9 @@ class PdfWrapper:
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
         self.title: str = None
-        self._metadata = get_metadata(self._read())
+        self._metadata = (
+            get_metadata(self._read()) if getattr(self, "preserve_metadata") else {}
+        )
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._font_register_events = []  # for reregister
