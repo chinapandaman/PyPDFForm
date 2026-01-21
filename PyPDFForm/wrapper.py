@@ -78,7 +78,7 @@ class PdfWrapper:
         ("use_full_widget_name", False),
         ("need_appearances", False),
         ("generate_appearance_streams", False),
-        ("preserve_metadata", False),
+        ("preserve_metadata", False),  # TODO: (maybe) document this
         ("title", None),
     ]
 
