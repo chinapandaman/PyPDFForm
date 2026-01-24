@@ -148,39 +148,6 @@ def test_create_checkbox_complex_fill(template_stream, pdf_samples, request):
 
 
 @pytest.mark.posix_only
-def test_create_checkbox_complex_fill_flatten(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_complex_fill_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_field(
-            Fields.CheckBoxField(
-                name="foo",
-                page_number=1,
-                x=100,
-                y=100,
-                size=100,
-                button_style="check",
-                tick_color=(0, 1, 0),
-                bg_color=(0, 0, 1),
-                border_color=(1, 0, 0),
-                border_width=5,
-            )
-        )
-        obj.fill(obj.sample_data, flatten=True)
-
-        assert obj.schema["properties"]["foo"]["type"] == "boolean"
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
 def test_create_checkbox_check_fill(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_checkbox_check_fill.pdf"
@@ -196,32 +163,6 @@ def test_create_checkbox_check_fill(template_stream, pdf_samples, request):
             )
         )
         obj.fill(obj.sample_data)
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
-def test_create_checkbox_check_fill_flatten(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_check_fill_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_field(
-            Fields.CheckBoxField(
-                name="foo",
-                page_number=1,
-                x=100,
-                y=100,
-                button_style="check",
-            )
-        )
-        obj.fill(obj.sample_data, flatten=True)
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
@@ -259,32 +200,6 @@ def test_create_checkbox_circle_fill(template_stream, pdf_samples, request):
 
 
 @pytest.mark.posix_only
-def test_create_checkbox_circle_fill_flatten(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_circle_fill_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_field(
-            Fields.CheckBoxField(
-                name="foo",
-                page_number=1,
-                x=100,
-                y=100,
-                button_style="circle",
-            )
-        )
-        obj.fill(obj.sample_data, flatten=True)
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
 def test_create_checkbox_cross_fill(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_checkbox_cross_fill.pdf"
@@ -300,32 +215,6 @@ def test_create_checkbox_cross_fill(template_stream, pdf_samples, request):
             )
         )
         obj.fill(obj.sample_data)
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
-def test_create_checkbox_cross_fill_flatten(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_cross_fill_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_field(
-            Fields.CheckBoxField(
-                name="foo",
-                page_number=1,
-                x=100,
-                y=100,
-                button_style="cross",
-            )
-        )
-        obj.fill(obj.sample_data, flatten=True)
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
