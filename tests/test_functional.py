@@ -224,6 +224,26 @@ def test_fill_with_customized_widgets_flatten(
         assert obj.read() == expected
 
 
+def test_fill_with_varied_int_values(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_fill_with_varied_int_values.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).fill(
+            {
+                "test": 100,
+                "test_2": -250,
+                "test_3": 0,
+            }
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_fill_radiobutton(template_with_radiobutton_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_fill_radiobutton.pdf")
     with open(
