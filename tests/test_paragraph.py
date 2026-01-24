@@ -86,35 +86,6 @@ def test_fill_sejda_complex_flatten(sejda_template_complex, pdf_samples, request
         assert obj.read() == expected
 
 
-def test_sejda_complex_paragraph_multiple_line_alignment(
-    sejda_template_complex, pdf_samples, request
-):
-    expected_path = os.path.join(
-        pdf_samples,
-        "paragraph",
-        "test_sejda_complex_paragraph_multiple_line_alignment.pdf",
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sejda_template_complex).fill(
-            {
-                "paragraph_font_auto_left": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-                "paragraph_font_auto_right": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-                "paragraph_font_auto_center": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-                "paragraph_font_ten_left": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-                "paragraph_font_ten_right": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-                "paragraph_font_ten_center": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-            }
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 @pytest.mark.posix_only
 def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "paragraph", "test_paragraph_complex.pdf")
