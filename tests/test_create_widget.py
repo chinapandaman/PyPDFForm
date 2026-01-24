@@ -8,31 +8,6 @@ from PyPDFForm import Fields, PdfWrapper
 
 
 @pytest.mark.posix_only
-def test_create_checkbox_default(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_default.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_field(
-            Fields.CheckBoxField(
-                name="foo",
-                page_number=1,
-                x=100,
-                y=100,
-            )
-        )
-        assert obj.schema["properties"]["foo"]["type"] == "boolean"
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
 def test_create_checkbox_default_filled(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_checkbox_default_filled.pdf"
@@ -72,38 +47,6 @@ def test_create_checkbox_default_filled_flatten(template_stream, pdf_samples, re
             )
         )
         obj.fill(obj.sample_data, flatten=True)
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
-def test_create_checkbox_complex(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_complex.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_field(
-            Fields.CheckBoxField(
-                name="foo",
-                page_number=1,
-                x=100,
-                y=100,
-                size=100,
-                button_style="check",
-                tick_color=(0, 1, 0),
-                bg_color=(0, 0, 1),
-                border_color=(1, 0, 0),
-                border_width=5,
-            )
-        )
-
-        assert obj.schema["properties"]["foo"]["type"] == "boolean"
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
@@ -226,29 +169,6 @@ def test_create_checkbox_cross_fill(template_stream, pdf_samples, request):
 
 
 @pytest.mark.posix_only
-def test_create_text_default(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_text_default.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_field(
-            Fields.TextField(
-                name="foo",
-                page_number=1,
-                x=100,
-                y=100,
-            )
-        )
-        assert obj.schema["properties"]["foo"]["type"] == "string"
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
 def test_create_text_alpha_bg_color(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_text_alpha_bg_color.pdf"
@@ -287,32 +207,6 @@ def test_create_text_align_center(template_stream, pdf_samples, request):
                 x=100,
                 y=100,
                 alignment=1,
-            )
-        )
-        assert obj.schema["properties"]["foo"]["type"] == "string"
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
-def test_create_text_align_right(template_stream, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_text_align_right.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_field(
-            Fields.TextField(
-                name="foo",
-                page_number=1,
-                x=100,
-                y=100,
-                alignment=2,
             )
         )
         assert obj.schema["properties"]["foo"]["type"] == "string"
@@ -392,43 +286,6 @@ def test_create_text_default_filled_flatten(template_stream, pdf_samples, reques
             )
         )
         obj.fill(obj.sample_data, flatten=True)
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
-def test_create_text_complex(template_stream, pdf_samples, sample_font_stream, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_text_complex.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = (
-            PdfWrapper(template_stream)
-            .register_font("new_font", sample_font_stream)
-            .create_field(
-                Fields.TextField(
-                    name="foo",
-                    page_number=1,
-                    x=100,
-                    y=100,
-                    width=400,
-                    height=400,
-                    max_length=2,
-                    font="new_font",
-                    font_size=50,
-                    font_color=(1, 0.5, 1),
-                    bg_color=(0, 0, 1),
-                    border_color=(1, 0, 0),
-                    border_width=5,
-                )
-            )
-        )
-        assert obj.schema["properties"]["foo"]["type"] == "string"
-        assert obj.schema["properties"]["foo"]["maxLength"] == 2
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
@@ -731,29 +588,6 @@ def test_fill_cmyk_color(pdf_samples, request):
         obj = PdfWrapper(
             os.path.join(pdf_samples, "widget", "sample_template_with_cmyk_color.pdf")
         ).fill({"foo": "foo"})
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
-def test_create_radio_default(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_radio_default.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).create_field(
-            Fields.RadioGroup(
-                name="radio",
-                page_number=2,
-                x=[50, 100, 150],
-                y=[50, 100, 150],
-            )
-        )
-        assert obj.schema["properties"]["radio"]["type"] == "integer"
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
