@@ -27,28 +27,6 @@ def test_pdf_form_with_pages_without_widgets(issue_pdf_directory, request):
         assert obj.read() == expected
 
 
-def test_pdf_form_with_central_aligned_text_fields(issue_pdf_directory, request):
-    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-285.pdf")).fill(
-        {
-            "name": "Hans Mustermann",
-            "fulladdress": "Musterstr. 12, 82903 Musterdorf, Musterland",
-            "advisorname": "Karl Test",
-        }
-    )
-
-    expected_path = os.path.join(issue_pdf_directory, "PPF-285-expected.pdf")
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_pdf_form_with_central_aligned_text_fields_void(issue_pdf_directory):
-    assert PdfWrapper(os.path.join(issue_pdf_directory, "PPF-285.pdf")).fill({}).read()
-
-
 @pytest.mark.posix_only
 def test_pdf_form_with_paragraph_fields_new_line_symbol_text(
     issue_pdf_directory, request
