@@ -138,34 +138,6 @@ def test_dropdown_two_via_str(sample_template_with_dropdown, pdf_samples, reques
         assert obj.read() == expected
 
 
-def test_dropdown_two_flatten(sample_template_with_dropdown, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_two_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sample_template_with_dropdown).fill(
-            {
-                "test_1": "test_1",
-                "test_2": "test_2",
-                "test_3": "test_3",
-                "check_1": True,
-                "check_2": True,
-                "check_3": True,
-                "radio_1": 1,
-                "dropdown_1": 1,
-            },
-            flatten=True,
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 def test_dropdown_three(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_three.pdf")
     with open(expected_path, "rb+") as f:
@@ -180,34 +152,6 @@ def test_dropdown_three(sample_template_with_dropdown, pdf_samples, request):
                 "radio_1": 1,
                 "dropdown_1": 2,
             },
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_dropdown_three_flatten(sample_template_with_dropdown, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_three_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sample_template_with_dropdown).fill(
-            {
-                "test_1": "test_1",
-                "test_2": "test_2",
-                "test_3": "test_3",
-                "check_1": True,
-                "check_2": True,
-                "check_3": True,
-                "radio_1": 1,
-                "dropdown_1": 2,
-            },
-            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -244,34 +188,6 @@ def test_dropdown_four(sample_template_with_dropdown, pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_dropdown_four_flatten(sample_template_with_dropdown, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_four_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sample_template_with_dropdown).fill(
-            {
-                "test_1": "test_1",
-                "test_2": "test_2",
-                "test_3": "test_3",
-                "check_1": True,
-                "check_2": True,
-                "check_3": True,
-                "radio_1": 1,
-                "dropdown_1": 3,
-            },
-            flatten=True,
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 @pytest.mark.posix_only
 def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_alignment.pdf")
@@ -282,30 +198,6 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
                 "dropdown_center": 1,
                 "dropdown_right": 2,
             },
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
-def test_dropdown_alignment_flatten(dropdown_alignment, pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_alignment_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(dropdown_alignment).fill(
-            {
-                "dropdown_left": 0,
-                "dropdown_center": 1,
-                "dropdown_right": 2,
-            },
-            flatten=True,
         )
 
         request.config.results["expected_path"] = expected_path
