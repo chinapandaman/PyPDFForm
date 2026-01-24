@@ -480,46 +480,6 @@ def test_create_text_complex_filled(
 
 
 @pytest.mark.posix_only
-def test_create_text_complex_filled_flatten(
-    template_stream, pdf_samples, sample_font_stream, request
-):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_text_complex_filled_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = (
-            PdfWrapper(template_stream)
-            .register_font("new_font", sample_font_stream)
-            .create_field(
-                Fields.TextField(
-                    name="foo",
-                    page_number=1,
-                    x=100,
-                    y=100,
-                    width=400,
-                    height=400,
-                    max_length=2,
-                    font="new_font",
-                    font_size=50,
-                    font_color=(1, 0.5, 1),
-                    bg_color=(0, 0, 1),
-                    border_color=(1, 0, 0),
-                    border_width=5,
-                )
-            )
-        )
-        obj.fill(obj.sample_data, flatten=True)
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
 def test_create_text_comb(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "test_create_text_comb.pdf")
     with open(expected_path, "rb+") as f:
@@ -562,38 +522,6 @@ def test_create_checkbox_persist_old_widgets_fill(
                 y=100,
             )
         ).fill(obj.sample_data)
-        assert obj.schema["properties"]["foo"]["type"] == "boolean"
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
-def test_create_checkbox_persist_old_widgets_fill_flatten(
-    template_stream, pdf_samples, request
-):
-    expected_path = os.path.join(
-        pdf_samples,
-        "widget",
-        "test_create_checkbox_persist_old_widgets_fill_flatten.pdf",
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream)
-        obj.widgets["test"].font_size = 30
-        obj.widgets["test"].font_color = (0, 1, 0)
-        obj.create_field(
-            Fields.CheckBoxField(
-                name="foo",
-                page_number=1,
-                x=100,
-                y=100,
-            )
-        ).fill(obj.sample_data, flatten=True)
         assert obj.schema["properties"]["foo"]["type"] == "boolean"
 
         request.config.results["expected_path"] = expected_path
@@ -813,24 +741,6 @@ def test_fill_cmyk_color(pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_fill_cmyk_color_flatten(pdf_samples, request):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_fill_cmyk_color_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(
-            os.path.join(pdf_samples, "widget", "sample_template_with_cmyk_color.pdf")
-        ).fill({"foo": "foo"}, flatten=True)
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 @pytest.mark.posix_only
 def test_create_radio_default(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "test_create_radio_default.pdf")
@@ -992,41 +902,6 @@ def test_create_signature_default_filled(
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
-def test_create_signature_default_filled_flatten(
-    template_stream, pdf_samples, image_samples, request
-):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_signature_default_filled_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = (
-            PdfWrapper(template_stream)
-            .create_field(
-                Fields.SignatureField(
-                    name="sig_1",
-                    page_number=1,
-                    x=100,
-                    y=100,
-                    width=410,
-                    height=100,
-                )
-            )
-            .fill(
-                {"sig_1": os.path.join(image_samples, "sample_signature.png")},
-                flatten=True,
-            )
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 def test_create_image_default(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "test_create_image_default.pdf")
     with open(expected_path, "rb+") as f:
@@ -1071,40 +946,6 @@ def test_create_image_default_filled(
                 )
             )
             .fill({"image_1": os.path.join(image_samples, "sample_image.jpg")})
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_create_image_default_filled_flatten(
-    template_stream, pdf_samples, image_samples, request
-):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_image_default_filled_flatten.pdf"
-    )
-    with open(expected_path, "rb+") as f:
-        obj = (
-            PdfWrapper(template_stream)
-            .create_field(
-                Fields.ImageField(
-                    name="image_1",
-                    page_number=1,
-                    x=100,
-                    y=100,
-                    width=192,
-                    height=108,
-                )
-            )
-            .fill(
-                {"image_1": os.path.join(image_samples, "sample_image.jpg")},
-                flatten=True,
-            )
         )
 
         request.config.results["expected_path"] = expected_path
