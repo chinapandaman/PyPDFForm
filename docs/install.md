@@ -106,6 +106,19 @@ For a PDF viewer to display content in a form field (especially text fields), it
         * **Single-line text fields only:** It does not support multi-line text fields.
         * **No text alignment handling:** Text alignment (left, center, right) is not preserved or applied.
 
+## Handling metadata
+
+???+ note
+    PDF metadata preservation must be enabled explicitly due to regressions identified in the test suites.
+
+To ensure the original metadata of a PDF template is maintained after performing operations with `PdfWrapper`, set the `preserve_metadata` parameter to `True` during instantiation:
+
+```python
+from PyPDFForm import PdfWrapper
+
+pdf = PdfWrapper("sample_template.pdf", preserve_metadata=True)
+```
+
 ## Use full name for PDF form fields
 
 According to section 12.7.3.2 of the [PDF standard](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf#page=442), PDF form fields can have fully qualified names constructed using the pattern `<parent_field_name>.<field_name>`.

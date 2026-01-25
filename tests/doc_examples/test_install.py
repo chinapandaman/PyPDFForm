@@ -57,6 +57,15 @@ def test_create_generate_appearance_streams_wrapper(static_pdfs):
     )
 
 
+def test_create_preserve_metadata_wrapper(static_pdfs):
+    pdf = PdfWrapper(
+        os.path.join(static_pdfs, "sample_template.pdf"),
+        preserve_metadata=True,
+    )
+    pdf_copy = PdfWrapper(pdf.read(), preserve_metadata=True)
+    assert pdf_copy._metadata == pdf._metadata  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+
+
 def test_use_full_widget_name(static_pdfs):
     pdf = PdfWrapper(
         os.path.join(static_pdfs, "sample_template_with_full_key.pdf"),
