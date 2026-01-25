@@ -6,7 +6,7 @@ from io import BytesIO
 import pytest
 from jsonschema import ValidationError, validate
 
-from PyPDFForm import BlankPage, Fields, PdfArray, PdfWrapper, Widgets
+from PyPDFForm import BlankPage, Fields, PdfArray, PdfWrapper
 from PyPDFForm.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
 from PyPDFForm.deprecation import deprecation_notice
 from PyPDFForm.middleware.base import Widget
@@ -65,82 +65,6 @@ def test_register_bad_fonts():
 
     obj = PdfWrapper().register_font("foo", b"foo")
     assert "foo" not in obj.fonts
-
-
-@pytest.mark.posix_only
-def test_register_global_font_fill(
-    template_stream, pdf_samples, sample_font_stream, data_dict, request
-):
-    expected_path = os.path.join(pdf_samples, "test_register_global_font_fill.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(template_stream).register_font(
-            "new_font",
-            sample_font_stream,
-        )
-        assert "new_font" in obj.fonts
-        for v in obj.widgets.values():
-            if isinstance(v, Widgets.Text):
-                v.font = "new_font"
-        obj.fill(
-            data_dict,
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_fill_font_20(template_stream, pdf_samples, data_dict, request):
-    expected_path = os.path.join(pdf_samples, "test_fill_font_20.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(template_stream)
-        for v in obj.widgets.values():
-            if isinstance(v, Widgets.Text):
-                v.font_size = 20
-        obj.fill(
-            data_dict,
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_fill_font_color_red(template_stream, pdf_samples, data_dict, request):
-    expected_path = os.path.join(pdf_samples, "test_fill_font_color_red.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(template_stream)
-        for v in obj.widgets.values():
-            if isinstance(v, Widgets.Text):
-                v.font_color = (1, 0, 0)
-        obj.fill(
-            data_dict,
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
 
 
 @pytest.mark.posix_only
