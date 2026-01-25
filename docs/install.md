@@ -109,9 +109,9 @@ For a PDF viewer to display content in a form field (especially text fields), it
 ## Handling metadata
 
 ???+ note
-    Due to some regressions in the test suites, PDF metadata needs to be handled explicitly.
+    PDF metadata preservation must be enabled explicitly due to regressions identified in the test suites.
 
-To ensure a PDF's metadata is preserved after performing operations through `PdfWrapper`, instantiate the object with `preserve_metadata` set to `True`:
+To ensure the original metadata of a PDF template is maintained after performing operations with `PdfWrapper`, set the `preserve_metadata` parameter to `True` during instantiation:
 
 ```python
 from PyPDFForm import PdfWrapper
