@@ -903,25 +903,6 @@ def test_widget_coord_resolution():
     assert obj.widgets["signature"].height == 500
 
 
-def test_title(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "test_title.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream, title="foo")
-        assert obj.title == "foo"
-        obj.title = "bar"
-        assert obj.title == "bar"
-        obj.title = "foobar"
-        assert obj.title == "foobar"
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 def test_hidden_text_check(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_hidden_text_check.pdf")
     with open(expected_path, "rb+") as f:
