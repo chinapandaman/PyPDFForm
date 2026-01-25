@@ -358,7 +358,7 @@ class PdfWrapper:
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
            generating appearance streams.
-        3. If `preserve_metadata` is enabled, it preserves the original metadata of the PDF.
+        3. It preserves the original metadata of the PDF document if it has any.
         4. If a title or on-open JavaScript is set, it updates the PDF properties
            accordingly.
 
@@ -372,7 +372,7 @@ class PdfWrapper:
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
 
-        if result:
+        if self._metadata:
             # TODO: refactor with preserve_pdf_properties
             result = set_metadata(result, self._metadata)
 
