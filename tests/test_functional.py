@@ -27,18 +27,18 @@ def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
 
 
-def test_write(template_stream, pdf_samples):
-    assert PdfWrapper(template_stream).write(
-        os.path.join(pdf_samples, "sample_template.pdf")
+def test_write(template_with_radiobutton_stream, pdf_samples):
+    assert PdfWrapper(template_with_radiobutton_stream).write(
+        os.path.join(pdf_samples, "sample_template_with_radio_button.pdf")
     )
 
 
-def test_write_io(template_stream):
+def test_write_io(template_with_radiobutton_stream):
     buff = BytesIO()
-    PdfWrapper(template_stream).write(buff)
+    PdfWrapper(template_with_radiobutton_stream).write(buff)
     buff.seek(0)
 
-    assert buff.read() == template_stream
+    assert buff.read() == template_with_radiobutton_stream
 
 
 def test_fill(template_stream, pdf_samples, data_dict, request):
