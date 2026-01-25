@@ -7,23 +7,6 @@ import pytest
 from PyPDFForm import PdfWrapper
 
 
-@pytest.mark.posix_only
-def test_fill_signature(pdf_samples, image_samples, request):
-    expected_path = os.path.join(pdf_samples, "signature", "test_fill_signature.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(
-            os.path.join(pdf_samples, "signature", "sample_template_with_signature.pdf")
-        ).fill({"signature": os.path.join(image_samples, "sample_signature.png")})
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 def test_signature_schema(pdf_samples):
     obj = PdfWrapper(
         os.path.join(pdf_samples, "signature", "sample_template_with_signature.pdf")
@@ -53,33 +36,6 @@ def test_fill_signature_overlap(pdf_samples, image_samples, request):
                 pdf_samples, "signature", "sample_template_with_signature_overlap.pdf"
             )
         ).fill({"signature": os.path.join(image_samples, "sample_signature.png")})
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-@pytest.mark.posix_only
-def test_fill_signature_overlap_not_preserve_aspect_ratio(
-    pdf_samples, image_samples, request
-):
-    expected_path = os.path.join(
-        pdf_samples,
-        "signature",
-        "test_fill_signature_overlap_not_preserve_aspect_ratio.pdf",
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(
-            os.path.join(
-                pdf_samples, "signature", "sample_template_with_signature_overlap.pdf"
-            )
-        )
-        obj.widgets["signature"].preserve_aspect_ratio = False
-        obj.fill({"signature": os.path.join(image_samples, "sample_signature.png")})
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()

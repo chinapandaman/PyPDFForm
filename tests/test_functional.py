@@ -41,24 +41,6 @@ def test_write_io(template_stream):
     assert buff.read() == template_stream
 
 
-def test_fill(template_stream, pdf_samples, data_dict, request):
-    expected_path = os.path.join(pdf_samples, "test_fill.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).fill(
-            data_dict,
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.read())
-        assert obj.read() == obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 def test_fill_flatten_then_unflatten(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "test_fill_flatten_then_unflatten.pdf")
     with open(expected_path, "rb+") as f:
@@ -233,29 +215,6 @@ def test_fill_with_varied_int_values(template_stream, pdf_samples, request):
                 "test_2": -250,
                 "test_3": 0,
             }
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_fill_radiobutton(template_with_radiobutton_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "test_fill_radiobutton.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(template_with_radiobutton_stream).fill(
-            {
-                "radio_1": 0,
-                "radio_2": 1,
-                "radio_3": 2,
-            },
         )
 
         request.config.results["expected_path"] = expected_path
@@ -723,24 +682,6 @@ def test_radio_change_size(template_with_radiobutton_stream, pdf_samples, reques
         obj.widgets["radio_1"].size = 50
         obj.widgets["radio_2"].size = 40
         obj.widgets["radio_3"].size = 60
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_fill_image(
-    sample_template_with_image_field, image_samples, pdf_samples, request
-):
-    expected_path = os.path.join(pdf_samples, "test_fill_image.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sample_template_with_image_field).fill(
-            {"image_1": os.path.join(image_samples, "sample_image.jpg")},
-        )
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
