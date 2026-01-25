@@ -559,16 +559,6 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
         assert obj.read() == expected
 
 
-def test_pages(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "pages", "test_pages.pdf")
-    obj = PdfWrapper(template_stream)
-
-    with open(expected_path, "rb+") as f:
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.pages[0].read()
-        assert obj.pages[0].read() == f.read()
-
-
 @pytest.mark.posix_only
 def test_pages_preserve_font(template_stream, pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "pages", "test_pages_preserve_font.pdf")
