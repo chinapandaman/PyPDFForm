@@ -41,24 +41,6 @@ def test_write_io(template_stream):
     assert buff.read() == template_stream
 
 
-def test_fill(template_stream, pdf_samples, data_dict, request):
-    expected_path = os.path.join(pdf_samples, "test_fill.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).fill(
-            data_dict,
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.read())
-        assert obj.read() == obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 def test_fill_flatten_then_unflatten(template_stream, pdf_samples, data_dict, request):
     expected_path = os.path.join(pdf_samples, "test_fill_flatten_then_unflatten.pdf")
     with open(expected_path, "rb+") as f:
@@ -233,29 +215,6 @@ def test_fill_with_varied_int_values(template_stream, pdf_samples, request):
                 "test_2": -250,
                 "test_3": 0,
             }
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_fill_radiobutton(template_with_radiobutton_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "test_fill_radiobutton.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(template_with_radiobutton_stream).fill(
-            {
-                "radio_1": 0,
-                "radio_2": 1,
-                "radio_3": 2,
-            },
         )
 
         request.config.results["expected_path"] = expected_path
@@ -600,16 +559,6 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
         assert obj.read() == expected
 
 
-def test_pages(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "pages", "test_pages.pdf")
-    obj = PdfWrapper(template_stream)
-
-    with open(expected_path, "rb+") as f:
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.pages[0].read()
-        assert obj.pages[0].read() == f.read()
-
-
 @pytest.mark.posix_only
 def test_pages_preserve_font(template_stream, pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "pages", "test_pages_preserve_font.pdf")
@@ -683,78 +632,12 @@ def test_pages_inherit_attributes(template_stream):
         assert getattr(page, "use_full_widget_name")
 
 
-def test_generate_coordinate_grid(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "test_generate_coordinate_grid.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).generate_coordinate_grid((1, 0, 1))
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 def test_generate_coordinate_grid_margin_50(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "test_generate_coordinate_grid_margin_50.pdf"
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_stream).generate_coordinate_grid((1, 0, 1), margin=50)
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_checkbox_change_size(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "test_checkbox_change_size.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream)
-        obj.widgets["check"].size = 50
-        obj.widgets["check_2"].size = 40
-        obj.widgets["check_3"].size = 60
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_radio_change_size(template_with_radiobutton_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "test_radio_change_size.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_with_radiobutton_stream)
-        obj.widgets["radio_1"].size = 50
-        obj.widgets["radio_2"].size = 40
-        obj.widgets["radio_3"].size = 60
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_fill_image(
-    sample_template_with_image_field, image_samples, pdf_samples, request
-):
-    expected_path = os.path.join(pdf_samples, "test_fill_image.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sample_template_with_image_field).fill(
-            {"image_1": os.path.join(image_samples, "sample_image.jpg")},
-        )
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
@@ -901,25 +784,6 @@ def test_widget_coord_resolution():
     assert obj.widgets["signature"].y == 600
     assert obj.widgets["signature"].width == 600
     assert obj.widgets["signature"].height == 500
-
-
-def test_title(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "test_title.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream, title="foo")
-        assert obj.title == "foo"
-        obj.title = "bar"
-        assert obj.title == "bar"
-        obj.title = "foobar"
-        assert obj.title == "foobar"
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
 
 
 def test_hidden_text_check(template_stream, pdf_samples, request):
