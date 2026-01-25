@@ -1,23 +1,28 @@
-%PDF-1.3
+%PDF-1.6
 %‚„œ”
 1 0 obj
 <<
-/Type /Catalog
-/Pages 2 0 R
-/Outlines 6 0 R
-/AcroForm 8 0 R
+/Producer (pypdf)
 >>
 endobj
 2 0 obj
 <<
 /Type /Pages
 /Count 1
-/Kids [ 3 0 R ]
+/Kids [ 4 0 R ]
 >>
 endobj
 3 0 obj
 <<
-/Contents 4 0 R
+/Type /Catalog
+/Pages 2 0 R
+/Outlines 6 0 R
+/AcroForm 10 0 R
+>>
+endobj
+4 0 obj
+<<
+/Contents 5 0 R
 /CropBox [ 0.0 0.0 612 792 ]
 /MediaBox [ 0.0 0.0 612 792 ]
 /Resources <<
@@ -25,33 +30,16 @@ endobj
 /Rotate 0
 /Type /Page
 /Parent 2 0 R
-/Annots [ 5 0 R ]
+/Annots [ 9 0 R ]
 >>
 endobj
-4 0 obj
+5 0 obj
 <<
 /Length 0
 >>
 stream
 
 endstream
-endobj
-5 0 obj
-<<
-/DA (\057Helv 12 Tf 0 g)
-/F 4
-/FT /Tx
-/Ff 4096
-/MK <<
->>
-/P 3 0 R
-/Rect [ 337.092 592.617 538.147 663.054 ]
-/Subtype /Widget
-/T (Address)
-/Type /Annot
-/V (Mr John Smith\012132\054 My Street\012Kingston\054 New York 12401)
-/AP (Mr John Smith\012132\054 My Street\012Kingston\054 New York 12401)
->>
 endobj
 6 0 obj
 <<
@@ -64,7 +52,7 @@ endobj
 <<
 /Title (Blank Page)
 /A <<
-/D [ 3 0 R /XYZ 0 792 null ]
+/D [ 4 0 R /XYZ 0 792 null ]
 /S /GoTo
 >>
 /F 0
@@ -74,35 +62,58 @@ endobj
 endobj
 8 0 obj
 <<
-/DA (\057Helv 0 Tf 0 g )
-/DR <<
-/Encoding <<
-/PDFDocEncoding 9 0 R
->>
-/Font <<
-/Helv 10 0 R
-/ZaDb 11 0 R
->>
->>
-/Fields [ 5 0 R ]
+/D [ 4 0 R /XYZ 0 792 null ]
+/S /GoTo
 >>
 endobj
 9 0 obj
+<<
+/DA (\057Helv 12 Tf 0 g)
+/F 4
+/FT /Tx
+/Ff 4096
+/MK <<
+>>
+/P 4 0 R
+/Rect [ 337.092 592.617 538.147 663.054 ]
+/Subtype /Widget
+/T (Address)
+/Type /Annot
+/V (Mr John Smith\012132\054 My Street\012Kingston\054 New York 12401)
+/AP (Mr John Smith\012132\054 My Street\012Kingston\054 New York 12401)
+>>
+endobj
+10 0 obj
+<<
+/DA (\057Helv 0 Tf 0 g )
+/DR <<
+/Encoding <<
+/PDFDocEncoding 11 0 R
+>>
+/Font <<
+/Helv 12 0 R
+/ZaDb 13 0 R
+>>
+>>
+/Fields [ 9 0 R ]
+>>
+endobj
+11 0 obj
 <<
 /Differences [ 24 /breve /caron /circumflex /dotaccent /hungarumlaut /ogonek /ring /tilde 39 /quotesingle 96 /grave 128 /bullet /dagger /daggerdbl /ellipsis /emdash /endash /florin /fraction /guilsinglleft /guilsinglright /minus /perthousand /quotedblbase /quotedblleft /quotedblright /quoteleft /quoteright /quotesinglbase /trademark /fi /fl /Lslash /OE /Scaron /Ydieresis /Zcaron /dotlessi /lslash /oe /scaron /zcaron 160 /Euro 164 /currency 166 /brokenbar 168 /dieresis /copyright /ordfeminine 172 /logicalnot /.notdef /registered /macron /degree /plusminus /twosuperior /threesuperior /acute /mu 183 /periodcentered /cedilla /onesuperior /ordmasculine 188 /onequarter /onehalf /threequarters 192 /Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla /Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis /Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls /agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla /egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis /eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide /oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis ]
 /Type /Encoding
 >>
 endobj
-10 0 obj
+12 0 obj
 <<
 /BaseFont /Helvetica
-/Encoding 9 0 R
+/Encoding 11 0 R
 /Name /Helv
 /Subtype /Type1
 /Type /Font
 >>
 endobj
-11 0 obj
+13 0 obj
 <<
 /BaseFont /ZapfDingbats
 /Name /ZaDb
@@ -110,35 +121,28 @@ endobj
 /Type /Font
 >>
 endobj
-12 0 obj
-<<
-/Producer (Acrobat Pro 23\0566\05620380)
-/CreationDate (D\07220231209080635\05508\04700\047)
-/Creator (Acrobat Pro 23\0566\05620380)
-/ModDate (D\07220231209080721\05508\04700\047)
->>
-endobj
 xref
-0 13
+0 14
 0000000000 65535 f 
 0000000015 00000 n 
-0000000096 00000 n 
-0000000155 00000 n 
-0000000322 00000 n 
-0000000371 00000 n 
-0000000686 00000 n 
-0000000741 00000 n 
-0000000867 00000 n 
-0000001017 00000 n 
-0000002343 00000 n 
-0000002442 00000 n 
-0000002528 00000 n 
+0000000054 00000 n 
+0000000113 00000 n 
+0000000195 00000 n 
+0000000362 00000 n 
+0000000411 00000 n 
+0000000466 00000 n 
+0000000592 00000 n 
+0000000651 00000 n 
+0000000966 00000 n 
+0000001118 00000 n 
+0000002445 00000 n 
+0000002545 00000 n 
 trailer
 <<
-/Size 13
-/Root 1 0 R
-/Info 12 0 R
+/Size 14
+/Root 3 0 R
+/Info 1 0 R
 >>
 startxref
-2730
+2631
 %%EOF
