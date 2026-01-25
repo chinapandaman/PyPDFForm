@@ -41,4 +41,4 @@ def test_index_snippets(pdf_samples, request):
         expected = f.read()
 
         assert len(pdf.read()) == len(expected)
-        request.config.results["skip_regenerate"] = len(pdf.read()) == len(expected)
+        assert pdf.read() == expected
