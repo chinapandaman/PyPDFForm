@@ -1,40 +1,31 @@
-%PDF-1.5
+%PDF-1.3
 %‚„œ”
 1 0 obj
 <<
-/Producer (pypdf)
+/Type /Catalog
+/Pages 2 0 R
+/Outlines 7 0 R
+/AcroForm 8 0 R
 >>
 endobj
 2 0 obj
 <<
 /Type /Pages
 /Count 1
-/Kids [ 4 0 R ]
+/Kids [ 3 0 R ]
 >>
 endobj
 3 0 obj
-<<
-/Type /Catalog
-/Pages 2 0 R
-/Outlines 5 0 R
-/AcroForm 12 0 R
->>
-endobj
-4 0 obj
 <<
 /Type /Page
 /MediaBox [ 0 0 595 842 ]
 /Resources <<
 >>
 /Parent 2 0 R
-/Annots [ 6 0 R 8 0 R 10 0 R ]
+/Annots [ 4 0 R 5 0 R 6 0 R ]
 >>
 endobj
-5 0 obj
-<<
->>
-endobj
-6 0 obj
+4 0 obj
 <<
 /Subtype /Widget
 /Rect [ 162.5 647 372.5 690 ]
@@ -46,7 +37,7 @@ endobj
 /H /P
 /MK <<
 >>
-/P 4 0 R
+/P 3 0 R
 /TM (NZPBFGhAQ)
 /T (dropdown\137left)
 /Opt [ [ (foo) (foo) ] [ (bar) (bar) ] [ (foobar) (foobar) ] ( ) ]
@@ -55,18 +46,7 @@ endobj
 /I [ 0 ]
 >>
 endobj
-7 0 obj
-<<
-/Type /XObject
-/Subtype /Form
-/BBox [ 0 0 210 43 ]
-/Length 0
->>
-stream
-
-endstream
-endobj
-8 0 obj
+5 0 obj
 <<
 /Subtype /Widget
 /Rect [ 163.5 529 373.5 572 ]
@@ -78,7 +58,7 @@ endobj
 /H /P
 /MK <<
 >>
-/P 4 0 R
+/P 3 0 R
 /TM (2YVKkX7E5)
 /T (dropdown\137center)
 /Opt [ [ (option\0551) (option\0551) ] [ (option\0552) (option\0552) ] [ (option\0553) (option\0553) ] ( ) ]
@@ -87,18 +67,7 @@ endobj
 /I [ 1 ]
 >>
 endobj
-9 0 obj
-<<
-/Type /XObject
-/Subtype /Form
-/BBox [ 0 0 210 43 ]
-/Length 0
->>
-stream
-
-endstream
-endobj
-10 0 obj
+6 0 obj
 <<
 /Subtype /Widget
 /Rect [ 162.5 398 372.5 441 ]
@@ -110,7 +79,7 @@ endobj
 /H /P
 /MK <<
 >>
-/P 4 0 R
+/P 3 0 R
 /TM (1d\1377QAC\137f)
 /T (dropdown\137right)
 /Opt [ [ (select\0551) (select\0551) ] [ (select\0552) (select\0552) ] [ (select\0553) (select\0553) ] ( ) ]
@@ -119,43 +88,40 @@ endobj
 /I [ 2 ]
 >>
 endobj
-11 0 obj
+7 0 obj
 <<
-/Type /XObject
-/Subtype /Form
-/BBox [ 0 0 210 43 ]
-/Length 0
 >>
-stream
-
-endstream
 endobj
-12 0 obj
+8 0 obj
 <<
-/Fields [ 6 0 R 8 0 R 10 0 R ]
+/Fields [ 4 0 R 5 0 R 6 0 R ]
+>>
+endobj
+9 0 obj
+<<
+/Producer (DocFly)
+/CreationDate (D\07220230222234005Z)
+/ModDate (D\07220230222234005Z)
 >>
 endobj
 xref
-0 13
+0 10
 0000000000 65535 f 
 0000000015 00000 n 
-0000000054 00000 n 
-0000000113 00000 n 
-0000000195 00000 n 
-0000000316 00000 n 
-0000000337 00000 n 
-0000000617 00000 n 
-0000000717 00000 n 
-0000001057 00000 n 
-0000001157 00000 n 
-0000001503 00000 n 
-0000001604 00000 n 
+0000000096 00000 n 
+0000000155 00000 n 
+0000000275 00000 n 
+0000000555 00000 n 
+0000000895 00000 n 
+0000001240 00000 n 
+0000001261 00000 n 
+0000001312 00000 n 
 trailer
 <<
-/Size 13
-/Root 3 0 R
-/Info 1 0 R
+/Size 10
+/Root 1 0 R
+/Info 9 0 R
 >>
 startxref
-1657
+1421
 %%EOF
