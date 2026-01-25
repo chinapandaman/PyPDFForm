@@ -78,7 +78,7 @@ class PdfWrapper:
         ("use_full_widget_name", False),
         ("need_appearances", False),
         ("generate_appearance_streams", False),
-        ("preserve_metadata", False),  # TODO: (maybe) document this
+        ("preserve_metadata", True),  # TODO: (maybe) document this
         ("title", None),
     ]
 
@@ -376,7 +376,7 @@ class PdfWrapper:
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
 
-        if getattr(self, "preserve_metadata"):
+        if getattr(self, "preserve_metadata") and result:
             # TODO: refactor with preserve_pdf_properties
             result = set_metadata(result, self._metadata)
 
