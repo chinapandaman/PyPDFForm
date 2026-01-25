@@ -371,7 +371,7 @@ def test_preserve_metadata():
     )
     writer.write(pdf_stream)
     pdf_stream.seek(0)
-    wrapper = PdfWrapper(pdf_stream, preserve_metadata=True)
+    wrapper = PdfWrapper(pdf_stream)
     wrapper.create_field(Fields.TextField(name="Test", page_number=1, x=100, y=400))
     new_stream = BytesIO(wrapper.read())
     reader = PdfReader(new_stream)
@@ -379,4 +379,4 @@ def test_preserve_metadata():
     assert metadata["/test_key"] == "test_value"
     assert metadata["/other_key"] == "other_value"
 
-    assert PdfWrapper(preserve_metadata=True)
+    assert PdfWrapper()
