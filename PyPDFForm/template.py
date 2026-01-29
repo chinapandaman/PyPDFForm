@@ -15,17 +15,17 @@ from typing import Dict, List, Tuple, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
-from .constants import WIDGET_TYPES, Annots, MaxLen, Parent, T
+from .constants import (MULTILINE, READ_ONLY, WIDGET_TYPES, Annots, MaxLen,
+                        Parent, T)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
                        WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
-                       get_checkbox_value, get_dropdown_value,
-                       get_field_readonly, get_field_rect, get_radio_value,
-                       get_text_field_multiline, get_text_value,
-                       update_annotation_name)
+                       check_field_flag, get_checkbox_value,
+                       get_dropdown_value, get_field_rect, get_radio_value,
+                       get_text_value, update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
@@ -100,7 +100,7 @@ def build_widgets(
                 _widget.__dict__["tooltip"] = extract_widget_property(
                     widget, WIDGET_DESCRIPTION_PATTERNS, None, str
                 )
-                _widget.__dict__["readonly"] = get_field_readonly(widget)
+                _widget.__dict__["readonly"] = check_field_flag(widget, READ_ONLY)
 
                 field_rect = get_field_rect(widget)
                 _widget.x, _widget.y, _widget.width, _widget.height = field_rect
@@ -109,7 +109,7 @@ def build_widgets(
                     # mostly for schema for now
                     # doesn't trigger hook
                     _widget.__dict__["max_length"] = get_text_field_max_length(widget)
-                    _widget.__dict__["multiline"] = get_text_field_multiline(widget)
+                    _widget.__dict__["multiline"] = check_field_flag(widget, MULTILINE)
                     get_text_value(widget, _widget)
 
                 if type(_widget) is Checkbox:
