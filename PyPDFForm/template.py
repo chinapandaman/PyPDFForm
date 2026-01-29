@@ -15,7 +15,7 @@ from typing import Dict, List, Tuple, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
-from .constants import MULTILINE, READ_ONLY, WIDGET_TYPES, Annots, MaxLen
+from .constants import MULTILINE, READ_ONLY, WIDGET_TYPES, Annots
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -23,8 +23,8 @@ from .middleware.text import Text
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
                        WIDGET_TYPE_PATTERNS, check_field_flag,
                        get_checkbox_value, get_dropdown_value, get_field_rect,
-                       get_radio_value, get_text_value, get_widget_key,
-                       update_annotation_name)
+                       get_radio_value, get_text_field_max_length,
+                       get_text_value, get_widget_key, update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
@@ -208,20 +208,6 @@ def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
             result = _type(key)
             break
     return result
-
-
-def get_text_field_max_length(widget: dict) -> Union[int, None]:
-    """
-    Extracts the maximum length of a text field from a widget dictionary.
-
-    Args:
-        widget (dict): The widget dictionary to extract the max length from.
-
-    Returns:
-        Union[int, None]: The maximum length of the text field, or None
-            if the max length is not specified.
-    """
-    return int(widget[MaxLen]) or None if MaxLen in widget else None
 
 
 def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:

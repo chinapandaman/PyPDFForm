@@ -14,8 +14,8 @@ from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
 from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, SLASH, TU,
-                        A, Btn, Ch, Ff, I, N, Off, Opt, Parent, Rect, Sig, T,
-                        Tx, V, Yes)
+                        A, Btn, Ch, Ff, I, MaxLen, N, Off, Opt, Parent, Rect,
+                        Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -332,6 +332,20 @@ def get_text_value(annot: DictionaryObject, widget: Text) -> None:
         widget.value = annot[Parent].get(V)
     else:
         widget.value = annot.get(V)
+
+
+def get_text_field_max_length(widget: dict) -> Union[int, None]:
+    """
+    Extracts the maximum length of a text field from a widget dictionary.
+
+    Args:
+        widget (dict): The widget dictionary to extract the max length from.
+
+    Returns:
+        Union[int, None]: The maximum length of the text field, or None
+            if the max length is not specified.
+    """
+    return int(widget[MaxLen]) or None if MaxLen in widget else None
 
 
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:
