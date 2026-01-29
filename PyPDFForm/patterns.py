@@ -99,6 +99,19 @@ DROPDOWN_CHOICE_PATTERNS = [
 
 
 def get_field_readonly(annot: DictionaryObject) -> bool:
+    """
+    Checks if a field annotation is read-only.
+
+    This function inspects the 'Ff' (field flags) entry of the annotation
+    dictionary (or its parent if it's a child annotation) to determine if the
+    ReadOnly flag is set.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+
+    Returns:
+        bool: True if the field is read-only, False otherwise.
+    """
     if Parent in annot and Ff not in annot:
         return bool(
             int(
