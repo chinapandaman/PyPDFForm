@@ -98,6 +98,19 @@ DROPDOWN_CHOICE_PATTERNS = [
 ]
 
 
+def check_field_flag(annot: DictionaryObject, flag: int) -> bool:
+    if Parent in annot and Ff not in annot:
+        return bool(
+            int(
+                annot[NameObject(Parent)][NameObject(Ff)]
+                if Ff in annot[NameObject(Parent)]
+                else 0
+            )
+            & flag
+        )
+    return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & flag)
+
+
 def get_field_readonly(annot: DictionaryObject) -> bool:
     """
     Checks if a field annotation is read-only.
@@ -112,16 +125,7 @@ def get_field_readonly(annot: DictionaryObject) -> bool:
     Returns:
         bool: True if the field is read-only, False otherwise.
     """
-    if Parent in annot and Ff not in annot:
-        return bool(
-            int(
-                annot[NameObject(Parent)][NameObject(Ff)]
-                if Ff in annot[NameObject(Parent)]
-                else 0
-            )
-            & READ_ONLY
-        )
-    return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & READ_ONLY)
+    return check_field_flag(annot, READ_ONLY)
 
 
 def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
@@ -328,16 +332,7 @@ def get_text_field_multiline(annot: DictionaryObject) -> bool:
     Returns:
         bool: True if the text field is multiline, False otherwise.
     """
-    if Parent in annot and Ff not in annot:
-        return bool(
-            int(
-                annot[NameObject(Parent)][NameObject(Ff)]
-                if Ff in annot[NameObject(Parent)]
-                else 0
-            )
-            & MULTILINE
-        )
-    return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & MULTILINE)
+    return check_field_flag(annot, MULTILINE)
 
 
 def get_field_rect(annot: DictionaryObject) -> Tuple[float, float, float, float]:
