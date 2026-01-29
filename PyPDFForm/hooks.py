@@ -77,6 +77,26 @@ def trigger_widget_hooks(
         return f.read()
 
 
+def _update_field_flag(annot: DictionaryObject, flag: int, set: bool) -> None:
+    # Ff in annot[Parent] only in hooks.py, or when editing instead of retrieving
+    if Parent in annot and (Ff in annot[Parent] or Ff not in annot):
+        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
+            (
+                int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | flag
+                if set
+                else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~flag
+            )
+        )
+    else:
+        annot[NameObject(Ff)] = NumberObject(
+            (
+                int(annot.get(NameObject(Ff), 0)) | flag
+                if set
+                else int(annot.get(NameObject(Ff), 0)) & ~flag
+            )
+        )
+
+
 def update_text_field_font(annot: DictionaryObject, val: str) -> None:
     """
     Updates the font of a text field annotation.
@@ -215,20 +235,7 @@ def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
         val (bool): True to enable multiline, False to disable.
     """
     if val:
-        # Ff in annot[Parent] only in hooks.py, or when editing instead of retrieving
-        if Parent in annot and Ff in annot[Parent]:
-            annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-                int(
-                    annot[NameObject(Parent)][NameObject(Ff)]
-                    if Ff in annot[NameObject(Parent)]
-                    else 0
-                )
-                | MULTILINE
-            )
-        else:
-            annot[NameObject(Ff)] = NumberObject(
-                int(annot[NameObject(Ff)] if Ff in annot else 0) | MULTILINE
-            )
+        _update_field_flag(annot, MULTILINE, True)
 
 
 def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
@@ -244,19 +251,7 @@ def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
         val (bool): True to enable comb, False to disable.
     """
     if val:
-        if Parent in annot and Ff in annot[Parent]:
-            annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-                int(
-                    annot[NameObject(Parent)][NameObject(Ff)]
-                    if Ff in annot[NameObject(Parent)]
-                    else 0
-                )
-                | COMB
-            )
-        else:
-            annot[NameObject(Ff)] = NumberObject(
-                int(annot[NameObject(Ff)] if Ff in annot else 0) | COMB
-            )
+        _update_field_flag(annot, COMB, True)
 
 
 def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
@@ -364,22 +359,7 @@ def flatten_generic(annot: DictionaryObject, val: bool) -> None:
         annot (DictionaryObject): The annotation dictionary.
         val (bool): True to flatten (make read-only), False to unflatten (make editable).
     """
-    if Parent in annot and (Ff in annot[Parent] or Ff not in annot):
-        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-            (
-                int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
-                if val
-                else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~READ_ONLY
-            )
-        )
-    else:
-        annot[NameObject(Ff)] = NumberObject(
-            (
-                int(annot.get(NameObject(Ff), 0)) | READ_ONLY
-                if val
-                else int(annot.get(NameObject(Ff), 0)) & ~READ_ONLY
-            )
-        )
+    _update_field_flag(annot, READ_ONLY, True)
 
 
 def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
@@ -409,22 +389,7 @@ def update_field_required(annot: DictionaryObject, val: bool) -> None:
         annot (DictionaryObject): The annotation dictionary for the form field.
         val (bool): True to set the field as required, False to make it optional.
     """
-    if Parent in annot and Ff in annot[Parent]:
-        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-            (
-                int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | REQUIRED
-                if val
-                else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~REQUIRED
-            )
-        )
-    else:
-        annot[NameObject(Ff)] = NumberObject(
-            (
-                int(annot.get(NameObject(Ff), 0)) | REQUIRED
-                if val
-                else int(annot.get(NameObject(Ff), 0)) & ~REQUIRED
-            )
-        )
+    _update_field_flag(annot, REQUIRED, val)
 
 
 def update_field_hidden(annot: DictionaryObject, val: bool) -> None:
