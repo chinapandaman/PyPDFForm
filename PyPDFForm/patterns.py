@@ -99,6 +99,20 @@ DROPDOWN_CHOICE_PATTERNS = [
 
 
 def check_field_flag(annot: DictionaryObject, flag: int) -> bool:
+    """
+    Checks if a specific flag is set for a field annotation.
+
+    This function inspects the 'Ff' (field flags) entry of the annotation
+    dictionary (or its parent if it's a child annotation) to determine if the
+    provided flag is set.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+        flag (int): The bit flag to check for.
+
+    Returns:
+        bool: True if the flag is set, False otherwise.
+    """
     if Parent in annot and Ff not in annot:
         return bool(
             int(
