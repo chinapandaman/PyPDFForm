@@ -413,4 +413,16 @@ def get_field_rect(annot: DictionaryObject) -> Tuple[float, float, float, float]
 
 
 def get_field_hidden(annot: DictionaryObject) -> bool:
+    """
+    Checks if a field annotation is hidden.
+
+    This function inspects the 'F' (flags) entry of the annotation
+    dictionary to determine if the Hidden flag is set.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+
+    Returns:
+        bool: True if the field is hidden, False otherwise.
+    """
     return bool(int(annot[NameObject(F)] if F in annot else 0) & HIDDEN)
