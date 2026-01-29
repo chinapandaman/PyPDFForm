@@ -328,22 +328,7 @@ def flatten_radio(annot: DictionaryObject, val: bool) -> None:
         annot (DictionaryObject): The radio button annotation dictionary.
         val (bool): True to flatten (make read-only), False to unflatten (make editable).
     """
-    if Parent in annot:
-        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-            (
-                int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | READ_ONLY
-                if val
-                else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~READ_ONLY
-            )
-        )
-    else:
-        annot[NameObject(Ff)] = NumberObject(
-            (
-                int(annot.get(NameObject(Ff), 0)) | READ_ONLY
-                if val
-                else int(annot.get(NameObject(Ff), 0)) & ~READ_ONLY
-            )
-        )
+    _update_field_flag(annot, READ_ONLY, val)
 
 
 def flatten_generic(annot: DictionaryObject, val: bool) -> None:
