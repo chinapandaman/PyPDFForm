@@ -70,3 +70,20 @@ def test_addition_operator_3_times_values(template_stream, data_dict):
     for k, v in obj.widgets.items():
         if k.split("-")[0] in data_dict:
             assert (v.value or False) == data_dict[k.split("-")[0]]
+
+
+def test_field_readonly(pdf_samples):
+    obj = PdfWrapper(os.path.join(pdf_samples, "test_fill_flatten_then_unflatten.pdf"))
+
+    for k, v in obj.widgets.items():
+        if k in ["test_2", "check_3"]:
+            assert not v.readonly
+        else:
+            assert v.readonly
+
+
+def test_field_readonly_sejda(pdf_samples):
+    obj = PdfWrapper(os.path.join(pdf_samples, "test_fill_sejda_flatten.pdf"))
+
+    for v in obj.widgets.values():
+        assert v.readonly

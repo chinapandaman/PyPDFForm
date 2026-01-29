@@ -14,8 +14,8 @@ from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
 from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, MULTILINE,
-                        SLASH, TU, A, Btn, Ch, Ff, I, N, Off, Opt, Parent,
-                        Rect, Sig, T, Tx, V, Yes)
+                        READ_ONLY, SLASH, TU, A, Btn, Ch, Ff, I, N, Off, Opt,
+                        Parent, Rect, Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -96,6 +96,19 @@ DROPDOWN_CHOICE_PATTERNS = [
     {Opt: True},
     {Parent: {Opt: True}},
 ]
+
+
+def get_field_readonly(annot: DictionaryObject) -> bool:
+    if Parent in annot and Ff not in annot:
+        return bool(
+            int(
+                annot[NameObject(Parent)][NameObject(Ff)]
+                if Ff in annot[NameObject(Parent)]
+                else 0
+            )
+            & READ_ONLY
+        )
+    return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & READ_ONLY)
 
 
 def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
