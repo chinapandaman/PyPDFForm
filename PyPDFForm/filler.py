@@ -23,9 +23,9 @@ from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .patterns import (update_checkbox_value, update_dropdown_value,
-                       update_radio_value, update_text_value)
-from .template import get_widget_key
+from .patterns import (get_widget_key, update_checkbox_value,
+                       update_dropdown_value, update_radio_value,
+                       update_text_value)
 from .utils import stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 

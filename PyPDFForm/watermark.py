@@ -18,7 +18,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
 from .constants import Annots
-from .template import get_widget_key
+from .patterns import get_widget_key
 from .utils import stream_to_io
 
 

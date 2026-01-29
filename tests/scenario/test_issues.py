@@ -9,7 +9,8 @@ from pypdf import PdfReader, PdfWriter
 from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.constants import TU, Parent, V
 from PyPDFForm.middleware.radio import Radio
-from PyPDFForm.template import get_widget_key, get_widgets_by_page
+from PyPDFForm.patterns import get_widget_key
+from PyPDFForm.template import get_widgets_by_page
 from PyPDFForm.utils import stream_to_io
 
 
