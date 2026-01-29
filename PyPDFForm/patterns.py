@@ -348,6 +348,30 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
     return int(widget[MaxLen]) or None if MaxLen in widget else None
 
 
+def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
+    """
+    Extracts the choices from a dropdown widget dictionary.
+
+    This function extracts the choices from a dropdown widget dictionary.
+
+    Args:
+        widget (dict): The widget dictionary to extract the choices from.
+
+    Returns:
+        Union[Tuple[str, ...], None]: A tuple of strings representing the choices in the dropdown, or None if the choices are not specified.
+    """
+    return tuple(
+        (
+            each.get_object()
+            if isinstance(each.get_object(), str)
+            else str(each.get_object()[1])
+        )
+        for each in extract_widget_property(
+            widget, DROPDOWN_CHOICE_PATTERNS, None, None
+        )
+    )
+
+
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:
     """
     Updates the name of an annotation, setting the T (title) entry.

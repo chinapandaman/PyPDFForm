@@ -10,7 +10,7 @@ types of widgets.
 
 from functools import lru_cache
 from io import BytesIO
-from typing import Dict, List, Tuple, Union, cast
+from typing import Dict, List, Union, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
@@ -20,11 +20,12 @@ from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
-from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
-                       WIDGET_TYPE_PATTERNS, check_field_flag,
-                       get_checkbox_value, get_dropdown_value, get_field_rect,
-                       get_radio_value, get_text_field_max_length,
-                       get_text_value, get_widget_key, update_annotation_name)
+from .patterns import (WIDGET_DESCRIPTION_PATTERNS, WIDGET_TYPE_PATTERNS,
+                       check_field_flag, get_checkbox_value,
+                       get_dropdown_choices, get_dropdown_value,
+                       get_field_rect, get_radio_value,
+                       get_text_field_max_length, get_text_value,
+                       get_widget_key, update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
@@ -208,30 +209,6 @@ def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
             result = _type(key)
             break
     return result
-
-
-def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
-    """
-    Extracts the choices from a dropdown widget dictionary.
-
-    This function extracts the choices from a dropdown widget dictionary.
-
-    Args:
-        widget (dict): The widget dictionary to extract the choices from.
-
-    Returns:
-        Union[Tuple[str, ...], None]: A tuple of strings representing the choices in the dropdown, or None if the choices are not specified.
-    """
-    return tuple(
-        (
-            each.get_object()
-            if isinstance(each.get_object(), str)
-            else str(each.get_object()[1])
-        )
-        for each in extract_widget_property(
-            widget, DROPDOWN_CHOICE_PATTERNS, None, None
-        )
-    )
 
 
 def update_widget_keys(
