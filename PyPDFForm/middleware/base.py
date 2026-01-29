@@ -22,7 +22,7 @@ class Widget:
     """
 
     SET_ATTR_TRIGGER_HOOK_MAP = {
-        "readonly": "flatten_generic",
+        "readonly": "flatten_field",
         "required": "update_field_required",
         "hidden": "update_field_hidden",
         "tooltip": "update_field_tooltip",

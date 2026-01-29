@@ -15,7 +15,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
 from .constants import WIDGET_TYPES, Annots
-from .hooks import flatten_generic, flatten_radio
+from .hooks import flatten_field
 from .image import get_draw_image_resolutions, get_image_dimensions
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
@@ -122,9 +122,7 @@ def fill(
 
             # flatten all
             if flatten:
-                (flatten_radio if isinstance(widget, Radio) else flatten_generic)(
-                    annot, True
-                )
+                flatten_field(annot, True)
             if widget.value is None:
                 continue
 
