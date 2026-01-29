@@ -77,13 +77,25 @@ def trigger_widget_hooks(
         return f.read()
 
 
-def _update_field_flag(annot: DictionaryObject, flag: int, set: bool) -> None:
+def _update_field_flag(annot: DictionaryObject, flag: int, should_set: bool) -> None:
+    """
+    Sets or unsets a bit flag for a form field annotation.
+
+    This internal helper function modifies the 'Ff' (field flags) entry in the
+    annotation dictionary or its parent dictionary to set or unset a specific
+    bit flag.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        flag (int): The bit flag to set or unset.
+        should_set (bool): True to set the flag, False to unset it.
+    """
     # Ff in annot[Parent] only in hooks.py, or when editing instead of retrieving
     if Parent in annot and (Ff in annot[Parent] or Ff not in annot):
         annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
             (
                 int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | flag
-                if set
+                if should_set
                 else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~flag
             )
         )
@@ -91,7 +103,7 @@ def _update_field_flag(annot: DictionaryObject, flag: int, set: bool) -> None:
         annot[NameObject(Ff)] = NumberObject(
             (
                 int(annot.get(NameObject(Ff), 0)) | flag
-                if set
+                if should_set
                 else int(annot.get(NameObject(Ff), 0)) & ~flag
             )
         )
