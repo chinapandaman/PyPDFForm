@@ -107,7 +107,7 @@ def test_field_required_sejda(pdf_samples):
         )
     )
 
-    assert obj.widgets["buyer_address"].required == True
+    assert obj.widgets["buyer_address"].required
     for k, v in obj.widgets.items():
         if k != "buyer_address":
             assert not v.required
