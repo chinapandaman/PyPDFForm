@@ -359,7 +359,7 @@ def flatten_generic(annot: DictionaryObject, val: bool) -> None:
         annot (DictionaryObject): The annotation dictionary.
         val (bool): True to flatten (make read-only), False to unflatten (make editable).
     """
-    _update_field_flag(annot, READ_ONLY, True)
+    _update_field_flag(annot, READ_ONLY, val)
 
 
 def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
