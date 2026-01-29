@@ -13,9 +13,9 @@ from typing import Tuple, Union
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
 
-from .constants import (AP, AS, DV, FT, IMAGE_FIELD_IDENTIFIER, JS, SLASH, TU,
-                        A, Btn, Ch, Ff, I, MaxLen, N, Off, Opt, Parent, Rect,
-                        Sig, T, Tx, V, Yes)
+from .constants import (AP, AS, DV, FT, HIDDEN, IMAGE_FIELD_IDENTIFIER, JS,
+                        SLASH, TU, A, Btn, Ch, F, Ff, I, MaxLen, N, Off, Opt,
+                        Parent, Rect, Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -410,3 +410,7 @@ def get_field_rect(annot: DictionaryObject) -> Tuple[float, float, float, float]
         float(abs(rect[2].get_object() - rect[0].get_object())),
         float(abs(rect[3].get_object() - rect[1].get_object())),
     )
+
+
+def get_field_hidden(annot: DictionaryObject) -> bool:
+    return bool(int(annot[NameObject(F)] if F in annot else 0) & HIDDEN)
