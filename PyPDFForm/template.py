@@ -23,7 +23,7 @@ from .middleware.text import Text
 from .patterns import (WIDGET_DESCRIPTION_PATTERNS, WIDGET_TYPE_PATTERNS,
                        check_field_flag, get_checkbox_value,
                        get_dropdown_choices, get_dropdown_value,
-                       get_field_rect, get_radio_value,
+                       get_field_hidden, get_field_rect, get_radio_value,
                        get_text_field_max_length, get_text_value,
                        get_widget_key, update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
@@ -102,6 +102,7 @@ def build_widgets(
                 )
                 _widget.__dict__["readonly"] = check_field_flag(widget, READ_ONLY)
                 _widget.__dict__["required"] = check_field_flag(widget, REQUIRED)
+                _widget.__dict__["hidden"] = get_field_hidden(widget)
 
                 field_rect = get_field_rect(widget)
                 _widget.x, _widget.y, _widget.width, _widget.height = field_rect

@@ -111,3 +111,24 @@ def test_field_required_sejda(pdf_samples):
     for k, v in obj.widgets.items():
         if k != "buyer_address":
             assert not v.required
+
+
+def test_field_hidden(pdf_samples):
+    obj = PdfWrapper(os.path.join(pdf_samples, "test_hidden_text_check.pdf"))
+
+    assert obj.widgets["test"].hidden
+    assert obj.widgets["check_2"].hidden
+    for k, v in obj.widgets.items():
+        if k not in ["test", "check_2"]:
+            assert not v.hidden
+
+
+def test_field_hidden_sejda(pdf_samples):
+    obj = PdfWrapper(os.path.join(pdf_samples, "test_hidden_sejda.pdf"))
+
+    assert obj.widgets["buyer_name"].hidden
+    assert obj.widgets["purchase_option"].hidden
+    assert obj.widgets["at_future_date"].hidden
+    for k, v in obj.widgets.items():
+        if k not in ["buyer_name", "purchase_option", "at_future_date"]:
+            assert not v.hidden
