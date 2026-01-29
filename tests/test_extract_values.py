@@ -87,3 +87,27 @@ def test_field_readonly_sejda(pdf_samples):
 
     for v in obj.widgets.values():
         assert v.readonly
+
+
+def test_field_required(pdf_samples):
+    obj = PdfWrapper(
+        os.path.join(pdf_samples, "widget", "test_create_required_fields.pdf")
+    )
+
+    for v in obj.widgets.values():
+        assert v.required
+
+
+def test_field_required_sejda(pdf_samples):
+    obj = PdfWrapper(
+        os.path.join(
+            pdf_samples,
+            "test_widget_attr_trigger",
+            "test_set_text_field_required_sejda.pdf",
+        )
+    )
+
+    assert obj.widgets["buyer_address"].required == True
+    for k, v in obj.widgets.items():
+        if k != "buyer_address":
+            assert not v.required

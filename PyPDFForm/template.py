@@ -15,7 +15,7 @@ from typing import Dict, List, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
-from .constants import MULTILINE, READ_ONLY, WIDGET_TYPES, Annots
+from .constants import MULTILINE, READ_ONLY, REQUIRED, WIDGET_TYPES, Annots
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -101,6 +101,7 @@ def build_widgets(
                     widget, WIDGET_DESCRIPTION_PATTERNS, None, str
                 )
                 _widget.__dict__["readonly"] = check_field_flag(widget, READ_ONLY)
+                _widget.__dict__["required"] = check_field_flag(widget, REQUIRED)
 
                 field_rect = get_field_rect(widget)
                 _widget.x, _widget.y, _widget.width, _widget.height = field_rect
