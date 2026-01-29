@@ -22,6 +22,7 @@ from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
+from .utils import extract_widget_property
 
 WIDGET_TYPE_PATTERNS = [
     (
@@ -123,6 +124,41 @@ def check_field_flag(annot: DictionaryObject, flag: int) -> bool:
             & flag
         )
     return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & flag)
+
+
+def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
+    """
+    Extracts the widget key from a widget dictionary.
+
+    This function extracts the widget key from a widget dictionary based on
+    predefined patterns. If `use_full_widget_name` is True, it recursively
+    constructs the full widget name by concatenating the parent widget keys.
+
+    Args:
+        widget (dict): The widget dictionary to extract the key from.
+        use_full_widget_name (bool): Whether to use the full widget name
+            (including parent names) as the widget key.
+
+    Returns:
+        str: The extracted widget key.
+    """
+    if not use_full_widget_name:
+        return extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+
+    key = widget.get(T)
+    if (
+        Parent in widget
+        and T in widget[Parent].get_object()
+        and widget[Parent].get_object()[T] != key  # sejda case
+    ):
+        if key is None:
+            return get_widget_key(widget[Parent].get_object(), use_full_widget_name)
+
+        return (
+            f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
+        )
+
+    return key or ""
 
 
 def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:

@@ -23,7 +23,7 @@ from .constants import (AA, COMB, DA, FONT_COLOR_IDENTIFIER,
                         REQUIRED, TU, Action, Annots, Bl, D, E, F, Ff, Fo,
                         JavaScript, MaxLen, Opt, Parent, Q, Rect, S, Type, U,
                         X)
-from .template import get_widget_key
+from .patterns import get_widget_key
 from .utils import stream_to_io
 
 

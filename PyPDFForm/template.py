@@ -15,17 +15,16 @@ from typing import Dict, List, Tuple, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
-from .constants import (MULTILINE, READ_ONLY, WIDGET_TYPES, Annots, MaxLen,
-                        Parent, T)
+from .constants import MULTILINE, READ_ONLY, WIDGET_TYPES, Annots, MaxLen
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (DROPDOWN_CHOICE_PATTERNS, WIDGET_DESCRIPTION_PATTERNS,
-                       WIDGET_KEY_PATTERNS, WIDGET_TYPE_PATTERNS,
-                       check_field_flag, get_checkbox_value,
-                       get_dropdown_value, get_field_rect, get_radio_value,
-                       get_text_value, update_annotation_name)
+                       WIDGET_TYPE_PATTERNS, check_field_flag,
+                       get_checkbox_value, get_dropdown_value, get_field_rect,
+                       get_radio_value, get_text_value, get_widget_key,
+                       update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
@@ -182,41 +181,6 @@ def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
                         break
 
     return result
-
-
-def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
-    """
-    Extracts the widget key from a widget dictionary.
-
-    This function extracts the widget key from a widget dictionary based on
-    predefined patterns. If `use_full_widget_name` is True, it recursively
-    constructs the full widget name by concatenating the parent widget keys.
-
-    Args:
-        widget (dict): The widget dictionary to extract the key from.
-        use_full_widget_name (bool): Whether to use the full widget name
-            (including parent names) as the widget key.
-
-    Returns:
-        str: The extracted widget key.
-    """
-    if not use_full_widget_name:
-        return extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
-
-    key = widget.get(T)
-    if (
-        Parent in widget
-        and T in widget[Parent].get_object()
-        and widget[Parent].get_object()[T] != key  # sejda case
-    ):
-        if key is None:
-            return get_widget_key(widget[Parent].get_object(), use_full_widget_name)
-
-        return (
-            f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
-        )
-
-    return key or ""
 
 
 def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
