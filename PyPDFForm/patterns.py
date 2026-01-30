@@ -349,6 +349,16 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
 
 
 def get_text_field_alignment(widget: dict) -> Union[int, None]:
+    """
+    Extracts the alignment (quadding) of a text field from a widget dictionary.
+
+    Args:
+        widget (dict): The widget dictionary to extract the alignment from.
+
+    Returns:
+        Union[int, None]: The alignment of the text field, or None if the
+            alignment is not specified or is the default (left-justified).
+    """
     return int(widget.get(Q, 0)) or None
 
 
