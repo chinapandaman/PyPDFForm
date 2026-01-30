@@ -98,6 +98,7 @@ def build_widgets(
             key = get_widget_key(widget, use_full_widget_name)
             _widget = construct_widget(widget, key)
             if _widget is not None:
+                # widget property extractions don't trigger hooks in this function
                 _widget.__dict__["tooltip"] = extract_widget_property(
                     widget, WIDGET_DESCRIPTION_PATTERNS, None, str
                 )
@@ -109,8 +110,6 @@ def build_widgets(
                 _widget.x, _widget.y, _widget.width, _widget.height = field_rect
 
                 if isinstance(_widget, Text):
-                    # mostly for schema for now
-                    # doesn't trigger hook
                     _widget.__dict__["max_length"] = get_text_field_max_length(widget)
                     _widget.__dict__["multiline"] = check_field_flag(widget, MULTILINE)
                     _widget.__dict__["alignment"] = get_text_field_alignment(widget)
