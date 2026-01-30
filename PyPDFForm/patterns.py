@@ -15,7 +15,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
 
 from .constants import (AP, AS, DV, FT, HIDDEN, IMAGE_FIELD_IDENTIFIER, JS,
                         SLASH, TU, A, Btn, Ch, F, Ff, I, MaxLen, N, Off, Opt,
-                        Parent, Rect, Sig, T, Tx, V, Yes)
+                        Parent, Q, Rect, Sig, T, Tx, V, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -346,6 +346,20 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
             if the max length is not specified.
     """
     return int(widget[MaxLen]) or None if MaxLen in widget else None
+
+
+def get_text_field_alignment(widget: dict) -> Union[int, None]:
+    """
+    Extracts the alignment (quadding) of a text field from a widget dictionary.
+
+    Args:
+        widget (dict): The widget dictionary to extract the alignment from.
+
+    Returns:
+        Union[int, None]: The alignment of the text field, or None if the
+            alignment is not specified or is the default (left-justified).
+    """
+    return int(widget.get(Q, 0)) or None
 
 
 def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
