@@ -144,3 +144,26 @@ def test_text_field_alignment_sejda(pdf_samples):
     )
 
     assert obj.widgets["buyer_name"].alignment == 2
+
+
+def test_text_field_comb(max_length_expected_directory):
+    obj = PdfWrapper(
+        os.path.join(
+            max_length_expected_directory,
+            "test_fill_comb_text_field_all_chars.pdf",
+        )
+    )
+
+    assert obj.widgets["LastName"].comb
+
+
+def test_text_field_comb_sejda(pdf_samples):
+    obj = PdfWrapper(
+        os.path.join(
+            pdf_samples,
+            "test_widget_attr_trigger",
+            "test_set_text_field_comb_sejda.pdf",
+        )
+    )
+
+    assert obj.widgets["buyer_name"].comb

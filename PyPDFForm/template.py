@@ -15,7 +15,8 @@ from typing import Dict, List, Union, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
-from .constants import MULTILINE, READ_ONLY, REQUIRED, WIDGET_TYPES, Annots
+from .constants import (COMB, MULTILINE, READ_ONLY, REQUIRED, WIDGET_TYPES,
+                        Annots)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -113,6 +114,7 @@ def build_widgets(
                     _widget.__dict__["max_length"] = get_text_field_max_length(widget)
                     _widget.__dict__["multiline"] = check_field_flag(widget, MULTILINE)
                     _widget.__dict__["alignment"] = get_text_field_alignment(widget)
+                    _widget.__dict__["comb"] = check_field_flag(widget, COMB)
                     get_text_value(widget, _widget)
 
                 if type(_widget) is Checkbox:
