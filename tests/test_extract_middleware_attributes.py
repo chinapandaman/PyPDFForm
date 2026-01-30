@@ -167,3 +167,15 @@ def test_text_field_comb_sejda(pdf_samples):
     )
 
     assert obj.widgets["buyer_name"].comb
+
+
+def test_checkbox_size_sejda(pdf_samples):
+    obj = PdfWrapper(
+        os.path.join(
+            pdf_samples,
+            "test_widget_attr_trigger",
+            "test_set_checkbox_size_sejda.pdf",
+        )
+    )
+
+    assert obj.widgets["date_of_this_bill"].size == 30
