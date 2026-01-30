@@ -110,10 +110,10 @@ def build_widgets(
                 _widget.x, _widget.y, _widget.width, _widget.height = field_rect
 
                 if isinstance(_widget, Text):
-                    _widget.__dict__["max_length"] = get_text_field_max_length(widget)
-                    _widget.__dict__["multiline"] = check_field_flag(widget, MULTILINE)
-                    _widget.__dict__["alignment"] = get_text_field_alignment(widget)
                     _widget.__dict__["comb"] = check_field_flag(widget, COMB)
+                    _widget.__dict__["alignment"] = get_text_field_alignment(widget)
+                    _widget.__dict__["multiline"] = check_field_flag(widget, MULTILINE)
+                    _widget.__dict__["max_length"] = get_text_field_max_length(widget)
                     get_text_value(widget, _widget)
 
                 if type(_widget) is Checkbox:
