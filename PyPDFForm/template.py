@@ -117,7 +117,6 @@ def build_widgets(
                     get_text_value(widget, _widget)
 
                 if type(_widget) is Checkbox:
-                    _widget.__dict__["size"] = min(_widget.width, _widget.height)
                     _widget.value = get_checkbox_value(widget)
 
                 if isinstance(_widget, Dropdown):
