@@ -24,8 +24,8 @@ from .patterns import (WIDGET_DESCRIPTION_PATTERNS, WIDGET_TYPE_PATTERNS,
                        check_field_flag, get_checkbox_value,
                        get_dropdown_choices, get_dropdown_value,
                        get_field_hidden, get_field_rect, get_radio_value,
-                       get_text_field_max_length, get_text_value,
-                       get_widget_key, update_annotation_name)
+                       get_text_field_alignment, get_text_field_max_length,
+                       get_text_value, get_widget_key, update_annotation_name)
 from .utils import extract_widget_property, find_pattern_match, stream_to_io
 
 
@@ -112,6 +112,7 @@ def build_widgets(
                     # doesn't trigger hook
                     _widget.__dict__["max_length"] = get_text_field_max_length(widget)
                     _widget.__dict__["multiline"] = check_field_flag(widget, MULTILINE)
+                    _widget.__dict__["alignment"] = get_text_field_alignment(widget)
                     get_text_value(widget, _widget)
 
                 if type(_widget) is Checkbox:

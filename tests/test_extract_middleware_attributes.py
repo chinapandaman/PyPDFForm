@@ -132,3 +132,15 @@ def test_field_hidden_sejda(pdf_samples):
     for k, v in obj.widgets.items():
         if k not in ["buyer_name", "purchase_option", "at_future_date"]:
             assert not v.hidden
+
+
+def test_text_field_alignment_sejda(pdf_samples):
+    obj = PdfWrapper(
+        os.path.join(
+            pdf_samples,
+            "test_widget_attr_trigger",
+            "test_set_text_field_alignment_sejda.pdf",
+        )
+    )
+
+    assert obj.widgets["buyer_name"].alignment == 2
