@@ -16,7 +16,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
 from .constants import (COMB, MULTILINE, READ_ONLY, REQUIRED, WIDGET_TYPES,
-                        Annots)
+                        Annots, Subtype, Widget)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -176,6 +176,8 @@ def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
         if widgets:
             for widget in widgets:
                 widget = dict(widget.get_object())
+                if widget.get(Subtype) != Widget:
+                    continue
                 for each in WIDGET_TYPE_PATTERNS:
                     patterns = each[0]
                     check = True
