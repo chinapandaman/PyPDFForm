@@ -257,7 +257,9 @@ def create_annotations(
                 }
             )
             for k, v in getattr(annotation, "_additional_properties", ()):
-                annot[k] = v
+                val = getattr(annotation, v[1])
+                if val is not None:
+                    annot[k] = v[0](val)
             page_annotations.append(annot)
 
         if Annots in page:

@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from dataclasses import dataclass
+from typing import Optional
 
-from pypdf.generic import NameObject
+from pypdf.generic import NameObject, TextStringObject
 
+from ..constants import T
 from .base import Annotation
 
 
@@ -13,6 +15,10 @@ class TextAnnotation(Annotation):
 
     comment_icon: str = "/Comment"
 
-    icon: str = comment_icon
+    title: Optional[str] = None
+    icon: Optional[str] = comment_icon
 
-    _additional_properties: tuple = ((NameObject("/Name"), NameObject(icon)),)
+    _additional_properties: tuple = (
+        (NameObject(T), (TextStringObject, "title")),
+        (NameObject("/Name"), (NameObject, "icon")),
+    )
