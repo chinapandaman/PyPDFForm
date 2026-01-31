@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
 
 from dataclasses import dataclass
+from enum import Enum
 
 from pypdf.generic import NameObject
 
 from .base import Annotation
 
 
-@dataclass
-class TextAnnotationIcons:
-    comment = "/Comment"
+class TextAnnotationIcons(Enum):
+    comment: str = "/Comment"
 
 
 @dataclass
 class TextAnnotation(Annotation):
     _annotation_type: str = "/Text"
 
-    icon: str = "/Comment"
+    icons = TextAnnotationIcons
+    icon = icons.comment
 
-    _additional_properties: tuple = (
-        (NameObject("/Name"), NameObject(icon)),
-    )
+    _additional_properties: tuple = ((NameObject("/Name"), NameObject(icon.value)),)
