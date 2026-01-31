@@ -13,10 +13,12 @@ from io import BytesIO
 from typing import Dict, List, Union, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject
+from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
+                           NameObject, TextStringObject)
 
+from .annotations.base import Annotation
 from .constants import (COMB, MULTILINE, READ_ONLY, REQUIRED, WIDGET_TYPES,
-                        Annots, Subtype, Widget)
+                        Annot, Annots, Contents, Rect, Subtype, Type, Widget)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -215,6 +217,58 @@ def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
             result = _type(key)
             break
     return result
+
+
+def create_annotations(
+    template: bytes,
+    annotations: List[Annotation],
+) -> bytes:
+    reader = PdfReader(stream_to_io(template))
+    writer = PdfWriter(clone_from=reader)
+
+    annotations_by_page = {}
+    for annotation in annotations:
+        if annotation.page_number not in annotations_by_page:
+            annotations_by_page[annotation.page_number] = []
+        annotations_by_page[annotation.page_number].append(annotation)
+
+    for i, page in enumerate(writer.pages):
+        page_num = i + 1
+        if page_num not in annotations_by_page:
+            continue
+
+        page_annotations = ArrayObject([])
+        for annotation in annotations_by_page[page_num]:
+            annot = DictionaryObject(
+                {
+                    NameObject(Type): NameObject(Annot),
+                    NameObject(Subtype): NameObject(
+                        getattr(annotation, "_annotation_type")
+                    ),
+                    NameObject(Rect): ArrayObject(
+                        [
+                            FloatObject(annotation.x),
+                            FloatObject(annotation.y),
+                            FloatObject(annotation.x + annotation.width),
+                            FloatObject(annotation.y + annotation.height),
+                        ]
+                    ),
+                    NameObject(Contents): TextStringObject(annotation.contents),
+                }
+            )
+            for k, v in getattr(annotation, "_additional_properties", ()):
+                annot[k] = v
+            page_annotations.append(annot)
+
+        if Annots in page:
+            page[Annots] += page_annotations
+        else:
+            page[NameObject(Annots)] = page_annotations
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
 
 
 def update_widget_keys(

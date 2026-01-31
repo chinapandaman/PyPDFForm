@@ -27,6 +27,7 @@ from typing import (TYPE_CHECKING, BinaryIO, Dict, Sequence, TextIO, Tuple,
 
 from .adapter import (fp_or_f_obj_or_f_content_to_content,
                       fp_or_f_obj_or_stream_to_stream)
+from .annotations import AnnotationTypes
 from .ap import appearance_streams_handler, preserve_pdf_properties
 from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
@@ -38,8 +39,8 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .raw import RawText, RawTypes
-from .template import (build_widgets, get_metadata, set_metadata,
-                       update_widget_keys)
+from .template import (build_widgets, create_annotations, get_metadata,
+                       set_metadata, update_widget_keys)
 from .types import PdfArray
 from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
@@ -535,6 +536,11 @@ class PdfWrapper:
         if image_drawn_stream is not None:
             # because copy_watermark_widgets and remove_all_widgets
             self._reregister_font()
+
+        return self
+
+    def annotate(self, annotations: Sequence[AnnotationTypes]) -> PdfWrapper:
+        self._stream = create_annotations(self._read(), annotations)
 
         return self
 

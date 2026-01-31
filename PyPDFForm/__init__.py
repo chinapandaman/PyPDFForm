@@ -22,6 +22,7 @@ PyPDFForm aims to simplify PDF form manipulation, making it accessible to develo
 
 __version__ = "4.4.0"
 
+from .annotations import Annotations
 from .assets.blank import BlankPage
 from .middleware import Widgets
 from .raw import RawElements
@@ -29,4 +30,12 @@ from .types import PdfArray
 from .widgets import Fields
 from .wrapper import PdfWrapper
 
-__all__ = ["PdfWrapper", "PdfArray", "Fields", "BlankPage", "RawElements", "Widgets"]
+__all__ = [
+    "PdfWrapper",
+    "PdfArray",
+    "Annotations",
+    "Fields",
+    "BlankPage",
+    "RawElements",
+    "Widgets",
+]
