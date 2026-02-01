@@ -1,7 +1,4 @@
-# Embed PDF JavaScript (beta)
-
-???+ info
-    These beta features and their documentation are subject to change. Use with caution; they may be modified, rolled back, or fail in some PDF forms.
+# Embed PDF JavaScript
 
 ???+ warning
     Do NOT trust user input; always sanitize it. Although PDF JavaScript runs in a sandbox, arbitrary execution is dangerous and can lead to remote code execution vulnerabilities.
