@@ -16,7 +16,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, TextStringObject)
 
-from .annotations.base import Annotation
+from .annotations import AnnotationTypes
 from .constants import (COMB, MULTILINE, READ_ONLY, REQUIRED, WIDGET_TYPES,
                         Annot, Annots, Contents, Rect, Subtype, Type, Widget)
 from .middleware.checkbox import Checkbox
@@ -221,7 +221,7 @@ def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
 
 def create_annotations(
     template: bytes,
-    annotations: List[Annotation],
+    annotations: List[AnnotationTypes],
 ) -> bytes:
     reader = PdfReader(stream_to_io(template))
     writer = PdfWriter(clone_from=reader)
