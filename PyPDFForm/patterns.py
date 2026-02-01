@@ -384,7 +384,7 @@ def get_text_field_alignment(widget: dict) -> Union[int, None]:
         Union[int, None]: The alignment of the text field, or None if the
             alignment is not specified or is the default (left-justified).
     """
-    return int(widget.get(Q, 0)) or None
+    return int(widget[Q]) if Q in widget else None
 
 
 def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
