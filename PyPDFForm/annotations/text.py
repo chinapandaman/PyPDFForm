@@ -1,0 +1,54 @@
+# -*- coding: utf-8 -*-
+"""
+This module defines the `TextAnnotation` class, which is used to represent
+a text annotation (sticky note) in a PDF document.
+
+The `TextAnnotation` class encapsulates the properties of a text annotation,
+such as its location, dimensions, content, title, and the icon to be displayed.
+"""
+
+from dataclasses import dataclass
+from typing import Optional
+
+from pypdf.generic import NameObject, TextStringObject
+
+from ..constants import T
+from .base import Annotation
+
+
+@dataclass
+class TextAnnotation(Annotation):
+    """
+    Represents a text annotation in a PDF document.
+
+    This dataclass extends the base `Annotation` class and defines the specific
+    attributes and metadata associated with a text annotation, often visualized
+    as a sticky note.
+
+    Attributes:
+        _annotation_type (str): The PDF internal type of the annotation, which is "/Text".
+        _additional_properties (tuple): A tuple defining how specific attributes are mapped
+            to PDF dictionary keys for the annotation.
+        note_icon (str): The identifier for a "Note" icon.
+        comment_icon (str): The identifier for a "Comment" icon.
+        help_icon (str): The identifier for a "Help" icon.
+        key_icon (str): The identifier for a "Key" icon.
+        insert_icon (str): The identifier for an "Insert" icon.
+        title (Optional[str]): The title to be displayed in the annotation's title bar.
+        icon (Optional[str]): The name of the icon to be used for the annotation's appearance.
+    """
+
+    _annotation_type: str = "/Text"
+    _additional_properties: tuple = (
+        (NameObject(T), (TextStringObject, "title")),
+        (NameObject("/Name"), (NameObject, "icon")),
+    )
+
+    note_icon: str = "/Note"
+    comment_icon: str = "/Comment"
+    help_icon: str = "/Help"
+    key_icon: str = "/Key"
+    insert_icon: str = "/Insert"
+
+    title: Optional[str] = None
+    icon: Optional[str] = None

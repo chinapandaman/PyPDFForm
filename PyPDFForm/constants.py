@@ -43,6 +43,8 @@ DEPRECATION_NOTICE = "{} will be deprecated soon. Use {} instead."
 
 Title = "/Title"
 Annots = "/Annots"
+Annot = "/Annot"
+Contents = "/Contents"
 Widget = "/Widget"
 T = "/T"
 TU = "/TU"

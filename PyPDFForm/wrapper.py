@@ -38,8 +38,8 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .raw import RawText, RawTypes
-from .template import (build_widgets, get_metadata, set_metadata,
-                       update_widget_keys)
+from .template import (build_widgets, create_annotations, get_metadata,
+                       set_metadata, update_widget_keys)
 from .types import PdfArray
 from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
@@ -48,6 +48,7 @@ from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
 from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
 
 if TYPE_CHECKING:
+    from .annotations import AnnotationTypes
     from .assets.blank import BlankPage
     from .widgets import FieldTypes
 
@@ -535,6 +536,25 @@ class PdfWrapper:
         if image_drawn_stream is not None:
             # because copy_watermark_widgets and remove_all_widgets
             self._reregister_font()
+
+        return self
+
+    def annotate(self, annotations: Sequence[AnnotationTypes]) -> PdfWrapper:
+        """
+        Adds annotations to the PDF.
+
+        This method allows you to add various types of annotations (e.g., text
+        annotations/sticky notes) to the PDF pages.
+
+        Args:
+            annotations (Sequence[AnnotationTypes]): A list of annotation objects
+                to be added to the PDF.
+
+        Returns:
+            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
+        """
+
+        self._stream = create_annotations(self._read(), annotations)
 
         return self
 
