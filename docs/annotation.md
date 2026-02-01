@@ -1,16 +1,16 @@
 # Annotate PDFs
 
-PyPDFForm supports annotating PDFs by creating non-form-field annotations.
+PyPDFForm supports adding non-form-field annotations to PDFs.
 
-This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
+This section uses [this PDF](pdfs/sample_template.pdf) as an example.
 
 Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
 
-All optional parameters will have a comment `# optional` after each of them.
+Optional parameters are marked with an `# optional` comment.
 
 ## Create text annotations
 
-Text annotations appear on a PDF in the form of sticky notes. To create them, use the `PdfWrapper.annotate` method and pass a list of annotations to create:
+Text annotations appear as sticky notes on a PDF. To create them, use the `PdfWrapper.annotate` method and pass a list of annotations:
 
 ```python
 from PyPDFForm import Annotations, PdfWrapper
