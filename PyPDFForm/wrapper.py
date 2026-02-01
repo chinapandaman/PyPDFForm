@@ -27,7 +27,6 @@ from typing import (TYPE_CHECKING, BinaryIO, Dict, Sequence, TextIO, Tuple,
 
 from .adapter import (fp_or_f_obj_or_f_content_to_content,
                       fp_or_f_obj_or_stream_to_stream)
-from .annotations import AnnotationTypes
 from .ap import appearance_streams_handler, preserve_pdf_properties
 from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
@@ -49,6 +48,7 @@ from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
 from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
 
 if TYPE_CHECKING:
+    from .annotations import AnnotationTypes
     from .assets.blank import BlankPage
     from .widgets import FieldTypes
 
