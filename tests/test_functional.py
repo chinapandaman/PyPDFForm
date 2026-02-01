@@ -6,7 +6,7 @@ from io import BytesIO
 import pytest
 from jsonschema import ValidationError, validate
 
-from PyPDFForm import BlankPage, Fields, PdfArray, PdfWrapper
+from PyPDFForm import Annotations, BlankPage, Fields, PdfArray, PdfWrapper
 from PyPDFForm.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
 from PyPDFForm.deprecation import deprecation_notice
 from PyPDFForm.middleware.base import Widget
@@ -786,3 +786,101 @@ def test_merge(template_stream):
                 assert field[V] == f"test_2_{int(page / 3)}"
             elif key.startswith("test_3-"):
                 assert field[V] == f"test_3_{int(page / 3 - 0.5)}"
+
+
+def test_annotate(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_annotate.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).annotate(
+            [
+                Annotations.TextAnnotation(
+                    1, 100, 100, contents="this is an annotation"
+                ),
+                Annotations.TextAnnotation(
+                    1,
+                    200,
+                    100,
+                    contents="this is a second annotation",
+                    title="Annotation 2",
+                    icon=Annotations.TextAnnotation.comment_icon,
+                ),
+                Annotations.TextAnnotation(
+                    1,
+                    100,
+                    200,
+                    contents="this is a third annotation",
+                    icon=Annotations.TextAnnotation.help_icon,
+                ),
+                Annotations.TextAnnotation(
+                    1,
+                    200,
+                    200,
+                    contents="this is a forth annotation",
+                    icon=Annotations.TextAnnotation.key_icon,
+                ),
+                Annotations.TextAnnotation(
+                    2,
+                    100,
+                    300,
+                    contents="this is a fifth annotation",
+                    icon=Annotations.TextAnnotation.insert_icon,
+                ),
+            ]
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
+def test_annotate_no_annotations(pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_annotate_no_annotations.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).annotate(
+            [
+                Annotations.TextAnnotation(
+                    1, 100, 100, contents="this is an annotation"
+                ),
+                Annotations.TextAnnotation(
+                    1,
+                    200,
+                    100,
+                    contents="this is a second annotation",
+                    title="Annotation 2",
+                    icon=Annotations.TextAnnotation.comment_icon,
+                ),
+                Annotations.TextAnnotation(
+                    1,
+                    100,
+                    200,
+                    contents="this is a third annotation",
+                    icon=Annotations.TextAnnotation.help_icon,
+                ),
+                Annotations.TextAnnotation(
+                    1,
+                    200,
+                    200,
+                    contents="this is a forth annotation",
+                    icon=Annotations.TextAnnotation.key_icon,
+                ),
+                Annotations.TextAnnotation(
+                    1,
+                    100,
+                    300,
+                    contents="this is a fifth annotation",
+                    icon=Annotations.TextAnnotation.insert_icon,
+                ),
+            ]
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected

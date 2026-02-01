@@ -278,7 +278,7 @@ def create_annotations(
             page_annotations.append(annot)
 
         if Annots in page:
-            page[Annots] += page_annotations
+            page[NameObject(Annots)] += page_annotations
         else:
             page[NameObject(Annots)] = page_annotations
 
