@@ -14,6 +14,7 @@ class TextAnnotation(Annotation):
     _annotation_type: str = "/Text"
 
     comment_icon: str = "/Comment"
+    note_icon: str = "/Note"
 
     title: Optional[str] = None
     icon: Optional[str] = comment_icon
