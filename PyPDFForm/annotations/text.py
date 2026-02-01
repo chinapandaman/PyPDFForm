@@ -12,14 +12,13 @@ from .base import Annotation
 @dataclass
 class TextAnnotation(Annotation):
     _annotation_type: str = "/Text"
-
-    comment_icon: str = "/Comment"
-    note_icon: str = "/Note"
-
-    title: Optional[str] = None
-    icon: Optional[str] = comment_icon
-
     _additional_properties: tuple = (
         (NameObject(T), (TextStringObject, "title")),
         (NameObject("/Name"), (NameObject, "icon")),
     )
+
+    note_icon: str = "/Note"
+    comment_icon: str = "/Comment"
+
+    title: Optional[str] = None
+    icon: Optional[str] = None
