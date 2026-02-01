@@ -15,7 +15,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
 
 from .constants import (AP, AS, DV, FT, HIDDEN, IMAGE_FIELD_IDENTIFIER, JS,
                         SLASH, TU, A, Btn, Ch, F, Ff, I, MaxLen, N, Off, Opt,
-                        Parent, Q, Rect, Sig, T, Tx, V, Yes)
+                        Parent, Q, Rect, Sig, Subtype, T, Tx, V, Widget, Yes)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
@@ -26,24 +26,37 @@ from .utils import extract_widget_property
 
 WIDGET_TYPE_PATTERNS = [
     (
-        ({A: {JS: IMAGE_FIELD_IDENTIFIER}},),
+        (
+            {Subtype: Widget},
+            {A: {JS: IMAGE_FIELD_IDENTIFIER}},
+        ),
         Image,
     ),
     (
-        ({FT: Sig},),
+        (
+            {Subtype: Widget},
+            {FT: Sig},
+        ),
         Signature,
     ),
     (
-        ({Parent: {FT: Sig}},),
+        (
+            {Subtype: Widget},
+            {Parent: {FT: Sig}},
+        ),
         Signature,
     ),
     (
-        ({FT: Tx},),
+        (
+            {Subtype: Widget},
+            {FT: Tx},
+        ),
         Text,
     ),
     (
         # reportlab creation pattern
         (
+            {Subtype: Widget},
             {FT: Btn},
             {Parent: {FT: Btn}},
             {AS: (Yes, Off, SLASH)},
@@ -52,25 +65,36 @@ WIDGET_TYPE_PATTERNS = [
     ),
     (
         (
+            {Subtype: Widget},
             {FT: Btn},
             {AS: (Yes, Off)},
         ),
         Checkbox,
     ),
     (
-        ({FT: Ch},),
+        (
+            {Subtype: Widget},
+            {FT: Ch},
+        ),
         Dropdown,
     ),
     (
-        ({Parent: {FT: Ch}},),
+        (
+            {Subtype: Widget},
+            {Parent: {FT: Ch}},
+        ),
         Dropdown,
     ),
     (
-        ({Parent: {FT: Tx}},),
+        (
+            {Subtype: Widget},
+            {Parent: {FT: Tx}},
+        ),
         Text,
     ),
     (
         (
+            {Subtype: Widget},
             {Parent: {FT: Btn}},
             {Parent: {DV: (Yes, Off)}},
             {AS: (Yes, Off)},
@@ -79,6 +103,7 @@ WIDGET_TYPE_PATTERNS = [
     ),
     (
         (
+            {Subtype: Widget},
             {Parent: {FT: Btn}},
             {AS: (Yes, Off, SLASH)},
         ),
