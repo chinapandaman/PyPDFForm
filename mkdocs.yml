@@ -13,6 +13,7 @@ nav:
     - inspect.md
     - fill.md
     - style.md
+    - annotation.md
     - acro_js.md
     - draw.md
     - utils.md
