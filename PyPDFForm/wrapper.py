@@ -540,6 +540,20 @@ class PdfWrapper:
         return self
 
     def annotate(self, annotations: Sequence[AnnotationTypes]) -> PdfWrapper:
+        """
+        Adds annotations to the PDF.
+
+        This method allows you to add various types of annotations (e.g., text
+        annotations/sticky notes) to the PDF pages.
+
+        Args:
+            annotations (Sequence[AnnotationTypes]): A list of annotation objects
+                to be added to the PDF.
+
+        Returns:
+            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
+        """
+
         self._stream = create_annotations(self._read(), annotations)
 
         return self

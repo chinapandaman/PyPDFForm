@@ -223,6 +223,21 @@ def create_annotations(
     template: bytes,
     annotations: List[AnnotationTypes],
 ) -> bytes:
+    """
+    Creates and adds annotations to a PDF template.
+
+    This function takes a PDF template and a list of annotation objects, and
+    renders each annotation onto its specified page in the PDF. It supports
+    various annotation types defined in the `PyPDFForm.annotations` package.
+
+    Args:
+        template (bytes): The PDF template to add annotations to.
+        annotations (List[AnnotationTypes]): A list of annotation objects to be
+            added to the PDF.
+
+    Returns:
+        bytes: The updated PDF stream with the added annotations.
+    """
     reader = PdfReader(stream_to_io(template))
     writer = PdfWriter(clone_from=reader)
 
