@@ -4,19 +4,19 @@ WORKDIR /pypdfform
 
 EXPOSE 8000 8080
 
-RUN apt-get update && \
-    apt-get install -y make dos2unix bash-completion git libatomic1 poppler-utils imagemagick
-
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-COPY . /pypdfform
+COPY ./pyproject.toml /pypdfform/pyproject.toml
 
-RUN uv pip install -U -r pyproject.toml --extra dev --system
+COPY ./entrypoint.sh /pypdfform/entrypoint.sh
 
-RUN echo "source /etc/profile" >> /root/.bashrc && \
-    echo "[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion" >> /root/.bashrc
-
-RUN chmod +x entrypoint.sh && \
+RUN apt-get update && \
+    apt-get install -y make dos2unix bash-completion git libatomic1 poppler-utils imagemagick && \
+    uv pip install -U -r pyproject.toml --extra dev --system && \
+    echo "source /etc/profile" >> /root/.bashrc && \
+    echo "[ -f /usr/share/bash-completion/bash_completion ] && \
+    . /usr/share/bash-completion/bash_completion" >> /root/.bashrc && \
+    chmod +x entrypoint.sh && \
     dos2unix entrypoint.sh
 
 ENTRYPOINT ["sh", "entrypoint.sh"]

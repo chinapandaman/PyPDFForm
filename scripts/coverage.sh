@@ -3,7 +3,7 @@ if [ "$VIRTUAL_ENV" == "" ] && [ "$PYPDFFORM_ENV" != "container" ]; then
 fi
 
 rm -rf htmlcov/
-coverage run -m pytest && coverage html
+coverage run -m pytest && coverage html && coverage xml
 
 if [ "$PYPDFFORM_ENV" == "container" ]; then
   echo "Coverage report: http://localhost:8000/htmlcov/index.html"

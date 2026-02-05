@@ -12,3 +12,6 @@ dist/
 *.egg-info/
 .aider*
 .DS_store
+coverage.xml
+.scannerwork/
+sonar-project.properties
