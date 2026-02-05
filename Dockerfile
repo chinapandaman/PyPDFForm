@@ -12,7 +12,8 @@ RUN apt-get update && \
     apt-get install -y make dos2unix bash-completion git libatomic1 poppler-utils imagemagick && \
     uv pip install -U -r pyproject.toml --extra dev --system && \
     echo "source /etc/profile" >> /root/.bashrc && \
-    echo "[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion" >> /root/.bashrc && \
+    echo "[ -f /usr/share/bash-completion/bash_completion ] && \
+    . /usr/share/bash-completion/bash_completion" >> /root/.bashrc && \
     chmod +x entrypoint.sh && \
     dos2unix entrypoint.sh
 
