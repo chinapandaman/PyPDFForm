@@ -6,7 +6,9 @@ EXPOSE 8000 8080
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-COPY . /pypdfform
+COPY ./pyproject.toml /pypdfform/pyproject.toml
+
+COPY ./entrypoint.sh /pypdfform/entrypoint.sh
 
 RUN apt-get update && \
     apt-get install -y make dos2unix bash-completion git libatomic1 poppler-utils imagemagick && \
