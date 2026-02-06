@@ -62,12 +62,12 @@ class Widget:
         self.height: Optional[Union[float, List[float]]] = None
 
         # javascript
-        self.on_hovered_over_javascript: Union[str, TextIO] = None
-        self.on_hovered_off_javascript: Union[str, TextIO] = None
-        self.on_mouse_pressed_javascript: Union[str, TextIO] = None
-        self.on_mouse_released_javascript: Union[str, TextIO] = None
-        self.on_focused_javascript: Union[str, TextIO] = None
-        self.on_blurred_javascript: Union[str, TextIO] = None
+        self.on_hovered_over_javascript: Optional[Union[str, TextIO]] = None
+        self.on_hovered_off_javascript: Optional[Union[str, TextIO]] = None
+        self.on_mouse_pressed_javascript: Optional[Union[str, TextIO]] = None
+        self.on_mouse_released_javascript: Optional[Union[str, TextIO]] = None
+        self.on_focused_javascript: Optional[Union[str, TextIO]] = None
+        self.on_blurred_javascript: Optional[Union[str, TextIO]] = None
 
     def __setattr__(self, name: str, value: Any) -> None:
         """
