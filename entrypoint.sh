@@ -6,15 +6,15 @@ git config --global --add safe.directory /pypdfform
 find /pypdfform/scripts -type f -name "*.sh" -print0 | xargs -0 dos2unix -q
 export PYPDFFORM_ENV=container
 
-echo "alias clean='make clean-temp'" >> /root/.bashrc
-echo "alias compare='(trap \"kill 0\" SIGINT; make serve-files > /dev/null 2>&1 & make compare-pdf-diffs && echo \"Finished comparing.\" & wait)'" >> /root/.bashrc
-echo "alias coverage='make coverage-all'" >> /root/.bashrc
-echo "alias docs='make serve-docs'" >> /root/.bashrc
-echo "alias format='make format-code'" >> /root/.bashrc
-echo "alias server='make serve-files'" >> /root/.bashrc
-echo "alias linting='make linting'" >> /root/.bashrc
-echo "alias test='make test-all'" >> /root/.bashrc
-echo "alias update='make generate-new-pdf-samples'" >> /root/.bashrc
+echo "alias clean='make clean-temp'" >> ~/.bashrc
+echo "alias compare='(trap \"kill 0\" SIGINT; make serve-files > /dev/null 2>&1 & make compare-pdf-diffs && echo \"Finished comparing.\" & wait)'" >> ~/.bashrc
+echo "alias coverage='make coverage-all'" >> ~/.bashrc
+echo "alias docs='make serve-docs'" >> ~/.bashrc
+echo "alias format='make format-code'" >> ~/.bashrc
+echo "alias server='make serve-files'" >> ~/.bashrc
+echo "alias linting='make linting'" >> ~/.bashrc
+echo "alias test='make test-all'" >> ~/.bashrc
+echo "alias update='make generate-new-pdf-samples'" >> ~/.bashrc
 
 cat << "EOF"
 
