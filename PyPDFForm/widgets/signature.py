@@ -79,7 +79,7 @@ class SignatureWidget:
         self.name = name
         self.x = x
         self.y = y
-        self.optional_params = {
+        self.optional_parameters = {
             each[0]: kwargs.get(each[0], each[1]) for each in self.OPTIONAL_PARAMS
         }
         for each in self.ALLOWED_HOOK_PARAMS:
@@ -154,8 +154,10 @@ class SignatureWidget:
                     [
                         FloatObject(widget.x),
                         FloatObject(widget.y),
-                        FloatObject(widget.x + widget.optional_params.get("width")),
-                        FloatObject(widget.y + widget.optional_params.get("height")),
+                        FloatObject(widget.x + widget.optional_parameters.get("width")),
+                        FloatObject(
+                            widget.y + widget.optional_parameters.get("height")
+                        ),
                     ]
                 )
 
