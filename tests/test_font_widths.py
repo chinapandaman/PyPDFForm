@@ -3,6 +3,7 @@
 # https://github.com/chinapandaman/PyPDFForm/issues/1142
 # https://github.com/chinapandaman/PyPDFForm/pull/1154
 
+import math
 import os
 from io import BytesIO
 from unittest.mock import MagicMock, patch
@@ -44,7 +45,9 @@ def test_compute_font_glyph_widths_with_valid_font(sample_font_stream):
     assert all(isinstance(w, float) for w in widths)
 
     # with this font, not all widths should be equal to missing width
-    assert any(w != missing_width for w in widths)
+    assert any(
+        not math.isclose(w, missing_width, rel_tol=1e-09, abs_tol=1e-09) for w in widths
+    )
 
 
 def test_compute_font_glyph_widths_with_default_missing_width(sample_font_stream):
