@@ -8,7 +8,7 @@ common attributes and methods for all form widgets, such as name, value,
 and schema definition.
 """
 
-from typing import Any, List, TextIO, Union
+from typing import Any, List, Optional, TextIO, Union
 
 
 class Widget:
@@ -49,17 +49,17 @@ class Widget:
         super().__init__()
         self._name = name
         self._value = value
-        self.tooltip: str = None
-        self.readonly: bool = None
-        self.required: bool = None
-        self.hidden: bool = None
+        self.tooltip: Optional[str] = None
+        self.readonly: Optional[bool] = None
+        self.required: Optional[bool] = None
+        self.hidden: Optional[bool] = None
         self.hooks_to_trigger: list = []
 
         # coordinate & dimension
-        self.x: Union[float, List[float]] = None
-        self.y: Union[float, List[float]] = None
-        self.width: Union[float, List[float]] = None
-        self.height: Union[float, List[float]] = None
+        self.x: Optional[Union[float, List[float]]] = None
+        self.y: Optional[Union[float, List[float]]] = None
+        self.width: Optional[Union[float, List[float]]] = None
+        self.height: Optional[Union[float, List[float]]] = None
 
         # javascript
         self.on_hovered_over_javascript: Union[str, TextIO] = None
