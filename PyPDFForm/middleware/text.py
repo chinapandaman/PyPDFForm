@@ -7,6 +7,8 @@ Widget class. It represents a text field form field in a PDF document,
 allowing users to enter text.
 """
 
+from typing import Optional
+
 from .base import Widget
 
 
@@ -56,13 +58,13 @@ class Text(Widget):
         )
         super().__init__(name, value)
 
-        self.font: str = None
-        self.font_size: float = None
-        self.font_color: tuple = None
-        self.comb: bool = None
-        self.alignment: int = None
-        self.multiline: bool = None
-        self.max_length: int = None
+        self.font: Optional[str] = None
+        self.font_size: Optional[float] = None
+        self.font_color: Optional[tuple] = None
+        self.comb: Optional[bool] = None
+        self.alignment: Optional[int] = None
+        self.multiline: Optional[bool] = None
+        self.max_length: Optional[int] = None
 
     @property
     def value(self) -> str:
