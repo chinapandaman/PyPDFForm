@@ -59,12 +59,9 @@ def fp_or_f_obj_or_stream_to_stream(
     elif readable(fp_or_f_obj_or_stream):
         result = fp_or_f_obj_or_stream.read()
 
-    elif isinstance(fp_or_f_obj_or_stream, str):
-        if not isfile(fp_or_f_obj_or_stream):
-            pass
-        else:
-            with open(fp_or_f_obj_or_stream, "rb") as _file:
-                result = _file.read()
+    elif isinstance(fp_or_f_obj_or_stream, str) and isfile(fp_or_f_obj_or_stream):
+        with open(fp_or_f_obj_or_stream, "rb") as _file:
+            result = _file.read()
     return result
 
 

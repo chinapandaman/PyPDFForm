@@ -22,8 +22,8 @@ from collections import defaultdict
 from dataclasses import asdict
 from functools import cached_property
 from os import PathLike
-from typing import (TYPE_CHECKING, BinaryIO, Dict, Sequence, TextIO, Tuple,
-                    Union)
+from typing import (TYPE_CHECKING, BinaryIO, Dict, Optional, Sequence, TextIO,
+                    Tuple, Union)
 
 from .adapter import (fp_or_f_obj_or_f_content_to_content,
                       fp_or_f_obj_or_stream_to_stream)
@@ -108,7 +108,7 @@ class PdfWrapper:
         super().__init__()
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
-        self.title: str = None
+        self.title: Optional[str] = None
         self._metadata = (
             get_metadata(self._read()) if kwargs.get("preserve_metadata") else {}
         )
