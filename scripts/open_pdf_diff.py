@@ -44,13 +44,15 @@ if __name__ == "__main__":
             base_url = "http://localhost:8000/"
     else:
         if sys.platform == "darwin":
-            subprocess.run(["open", "-a", "Google Chrome", before_path])
-            subprocess.run(["open", "-a", "Google Chrome", after_path])
-            subprocess.run(["open", "-a", "Google Chrome", pdf_diff])
+            chrome = "Google Chrome"
+            subprocess.run(["open", "-a", chrome, before_path])
+            subprocess.run(["open", "-a", chrome, after_path])
+            subprocess.run(["open", "-a", chrome, pdf_diff])
         else:
-            webbrowser.get("/usr/bin/google-chrome %s").open(before_path)
-            webbrowser.get("/usr/bin/google-chrome %s").open(after_path)
-            webbrowser.get("/usr/bin/google-chrome %s").open(pdf_diff)
+            chrome = "/usr/bin/google-chrome %s"
+            webbrowser.get(chrome).open(before_path)
+            webbrowser.get(chrome).open(after_path)
+            webbrowser.get(chrome).open(pdf_diff)
 
     print("Before:", base_url + before_path.split(f"{project_root}/")[1])
     print("After:", base_url + after_path.split(f"{project_root}/./scripts/../")[1])
