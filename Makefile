@@ -28,9 +28,5 @@ serve-docs:
 serve-files:
 	bash ./scripts/http_server.sh
 
-fix-permission:
-	rm -rf ./pdf_samples ./PyPDFForm ./tests ./scripts
-	git checkout -- ./pdf_samples ./PyPDFForm ./tests ./scripts
-
 clean-temp:
 	rm -f ./temp/*.pdf ./temp/*.png
