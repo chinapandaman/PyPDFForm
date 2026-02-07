@@ -438,28 +438,43 @@ def update_widget_keys(
     out.append(pdf)
 
     for i, old_key in enumerate(old_keys):
-        index = indices[i]
-        new_key = new_keys[i]
-        tracker = -1
-        for page in out.pages:
-            for annot in page.get(Annots, []):
-                annot = cast(DictionaryObject, annot.get_object())
-                key = get_widget_key(annot.get_object(), False)
-
-                widget = widgets.get(key)
-                if widget is None:
-                    continue
-
-                if old_key != key:
-                    continue
-
-                tracker += 1
-                if not isinstance(widget, Radio) and tracker != index:
-                    continue
-
-                update_annotation_name(annot, new_key)
+        _update_single_widget_key(out, widgets, old_key, new_keys[i], indices[i])
 
     with BytesIO() as f:
         out.write(f)
         f.seek(0)
         return f.read()
+
+
+def _update_single_widget_key(
+    writer: PdfWriter,
+    widgets: Dict[str, WIDGET_TYPES],
+    old_key: str,
+    new_key: str,
+    index: int,
+) -> None:
+    """
+    Updates a single widget key in a PDF template.
+
+    Args:
+        writer (PdfWriter): The PDF writer object.
+        widgets (Dict[str, WIDGET_TYPES]): A dictionary of widgets in the template.
+        old_key (str): The old widget key to be replaced.
+        new_key (str): The new widget key to replace the old key.
+        index (int): The index of the widget to update if multiple widgets have the same name.
+    """
+    tracker = -1
+    for page in writer.pages:
+        for annot in page.get(Annots, []):
+            annot = cast(DictionaryObject, annot.get_object())
+            key = get_widget_key(annot.get_object(), False)
+
+            widget = widgets.get(key)
+            if widget is None or old_key != key:
+                continue
+
+            tracker += 1
+            if not isinstance(widget, Radio) and tracker != index:
+                continue
+
+            update_annotation_name(annot, new_key)
