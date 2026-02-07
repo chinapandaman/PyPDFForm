@@ -240,21 +240,49 @@ def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
     result = {}
 
     for i, page in enumerate(pdf_file.pages):
-        widgets = page.annotations
-        result[i + 1] = []
-        if widgets:
-            for widget in widgets:
-                widget = dict(widget.get_object())
-                for each in WIDGET_TYPE_PATTERNS:
-                    patterns = each[0]
-                    check = True
-                    for pattern in patterns:
-                        check = check and find_pattern_match(pattern, widget)
-                    if check:
-                        result[i + 1].append(widget)
-                        break
+        result[i + 1] = _get_widgets_on_page(page)
 
     return result
+
+
+def _get_widgets_on_page(page) -> List[dict]:
+    """
+    Retrieves widgets from a single PDF page.
+
+    Args:
+        page: The PDF page object.
+
+    Returns:
+        List[dict]: A list of widget dictionaries found on the page.
+    """
+    widgets = page.annotations
+    result = []
+    if widgets:
+        for widget in widgets:
+            widget = dict(widget.get_object())
+            if _is_widget(widget):
+                result.append(widget)
+    return result
+
+
+def _is_widget(widget: dict) -> bool:
+    """
+    Checks if a dictionary represents a valid widget.
+
+    Args:
+        widget (dict): The dictionary to check.
+
+    Returns:
+        bool: True if the dictionary represents a widget, False otherwise.
+    """
+    for each in WIDGET_TYPE_PATTERNS:
+        patterns = each[0]
+        check = True
+        for pattern in patterns:
+            check = check and find_pattern_match(pattern, widget)
+        if check:
+            return True
+    return False
 
 
 def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
