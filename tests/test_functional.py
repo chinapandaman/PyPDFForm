@@ -284,7 +284,7 @@ def test_addition_operator_3_times(template_stream, data_dict):
     for _ in range(3):
         result_2 += PdfWrapper(template_stream).fill(data_dict).pages
 
-    assert len(result.pages) == len(result.pages)
+    assert len(result_2.pages) == len(result.pages)
 
 
 def test_merging_unique_suffix(template_stream):
