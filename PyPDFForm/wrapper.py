@@ -316,6 +316,7 @@ class PdfWrapper:
 
         result = [
             self.__class__(
+                # Case: Single watermark PDF, extracting a specific page to the first output page.
                 copy_watermark_widgets(each, self._read(), None, i),
                 **{param: getattr(self, param) for param, _ in self.USER_PARAMS},
             )
@@ -475,6 +476,7 @@ class PdfWrapper:
         """
 
         stream_with_widgets = self._read()
+        # Case: Single watermark PDF, mapping pages 1:1 to output pages.
         self._stream = copy_watermark_widgets(
             generate_coordinate_grid(
                 remove_all_widgets(self._read()),
@@ -525,6 +527,7 @@ class PdfWrapper:
             keys_to_copy = [
                 k for k, v in self.widgets.items() if not isinstance(v, Signature)
             ]  # only copy non-image fields
+            # Case: Single watermark PDF, mapping pages 1:1 to output pages.
             filled_stream = copy_watermark_widgets(
                 remove_all_widgets(image_drawn_stream),
                 filled_stream,
@@ -641,6 +644,7 @@ class PdfWrapper:
             )
 
         watermarks = getattr(widget_class, "bulk_watermarks")(widgets, self._read())
+        # Case: List of watermark PDFs, each corresponding to an output page.
         self._stream = copy_watermark_widgets(
             self._read(),
             watermarks,
@@ -763,6 +767,7 @@ class PdfWrapper:
 
         stream_with_widgets = self._read()
         self._stream = merge_watermarks_with_pdf(self._read(), watermarks)
+        # Case: Single watermark PDF, mapping pages 1:1 to output pages.
         self._stream = copy_watermark_widgets(
             remove_all_widgets(self._read()), stream_with_widgets, None, None
         )
