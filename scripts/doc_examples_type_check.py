@@ -24,33 +24,68 @@ import textwrap
 import yaml
 
 
-def main():
-    # 1. Create ci_artifacts
-    artifact_dir = "ci_artifacts"
+def setup_artifact_dir(artifact_dir):
+    """Creates the artifact directory and pyrightconfig.json."""
     if not os.path.exists(artifact_dir):
         os.makedirs(artifact_dir)
 
-    # Create pyrightconfig.json to ignore root pyproject.toml and set python path
     with open(os.path.join(artifact_dir, "pyrightconfig.json"), "w") as f:
         json.dump({"extraPaths": [".."]}, f)
 
-    # 2. Look up docs under User Guide
-    with open("mkdocs.yml", "r") as f:
+
+def get_user_guide_docs(mkdocs_path):
+    """Extracts User Guide document paths from mkdocs.yml."""
+    with open(mkdocs_path, "r") as f:
         content = f.read()
 
-    # Remove custom python tags that cause yaml.safe_load to fail
     content = re.sub(r"!!python/name:[\w\.]+", "null", content)
-
     config = yaml.safe_load(content)
 
-    user_guide_docs = []
     nav = config.get("nav", [])
     for item in nav:
         if isinstance(item, dict) and "User Guide" in item:
-            user_guide_docs = item["User Guide"]
-            break
+            return item["User Guide"]
+    return []
 
-    snippet_map = {}  # filename -> (doc_path, start_line_in_doc)
+
+def _extract_snippets_from_file(
+    lines, doc_file, doc_path, artifact_dir, snippet_map, snippet_idx
+):
+    """Helper to extract snippets from a single file's lines."""
+    in_code_block = False
+    code_lines = []
+    start_line = 0
+
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith("```python"):
+            in_code_block = True
+            start_line = i + 1
+            code_lines = []
+        elif stripped.startswith("```") and in_code_block:
+            in_code_block = False
+            if not code_lines:
+                continue
+
+            safe_doc_name = doc_file.replace("/", "_").replace(".", "_")
+            snippet_filename = f"{safe_doc_name}_{snippet_idx}.py"
+            snippet_path = os.path.join(artifact_dir, snippet_filename)
+
+            dedented_code = textwrap.dedent("".join(code_lines))
+            with open(snippet_path, "w") as sf:
+                sf.write(dedented_code)
+
+            snippet_map[snippet_filename] = (doc_path, start_line)
+            snippet_idx += 1
+        elif in_code_block:
+            code_lines.append(line)
+
+    return snippet_idx
+
+
+def extract_snippets(user_guide_docs, artifact_dir):
+    """Extracts Python snippets from documentation and saves them to files."""
+    snippet_map = {}
     snippet_idx = 0
 
     for doc_file in user_guide_docs:
@@ -64,39 +99,15 @@ def main():
         with open(doc_path, "r") as f:
             lines = f.readlines()
 
-        in_code_block = False
-        code_lines = []
-        start_line = 0
+        snippet_idx = _extract_snippets_from_file(
+            lines, doc_file, doc_path, artifact_dir, snippet_map, snippet_idx
+        )
 
-        for i, line in enumerate(lines):
-            stripped = line.strip()
-            # Check for python code block
-            if stripped.startswith("```python"):
-                in_code_block = True
-                start_line = i + 1  # 1-based index (line with ```python)
-                code_lines = []
-            elif stripped.startswith("```") and in_code_block:
-                in_code_block = False
+    return snippet_map
 
-                # Check if snippet is empty
-                if not code_lines:
-                    continue
 
-                safe_doc_name = doc_file.replace("/", "_").replace(".", "_")
-                snippet_filename = f"{safe_doc_name}_{snippet_idx}.py"
-                snippet_path = os.path.join(artifact_dir, snippet_filename)
-
-                dedented_code = textwrap.dedent("".join(code_lines))
-
-                with open(snippet_path, "w") as sf:
-                    sf.write(dedented_code)
-
-                snippet_map[snippet_filename] = (doc_path, start_line)
-                snippet_idx += 1
-            elif in_code_block:
-                code_lines.append(line)
-
-    # 4. Run pyright
+def run_pyright(artifact_dir):
+    """Runs pyright on the artifact directory and returns diagnostics."""
     cmd = [
         "pyright",
         "--outputjson",
@@ -106,21 +117,17 @@ def main():
     ]
 
     result = subprocess.run(cmd, capture_output=True, text=True)
-    output = result.stdout
-
     try:
-        data = json.loads(output)
+        data = json.loads(result.stdout)
+        return data.get("generalDiagnostics", [])
     except json.JSONDecodeError:
         print("Failed to decode pyright output")
-        # cleanup
-        if os.path.exists(artifact_dir):
-            shutil.rmtree(artifact_dir)
-        return
+        return None
 
-    diagnostics = data.get("generalDiagnostics", [])
 
-    # 5. Report errors
-    errors_by_location = {}  # doc_path -> {line_num -> [messages]}
+def map_diagnostics(diagnostics, snippet_map):
+    """Maps pyright diagnostics back to original documentation files."""
+    errors_by_location = {}
 
     for diag in diagnostics:
         file_path = diag.get("file")
@@ -128,12 +135,8 @@ def main():
 
         if filename in snippet_map:
             original_doc, start_line = snippet_map[filename]
-
             error_line_in_snippet = diag["range"]["start"]["line"]
-            # start_line is the line with ```python
-            # line 0 of snippet is start_line + 1
             original_line = start_line + 1 + error_line_in_snippet
-
             msg = diag.get("message", "")
 
             if original_doc not in errors_by_location:
@@ -143,7 +146,11 @@ def main():
 
             errors_by_location[original_doc][original_line].append(msg)
 
-    # Print consolidated errors
+    return errors_by_location
+
+
+def report_errors(errors_by_location):
+    """Prints consolidated errors and returns True if any errors were found."""
     has_errors = False
     for doc_path in sorted(errors_by_location.keys()):
         for line_num in sorted(errors_by_location[doc_path].keys()):
@@ -152,10 +159,39 @@ def main():
             print(f"{doc_path}:{line_num}")
             for m in messages:
                 print(f"  {m}")
+    return has_errors
 
-    # 6. Delete ci_artifacts
+
+def cleanup(artifact_dir):
+    """Removes the artifact directory."""
     if os.path.exists(artifact_dir):
         shutil.rmtree(artifact_dir)
+
+
+def main():
+    # 1. Create ci_artifacts
+    artifact_dir = "ci_artifacts"
+    setup_artifact_dir(artifact_dir)
+
+    # 2. Look up docs under User Guide
+    user_guide_docs = get_user_guide_docs("mkdocs.yml")
+
+    # 3. Extract snippets
+    snippet_map = extract_snippets(user_guide_docs, artifact_dir)
+
+    # 4. Run pyright
+    diagnostics = run_pyright(artifact_dir)
+
+    if diagnostics is None:
+        cleanup(artifact_dir)
+        return
+
+    # 5. Report errors
+    errors_by_location = map_diagnostics(diagnostics, snippet_map)
+    has_errors = report_errors(errors_by_location)
+
+    # 6. Delete ci_artifacts
+    cleanup(artifact_dir)
 
     if has_errors:
         sys.exit(1)
