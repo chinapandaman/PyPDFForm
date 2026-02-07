@@ -97,59 +97,126 @@ def build_widgets(
 
     for widgets in get_widgets_by_page(pdf_stream).values():
         for widget in widgets:
-            key = get_widget_key(widget, use_full_widget_name)
-            _widget = construct_widget(widget, key)
-            if _widget is not None:
-                # widget property extractions don't trigger hooks in this function
-                _widget.__dict__["tooltip"] = extract_widget_property(
-                    widget, WIDGET_DESCRIPTION_PATTERNS, None, str
-                )
-                _widget.__dict__["readonly"] = check_field_flag(widget, READ_ONLY)
-                _widget.__dict__["required"] = check_field_flag(widget, REQUIRED)
-                _widget.__dict__["hidden"] = get_field_hidden(widget)
-
-                field_rect = get_field_rect(widget)
-                _widget.x, _widget.y, _widget.width, _widget.height = field_rect
-
-                if isinstance(_widget, Text):
-                    _widget.__dict__["comb"] = check_field_flag(widget, COMB)
-                    _widget.__dict__["alignment"] = get_text_field_alignment(widget)
-                    _widget.__dict__["multiline"] = check_field_flag(widget, MULTILINE)
-                    _widget.__dict__["max_length"] = get_text_field_max_length(widget)
-                    get_text_value(widget, _widget)
-
-                if type(_widget) is Checkbox:
-                    _widget.value = get_checkbox_value(widget)
-
-                if isinstance(_widget, Dropdown):
-                    # actually used for filling value
-                    # doesn't trigger hook
-                    _widget.__dict__["choices"] = get_dropdown_choices(widget)
-                    get_dropdown_value(widget, _widget)
-
-                if isinstance(_widget, Radio):
-                    if key not in results:
-                        _widget.x = []
-                        _widget.y = []
-                        _widget.width = []
-                        _widget.height = []
-                        results[key] = _widget
-
-                    # for schema
-                    results[key].number_of_options += 1
-
-                    results[key].x.append(field_rect[0])
-                    results[key].y.append(field_rect[1])
-                    results[key].width.append(field_rect[2])
-                    results[key].height.append(field_rect[3])
-
-                    if get_radio_value(widget):
-                        results[key].value = results[key].number_of_options - 1
-                    continue
-
-                results[key] = _widget
+            _process_widget(widget, use_full_widget_name, results)
 
     return results
+
+
+def _process_widget(
+    widget: dict, use_full_widget_name: bool, results: Dict[str, WIDGET_TYPES]
+) -> None:
+    """
+    Processes a single widget and adds it to the results dictionary.
+
+    Args:
+        widget (dict): The widget dictionary from the PDF.
+        use_full_widget_name (bool): Whether to use the full widget name.
+        results (Dict[str, WIDGET_TYPES]): The dictionary of widgets being built.
+    """
+    key = get_widget_key(widget, use_full_widget_name)
+    _widget = construct_widget(widget, key)
+    if _widget is not None:
+        _populate_common_properties(widget, _widget)
+
+        if isinstance(_widget, Text):
+            _populate_text_properties(widget, _widget)
+
+        if type(_widget) is Checkbox:
+            _widget.value = get_checkbox_value(widget)
+
+        if isinstance(_widget, Dropdown):
+            _populate_dropdown_properties(widget, _widget)
+
+        if isinstance(_widget, Radio):
+            _handle_radio_widget(widget, key, _widget, results)
+        else:
+            results[key] = _widget
+
+
+def _populate_common_properties(widget: dict, _widget: WIDGET_TYPES) -> None:
+    """
+    Populates common properties for a widget.
+
+    Args:
+        widget (dict): The widget dictionary from the PDF.
+        _widget (WIDGET_TYPES): The widget object to populate.
+    """
+    # widget property extractions don't trigger hooks in this function
+    _widget.__dict__["tooltip"] = extract_widget_property(
+        widget, WIDGET_DESCRIPTION_PATTERNS, None, str
+    )
+    _widget.__dict__["readonly"] = check_field_flag(widget, READ_ONLY)
+    _widget.__dict__["required"] = check_field_flag(widget, REQUIRED)
+    _widget.__dict__["hidden"] = get_field_hidden(widget)
+
+    _widget.x, _widget.y, _widget.width, _widget.height = get_field_rect(widget)
+
+
+def _populate_text_properties(widget: dict, _widget: Text) -> None:
+    """
+    Populates properties specific to text widgets.
+
+    Args:
+        widget (dict): The widget dictionary from the PDF.
+        _widget (Text): The text widget object to populate.
+    """
+    _widget.__dict__["comb"] = check_field_flag(widget, COMB)
+    _widget.__dict__["alignment"] = get_text_field_alignment(widget)
+    _widget.__dict__["multiline"] = check_field_flag(widget, MULTILINE)
+    _widget.__dict__["max_length"] = get_text_field_max_length(widget)
+    get_text_value(widget, _widget)
+
+
+def _populate_dropdown_properties(widget: dict, _widget: Dropdown) -> None:
+    """
+    Populates properties specific to dropdown widgets.
+
+    Args:
+        widget (dict): The widget dictionary from the PDF.
+        _widget (Dropdown): The dropdown widget object to populate.
+    """
+    # actually used for filling value
+    # doesn't trigger hook
+    _widget.__dict__["choices"] = get_dropdown_choices(widget)
+    get_dropdown_value(widget, _widget)
+
+
+def _handle_radio_widget(
+    widget: dict, key: str, _widget: Radio, results: Dict[str, WIDGET_TYPES]
+) -> None:
+    """
+    Handles the logic for radio widgets, including aggregating multiple options.
+
+    Args:
+        widget (dict): The widget dictionary from the PDF.
+        key (str): The widget key.
+        _widget (Radio): The radio widget object.
+        results (Dict[str, WIDGET_TYPES]): The dictionary of widgets being built.
+    """
+    field_rect = get_field_rect(widget)
+
+    if key not in results:
+        _widget.x = []
+        _widget.y = []
+        _widget.width = []
+        _widget.height = []
+        results[key] = _widget
+
+    radio = cast(Radio, results[key])
+    # for schema
+    radio.number_of_options += 1
+
+    if isinstance(radio.x, list):
+        radio.x.append(field_rect[0])
+    if isinstance(radio.y, list):
+        radio.y.append(field_rect[1])
+    if isinstance(radio.width, list):
+        radio.width.append(field_rect[2])
+    if isinstance(radio.height, list):
+        radio.height.append(field_rect[3])
+
+    if get_radio_value(widget):
+        radio.value = radio.number_of_options - 1
 
 
 @lru_cache()
