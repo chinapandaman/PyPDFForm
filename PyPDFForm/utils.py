@@ -208,6 +208,30 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     return result.read()
 
 
+def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
+    """
+    Checks if a widget value matches a pattern value.
+
+    Args:
+        pattern_value (Any): The value from the pattern.
+        widget_value (Any): The value from the widget.
+
+    Returns:
+        bool: True if it matches, False otherwise.
+    """
+    if isinstance(pattern_value, dict) and isinstance(
+        widget_value, (dict, DictionaryObject)
+    ):
+        return find_pattern_match(pattern_value, widget_value)
+
+    if isinstance(pattern_value, tuple):
+        if widget_value in pattern_value:
+            return True
+        return SLASH in pattern_value and widget_value.startswith(SLASH)
+
+    return pattern_value == widget_value
+
+
 def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> bool:
     """
     Recursively finds a pattern match within a PDF widget (annotation dictionary).
@@ -225,22 +249,9 @@ def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> 
         bool: True if a match is found, False otherwise.
     """
     for key, value in widget.items():
-        result = False
-        if key in pattern:
-            value = value.get_object()
-            if isinstance(pattern[key], dict) and isinstance(
-                value, (dict, DictionaryObject)
-            ):
-                result = find_pattern_match(pattern[key], value)
-            else:
-                if isinstance(pattern[key], tuple):
-                    result = value in pattern[key]
-                    if not result and SLASH in pattern[key] and value.startswith(SLASH):
-                        result = True
-                else:
-                    result = pattern[key] == value
-        if result:
-            return result
+        if key in pattern and _is_value_match(pattern[key], value.get_object()):
+            return True
+
     return False
 
 
