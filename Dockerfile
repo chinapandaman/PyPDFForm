@@ -14,8 +14,10 @@ COPY ./pyproject.toml /pypdfform/pyproject.toml
 COPY ./entrypoint.sh /pypdfform/entrypoint.sh
 
 RUN apt-get update && \
-    apt-get install -y make dos2unix bash-completion git libatomic1 poppler-utils imagemagick && \
+    apt-get install -y make dos2unix bash-completion git libatomic1 poppler-utils imagemagick sudo && \
     uv pip install -U -r pyproject.toml --extra dev --system && \
+    echo "pypdfform-dev ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/pypdfform-dev && \
+    chmod 0440 /etc/sudoers.d/pypdfform-dev && \
     echo "source /etc/profile" >> /home/pypdfform-dev/.bashrc && \
     echo "[ -f /usr/share/bash-completion/bash_completion ] && \
     . /usr/share/bash-completion/bash_completion" >> /home/pypdfform-dev/.bashrc && \
