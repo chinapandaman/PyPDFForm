@@ -312,6 +312,59 @@ def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
     return result
 
 
+def _group_annotations_by_page(
+    annotations: List[AnnotationTypes],
+) -> Dict[int, List[AnnotationTypes]]:
+    """
+    Groups annotations by their page number.
+
+    Args:
+        annotations (List[AnnotationTypes]): A list of annotation objects.
+
+    Returns:
+        Dict[int, List[AnnotationTypes]]: A dictionary where keys are page
+            numbers and values are lists of annotations for that page.
+    """
+    result = {}
+    for annotation in annotations:
+        if annotation.page_number not in result:
+            result[annotation.page_number] = []
+        result[annotation.page_number].append(annotation)
+    return result
+
+
+def _create_annotation_object(annotation: AnnotationTypes) -> DictionaryObject:
+    """
+    Creates a PDF dictionary object for an annotation.
+
+    Args:
+        annotation (AnnotationTypes): The annotation object to convert.
+
+    Returns:
+        DictionaryObject: The PDF dictionary object representing the annotation.
+    """
+    annot = DictionaryObject(
+        {
+            NameObject(Type): NameObject(Annot),
+            NameObject(Subtype): NameObject(getattr(annotation, "_annotation_type")),
+            NameObject(Rect): ArrayObject(
+                [
+                    FloatObject(annotation.x),
+                    FloatObject(annotation.y),
+                    FloatObject(annotation.x + annotation.width),
+                    FloatObject(annotation.y + annotation.height),
+                ]
+            ),
+            NameObject(Contents): TextStringObject(annotation.contents),
+        }
+    )
+    for k, v in getattr(annotation, "_additional_properties", ()):
+        val = getattr(annotation, v[1])
+        if val is not None:
+            annot[k] = v[0](val)
+    return annot
+
+
 def create_annotations(
     template: bytes,
     annotations: List[AnnotationTypes],
@@ -334,11 +387,7 @@ def create_annotations(
     reader = PdfReader(stream_to_io(template))
     writer = PdfWriter(clone_from=reader)
 
-    annotations_by_page = {}
-    for annotation in annotations:
-        if annotation.page_number not in annotations_by_page:
-            annotations_by_page[annotation.page_number] = []
-        annotations_by_page[annotation.page_number].append(annotation)
+    annotations_by_page = _group_annotations_by_page(annotations)
 
     for i, page in enumerate(writer.pages):
         page_num = i + 1
@@ -347,28 +396,7 @@ def create_annotations(
 
         page_annotations = ArrayObject([])
         for annotation in annotations_by_page[page_num]:
-            annot = DictionaryObject(
-                {
-                    NameObject(Type): NameObject(Annot),
-                    NameObject(Subtype): NameObject(
-                        getattr(annotation, "_annotation_type")
-                    ),
-                    NameObject(Rect): ArrayObject(
-                        [
-                            FloatObject(annotation.x),
-                            FloatObject(annotation.y),
-                            FloatObject(annotation.x + annotation.width),
-                            FloatObject(annotation.y + annotation.height),
-                        ]
-                    ),
-                    NameObject(Contents): TextStringObject(annotation.contents),
-                }
-            )
-            for k, v in getattr(annotation, "_additional_properties", ()):
-                val = getattr(annotation, v[1])
-                if val is not None:
-                    annot[k] = v[0](val)
-            page_annotations.append(annot)
+            page_annotations.append(_create_annotation_object(annotation))
 
         if Annots in page:
             page[NameObject(Annots)] += page_annotations
