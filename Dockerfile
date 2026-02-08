@@ -1,8 +1,5 @@
 FROM python:3.12-slim
 
-RUN groupadd -g 1000 pypdfform-dev && \
-    useradd -u 1000 -g pypdfform-dev -m pypdfform-dev
-
 WORKDIR /pypdfform
 
 EXPOSE 8000 8080
@@ -13,7 +10,9 @@ COPY ./pyproject.toml /pypdfform/pyproject.toml
 
 COPY ./entrypoint.sh /pypdfform/entrypoint.sh
 
-RUN apt-get update && \
+RUN groupadd -g 1000 pypdfform-dev && \
+    useradd -u 1000 -g pypdfform-dev -m pypdfform-dev && \
+    apt-get update && \
     apt-get install -y make dos2unix bash-completion git libatomic1 poppler-utils imagemagick sudo && \
     uv pip install -U -r pyproject.toml --extra dev --system && \
     echo "pypdfform-dev ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/pypdfform-dev && \
