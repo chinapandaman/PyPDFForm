@@ -11,7 +11,15 @@ COPY ./pyproject.toml /pypdfform/pyproject.toml
 COPY ./entrypoint.sh /pypdfform/entrypoint.sh
 
 RUN apt-get update && \
-    apt-get install -y make dos2unix bash-completion git libatomic1 poppler-utils imagemagick sudo && \
+    apt-get install -y \
+    make \
+    dos2unix \
+    bash-completion \
+    git \
+    libatomic1 \
+    poppler-utils \
+    imagemagick \
+    sudo && \
     uv pip install -U -r pyproject.toml --extra dev --system && \
     groupadd -g 1000 pypdfform-dev && \
     useradd -u 1000 -g pypdfform-dev -m pypdfform-dev && \
