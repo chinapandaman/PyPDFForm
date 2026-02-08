@@ -10,11 +10,11 @@ COPY ./pyproject.toml /pypdfform/pyproject.toml
 
 COPY ./entrypoint.sh /pypdfform/entrypoint.sh
 
-RUN groupadd -g 1000 pypdfform-dev && \
-    useradd -u 1000 -g pypdfform-dev -m pypdfform-dev && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y make dos2unix bash-completion git libatomic1 poppler-utils imagemagick sudo && \
     uv pip install -U -r pyproject.toml --extra dev --system && \
+    groupadd -g 1000 pypdfform-dev && \
+    useradd -u 1000 -g pypdfform-dev -m pypdfform-dev && \
     echo "pypdfform-dev ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/pypdfform-dev && \
     chmod 0440 /etc/sudoers.d/pypdfform-dev && \
     echo "source /etc/profile" >> /home/pypdfform-dev/.bashrc && \
