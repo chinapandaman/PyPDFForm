@@ -6,7 +6,7 @@ git config --global --add safe.directory /pypdfform
 find /pypdfform/scripts -type f -name "*.sh" -print0 | xargs -0 dos2unix -q
 export PYPDFFORM_ENV=container
 
-echo "PS1='\[\e[34m\]Enter \[\e[38;5;220m\]help\[\e[34m\] for commands > \[\e[0m\] '" >> ~/.bashrc
+echo "PS1='\[\e[34m\]Enter \[\e[38;5;220m\]help\[\e[34m\] for commands > \[\e[0m\]'" >> ~/.bashrc
 echo "alias help='cat ~/.container_docs.txt'" >> ~/.bashrc
 
 echo "alias clean='make clean-temp'" >> ~/.bashrc
