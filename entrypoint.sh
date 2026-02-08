@@ -6,6 +6,9 @@ git config --global --add safe.directory /pypdfform
 find /pypdfform/scripts -type f -name "*.sh" -print0 | xargs -0 dos2unix -q
 export PYPDFFORM_ENV=container
 
+echo "PS1='Enter help for commands > '" >> ~/.bashrc
+echo "alias help='cat ~/.container_docs.txt'" >> ~/.bashrc
+
 echo "alias clean='make clean-temp'" >> ~/.bashrc
 echo "alias compare='(trap \"kill 0\" SIGINT; make serve-files > /dev/null 2>&1 & make compare-pdf-diffs && echo \"Finished comparing.\" & wait)'" >> ~/.bashrc
 echo "alias coverage='make coverage-all'" >> ~/.bashrc
@@ -16,7 +19,7 @@ echo "alias linting='make linting'" >> ~/.bashrc
 echo "alias test='make test-all'" >> ~/.bashrc
 echo "alias update='make generate-new-pdf-samples'" >> ~/.bashrc
 
-cat << "EOF"
+cat << "EOF" > ~/.container_docs.txt
 
  /$$$$$$$            /$$$$$$$  /$$$$$$$  /$$$$$$$$ /$$$$$$$$                               
 | $$__  $$          | $$__  $$| $$__  $$| $$_____/| $$_____/                               
@@ -45,5 +48,7 @@ Welcome to the PyPDFForm development container!
 | update   | Update PDF samples after changing the code.             | N/A                                                                                 |
 
 EOF
+
+cat ~/.container_docs.txt
 
 exec "$@"
