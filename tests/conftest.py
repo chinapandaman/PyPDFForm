@@ -249,6 +249,7 @@ def sejda_data():
 
 @pytest.fixture
 def sejda_complex_data():
+    test_text = "test text"
     return {
         "checkbox": True,
         "radio": 0,
@@ -264,9 +265,9 @@ def sejda_complex_data():
         "paragraph_font_ten_left": "paragraph_font_ten_left",
         "paragraph_font_ten_center": "paragraph_font_ten_center",
         "paragraph_font_ten_right": "paragraph_font_ten_right",
-        "text__font_auto_left": "test text",
-        "text_font_auto_center": "test text",
-        "text_font_auto_right": "test text",
+        "text__font_auto_left": test_text,
+        "text_font_auto_center": test_text,
+        "text_font_auto_right": test_text,
         "text_font_ten_left": "text_font_ten_left",
         "text_font_ten_center": "text_font_ten_center",
         "text_font_ten_right": "text_font_ten_right",
