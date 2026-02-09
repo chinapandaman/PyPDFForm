@@ -248,6 +248,33 @@ def sejda_data():
 
 
 @pytest.fixture
+def sejda_complex_data():
+    test_text = "test text"
+    return {
+        "checkbox": True,
+        "radio": 0,
+        "dropdown_font_auto_left": 0,
+        "dropdown_font_auto_center": 1,
+        "dropdown_font_auto_right": 2,
+        "dropdown_font_ten_left": 0,
+        "dropdown_font_ten_center": 1,
+        "dropdown_font_ten_right": 2,
+        "paragraph_font_auto_left": "paragraph_font_auto_left",
+        "paragraph_font_auto_center": "paragraph_font_auto_center",
+        "paragraph_font_auto_right": "paragraph_font_auto_right",
+        "paragraph_font_ten_left": "paragraph_font_ten_left",
+        "paragraph_font_ten_center": "paragraph_font_ten_center",
+        "paragraph_font_ten_right": "paragraph_font_ten_right",
+        "text__font_auto_left": test_text,
+        "text_font_auto_center": test_text,
+        "text_font_auto_right": test_text,
+        "text_font_ten_left": "text_font_ten_left",
+        "text_font_ten_center": "text_font_ten_center",
+        "text_font_ten_right": "text_font_ten_right",
+    }
+
+
+@pytest.fixture
 def max_length_expected_directory():
     return os.path.join(
         os.path.dirname(__file__),
