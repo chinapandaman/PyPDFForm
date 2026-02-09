@@ -37,7 +37,7 @@ from .hooks import trigger_widget_hooks
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .raw import RawText, RawTypes
+from .raw import RawTypes
 from .template import (build_widgets, create_annotations, get_metadata,
                        set_metadata, update_widget_keys)
 from .types import PdfArray
@@ -801,10 +801,8 @@ class PdfWrapper:
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         if register_font(font_name, ttf_file) if ttf_file is not None else False:
-            if first_time and getattr(self, "need_appearances"):
-                self.draw([RawText(" ", 1, 0, 0, font=font_name)])
             self._stream, new_font_name = register_font_acroform(
-                self._read(), ttf_file, getattr(self, "need_appearances")
+                self._read(), font_name, ttf_file, getattr(self, "need_appearances")
             )
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))

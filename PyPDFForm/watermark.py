@@ -9,6 +9,7 @@ and to copy specific widgets from the watermarks to the original PDF.
 """
 
 from collections import defaultdict
+from functools import lru_cache
 from io import BytesIO
 from typing import Any, Dict, List, Optional, Union
 
@@ -17,8 +18,10 @@ from pypdf.generic import ArrayObject, NameObject
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
+from .assets.blank import BlankPage
 from .constants import Annots
 from .patterns import get_widget_key
+from .raw.text import RawText
 from .utils import stream_to_io
 
 
@@ -316,6 +319,13 @@ def merge_watermarks_with_pdf(
     output.write(result)
     result.seek(0)
     return result.read()
+
+
+@lru_cache
+def get_watermark_with_font(font_name: str) -> bytes:
+    return create_watermarks_and_draw(
+        BlankPage().read(), [RawText(" ", 1, 0, 0, font=font_name).to_draw]
+    )[0]
 
 
 def _clone_page_widgets(
