@@ -27,6 +27,7 @@ from .constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR, EM_TO_PDF_FACTOR,
                         MissingWidth, Resources, Subtype, TrueType, Type,
                         Widths, WinAnsiEncoding)
 from .utils import stream_to_io
+from .watermark import get_watermark_with_font
 
 
 @lru_cache
@@ -144,7 +145,7 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float) -> list[f
 
 
 def register_font_acroform(
-    pdf: bytes, ttf_stream: bytes, need_appearances: bool
+    pdf: bytes, font_name: str, ttf_stream: bytes, need_appearances: bool
 ) -> tuple:
     """
     Registers a TrueType font within the PDF's AcroForm dictionary.
@@ -156,6 +157,7 @@ def register_font_acroform(
     Args:
         pdf (bytes): The PDF file data as bytes. This is the PDF document that
             will be modified to include the new font.
+        font_name (str): The name of the font being registered.
         ttf_stream (bytes): The font file data in TTF format as bytes. This is the
             raw data of the TrueType font file.
         need_appearances (bool): If True, attempts to retrieve existing font parameters
@@ -175,7 +177,7 @@ def register_font_acroform(
     font_dict_params = {}
     if need_appearances:
         font_descriptor_params, font_dict_params = get_additional_font_params(
-            pdf, base_font_name
+            get_watermark_with_font(font_name), base_font_name
         )
 
     font_file_stream = StreamObject()

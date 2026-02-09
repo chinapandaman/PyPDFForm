@@ -37,7 +37,6 @@ from .hooks import trigger_widget_hooks
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .raw import RawText, RawTypes
 from .template import (build_widgets, create_annotations, get_metadata,
                        set_metadata, update_widget_keys)
 from .types import PdfArray
@@ -50,6 +49,7 @@ from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
 if TYPE_CHECKING:
     from .annotations import AnnotationTypes
     from .assets.blank import BlankPage
+    from .raw import RawTypes
     from .widgets import FieldTypes
 
 
@@ -223,7 +223,7 @@ class PdfWrapper:
         font_register_events_len = len(self._font_register_events)
         for i in range(font_register_events_len):
             event = self._font_register_events[i]
-            self.register_font(event[0], event[1], False)
+            self.register_font(event[0], event[1])
         self._font_register_events = self._font_register_events[
             font_register_events_len:
         ]
@@ -780,7 +780,6 @@ class PdfWrapper:
         self,
         font_name: str,
         ttf_file: Union[bytes, str, BinaryIO],
-        first_time: bool = True,
     ) -> PdfWrapper:
         """
         Registers a custom font for use in the PDF.
@@ -791,8 +790,6 @@ class PdfWrapper:
                 - bytes: The raw TTF file data as a byte string.
                 - str: The file path to the TTF file.
                 - BinaryIO: An open file-like object containing the TTF file data.
-            first_time (bool): Whether this is the first time the font is being registered (default: True).
-                If True and `need_appearances` is enabled, a blank text string is drawn to ensure the font is properly embedded in the PDF.
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
@@ -801,10 +798,8 @@ class PdfWrapper:
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         if register_font(font_name, ttf_file) if ttf_file is not None else False:
-            if first_time and getattr(self, "need_appearances"):
-                self.draw([RawText(" ", 1, 0, 0, font=font_name)])
             self._stream, new_font_name = register_font_acroform(
-                self._read(), ttf_file, getattr(self, "need_appearances")
+                self._read(), font_name, ttf_file, getattr(self, "need_appearances")
             )
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))
