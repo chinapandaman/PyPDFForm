@@ -145,7 +145,7 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float) -> list[f
 
 
 def register_font_acroform(
-    pdf: bytes, registered_font_name: str, ttf_stream: bytes, need_appearances: bool
+    pdf: bytes, font_name: str, ttf_stream: bytes, need_appearances: bool
 ) -> tuple:
     """
     Registers a TrueType font within the PDF's AcroForm dictionary.
@@ -176,7 +176,7 @@ def register_font_acroform(
     font_dict_params = {}
     if need_appearances:
         font_descriptor_params, font_dict_params = get_additional_font_params(
-            get_watermark_with_font(registered_font_name), base_font_name
+            get_watermark_with_font(font_name), base_font_name
         )
 
     font_file_stream = StreamObject()
