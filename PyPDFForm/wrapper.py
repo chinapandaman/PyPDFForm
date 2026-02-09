@@ -223,7 +223,7 @@ class PdfWrapper:
         font_register_events_len = len(self._font_register_events)
         for i in range(font_register_events_len):
             event = self._font_register_events[i]
-            self.register_font(event[0], event[1], False)
+            self.register_font(event[0], event[1])
         self._font_register_events = self._font_register_events[
             font_register_events_len:
         ]
@@ -780,7 +780,6 @@ class PdfWrapper:
         self,
         font_name: str,
         ttf_file: Union[bytes, str, BinaryIO],
-        first_time: bool = True,
     ) -> PdfWrapper:
         """
         Registers a custom font for use in the PDF.
@@ -791,8 +790,6 @@ class PdfWrapper:
                 - bytes: The raw TTF file data as a byte string.
                 - str: The file path to the TTF file.
                 - BinaryIO: An open file-like object containing the TTF file data.
-            first_time (bool): Whether this is the first time the font is being registered (default: True).
-                If True and `need_appearances` is enabled, a blank text string is drawn to ensure the font is properly embedded in the PDF.
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
