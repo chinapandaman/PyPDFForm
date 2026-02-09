@@ -37,7 +37,6 @@ from .hooks import trigger_widget_hooks
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .raw import RawTypes
 from .template import (build_widgets, create_annotations, get_metadata,
                        set_metadata, update_widget_keys)
 from .types import PdfArray
@@ -50,6 +49,7 @@ from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
 if TYPE_CHECKING:
     from .annotations import AnnotationTypes
     from .assets.blank import BlankPage
+    from .raw import RawTypes
     from .widgets import FieldTypes
 
 
