@@ -323,6 +323,19 @@ def merge_watermarks_with_pdf(
 
 @lru_cache
 def get_watermark_with_font(font_name: str) -> bytes:
+    """
+    Creates a watermark PDF with a single space character using the specified font.
+
+    This function is primarily used to generate a dummy PDF page that includes
+    a specific font, which can then be merged with another PDF to ensure the
+    font is available or embedded. The result is cached for performance.
+
+    Args:
+        font_name (str): The name of the font to use.
+
+    Returns:
+        bytes: The watermark PDF as a byte stream.
+    """
     return create_watermarks_and_draw(
         BlankPage().read(), [RawText(" ", 1, 0, 0, font=font_name).to_draw]
     )[0]

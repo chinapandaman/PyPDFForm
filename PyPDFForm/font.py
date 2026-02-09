@@ -157,6 +157,7 @@ def register_font_acroform(
     Args:
         pdf (bytes): The PDF file data as bytes. This is the PDF document that
             will be modified to include the new font.
+        font_name (str): The name of the font being registered.
         ttf_stream (bytes): The font file data in TTF format as bytes. This is the
             raw data of the TrueType font file.
         need_appearances (bool): If True, attempts to retrieve existing font parameters
