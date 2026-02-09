@@ -45,9 +45,14 @@ if __name__ == "__main__":
     else:
         if sys.platform == "darwin":
             chrome = "Google Chrome"
-            subprocess.run(["open", "-a", chrome, before_path])
-            subprocess.run(["open", "-a", chrome, after_path])
-            subprocess.run(["open", "-a", chrome, pdf_diff])
+            if os.environ.get("ACROBAT") == "true":
+                acrobat = "Adobe Acrobat"
+                subprocess.run(["open", "-a", acrobat, before_path])
+                subprocess.run(["open", "-a", acrobat, after_path])
+            else:
+                subprocess.run(["open", "-a", chrome, before_path])
+                subprocess.run(["open", "-a", chrome, after_path])
+                subprocess.run(["open", "-a", chrome, pdf_diff])
         else:
             chrome = "/usr/bin/google-chrome %s"
             webbrowser.get(chrome).open(before_path)
