@@ -67,7 +67,7 @@ def test_create_check(pdf_samples, request):
             button_style="cross",  # optional
             tick_color=(0, 1, 0),  # optional
             bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-            border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+            border_color=(1, 1, 0, 1),  # optional, (r, g, b, alpha)
             border_width=5,  # optional
         )
     )
@@ -99,7 +99,7 @@ def test_create_radio(pdf_samples, request):
             shape="square",  # optional, circle or square
             tick_color=(0, 1, 0),  # optional
             bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-            border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+            border_color=(1, 0, 1, 1),  # optional, (r, g, b, alpha)
             border_width=5,  # optional
         )
     )
@@ -140,7 +140,7 @@ def test_create_dropdown(pdf_samples, sample_font_stream, request):
                 font_size=15,  # optional
                 font_color=(0, 1, 0),  # optional
                 bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-                border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+                border_color=(0, 1, 0, 1),  # optional, (r, g, b, alpha)
                 border_width=5,  # optional
             )
         )
