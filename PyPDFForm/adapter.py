@@ -11,7 +11,7 @@ stream before further processing.
 """
 
 from os.path import isfile
-from typing import Any, BinaryIO, Union
+from typing import Any, BinaryIO
 
 
 def readable(obj: Any) -> bool:
@@ -32,7 +32,7 @@ def readable(obj: Any) -> bool:
 
 
 def fp_or_f_obj_or_stream_to_stream(
-    fp_or_f_obj_or_stream: Union[bytes, str, BinaryIO],
+    fp_or_f_obj_or_stream: bytes | str | BinaryIO,
 ) -> bytes:
     """
     Adapt a file path, file object, or stream to a byte stream.
@@ -44,7 +44,7 @@ def fp_or_f_obj_or_stream_to_stream(
         - file-like objects with a read() method (BinaryIO)
 
     Args:
-        fp_or_f_obj_or_stream (Union[bytes, str, BinaryIO]): The input to adapt.
+        fp_or_f_obj_or_stream (bytes | str | BinaryIO): The input to adapt.
             It can be a byte stream, a file path (string), or a file object.
 
     Returns:
@@ -66,7 +66,7 @@ def fp_or_f_obj_or_stream_to_stream(
 
 
 def fp_or_f_obj_or_f_content_to_content(
-    fp_or_f_obj_or_f_content: Union[str, BinaryIO],
+    fp_or_f_obj_or_f_content: str | BinaryIO,
 ) -> str:
     """
     Adapt a file path, file object, or file content to file content.
@@ -78,7 +78,7 @@ def fp_or_f_obj_or_f_content_to_content(
         - file-like objects with a read() method (BinaryIO)
 
     Args:
-        fp_or_f_obj_or_f_content (Union[str, BinaryIO]): The input to adapt.
+        fp_or_f_obj_or_f_content (str | BinaryIO): The input to adapt.
             It can be file content, a file path (string), or a file object.
 
     Returns:

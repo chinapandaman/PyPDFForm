@@ -11,7 +11,7 @@ specific functionality for interacting with dropdown form fields in PDFs.
 """
 
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Type, Union
+from typing import List, Optional, Tuple, Type
 
 from .base import Field, Widget
 from .text import TextWidget
@@ -71,7 +71,7 @@ class DropdownField(Field):
 
     Attributes:
         _widget_class (Type[Widget]): The widget class associated with this field type.
-        options (Optional[List[Union[str, Tuple[str, str]]]]): A list of options
+        options (Optional[List[str | Tuple[str, str]]]): A list of options
             available in the dropdown. Each option can be a string (display value)
             or a tuple of strings (display value, export value).
         width (Optional[float]): The width of the dropdown field.
@@ -86,7 +86,7 @@ class DropdownField(Field):
 
     _widget_class: Type[Widget] = DropdownWidget
 
-    options: Optional[List[Union[str, Tuple[str, str]]]] = None
+    options: Optional[List[str | Tuple[str, str]]] = None
     width: Optional[float] = None
     height: Optional[float] = None
     # pylint: disable=R0801

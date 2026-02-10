@@ -10,7 +10,7 @@ types of widgets.
 
 from functools import lru_cache
 from io import BytesIO
-from typing import Dict, List, Union, cast
+from typing import Dict, List, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
@@ -285,7 +285,7 @@ def _is_widget(widget: dict) -> bool:
     return False
 
 
-def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
+def construct_widget(widget: dict, key: str) -> WIDGET_TYPES | None:
     """
     Constructs a widget object based on the widget dictionary and key.
 
@@ -297,7 +297,7 @@ def construct_widget(widget: dict, key: str) -> Union[WIDGET_TYPES, None]:
         key (str): The key of the widget.
 
     Returns:
-        Union[WIDGET_TYPES, None]: The constructed widget object, or None
+        WIDGET_TYPES | None: The constructed widget object, or None
             if the widget type is not recognized.
     """
     result = None

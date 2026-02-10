@@ -8,7 +8,7 @@ properties in the PDF's annotation dictionary. It also provides utility function
 for updating these widgets.
 """
 
-from typing import Tuple, Union
+from typing import Tuple
 
 from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
                            NumberObject, TextStringObject)
@@ -204,7 +204,7 @@ def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
             break
 
 
-def get_checkbox_value(annot: DictionaryObject) -> Union[bool, None]:
+def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     """
     Retrieves the boolean value of a checkbox annotation.
 
@@ -216,7 +216,7 @@ def get_checkbox_value(annot: DictionaryObject) -> Union[bool, None]:
         annot (DictionaryObject): The checkbox annotation dictionary.
 
     Returns:
-        Union[bool, None]: True if the checkbox is checked, None otherwise.
+        bool | None: True if the checkbox is checked, None otherwise.
     """
     return True if annot.get(V, Off) != Off else None
 
@@ -359,7 +359,7 @@ def get_text_value(annot: DictionaryObject, widget: Text) -> None:
         widget.value = annot.get(V)
 
 
-def get_text_field_max_length(widget: dict) -> Union[int, None]:
+def get_text_field_max_length(widget: dict) -> int | None:
     """
     Extracts the maximum length of a text field from a widget dictionary.
 
@@ -367,13 +367,13 @@ def get_text_field_max_length(widget: dict) -> Union[int, None]:
         widget (dict): The widget dictionary to extract the max length from.
 
     Returns:
-        Union[int, None]: The maximum length of the text field, or None
+        int | None: The maximum length of the text field, or None
             if the max length is not specified.
     """
     return int(widget[MaxLen]) or None if MaxLen in widget else None
 
 
-def get_text_field_alignment(widget: dict) -> Union[int, None]:
+def get_text_field_alignment(widget: dict) -> int | None:
     """
     Extracts the alignment (quadding) of a text field from a widget dictionary.
 
@@ -381,13 +381,13 @@ def get_text_field_alignment(widget: dict) -> Union[int, None]:
         widget (dict): The widget dictionary to extract the alignment from.
 
     Returns:
-        Union[int, None]: The alignment of the text field, or None if the
+        int | None: The alignment of the text field, or None if the
             alignment is not specified or is the default (left-justified).
     """
     return int(widget[Q]) if Q in widget else None
 
 
-def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
+def get_dropdown_choices(widget: dict) -> Tuple[str, ...] | None:
     """
     Extracts the choices from a dropdown widget dictionary.
 
@@ -397,7 +397,7 @@ def get_dropdown_choices(widget: dict) -> Union[Tuple[str, ...], None]:
         widget (dict): The widget dictionary to extract the choices from.
 
     Returns:
-        Union[Tuple[str, ...], None]: A tuple of strings representing the choices in the dropdown, or None if the choices are not specified.
+        Tuple[str, ...] | None: A tuple of strings representing the choices in the dropdown, or None if the choices are not specified.
     """
     return tuple(
         (

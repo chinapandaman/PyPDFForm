@@ -8,7 +8,6 @@ type hinting in methods that handle drawing onto the PDF.
 """
 
 from dataclasses import dataclass
-from typing import Union
 
 from .circle import RawCircle
 from .ellipse import RawEllipse
@@ -17,7 +16,7 @@ from .line import RawLine
 from .rect import RawRectangle
 from .text import RawText
 
-RawTypes = Union[RawText, RawImage, RawLine, RawRectangle, RawCircle, RawEllipse]
+RawTypes = RawText | RawImage | RawLine | RawRectangle | RawCircle | RawEllipse
 
 
 @dataclass

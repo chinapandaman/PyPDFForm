@@ -8,7 +8,7 @@ common attributes and methods for all form widgets, such as name, value,
 and schema definition.
 """
 
-from typing import Any, List, Optional, TextIO, Union
+from typing import Any, List, Optional, TextIO
 
 
 class Widget:
@@ -56,18 +56,18 @@ class Widget:
         self.hooks_to_trigger: list = []
 
         # coordinate & dimension
-        self.x: Optional[Union[float, List[float]]] = None
-        self.y: Optional[Union[float, List[float]]] = None
-        self.width: Optional[Union[float, List[float]]] = None
-        self.height: Optional[Union[float, List[float]]] = None
+        self.x: Optional[float | List[float]] = None
+        self.y: Optional[float | List[float]] = None
+        self.width: Optional[float | List[float]] = None
+        self.height: Optional[float | List[float]] = None
 
         # javascript
-        self.on_hovered_over_javascript: Optional[Union[str, TextIO]] = None
-        self.on_hovered_off_javascript: Optional[Union[str, TextIO]] = None
-        self.on_mouse_pressed_javascript: Optional[Union[str, TextIO]] = None
-        self.on_mouse_released_javascript: Optional[Union[str, TextIO]] = None
-        self.on_focused_javascript: Optional[Union[str, TextIO]] = None
-        self.on_blurred_javascript: Optional[Union[str, TextIO]] = None
+        self.on_hovered_over_javascript: Optional[str | TextIO] = None
+        self.on_hovered_off_javascript: Optional[str | TextIO] = None
+        self.on_mouse_pressed_javascript: Optional[str | TextIO] = None
+        self.on_mouse_released_javascript: Optional[str | TextIO] = None
+        self.on_focused_javascript: Optional[str | TextIO] = None
+        self.on_blurred_javascript: Optional[str | TextIO] = None
 
     def __setattr__(self, name: str, value: Any) -> None:
         """

@@ -18,7 +18,7 @@ from functools import lru_cache
 from io import BytesIO
 from secrets import choice
 from string import ascii_letters, digits, punctuation
-from typing import Any, BinaryIO, List, Union
+from typing import Any, BinaryIO, List
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, NameObject
@@ -232,7 +232,7 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
     return pattern_value == widget_value
 
 
-def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> bool:
+def find_pattern_match(pattern: dict, widget: dict | DictionaryObject) -> bool:
     """
     Recursively finds a pattern match within a PDF widget (annotation dictionary).
 
@@ -242,7 +242,7 @@ def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> 
 
     Args:
         pattern (dict): The pattern to search for, represented as a dictionary.
-        widget (Union[dict, DictionaryObject]): The widget to search within, which
+        widget (dict | DictionaryObject): The widget to search within, which
             can be a dictionary or a DictionaryObject.
 
     Returns:
@@ -256,8 +256,8 @@ def find_pattern_match(pattern: dict, widget: Union[dict, DictionaryObject]) -> 
 
 
 def traverse_pattern(
-    pattern: dict, widget: Union[dict, DictionaryObject]
-) -> Union[str, list, None]:
+    pattern: dict, widget: dict | DictionaryObject
+) -> str | list | None:
     """
     Recursively traverses a pattern within a PDF widget (annotation dictionary) and returns the value.
 
@@ -267,11 +267,11 @@ def traverse_pattern(
 
     Args:
         pattern (dict): The pattern to traverse, represented as a dictionary.
-        widget (Union[dict, DictionaryObject]): The widget to traverse within, which
+        widget (dict | DictionaryObject): The widget to traverse within, which
             can be a dictionary or a DictionaryObject.
 
     Returns:
-        Union[str, list, None]: The value found, or None if not found.
+        str | list | None: The value found, or None if not found.
     """
     for key, value in widget.items():
         result = None
@@ -290,10 +290,10 @@ def traverse_pattern(
 
 
 def extract_widget_property(
-    widget: Union[dict, DictionaryObject],
+    widget: dict | DictionaryObject,
     patterns: list,
     default_value: Any,
-    func_before_return: Union[Callable, None],
+    func_before_return: Callable | None,
 ) -> Any:
     """
     Extracts a specific property from a PDF widget based on a list of patterns.
@@ -303,11 +303,11 @@ def extract_widget_property(
     extracted and returned. If no match is found, a default value is returned.
 
     Args:
-        widget (Union[dict, DictionaryObject]): The widget to extract the property from.
+        widget (dict | DictionaryObject): The widget to extract the property from.
         patterns (list): A list of patterns to search for. Each pattern should be a
             dictionary representing the structure of the property to extract.
         default_value (Any): The default value to return if no pattern is found.
-        func_before_return (Union[Callable, None]): An optional function to call before
+        func_before_return (Callable | None): An optional function to call before
             returning the extracted value. This can be used to perform additional
             processing or formatting on the value.
 

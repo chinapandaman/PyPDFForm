@@ -10,11 +10,10 @@ annotations, facilitating their creation and manipulation within PDF documents.
 """
 
 from dataclasses import dataclass
-from typing import Union
 
 from .text import TextAnnotation
 
-AnnotationTypes = Union[TextAnnotation]
+AnnotationTypes = TextAnnotation
 
 
 @dataclass

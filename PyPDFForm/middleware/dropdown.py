@@ -6,7 +6,7 @@ This module defines the Dropdown class, which is a subclass of the
 Widget class. It represents a dropdown form field in a PDF document.
 """
 
-from typing import Optional, Union
+from typing import Optional
 
 from .base import Widget
 
@@ -57,7 +57,7 @@ class Dropdown(Widget):
         self.font: Optional[str] = None
         self.font_size: Optional[float] = None
         self.font_color: Optional[tuple] = None
-        self.choices: Optional[Union[tuple, list]] = None
+        self.choices: Optional[tuple | list] = None
 
     @property
     def value(self) -> int:
@@ -70,7 +70,7 @@ class Dropdown(Widget):
         return super().value
 
     @value.setter
-    def value(self, value: Union[str, int]) -> None:
+    def value(self, value: str | int) -> None:
         """
         Sets the value of the dropdown.
 
@@ -79,7 +79,7 @@ class Dropdown(Widget):
         added to the choices, and its new index is used.
 
         Args:
-            value (Union[str, int]): The value to set. Can be a string
+            value (str | int): The value to set. Can be a string
                                       (option text) or an integer (index).
         """
         if isinstance(value, str):
@@ -91,7 +91,7 @@ class Dropdown(Widget):
 
         self._value = value
 
-    def _get_option_index(self, value: str) -> Union[int, None]:
+    def _get_option_index(self, value: str) -> int | None:
         """
         Gets the index of a given option value in the dropdown's choices.
 
@@ -99,7 +99,7 @@ class Dropdown(Widget):
             value (str): The option value to search for.
 
         Returns:
-            Union[int, None]: The index of the option if found, otherwise None.
+            int | None: The index of the option if found, otherwise None.
         """
         for i, each in enumerate(self.choices):
             if value == each:
