@@ -2,7 +2,7 @@
 """
 The `annotations` package provides classes representing various types of PDF annotations.
 
-It defines `AnnotationTypes` as a Union of all supported annotation types, allowing for
+It defines `AnnotationTypes` as a collection of all supported annotation types, allowing for
 flexible type hinting when working with different annotation configurations.
 
 Classes within this package encapsulate the properties and behaviors of individual

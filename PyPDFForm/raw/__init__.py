@@ -3,7 +3,7 @@
 The `raw` package provides classes representing raw drawable elements
 (like text and images) that can be rendered directly onto a PDF document.
 
-It defines `RawTypes` as a Union of all supported raw element types, used for
+It defines `RawTypes` as a collection of all supported raw element types, used for
 type hinting in methods that handle drawing onto the PDF.
 """
 
