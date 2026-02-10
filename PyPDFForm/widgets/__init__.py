@@ -2,7 +2,7 @@
 """
 The `widgets` package provides a collection of classes representing various types of PDF form fields (widgets).
 
-It defines `FieldTypes` as a Union of all supported field types, allowing for flexible
+It defines `FieldTypes` as a collection of all supported field types, allowing for flexible
 type hinting when working with different widget configurations.
 
 Classes within this package encapsulate the properties and behaviors of individual
