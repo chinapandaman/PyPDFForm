@@ -358,10 +358,7 @@ def _create_annotation_object(annotation: AnnotationTypes) -> DictionaryObject:
             NameObject(Contents): TextStringObject(annotation.contents),
         }
     )
-    for k, v in getattr(annotation, "_additional_properties", ()):
-        val = getattr(annotation, v[1])
-        if val is not None:
-            annot[k] = v[0](val)
+    annot.update(**annotation.get_specific_properties())
     return annot
 
 

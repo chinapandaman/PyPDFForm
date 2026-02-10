@@ -36,3 +36,6 @@ class Annotation:
     width: float = 20
     height: float = 20
     contents: str = ""
+
+    def get_specific_properties(self) -> dict:
+        raise NotImplementedError
