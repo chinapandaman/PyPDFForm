@@ -65,7 +65,7 @@ new_form = PdfWrapper("dummy.pdf").create_field(
         button_style="check",  # optional (1)
         tick_color=(0, 1, 0),  # optional
         bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-        border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+        border_color=(1, 1, 0, 1),  # optional, (r, g, b, alpha)
         border_width=5,  # optional
     )
 )
@@ -100,7 +100,7 @@ new_form = PdfWrapper("dummy.pdf").create_field(
         shape="square",  # optional, circle or square
         tick_color=(0, 1, 0),  # optional
         bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-        border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+        border_color=(1, 0, 1, 1),  # optional, (r, g, b, alpha)
         border_width=5,  # optional
     )
 )
@@ -140,7 +140,7 @@ A dropdown field shares a similar set of parameters as a text field. The only si
             font_size=15,  # optional
             font_color=(1, 0, 0),  # optional
             bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-            border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+            border_color=(0, 1, 0, 1),  # optional, (r, g, b, alpha)
             border_width=5,  # optional
         )
     )
