@@ -8,7 +8,6 @@ allowing users to add their signature as an image.
 """
 
 from os.path import expanduser
-from typing import Union
 
 from ..adapter import fp_or_f_obj_or_stream_to_stream
 from .base import Widget
@@ -55,7 +54,7 @@ class Signature(Widget):
         return expanduser("~/Downloads/sample_image.jpg")
 
     @property
-    def stream(self) -> Union[bytes, None]:
+    def stream(self) -> bytes | None:
         """
         Returns the stream of the signature image.
 
@@ -64,7 +63,7 @@ class Signature(Widget):
         as a stream of bytes.
 
         Returns:
-            Union[bytes, None]: The stream of the signature image.
+            bytes | None: The stream of the signature image.
         """
         return (
             fp_or_f_obj_or_stream_to_stream(self.value)

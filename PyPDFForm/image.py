@@ -8,14 +8,14 @@ account whether to preserve the aspect ratio.
 """
 
 from io import BytesIO
-from typing import Tuple, Union
+from typing import Tuple
 
 from PIL import Image
 
 from .constants import Rect
 
 
-def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
+def rotate_image(image_stream: bytes, rotation: float | int) -> bytes:
     """
     Rotates an image by a specified angle in degrees.
 
@@ -26,7 +26,7 @@ def rotate_image(image_stream: bytes, rotation: Union[float, int]) -> bytes:
 
     Args:
         image_stream (bytes): The image data as bytes.
-        rotation (Union[float, int]): The rotation angle in degrees. Positive values
+        rotation (float | int): The rotation angle in degrees. Positive values
             rotate the image counterclockwise, while negative values rotate it clockwise.
 
     Returns:

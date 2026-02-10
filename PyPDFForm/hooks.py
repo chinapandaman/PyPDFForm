@@ -11,7 +11,7 @@ filling process, allowing for customization of the form's appearance and behavio
 
 import sys
 from io import BytesIO
-from typing import TextIO, Union, cast
+from typing import TextIO, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
@@ -393,7 +393,7 @@ def update_field_hidden(annot: DictionaryObject, val: bool) -> None:
 
 
 def _update_field_javascript(
-    annot: DictionaryObject, trigger_event: str, val: Union[str, TextIO]
+    annot: DictionaryObject, trigger_event: str, val: str | TextIO
 ) -> None:
     """
     Updates a specific JavaScript action for a form field annotation.
@@ -405,7 +405,7 @@ def _update_field_javascript(
         annot (DictionaryObject): The annotation dictionary for the form field.
         trigger_event (str): The event that triggers the JavaScript action
             (e.g., E for enter, X for exit, D for down, U for up, Fo for focus, Bl for blur).
-        val (Union[str, TextIO]): The JavaScript code to execute. Can be a string
+        val (str | TextIO): The JavaScript code to execute. Can be a string
             containing the code or a file-like object/path to a file containing the code.
     """
     if AA not in annot:
@@ -424,7 +424,7 @@ def _update_field_javascript(
 
 
 def update_field_on_hovered_over_javascript(
-    annot: DictionaryObject, val: Union[str, TextIO]
+    annot: DictionaryObject, val: str | TextIO
 ) -> None:
     """
     Updates the JavaScript action triggered when the mouse enters the field area.
@@ -434,13 +434,13 @@ def update_field_on_hovered_over_javascript(
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
-        val (Union[str, TextIO]): The JavaScript code to execute.
+        val (str | TextIO): The JavaScript code to execute.
     """
     _update_field_javascript(annot, E, val)
 
 
 def update_field_on_hovered_off_javascript(
-    annot: DictionaryObject, val: Union[str, TextIO]
+    annot: DictionaryObject, val: str | TextIO
 ) -> None:
     """
     Updates the JavaScript action triggered when the mouse exits the field area.
@@ -450,13 +450,13 @@ def update_field_on_hovered_off_javascript(
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
-        val (Union[str, TextIO]): The JavaScript code to execute.
+        val (str | TextIO): The JavaScript code to execute.
     """
     _update_field_javascript(annot, X, val)
 
 
 def update_field_on_mouse_pressed_javascript(
-    annot: DictionaryObject, val: Union[str, TextIO]
+    annot: DictionaryObject, val: str | TextIO
 ) -> None:
     """
     Updates the JavaScript action triggered when the mouse button is pressed down inside the field.
@@ -466,13 +466,13 @@ def update_field_on_mouse_pressed_javascript(
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
-        val (Union[str, TextIO]): The JavaScript code to execute.
+        val (str | TextIO): The JavaScript code to execute.
     """
     _update_field_javascript(annot, D, val)
 
 
 def update_field_on_mouse_released_javascript(
-    annot: DictionaryObject, val: Union[str, TextIO]
+    annot: DictionaryObject, val: str | TextIO
 ) -> None:
     """
     Updates the JavaScript action triggered when the mouse button is released inside the field.
@@ -482,13 +482,13 @@ def update_field_on_mouse_released_javascript(
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
-        val (Union[str, TextIO]): The JavaScript code to execute.
+        val (str | TextIO): The JavaScript code to execute.
     """
     _update_field_javascript(annot, U, val)
 
 
 def update_field_on_focused_javascript(
-    annot: DictionaryObject, val: Union[str, TextIO]
+    annot: DictionaryObject, val: str | TextIO
 ) -> None:
     """
     Updates the JavaScript action triggered when the field receives input focus.
@@ -498,13 +498,13 @@ def update_field_on_focused_javascript(
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
-        val (Union[str, TextIO]): The JavaScript code to execute.
+        val (str | TextIO): The JavaScript code to execute.
     """
     _update_field_javascript(annot, Fo, val)
 
 
 def update_field_on_blurred_javascript(
-    annot: DictionaryObject, val: Union[str, TextIO]
+    annot: DictionaryObject, val: str | TextIO
 ) -> None:
     """
     Updates the JavaScript action triggered when the field loses input focus.
@@ -514,6 +514,6 @@ def update_field_on_blurred_javascript(
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
-        val (Union[str, TextIO]): The JavaScript code to execute.
+        val (str | TextIO): The JavaScript code to execute.
     """
     _update_field_javascript(annot, Bl, val)

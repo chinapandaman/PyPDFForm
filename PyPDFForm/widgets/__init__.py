@@ -10,7 +10,6 @@ form fields, facilitating their creation and manipulation within PDF documents.
 """
 
 from dataclasses import dataclass
-from typing import Union
 
 from .checkbox import CheckBoxField
 from .dropdown import DropdownField
@@ -19,9 +18,9 @@ from .radio import RadioGroup
 from .signature import SignatureField
 from .text import TextField
 
-FieldTypes = Union[
-    TextField, CheckBoxField, RadioGroup, DropdownField, SignatureField, ImageField
-]
+FieldTypes = (
+    TextField | CheckBoxField | RadioGroup | DropdownField | SignatureField | ImageField
+)
 
 
 @dataclass

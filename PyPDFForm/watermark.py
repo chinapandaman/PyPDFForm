@@ -11,7 +11,7 @@ and to copy specific widgets from the watermarks to the original PDF.
 from collections import defaultdict
 from functools import lru_cache
 from io import BytesIO
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from pypdf import PageObject, PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, NameObject
@@ -446,7 +446,7 @@ def _collect_from_multiple_watermarks(
 
 def _collect_widgets_to_copy(
     writer: PdfWriter,
-    watermarks: Union[List[bytes], bytes],
+    watermarks: List[bytes] | bytes,
     keys: Optional[List[str]],
     page_num: Optional[int],
 ) -> Dict[int, List[Any]]:
@@ -455,7 +455,7 @@ def _collect_widgets_to_copy(
 
     Args:
         writer (PdfWriter): The PdfWriter for the output PDF.
-        watermarks (Union[List[bytes], bytes]): Watermark(s) to copy from.
+        watermarks (List[bytes] | bytes): Watermark(s) to copy from.
         keys (Optional[List[str]]): Keys of widgets to copy.
         page_num (Optional[int]): Specific page index to copy from.
 
@@ -500,7 +500,7 @@ def _apply_widgets_to_pages(
 
 def copy_watermark_widgets(
     pdf: bytes,
-    watermarks: Union[List[bytes], bytes],
+    watermarks: List[bytes] | bytes,
     keys: Optional[List[str]],
     page_num: Optional[int],
 ) -> bytes:
@@ -514,7 +514,7 @@ def copy_watermark_widgets(
 
     Args:
         pdf (bytes): The original PDF file as a byte stream.
-        watermarks (Union[List[bytes], bytes]): Either a single PDF byte stream or
+        watermarks (List[bytes] | bytes): Either a single PDF byte stream or
             a list of PDF byte streams.
         keys (Optional[List[str]]): A list of widget keys to copy. If None,
             all widgets are copied.

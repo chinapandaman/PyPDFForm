@@ -17,7 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from inspect import signature
 from io import BytesIO
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from pypdf import PdfReader
 from reportlab.lib.colors import Color
@@ -53,8 +53,8 @@ class Widget:
         self,
         name: str,
         page_number: int,
-        x: Union[float, List[float]],
-        y: Union[float, List[float]],
+        x: float | List[float],
+        y: float | List[float],
         **kwargs,
     ) -> None:
         """
@@ -67,8 +67,8 @@ class Widget:
         Args:
             name (str): Name of the widget.
             page_number (int): Page number of the widget.
-            x (Union[float, List[float]]): X coordinate(s) of the widget. Can be a single float or a list of floats.
-            y (Union[float, List[float]]): Y coordinate(s) of the widget. Can be a single float or a list of floats.
+            x (float | List[float]): X coordinate(s) of the widget. Can be a single float or a list of floats.
+            y (float | List[float]): Y coordinate(s) of the widget. Can be a single float or a list of floats.
             **kwargs: Additional keyword arguments for customizing the widget.
 
         Returns:

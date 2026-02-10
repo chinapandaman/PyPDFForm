@@ -5,7 +5,7 @@ Contains the RawImage class, which represents an image that can be drawn
 directly onto a PDF page at a specified position and size.
 """
 
-from typing import BinaryIO, Union
+from typing import BinaryIO
 
 from ..adapter import fp_or_f_obj_or_stream_to_stream
 from ..image import rotate_image
@@ -22,7 +22,7 @@ class RawImage:
 
     def __init__(
         self,
-        image: Union[bytes, str, BinaryIO],
+        image: bytes | str | BinaryIO,
         page_number: int,
         x: float,
         y: float,

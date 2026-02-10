@@ -9,7 +9,7 @@ supports flattening the filled form to prevent further modifications.
 """
 
 from io import BytesIO
-from typing import Dict, Union, cast
+from typing import Dict, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
@@ -31,7 +31,7 @@ from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
 def signature_image_handler(
-    widget: dict, middleware: Union[Signature, Image], images_to_draw: list
+    widget: dict, middleware: Signature | Image, images_to_draw: list
 ) -> bool:
     """Handles signature and image widgets by extracting image data and preparing it for drawing.
 
@@ -43,7 +43,7 @@ def signature_image_handler(
 
     Args:
         widget (dict): The widget dictionary representing the signature or image field.
-        middleware (Union[Signature, Image]): The middleware object containing the image data and properties.
+        middleware (Signature | Image): The middleware object containing the image data and properties.
         images_to_draw (list): A list to store image data for drawing.
 
     Returns:
