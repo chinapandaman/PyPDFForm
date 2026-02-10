@@ -6,9 +6,7 @@ EXPOSE 8000 8080
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-COPY ./pyproject.toml /pypdfform/pyproject.toml
-
-COPY ./entrypoint.sh /pypdfform/entrypoint.sh
+COPY . /pypdfform
 
 RUN apt-get update && \
     apt-get install -y \
@@ -37,8 +35,6 @@ RUN apt-get update && \
     chown -R pypdfform-dev:pypdfform-dev /home/pypdfform-dev /pypdfform
 
 USER pypdfform-dev
-
-COPY . /pypdfform
 
 ENTRYPOINT ["bash", "entrypoint.sh"]
 
