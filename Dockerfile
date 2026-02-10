@@ -38,6 +38,8 @@ RUN apt-get update && \
 
 USER pypdfform-dev
 
+COPY . /pypdfform
+
 ENTRYPOINT ["bash", "entrypoint.sh"]
 
 CMD ["bash"]
