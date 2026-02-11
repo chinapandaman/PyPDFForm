@@ -48,6 +48,15 @@ class TextAnnotation(Annotation):
     icon: Optional[str] = None
 
     def get_specific_properties(self) -> dict:
+        """
+        Gets properties specific to the text annotation.
+
+        This method includes the title (author) and the icon name for the
+        text annotation if they are provided.
+
+        Returns:
+            dict: A dictionary of PDF properties specific to the text annotation.
+        """
         result = {}
         if self.title is not None:
             result[NameObject(T)] = TextStringObject(self.title)
