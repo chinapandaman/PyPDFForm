@@ -42,7 +42,7 @@ pdf.write("output.pdf")
 
 ## Create text markup annotations
 
-There are four types of text markup annotations: highlight, underline, squiggly, and strikeout. To create them, specify the coordinates and resolutions for the bounding box:
+There are four types of text markup annotations: highlight, underline, squiggly, and strikeout. To create them, specify the coordinates and dimensions for the bounding box:
 
 === "Highlight"
     ```python
