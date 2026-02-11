@@ -11,12 +11,14 @@ annotations, facilitating their creation and manipulation within PDF documents.
 
 from dataclasses import dataclass
 
+from .link import LinkAnnotation
 from .text import TextAnnotation
 from .text_markup import (HighlightAnnotation, SquigglyAnnotation,
                           StrikeOutAnnotation, UnderlineAnnotation)
 
 AnnotationTypes = (
     TextAnnotation
+    | LinkAnnotation
     | HighlightAnnotation
     | UnderlineAnnotation
     | SquigglyAnnotation
@@ -34,6 +36,7 @@ class Annotations:
     """
 
     TextAnnotation = TextAnnotation
+    LinkAnnotation = LinkAnnotation
     HighlightAnnotation = HighlightAnnotation
     UnderlineAnnotation = UnderlineAnnotation
     SquigglyAnnotation = SquigglyAnnotation
