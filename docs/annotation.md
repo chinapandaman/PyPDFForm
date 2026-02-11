@@ -40,6 +40,32 @@ pdf.write("output.pdf")
 
 1. Default is `note_icon`. Other options are `comment_icon`, `help_icon`, `key_icon`, and `insert_icon`.
 
+## Create link annotations
+
+???+ note
+    At the moment, PyPDFForm only supports creating link annotations targeting URIs.
+
+A link annotation navigates to a destination specified when clicked. The below snippet creates a link annotation on top of the text `TEST PDF TEMPLATE` that redirects to `https://www.google.com/`:
+
+```python
+from PyPDFForm import Annotations, PdfWrapper
+
+pdf = PdfWrapper("sample_template.pdf").annotate(
+    [
+        Annotations.LinkAnnotation(
+            page_number=1,
+            x=70,
+            y=705,
+            width=95,
+            height=20,
+            uri="https://www.google.com/",
+        )
+    ]
+)
+
+pdf.write("output.pdf")
+```
+
 ## Create text markup annotations
 
 There are four types of text markup annotations: highlight, underline, squiggly, and strikeout. To create them, specify the coordinates and dimensions for the bounding box:
