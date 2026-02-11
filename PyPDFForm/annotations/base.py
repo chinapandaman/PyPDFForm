@@ -46,10 +46,10 @@ class Annotation:
         """
         Gets properties specific to the annotation type.
 
-        This method should be implemented by subclasses to return a dictionary
-        containing PDF properties and their values that are unique to that
-        specific type of annotation. These properties are used when creating
-        the annotation's entry in the PDF document.
+        This method constructs the base dictionary containing PDF properties
+        and their values that are common to all types of annotations.
+        These properties are used when creating the annotation's entry in
+        the PDF document.
 
         Returns:
             dict: A dictionary of PDF properties specific to the annotation type.

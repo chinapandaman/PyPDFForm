@@ -51,8 +51,8 @@ class TextAnnotation(Annotation):
         """
         Gets properties specific to the text annotation.
 
-        This method includes the title (author) and the icon name for the
-        text annotation if they are provided.
+        This method extends the base properties with the title (author)
+        and the icon name for the text annotation if they are provided.
 
         Returns:
             dict: A dictionary of PDF properties specific to the text annotation.
