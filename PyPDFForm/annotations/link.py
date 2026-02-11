@@ -37,15 +37,14 @@ class LinkAnnotation(Annotation):
 
     def get_specific_properties(self) -> dict:
         """
-        Gets properties specific to the link annotation type.
+        Gets properties specific to the link annotation.
 
-        This method returns a dictionary containing PDF properties and their
-        values that are unique to a link annotation, perforated with the URI action.
+        This method extends the base properties with the URI action.
 
         Returns:
             dict: A dictionary of PDF properties specific to the link annotation.
         """
-        result = {}
+        result = super().get_specific_properties()
         if self.uri is not None:
             result[NameObject(A)] = DictionaryObject(
                 {

@@ -51,13 +51,13 @@ class TextAnnotation(Annotation):
         """
         Gets properties specific to the text annotation.
 
-        This method includes the title (author) and the icon name for the
-        text annotation if they are provided.
+        This method extends the base properties with the title (author)
+        and the icon name for the text annotation if they are provided.
 
         Returns:
             dict: A dictionary of PDF properties specific to the text annotation.
         """
-        result = {}
+        result = super().get_specific_properties()
         if self.title is not None:
             result[NameObject(T)] = TextStringObject(self.title)
         if self.icon is not None:

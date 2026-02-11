@@ -32,26 +32,31 @@ class TextMarkupAnnotation(Annotation):
         """
         Gets properties specific to the text markup annotation.
 
-        This method calculates the `QuadPoints` for the markup based on the
-        annotation's position and dimensions.
+        This method extends the base properties with the `QuadPoints` for
+        the markup based on the annotation's position and dimensions.
 
         Returns:
-            dict: A dictionary containing the `/QuadPoints` property.
+            dict: A dictionary of PDF properties specific to the text markup annotation.
         """
-        return {
-            NameObject("/QuadPoints"): ArrayObject(
-                [
-                    FloatObject(self.x),
-                    FloatObject(self.y),
-                    FloatObject(self.x + self.width),
-                    FloatObject(self.y),
-                    FloatObject(self.x),
-                    FloatObject(self.y + self.height),
-                    FloatObject(self.x + self.width),
-                    FloatObject(self.y + self.height),
-                ]
-            )
-        }
+        result = super().get_specific_properties()
+        result.update(
+            {
+                NameObject("/QuadPoints"): ArrayObject(
+                    [
+                        FloatObject(self.x),
+                        FloatObject(self.y),
+                        FloatObject(self.x + self.width),
+                        FloatObject(self.y),
+                        FloatObject(self.x),
+                        FloatObject(self.y + self.height),
+                        FloatObject(self.x + self.width),
+                        FloatObject(self.y + self.height),
+                    ]
+                ),
+            }
+        )
+
+        return result
 
 
 @dataclass

@@ -11,6 +11,11 @@ Classes:
 
 from dataclasses import dataclass
 
+from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
+                           NameObject, TextStringObject)
+
+from ..constants import Annot, Contents, Rect, Subtype, Type
+
 
 @dataclass
 class Annotation:
@@ -41,12 +46,26 @@ class Annotation:
         """
         Gets properties specific to the annotation type.
 
-        This method should be implemented by subclasses to return a dictionary
-        containing PDF properties and their values that are unique to that
-        specific type of annotation. These properties are used when creating
-        the annotation's entry in the PDF document.
+        This method constructs the base dictionary containing PDF properties
+        and their values that are common to all types of annotations.
+        These properties are used when creating the annotation's entry in
+        the PDF document.
 
         Returns:
             dict: A dictionary of PDF properties specific to the annotation type.
         """
-        raise NotImplementedError
+        return DictionaryObject(
+            {
+                NameObject(Type): NameObject(Annot),
+                NameObject(Subtype): NameObject(getattr(self, "_annotation_type")),
+                NameObject(Rect): ArrayObject(
+                    [
+                        FloatObject(self.x),
+                        FloatObject(self.y),
+                        FloatObject(self.x + self.width),
+                        FloatObject(self.y + self.height),
+                    ]
+                ),
+                NameObject(Contents): TextStringObject(self.contents),
+            }
+        )
