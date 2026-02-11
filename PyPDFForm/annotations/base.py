@@ -11,6 +11,11 @@ Classes:
 
 from dataclasses import dataclass
 
+from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
+                           NameObject, TextStringObject)
+
+from ..constants import Annot, Contents, Rect, Subtype, Type
+
 
 @dataclass
 class Annotation:
@@ -49,4 +54,18 @@ class Annotation:
         Returns:
             dict: A dictionary of PDF properties specific to the annotation type.
         """
-        raise NotImplementedError
+        return DictionaryObject(
+            {
+                NameObject(Type): NameObject(Annot),
+                NameObject(Subtype): NameObject(self._annotation_type),
+                NameObject(Rect): ArrayObject(
+                    [
+                        FloatObject(self.x),
+                        FloatObject(self.y),
+                        FloatObject(self.x + self.width),
+                        FloatObject(self.y + self.height),
+                    ]
+                ),
+                NameObject(Contents): TextStringObject(self.contents),
+            }
+        )

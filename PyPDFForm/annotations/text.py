@@ -57,7 +57,7 @@ class TextAnnotation(Annotation):
         Returns:
             dict: A dictionary of PDF properties specific to the text annotation.
         """
-        result = {}
+        result = super().get_specific_properties()
         if self.title is not None:
             result[NameObject(T)] = TextStringObject(self.title)
         if self.icon is not None:

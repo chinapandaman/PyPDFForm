@@ -13,12 +13,11 @@ from io import BytesIO
 from typing import Dict, List, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
-                           NameObject, TextStringObject)
+from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
 from .annotations import AnnotationTypes
 from .constants import (COMB, MULTILINE, READ_ONLY, REQUIRED, WIDGET_TYPES,
-                        Annot, Annots, Contents, Rect, Subtype, Type)
+                        Annots)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -333,35 +332,6 @@ def _group_annotations_by_page(
     return result
 
 
-def _create_annotation_object(annotation: AnnotationTypes) -> DictionaryObject:
-    """
-    Creates a PDF dictionary object for an annotation.
-
-    Args:
-        annotation (AnnotationTypes): The annotation object to convert.
-
-    Returns:
-        DictionaryObject: The PDF dictionary object representing the annotation.
-    """
-    annot = DictionaryObject(
-        {
-            NameObject(Type): NameObject(Annot),
-            NameObject(Subtype): NameObject(getattr(annotation, "_annotation_type")),
-            NameObject(Rect): ArrayObject(
-                [
-                    FloatObject(annotation.x),
-                    FloatObject(annotation.y),
-                    FloatObject(annotation.x + annotation.width),
-                    FloatObject(annotation.y + annotation.height),
-                ]
-            ),
-            NameObject(Contents): TextStringObject(annotation.contents),
-        }
-    )
-    annot.update(**annotation.get_specific_properties())
-    return annot
-
-
 def create_annotations(
     template: bytes,
     annotations: List[AnnotationTypes],
@@ -393,7 +363,7 @@ def create_annotations(
 
         page_annotations = ArrayObject([])
         for annotation in annotations_by_page[page_num]:
-            page_annotations.append(_create_annotation_object(annotation))
+            page_annotations.append(annotation.get_specific_properties())
 
         if Annots in page:
             page[NameObject(Annots)] += page_annotations

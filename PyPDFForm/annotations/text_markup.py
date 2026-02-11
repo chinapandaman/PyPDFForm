@@ -38,20 +38,25 @@ class TextMarkupAnnotation(Annotation):
         Returns:
             dict: A dictionary containing the `/QuadPoints` property.
         """
-        return {
-            NameObject("/QuadPoints"): ArrayObject(
-                [
-                    FloatObject(self.x),
-                    FloatObject(self.y),
-                    FloatObject(self.x + self.width),
-                    FloatObject(self.y),
-                    FloatObject(self.x),
-                    FloatObject(self.y + self.height),
-                    FloatObject(self.x + self.width),
-                    FloatObject(self.y + self.height),
-                ]
-            )
-        }
+        result = super().get_specific_properties()
+        result.update(
+            {
+                NameObject("/QuadPoints"): ArrayObject(
+                    [
+                        FloatObject(self.x),
+                        FloatObject(self.y),
+                        FloatObject(self.x + self.width),
+                        FloatObject(self.y),
+                        FloatObject(self.x),
+                        FloatObject(self.y + self.height),
+                        FloatObject(self.x + self.width),
+                        FloatObject(self.y + self.height),
+                    ]
+                ),
+            }
+        )
+
+        return result
 
 
 @dataclass

@@ -45,7 +45,7 @@ class LinkAnnotation(Annotation):
         Returns:
             dict: A dictionary of PDF properties specific to the link annotation.
         """
-        result = {}
+        result = super().get_specific_properties()
         if self.uri is not None:
             result[NameObject(A)] = DictionaryObject(
                 {
