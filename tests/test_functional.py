@@ -7,6 +7,7 @@ import pytest
 from jsonschema import ValidationError, validate
 
 from PyPDFForm import Annotations, BlankPage, Fields, PdfArray, PdfWrapper
+from PyPDFForm.annotations.base import Annotation
 from PyPDFForm.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
 from PyPDFForm.deprecation import deprecation_notice
 from PyPDFForm.middleware.base import Widget
@@ -786,6 +787,17 @@ def test_merge(template_stream):
                 assert field[V] == f"test_2_{int(page / 3)}"
             elif key.startswith("test_3-"):
                 assert field[V] == f"test_3_{int(page / 3 - 0.5)}"
+
+
+def test_base_annotation_get_specific_properties_not_implemented():
+    annotation = Annotation(1, 100, 100)
+    try:
+        annotation.get_specific_properties()
+        pytest.fail(
+            reason="base annotation shouldn't have get_specific_properties implemented."
+        )
+    except NotImplementedError:
+        pass
 
 
 def test_annotate(template_stream, pdf_samples, request):

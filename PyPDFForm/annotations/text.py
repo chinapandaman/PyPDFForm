@@ -27,8 +27,6 @@ class TextAnnotation(Annotation):
 
     Attributes:
         _annotation_type (str): The PDF internal type of the annotation, which is "/Text".
-        _additional_properties (tuple): A tuple defining how specific attributes are mapped
-            to PDF dictionary keys for the annotation.
         note_icon (str): The identifier for a "Note" icon.
         comment_icon (str): The identifier for a "Comment" icon.
         help_icon (str): The identifier for a "Help" icon.
@@ -39,10 +37,6 @@ class TextAnnotation(Annotation):
     """
 
     _annotation_type: str = "/Text"
-    _additional_properties: tuple = (
-        (NameObject(T), (TextStringObject, "title")),
-        (NameObject("/Name"), (NameObject, "icon")),
-    )
 
     note_icon: str = "/Note"
     comment_icon: str = "/Comment"
@@ -52,3 +46,21 @@ class TextAnnotation(Annotation):
 
     title: Optional[str] = None
     icon: Optional[str] = None
+
+    def get_specific_properties(self) -> dict:
+        """
+        Gets properties specific to the text annotation.
+
+        This method includes the title (author) and the icon name for the
+        text annotation if they are provided.
+
+        Returns:
+            dict: A dictionary of PDF properties specific to the text annotation.
+        """
+        result = {}
+        if self.title is not None:
+            result[NameObject(T)] = TextStringObject(self.title)
+        if self.icon is not None:
+            result[NameObject("/Name")] = NameObject(self.icon)
+
+        return result

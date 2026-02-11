@@ -39,3 +39,48 @@ pdf.write("output.pdf")
 ```
 
 1. Default is `note_icon`. Other options are `comment_icon`, `help_icon`, `key_icon`, and `insert_icon`.
+
+## Create text markup annotations
+
+There are four types of text markup annotations: highlight, underline, squiggly, and strikeout. To create them, specify the coordinates and dimensions for the bounding box:
+
+=== "Highlight"
+    ```python
+    from PyPDFForm import Annotations, PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf").annotate(
+        [Annotations.HighlightAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
+    )
+
+    pdf.write("output.pdf")
+    ```
+=== "Underline"
+    ```python
+    from PyPDFForm import Annotations, PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf").annotate(
+        [Annotations.UnderlineAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
+    )
+
+    pdf.write("output.pdf")
+    ```
+=== "Squiggly"
+    ```python
+    from PyPDFForm import Annotations, PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf").annotate(
+        [Annotations.SquigglyAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
+    )
+
+    pdf.write("output.pdf")
+    ```
+=== "Strikeout"
+    ```python
+    from PyPDFForm import Annotations, PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf").annotate(
+        [Annotations.StrikeOutAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
+    )
+
+    pdf.write("output.pdf")
+    ```
