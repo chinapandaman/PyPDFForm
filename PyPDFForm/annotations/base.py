@@ -57,7 +57,7 @@ class Annotation:
         return DictionaryObject(
             {
                 NameObject(Type): NameObject(Annot),
-                NameObject(Subtype): NameObject(self._annotation_type),
+                NameObject(Subtype): NameObject(getattr(self, "_annotation_type")),
                 NameObject(Rect): ArrayObject(
                     [
                         FloatObject(self.x),
