@@ -43,9 +43,9 @@ pdf.write("output.pdf")
 ## Create link annotations
 
 ???+ note
-    At the moment, PyPDFForm only supports creating link annotations targeting URIs.
+    Currently, PyPDFForm only supports link annotations that target URIs.
 
-A link annotation navigates to a destination specified when clicked. The below snippet creates a link annotation on top of the text `TEST PDF TEMPLATE` that redirects to `https://www.google.com/`:
+A link annotation navigates to a specified destination when clicked. The following snippet creates a link annotation on top of the text `TEST PDF TEMPLATE` that redirects to `https://www.google.com/`:
 
 ```python
 from PyPDFForm import Annotations, PdfWrapper
