@@ -342,6 +342,30 @@ def flatten_field(annot: DictionaryObject, val: bool) -> None:
     _update_field_flag(annot, READ_ONLY, val)
 
 
+def update_field_x(annot: DictionaryObject, val: float) -> None:
+    if not isinstance(val, float):
+        return
+    annot[NameObject(Rect)][0] = FloatObject(val)
+
+
+def update_field_y(annot: DictionaryObject, val: float) -> None:
+    if not isinstance(val, float):
+        return
+    annot[NameObject(Rect)][1] = FloatObject(val)
+
+
+def update_field_width(annot: DictionaryObject, val: float) -> None:
+    if not isinstance(val, float):
+        return
+    annot[NameObject(Rect)][2] = FloatObject(annot[Rect][0] + val)
+
+
+def update_field_height(annot: DictionaryObject, val: float) -> None:
+    if not isinstance(val, float):
+        return
+    annot[NameObject(Rect)][3] = FloatObject(annot[Rect][1] + val)
+
+
 def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
     """
     Updates the tooltip (alternate field name) of a form field annotation.
