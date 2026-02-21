@@ -148,7 +148,12 @@ def _populate_common_properties(widget: dict, _widget: WIDGET_TYPES) -> None:
     _widget.__dict__["required"] = check_field_flag(widget, REQUIRED)
     _widget.__dict__["hidden"] = get_field_hidden(widget)
 
-    _widget.x, _widget.y, _widget.width, _widget.height = get_field_rect(widget)
+    (
+        _widget.__dict__["x"],
+        _widget.__dict__["y"],
+        _widget.__dict__["width"],
+        _widget.__dict__["height"],
+    ) = get_field_rect(widget)
 
 
 def _populate_text_properties(widget: dict, _widget: Text) -> None:
@@ -195,10 +200,10 @@ def _handle_radio_widget(
     field_rect = get_field_rect(widget)
 
     if key not in results:
-        _widget.x = []
-        _widget.y = []
-        _widget.width = []
-        _widget.height = []
+        _widget.__dict__["x"] = []
+        _widget.__dict__["y"] = []
+        _widget.__dict__["width"] = []
+        _widget.__dict__["height"] = []
         results[key] = _widget
 
     radio = cast(Radio, results[key])
@@ -210,9 +215,9 @@ def _handle_radio_widget(
     if isinstance(radio.y, list):
         radio.y.append(field_rect[1])
     if isinstance(radio.width, list):
-        radio.width.append(field_rect[2])
+        radio.__dict__["width"].append(field_rect[2])
     if isinstance(radio.height, list):
-        radio.height.append(field_rect[3])
+        radio.__dict__["height"].append(field_rect[3])
 
     if get_radio_value(widget):
         radio.value = radio.number_of_options - 1

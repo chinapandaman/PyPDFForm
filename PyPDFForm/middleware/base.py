@@ -22,6 +22,10 @@ class Widget:
     """
 
     SET_ATTR_TRIGGER_HOOK_MAP = {
+        "x": "update_field_x",
+        "y": "update_field_y",
+        "width": "update_field_width",
+        "height": "update_field_height",
         "readonly": "flatten_field",
         "required": "update_field_required",
         "hidden": "update_field_hidden",

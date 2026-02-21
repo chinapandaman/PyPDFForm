@@ -342,6 +342,74 @@ def flatten_field(annot: DictionaryObject, val: bool) -> None:
     _update_field_flag(annot, READ_ONLY, val)
 
 
+def update_field_x(annot: DictionaryObject, val: float) -> None:
+    """
+    Updates the X-coordinate (horizontal position) of a form field annotation.
+
+    This function modifies the 'Rect' entry of the annotation dictionary to change
+    the starting X-coordinate of the field and adjusts the ending X-coordinate
+    accordingly to maintain the field's width.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (float): The new X-coordinate for the left edge of the field.
+    """
+    if isinstance(val, float):
+        diff = val - annot[Rect][0]
+        annot[NameObject(Rect)][0] = FloatObject(val)
+        annot[NameObject(Rect)][2] = FloatObject(annot[NameObject(Rect)][2] + diff)
+
+
+def update_field_y(annot: DictionaryObject, val: float) -> None:
+    """
+    Updates the Y-coordinate (vertical position) of a form field annotation.
+
+    This function modifies the 'Rect' entry of the annotation dictionary to change
+    the starting Y-coordinate of the field and adjusts the ending Y-coordinate
+    accordingly to maintain the field's height.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (float): The new Y-coordinate for the bottom edge of the field.
+    """
+    if isinstance(val, float):
+        diff = val - annot[Rect][1]
+        annot[NameObject(Rect)][1] = FloatObject(val)
+        annot[NameObject(Rect)][3] = FloatObject(annot[NameObject(Rect)][3] + diff)
+
+
+def update_field_width(annot: DictionaryObject, val: float) -> None:
+    """
+    Updates the width of a form field annotation.
+
+    This function modifies the 'Rect' entry of the annotation dictionary to set
+    the new width of the field, adjusting the rightmost coordinate while keeping
+    the leftmost coordinate fixed.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (float): The new width of the field.
+    """
+    if isinstance(val, float):
+        annot[NameObject(Rect)][2] = FloatObject(annot[Rect][0] + val)
+
+
+def update_field_height(annot: DictionaryObject, val: float) -> None:
+    """
+    Updates the height of a form field annotation.
+
+    This function modifies the 'Rect' entry of the annotation dictionary to set
+    the new height of the field, adjusting the topmost coordinate while keeping
+    the bottommost coordinate fixed.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary for the form field.
+        val (float): The new height of the field.
+    """
+    if isinstance(val, float):
+        annot[NameObject(Rect)][3] = FloatObject(annot[Rect][1] + val)
+
+
 def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
     """
     Updates the tooltip (alternate field name) of a form field annotation.

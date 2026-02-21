@@ -202,7 +202,20 @@ class PdfWrapper:
                 for name, value in self.widgets[
                     self._key_update_tracker[k]
                 ].__dict__.items():
-                    if not name.startswith("_"):
+                    # TODO: this might be a bug
+                    needs_update = all(
+                        [
+                            not name.startswith("_"),
+                            name
+                            not in (
+                                "x",
+                                "y",
+                                "width",
+                                "height",
+                            ),
+                        ]
+                    )
+                    if needs_update:
                         setattr(v, name, value)
         self._key_update_tracker = {}
 
