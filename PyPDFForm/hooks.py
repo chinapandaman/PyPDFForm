@@ -345,13 +345,19 @@ def flatten_field(annot: DictionaryObject, val: bool) -> None:
 def update_field_x(annot: DictionaryObject, val: float) -> None:
     if not isinstance(val, float):
         return
+
+    diff = val - annot[Rect][0]
     annot[NameObject(Rect)][0] = FloatObject(val)
+    annot[NameObject(Rect)][2] = FloatObject(annot[NameObject(Rect)][2] + diff)
 
 
 def update_field_y(annot: DictionaryObject, val: float) -> None:
     if not isinstance(val, float):
         return
+
+    diff = val - annot[Rect][1]
     annot[NameObject(Rect)][1] = FloatObject(val)
+    annot[NameObject(Rect)][3] = FloatObject(annot[NameObject(Rect)][3] + diff)
 
 
 def update_field_width(annot: DictionaryObject, val: float) -> None:
