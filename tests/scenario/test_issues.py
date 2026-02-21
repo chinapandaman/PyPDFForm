@@ -293,3 +293,20 @@ def test_preserve_metadata():
     assert metadata["/other_key"] == "other_value"
 
     assert PdfWrapper(preserve_metadata=True)
+
+
+def test_change_field_resolutions(issue_pdf_directory, request):
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-1552.pdf"))
+    obj.widgets["topmostSubform[0].Page3[0].Liczbadni3a[0]"].x -= 5
+    obj.widgets["topmostSubform[0].Page3[0].Liczbadni3a[0]"].width += 25
+    obj.widgets["topmostSubform[0].Page3[0].Liczbadni3a[0]"].y -= 1
+    obj.widgets["topmostSubform[0].Page3[0].Liczbadni3a[0]"].height += 1
+    obj.fill({"topmostSubform[0].Page3[0].Liczbadni3a[0]": "23"})
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-1552_expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
