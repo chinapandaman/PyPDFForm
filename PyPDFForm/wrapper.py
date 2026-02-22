@@ -199,10 +199,9 @@ class PdfWrapper:
         # update key preserve old key attrs
         for k, v in new_widgets.items():
             if k in self._key_update_tracker:
-                for name, value in self.widgets[
-                    self._key_update_tracker[k]
-                ].attr_set_tracker.items():
-                    setattr(v, name, value)
+                old_widget = self.widgets[self._key_update_tracker[k]]
+                for name in old_widget.attr_set_tracker:
+                    setattr(v, name, getattr(old_widget, name, None))
         self._key_update_tracker = {}
 
         self.widgets = new_widgets
