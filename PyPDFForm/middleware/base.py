@@ -81,7 +81,8 @@ class Widget:
         Set an attribute on the widget.
 
         This method overrides the default __setattr__ method to
-        trigger hooks when certain attributes are set.
+        trigger hooks when certain attributes are set. It also
+        tracks the attributes that have been set.
 
         Args:
             name (str): The name of the attribute.
