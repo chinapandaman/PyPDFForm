@@ -51,8 +51,11 @@ class Widget:
             value (Any): The initial value of the widget. Defaults to None.
         """
         super().__init__()
+        self.attr_set_tracker = {}
+
         self._name = name
         self._value = value
+
         self.tooltip: Optional[str] = None
         self.readonly: Optional[bool] = None
         self.required: Optional[bool] = None
@@ -78,7 +81,8 @@ class Widget:
         Set an attribute on the widget.
 
         This method overrides the default __setattr__ method to
-        trigger hooks when certain attributes are set.
+        trigger hooks when certain attributes are set. It also
+        tracks the attributes that have been set.
 
         Args:
             name (str): The name of the attribute.
@@ -86,6 +90,14 @@ class Widget:
         """
         if name in self.SET_ATTR_TRIGGER_HOOK_MAP and value is not None:
             self.hooks_to_trigger.append((self.SET_ATTR_TRIGGER_HOOK_MAP[name], value))
+
+        if (
+            hasattr(self, "attr_set_tracker")
+            and name in self.__dict__
+            and value is not None
+        ):
+            self.attr_set_tracker[name] = value
+
         super().__setattr__(name, value)
 
     @property
