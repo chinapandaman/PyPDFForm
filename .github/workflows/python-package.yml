@@ -31,12 +31,13 @@ jobs:
     - name: Test with pytest
       if: matrix.os != 'windows-latest'
       run: |
-        coverage run -m pytest
+        coverage run -m pytest && coverage report --fail-under=100
     - name: Test with pytest (Windows)
       if: matrix.os == 'windows-latest'
       run: |
         coverage run -m pytest -v -m "not posix_only"
     - name: Upload coverage to Codecov
+      if: ${{ github.ref == 'refs/heads/master' }}
       uses: codecov/codecov-action@v5
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
