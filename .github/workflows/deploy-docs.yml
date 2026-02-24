@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: '3.x'
       - name: Install mkdocs
-        run: uv pip install -U mkdocs mkdocs-material mike --system
+        run: uv pip install -U -r pyproject.toml --extra dev --system
       - name: Deploy docs to GitHub page
         run: |
           git config --global user.name 'release-bot'
