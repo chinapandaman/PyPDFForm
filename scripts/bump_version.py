@@ -37,3 +37,5 @@ if __name__ == "__main__":
         os.remove(each)
         with open(each, mode="w", encoding="utf8") as f:
             f.write(content)
+
+    print(new_version, end="")
