@@ -48,9 +48,9 @@ class Dropdown(Widget):
         self.SET_ATTR_TRIGGER_HOOK_MAP.update(
             {
                 "font": "update_text_field_font",
+                "choices": "update_dropdown_choices",
                 "font_size": "update_text_field_font_size",
                 "font_color": "update_text_field_font_color",
-                "choices": "update_dropdown_choices",
             }
         )
 
