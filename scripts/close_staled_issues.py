@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Closes GitHub issues older than 90 days."""
+"""
+Closes stale GitHub issues.
+
+This script fetches all open issues from the project's GitHub repository.
+It identifies issues where the last comment is older than 90 days and
+the issue is not marked with the "help wanted" label. For each stale issue,
+it posts a comment explaining that the issue is being closed due to
+inactivity and then closes the issue.
+
+Requires the GITHUB_TOKEN environment variable to be set for API authentication.
+"""
 
 import json
 import os
