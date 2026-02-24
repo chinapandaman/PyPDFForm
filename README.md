@@ -60,6 +60,7 @@ The official documentation can be found on [the GitHub page](https://chinapandam
 
 ## Other Resources
 
+<!-- TODO: remove WIP when finish recording -->
 * [(WIP) Video Tutorials](https://youtube.com/playlist?list=PLNz_PBu1QA-gzYg5BvyOO98q15u5Xve1L&si=8MWasKEckBzY-NRQ)
 * [Chicago Python User Group - Dec 14, 2023](https://youtu.be/8t1RdAKwr9w?si=TLgumBNXv9H8szSn)
 
