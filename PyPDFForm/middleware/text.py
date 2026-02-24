@@ -45,6 +45,7 @@ class Text(Widget):
             multiline (bool): Whether the text field is multiline. Defaults to None.
             max_length (int): The maximum length of the text field. Defaults to None.
         """
+        super().__init__(name, value)
         self.SET_ATTR_TRIGGER_HOOK_MAP.update(
             {
                 "font": "update_text_field_font",
@@ -56,7 +57,6 @@ class Text(Widget):
                 "max_length": "update_text_field_max_length",
             }
         )
-        super().__init__(name, value)
 
         self.font: Optional[str] = None
         self.font_size: Optional[float] = None

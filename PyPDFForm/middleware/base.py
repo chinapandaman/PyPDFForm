@@ -21,23 +21,6 @@ class Widget:
     as name, value, and schema definition.
     """
 
-    SET_ATTR_TRIGGER_HOOK_MAP = {
-        "x": "update_field_x",
-        "y": "update_field_y",
-        "width": "update_field_width",
-        "height": "update_field_height",
-        "readonly": "flatten_field",
-        "required": "update_field_required",
-        "hidden": "update_field_hidden",
-        "tooltip": "update_field_tooltip",
-        "on_hovered_over_javascript": "update_field_on_hovered_over_javascript",
-        "on_hovered_off_javascript": "update_field_on_hovered_off_javascript",
-        "on_mouse_pressed_javascript": "update_field_on_mouse_pressed_javascript",
-        "on_mouse_released_javascript": "update_field_on_mouse_released_javascript",
-        "on_focused_javascript": "update_field_on_focused_javascript",
-        "on_blurred_javascript": "update_field_on_blurred_javascript",
-    }
-
     def __init__(
         self,
         name: str,
@@ -51,6 +34,22 @@ class Widget:
             value (Any): The initial value of the widget. Defaults to None.
         """
         super().__init__()
+        self.SET_ATTR_TRIGGER_HOOK_MAP = {
+            "x": "update_field_x",
+            "y": "update_field_y",
+            "width": "update_field_width",
+            "height": "update_field_height",
+            "readonly": "flatten_field",
+            "required": "update_field_required",
+            "hidden": "update_field_hidden",
+            "tooltip": "update_field_tooltip",
+            "on_hovered_over_javascript": "update_field_on_hovered_over_javascript",
+            "on_hovered_off_javascript": "update_field_on_hovered_off_javascript",
+            "on_mouse_pressed_javascript": "update_field_on_mouse_pressed_javascript",
+            "on_mouse_released_javascript": "update_field_on_mouse_released_javascript",
+            "on_focused_javascript": "update_field_on_focused_javascript",
+            "on_blurred_javascript": "update_field_on_blurred_javascript",
+        }
         self.attr_set_tracker = {}
 
         self._name = name
@@ -88,7 +87,11 @@ class Widget:
             name (str): The name of the attribute.
             value (Any): The value of the attribute.
         """
-        if name in self.SET_ATTR_TRIGGER_HOOK_MAP and value is not None:
+        if (
+            hasattr(self, "SET_ATTR_TRIGGER_HOOK_MAP")
+            and name in self.SET_ATTR_TRIGGER_HOOK_MAP
+            and value is not None
+        ):
             self.hooks_to_trigger.append((self.SET_ATTR_TRIGGER_HOOK_MAP[name], value))
 
         if (
