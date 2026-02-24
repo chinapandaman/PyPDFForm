@@ -37,9 +37,9 @@ from .hooks import trigger_widget_hooks
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
+from .types import PdfArray
 from .template import (build_widgets, create_annotations, get_metadata,
                        set_metadata, update_widget_keys)
-from .types import PdfArray
 from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
