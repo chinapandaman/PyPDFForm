@@ -35,12 +35,12 @@ class Checkbox(Widget):
         Attributes:
             size (int): The size of the checkbox. Defaults to None.
         """
+        super().__init__(name, value)
         self.SET_ATTR_TRIGGER_HOOK_MAP.update(
             {
                 "size": "update_check_radio_size",
             }
         )
-        super().__init__(name, value)
 
         self.size: Optional[float] = None
 

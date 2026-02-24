@@ -44,6 +44,7 @@ class Dropdown(Widget):
             font (str): The font of the dropdown field.
             choices (List[str]): The list of choices for the dropdown.
         """
+        super().__init__(name, value)
         self.SET_ATTR_TRIGGER_HOOK_MAP.update(
             {
                 "font": "update_text_field_font",
@@ -52,7 +53,6 @@ class Dropdown(Widget):
                 "choices": "update_dropdown_choices",
             }
         )
-        super().__init__(name, value)
 
         self.font: Optional[str] = None
         self.font_size: Optional[float] = None
