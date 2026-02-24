@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-"""Bumps a version."""
+"""
+Bumps the package version in specified files.
+
+This script reads the current version from PyPDFForm/__init__.py,
+increments it based on the command-line argument (major, minor, or patch),
+and then updates the version number in both PyPDFForm/__init__.py and SECURITY.md.
+
+Usage:
+    python scripts/bump_version.py [major|minor|patch]
+"""
 
 import os
 import re

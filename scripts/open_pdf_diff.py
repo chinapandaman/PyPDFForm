@@ -1,5 +1,16 @@
 # -*- coding: utf-8 -*-
-"""Opens a diff of a PDF between changes."""
+"""
+Generates and opens a visual diff of two PDF files.
+
+This script takes a "before" PDF file path. It assumes a corresponding
+"after" PDF exists in the 'temp' directory (created by create_pdf_diff.py).
+It converts both PDFs to PNG images, creates a visual diff image, and
+prints the pixel difference count.
+
+Finally, it attempts to open the before, after, and diff images in a
+web browser or the default image viewer, and prints their accessible URLs
+for web-based environments.
+"""
 
 import os
 import subprocess

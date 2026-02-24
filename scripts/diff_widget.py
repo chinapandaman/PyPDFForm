@@ -1,5 +1,17 @@
 # -*- coding: utf-8 -*-
-"""Serializing and compare the same widget across two PDF forms."""
+"""
+Compares and diffs a single widget from two separate PDF files.
+
+This script serializes a specified widget from two PDF files into a
+human-readable string format. It then generates an HTML file that
+highlights the differences between the two widget structures. The depth
+of the serialization can be controlled.
+
+The resulting diff is saved to temp/diff.html.
+
+Usage:
+    python scripts/diff_widget.py <file1.pdf> <file2.pdf> <widget_key> <recursion_depth>
+"""
 
 import sys
 from difflib import HtmlDiff

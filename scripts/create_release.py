@@ -1,5 +1,18 @@
 # -*- coding: utf-8 -*-
-"""Creates a GitHub release."""
+"""
+Creates a new GitHub release for the current version.
+
+This script reads the version from PyPDFForm/__init__.py and compares it
+to the latest version fetched from the repository, provided as an argument.
+If the current version is newer, it proceeds to create a new GitHub release.
+The release is tagged with the new version number, and release notes are
+generated automatically by GitHub.
+
+Requires the GITHUB_TOKEN environment variable for authentication.
+
+Usage:
+    python scripts/create_release.py <latest_deployed_version>
+"""
 
 import os
 import re
