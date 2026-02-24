@@ -884,3 +884,19 @@ def test_annotate_no_annotations(pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_annotate_link_page_dest(template_stream, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "test_annotate_link_page_dest.pdf")
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(template_stream).annotate(
+            [Annotations.LinkAnnotation(1, 0, 0, page=2)]
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
