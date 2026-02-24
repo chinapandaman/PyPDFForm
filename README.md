@@ -5,7 +5,7 @@
 <p align="center">
     <a href="https://pypi.org/project/PyPDFForm/"><img src="https://img.shields.io/pypi/v/pypdfform?label=version&color=magenta"></a>
     <a href="https://chinapandaman.github.io/PyPDFForm/"><img src="https://img.shields.io/github/v/release/chinapandaman/pypdfform?label=docs&color=cyan"></a>
-    <a href="https://codecov.io/gh/chinapandaman/PyPDFForm"><img src="https://img.shields.io/codecov/c/github/chinapandaman/pypdfform"/></a>
+    <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml"><img src="https://img.shields.io/badge/coverage-100%25-green"></a>
     <a href="https://github.com/chinapandaman/PyPDFForm/raw/master/LICENSE"><img src="https://img.shields.io/github/license/chinapandaman/pypdfform?label=license&color=orange"></a>
     <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/pypi/pyversions/pypdfform?label=python&color=gold"></a>
     <a href="https://pepy.tech/projects/pypdfform"><img src="https://static.pepy.tech/badge/pypdfform/month"></a>
@@ -60,7 +60,6 @@ The official documentation can be found on [the GitHub page](https://chinapandam
 
 ## Other Resources
 
-<!-- will remove WIP when finish recording -->
 * [(WIP) Video Tutorials](https://youtube.com/playlist?list=PLNz_PBu1QA-gzYg5BvyOO98q15u5Xve1L&si=8MWasKEckBzY-NRQ)
 * [Chicago Python User Group - Dec 14, 2023](https://youtu.be/8t1RdAKwr9w?si=TLgumBNXv9H8szSn)
 
