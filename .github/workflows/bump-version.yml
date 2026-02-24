@@ -40,5 +40,5 @@ jobs:
           git config --global user.name 'release-bot'
           git config --global user.email 'bot@domain.com'
           git diff --quiet && git diff --staged --quiet || \
-          git commit -am "[skip ci]: $(git describe --tags $(git rev-list --tags --max-count=1)) => $NEW_VERSION"
+          git commit -am "[skip ci]: $(git describe --tags $(git rev-list --tags --max-count=1)) => v$NEW_VERSION"
           git push
