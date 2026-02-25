@@ -12,6 +12,7 @@ annotations, facilitating their creation and manipulation within PDF documents.
 from dataclasses import dataclass
 
 from .link import LinkAnnotation
+from .stamp import RubberStampAnnotation
 from .text import TextAnnotation
 from .text_markup import (HighlightAnnotation, SquigglyAnnotation,
                           StrikeOutAnnotation, UnderlineAnnotation)
@@ -23,6 +24,7 @@ AnnotationTypes = (
     | UnderlineAnnotation
     | SquigglyAnnotation
     | StrikeOutAnnotation
+    | RubberStampAnnotation
 )
 
 
@@ -41,3 +43,4 @@ class Annotations:
     UnderlineAnnotation = UnderlineAnnotation
     SquigglyAnnotation = SquigglyAnnotation
     StrikeOutAnnotation = StrikeOutAnnotation
+    RubberStampAnnotation = RubberStampAnnotation
