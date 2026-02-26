@@ -16,8 +16,8 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
 from .annotations import AnnotationTypes
-from .constants import (COMB, MULTILINE, READ_ONLY, REQUIRED, WIDGET_TYPES,
-                        Annots)
+from .constants import COMB, MULTILINE, READ_ONLY, REQUIRED, Annots
+from .middleware import WIDGET_TYPES
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio

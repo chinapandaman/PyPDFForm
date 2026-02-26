@@ -14,9 +14,10 @@ from typing import Dict, cast
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject
 
-from .constants import WIDGET_TYPES, Annots
+from .constants import Annots
 from .hooks import flatten_field
 from .image import get_draw_image_resolutions, get_image_dimensions
+from .middleware import WIDGET_TYPES
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image
