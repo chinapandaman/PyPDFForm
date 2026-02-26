@@ -15,13 +15,6 @@ Using constants improves code readability and maintainability by providing
 meaningful names for frequently used values and reducing the risk of typos.
 """
 
-from .middleware.checkbox import Checkbox
-from .middleware.dropdown import Dropdown
-from .middleware.image import Image
-from .middleware.radio import Radio
-from .middleware.signature import Signature
-from .middleware.text import Text
-
 VERSION_IDENTIFIERS = [
     b"%PDF-1.0",
     b"%PDF-1.1",
@@ -34,8 +27,6 @@ VERSION_IDENTIFIERS = [
     b"%PDF-2.0",
 ]
 VERSION_IDENTIFIER_PREFIX = "%PDF-".encode("utf-8")
-
-WIDGET_TYPES = Text | Checkbox | Radio | Dropdown | Signature | Image
 
 DEPRECATION_NOTICE = "{} will be deprecated soon. Use {} instead."
 

@@ -17,6 +17,8 @@ from .radio import Radio
 from .signature import Signature
 from .text import Text
 
+WIDGET_TYPES = Text | Checkbox | Radio | Dropdown | Signature | Image
+
 
 @dataclass
 class Widgets:
