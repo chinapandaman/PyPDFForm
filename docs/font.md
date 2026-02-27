@@ -2,7 +2,7 @@
 
 PyPDFForm enables the use of custom fonts in certain APIs. To use a custom font, you must first register its TrueType (.ttf) file.
 
-For example, to use a font from the [Liberation Serif](https://fonts.adobe.com/fonts/liberation-serif) family, register its TrueType file (e.g., [LiberationSerif-BoldItalic.ttf](https://github.com/chinapandaman/PyPDFForm/raw/master/font_samples/LiberationSerif-BoldItalic.ttf)) as follows:
+For example, to use a font from the [Liberation Serif](https://fonts.adobe.com/fonts/liberation-serif) family, register its TrueType file (e.g., [LiberationSerif-BoldItalic.ttf](https://github.com/chinapandaman/PyPDFForm/blob/master/font_samples/LiberationSerif-BoldItalic.ttf)) as follows:
 
 === "File Path"
     ```python
