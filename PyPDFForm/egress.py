@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-A module for handling PDF appearance streams.
+A module for egress functions.
 
-This module provides functionality to manage appearance streams in PDF forms,
-which are necessary for form fields to display correctly after being filled.
-It uses both pypdf and pikepdf for manipulation.
+This module provides functionalities that prepare the final PDF for output (egress),
+ensuring that it is properly formatted and ready for the end-user. This includes
+managing appearance streams (so form fields display correctly after being filled),
+handling the /NeedAppearances flag, and preserving or updating document-level
+properties like the title and OpenAction scripts. These functions are typically
+called right before the final PDF byte stream is returned by the wrapper module.
 """
 
 from functools import lru_cache
