@@ -27,9 +27,9 @@ from typing import (TYPE_CHECKING, BinaryIO, Dict, Optional, Sequence, TextIO,
 
 from .adapter import (fp_or_f_obj_or_f_content_to_content,
                       fp_or_f_obj_or_stream_to_stream)
-from .ap import appearance_streams_handler, preserve_pdf_properties
 from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
+from .egress import appearance_streams_handler, preserve_pdf_properties
 from .filler import fill
 from .font import (get_all_available_fonts, register_font,
                    register_font_acroform)
