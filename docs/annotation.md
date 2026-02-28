@@ -114,7 +114,7 @@ There are four types of text markup annotations: highlight, underline, squiggly,
 ## Create rubber stamp annotations
 
 ???+ note
-    Currently Chromium based browsers have trouble rendering rubber stamp annotations correctly.
+    Currently, Chromium-based browsers have trouble rendering rubber stamp annotations correctly.
 
 A rubber stamp annotation displays text or graphics intended to look as if they were stamped on the page with a rubber stamp. PyPDFForm supports a collection of predefined rubber stamps you can use to annotate PDFs:
 
@@ -137,4 +137,4 @@ pdf = PdfWrapper("sample_template.pdf").annotate(
 pdf.write("output.pdf")
 ```
 
-1. Support `approved`, `experimental`, `not_approved`, `as_is`, `expired`, `not_for_public_release`, `confidential`, `final`, `sold`, `departmental`, `for_comment`, `top_secret`, `draft`, and `for_public_release`.
+1. Supported options are `approved`, `experimental`, `not_approved`, `as_is`, `expired`, `not_for_public_release`, `confidential`, `final`, `sold`, `departmental`, `for_comment`, `top_secret`, `draft`, and `for_public_release`.
