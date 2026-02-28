@@ -6,7 +6,7 @@ This module provides functionalities that prepare the final PDF for output (egre
 ensuring that it is properly formatted and ready for the end-user. This includes
 managing appearance streams (so form fields display correctly after being filled),
 handling the /NeedAppearances flag, and preserving or updating document-level
-properties like the title and OpenAction scripts. These functions are typically
+properties like metadata, title, and OpenAction scripts. These functions are typically
 called right before the final PDF byte stream is returned by the wrapper module.
 """
 
@@ -70,12 +70,12 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
 
 
 def preserve_pdf_properties(
-    pdf: bytes, title: str, script: str, metadata: dict = None
+    pdf: bytes, title: str, script: str, metadata: dict
 ) -> bytes:
     """
-    Preserves and updates PDF properties such as title and OpenAction scripts.
+    Preserves and updates PDF properties such as metadata, title, and OpenAction scripts.
 
-    This function allows setting or updating the PDF's title in its metadata and
+    This function allows setting or updating the PDF's title and metadata, and
     attaching a JavaScript script that executes when the PDF is opened.
 
     Args:

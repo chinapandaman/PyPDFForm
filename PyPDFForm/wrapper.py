@@ -362,9 +362,8 @@ class PdfWrapper:
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
            generating appearance streams.
-        3. If `preserve_metadata` is enabled, it preserves the original metadata of the PDF.
-        4. If a title or on-open JavaScript is set, it updates the PDF properties
-           accordingly.
+        3. If `preserve_metadata`, title, or on-open JavaScript are set, it preserves
+           or updates the corresponding PDF properties accordingly.
 
         Returns:
             bytes: The processed PDF document content as a byte string.
