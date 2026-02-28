@@ -48,10 +48,10 @@ from PyPDFForm import PdfWrapper
 
 form = PdfWrapper("sample_template.pdf")
 
-form.widgets["test"].x = (form.widgets["test"].x or 0) - 5
-form.widgets["test"].y = (form.widgets["test"].y or 0) - 5
-form.widgets["test"].width = (form.widgets["test"].width or 0) + 10
-form.widgets["test"].height = (form.widgets["test"].height or 0) + 10
+form.widgets["test"].x = 68.3365
+form.widgets["test"].y = 657.692
+form.widgets["test"].width = 242.4235
+form.widgets["test"].height = 31.067999999999984
 
 form.write("output.pdf")
 ```

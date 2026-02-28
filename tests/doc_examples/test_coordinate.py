@@ -40,10 +40,10 @@ def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, request):
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
-    form.widgets["test"].x = (form.widgets["test"].x or 0) - 5
-    form.widgets["test"].y = (form.widgets["test"].y or 0) - 5
-    form.widgets["test"].width = (form.widgets["test"].width or 0) + 10
-    form.widgets["test"].height = (form.widgets["test"].height or 0) + 10
+    form.widgets["test"].x = 68.3365
+    form.widgets["test"].y = 657.692
+    form.widgets["test"].width = 242.4235
+    form.widgets["test"].height = 31.067999999999984
 
     request.config.results["expected_path"] = expected_path
     request.config.results["stream"] = form.read()
