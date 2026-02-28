@@ -66,6 +66,32 @@ def test_uri_link_annotations(static_pdfs, pdf_samples, request):
         assert pdf.read() == expected
 
 
+def test_page_link_annotations(static_pdfs, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_page_link_annotations.pdf")
+
+    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
+        [
+            Annotations.LinkAnnotation(
+                page_number=1,
+                x=70,
+                y=705,
+                width=95,
+                height=20,
+                page=2,
+            )
+        ]
+    )
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = pdf.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(pdf.read()) == len(expected)
+        assert pdf.read() == expected
+
+
 def test_highlight_annotations(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_highlight_annotations.pdf")
 
