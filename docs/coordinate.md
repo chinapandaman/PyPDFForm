@@ -35,3 +35,23 @@ print(form.widgets["test"].y)
 print(form.widgets["test"].width)
 print(form.widgets["test"].height)
 ```
+
+## Change form field coordinates & dimensions
+
+???+ tip
+    For checkbox/radio button, consider modifying [size](style.md#change-checkboxradio-button-size) instead of `width` or `height`.
+
+You can modify the attributes used to inspect the coordinates and dimensions of a PDF form field's rectangular bounding box to reposition and/or reshape the field:
+
+```python
+from PyPDFForm import PdfWrapper
+
+form = PdfWrapper("sample_template.pdf")
+
+form.widgets["test"].x -= 5
+form.widgets["test"].y -= 5
+form.widgets["test"].width += 10
+form.widgets["test"].height += 10
+
+form.write("output.pdf")
+```
