@@ -42,29 +42,50 @@ pdf.write("output.pdf")
 
 ## Create link annotations
 
-???+ note
-    Currently, PyPDFForm only supports link annotations that target URIs.
+A link annotation navigates to a specified destination when clicked. A destination can be a URI or another page of the same PDF.
 
-A link annotation navigates to a specified destination when clicked. The following snippet creates a link annotation on top of the text `TEST PDF TEMPLATE` that redirects to `https://www.google.com/`:
+=== "URI"
+    The following snippet creates a link annotation on top of the text `TEST PDF TEMPLATE` that redirects to `https://www.google.com/`:
 
-```python
-from PyPDFForm import Annotations, PdfWrapper
+    ```python
+    from PyPDFForm import Annotations, PdfWrapper
 
-pdf = PdfWrapper("sample_template.pdf").annotate(
-    [
-        Annotations.LinkAnnotation(
-            page_number=1,
-            x=70,
-            y=705,
-            width=95,
-            height=20,
-            uri="https://www.google.com/",
-        )
-    ]
-)
+    pdf = PdfWrapper("sample_template.pdf").annotate(
+        [
+            Annotations.LinkAnnotation(
+                page_number=1,
+                x=70,
+                y=705,
+                width=95,
+                height=20,
+                uri="https://www.google.com/",
+            )
+        ]
+    )
 
-pdf.write("output.pdf")
-```
+    pdf.write("output.pdf")
+    ```
+=== "Another Page"
+    The following snippet creates a link annotation on top of the text `TEST PDF TEMPLATE` that redirects to the second page of the PDF:
+
+    ```python
+    from PyPDFForm import Annotations, PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf").annotate(
+        [
+            Annotations.LinkAnnotation(
+                page_number=1,
+                x=70,
+                y=705,
+                width=95,
+                height=20,
+                page=2,
+            )
+        ]
+    )
+
+    pdf.write("output.pdf")
+    ```
 
 ## Create text markup annotations
 
