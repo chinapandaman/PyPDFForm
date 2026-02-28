@@ -69,8 +69,9 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     return result
 
 
-@lru_cache
-def preserve_pdf_properties(pdf: bytes, title: str, script: str) -> bytes:
+def preserve_pdf_properties(
+    pdf: bytes, title: str, script: str, metadata: dict = None
+) -> bytes:
     """
     Preserves and updates PDF properties such as title and OpenAction scripts.
 
@@ -81,6 +82,7 @@ def preserve_pdf_properties(pdf: bytes, title: str, script: str) -> bytes:
         pdf (bytes): The PDF file content as a bytes stream.
         title (str): The title to be set in the PDF metadata.
         script (str): JavaScript code to be executed when the PDF is opened.
+        metadata (dict): The original metadata to preserve.
 
     Returns:
         bytes: The modified PDF content as a bytes stream.
@@ -89,11 +91,14 @@ def preserve_pdf_properties(pdf: bytes, title: str, script: str) -> bytes:
     writer = PdfWriter()
     writer.append(reader)
 
-    if title:
-        metadata = reader.metadata or {}
-        metadata[NameObject(Title)] = TextStringObject(title)
+    if title or metadata:
+        _metadata = reader.metadata or {}
+        if metadata:
+            _metadata.update(metadata)
+        if title:
+            _metadata[NameObject(Title)] = TextStringObject(title)
 
-        writer.add_metadata(metadata)
+        writer.add_metadata(_metadata)
 
     if script:
         open_action = DictionaryObject()

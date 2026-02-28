@@ -38,7 +38,7 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .template import (build_widgets, create_annotations, get_metadata,
-                       set_metadata, update_widget_keys)
+                       update_widget_keys)
 from .types import PdfArray
 from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
@@ -376,15 +376,14 @@ class PdfWrapper:
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
 
-        if getattr(self, "preserve_metadata"):
-            # TODO: refactor with preserve_pdf_properties
-            result = set_metadata(result, self._metadata)
-
-        if any([self.title, self.on_open_javascript]):
+        if any(
+            [getattr(self, "preserve_metadata"), self.title, self.on_open_javascript]
+        ):
             result = preserve_pdf_properties(
                 result,
                 self.title,
                 self.on_open_javascript,
+                self._metadata if getattr(self, "preserve_metadata") else None,
             )
 
         return result
