@@ -148,3 +148,31 @@ def test_strikeout_annotations(static_pdfs, pdf_samples, request):
 
         assert len(pdf.read()) == len(expected)
         assert pdf.read() == expected
+
+
+def test_rubber_stamp_annotations(static_pdfs, pdf_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_rubber_stamp_annotations.pdf"
+    )
+
+    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
+        [
+            Annotations.RubberStampAnnotation(
+                page_number=1,
+                x=70,
+                y=720,
+                width=95,
+                height=20,
+                name=Annotations.RubberStampAnnotation.approved,  # optional
+            )
+        ]
+    )
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = pdf.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(pdf.read()) == len(expected)
+        assert pdf.read() == expected
