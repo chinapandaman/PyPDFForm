@@ -31,3 +31,25 @@ def test_field_coordinates_dimensions(static_pdfs):
     assert isinstance(form.widgets["test"].y, float)
     assert isinstance(form.widgets["test"].width, float)
     assert isinstance(form.widgets["test"].height, float)
+
+
+def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, request):
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_change_field_coordinates_dimensions.pdf"
+    )
+
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
+
+    form.widgets["test"].x = 68.3365
+    form.widgets["test"].y = 657.692
+    form.widgets["test"].width = 242.4235
+    form.widgets["test"].height = 31.067999999999984
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(form.read()) == len(expected)
+        assert form.read() == expected
