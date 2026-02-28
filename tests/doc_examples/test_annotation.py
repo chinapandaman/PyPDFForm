@@ -40,8 +40,8 @@ def test_text_annotations(static_pdfs, pdf_samples, request):
         assert pdf.read() == expected
 
 
-def test_link_annotations(static_pdfs, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "docs", "test_link_annotations.pdf")
+def test_uri_link_annotations(static_pdfs, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_uri_link_annotations.pdf")
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
         [
