@@ -32,6 +32,7 @@ from .types import PdfArray
 from .widgets import Fields
 from .wrapper import PdfWrapper
 
+# TODO: figure out why `Annotation sizes differ:`
 for logger in [
     logging.getLogger(name) for name in getattr(logging.root.manager, "loggerDict")
 ]:
