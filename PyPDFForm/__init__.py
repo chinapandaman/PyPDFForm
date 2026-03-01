@@ -20,6 +20,8 @@ The library supports various PDF form features, including:
 PyPDFForm aims to simplify PDF form manipulation, making it accessible to developers of all skill levels.
 """
 
+import logging
+
 __version__ = "4.7.0"
 
 from .annotations import Annotations
@@ -29,6 +31,13 @@ from .raw import RawElements
 from .types import PdfArray
 from .widgets import Fields
 from .wrapper import PdfWrapper
+
+# TODO: figure out why `Annotation sizes differ:`
+for logger in [
+    logging.getLogger(name) for name in getattr(logging.root.manager, "loggerDict")
+]:
+    if "pypdf" in logger.name:
+        logger.setLevel(logging.ERROR)
 
 __all__ = [
     "PdfWrapper",
