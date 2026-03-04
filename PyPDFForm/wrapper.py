@@ -44,7 +44,8 @@ from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
 from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
                         merge_watermarks_with_pdf)
-from .widgets import CheckBoxField, ImageField, RadioGroup, SignatureField
+from .widgets import (CheckBoxField, DropdownField, ImageField, RadioGroup,
+                      SignatureField)
 
 if TYPE_CHECKING:
     from .annotations import AnnotationTypes
@@ -578,6 +579,7 @@ class PdfWrapper:
         needs_separate_creation = [
             CheckBoxField,
             RadioGroup,
+            DropdownField,
             SignatureField,
             ImageField,
         ]
@@ -596,6 +598,12 @@ class PdfWrapper:
         needs_separate_creation_dict[CheckBoxField] = needs_separate_creation_dict.pop(
             CheckBoxField, []
         ) + needs_separate_creation_dict.pop(RadioGroup, [])
+
+        if (
+            DropdownField in needs_separate_creation_dict
+            and len(needs_separate_creation_dict[DropdownField]) > 1
+        ):
+            general_creation += needs_separate_creation_dict.pop(DropdownField, [])
 
         for each in list(needs_separate_creation_dict.values()) + [general_creation]:
             if each:
