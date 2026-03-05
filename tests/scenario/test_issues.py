@@ -293,3 +293,75 @@ def test_preserve_metadata():
     assert metadata["/other_key"] == "other_value"
 
     assert PdfWrapper(preserve_metadata=True)
+
+
+@pytest.mark.posix_only
+def test_dropdown_tutorial(issue_pdf_directory, request):
+    obj = PdfWrapper(BlankPage(width=612, height=792) * 3)
+    obj.generate_coordinate_grid(margin=100, color=(0, 0, 1))
+
+    obj.register_font("my_font", "./LiberationSerif-BoldItalic.ttf")
+
+    obj.bulk_create_fields(
+        [
+            Fields.TextField(
+                name="text_field_custom_text",
+                page_number=1,
+                x=100,
+                y=700,
+                font="my_font",
+                font_size=25,
+                font_color=(1, 0, 0),
+            ),
+            Fields.TextField(
+                name="text_field_misc",
+                page_number=1,
+                x=100,
+                y=600,
+                alignment=2,
+                font="my_font",
+                max_length=5,
+            ),
+            Fields.TextField(
+                name="text_field_paragraph",
+                page_number=1,
+                x=100,
+                y=400,
+                width=200,
+                height=100,
+                font="my_font",
+                multiline=True,
+            ),
+            Fields.RadioGroup(
+                name="radio",
+                page_number=1,
+                x=[300, 400, 500],
+                y=[700, 700, 700],
+            ),
+            Fields.RadioGroup(
+                name="radio_cutomized",
+                page_number=1,
+                x=[300, 400, 500],
+                y=[600, 600, 600],
+                size=50,
+                shape="square",
+                button_style="diamond",
+                tick_color=(0, 0, 1),
+            ),
+            Fields.DropdownField(
+                name="dropdown",
+                page_number=2,
+                x=100,
+                y=600,
+                options=["dog", "cat", "fish"],
+            ),
+        ]
+    )
+
+    expected_path = os.path.join(issue_pdf_directory, "PPF-1599_expected.pdf")
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = obj.read()
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected

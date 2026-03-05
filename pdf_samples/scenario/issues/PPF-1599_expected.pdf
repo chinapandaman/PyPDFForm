@@ -1,0 +1,2615 @@
+%PDF-1.3
+%‚„œ”
+1 0 obj
+<<
+/Producer (pypdf)
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Count 3
+/Kids [ 4 0 R 11 0 R 18 0 R ]
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+/Outlines 25 0 R
+>>
+endobj
+4 0 obj
+<<
+/Contents 5 0 R
+/MediaBox [ 0 0 612 792 ]
+/Resources <<
+/Font 8 0 R
+/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
+/Parent 2 0 R
+/Annots [ 26 0 R 34 0 R 36 0 R 37 0 R 45 0 R 46 0 R 51 0 R 56 0 R 59 0 R ]
+>>
+endobj
+5 0 obj
+[ 6 0 R 7 0 R ]
+endobj
+6 0 obj
+<<
+/Length 47
+>>
+stream
+q
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+ 
+
+Q
+
+endstream
+endobj
+7 0 obj
+<<
+/Length 4322
+>>
+stream
+q
+0.0 0.0 612 792 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 RG
+n
+100 0 m
+100 792 l
+S
+0 0 1 RG
+n
+200 0 m
+200 792 l
+S
+0 0 1 RG
+n
+300 0 m
+300 792 l
+S
+0 0 1 RG
+n
+400 0 m
+400 792 l
+S
+0 0 1 RG
+n
+500 0 m
+500 792 l
+S
+0 0 1 RG
+n
+600 0 m
+600 792 l
+S
+0 0 1 RG
+n
+0 100 m
+612 100 l
+S
+0 0 1 RG
+n
+0 200 m
+612 200 l
+S
+0 0 1 RG
+n
+0 300 m
+612 300 l
+S
+0 0 1 RG
+n
+0 400 m
+612 400 l
+S
+0 0 1 RG
+n
+0 500 m
+612 500 l
+S
+0 0 1 RG
+n
+0 600 m
+612 600 l
+S
+0 0 1 RG
+n
+0 700 m
+612 700 l
+S
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 88 Tm
+(\050100\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 188 Tm
+(\050100\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 288 Tm
+(\050100\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 388 Tm
+(\050100\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 488 Tm
+(\050100\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 588 Tm
+(\050100\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 688 Tm
+(\050100\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 88 Tm
+(\050200\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 188 Tm
+(\050200\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 288 Tm
+(\050200\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 388 Tm
+(\050200\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 488 Tm
+(\050200\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 588 Tm
+(\050200\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 688 Tm
+(\050200\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 88 Tm
+(\050300\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 188 Tm
+(\050300\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 288 Tm
+(\050300\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 388 Tm
+(\050300\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 488 Tm
+(\050300\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 588 Tm
+(\050300\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 688 Tm
+(\050300\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 88 Tm
+(\050400\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 188 Tm
+(\050400\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 288 Tm
+(\050400\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 388 Tm
+(\050400\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 488 Tm
+(\050400\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 588 Tm
+(\050400\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 688 Tm
+(\050400\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 88 Tm
+(\050500\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 188 Tm
+(\050500\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 288 Tm
+(\050500\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 388 Tm
+(\050500\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 488 Tm
+(\050500\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 588 Tm
+(\050500\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 688 Tm
+(\050500\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 88 Tm
+(\050600\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 188 Tm
+(\050600\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 288 Tm
+(\050600\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 388 Tm
+(\050600\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 488 Tm
+(\050600\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 588 Tm
+(\050600\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 688 Tm
+(\050600\054 700\051) Tj
+T*
+ET
+Q
+
+endstream
+endobj
+8 0 obj
+<<
+/F1 9 0 R
+/F1-0 10 0 R
+>>
+endobj
+9 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+10 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+11 0 obj
+<<
+/Contents 12 0 R
+/MediaBox [ 0 0 612 792 ]
+/Resources <<
+/Font 15 0 R
+/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
+/Parent 2 0 R
+/Annots [ 66 0 R ]
+>>
+endobj
+12 0 obj
+[ 13 0 R 14 0 R ]
+endobj
+13 0 obj
+<<
+/Length 47
+>>
+stream
+q
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+ 
+
+Q
+
+endstream
+endobj
+14 0 obj
+<<
+/Length 4322
+>>
+stream
+q
+0.0 0.0 612 792 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 RG
+n
+100 0 m
+100 792 l
+S
+0 0 1 RG
+n
+200 0 m
+200 792 l
+S
+0 0 1 RG
+n
+300 0 m
+300 792 l
+S
+0 0 1 RG
+n
+400 0 m
+400 792 l
+S
+0 0 1 RG
+n
+500 0 m
+500 792 l
+S
+0 0 1 RG
+n
+600 0 m
+600 792 l
+S
+0 0 1 RG
+n
+0 100 m
+612 100 l
+S
+0 0 1 RG
+n
+0 200 m
+612 200 l
+S
+0 0 1 RG
+n
+0 300 m
+612 300 l
+S
+0 0 1 RG
+n
+0 400 m
+612 400 l
+S
+0 0 1 RG
+n
+0 500 m
+612 500 l
+S
+0 0 1 RG
+n
+0 600 m
+612 600 l
+S
+0 0 1 RG
+n
+0 700 m
+612 700 l
+S
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 88 Tm
+(\050100\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 188 Tm
+(\050100\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 288 Tm
+(\050100\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 388 Tm
+(\050100\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 488 Tm
+(\050100\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 588 Tm
+(\050100\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 688 Tm
+(\050100\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 88 Tm
+(\050200\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 188 Tm
+(\050200\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 288 Tm
+(\050200\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 388 Tm
+(\050200\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 488 Tm
+(\050200\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 588 Tm
+(\050200\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 688 Tm
+(\050200\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 88 Tm
+(\050300\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 188 Tm
+(\050300\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 288 Tm
+(\050300\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 388 Tm
+(\050300\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 488 Tm
+(\050300\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 588 Tm
+(\050300\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 688 Tm
+(\050300\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 88 Tm
+(\050400\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 188 Tm
+(\050400\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 288 Tm
+(\050400\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 388 Tm
+(\050400\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 488 Tm
+(\050400\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 588 Tm
+(\050400\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 688 Tm
+(\050400\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 88 Tm
+(\050500\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 188 Tm
+(\050500\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 288 Tm
+(\050500\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 388 Tm
+(\050500\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 488 Tm
+(\050500\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 588 Tm
+(\050500\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 688 Tm
+(\050500\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 88 Tm
+(\050600\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 188 Tm
+(\050600\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 288 Tm
+(\050600\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 388 Tm
+(\050600\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 488 Tm
+(\050600\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 588 Tm
+(\050600\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 688 Tm
+(\050600\054 700\051) Tj
+T*
+ET
+Q
+
+endstream
+endobj
+15 0 obj
+<<
+/F1 16 0 R
+/F1-0 17 0 R
+>>
+endobj
+16 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+17 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+18 0 obj
+<<
+/Contents 19 0 R
+/MediaBox [ 0 0 612 792 ]
+/Resources <<
+/Font 22 0 R
+/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
+/Parent 2 0 R
+>>
+endobj
+19 0 obj
+[ 20 0 R 21 0 R ]
+endobj
+20 0 obj
+<<
+/Length 47
+>>
+stream
+q
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+ 
+
+Q
+
+endstream
+endobj
+21 0 obj
+<<
+/Length 4322
+>>
+stream
+q
+0.0 0.0 612 792 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 RG
+n
+100 0 m
+100 792 l
+S
+0 0 1 RG
+n
+200 0 m
+200 792 l
+S
+0 0 1 RG
+n
+300 0 m
+300 792 l
+S
+0 0 1 RG
+n
+400 0 m
+400 792 l
+S
+0 0 1 RG
+n
+500 0 m
+500 792 l
+S
+0 0 1 RG
+n
+600 0 m
+600 792 l
+S
+0 0 1 RG
+n
+0 100 m
+612 100 l
+S
+0 0 1 RG
+n
+0 200 m
+612 200 l
+S
+0 0 1 RG
+n
+0 300 m
+612 300 l
+S
+0 0 1 RG
+n
+0 400 m
+612 400 l
+S
+0 0 1 RG
+n
+0 500 m
+612 500 l
+S
+0 0 1 RG
+n
+0 600 m
+612 600 l
+S
+0 0 1 RG
+n
+0 700 m
+612 700 l
+S
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 88 Tm
+(\050100\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 188 Tm
+(\050100\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 288 Tm
+(\050100\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 388 Tm
+(\050100\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 488 Tm
+(\050100\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 588 Tm
+(\050100\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 45.304 688 Tm
+(\050100\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 88 Tm
+(\050200\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 188 Tm
+(\050200\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 288 Tm
+(\050200\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 388 Tm
+(\050200\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 488 Tm
+(\050200\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 588 Tm
+(\050200\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 145.304 688 Tm
+(\050200\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 88 Tm
+(\050300\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 188 Tm
+(\050300\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 288 Tm
+(\050300\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 388 Tm
+(\050300\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 488 Tm
+(\050300\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 588 Tm
+(\050300\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 245.304 688 Tm
+(\050300\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 88 Tm
+(\050400\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 188 Tm
+(\050400\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 288 Tm
+(\050400\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 388 Tm
+(\050400\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 488 Tm
+(\050400\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 588 Tm
+(\050400\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 345.304 688 Tm
+(\050400\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 88 Tm
+(\050500\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 188 Tm
+(\050500\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 288 Tm
+(\050500\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 388 Tm
+(\050500\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 488 Tm
+(\050500\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 588 Tm
+(\050500\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 445.304 688 Tm
+(\050500\054 700\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 88 Tm
+(\050600\054 100\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 188 Tm
+(\050600\054 200\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 288 Tm
+(\050600\054 300\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 388 Tm
+(\050600\054 400\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 488 Tm
+(\050600\054 500\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 588 Tm
+(\050600\054 600\051) Tj
+T*
+ET
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+0 0 1 rg
+BT
+1 0 0 1 545.304 688 Tm
+(\050600\054 700\051) Tj
+T*
+ET
+Q
+
+endstream
+endobj
+22 0 obj
+<<
+/F1 23 0 R
+/F1-0 24 0 R
+>>
+endobj
+23 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+24 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+25 0 obj
+<<
+>>
+endobj
+26 0 obj
+<<
+/AP <<
+/D <<
+/0 27 0 R
+/Off 28 0 R
+>>
+/N <<
+/0 29 0 R
+/Off 30 0 R
+>>
+/R <<
+/0 31 0 R
+/Off 32 0 R
+>>
+>>
+/AS /Off
+/BS <<
+/S /S
+/W 1
+>>
+/F 4
+/FT /Btn
+/H /N
+/MK <<
+/BC [ 0.1 0.1 0.1 ]
+/BG [ 0.8 0.843 1 ]
+/CA (l)
+>>
+/P 33 0 R
+/Parent 35 0 R
+/Rect [ 300 700 320 720 ]
+/Subtype /Widget
+/Type /Annot
+>>
+endobj
+27 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 190
+>>
+stream
+xúeQ;É0›s
+_¿	I!'`¶W®T¶–°◊ØÌ%Å„>ñüÿ¡√∆µ MÅ+ÕPÜcs~<¯Aﬁ◊«y˘÷ñ(Ö—◊¶∏H6õU¿¨¿3™ªÉ:Âi~ª’ÌéÜµû/˜ªØô)Èû“Ö¯»±ªVN]∑C—∞Y§\√Ø
+,≥,l=u‘W2@ü·ÿ¿F∫«âgÈÅ‚ú∆‹]
+KÉ¢1`¨qîk¯UÅeñÖ≠ßé‚_Ú(Zl/
+endstream
+endobj
+28 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 147
+>>
+stream
+xúeéA¬ E˜9E.ê¡bÂ]◊+8”Æ∫®.ºæIêt ﬁˇa˛âÇª÷Ç<G≠tõë3>w∫%ÿ~ ˆˆñ8≈ã‘Ê‹,@çP≥ëT5\Ÿ†ëOw®s~á7X·k›˜˛èô9yNÎâ„tÕSw)™ù∑£4P1™…µ∆T˛Ò8Søz¡˙gÌD˜
+endstream
+endobj
+29 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 187
+>>
+stream
+xúeQ;É0›s
+_¿&I'`nØP©L†CØ_HÉ0qxÀOl@∞Úª@ú∏r‚˚æÇÅ§ûÔ@Ú≠≠ƒ2&™Mqël6™ÄYÅ+Ê8Twu √¸
+˜∞ÖH`ıXx≥Ôu«9]RzâcæÕπª+ßÓ⁄°ËhB)◊≥mñáΩßé˙H ¯ÿWË¬\É‰#àÙ1Ê©§πªõ-àC—0◊  5¸¨@õÂaÔ©£¯O¸ ∑Wiî
+endstream
+endobj
+30 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 142
+>>
+stream
+xúeNKÑ0›s
+. mÕx◊zÖI∆ïu·ı:M€ôî˙>‰(∏Èùë_Za–˘‹@∞”#(ù’{±ø∑»±$7«MT*2rÅ≤g¨·»›T)øÊ,p ¶ZgMvˇgú8zHÎë˚0N°kØg≠PjîÑ*rÆ‡ø
+JªZ∏ı‰U,£C¨
+endstream
+endobj
+31 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 189
+>>
+stream
+xúeQKÉ ›sä\ åAhÂÆ€+t¶¨∫–.z˝&A¢£1>ôºqÇ¬µÇ_WZÓ|€ã#ò¯!†Iﬁ◊«ë‹µ%ü¬L≠).á¡.C0+p√áÍ†AyòﬂÓ·6Á)C´Á À˝ÆkfütOÈ…áxÀq8TVæ∫ÓÄ¢1`≤HπéüXgYÿz⁄®ØdÄ1√^¿F∫∆âGÈ¡«%Õy8T6÷8Ec¿ÿ‚(◊Ò≥Î,[O≈ø‰ºÛl
+endstream
+endobj
+32 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 144
+>>
+stream
+xúeNK¬0›s
+. Sb—Ê]◊+8cW.™Ø/3ItBxÊ(∏[≠»K≤“Âb”s¡…é†L~oü£)k:ImÅª®!‘dcÆÿ¿Q∏;®S~Õwÿ‡ ñåµÆ´Ö{ˇ«Ã¨ë”ªröœyÓ>Öı7‚v(*B◊_ï]#<zÍ™l∑D∆
+endstream
+endobj
+33 0 obj
+<<
+/Annots [ 26 0 R 34 0 R 36 0 R 37 0 R 45 0 R 46 0 R ]
+/Contents 47 0 R
+/MediaBox [ 0 0 612 792 ]
+/Parent 48 0 R
+/Resources <<
+/Font 49 0 R
+/ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
+>>
+endobj
+34 0 obj
+<<
+/AP <<
+/D <<
+/1 27 0 R
+/Off 28 0 R
+>>
+/N <<
+/1 29 0 R
+/Off 30 0 R
+>>
+/R <<
+/1 31 0 R
+/Off 32 0 R
+>>
+>>
+/AS /Off
+/BS <<
+/S /S
+/W 1
+>>
+/F 4
+/FT /Btn
+/H /N
+/MK <<
+/BC [ 0.1 0.1 0.1 ]
+/BG [ 0.8 0.843 1 ]
+/CA (l)
+>>
+/P 33 0 R
+/Parent 35 0 R
+/Rect [ 400 700 420 720 ]
+/Subtype /Widget
+/Type /Annot
+>>
+endobj
+35 0 obj
+<<
+/FT /Btn
+/Ff 49152
+/Kids [ 26 0 R 34 0 R 36 0 R ]
+/T (radio)
+>>
+endobj
+36 0 obj
+<<
+/AP <<
+/D <<
+/2 27 0 R
+/Off 28 0 R
+>>
+/N <<
+/2 29 0 R
+/Off 30 0 R
+>>
+/R <<
+/2 31 0 R
+/Off 32 0 R
+>>
+>>
+/AS /Off
+/BS <<
+/S /S
+/W 1
+>>
+/F 4
+/FT /Btn
+/H /N
+/MK <<
+/BC [ 0.1 0.1 0.1 ]
+/BG [ 0.8 0.843 1 ]
+/CA (l)
+>>
+/P 33 0 R
+/Parent 35 0 R
+/Rect [ 500 700 520 720 ]
+/Subtype /Widget
+/Type /Annot
+>>
+endobj
+37 0 obj
+<<
+/AP <<
+/D <<
+/0 38 0 R
+/Off 39 0 R
+>>
+/N <<
+/0 40 0 R
+/Off 41 0 R
+>>
+/R <<
+/0 42 0 R
+/Off 43 0 R
+>>
+>>
+/AS /Off
+/BS <<
+/S /S
+/W 1
+>>
+/F 4
+/FT /Btn
+/H /N
+/MK <<
+/BC [ 0.1 0.1 0.1 ]
+/BG [ 0.8 0.843 1 ]
+/CA (u)
+>>
+/P 33 0 R
+/Parent 44 0 R
+/Rect [ 300 600 350 650 ]
+/Subtype /Widget
+/Type /Annot
+>>
+endobj
+38 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 180
+>>
+stream
+xúeê1é0˚ºb_∞≤ù8N^@_@wPpP‹˜œâƒQ†ÿRdÔé6π≈äñÌ#¿â«í«v=æ](Ø>“Ò°Ô÷π*Uœr,˜m|#∏‰Eù”<*T(™¯Å6V©m`P\•U‹rM«¡°≠uá”‘4'NÔZ´ß‹dD∑ú5J¥Ñ˝Só,FÔIU£⁄‹÷E‹7e®’‹&∑œ@ï—d=¡Ë;·G‘3Æ˘«??¸;ﬂ
+endstream
+endobj
+39 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 67
+>>
+stream
+xú+‰2THW0TpW–37bSs=KÖ¢t 4£¢TÖ4.=KrÍ(W0–3cCK™*Ê
+ ë|
+endstream
+endobj
+40 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 175
+>>
+stream
+xúeO1n1€˝
+ΩÄeÀˆΩ sÚÖ¢MávH:‰˚°] K` $íínÖv5⁄…0ÖV≈ÔWsΩÿ∏⁄WÌóì˙s‰˛<$˘+Ár€Æó}âG‰P™√…ˆkl®^€¥	O∫F˛®mƒ!20ŸZOKÉ™$≤≥÷î<|é™5¯h
+{•.ŸòΩ+ï∆±≠+ub3b0™∫ ≠3µP≈hæ‰ﬁm’˚÷ÌÁ'Iu:(
+endstream
+endobj
+41 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 61
+>>
+stream
+xú+‰2THW0TpW–≥ "c ª(]¡ ç¿®(U!çKœPÇÇ‹ÅÚÂ
+z¶`lh	B@%≈\Å /‹1
+endstream
+endobj
+42 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 180
+>>
+stream
+xúeP1n1€˝
+Ω@eÀ“Ω‡Ê‰AõÕêdË˜À3ê,ÅI@¶(BˆΩAÆŸEÀ…®‰Ìq„ÒÖ«ó|7≈&/ûwZ˛ƒ4©t=€©›È8∞2^Âyo›<≤Lîõ`h∑>JJ-`£À/€›X§∆ò!°ï–òË=hw´úNm®Â`ÿ;ı∞eÕ…T∏¬∑5z§ñÆ
+öŒ.s{Íö√éG∏∆⁄c’ã¸Nˇm1;˛
+endstream
+endobj
+43 0 obj
+<<
+/BBox [ 0 0 20 20 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF ]
+>>
+/Subtype /Form
+/Type /XObject
+/Length 64
+>>
+stream
+xú+‰2THW0TpW–≥0bSs Ø(]¡ ç¿®(U!çKœ–RÜÉ‹ÅJ ÙL¡(D@U≈\Å ÅtK
+endstream
+endobj
+44 0 obj
+<<
+/FT /Btn
+/Ff 49152
+/Kids [ 37 0 R 45 0 R 46 0 R ]
+/T (radio\137cutomized)
+>>
+endobj
+45 0 obj
+<<
+/AP <<
+/D <<
+/1 38 0 R
+/Off 39 0 R
+>>
+/N <<
+/1 40 0 R
+/Off 41 0 R
+>>
+/R <<
+/1 42 0 R
+/Off 43 0 R
+>>
+>>
+/AS /Off
+/BS <<
+/S /S
+/W 1
+>>
+/F 4
+/FT /Btn
+/H /N
+/MK <<
+/BC [ 0.1 0.1 0.1 ]
+/BG [ 0.8 0.843 1 ]
+/CA (u)
+>>
+/P 33 0 R
+/Parent 44 0 R
+/Rect [ 400 600 450 650 ]
+/Subtype /Widget
+/Type /Annot
+>>
+endobj
+46 0 obj
+<<
+/AP <<
+/D <<
+/2 38 0 R
+/Off 39 0 R
+>>
+/N <<
+/2 40 0 R
+/Off 41 0 R
+>>
+/R <<
+/2 42 0 R
+/Off 43 0 R
+>>
+>>
+/AS /Off
+/BS <<
+/S /S
+/W 1
+>>
+/F 4
+/FT /Btn
+/H /N
+/MK <<
+/BC [ 0.1 0.1 0.1 ]
+/BG [ 0.8 0.843 1 ]
+/CA (u)
+>>
+/P 33 0 R
+/Parent 44 0 R
+/Rect [ 500 600 550 650 ]
+/Subtype /Widget
+/Type /Annot
+>>
+endobj
+47 0 obj
+<<
+/Filter [ /ASCII85Decode /FlateDecode ]
+/Length 59
+>>
+stream
+GapQh0E=F,0U\H3T\pNYT^QKk?tc>IP,;W#U1^23ihPEM_PP$O!3^,C5Q~>
+endstream
+endobj
+48 0 obj
+<<
+/Count 1
+/Kids [ 33 0 R ]
+/Type /Pages
+>>
+endobj
+49 0 obj
+<<
+/F1 50 0 R
+>>
+endobj
+50 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+51 0 obj
+<<
+/AP <<
+/N 52 0 R
+>>
+/BS <<
+/S /S
+/W 1
+>>
+/DA (\057Helv 25 Tf 1 0 0 rg)
+/DV ()
+/F 4
+/FT /Tx
+/Ff 0
+/MK <<
+/BC [ 0.1 0.1 0.1 ]
+/BG [ 0.8 0.843 1 ]
+>>
+/P 55 0 R
+/Rect [ 100 700 220 736 ]
+/Subtype /Widget
+/T (text\137field\137custom\137text)
+/Type /Annot
+/V ()
+>>
+endobj
+52 0 obj
+<<
+/BBox [ 0 0 120 36 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF /Text ]
+/Font <<
+/Helv 53 0 R
+>>
+>>
+/Subtype /Form
+/Type /XObject
+/Length 96
+>>
+stream
+xú%åA
+Ä D˜sä9Å˘5≈∂E∏rQù†⁄Ÿ¢éüÃ¨ﬁ„©@ZKa>†©)F”zÊ;îﬂ!|†ïcΩHGÎ™s£Y^ˆi .öÇ<≠©h≈YÇ51aL>í£ó
+endstream
+endobj
+53 0 obj
+<<
+/BaseFont /Helvetica
+/Subtype /Type1
+/Name /Helv
+/Type /Font
+/Encoding 54 0 R
+>>
+endobj
+54 0 obj
+<<
+/Type /Encoding
+/Differences [ 24 /breve /caron /circumflex /dotaccent /hungarumlaut /ogonek /ring /tilde 39 /quotesingle 96 /grave 128 /bullet /dagger /daggerdbl /ellipsis /emdash /endash /florin /fraction /guilsinglleft /guilsinglright /minus /perthousand /quotedblbase /quotedblleft /quotedblright /quoteleft /quoteright /quotesinglbase /trademark /fi /fl /Lslash /OE /Scaron /Ydieresis /Zcaron /dotlessi /lslash /oe /scaron /zcaron 160 /Euro 164 /currency 166 /brokenbar 168 /dieresis /copyright /ordfeminine 172 /logicalnot /.notdef /registered /macron /degree /plusminus /twosuperior /threesuperior /acute /mu 183 /periodcentered /cedilla /onesuperior /ordmasculine 188 /onequarter /onehalf /threequarters 192 /Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla /Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis /Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls /agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla /egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis /eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide /oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis ]
+>>
+endobj
+55 0 obj
+<<
+/Annots [ 51 0 R 56 0 R 59 0 R ]
+/Contents 62 0 R
+/MediaBox [ 0 0 612 792 ]
+/Parent 63 0 R
+/Resources <<
+/Font 64 0 R
+/ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
+>>
+endobj
+56 0 obj
+<<
+/AP <<
+/N 57 0 R
+>>
+/BS <<
+/S /S
+/W 1
+>>
+/DA (\057Helv 12 Tf \0561 \0561 \0561 rg)
+/DV ()
+/F 4
+/FT /Tx
+/Ff 0
+/MK <<
+/BC [ 0.1 0.1 0.1 ]
+/BG [ 0.8 0.843 1 ]
+>>
+/MaxLen 5
+/P 55 0 R
+/Rect [ 100 600 220 636 ]
+/Subtype /Widget
+/T (text\137field\137misc)
+/Type /Annot
+/V ()
+/Q 2
+>>
+endobj
+57 0 obj
+<<
+/BBox [ 0 0 120 36 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF /Text ]
+/Font <<
+/Helv 58 0 R
+>>
+>>
+/Subtype /Form
+/Type /XObject
+/Length 96
+>>
+stream
+xú%åA
+Ä D˜sä9Å˘5≈∂E∏rQù†⁄Ÿ¢éüÃ¨ﬁ„©@ZKa>†©)F”zÊ;îﬂ!|†ïcΩHGÎ™s£Y^ˆi .öÇ<≠©h≈YÇ51aL>í£ó
+endstream
+endobj
+58 0 obj
+<<
+/BaseFont /Helvetica
+/Subtype /Type1
+/Name /Helv
+/Type /Font
+/Encoding 54 0 R
+>>
+endobj
+59 0 obj
+<<
+/AP <<
+/N 60 0 R
+>>
+/BS <<
+/S /S
+/W 1
+>>
+/DA (\057Helv 12 Tf \0561 \0561 \0561 rg)
+/DV ()
+/F 4
+/FT /Tx
+/Ff 4096
+/MK <<
+/BC [ 0.1 0.1 0.1 ]
+/BG [ 0.8 0.843 1 ]
+>>
+/P 55 0 R
+/Rect [ 100 400 300 500 ]
+/Subtype /Widget
+/T (text\137field\137paragraph)
+/Type /Annot
+/V ()
+>>
+endobj
+60 0 obj
+<<
+/BBox [ 0 0 200 100 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF /Text ]
+/Font <<
+/Helv 61 0 R
+>>
+>>
+/Subtype /Form
+/Type /XObject
+/Length 95
+>>
+stream
+xú%å9
+Ä@Û~Eø`úY‹T#Ej&®Å>ﬂYÑ™®õíöR9ç◊•2®“‹k≈1˛L=åTJ&-F:˛πëÕ/õ°%Nü*:>-8ºò™=FtCã©Å‚
+endstream
+endobj
+61 0 obj
+<<
+/BaseFont /Helvetica
+/Subtype /Type1
+/Name /Helv
+/Type /Font
+/Encoding 54 0 R
+>>
+endobj
+62 0 obj
+<<
+/Filter [ /ASCII85Decode /FlateDecode ]
+/Length 59
+>>
+stream
+GapQh0E=F,0U\H3T\pNYT^QKk?tc>IP,;W#U1^23ihPEM_PP$O!3^,C5Q~>
+endstream
+endobj
+63 0 obj
+<<
+/Count 1
+/Kids [ 55 0 R ]
+/Type /Pages
+>>
+endobj
+64 0 obj
+<<
+/F1 65 0 R
+>>
+endobj
+65 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+66 0 obj
+<<
+/AP <<
+/N 67 0 R
+>>
+/BS <<
+/S /S
+/W 1
+>>
+/DA (\057Helv 12 Tf \0561 \0561 \0561 rg)
+/DV (dog)
+/F 4
+/FT /Ch
+/Ff 131072
+/I [ 0 ]
+/MK <<
+/BC [ 0.1 0.1 0.1 ]
+/BG [ 0.8 0.843 1 ]
+>>
+/MaxLen 100
+/Opt [ (dog) (cat) (fish) ]
+/P 70 0 R
+/Rect [ 100 600 220 636 ]
+/Subtype /Widget
+/T (dropdown)
+/Type /Annot
+/V (dog)
+>>
+endobj
+67 0 obj
+<<
+/BBox [ 0 0 120 36 ]
+/Filter [ /FlateDecode ]
+/FormType 1
+/Matrix [ 1 0 0 1 0 0 ]
+/Resources <<
+/ProcSet [ /PDF /Text ]
+/Font <<
+/Helv 68 0 R
+>>
+>>
+/Subtype /Form
+/Type /XObject
+/Length 131
+>>
+stream
+xúMç1Ç@D˚9≈î⁄,˚wÅ`!ÿPh~‚D# QèÔ_mLf™7y„*∫*è.#<=%x∆íÀÄúóc·ﬁLŸ1i≥"”7Îæ!fC%cHËÑª	ì¥C≠»ˆ√ÌivÍü◊>ÖﬂWÊ∆&lŒèqKΩ¢U–ˆ>ë‹!∑
+endstream
+endobj
+68 0 obj
+<<
+/BaseFont /Helvetica
+/Subtype /Type1
+/Name /Helv
+/Type /Font
+/Encoding 69 0 R
+>>
+endobj
+69 0 obj
+<<
+/Type /Encoding
+/Differences [ 24 /breve /caron /circumflex /dotaccent /hungarumlaut /ogonek /ring /tilde 39 /quotesingle 96 /grave 128 /bullet /dagger /daggerdbl /ellipsis /emdash /endash /florin /fraction /guilsinglleft /guilsinglright /minus /perthousand /quotedblbase /quotedblleft /quotedblright /quoteleft /quoteright /quotesinglbase /trademark /fi /fl /Lslash /OE /Scaron /Ydieresis /Zcaron /dotlessi /lslash /oe /scaron /zcaron 160 /Euro 164 /currency 166 /brokenbar 168 /dieresis /copyright /ordfeminine 172 /logicalnot /.notdef /registered /macron /degree /plusminus /twosuperior /threesuperior /acute /mu 183 /periodcentered /cedilla /onesuperior /ordmasculine 188 /onequarter /onehalf /threequarters 192 /Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla /Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis /Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls /agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla /egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis /eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide /oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis ]
+>>
+endobj
+70 0 obj
+<<
+/Annots [ 66 0 R ]
+/Contents 71 0 R
+/MediaBox [ 0 0 612 792 ]
+/Parent 72 0 R
+/Resources <<
+/Font 73 0 R
+/ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
+>>
+endobj
+71 0 obj
+<<
+/Filter [ /ASCII85Decode /FlateDecode ]
+/Length 59
+>>
+stream
+GapQh0E=F,0U\H3T\pNYT^QKk?tc>IP,;W#U1^23ihPEM_PP$O!3^,C5Q~>
+endstream
+endobj
+72 0 obj
+<<
+/Count 1
+/Kids [ 70 0 R ]
+/Type /Pages
+>>
+endobj
+73 0 obj
+<<
+/F1 74 0 R
+>>
+endobj
+74 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+xref
+0 75
+0000000000 65535 f 
+0000000015 00000 n 
+0000000054 00000 n 
+0000000127 00000 n 
+0000000193 00000 n 
+0000000457 00000 n 
+0000000488 00000 n 
+0000000585 00000 n 
+0000004959 00000 n 
+0000005003 00000 n 
+0000005110 00000 n 
+0000005218 00000 n 
+0000005429 00000 n 
+0000005463 00000 n 
+0000005561 00000 n 
+0000009936 00000 n 
+0000009982 00000 n 
+0000010090 00000 n 
+0000010198 00000 n 
+0000010390 00000 n 
+0000010424 00000 n 
+0000010522 00000 n 
+0000014897 00000 n 
+0000014943 00000 n 
+0000015051 00000 n 
+0000015159 00000 n 
+0000015181 00000 n 
+0000015495 00000 n 
+0000015883 00000 n 
+0000016228 00000 n 
+0000016613 00000 n 
+0000016953 00000 n 
+0000017340 00000 n 
+0000017682 00000 n 
+0000017929 00000 n 
+0000018243 00000 n 
+0000018326 00000 n 
+0000018640 00000 n 
+0000018954 00000 n 
+0000019332 00000 n 
+0000019596 00000 n 
+0000019969 00000 n 
+0000020227 00000 n 
+0000020605 00000 n 
+0000020866 00000 n 
+0000020962 00000 n 
+0000021276 00000 n 
+0000021590 00000 n 
+0000021740 00000 n 
+0000021801 00000 n 
+0000021834 00000 n 
+0000021942 00000 n 
+0000022220 00000 n 
+0000022545 00000 n 
+0000022645 00000 n 
+0000023972 00000 n 
+0000024198 00000 n 
+0000024493 00000 n 
+0000024818 00000 n 
+0000024918 00000 n 
+0000025206 00000 n 
+0000025531 00000 n 
+0000025631 00000 n 
+0000025781 00000 n 
+0000025842 00000 n 
+0000025875 00000 n 
+0000025983 00000 n 
+0000026310 00000 n 
+0000026671 00000 n 
+0000026771 00000 n 
+0000028098 00000 n 
+0000028310 00000 n 
+0000028460 00000 n 
+0000028521 00000 n 
+0000028554 00000 n 
+trailer
+<<
+/Size 75
+/Root 3 0 R
+/Info 1 0 R
+>>
+startxref
+28662
+%%EOF
