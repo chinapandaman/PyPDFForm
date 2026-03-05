@@ -295,6 +295,7 @@ def test_preserve_metadata():
     assert PdfWrapper(preserve_metadata=True)
 
 
+@pytest.mark.posix_only
 def test_dropdown_tutorial(issue_pdf_directory, request):
     obj = PdfWrapper(BlankPage(width=612, height=792) * 3)
     obj.generate_coordinate_grid(margin=100, color=(0, 0, 1))
