@@ -335,9 +335,7 @@ def create_annotations(
     Returns:
         bytes: The updated PDF stream with the added annotations.
     """
-    reader = PdfReader(stream_to_io(template))
-    writer = PdfWriter(clone_from=reader)
-
+    writer = PdfWriter(stream_to_io(template))
     annotations_by_page = _group_annotations_by_page(annotations)
 
     for i, page in enumerate(writer.pages):
