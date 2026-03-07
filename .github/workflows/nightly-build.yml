@@ -6,7 +6,7 @@ permissions:
 on:
   workflow_dispatch:
   schedule:
-    - cron: "00 07 * * *"
+    - cron: "00 08 * * *"
 
 jobs:
   close-staled-issues:
@@ -78,7 +78,7 @@ jobs:
       - name: Run nightly tests on newest PDF samples
         run: |
           git checkout master
-          CONTAINER_ID=$(docker run -i -d --rm -v ${PWD}/pdf_samples:/pypdfform/pdf_samples pypdfform-dev)
+          CONTAINER_ID=$(docker run -i -d --rm -v ./pdf_samples:/pypdfform/pdf_samples pypdfform-dev)
           docker exec -i -u 0 $CONTAINER_ID /bin/bash -c "
             rm -rf PyPDFForm
             pip install PyPDFForm
