@@ -6,7 +6,7 @@ permissions:
 on:
   workflow_dispatch:
   schedule:
-    - cron: "00 00 * * *"
+    - cron: "00 07 * * *"
 
 jobs:
   close-staled-issues:
