@@ -82,5 +82,5 @@ jobs:
           docker exec -i -u 0 $CONTAINER_ID /bin/bash -c "
             rm -rf PyPDFForm
             pip install PyPDFForm
-            coverage run -m pytest
+            PYTHONPATH=. pytest
           "
