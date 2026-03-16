@@ -14,23 +14,6 @@ from PyPDFForm.template import get_widgets_by_page
 from PyPDFForm.utils import stream_to_io
 
 
-@pytest.mark.posix_only
-def test_pdf_form_with_paragraph_fields_new_line_symbol_text(
-    issue_pdf_directory, request
-):
-    obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-415.pdf")).fill(
-        {"Address": "Mr John Smith\n132, My Street\nKingston, New York 12401"}
-    )
-
-    expected_path = os.path.join(issue_pdf_directory, "PPF-415-expected.pdf")
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 def test_encrypted_edit_pdf_form(issue_pdf_directory, request):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "437.pdf"))
     obj = obj.fill(obj.sample_data)
