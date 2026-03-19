@@ -34,10 +34,11 @@ class SignatureWidget:
     """
     Represents a signature widget in a PDF form.
 
-    This class is responsible for handling the creation, rendering, and
-    integration of signature fields in a PDF document. It inherits from
-    the base Widget class and provides specific functionality for handling
-    signatures.
+    This class is responsible for handling the creation and integration of
+    signature fields in a PDF document. Unlike other widget types, it does not
+    inherit from the base Widget class — instead of using ReportLab's AcroForm
+    API, it copies a pre-built signature annotation from a bedrock PDF and
+    places it at the specified coordinates.
 
     Attributes:
         OPTIONAL_PARAMS (list): A list of tuples, where each tuple contains the
