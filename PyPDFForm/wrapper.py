@@ -31,8 +31,8 @@ from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
 from .egress import appearance_streams_handler, preserve_pdf_properties
 from .filler import fill
-from .font import (auto_register_fonts, get_all_available_fonts, register_font,
-                   register_font_acroform)
+from .font import (auto_register_fonts, get_all_available_fonts,
+                   register_font_acroform, validate_font)
 from .hooks import trigger_widget_hooks
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
@@ -802,7 +802,7 @@ class PdfWrapper:
 
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
-        if register_font(font_name, ttf_file) if ttf_file is not None else False:
+        if validate_font(font_name, ttf_file) if ttf_file is not None else False:
             self._stream, new_font_name = register_font_acroform(
                 self._read(), ttf_file, getattr(self, "need_appearances")
             )

@@ -238,6 +238,8 @@ def create_watermarks_and_draw(
         to_draw (List[dict]): A list of drawing instructions, where each dictionary
             must contain a "page_number" key (1-based) and a "type" key ("image", "text", or "line")
             along with type-specific parameters.
+        font_mapping (Optional[Dict[str, str]]): A dictionary mapping original font names
+            to temporary unique font names used by ReportLab.
 
     Returns:
         List[bytes]: A list of watermark PDF byte streams. An empty byte string (b"")

@@ -35,21 +35,21 @@ from .watermark import create_watermarks_and_draw
 
 
 @lru_cache
-def register_font(font_name: str, ttf_stream: bytes) -> bool:
+def validate_font(font_name: str, ttf_stream: bytes) -> bool:
     """
-    Registers a TrueType font with the ReportLab library.
+    Validates a TrueType font stream.
 
-    This allows the font to be used for generating PDF documents with ReportLab.
+    This checks if the provided stream is a valid TrueType font by parsing it
+    with ReportLab's TTFont.
 
     Args:
-        font_name (str): The name to register the font under. This name will be used
-            to reference the font when creating PDF documents with ReportLab.
+        font_name (str): The name of the font.
         ttf_stream (bytes): The font file data in TTF format. This should be the raw
             bytes of the TTF file.
 
     Returns:
-        bool: True if the font was registered successfully, False otherwise.
-            Returns False if a TTFError occurs during registration, which usually
+        bool: True if the font stream is valid, False otherwise.
+            Returns False if a TTFError occurs during parsing, which usually
             indicates an invalid TTF stream.
     """
     buff = BytesIO()
