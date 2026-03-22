@@ -765,26 +765,12 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        import uuid
-        from io import BytesIO
+        from .font import auto_register_fonts
 
-        from reportlab.pdfbase.pdfmetrics import _fonts
-        from reportlab.pdfbase.ttfonts import TTFont
-
-        font_mapping = {}
-        for font_name, ttf_stream in self._font_register_events:
-            rl_name = uuid.uuid4().hex
-            font_mapping[font_name] = rl_name
-            _fonts[rl_name] = TTFont(rl_name, BytesIO(ttf_stream))
-
-        try:
+        with auto_register_fonts(self._font_register_events) as font_mapping:
             watermarks = create_watermarks_and_draw(
                 self._read(), [each.to_draw for each in elements], font_mapping
             )
-        finally:
-            for rl_name in font_mapping.values():
-                if rl_name in _fonts:
-                    del _fonts[rl_name]
 
         stream_with_widgets = self._read()
         self._stream = merge_watermarks_with_pdf(self._read(), watermarks)

@@ -7,6 +7,8 @@ allowing these fonts to be used when filling form fields. The module also provid
 for extracting font information from TTF streams and managing font names within a PDF.
 """
 
+import uuid
+from contextlib import contextmanager
 from functools import lru_cache
 from io import BytesIO
 from zlib import compress
@@ -15,6 +17,7 @@ from fontTools.ttLib import TTFont as FT_TTFont
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, StreamObject)
+from reportlab.pdfbase.pdfmetrics import _fonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from .assets.blank import BlankPage
@@ -145,6 +148,32 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float) -> list[f
     return widths
 
 
+@contextmanager
+def auto_register_fonts(fonts: list[tuple[str, bytes]]):
+    """
+    Registers a list of fonts temporarily with unique names, yielding a mapping
+    from the original font names to the unique names.
+
+    Args:
+        fonts (list[tuple[str, bytes]]): A list of tuples, each containing a font name and its TTF stream.
+
+    Yields:
+        dict: A mapping of the original font names to the temporary unique names used by ReportLab.
+    """
+    font_mapping = {}
+    for font_name, ttf_stream in fonts:
+        rl_name = uuid.uuid4().hex
+        font_mapping[font_name] = rl_name
+        _fonts[rl_name] = TTFont(rl_name, BytesIO(ttf_stream))
+
+    try:
+        yield font_mapping
+    finally:
+        for rl_name in font_mapping.values():
+            if rl_name in _fonts:
+                del _fonts[rl_name]
+
+
 @lru_cache
 def get_watermark_with_font(ttf_stream: bytes) -> bytes:
     """
@@ -160,21 +189,11 @@ def get_watermark_with_font(ttf_stream: bytes) -> bytes:
     Returns:
         bytes: The watermark PDF as a byte stream.
     """
-    import uuid
-
-    from reportlab.pdfbase.pdfmetrics import _fonts
-    from reportlab.pdfbase.ttfonts import TTFont
-
-    rl_name = uuid.uuid4().hex
-    _fonts[rl_name] = TTFont(rl_name, BytesIO(ttf_stream))
-
-    try:
+    with auto_register_fonts([("temp", ttf_stream)]) as font_mapping:
         return create_watermarks_and_draw(
-            BlankPage().read(), [RawText(" ", 1, 0, 0, font=rl_name).to_draw]
+            BlankPage().read(),
+            [RawText(" ", 1, 0, 0, font=font_mapping["temp"]).to_draw],
         )[0]
-    finally:
-        if rl_name in _fonts:
-            del _fonts[rl_name]
 
 
 def register_font_acroform(
