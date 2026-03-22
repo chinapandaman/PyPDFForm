@@ -7,10 +7,10 @@ allowing these fonts to be used when filling form fields. The module also provid
 for extracting font information from TTF streams and managing font names within a PDF.
 """
 
-import uuid
 from contextlib import contextmanager
 from functools import lru_cache
 from io import BytesIO
+from uuid import uuid4
 from zlib import compress
 
 from fontTools.ttLib import TTFont as FT_TTFont
@@ -162,9 +162,9 @@ def auto_register_fonts(fonts: list[tuple[str, bytes]]):
     """
     font_mapping = {}
     for font_name, ttf_stream in fonts:
-        rl_name = uuid.uuid4().hex
+        rl_name = uuid4().hex
         font_mapping[font_name] = rl_name
-        _fonts[rl_name] = TTFont(rl_name, BytesIO(ttf_stream))
+        _fonts[rl_name] = TTFont(rl_name, stream_to_io(ttf_stream))
 
     try:
         yield font_mapping
