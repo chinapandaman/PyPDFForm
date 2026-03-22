@@ -17,6 +17,7 @@ from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, StreamObject)
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
+from .assets.blank import BlankPage
 from .constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR, EM_TO_PDF_FACTOR,
                         ENCODING_TABLE_SIZE, FIRST_CHAR_CODE, FONT_NAME_PREFIX,
                         LAST_CHAR_CODE, AcroForm, BaseFont, Encoding, Fields,
@@ -25,8 +26,9 @@ from .constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR, EM_TO_PDF_FACTOR,
                         FontName, FontNotdef, LastChar, Length, Length1,
                         MissingWidth, Resources, Subtype, TrueType, Type,
                         Widths, WinAnsiEncoding)
+from .raw.text import RawText
 from .utils import stream_to_io
-from .watermark import get_watermark_with_font
+from .watermark import create_watermarks_and_draw
 
 
 @lru_cache
@@ -143,8 +145,40 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float) -> list[f
     return widths
 
 
+@lru_cache
+def get_watermark_with_font(ttf_stream: bytes) -> bytes:
+    """
+    Creates a watermark PDF with a single space character using the specified font.
+
+    This function is primarily used to generate a dummy PDF page that includes
+    a specific font, which can then be merged with another PDF to ensure the
+    font is available or embedded. The result is cached for performance.
+
+    Args:
+        ttf_stream (bytes): The TrueType font stream to use.
+
+    Returns:
+        bytes: The watermark PDF as a byte stream.
+    """
+    import uuid
+
+    from reportlab.pdfbase.pdfmetrics import _fonts
+    from reportlab.pdfbase.ttfonts import TTFont
+
+    rl_name = uuid.uuid4().hex
+    _fonts[rl_name] = TTFont(rl_name, BytesIO(ttf_stream))
+
+    try:
+        return create_watermarks_and_draw(
+            BlankPage().read(), [RawText(" ", 1, 0, 0, font=rl_name).to_draw]
+        )[0]
+    finally:
+        if rl_name in _fonts:
+            del _fonts[rl_name]
+
+
 def register_font_acroform(
-    pdf: bytes, font_name: str, ttf_stream: bytes, need_appearances: bool
+    pdf: bytes, ttf_stream: bytes, need_appearances: bool
 ) -> tuple:
     """
     Registers a TrueType font within the PDF's AcroForm dictionary.
@@ -156,7 +190,6 @@ def register_font_acroform(
     Args:
         pdf (bytes): The PDF file data as bytes. This is the PDF document that
             will be modified to include the new font.
-        font_name (str): The name of the font being registered.
         ttf_stream (bytes): The font file data in TTF format as bytes. This is the
             raw data of the TrueType font file.
         need_appearances (bool): If True, attempts to retrieve existing font parameters

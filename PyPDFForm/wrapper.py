@@ -767,6 +767,7 @@ class PdfWrapper:
 
         import uuid
         from io import BytesIO
+
         from reportlab.pdfbase.pdfmetrics import _fonts
         from reportlab.pdfbase.ttfonts import TTFont
 
@@ -819,7 +820,7 @@ class PdfWrapper:
 
         if register_font(font_name, ttf_file) if ttf_file is not None else False:
             self._stream, new_font_name = register_font_acroform(
-                self._read(), font_name, ttf_file, getattr(self, "need_appearances")
+                self._read(), ttf_file, getattr(self, "need_appearances")
             )
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))

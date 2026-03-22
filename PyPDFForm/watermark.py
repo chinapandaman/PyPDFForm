@@ -9,7 +9,6 @@ and to copy specific widgets from the watermarks to the original PDF.
 """
 
 from collections import defaultdict
-from functools import lru_cache
 from io import BytesIO
 from typing import Any, Dict, List, Optional
 
@@ -18,10 +17,8 @@ from pypdf.generic import ArrayObject, NameObject
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
-from .assets.blank import BlankPage
 from .constants import Annots
 from .patterns import get_widget_key
-from .raw.text import RawText
 from .utils import stream_to_io
 
 
@@ -282,7 +279,9 @@ def create_watermarks_and_draw(
         )
 
         for element in elements:
-            type_to_func[element["type"]](canvas, **element, font_mapping=font_mapping or {})
+            type_to_func[element["type"]](
+                canvas, **element, font_mapping=font_mapping or {}
+            )
 
         canvas.save()
         buff.seek(0)
@@ -322,37 +321,6 @@ def merge_watermarks_with_pdf(
     output.write(result)
     result.seek(0)
     return result.read()
-
-
-@lru_cache
-def get_watermark_with_font(ttf_stream: bytes) -> bytes:
-    """
-    Creates a watermark PDF with a single space character using the specified font.
-
-    This function is primarily used to generate a dummy PDF page that includes
-    a specific font, which can then be merged with another PDF to ensure the
-    font is available or embedded. The result is cached for performance.
-
-    Args:
-        ttf_stream (bytes): The TrueType font stream to use.
-
-    Returns:
-        bytes: The watermark PDF as a byte stream.
-    """
-    import uuid
-    from reportlab.pdfbase.pdfmetrics import _fonts
-    from reportlab.pdfbase.ttfonts import TTFont
-
-    rl_name = uuid.uuid4().hex
-    _fonts[rl_name] = TTFont(rl_name, BytesIO(ttf_stream))
-
-    try:
-        return create_watermarks_and_draw(
-            BlankPage().read(), [RawText(" ", 1, 0, 0, font=rl_name).to_draw]
-        )[0]
-    finally:
-        if rl_name in _fonts:
-            del _fonts[rl_name]
 
 
 def _clone_page_widgets(
