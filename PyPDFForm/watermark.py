@@ -43,9 +43,10 @@ def draw_text(canvas: Canvas, **kwargs) -> None:
     widget = kwargs["widget"]
     coordinate_x = kwargs["x"]
     coordinate_y = kwargs["y"]
+    font_mapping = kwargs.get("font_mapping", {})
 
     text_to_draw = widget.value
-    canvas.setFont(widget.font, widget.font_size)
+    canvas.setFont(font_mapping.get(widget.font, widget.font), widget.font_size)
     canvas.setFillColorRGB(
         widget.font_color[0], widget.font_color[1], widget.font_color[2]
     )
@@ -225,7 +226,9 @@ def draw_image(canvas: Canvas, **kwargs) -> None:
     image_buff.close()
 
 
-def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
+def create_watermarks_and_draw(
+    pdf: bytes, to_draw: List[dict], font_mapping: Optional[Dict[str, str]] = None
+) -> List[bytes]:
     """
     Creates a watermark PDF for each page of the input PDF based on the drawing instructions.
 
@@ -279,7 +282,7 @@ def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
         )
 
         for element in elements:
-            type_to_func[element["type"]](canvas, **element)
+            type_to_func[element["type"]](canvas, **element, font_mapping=font_mapping or {})
 
         canvas.save()
         buff.seek(0)
@@ -322,7 +325,7 @@ def merge_watermarks_with_pdf(
 
 
 @lru_cache
-def get_watermark_with_font(font_name: str) -> bytes:
+def get_watermark_with_font(ttf_stream: bytes) -> bytes:
     """
     Creates a watermark PDF with a single space character using the specified font.
 
@@ -331,14 +334,25 @@ def get_watermark_with_font(font_name: str) -> bytes:
     font is available or embedded. The result is cached for performance.
 
     Args:
-        font_name (str): The name of the font to use.
+        ttf_stream (bytes): The TrueType font stream to use.
 
     Returns:
         bytes: The watermark PDF as a byte stream.
     """
-    return create_watermarks_and_draw(
-        BlankPage().read(), [RawText(" ", 1, 0, 0, font=font_name).to_draw]
-    )[0]
+    import uuid
+    from reportlab.pdfbase.pdfmetrics import _fonts
+    from reportlab.pdfbase.ttfonts import TTFont
+
+    rl_name = uuid.uuid4().hex
+    _fonts[rl_name] = TTFont(rl_name, BytesIO(ttf_stream))
+
+    try:
+        return create_watermarks_and_draw(
+            BlankPage().read(), [RawText(" ", 1, 0, 0, font=rl_name).to_draw]
+        )[0]
+    finally:
+        if rl_name in _fonts:
+            del _fonts[rl_name]
 
 
 def _clone_page_widgets(

@@ -15,7 +15,6 @@ from fontTools.ttLib import TTFont as FT_TTFont
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, StreamObject)
-from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from .constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR, EM_TO_PDF_FACTOR,
@@ -53,7 +52,7 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
     buff.seek(0)
 
     try:
-        registerFont(TTFont(name=font_name, filename=buff))
+        TTFont(name=font_name, filename=buff)
         result = True
     except TTFError:
         result = False
@@ -177,7 +176,7 @@ def register_font_acroform(
     font_dict_params = {}
     if need_appearances:
         font_descriptor_params, font_dict_params = get_additional_font_params(
-            get_watermark_with_font(font_name), base_font_name
+            get_watermark_with_font(ttf_stream), base_font_name
         )
 
     font_file_stream = StreamObject()
