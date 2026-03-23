@@ -7,17 +7,21 @@ allowing these fonts to be used when filling form fields. The module also provid
 for extracting font information from TTF streams and managing font names within a PDF.
 """
 
+from contextlib import contextmanager
 from functools import lru_cache
 from io import BytesIO
+from typing import Generator
+from uuid import uuid4
 from zlib import compress
 
 from fontTools.ttLib import TTFont as FT_TTFont
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
                            NameObject, NumberObject, StreamObject)
-from reportlab.pdfbase.pdfmetrics import registerFont
+from reportlab.pdfbase.pdfmetrics import _fonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
+from .assets.blank import BlankPage
 from .constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR, EM_TO_PDF_FACTOR,
                         ENCODING_TABLE_SIZE, FIRST_CHAR_CODE, FONT_NAME_PREFIX,
                         LAST_CHAR_CODE, AcroForm, BaseFont, Encoding, Fields,
@@ -26,26 +30,27 @@ from .constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR, EM_TO_PDF_FACTOR,
                         FontName, FontNotdef, LastChar, Length, Length1,
                         MissingWidth, Resources, Subtype, TrueType, Type,
                         Widths, WinAnsiEncoding)
+from .raw.text import RawText
 from .utils import stream_to_io
-from .watermark import get_watermark_with_font
+from .watermark import create_watermarks_and_draw
 
 
 @lru_cache
-def register_font(font_name: str, ttf_stream: bytes) -> bool:
+def validate_font(font_name: str, ttf_stream: bytes) -> bool:
     """
-    Registers a TrueType font with the ReportLab library.
+    Validates a TrueType font stream.
 
-    This allows the font to be used for generating PDF documents with ReportLab.
+    This checks if the provided stream is a valid TrueType font by parsing it
+    with ReportLab's TTFont.
 
     Args:
-        font_name (str): The name to register the font under. This name will be used
-            to reference the font when creating PDF documents with ReportLab.
+        font_name (str): The name of the font.
         ttf_stream (bytes): The font file data in TTF format. This should be the raw
             bytes of the TTF file.
 
     Returns:
-        bool: True if the font was registered successfully, False otherwise.
-            Returns False if a TTFError occurs during registration, which usually
+        bool: True if the font stream is valid, False otherwise.
+            Returns False if a TTFError occurs during parsing, which usually
             indicates an invalid TTF stream.
     """
     buff = BytesIO()
@@ -53,7 +58,7 @@ def register_font(font_name: str, ttf_stream: bytes) -> bool:
     buff.seek(0)
 
     try:
-        registerFont(TTFont(name=font_name, filename=buff))
+        TTFont(name=font_name, filename=buff)
         result = True
     except TTFError:
         result = False
@@ -144,8 +149,58 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float) -> list[f
     return widths
 
 
+@contextmanager
+def temporary_font_registration(
+    fonts: list[tuple[str, bytes]],
+) -> Generator[dict[str, str], None, None]:
+    """
+    Registers a list of fonts temporarily with unique names, yielding a mapping
+    from the original font names to the unique names.
+
+    Args:
+        fonts (list[tuple[str, bytes]]): A list of tuples, each containing a font name and its TTF stream.
+
+    Yields:
+        dict: A mapping of the original font names to the temporary unique names used by ReportLab.
+    """
+    font_mapping = {}
+    for font_name, ttf_stream in fonts:
+        rl_name = uuid4().hex
+        font_mapping[font_name] = rl_name
+        _fonts[rl_name] = TTFont(rl_name, stream_to_io(ttf_stream))
+
+    try:
+        yield font_mapping
+    finally:
+        for rl_name in font_mapping.values():
+            if rl_name in _fonts:
+                del _fonts[rl_name]
+
+
+@lru_cache
+def get_watermark_with_font(ttf_stream: bytes) -> bytes:
+    """
+    Creates a watermark PDF with a single space character using the specified font.
+
+    This function is primarily used to generate a dummy PDF page that includes
+    a specific font, which can then be merged with another PDF to ensure the
+    font is available or embedded. The result is cached for performance.
+
+    Args:
+        ttf_stream (bytes): The TrueType font stream to use.
+
+    Returns:
+        bytes: The watermark PDF as a byte stream.
+    """
+    with temporary_font_registration([("temp", ttf_stream)]) as font_mapping:
+        return create_watermarks_and_draw(
+            BlankPage().read(),
+            [RawText(" ", 1, 0, 0, font=font_mapping["temp"]).to_draw],
+        )[0]
+
+
 def register_font_acroform(
-    pdf: bytes, font_name: str, ttf_stream: bytes, need_appearances: bool
+    pdf: bytes, ttf_stream: bytes, need_appearances: bool
 ) -> tuple:
     """
     Registers a TrueType font within the PDF's AcroForm dictionary.
@@ -157,7 +212,6 @@ def register_font_acroform(
     Args:
         pdf (bytes): The PDF file data as bytes. This is the PDF document that
             will be modified to include the new font.
-        font_name (str): The name of the font being registered.
         ttf_stream (bytes): The font file data in TTF format as bytes. This is the
             raw data of the TrueType font file.
         need_appearances (bool): If True, attempts to retrieve existing font parameters
@@ -177,7 +231,7 @@ def register_font_acroform(
     font_dict_params = {}
     if need_appearances:
         font_descriptor_params, font_dict_params = get_additional_font_params(
-            get_watermark_with_font(font_name), base_font_name
+            get_watermark_with_font(ttf_stream), base_font_name
         )
 
     font_file_stream = StreamObject()

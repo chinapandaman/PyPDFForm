@@ -9,7 +9,6 @@ and to copy specific widgets from the watermarks to the original PDF.
 """
 
 from collections import defaultdict
-from functools import lru_cache
 from io import BytesIO
 from typing import Any, Dict, List, Optional
 
@@ -18,10 +17,8 @@ from pypdf.generic import ArrayObject, NameObject
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
-from .assets.blank import BlankPage
 from .constants import Annots
 from .patterns import get_widget_key
-from .raw.text import RawText
 from .utils import stream_to_io
 
 
@@ -43,9 +40,10 @@ def draw_text(canvas: Canvas, **kwargs) -> None:
     widget = kwargs["widget"]
     coordinate_x = kwargs["x"]
     coordinate_y = kwargs["y"]
+    font_mapping = kwargs.get("font_mapping", {})
 
     text_to_draw = widget.value
-    canvas.setFont(widget.font, widget.font_size)
+    canvas.setFont(font_mapping.get(widget.font, widget.font), widget.font_size)
     canvas.setFillColorRGB(
         widget.font_color[0], widget.font_color[1], widget.font_color[2]
     )
@@ -225,7 +223,9 @@ def draw_image(canvas: Canvas, **kwargs) -> None:
     image_buff.close()
 
 
-def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
+def create_watermarks_and_draw(
+    pdf: bytes, to_draw: List[dict], font_mapping: Optional[Dict[str, str]] = None
+) -> List[bytes]:
     """
     Creates a watermark PDF for each page of the input PDF based on the drawing instructions.
 
@@ -238,6 +238,8 @@ def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
         to_draw (List[dict]): A list of drawing instructions, where each dictionary
             must contain a "page_number" key (1-based) and a "type" key ("image", "text", or "line")
             along with type-specific parameters.
+        font_mapping (Optional[Dict[str, str]]): A dictionary mapping original font names
+            to temporary unique font names used by ReportLab.
 
     Returns:
         List[bytes]: A list of watermark PDF byte streams. An empty byte string (b"")
@@ -279,7 +281,9 @@ def create_watermarks_and_draw(pdf: bytes, to_draw: List[dict]) -> List[bytes]:
         )
 
         for element in elements:
-            type_to_func[element["type"]](canvas, **element)
+            type_to_func[element["type"]](
+                canvas, **element, font_mapping=font_mapping or {}
+            )
 
         canvas.save()
         buff.seek(0)
@@ -319,26 +323,6 @@ def merge_watermarks_with_pdf(
     output.write(result)
     result.seek(0)
     return result.read()
-
-
-@lru_cache
-def get_watermark_with_font(font_name: str) -> bytes:
-    """
-    Creates a watermark PDF with a single space character using the specified font.
-
-    This function is primarily used to generate a dummy PDF page that includes
-    a specific font, which can then be merged with another PDF to ensure the
-    font is available or embedded. The result is cached for performance.
-
-    Args:
-        font_name (str): The name of the font to use.
-
-    Returns:
-        bytes: The watermark PDF as a byte stream.
-    """
-    return create_watermarks_and_draw(
-        BlankPage().read(), [RawText(" ", 1, 0, 0, font=font_name).to_draw]
-    )[0]
 
 
 def _clone_page_widgets(

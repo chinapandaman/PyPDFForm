@@ -31,8 +31,8 @@ from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
 from .egress import appearance_streams_handler, preserve_pdf_properties
 from .filler import fill
-from .font import (get_all_available_fonts, register_font,
-                   register_font_acroform)
+from .font import (get_all_available_fonts, register_font_acroform,
+                   temporary_font_registration, validate_font)
 from .hooks import trigger_widget_hooks
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
@@ -765,9 +765,10 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        watermarks = create_watermarks_and_draw(
-            self._read(), [each.to_draw for each in elements]
-        )
+        with temporary_font_registration(self._font_register_events) as font_mapping:
+            watermarks = create_watermarks_and_draw(
+                self._read(), [each.to_draw for each in elements], font_mapping
+            )
 
         stream_with_widgets = self._read()
         self._stream = merge_watermarks_with_pdf(self._read(), watermarks)
@@ -801,9 +802,9 @@ class PdfWrapper:
 
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
-        if register_font(font_name, ttf_file) if ttf_file is not None else False:
+        if validate_font(font_name, ttf_file) if ttf_file is not None else False:
             self._stream, new_font_name = register_font_acroform(
-                self._read(), font_name, ttf_file, getattr(self, "need_appearances")
+                self._read(), ttf_file, getattr(self, "need_appearances")
             )
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))
