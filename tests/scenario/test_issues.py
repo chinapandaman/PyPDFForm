@@ -11,7 +11,6 @@ from PyPDFForm.constants import TU, Parent, V
 from PyPDFForm.middleware.radio import Radio
 from PyPDFForm.patterns import get_widget_key
 from PyPDFForm.template import get_widgets_by_page
-from PyPDFForm.utils import stream_to_io
 
 
 def test_encrypted_edit_pdf_form(issue_pdf_directory, request):
@@ -167,7 +166,7 @@ def test_merge_sejda_pdf_forms(issue_pdf_directory):
             os.path.join(issue_pdf_directory, "PPF-884.pdf"), need_appearances=True
         ).fill(data[i])
 
-    result = PdfReader(stream_to_io(obj.read()))
+    result = PdfReader(BytesIO(obj.read()))
 
     for i, page in enumerate(result.pages):
         page_data = data[i]

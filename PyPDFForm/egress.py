@@ -19,7 +19,6 @@ from pypdf.generic import DictionaryObject, NameObject, TextStringObject
 
 from .constants import (JS, XFA, AcroForm, JavaScript, OpenAction, Root, S,
                         Title)
-from .utils import stream_to_io
 
 
 @lru_cache
@@ -44,7 +43,7 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     Returns:
         bytes: The modified PDF content as a bytes stream.
     """
-    reader = PdfReader(stream_to_io(pdf))
+    reader = PdfReader(BytesIO(pdf))
     writer = PdfWriter()
 
     if AcroForm in reader.trailer[Root] and XFA in reader.trailer[Root][AcroForm]:
@@ -59,7 +58,7 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
         result = f.read()
 
     if generate_appearance_streams:
-        with Pdf.open(stream_to_io(result)) as f:
+        with Pdf.open(BytesIO(result)) as f:
             f.generate_appearance_streams()
             with BytesIO() as r:
                 f.save(r)
@@ -87,7 +86,7 @@ def preserve_pdf_properties(
     Returns:
         bytes: The modified PDF content as a bytes stream.
     """
-    reader = PdfReader(stream_to_io(pdf))
+    reader = PdfReader(BytesIO(pdf))
     writer = PdfWriter()
     writer.append(reader)
 

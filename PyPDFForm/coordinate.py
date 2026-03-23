@@ -7,6 +7,7 @@ It allows developers to visualize the coordinate system of each page in a PDF, w
 for debugging and precisely positioning elements when filling or drawing on PDF forms.
 """
 
+from io import BytesIO
 from typing import Tuple
 
 from pypdf import PdfReader
@@ -14,7 +15,6 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from .constants import COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO, DEFAULT_FONT
 from .middleware.text import Text
-from .utils import stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -39,7 +39,7 @@ def generate_coordinate_grid(
     Returns:
         bytes: The PDF file with the coordinate grid overlay as bytes.
     """
-    pdf_file = PdfReader(stream_to_io(pdf))
+    pdf_file = PdfReader(BytesIO(pdf))
     lines_by_page = {}
     texts_by_page = {}
 

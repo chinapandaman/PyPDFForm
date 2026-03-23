@@ -19,7 +19,6 @@ from reportlab.pdfgen.canvas import Canvas
 
 from .constants import Annots
 from .patterns import get_widget_key
-from .utils import stream_to_io
 
 
 def draw_text(canvas: Canvas, **kwargs) -> None:
@@ -260,7 +259,7 @@ def create_watermarks_and_draw(
     for each in to_draw:
         page_to_to_draw[each["page_number"]].append(each)
 
-    pdf_file = PdfReader(stream_to_io(pdf))
+    pdf_file = PdfReader(BytesIO(pdf))
     buff = BytesIO()
 
     for i, page in enumerate(pdf_file.pages):
@@ -310,13 +309,13 @@ def merge_watermarks_with_pdf(
         bytes: A byte stream representing the merged PDF with watermarks applied.
     """
     result = BytesIO()
-    pdf_file = PdfReader(stream_to_io(pdf))
+    pdf_file = PdfReader(BytesIO(pdf))
     output = PdfWriter()
     output.append(pdf_file)
 
     for i, page in enumerate(output.pages):
         if watermarks[i]:
-            watermark = PdfReader(stream_to_io(watermarks[i]))
+            watermark = PdfReader(BytesIO(watermarks[i]))
             if watermark.pages:
                 page.merge_page(watermark.pages[0])
 
@@ -368,7 +367,7 @@ def _collect_from_single_watermark_specific_page(
         Dict[int, List[Any]]: A dictionary mapping the first output page (index 0) to cloned widgets.
     """
     widgets_to_copy = defaultdict(list)
-    watermark_reader = PdfReader(stream_to_io(watermark))
+    watermark_reader = PdfReader(BytesIO(watermark))
     if page_num < len(watermark_reader.pages):
         widgets_to_copy[0] = _clone_page_widgets(
             writer, watermark_reader.pages[page_num], keys
@@ -393,7 +392,7 @@ def _collect_from_single_watermark_1_to_1(
         Dict[int, List[Any]]: A dictionary mapping output page indices to cloned widgets.
     """
     widgets_to_copy = defaultdict(list)
-    watermark_reader = PdfReader(stream_to_io(watermark))
+    watermark_reader = PdfReader(BytesIO(watermark))
     for i, page in enumerate(watermark_reader.pages):
         widgets_to_copy[i] = _clone_page_widgets(writer, page, keys)
     return widgets_to_copy
@@ -421,7 +420,7 @@ def _collect_from_multiple_watermarks(
     for i, watermark_stream in enumerate(watermarks):
         if not watermark_stream:
             continue
-        watermark_reader = PdfReader(stream_to_io(watermark_stream))
+        watermark_reader = PdfReader(BytesIO(watermark_stream))
         for j, page in enumerate(watermark_reader.pages):
             if page_num is None or j == page_num:
                 widgets_to_copy[i].extend(_clone_page_widgets(writer, page, keys))
@@ -509,7 +508,7 @@ def copy_watermark_widgets(
         bytes: The modified PDF byte stream with copied widgets.
     """
     pdf_writer = PdfWriter()
-    pdf_writer.append(PdfReader(stream_to_io(pdf)))
+    pdf_writer.append(PdfReader(BytesIO(pdf)))
 
     widgets_to_copy = _collect_widgets_to_copy(pdf_writer, watermarks, keys, page_num)
     _apply_widgets_to_pages(pdf_writer, widgets_to_copy)

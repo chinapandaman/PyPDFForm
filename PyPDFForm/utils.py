@@ -18,34 +18,12 @@ from functools import lru_cache
 from io import BytesIO
 from secrets import choice
 from string import ascii_letters, digits, punctuation
-from typing import Any, BinaryIO, List
+from typing import Any, List
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
 from .constants import SLASH, UNIQUE_SUFFIX_LENGTH, Annots
-
-
-def stream_to_io(stream: bytes) -> BinaryIO:
-    """
-    Converts a bytes stream to a BinaryIO object, which can be used by PyPDFForm.
-
-    This function takes a bytes stream as input and returns a BinaryIO object
-    that represents the same data. This is useful because PyPDFForm often
-    works with BinaryIO objects, so this function allows you to easily convert
-    a bytes stream to the correct format.
-
-    Args:
-        stream (bytes): The bytes stream to convert.
-
-    Returns:
-        BinaryIO: A BinaryIO object representing the stream.
-    """
-    result = BytesIO()
-    result.write(stream)
-    result.seek(0)
-
-    return result
 
 
 @lru_cache
@@ -63,7 +41,7 @@ def remove_all_widgets(pdf: bytes) -> bytes:
     Returns:
         bytes: The PDF with all widgets removed, as a bytes stream.
     """
-    pdf_file = PdfReader(stream_to_io(pdf))
+    pdf_file = PdfReader(BytesIO(pdf))
     result_stream = BytesIO()
     writer = PdfWriter()
     for page in pdf_file.pages:
@@ -89,7 +67,7 @@ def get_page_streams(pdf: bytes) -> List[bytes]:
     Returns:
         List[bytes]: A list of bytes streams, one for each page.
     """
-    pdf_file = PdfReader(stream_to_io(pdf))
+    pdf_file = PdfReader(BytesIO(pdf))
     result = []
 
     for page in pdf_file.pages:
@@ -167,8 +145,8 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
         bytes: The merged PDF file as a byte stream.
     """
     output = PdfWriter()
-    pdf_file = PdfReader(stream_to_io(pdf))
-    other_file = PdfReader(stream_to_io(other))
+    pdf_file = PdfReader(BytesIO(pdf))
+    other_file = PdfReader(BytesIO(other))
     result = BytesIO()
 
     for page in pdf_file.pages:
@@ -179,7 +157,7 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     output.write(result)
     result.seek(0)
 
-    merged_no_widgets = PdfReader(stream_to_io(remove_all_widgets(result.read())))
+    merged_no_widgets = PdfReader(BytesIO(remove_all_widgets(result.read())))
     output = PdfWriter()
     output.append(merged_no_widgets)
 
