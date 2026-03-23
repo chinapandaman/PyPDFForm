@@ -31,8 +31,8 @@ from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
 from .egress import appearance_streams_handler, preserve_pdf_properties
 from .filler import fill
-from .font import (auto_register_fonts, get_all_available_fonts,
-                   register_font_acroform, validate_font)
+from .font import (get_all_available_fonts, register_font_acroform,
+                   temporary_font_registration, validate_font)
 from .hooks import trigger_widget_hooks
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
@@ -765,7 +765,7 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        with auto_register_fonts(self._font_register_events) as font_mapping:
+        with temporary_font_registration(self._font_register_events) as font_mapping:
             watermarks = create_watermarks_and_draw(
                 self._read(), [each.to_draw for each in elements], font_mapping
             )

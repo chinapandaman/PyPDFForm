@@ -149,7 +149,7 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float) -> list[f
 
 
 @contextmanager
-def auto_register_fonts(fonts: list[tuple[str, bytes]]):
+def temporary_font_registration(fonts: list[tuple[str, bytes]]):
     """
     Registers a list of fonts temporarily with unique names, yielding a mapping
     from the original font names to the unique names.
@@ -189,7 +189,7 @@ def get_watermark_with_font(ttf_stream: bytes) -> bytes:
     Returns:
         bytes: The watermark PDF as a byte stream.
     """
-    with auto_register_fonts([("temp", ttf_stream)]) as font_mapping:
+    with temporary_font_registration([("temp", ttf_stream)]) as font_mapping:
         return create_watermarks_and_draw(
             BlankPage().read(),
             [RawText(" ", 1, 0, 0, font=font_mapping["temp"]).to_draw],
