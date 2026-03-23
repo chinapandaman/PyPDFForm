@@ -24,7 +24,6 @@ from .constants import (AA, COMB, DA, FONT_COLOR_IDENTIFIER,
                         JavaScript, MaxLen, Opt, Parent, Q, Rect, S, Type, U,
                         X)
 from .patterns import get_widget_key
-from .utils import stream_to_io
 
 
 def trigger_widget_hooks(
@@ -52,7 +51,7 @@ def trigger_widget_hooks(
     Returns:
         bytes: The modified PDF data as bytes, with the widget hooks applied.
     """
-    pdf_file = PdfReader(stream_to_io(pdf))
+    pdf_file = PdfReader(BytesIO(pdf))
     output = PdfWriter()
     output.append(pdf_file)
 

@@ -28,7 +28,7 @@ from .patterns import (WIDGET_DESCRIPTION_PATTERNS, WIDGET_TYPE_PATTERNS,
                        get_field_hidden, get_field_rect, get_radio_value,
                        get_text_field_alignment, get_text_field_max_length,
                        get_text_value, get_widget_key, update_annotation_name)
-from .utils import extract_widget_property, find_pattern_match, stream_to_io
+from .utils import extract_widget_property, find_pattern_match
 
 
 @lru_cache
@@ -45,7 +45,7 @@ def get_metadata(pdf: bytes) -> dict:
     if not pdf:
         return {}
 
-    reader = PdfReader(stream_to_io(pdf))
+    reader = PdfReader(BytesIO(pdf))
     return reader.metadata or {}
 
 
@@ -218,7 +218,7 @@ def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
         Dict[int, List[dict]]: A dictionary where keys are page numbers (1-indexed)
             and values are lists of widget dictionaries.
     """
-    pdf_file = PdfReader(stream_to_io(pdf))
+    pdf_file = PdfReader(BytesIO(pdf))
 
     result = {}
 
@@ -335,7 +335,7 @@ def create_annotations(
     Returns:
         bytes: The updated PDF stream with the added annotations.
     """
-    writer = PdfWriter(stream_to_io(template))
+    writer = PdfWriter(BytesIO(template))
     annotations_by_page = _group_annotations_by_page(annotations)
 
     for i, page in enumerate(writer.pages):
@@ -382,7 +382,7 @@ def update_widget_keys(
     Returns:
         bytes: The updated PDF template as a byte stream.
     """
-    pdf = PdfReader(stream_to_io(template))
+    pdf = PdfReader(BytesIO(template))
     out = PdfWriter()
     out.append(pdf)
 

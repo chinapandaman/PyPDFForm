@@ -24,7 +24,6 @@ from reportlab.lib.colors import Color
 from reportlab.pdfgen.canvas import Canvas
 
 from ..constants import fieldFlags, required
-from ..utils import stream_to_io
 
 
 class Widget:
@@ -177,7 +176,7 @@ class Widget:
         """
         result = []
 
-        pdf = PdfReader(stream_to_io(stream))
+        pdf = PdfReader(BytesIO(stream))
         watermark = BytesIO()
 
         widgets_by_page = {}

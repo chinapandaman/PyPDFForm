@@ -26,7 +26,6 @@ from reportlab.pdfgen.canvas import Canvas
 from ..assets.bedrock import BEDROCK_PDF
 from ..constants import Annots, Rect, T
 from ..patterns import get_widget_key
-from ..utils import stream_to_io
 from .base import Field
 
 
@@ -112,9 +111,9 @@ class SignatureWidget:
         for widget in widgets:
             page_to_widgets[widget.page_number].append(widget)
 
-        input_pdf = PdfReader(stream_to_io(stream))
+        input_pdf = PdfReader(BytesIO(stream))
 
-        bedrock = PdfReader(stream_to_io(BEDROCK_PDF))
+        bedrock = PdfReader(BytesIO(BEDROCK_PDF))
         page = bedrock.pages[0]
         annot_type_to_annot = {}
         for annot in page.get(Annots, []):  # pylint: disable=E1101

@@ -27,7 +27,6 @@ from .middleware.text import Text
 from .patterns import (get_widget_key, update_checkbox_value,
                        update_dropdown_value, update_radio_value,
                        update_text_value)
-from .utils import stream_to_io
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -177,7 +176,7 @@ def fill(
                The image drawn stream is only returned if there are any image or signature widgets
                in the form.
     """
-    pdf = PdfReader(stream_to_io(template))
+    pdf = PdfReader(BytesIO(template))
     out = PdfWriter()
     out.append(pdf)
 

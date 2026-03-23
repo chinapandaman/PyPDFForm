@@ -31,7 +31,6 @@ from .constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR, EM_TO_PDF_FACTOR,
                         MissingWidth, Resources, Subtype, TrueType, Type,
                         Widths, WinAnsiEncoding)
 from .raw.text import RawText
-from .utils import stream_to_io
 from .watermark import create_watermarks_and_draw
 
 
@@ -67,7 +66,7 @@ def validate_font(font_name: str, ttf_stream: bytes) -> bool:
     return result
 
 
-def get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
+def _get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
     """
     Retrieves additional font parameters from a PDF document for a given base font name.
 
@@ -88,7 +87,7 @@ def get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
     """
     font_descriptor_params = {}
     font_dict_params = {}
-    reader = PdfReader(stream_to_io(pdf))
+    reader = PdfReader(BytesIO(pdf))
     first_page = reader.get_page(0)
 
     for font in first_page[Resources][Font].values():
@@ -167,7 +166,7 @@ def temporary_font_registration(
     for font_name, ttf_stream in fonts:
         rl_name = uuid4().hex
         font_mapping[font_name] = rl_name
-        _fonts[rl_name] = TTFont(rl_name, stream_to_io(ttf_stream))
+        _fonts[rl_name] = TTFont(rl_name, BytesIO(ttf_stream))
 
     try:
         yield font_mapping
@@ -178,7 +177,7 @@ def temporary_font_registration(
 
 
 @lru_cache
-def get_watermark_with_font(ttf_stream: bytes) -> bytes:
+def _get_watermark_with_font(ttf_stream: bytes) -> bytes:
     """
     Creates a watermark PDF with a single space character using the specified font.
 
@@ -222,16 +221,16 @@ def register_font_acroform(
         tuple: A tuple containing the modified PDF data as bytes and the new font name
             (str) that was assigned to the registered font within the PDF.
     """
-    base_font_name = get_base_font_name(ttf_stream)
-    reader = PdfReader(stream_to_io(pdf))
+    base_font_name = _get_base_font_name(ttf_stream)
+    reader = PdfReader(BytesIO(pdf))
     writer = PdfWriter()
     writer.append(reader)
 
     font_descriptor_params = {}
     font_dict_params = {}
     if need_appearances:
-        font_descriptor_params, font_dict_params = get_additional_font_params(
-            get_watermark_with_font(ttf_stream), base_font_name
+        font_descriptor_params, font_dict_params = _get_additional_font_params(
+            _get_watermark_with_font(ttf_stream), base_font_name
         )
 
     font_file_stream = StreamObject()
@@ -299,7 +298,7 @@ def register_font_acroform(
         dr[NameObject(Font)] = DictionaryObject()
     fonts = dr[Font]
 
-    new_font_name = get_new_font_name(fonts)
+    new_font_name = _get_new_font_name(fonts)
     fonts[NameObject(new_font_name)] = font_dict_ref
 
     with BytesIO() as f:
@@ -309,7 +308,7 @@ def register_font_acroform(
 
 
 @lru_cache
-def get_base_font_name(ttf_stream: bytes) -> str:
+def _get_base_font_name(ttf_stream: bytes) -> str:
     """
     Extracts the base font name from a TrueType font stream.
 
@@ -323,12 +322,10 @@ def get_base_font_name(ttf_stream: bytes) -> str:
     Returns:
         str: The base font name, prefixed with a forward slash.
     """
-    return (
-        f"/{TTFont(name='new_font', filename=stream_to_io(ttf_stream)).face.name.ustr}"
-    )
+    return f"/{TTFont(name='new_font', filename=BytesIO(ttf_stream)).face.name.ustr}"
 
 
-def get_new_font_name(fonts: dict) -> str:
+def _get_new_font_name(fonts: dict) -> str:
     """
     Generates a new unique font name to avoid conflicts with existing fonts in the PDF.
 
@@ -368,7 +365,7 @@ def get_all_available_fonts(pdf: bytes) -> dict:
             (without the leading slash) and the values are the corresponding font
             identifiers in the PDF. Returns an empty dictionary if no fonts are found.
     """
-    reader = PdfReader(stream_to_io(pdf))
+    reader = PdfReader(BytesIO(pdf))
     try:
         fonts = reader.root_object[AcroForm][DR][Font]
     except KeyError:
