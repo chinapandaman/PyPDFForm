@@ -10,6 +10,7 @@ for extracting font information from TTF streams and managing font names within 
 from contextlib import contextmanager
 from functools import lru_cache
 from io import BytesIO
+from typing import Generator
 from uuid import uuid4
 from zlib import compress
 
@@ -149,7 +150,9 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float) -> list[f
 
 
 @contextmanager
-def temporary_font_registration(fonts: list[tuple[str, bytes]]):
+def temporary_font_registration(
+    fonts: list[tuple[str, bytes]],
+) -> Generator[dict[str, str], None, None]:
     """
     Registers a list of fonts temporarily with unique names, yielding a mapping
     from the original font names to the unique names.
