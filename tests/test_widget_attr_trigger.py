@@ -28,6 +28,33 @@ def test_register_font_no_form_fields(pdf_samples, sample_font_stream, request):
         assert obj.read() == expected
 
 
+@pytest.mark.posix_only
+def test_register_multiple_fonts(pdf_samples, font_samples, request):
+    expected_path = os.path.join(
+        pdf_samples, "test_widget_attr_trigger", "test_register_multiple_fonts.pdf"
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+        obj.register_font("foo", os.path.join(font_samples, "LiberationSerif-Bold.ttf"))
+        obj.register_font(
+            "bar", os.path.join(font_samples, "LiberationSerif-Italic.ttf")
+        )
+        obj.create_field(
+            Fields.TextField(name="foo", page_number=1, x=100, y=100, font="foo")
+        )
+        obj.create_field(
+            Fields.TextField(name="bar", page_number=1, x=100, y=200, font="bar")
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_set_radio_size(pdf_samples, template_with_radiobutton_stream, request):
     expected_path = os.path.join(
         pdf_samples, "test_widget_attr_trigger", "test_set_radio_size.pdf"
