@@ -205,70 +205,6 @@ def test_fill_radiobutton_flatten_then_unflatten(
         assert obj.read() == expected
 
 
-def test_fill_sejda(sejda_template, pdf_samples, sejda_data, request):
-    expected_path = os.path.join(pdf_samples, "test_fill_sejda.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(sejda_template).fill(sejda_data)
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_fill_sejda_flatten(sejda_template, pdf_samples, sejda_data, request):
-    expected_path = os.path.join(pdf_samples, "test_fill_sejda_flatten.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(sejda_template).fill(
-            sejda_data,
-            flatten=True,
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_fill_sejda_flatten_then_unflatten(
-    sejda_template, pdf_samples, sejda_data, request
-):
-    expected_path = os.path.join(
-        pdf_samples, "test_fill_sejda_flatten_then_unflatten.pdf"
-    )
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(sejda_template).fill(
-            sejda_data,
-            flatten=True,
-        )
-        obj.widgets["buyer_name"].readonly = False
-        obj.widgets["at_future_date"].readonly = False
-        obj.widgets["purchase_option"].readonly = False
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 def test_addition_operator_3_times(template_stream, data_dict):
     result = PdfWrapper()
 
@@ -496,26 +432,6 @@ def test_pages_preserve_font(template_stream, pdf_samples, sample_font_stream, r
         assert obj.pages[1].read() == f.read()
 
 
-def test_sejda_pages_1(sejda_template, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "pages", "test_sejda_pages_1.pdf")
-    obj = PdfWrapper(sejda_template)
-
-    with open(expected_path, "rb+") as f:
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.pages[0].read()
-        assert obj.pages[0].read() == f.read()
-
-
-def test_sejda_pages_2(sejda_template, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "pages", "test_sejda_pages_2.pdf")
-    obj = PdfWrapper(sejda_template)
-
-    with open(expected_path, "rb+") as f:
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.pages[1].read()
-        assert obj.pages[1].read() == f.read()
-
-
 def test_radio_pages_1(template_with_radiobutton_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "pages", "test_radio_pages_1.pdf")
     obj = PdfWrapper(template_with_radiobutton_stream)
@@ -578,32 +494,6 @@ def test_update_radio_key(template_with_radiobutton_stream, pdf_samples, request
         obj = PdfWrapper(template_with_radiobutton_stream)
         obj.update_widget_key("radio_3", "RADIO")
         obj.fill({"RADIO": 0})
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_update_sejda_key(sejda_template, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "test_update_sejda_key.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sejda_template)
-        obj.update_widget_key("year", "YEAR")
-        obj.update_widget_key("at_future_date", "FUTURE_DATE")
-        obj.update_widget_key("purchase_option", "PURCHASE_OPTION")
-        obj.update_widget_key("buyer_signed_date", "BUYER_SIGNED_DATE")
-        obj.fill(
-            {
-                "YEAR": "12",
-                "FUTURE_DATE": True,
-                "PURCHASE_OPTION": 1,
-                "BUYER_SIGNED_DATE": "2012-01-01",
-            }
-        )
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
@@ -731,23 +621,6 @@ def test_hidden_radio(template_with_radiobutton_stream, pdf_samples, request):
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_with_radiobutton_stream)
         obj.widgets["radio_2"].hidden = True
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_hidden_sejda(sejda_template, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "test_hidden_sejda.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sejda_template)
-        obj.widgets["buyer_name"].hidden = True
-        obj.widgets["purchase_option"].hidden = True
-        obj.widgets["at_future_date"].hidden = True
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()

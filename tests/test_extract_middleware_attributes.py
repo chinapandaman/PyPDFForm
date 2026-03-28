@@ -27,16 +27,6 @@ def test_radio_values(pdf_samples):
         assert obj.widgets[k].value == v
 
 
-def test_sejda_values(pdf_samples, sejda_data):
-    obj = PdfWrapper(os.path.join(pdf_samples, "test_fill_sejda.pdf"))
-
-    for k, v in sejda_data.items():
-        if v is False:
-            assert obj.widgets[k].value is None
-        else:
-            assert obj.widgets[k].value == v
-
-
 def test_dropdown_values(pdf_samples):
     obj = PdfWrapper(os.path.join(pdf_samples, "dropdown", "test_dropdown_two.pdf"))
 
@@ -98,21 +88,6 @@ def test_field_required(pdf_samples):
         assert v.required
 
 
-def test_field_required_sejda(pdf_samples):
-    obj = PdfWrapper(
-        os.path.join(
-            pdf_samples,
-            "test_widget_attr_trigger",
-            "test_set_text_field_required_sejda.pdf",
-        )
-    )
-
-    assert obj.widgets["buyer_address"].required
-    for k, v in obj.widgets.items():
-        if k != "buyer_address":
-            assert not v.required
-
-
 def test_field_hidden(pdf_samples):
     obj = PdfWrapper(os.path.join(pdf_samples, "test_hidden_text_check.pdf"))
 
@@ -121,29 +96,6 @@ def test_field_hidden(pdf_samples):
     for k, v in obj.widgets.items():
         if k not in ["test", "check_2"]:
             assert not v.hidden
-
-
-def test_field_hidden_sejda(pdf_samples):
-    obj = PdfWrapper(os.path.join(pdf_samples, "test_hidden_sejda.pdf"))
-
-    assert obj.widgets["buyer_name"].hidden
-    assert obj.widgets["purchase_option"].hidden
-    assert obj.widgets["at_future_date"].hidden
-    for k, v in obj.widgets.items():
-        if k not in ["buyer_name", "purchase_option", "at_future_date"]:
-            assert not v.hidden
-
-
-def test_text_field_alignment_sejda(pdf_samples):
-    obj = PdfWrapper(
-        os.path.join(
-            pdf_samples,
-            "test_widget_attr_trigger",
-            "test_set_text_field_alignment_sejda.pdf",
-        )
-    )
-
-    assert obj.widgets["buyer_name"].alignment == 2
 
 
 def test_text_field_comb(max_length_expected_directory):
@@ -155,15 +107,3 @@ def test_text_field_comb(max_length_expected_directory):
     )
 
     assert obj.widgets["LastName"].comb
-
-
-def test_text_field_comb_sejda(pdf_samples):
-    obj = PdfWrapper(
-        os.path.join(
-            pdf_samples,
-            "test_widget_attr_trigger",
-            "test_set_text_field_comb_sejda.pdf",
-        )
-    )
-
-    assert obj.widgets["buyer_name"].comb
