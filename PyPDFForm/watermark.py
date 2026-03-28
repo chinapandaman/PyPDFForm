@@ -309,9 +309,7 @@ def merge_watermarks_with_pdf(
         bytes: A byte stream representing the merged PDF with watermarks applied.
     """
     result = BytesIO()
-    pdf_file = PdfReader(BytesIO(pdf))
-    output = PdfWriter()
-    output.append(pdf_file)
+    output = PdfWriter(BytesIO(pdf))
 
     for i, page in enumerate(output.pages):
         if watermarks[i]:
