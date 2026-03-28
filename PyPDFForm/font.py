@@ -222,9 +222,7 @@ def register_font_acroform(
             (str) that was assigned to the registered font within the PDF.
     """
     base_font_name = _get_base_font_name(ttf_stream)
-    reader = PdfReader(BytesIO(pdf))
-    writer = PdfWriter()
-    writer.append(reader)
+    writer = PdfWriter(BytesIO(pdf))
 
     font_descriptor_params = {}
     font_dict_params = {}
