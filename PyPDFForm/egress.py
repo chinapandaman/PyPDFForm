@@ -44,11 +44,12 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
         bytes: The modified PDF content as a bytes stream.
     """
     reader = PdfReader(BytesIO(pdf))
+    writer = PdfWriter()
 
     if AcroForm in reader.trailer[Root] and XFA in reader.trailer[Root][AcroForm]:
         del reader.trailer[Root][AcroForm][XFA]
 
-    writer = PdfWriter(clone_from=reader)
+    writer.append(reader)
     writer.set_need_appearances_writer()
 
     with BytesIO() as f:
@@ -85,10 +86,12 @@ def preserve_pdf_properties(
     Returns:
         bytes: The modified PDF content as a bytes stream.
     """
-    writer = PdfWriter(BytesIO(pdf))
+    reader = PdfReader(BytesIO(pdf))
+    writer = PdfWriter()
+    writer.append(reader)
 
     if title or metadata:
-        _metadata = writer.metadata or {}
+        _metadata = reader.metadata or {}
         if metadata:
             _metadata.update(metadata)
         if title:
