@@ -665,6 +665,7 @@ class PdfWrapper:
 
         return self
 
+    @deprecation_notice(to_replace="bulk_create_fields")
     def create_field(
         self,
         field: FieldTypes,
@@ -683,8 +684,6 @@ class PdfWrapper:
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
-
-        deprecation_notice("create_field", "bulk_create_fields")
 
         return self._bulk_create_fields([field])
 

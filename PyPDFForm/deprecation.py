@@ -7,24 +7,37 @@ messages, ensuring consistency across the library when notifying users of
 deprecated features.
 """
 
+from functools import wraps
 from warnings import warn
 
 from .constants import DEPRECATION_NOTICE
 
 
-def deprecation_notice(to_deprecate: str, to_replace: str) -> None:
+def deprecation_notice(to_replace: str) -> callable:
     """
-    Issues a DeprecationWarning for a feature that is being deprecated.
+    A decorator that issues a DeprecationWarning when a deprecated method is called.
 
     Args:
-        to_deprecate (str): The name of the feature or function being deprecated.
-        to_replace (str): The name of the feature or function that should be used instead.
+        to_replace: The name of the method to use instead.
+
+    Returns:
+        callable: A decorator function.
     """
-    warn(
-        DEPRECATION_NOTICE.format(
-            to_deprecate,
-            to_replace,
-        ),
-        DeprecationWarning,  # noqa: PT030
-        stacklevel=3,
-    )
+
+    def decorator(func: callable) -> callable:
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            class_name = args[0].__class__.__name__
+            method_name = func.__name__
+            to_deprecate = f"{class_name}.{method_name}"
+            replacement = f"{class_name}.{to_replace}"
+            warn(
+                DEPRECATION_NOTICE.format(to_deprecate, replacement),
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
