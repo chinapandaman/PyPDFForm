@@ -14,13 +14,17 @@ from PyPDFForm.template import get_widgets_by_page
 
 
 def test_deprecation_warning():
+    class MockClass:
+        @deprecation_notice(to_replace="new_method")
+        def old_method(self):
+            return "result"
+
+    obj = MockClass()
     with pytest.warns(
-        DeprecationWarning, match="foo will be deprecated soon. Use bar instead."
+        DeprecationWarning,
+        match="MockClass.old_method will be deprecated soon. Use MockClass.new_method instead.",
     ):
-        deprecation_notice(
-            "foo",
-            "bar",
-        )
+        assert obj.old_method() == "result"
 
 
 def test_base_schema_definition():
