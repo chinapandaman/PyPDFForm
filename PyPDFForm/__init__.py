@@ -22,7 +22,7 @@ PyPDFForm aims to simplify PDF form manipulation, making it accessible to develo
 
 import logging
 
-__version__ = "4.7.5"
+__version__ = "4.7.6"
 
 from .annotations import Annotations
 from .assets.blank import BlankPage
