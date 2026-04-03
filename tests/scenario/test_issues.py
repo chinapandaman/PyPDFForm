@@ -267,7 +267,9 @@ def test_preserve_metadata():
     writer.write(pdf_stream)
     pdf_stream.seek(0)
     wrapper = PdfWrapper(pdf_stream, preserve_metadata=True)
-    wrapper.create_field(Fields.TextField(name="Test", page_number=1, x=100, y=400))
+    wrapper.bulk_create_fields(
+        [Fields.TextField(name="Test", page_number=1, x=100, y=400)]
+    )
     new_stream = BytesIO(wrapper.read())
     reader = PdfReader(new_stream)
     metadata = reader.metadata or {}

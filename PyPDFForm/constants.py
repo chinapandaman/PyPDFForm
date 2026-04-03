@@ -28,7 +28,8 @@ VERSION_IDENTIFIERS = [
 ]
 VERSION_IDENTIFIER_PREFIX = "%PDF-".encode("utf-8")
 
-DEPRECATION_NOTICE = "{} will be deprecated soon. Use {} instead."
+DEPRECATION_NOTICE = "{} will be deprecated soon."
+DEPRECATION_REPLACE_NOTICE = "Use {} instead."
 
 Title = "/Title"
 Annots = "/Annots"

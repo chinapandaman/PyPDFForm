@@ -10,7 +10,7 @@ deprecated features.
 from functools import wraps
 from warnings import warn
 
-from .constants import DEPRECATION_NOTICE
+from .constants import DEPRECATION_NOTICE, DEPRECATION_REPLACE_NOTICE
 
 
 def deprecation_notice(to_replace: str) -> callable:
@@ -32,7 +32,7 @@ def deprecation_notice(to_replace: str) -> callable:
             to_deprecate = f"{class_name}.{method_name}"
             replacement = f"{class_name}.{to_replace}"
             warn(
-                DEPRECATION_NOTICE.format(to_deprecate, replacement),
+                f"{DEPRECATION_NOTICE.format(to_deprecate)} {DEPRECATION_REPLACE_NOTICE.format(replacement)}",
                 DeprecationWarning,
                 stacklevel=2,
             )
