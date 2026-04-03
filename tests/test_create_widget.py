@@ -7,6 +7,21 @@ import pytest
 from PyPDFForm import Fields, PdfWrapper
 
 
+def test_create_field_deprecated(template_stream):
+    with pytest.warns(
+        DeprecationWarning,
+        match="PdfWrapper.create_field will be deprecated soon. Use PdfWrapper.bulk_create_fields instead.",
+    ):
+        assert (
+            PdfWrapper(template_stream)
+            .create_field(Fields.TextField("foo", 1, 100, 100))
+            .read()
+            == PdfWrapper(template_stream)
+            .bulk_create_fields([Fields.TextField("foo", 1, 100, 100)])
+            .read()
+        )
+
+
 @pytest.mark.posix_only
 def test_create_checkbox_complex_fill(template_stream, pdf_samples, request):
     expected_path = os.path.join(
