@@ -687,6 +687,7 @@ class PdfWrapper:
 
         return self._bulk_create_fields([field])
 
+    @deprecation_notice(to_replace="", param="defer")
     def update_widget_key(
         self, old_key: str, new_key: str, index: int = 0, defer: bool = False
     ) -> PdfWrapper:
