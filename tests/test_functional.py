@@ -27,6 +27,35 @@ def test_deprecation_warning():
         assert obj.old_method() == "result"
 
 
+def test_deprecation_warning_with_param():
+    class MockClass:
+        @deprecation_notice(to_replace="old_method.new_param", param="old_param")
+        def old_method(self):
+            return "result"
+
+    obj = MockClass()
+    with pytest.warns(
+        DeprecationWarning,
+        match="MockClass.old_method.old_param will be deprecated soon. Use MockClass.old_method.new_param instead.",
+    ):
+        assert obj.old_method() == "result"
+
+
+def test_deprecation_warning_empty_replace():
+    class MockClass:
+        @deprecation_notice(to_replace="")
+        def old_method(self):
+            return "result"
+
+    obj = MockClass()
+    with pytest.warns(
+        DeprecationWarning,
+        match="MockClass.old_method will be deprecated soon.",
+    ) as record:
+        assert obj.old_method() == "result"
+    assert "Use" not in str(record[0].message)
+
+
 def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
 
