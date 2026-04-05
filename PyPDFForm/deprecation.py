@@ -15,15 +15,16 @@ from .constants import DEPRECATION_NOTICE, DEPRECATION_REPLACE_NOTICE
 
 def deprecation_notice(to_replace: str, param: str = "") -> callable:
     """
-    A decorator that issues a DeprecationWarning when a deprecated method is called.
-    Can also be called directly within a method to emit deprecation warnings conditionally.
+    Issues a DeprecationWarning when a deprecated method is called. Can also be called
+    directly within a method to emit deprecation warnings conditionally.
 
     Args:
-        to_replace: The name of the method to use instead.
-        param: Optional parameter name to include in the deprecation notice.
+        to_replace (str): The name of the method to use instead.
+        param (str): Optional parameter name to include in the deprecation notice.
 
     Returns:
-        callable: A decorator function, or a function to emit notice directly when param is provided.
+        callable: A decorator function. The decorator has an `emit_notice` method
+            that can be called directly within a method body for conditional emission.
 
     Examples:
         As a decorator (emits on every call)::
