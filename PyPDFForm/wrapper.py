@@ -712,7 +712,9 @@ class PdfWrapper:
             raise NotImplementedError
 
         if defer:
-            deprecation_notice("", "defer").emit_notice(self, "update_widget_key")
+            deprecation_notice(to_replace="", param="defer").emit_notice(
+                self, "update_widget_key"
+            )
             self._keys_to_update.append((old_key, new_key, index))
             return self
 

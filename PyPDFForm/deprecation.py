@@ -24,6 +24,26 @@ def deprecation_notice(to_replace: str, param: str = "") -> callable:
 
     Returns:
         callable: A decorator function, or a function to emit notice directly when param is provided.
+
+    Examples:
+        As a decorator (emits on every call)::
+
+            @deprecation_notice(to_replace="new_method")
+            def old_method(self):
+                pass
+
+        As a decorator with a parameter (emits on every call)::
+
+            @deprecation_notice(to_replace="old_method.new_param.", param="old_param")
+            def old_method(self, old_param=None):
+                pass
+
+        Conditionally within a method body::
+
+            def my_method(self, use_legacy=False):
+                if use_legacy:
+                    deprecation_notice(to_replace="", param="use_legacy").emit_notice(self, "my_method")
+                    # legacy logic here
     """
 
     def _emit(class_name: str, method_name: str):
