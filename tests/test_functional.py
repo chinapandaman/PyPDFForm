@@ -56,6 +56,41 @@ def test_deprecation_warning_empty_replace():
     assert "Use" not in str(record[0].message)
 
 
+def test_deprecation_warning_direct_call():
+    class MockClass:
+        def my_method(self, use_legacy=False):
+            if use_legacy:
+                deprecation_notice(to_replace="", param="use_legacy").emit_notice(
+                    self, "my_method"
+                )
+            return "result"
+
+    obj = MockClass()
+    assert obj.my_method(use_legacy=False) == "result"
+    with pytest.warns(
+        DeprecationWarning,
+        match="MockClass.my_method.use_legacy will be deprecated soon.",
+    ):
+        assert obj.my_method(use_legacy=True) == "result"
+
+
+def test_deprecation_warning_direct_call_with_replace():
+    class MockClass:
+        def my_method(self, use_legacy=False):
+            if use_legacy:
+                deprecation_notice(
+                    to_replace="my_method.new_param", param="use_legacy"
+                ).emit_notice(self, "my_method")
+            return "result"
+
+    obj = MockClass()
+    with pytest.warns(
+        DeprecationWarning,
+        match="MockClass.my_method.use_legacy will be deprecated soon. Use MockClass.my_method.new_param instead.",
+    ):
+        assert obj.my_method(use_legacy=True) == "result"
+
+
 def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
 
