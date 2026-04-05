@@ -687,7 +687,6 @@ class PdfWrapper:
 
         return self._bulk_create_fields([field])
 
-    @deprecation_notice(to_replace="", param="defer")
     def update_widget_key(
         self, old_key: str, new_key: str, index: int = 0, defer: bool = False
     ) -> PdfWrapper:
@@ -713,6 +712,7 @@ class PdfWrapper:
             raise NotImplementedError
 
         if defer:
+            deprecation_notice("", "defer").emit_notice(self, "update_widget_key")
             self._keys_to_update.append((old_key, new_key, index))
             return self
 
