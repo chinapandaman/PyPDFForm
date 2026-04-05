@@ -46,7 +46,7 @@ def deprecation_notice(to_replace: str, param: str = "") -> callable:
                     # legacy logic here
     """
 
-    def _emit(class_name: str, method_name: str, stacklevel: int = 2):
+    def _emit(class_name: str, method_name: str, stacklevel: int = 3):
         to_deprecate = (
             f"{class_name}.{method_name}.{param}"
             if param
