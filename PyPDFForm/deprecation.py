@@ -46,7 +46,7 @@ def deprecation_notice(to_replace: str, param: str = "") -> callable:
                     # legacy logic here
     """
 
-    def _emit(class_name: str, method_name: str, stacklevel: int = 3):
+    def _emit(class_name: str, method_name: str, stacklevel: int):
         to_deprecate = (
             f"{class_name}.{method_name}.{param}"
             if param
@@ -61,7 +61,7 @@ def deprecation_notice(to_replace: str, param: str = "") -> callable:
     def decorator(func: callable) -> callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
-            _emit(args[0].__class__.__name__, func.__name__)
+            _emit(args[0].__class__.__name__, func.__name__, stacklevel=3)
             return func(*args, **kwargs)
 
         return wrapper
