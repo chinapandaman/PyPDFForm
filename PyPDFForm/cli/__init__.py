@@ -48,3 +48,6 @@ def main(
     if not version:
         print("Welcome to the PyPDFForm CLI!")
         print("Run with --help/-h for commands/options.")
+
+
+__all__ = ["cli_app"]
