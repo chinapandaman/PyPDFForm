@@ -25,7 +25,7 @@ class RawElements:
     A container class that provides convenient access to all available raw drawable elements.
 
     This class acts as a namespace for the various `Raw` classes defined in the
-    `PyPDFForm.raw` package, making it easier to reference them (e.g., `RawElements.RawText`).
+    `PyPDFForm.lib.raw` package, making it easier to reference them (e.g., `RawElements.RawText`).
     """
 
     RawText = RawText
