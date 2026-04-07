@@ -55,6 +55,9 @@ dev = [
     "ruff>=0.14.6,<1.0.0",
 ]
 
+[project.scripts]
+pypdfform = "PyPDFForm.cli:cli_app"
+
 [tool.coverage.run]
 include = ["PyPDFForm/*"]
 
