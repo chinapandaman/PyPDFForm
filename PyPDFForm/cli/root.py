@@ -40,7 +40,7 @@ def main(
             "-v",
             callback=version_callback,
             is_eager=True,
-            help="Show current version of PyPDFForm.",
+            help="Show current version of the CLI.",
         ),
     ] = None,
 ):
