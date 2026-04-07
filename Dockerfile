@@ -18,7 +18,7 @@ RUN apt-get update && \
     poppler-utils \
     imagemagick \
     sudo && \
-    uv pip install -U -r pyproject.toml --extra dev --system && \
+    uv pip install -U -r pyproject.toml --all-extras --system && \
     groupadd -g 1000 pypdfform-dev && \
     useradd -u 1000 -g pypdfform-dev -m pypdfform-dev && \
     echo "pypdfform-dev ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/pypdfform-dev && \
