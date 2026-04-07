@@ -10,7 +10,7 @@ PyPDFForm is a library built with Python. This part of the documentation is spec
     The command below uses [uv](https://docs.astral.sh/uv/):
 
     ```shell
-    uv pip install -U -r pyproject.toml --extra dev
+    uv pip install -U -r pyproject.toml --all-extras
     ```
 === "Development Container"
     PyPDFForm also offers a development container. To build it, run the following command in the project's root directory:
