@@ -20,8 +20,8 @@ from pprint import pprint
 
 from pypdf.generic import ArrayObject, DictionaryObject
 
-from PyPDFForm.patterns import get_widget_key
-from PyPDFForm.template import get_widgets_by_page
+from PyPDFForm.lib.patterns import get_widget_key
+from PyPDFForm.lib.template import get_widgets_by_page
 
 
 def serializing_widget(widget, level):
