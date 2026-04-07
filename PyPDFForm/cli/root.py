@@ -38,19 +38,10 @@ def main(
         typer.Option("--version", "-v", callback=version_callback, is_eager=True),
     ] = None,
 ):
-    """
-    Main entry point for the PyPDFForm CLI.
-
-    This command is executed when running the CLI application. By default,
-    it prints a greeting message. When the --version or -v flag is provided,
-    it displays the current version of PyPDFForm instead.
-
-    Args:
-        version (bool | None): Optional version flag. If provided, the version
-            information is displayed and the application exits.
-    """
+    # pylint: disable=C0116
     if not version:
-        print("Hello World!")
+        print("Welcome to the PyPDFForm CLI!")
+        print("Run with --help for commands/options.")
 
 
 if __name__ == "__main__":
