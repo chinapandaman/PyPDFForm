@@ -12,7 +12,7 @@ import typer
 
 from .. import __version__
 
-cli_app = typer.Typer()
+cli_app = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]})
 
 
 def version_callback(value: bool):
@@ -47,7 +47,7 @@ def main(
     # pylint: disable=C0116
     if not version:
         print("Welcome to the PyPDFForm CLI!")
-        print("Run with --help for commands/options.")
+        print("Run with --help/-h for commands/options.")
 
 
 if __name__ == "__main__":
