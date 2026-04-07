@@ -34,7 +34,7 @@ class Annotations:
     A container class that provides convenient access to all available PDF annotation types.
 
     This class acts as a namespace for the various `Annotation` classes defined in the
-    `PyPDFForm.annotations` package, making it easier to reference them (e.g., `Annotations.TextAnnotation`).
+    `PyPDFForm.lib.annotations` package, making it easier to reference them (e.g., `Annotations.TextAnnotation`).
     """
 
     TextAnnotation = TextAnnotation

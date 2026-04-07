@@ -26,7 +26,7 @@ class Widgets:
     A container class that provides convenient access to all available middleware widget classes.
 
     This class acts as a namespace for the various middleware classes defined in the
-    `PyPDFForm.middleware` package, making it easier to reference them (e.g., `Widgets.Text`).
+    `PyPDFForm.lib.middleware` package, making it easier to reference them (e.g., `Widgets.Text`).
     """
 
     Text = Text

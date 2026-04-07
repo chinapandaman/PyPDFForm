@@ -29,7 +29,7 @@ class Fields:
     A container class that provides convenient access to all available PDF form field types.
 
     This class acts as a namespace for the various `Field` classes defined in the
-    `PyPDFForm.widgets` package, making it easier to reference them (e.g., `Fields.TextField`).
+    `PyPDFForm.lib.widgets` package, making it easier to reference them (e.g., `Fields.TextField`).
     """
 
     TextField = TextField
