@@ -3,7 +3,7 @@
 from typer.testing import CliRunner
 
 from PyPDFForm import __version__
-from PyPDFForm.cli.root import cli_app
+from PyPDFForm.cli import cli_app
 
 runner = CliRunner()
 
