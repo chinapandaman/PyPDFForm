@@ -24,13 +24,13 @@ import logging
 
 __version__ = "4.7.7"
 
-from .annotations import Annotations
-from .assets.blank import BlankPage
-from .middleware import Widgets
-from .raw import RawElements
-from .types import PdfArray
-from .widgets import Fields
-from .wrapper import PdfWrapper
+from .lib.annotations import Annotations
+from .lib.assets.blank import BlankPage
+from .lib.middleware import Widgets
+from .lib.raw import RawElements
+from .lib.types import PdfArray
+from .lib.widgets import Fields
+from .lib.wrapper import PdfWrapper
 
 # TODO: figure out why `Annotation sizes differ:`
 for logger in [
