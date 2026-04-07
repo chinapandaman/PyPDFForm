@@ -15,6 +15,6 @@ if [ "$VIRTUAL_ENV" == "" ] && [ "$PYPDFFORM_ENV" != "container" ]; then
   source "./venv/bin/activate"
 fi
 
-uv pip install -U -r pyproject.toml --extra dev
+uv pip install -U -r pyproject.toml --all-extras
 
 mkdir -p temp
