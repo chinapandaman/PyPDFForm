@@ -13,10 +13,10 @@ from fontTools.ttLib import TTLibError
 from pypdf import PdfWriter
 
 from PyPDFForm import PdfWrapper
-from PyPDFForm.constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR,
-                                 ENCODING_TABLE_SIZE, AcroForm, Font,
-                                 FontDescriptor, MissingWidth, Widths)
-from PyPDFForm.font import compute_font_glyph_widths
+from PyPDFForm.lib.constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR,
+                                     ENCODING_TABLE_SIZE, AcroForm, Font,
+                                     FontDescriptor, MissingWidth, Widths)
+from PyPDFForm.lib.font import compute_font_glyph_widths
 
 
 @pytest.fixture
@@ -72,7 +72,7 @@ def test_compute_font_widths_raises_for_invalid_ttf():
 
 
 def test_compute_font_glyph_widths_with_missing_tables():
-    with patch("PyPDFForm.font.FT_TTFont") as mock_ttfont:
+    with patch("PyPDFForm.lib.font.FT_TTFont") as mock_ttfont:
         mock_font = MagicMock()
         mock_font.get.side_effect = lambda table: None
         mock_ttfont.return_value = mock_font

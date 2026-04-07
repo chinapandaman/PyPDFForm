@@ -7,10 +7,10 @@ import pytest
 from jsonschema import ValidationError, validate
 
 from PyPDFForm import Annotations, BlankPage, Fields, PdfArray, PdfWrapper
-from PyPDFForm.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
-from PyPDFForm.deprecation import deprecation_notice
-from PyPDFForm.middleware.base import Widget
-from PyPDFForm.template import get_widgets_by_page
+from PyPDFForm.lib.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
+from PyPDFForm.lib.deprecation import deprecation_notice
+from PyPDFForm.lib.middleware.base import Widget
+from PyPDFForm.lib.template import get_widgets_by_page
 
 
 def test_deprecation_warning():
