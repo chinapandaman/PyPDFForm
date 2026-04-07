@@ -35,7 +35,13 @@ def version_callback(value: bool):
 def main(
     version: Annotated[
         bool | None,
-        typer.Option("--version", "-v", callback=version_callback, is_eager=True),
+        typer.Option(
+            "--version",
+            "-v",
+            callback=version_callback,
+            is_eager=True,
+            help="Show current version of PyPDFForm.",
+        ),
     ] = None,
 ):
     # pylint: disable=C0116
