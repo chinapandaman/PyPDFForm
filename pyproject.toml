@@ -7,9 +7,7 @@ name = "PyPDFForm"
 dynamic = ["version"]
 description = "The Python library for PDF forms."
 readme = "README.md"
-authors = [
-    {name = "Jinge Li"}
-]
+authors = [{ name = "Jinge Li" }]
 license = "MIT"
 license-files = ["LICENSE"]
 classifiers = [
@@ -40,6 +38,7 @@ Homepage = "https://github.com/chinapandaman/PyPDFForm"
 Documentation = "https://chinapandaman.github.io/PyPDFForm/"
 
 [project.optional-dependencies]
+cli = ["typer>=0.24.1,<1.0.0"]
 dev = [
     "black>=25.11.0,<27.0.0",
     "coverage>=7.12.0,<8.0.0",
@@ -129,7 +128,7 @@ reportAssignmentType = "error"
 reportOptionalSubscript = "error"
 
 [tool.setuptools.dynamic]
-version = {attr = "PyPDFForm.__version__"}
+version = { attr = "PyPDFForm.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["PyPDFForm*"]
