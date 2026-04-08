@@ -16,7 +16,11 @@ from .update import update_cli
 cli_app = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
 )
-cli_app.add_typer(update_cli, name="update")
+cli_app.add_typer(
+    update_cli,
+    name="update",
+    help="Subcommands for updating PDF files and their elements.",
+)
 
 
 def version_callback(value: bool):
@@ -35,7 +39,7 @@ def version_callback(value: bool):
         raise typer.Exit
 
 
-@cli_app.callback(invoke_without_command=True)
+@cli_app.callback(invoke_without_command=True, help="Welcome to the PyPDFForm CLI!")
 def main(
     version: Annotated[  # pylint: disable=W0613
         bool | None,
@@ -44,7 +48,7 @@ def main(
             "-v",
             callback=version_callback,
             is_eager=True,
-            help="Show current version of the CLI.",
+            help="Show current version of the CLI and exit.",
         ),
     ] = None,
 ):
