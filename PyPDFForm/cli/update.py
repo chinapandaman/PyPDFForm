@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# TODO: fix this docstring
 """
 CLI commands for updating PDF metadata.
 
