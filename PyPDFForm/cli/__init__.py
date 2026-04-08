@@ -11,12 +11,12 @@ from typing import Annotated
 import typer
 
 from .. import __version__
-from .get import get_cli
+from .update import update_cli
 
 cli_app = typer.Typer(
     context_settings={"help_option_names": ["-h", "--help"]}, no_args_is_help=True
 )
-cli_app.add_typer(get_cli, name="get")
+cli_app.add_typer(update_cli, name="update")
 
 
 def version_callback(value: bool):
