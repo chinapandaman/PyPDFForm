@@ -14,7 +14,7 @@ from .. import __version__
 from .update import update_cli
 
 cli_app = typer.Typer(
-    context_settings={"help_option_names": ["-h", "--help"]}, no_args_is_help=True
+    context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
 )
 cli_app.add_typer(update_cli, name="update")
 
