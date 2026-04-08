@@ -39,7 +39,7 @@ def version_callback(value: bool):
         raise typer.Exit
 
 
-@cli_app.callback(invoke_without_command=True)
+@cli_app.callback(invoke_without_command=True, help="Welcome to the PyPDFForm CLI!")
 def main(
     version: Annotated[  # pylint: disable=W0613
         bool | None,
