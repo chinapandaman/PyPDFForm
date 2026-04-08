@@ -14,7 +14,7 @@ update_cli = typer.Typer(
 @update_cli.command(no_args_is_help=True)
 def title(
     pdf: Annotated[str, typer.Argument(help="The local path to a PDF.")],
-    title: Annotated[
+    new_title: Annotated[
         str, typer.Option("--title", "-t", help="The title to change to for the PDF.")
     ],
     output: Annotated[
@@ -24,4 +24,4 @@ def title(
     """
     Update the title of a PDF.
     """
-    PdfWrapper(pdf, title=title).write(output or pdf)
+    PdfWrapper(pdf, title=new_title).write(output or pdf)

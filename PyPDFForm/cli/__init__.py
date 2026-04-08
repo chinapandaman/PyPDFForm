@@ -38,7 +38,7 @@ def version_callback(value: bool):
 @cli_app.command(hidden=True)
 @cli_app.callback(invoke_without_command=True)
 def main(
-    version: Annotated[
+    version: Annotated[ # pylint: disable=W0613
         bool | None,
         typer.Option(
             "--version",
@@ -50,8 +50,7 @@ def main(
     ] = None,
 ):
     # pylint: disable=C0116
-    if not version:
-        pass
+    ...
 
 
 __all__ = ["cli_app"]
