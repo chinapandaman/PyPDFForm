@@ -35,7 +35,6 @@ def version_callback(value: bool):
         raise typer.Exit
 
 
-@cli_app.command(hidden=True)
 @cli_app.callback(invoke_without_command=True)
 def main(
     version: Annotated[  # pylint: disable=W0613
