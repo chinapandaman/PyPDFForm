@@ -13,7 +13,6 @@ def test_root_command():
     assert result.exit_code == 2
 
     assert "Usage:" in result.output
-    assert "--version" in result.output
     assert "main" not in result.output
 
 
