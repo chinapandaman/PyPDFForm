@@ -48,7 +48,7 @@ def main(
             "-v",
             callback=version_callback,
             is_eager=True,
-            help="Show current version of the CLI.",
+            help="Show current version of the CLI and exit.",
         ),
     ] = None,
 ):
