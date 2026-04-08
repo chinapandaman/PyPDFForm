@@ -10,10 +10,9 @@ runner = CliRunner()
 
 def test_root_command():
     result = runner.invoke(cli_app)
-    assert result.exit_code == 0
+    assert result.exit_code == 2
 
-    assert "Welcome to the PyPDFForm CLI!" in result.output
-    assert "Run with --help/-h for commands/options." in result.output
+    assert "Usage:" in result.output
 
 
 def test_root_command_with_version():

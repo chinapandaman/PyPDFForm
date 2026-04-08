@@ -11,8 +11,12 @@ from typing import Annotated
 import typer
 
 from .. import __version__
+from .get import get_cli
 
-cli_app = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]})
+cli_app = typer.Typer(
+    context_settings={"help_option_names": ["-h", "--help"]}, no_args_is_help=True
+)
+cli_app.add_typer(get_cli, name="get")
 
 
 def version_callback(value: bool):
@@ -31,7 +35,8 @@ def version_callback(value: bool):
         raise typer.Exit
 
 
-@cli_app.command()
+@cli_app.command(hidden=True)
+@cli_app.callback(invoke_without_command=True)
 def main(
     version: Annotated[
         bool | None,
@@ -46,8 +51,7 @@ def main(
 ):
     # pylint: disable=C0116
     if not version:
-        print("Welcome to the PyPDFForm CLI!")
-        print("Run with --help/-h for commands/options.")
+        pass
 
 
 __all__ = ["cli_app"]
