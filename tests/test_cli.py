@@ -25,3 +25,10 @@ def test_root_command_with_version():
 
     assert long.output == f"v{__version__}\n"
     assert long.output == short.output
+
+
+def test_update_command():
+    result = runner.invoke(cli_app, ["update"])
+    assert result.exit_code == 2
+
+    assert "Usage:" in result.output
