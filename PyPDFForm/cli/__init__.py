@@ -16,7 +16,11 @@ from .update import update_cli
 cli_app = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
 )
-cli_app.add_typer(update_cli, name="update")
+cli_app.add_typer(
+    update_cli,
+    name="update",
+    help="Subcommands for updating PDF files and their elements.",
+)
 
 
 def version_callback(value: bool):
