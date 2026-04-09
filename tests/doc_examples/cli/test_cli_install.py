@@ -6,7 +6,7 @@ from pypdf import PdfReader
 from typer.testing import CliRunner
 
 from PyPDFForm.cli import cli_app
-from PyPDFForm.lib.constants import Title
+from PyPDFForm.lib.constants import AcroForm, Title
 
 runner = CliRunner()
 
@@ -48,8 +48,5 @@ def test_need_appearances_option(static_pdfs, tmp_path):
     )
     assert result.exit_code == 0
 
-    with (
-        open(os.path.join(static_pdfs, "sample_template.pdf"), "rb") as f1,
-        open(output_path, "rb") as f2,
-    ):
-        assert len(f1.read()) != len(f2.read())
+    reader = PdfReader(output_path)
+    assert reader.root_object[AcroForm]["/NeedAppearances"]
