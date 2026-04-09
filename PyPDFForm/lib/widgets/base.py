@@ -177,7 +177,6 @@ class Widget:
         result = []
 
         pdf = PdfReader(BytesIO(stream))
-        watermark = BytesIO()
 
         widgets_by_page = {}
         for widget in widgets:
@@ -191,8 +190,9 @@ class Widget:
                 result.append(b"")
                 continue
 
-            watermark.seek(0)
-            watermark.flush()
+            # Use a fresh buffer per page to avoid stale trailing bytes
+            # when the current page watermark is smaller than a previous page.
+            watermark = BytesIO()
 
             canvas = Canvas(
                 watermark,
