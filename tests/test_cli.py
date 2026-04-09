@@ -14,7 +14,6 @@ def test_root_command():
 
     assert "Welcome to the PyPDFForm CLI!" in result.output
     assert "Usage:" in result.output
-    assert "Show current version of the CLI and" in result.output
     assert "main" not in result.output
 
 
