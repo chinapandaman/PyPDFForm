@@ -95,6 +95,25 @@ def preserve_metadata_callback(ctx: typer.Context, value: bool) -> None:
     ctx.obj["preserve_metadata"] = value
 
 
+def use_full_widget_name_callback(ctx: typer.Context, value: bool) -> None:
+    """
+    Callback function to handle the use_full_widget_name option.
+
+    This is triggered when the --use-full-widget-name flag is passed to the CLI.
+    It stores the value in the context object for use by subcommands.
+
+    Args:
+        ctx (typer.Context): The Typer context object used to pass data
+            between callbacks and commands.
+        value (bool): The value passed to the use_full_widget_name option.
+            If True, fully qualified names (including parent field names)
+            will be used when looking up form fields.
+    """
+    if not ctx.obj:
+        ctx.obj = {}
+    ctx.obj["use_full_widget_name"] = value
+
+
 @cli_app.callback(invoke_without_command=True, help="Welcome to the PyPDFForm CLI!")
 def main(
     version: Annotated[  # pylint: disable=W0613
@@ -129,6 +148,14 @@ def main(
             "--preserve-metadata",
             callback=preserve_metadata_callback,
             help="Preserve PDF metadata in output.",
+        ),
+    ] = False,
+    use_full_widget_name: Annotated[  # pylint: disable=W0613
+        bool,
+        typer.Option(
+            "--use-full-widget-name",
+            callback=use_full_widget_name_callback,
+            help="Use fully qualified names when accessing form fields.",
         ),
     ] = False,
 ) -> None:

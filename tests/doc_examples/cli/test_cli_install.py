@@ -98,3 +98,23 @@ def test_preserve_metadata_option(static_pdfs, tmp_path):
     reader = PdfReader(output_path)
     assert (reader.metadata or {}).get(Title) == "My PDF"
     assert (reader.metadata or {}).get("/foo") == "bar"
+
+
+def test_use_full_widget_name_option(static_pdfs, tmp_path):
+    output_path = os.path.join(tmp_path, "output.pdf")
+    result = runner.invoke(
+        cli_app,
+        [
+            "--use-full-widget-name",
+            "update",
+            "title",
+            os.path.join(static_pdfs, "sample_template_with_full_key.pdf"),
+            "-t",
+            "My PDF",
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    # TODO: finish this test
