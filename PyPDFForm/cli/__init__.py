@@ -59,6 +59,19 @@ def need_appearances_callback(ctx: typer.Context, value: bool) -> None:
 
 
 def generate_appearance_streams_callback(ctx: typer.Context, value: bool) -> None:
+    """
+    Callback function to handle the generate_appearance_streams option.
+
+    This is triggered when the --generate-appearance-streams flag is passed
+    to the CLI. It stores the value in the context object for use by subcommands.
+
+    Args:
+        ctx (typer.Context): The Typer context object used to pass data
+            between callbacks and commands.
+        value (bool): The value passed to the generate_appearance_streams
+            option. If True, appearance streams will be explicitly generated
+            for all form fields in output PDFs using pikepdf.
+    """
     if not ctx.obj:
         ctx.obj = {}
     ctx.obj["generate_appearance_streams"] = value
