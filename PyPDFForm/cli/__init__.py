@@ -40,6 +40,19 @@ def version_callback(value: bool) -> None:
 
 
 def need_appearances_callback(ctx: typer.Context, value: bool) -> None:
+    """
+    Callback function to handle the need_appearances option.
+
+    This is triggered when the --need-appearances flag is passed to the CLI.
+    It stores the value in the context object for use by subcommands.
+
+    Args:
+        ctx (typer.Context): The Typer context object used to pass data
+            between callbacks and commands.
+        value (bool): The value passed to the need_appearances option.
+            If True, PDF viewers will be instructed to generate appearance
+            streams for the output.
+    """
     if not ctx.obj:
         ctx.obj = {}
     ctx.obj["need_appearances"] = value
@@ -80,7 +93,7 @@ def main(
         typer.Option(
             "--need-appearances",
             callback=need_appearances_callback,
-            help="Instruct PDF viewers to generate appearance streams for output.",
+            help="Instruct PDF viewers to generate appearance streams for any output.",
         ),
     ] = False,
     preserve_metadata: Annotated[  # pylint: disable=W0613
