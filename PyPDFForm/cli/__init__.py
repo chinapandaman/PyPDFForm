@@ -39,6 +39,12 @@ def version_callback(value: bool) -> None:
         raise typer.Exit
 
 
+def need_appearances_callback(ctx: typer.Context, value: bool) -> None:
+    if not ctx.obj:
+        ctx.obj = {}
+    ctx.obj["need_appearances"] = value
+
+
 def preserve_metadata_callback(ctx: typer.Context, value: bool) -> None:
     """
     Callback function to handle the preserve_metadata option.
@@ -60,7 +66,7 @@ def preserve_metadata_callback(ctx: typer.Context, value: bool) -> None:
 @cli_app.callback(invoke_without_command=True, help="Welcome to the PyPDFForm CLI!")
 def main(
     version: Annotated[  # pylint: disable=W0613
-        bool | None,
+        bool,
         typer.Option(
             "--version",
             "-v",
@@ -68,7 +74,15 @@ def main(
             is_eager=True,
             help="Show current version of the CLI and exit.",
         ),
-    ] = None,
+    ] = False,
+    need_appearances: Annotated[  # pylint: disable=W0613
+        bool,
+        typer.Option(
+            "--need-appearances",
+            callback=need_appearances_callback,
+            help="Instruct PDF viewers to generate appearance streams for output.",
+        ),
+    ] = False,
     preserve_metadata: Annotated[  # pylint: disable=W0613
         bool,
         typer.Option(
