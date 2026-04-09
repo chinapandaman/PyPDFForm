@@ -58,6 +58,12 @@ def need_appearances_callback(ctx: typer.Context, value: bool) -> None:
     ctx.obj["need_appearances"] = value
 
 
+def generate_appearance_streams_callback(ctx: typer.Context, value: bool) -> None:
+    if not ctx.obj:
+        ctx.obj = {}
+    ctx.obj["generate_appearance_streams"] = value
+
+
 def preserve_metadata_callback(ctx: typer.Context, value: bool) -> None:
     """
     Callback function to handle the preserve_metadata option.
@@ -93,7 +99,15 @@ def main(
         typer.Option(
             "--need-appearances",
             callback=need_appearances_callback,
-            help="Instruct PDF viewers to generate appearance streams for any output.",
+            help="Instruct PDF viewers to generate appearance streams for any output PDF.",
+        ),
+    ] = False,
+    generate_appearance_streams: Annotated[  # pylint: disable=W0613
+        bool,
+        typer.Option(
+            "--generate-appearance-streams",
+            callback=generate_appearance_streams_callback,
+            help="Generate appearance streams for any output PDF.",
         ),
     ] = False,
     preserve_metadata: Annotated[  # pylint: disable=W0613
