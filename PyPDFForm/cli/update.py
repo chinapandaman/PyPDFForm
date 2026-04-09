@@ -26,6 +26,7 @@ update_cli = typer.Typer(
 
 @update_cli.command(no_args_is_help=True)
 def title(
+    ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="The local path to a PDF.")],
     new_title: Annotated[
         str, typer.Option("--title", "-t", help="The new title for the PDF.")
@@ -38,8 +39,10 @@ def title(
             help="The location to save the PDF to. Defaults to the original path if unspecified.",
         ),
     ] = None,
-):
+) -> None:
     """
     Update the title of a PDF.
     """
-    PdfWrapper(pdf, title=new_title).write(output or pdf)
+    PdfWrapper(
+        pdf, title=new_title, preserve_metadata=ctx.obj["preserve_metadata"]
+    ).write(output or pdf)
