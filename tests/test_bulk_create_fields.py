@@ -5,10 +5,9 @@ from io import BytesIO
 
 import pytest
 from pypdf import PdfReader
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
 
-from PyPDFForm import Fields, PdfWrapper
+from PyPDFForm import BlankPage, Fields, PdfWrapper
+from PyPDFForm.lib.constants import Annots, Subtype, Widget
 
 
 @pytest.mark.posix_only
@@ -151,15 +150,7 @@ def test_bulk_create_fields_stress_max_mixed(pdf_samples, request):
 
 
 def test_bulk_create_fields_does_not_duplicate_widgets():
-    template_buffer = BytesIO()
-    template_canvas = canvas.Canvas(template_buffer, pagesize=A4)
-    template_canvas.drawString(50, 800, "Page 1")
-    template_canvas.showPage()
-    template_canvas.drawString(50, 800, "Page 2")
-    template_canvas.showPage()
-    template_canvas.save()
-
-    wrapper = PdfWrapper(template_buffer.getvalue())
+    wrapper = PdfWrapper(BlankPage() * 2)
 
     fields = []
     y = 760.0
@@ -197,10 +188,10 @@ def test_bulk_create_fields_does_not_duplicate_widgets():
 
     widget_count = 0
     for page in reader.pages:
-        annots = page.get("/Annots") or []
+        annots = page.get(Annots) or []
         for annot_ref in annots:
             annot = annot_ref.get_object()
-            if str(annot.get("/Subtype", "")) == "/Widget":
+            if str(annot.get(Subtype)) == Widget:
                 widget_count += 1
 
     assert widget_count == len(fields)
