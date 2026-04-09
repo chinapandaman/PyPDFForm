@@ -43,6 +43,4 @@ def title(
     """
     Update the title of a PDF.
     """
-    PdfWrapper(
-        pdf, title=new_title, preserve_metadata=ctx.obj["preserve_metadata"]
-    ).write(output or pdf)
+    PdfWrapper(pdf, title=new_title, **ctx.obj).write(output or pdf)
