@@ -260,7 +260,6 @@ def create_watermarks_and_draw(
         page_to_to_draw[each["page_number"]].append(each)
 
     pdf_file = PdfReader(BytesIO(pdf))
-    buff = BytesIO()
 
     for i, page in enumerate(pdf_file.pages):
         elements = page_to_to_draw[i + 1]
@@ -268,8 +267,7 @@ def create_watermarks_and_draw(
             result.append(b"")
             continue
 
-        buff.seek(0)
-        buff.flush()
+        buff = BytesIO()
 
         canvas = Canvas(
             buff,
