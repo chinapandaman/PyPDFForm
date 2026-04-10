@@ -20,31 +20,37 @@ coordinate_cli = typer.Typer(
 @coordinate_cli.command(no_args_is_help=True)
 def grid(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="The local path to a PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
     output: Annotated[
         str,
         typer.Option(
             "--output",
             "-o",
-            help="The location to save the output PDF to. Defaults to the original path if not specified.",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
         ),
     ] = None,
     red: Annotated[
         float,
         typer.Option(
-            "--red", "-r", help="Red channel of the RGB color of the grid view."
+            "--red",
+            "-r",
+            help="Red channel of the RGB color.",
         ),
     ] = None,
     green: Annotated[
         float,
         typer.Option(
-            "--green", "-g", help="Green channel of the RGB color of the grid view."
+            "--green",
+            "-g",
+            help="Green channel of the RGB color.",
         ),
     ] = None,
     blue: Annotated[
         float,
         typer.Option(
-            "--blue", "-b", help="Blue channel of the RGB color of the grid view."
+            "--blue",
+            "-b",
+            help="Blue channel of the RGB color.",
         ),
     ] = None,
     margin: Annotated[

@@ -26,7 +26,7 @@ update_cli = typer.Typer(
 @update_cli.command(no_args_is_help=True)
 def title(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="The local path to a PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
     new_title: Annotated[
         str, typer.Option("--title", "-t", help="The new title for the PDF file.")
     ],
@@ -35,7 +35,7 @@ def title(
         typer.Option(
             "--output",
             "-o",
-            help="The location to save the output PDF to. Defaults to the original path if not specified.",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
         ),
     ] = None,
 ) -> None:
