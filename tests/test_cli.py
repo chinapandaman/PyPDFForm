@@ -12,7 +12,7 @@ def test_root_command():
     result = runner.invoke(cli_app)
     assert result.exit_code == 2
 
-    assert "Welcome to the PyPDFForm CLI!" in result.output
+    assert "PyPDFForm command-line interface." in result.output
     assert "Usage:" in result.output
     assert "main" not in result.output
 
