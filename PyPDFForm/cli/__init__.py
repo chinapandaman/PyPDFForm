@@ -137,7 +137,7 @@ def main(
         typer.Option(
             "--need-appearances",
             callback=need_appearances_callback,
-            help="Instruct PDF viewers to generate appearance streams for all output PDFs.",
+            help="Instruct PDF viewers to generate appearance streams for any output PDF.",
         ),
     ] = False,
     generate_appearance_streams: Annotated[  # pylint: disable=W0613
@@ -145,7 +145,7 @@ def main(
         typer.Option(
             "--generate-appearance-streams",
             callback=generate_appearance_streams_callback,
-            help="Generate appearance streams for all output PDFs.",
+            help="Generate appearance streams for any output PDF.",
         ),
     ] = False,
     preserve_metadata: Annotated[  # pylint: disable=W0613
