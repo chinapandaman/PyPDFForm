@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-# TODO: fix this docstring
 """
-CLI commands for updating PDF metadata.
+CLI commands for updating PDFs.
 
 This module provides command-line interface commands for modifying
-PDF file metadata such as title, author, subject, and other properties.
+PDF files, such as updating metadata or other elements.
 These commands allow users to update PDF documents directly from
-the terminal without needing to use Python code.
+the terminal without needing to write Python code.
 
 The commands in this module wrap the functionality provided by
 the PdfWrapper class, exposing it through a Typer-based CLI for
@@ -27,20 +26,20 @@ update_cli = typer.Typer(
 @update_cli.command(no_args_is_help=True)
 def title(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="The local path to a PDF.")],
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
     new_title: Annotated[
-        str, typer.Option("--title", "-t", help="The new title for the PDF.")
+        str, typer.Option("--title", "-t", help="The new title for the PDF file.")
     ],
     output: Annotated[
         str,
         typer.Option(
             "--output",
             "-o",
-            help="The location to save the PDF to. Defaults to the original path if unspecified.",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
         ),
     ] = None,
 ) -> None:
     """
-    Update the title of a PDF.
+    Update the title of a PDF file.
     """
     PdfWrapper(pdf, title=new_title, **ctx.obj).write(output or pdf)

@@ -11,10 +11,16 @@ from typing import Annotated
 import typer
 
 from .. import __version__
+from .coordinate import coordinate_cli
 from .update import update_cli
 
 cli_app = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
+)
+cli_app.add_typer(
+    coordinate_cli,
+    name="coordinate",
+    help="Subcommands for interacting with PDF coordinates and dimensions.",
 )
 cli_app.add_typer(
     update_cli,
@@ -114,7 +120,7 @@ def use_full_widget_name_callback(ctx: typer.Context, value: bool) -> None:
     ctx.obj["use_full_widget_name"] = value
 
 
-@cli_app.callback(invoke_without_command=True, help="Welcome to the PyPDFForm CLI!")
+@cli_app.callback(invoke_without_command=True, help="PyPDFForm command-line interface.")
 def main(
     version: Annotated[  # pylint: disable=W0613
         bool,
@@ -123,7 +129,7 @@ def main(
             "-v",
             callback=version_callback,
             is_eager=True,
-            help="Show current version of the CLI and exit.",
+            help="Show the current version of the CLI and exit.",
         ),
     ] = False,
     need_appearances: Annotated[  # pylint: disable=W0613
@@ -147,7 +153,7 @@ def main(
         typer.Option(
             "--preserve-metadata",
             callback=preserve_metadata_callback,
-            help="Preserve PDF metadata in output.",
+            help="Preserve PDF metadata in the output.",
         ),
     ] = False,
     use_full_widget_name: Annotated[  # pylint: disable=W0613
