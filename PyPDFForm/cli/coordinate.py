@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+CLI commands for interacting with PDF coordinates.
+
+This module provides command-line interface commands for working with
+PDF coordinates and dimensions, such as generating a coordinate grid view.
+"""
 
 from typing import Annotated
 
@@ -14,13 +20,13 @@ coordinate_cli = typer.Typer(
 @coordinate_cli.command(no_args_is_help=True)
 def grid(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="The local path to a PDF.")],
+    pdf: Annotated[str, typer.Argument(help="The local path to a PDF file.")],
     output: Annotated[
         str,
         typer.Option(
             "--output",
             "-o",
-            help="The location to save the PDF to. Defaults to the original path if unspecified.",
+            help="The location to save the output PDF to. Defaults to the original path if not specified.",
         ),
     ] = None,
     red: Annotated[
