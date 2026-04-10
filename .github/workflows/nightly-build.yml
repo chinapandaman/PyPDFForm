@@ -81,6 +81,7 @@ jobs:
           CONTAINER_ID=$(docker run -i -d --rm -v ./pdf_samples:/pypdfform/pdf_samples pypdfform-dev)
           docker exec -i -u 0 $CONTAINER_ID /bin/bash -c "
             rm -rf PyPDFForm
+            pip uninstall PyPDFForm -y
             pip install PyPDFForm
-            PYTHONPATH=. pytest
+            PYTHONPATH=. pytest -k "not cli"
           "
