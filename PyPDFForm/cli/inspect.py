@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+"""
+CLI commands for inspecting PDF form field data.
+
+This module provides command-line interface commands for extracting
+information from PDF forms. Features include generating a JSON schema
+describing the form fields, inspecting the current filled data of a
+PDF form, and generating sample data for filling a form.
+"""
 
 import json
 from typing import Annotated
@@ -20,6 +28,4 @@ def schema(
     """
     Generate a JSON schema that describes a PDF form.
     """
-    print(
-        json.dumps(PdfWrapper(pdf, **ctx.obj).schema)
-    )
+    print(json.dumps(PdfWrapper(pdf, **ctx.obj).schema))

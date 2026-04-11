@@ -12,8 +12,8 @@ import typer
 
 from .. import __version__
 from .coordinate import coordinate_cli
-from .update import update_cli
 from .inspect import inspect_cli
+from .update import update_cli
 
 cli_app = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
