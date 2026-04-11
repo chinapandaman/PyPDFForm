@@ -73,15 +73,15 @@ def build_widgets(
     """
     results = {}
 
-    for widgets in get_widgets_by_page(pdf_stream).values():
+    for page_num, widgets in get_widgets_by_page(pdf_stream).items():
         for widget in widgets:
-            _process_widget(widget, use_full_widget_name, results)
+            _process_widget(widget, use_full_widget_name, results, page_num)
 
     return results
 
 
 def _process_widget(
-    widget: dict, use_full_widget_name: bool, results: Dict[str, WIDGET_TYPES]
+    widget: dict, use_full_widget_name: bool, results: Dict[str, WIDGET_TYPES], page_number: int
 ) -> None:
     """
     Processes a single widget and adds it to the results dictionary.
@@ -90,11 +90,12 @@ def _process_widget(
         widget (dict): The widget dictionary from the PDF.
         use_full_widget_name (bool): Whether to use the full widget name.
         results (Dict[str, WIDGET_TYPES]): The dictionary of widgets being built.
+        page_number (int): The 1-indexed page number the widget appears on.
     """
     key = get_widget_key(widget, use_full_widget_name)
     _widget = construct_widget(widget, key)
     if _widget is not None:
-        _populate_common_properties(widget, _widget)
+        _populate_common_properties(widget, _widget, page_number)
 
         if isinstance(_widget, Text):
             _populate_text_properties(widget, _widget)
@@ -111,15 +112,19 @@ def _process_widget(
             results[key] = _widget
 
 
-def _populate_common_properties(widget: dict, _widget: WIDGET_TYPES) -> None:
+def _populate_common_properties(
+    widget: dict, _widget: WIDGET_TYPES, page_number: int
+) -> None:
     """
     Populates common properties for a widget.
 
     Args:
         widget (dict): The widget dictionary from the PDF.
         _widget (WIDGET_TYPES): The widget object to populate.
+        page_number (int): The 1-indexed page number the widget appears on.
     """
     # widget property extractions don't trigger hooks in this function
+    _widget.__dict__["page_number"] = page_number
     _widget.__dict__["tooltip"] = extract_widget_property(
         widget, WIDGET_DESCRIPTION_PATTERNS, None, str
     )

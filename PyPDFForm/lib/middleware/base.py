@@ -62,6 +62,7 @@ class Widget:
         self.hooks_to_trigger: list = []
 
         # coordinate & dimension
+        self.page_number: Optional[int] = None
         self.x: Optional[float | List[float]] = None
         self.y: Optional[float | List[float]] = None
         self.width: Optional[float | List[float]] = None

@@ -751,31 +751,37 @@ def test_widget_coord_resolution():
     assert obj.widgets["text"].y == 100
     assert obj.widgets["text"].width == 200
     assert obj.widgets["text"].height == 150
+    assert obj.widgets["text"].page_number == 1
 
     assert obj.widgets["check"].x == 150
     assert obj.widgets["check"].y == 200
     assert obj.widgets["check"].width == 60
     assert obj.widgets["check"].height == 60
+    assert obj.widgets["check"].page_number == 1
 
     assert obj.widgets["radio"].x == [400, 500, 600]
     assert obj.widgets["radio"].y == [450, 550, 650]
     assert obj.widgets["radio"].width == 10
     assert obj.widgets["radio"].height == 10
+    assert obj.widgets["radio"].page_number == 1
 
     assert obj.widgets["dropdown"].x == 400
     assert obj.widgets["dropdown"].y == 100
     assert obj.widgets["dropdown"].width == 250
     assert obj.widgets["dropdown"].height == 200
+    assert obj.widgets["dropdown"].page_number == 1
 
     assert obj.widgets["image"].x == 300
     assert obj.widgets["image"].y == 400
     assert obj.widgets["image"].width == 400
     assert obj.widgets["image"].height == 300
+    assert obj.widgets["image"].page_number == 1
 
     assert obj.widgets["signature"].x == 500
     assert obj.widgets["signature"].y == 600
     assert obj.widgets["signature"].width == 600
     assert obj.widgets["signature"].height == 500
+    assert obj.widgets["signature"].page_number == 1
 
 
 def test_hidden_text_check(template_stream, pdf_samples, request):
