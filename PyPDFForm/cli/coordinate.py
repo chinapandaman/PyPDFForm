@@ -104,3 +104,61 @@ def inspect(
             }
         )
     )
+
+
+@coordinate_cli.command(no_args_is_help=True)
+def modify(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    field: Annotated[
+        str, typer.Option("--field", "-f", help="Name of the form field to modify.")
+    ],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
+    x: Annotated[
+        float,
+        typer.Option(
+            "--x",
+            help="New x coordinate.",
+        ),
+    ] = None,
+    y: Annotated[
+        float,
+        typer.Option(
+            "--y",
+            help="New y coordinate.",
+        ),
+    ] = None,
+    width: Annotated[
+        float,
+        typer.Option(
+            "--width",
+            help="New width.",
+        ),
+    ] = None,
+    height: Annotated[
+        float,
+        typer.Option(
+            "--height",
+            help="New height.",
+        ),
+    ] = None,
+):
+    """
+    Modify the coordinates and dimensions of a form field's rectangular bounding box.
+    """
+    obj = PdfWrapper(pdf, **ctx.obj)
+    f = obj.widgets[field]
+
+    f.x = x if x is not None else f.x
+    f.y = y if y is not None else f.y
+    f.width = width if width is not None else f.width
+    f.height = height if height is not None else f.height
+
+    obj.write(output or pdf)

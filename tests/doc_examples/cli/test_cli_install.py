@@ -106,21 +106,16 @@ def test_preserve_metadata_option(static_pdfs, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_use_full_widget_name_option(static_pdfs, tmp_path):
-    output_path = os.path.join(tmp_path, "output.pdf")
+def test_use_full_widget_name_option(static_pdfs):
     result = runner.invoke(
         cli_app,
         [
             "--use-full-widget-name",
-            "update",
-            "title",
+            "coordinate",
+            "inspect",
             os.path.join(static_pdfs, "sample_template_with_full_key.pdf"),
-            "-t",
-            "My PDF",
-            "-o",
-            output_path,
+            "-f",
+            "Gain de 2 classes.0",
         ],
     )
     assert result.exit_code == 0
-
-    # TODO: finish this test

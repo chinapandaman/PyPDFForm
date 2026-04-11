@@ -60,3 +60,39 @@ def test_field_coordinates_dimensions(static_pdfs):
     assert obj["y"] == wrapper.widgets["test"].y
     assert obj["width"] == wrapper.widgets["test"].width
     assert obj["height"] == wrapper.widgets["test"].height
+
+
+def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, tmp_path):
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_change_field_coordinates_dimensions.pdf"
+    )
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "coordinate",
+            "modify",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "-f",
+            "test",
+            "-o",
+            output_path,
+            "--x",
+            "68.3365",
+            "--y",
+            "657.692",
+            "--width",
+            "242.4235",
+            "--height",
+            "31.067999999999984",
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        output = f2.read()
+
+        assert len(expected) == len(output)
+        assert expected == output
