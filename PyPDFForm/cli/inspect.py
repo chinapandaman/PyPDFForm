@@ -29,3 +29,14 @@ def schema(
     Generate a JSON schema that describes a PDF form.
     """
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).schema))
+
+
+@inspect_cli.command(no_args_is_help=True)
+def data(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+) -> None:
+    """
+    Inspect the current filled data of a PDF form.
+    """
+    print(json.dumps(PdfWrapper(pdf, **ctx.obj).data))
