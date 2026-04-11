@@ -56,3 +56,25 @@ def test_data(static_pdfs):
         "test_2": "test2",
         "test_3": "test3",
     }
+
+
+@pytest.mark.cli_test
+def test_sample_data(static_pdfs):
+    result = runner.invoke(
+        cli_app,
+        [
+            "inspect",
+            "sample",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+        ],
+    )
+    assert result.exit_code == 0
+
+    assert json.loads(result.output) == {
+        "check": True,
+        "check_2": True,
+        "check_3": True,
+        "test": "test",
+        "test_2": "test_2",
+        "test_3": "test_3",
+    }
