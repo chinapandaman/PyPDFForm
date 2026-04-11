@@ -34,3 +34,25 @@ def test_schema(static_pdfs):
             "check_3": {"type": "boolean"},
         },
     }
+
+
+@pytest.mark.cli_test
+def test_data(static_pdfs):
+    result = runner.invoke(
+        cli_app,
+        [
+            "inspect",
+            "data",
+            os.path.join(static_pdfs, "sample_template_filled.pdf"),
+        ],
+    )
+    assert result.exit_code == 0
+
+    assert json.loads(result.output) == {
+        "check": True,
+        "check_2": True,
+        "check_3": True,
+        "test": "test",
+        "test_2": "test2",
+        "test_3": "test3",
+    }
