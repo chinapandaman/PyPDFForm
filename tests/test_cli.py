@@ -40,6 +40,14 @@ def test_coordinate_command():
 
 
 @pytest.mark.cli_test
+def test_inspect_command():
+    result = runner.invoke(cli_app, ["inspect"])
+    assert result.exit_code == 2
+
+    assert "Usage:" in result.output
+
+
+@pytest.mark.cli_test
 def test_update_command():
     result = runner.invoke(cli_app, ["update"])
     assert result.exit_code == 2

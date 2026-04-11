@@ -12,6 +12,7 @@ import typer
 
 from .. import __version__
 from .coordinate import coordinate_cli
+from .inspect import inspect_cli
 from .update import update_cli
 
 cli_app = typer.Typer(
@@ -21,6 +22,11 @@ cli_app.add_typer(
     coordinate_cli,
     name="coordinate",
     help="Subcommands for interacting with PDF coordinates and dimensions.",
+)
+cli_app.add_typer(
+    inspect_cli,
+    name="inspect",
+    help="Subcommands for inspecting PDF forms.",
 )
 cli_app.add_typer(
     update_cli,
