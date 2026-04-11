@@ -88,7 +88,7 @@ def inspect(
     field: Annotated[
         str, typer.Option("--field", "-f", help="Name of the form field to inspect.")
     ],
-):
+) -> None:
     """
     Inspect the coordinates and dimensions of a form field's rectangular bounding box.
     """
@@ -149,7 +149,7 @@ def modify(
             help="New height.",
         ),
     ] = None,
-):
+) -> None:
     """
     Modify the coordinates and dimensions of a form field's rectangular bounding box.
     """

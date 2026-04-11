@@ -45,6 +45,7 @@ def test_coordinate_grid_view(pdf_samples, static_pdfs, tmp_path):
         assert expected == actual
 
 
+@pytest.mark.cli_test
 def test_field_coordinates_dimensions(static_pdfs):
     expected_path = os.path.join(static_pdfs, "sample_template.pdf")
 
@@ -62,6 +63,7 @@ def test_field_coordinates_dimensions(static_pdfs):
     assert obj["height"] == wrapper.widgets["test"].height
 
 
+@pytest.mark.cli_test
 def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, tmp_path):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_coordinates_dimensions.pdf"
