@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import json
 import os
 
 import pytest
 from typer.testing import CliRunner
 
+from PyPDFForm import PdfWrapper
 from PyPDFForm.cli import cli_app
 
 runner = CliRunner()
@@ -41,3 +43,20 @@ def test_coordinate_grid_view(pdf_samples, static_pdfs, tmp_path):
 
         assert len(expected) == len(actual)
         assert expected == actual
+
+
+def test_field_coordinates_dimensions(static_pdfs):
+    expected_path = os.path.join(static_pdfs, "sample_template.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        ["coordinate", "inspect", expected_path, "-f", "test"],
+    )
+    assert result.exit_code == 0
+
+    wrapper = PdfWrapper(expected_path)
+    obj = json.loads(result.output)
+    assert obj["x"] == wrapper.widgets["test"].x
+    assert obj["y"] == wrapper.widgets["test"].y
+    assert obj["width"] == wrapper.widgets["test"].width
+    assert obj["height"] == wrapper.widgets["test"].height
