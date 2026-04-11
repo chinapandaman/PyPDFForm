@@ -2,6 +2,7 @@
 
 import os
 
+import pytest
 from pypdf import PdfReader, PdfWriter
 from typer.testing import CliRunner
 
@@ -11,6 +12,7 @@ from PyPDFForm.lib.constants import AcroForm, Title
 runner = CliRunner()
 
 
+@pytest.mark.cli_test
 def test_change_title(static_pdfs, tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
     result = runner.invoke(
@@ -31,6 +33,7 @@ def test_change_title(static_pdfs, tmp_path):
     assert (reader.metadata or {}).get(Title) == "My PDF"
 
 
+@pytest.mark.cli_test
 def test_need_appearances_option(static_pdfs, tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
     result = runner.invoke(
@@ -52,6 +55,7 @@ def test_need_appearances_option(static_pdfs, tmp_path):
     assert reader.root_object[AcroForm]["/NeedAppearances"]
 
 
+@pytest.mark.cli_test
 def test_generate_appearance_streams_option(static_pdfs, tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
     result = runner.invoke(
@@ -73,6 +77,7 @@ def test_generate_appearance_streams_option(static_pdfs, tmp_path):
     assert "/NeedAppearances" not in reader.root_object[AcroForm]
 
 
+@pytest.mark.cli_test
 def test_preserve_metadata_option(static_pdfs, tmp_path):
     with_metadata = os.path.join(tmp_path, "metadata.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
@@ -100,6 +105,7 @@ def test_preserve_metadata_option(static_pdfs, tmp_path):
     assert (reader.metadata or {}).get("/foo") == "bar"
 
 
+@pytest.mark.cli_test
 def test_use_full_widget_name_option(static_pdfs, tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
     result = runner.invoke(
