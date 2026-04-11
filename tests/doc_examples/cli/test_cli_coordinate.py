@@ -2,6 +2,7 @@
 
 import os
 
+import pytest
 from typer.testing import CliRunner
 
 from PyPDFForm.cli import cli_app
@@ -9,6 +10,7 @@ from PyPDFForm.cli import cli_app
 runner = CliRunner()
 
 
+@pytest.mark.cli_test
 def test_coordinate_grid_view(pdf_samples, static_pdfs, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_coordinate_grid_view.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
