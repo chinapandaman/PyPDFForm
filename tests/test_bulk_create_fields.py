@@ -62,6 +62,20 @@ def test_bulk_create_fields_stress_max(pdf_samples, request):
             obj += PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
         obj.bulk_create_fields(fields)
 
+        for k, v in obj.widgets.items():
+            if k.startswith("text_"):
+                assert v.page_number == 1
+            if k.startswith("check_"):
+                assert v.page_number == 2
+            if k.startswith("dropdown_"):
+                assert v.page_number == 3
+            if k.startswith("radio_"):
+                assert v.page_number == 4
+            if k.startswith("image_"):
+                assert v.page_number == 5
+            if k.startswith("signature_"):
+                assert v.page_number == 6
+
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
 
