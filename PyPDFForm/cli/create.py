@@ -40,7 +40,7 @@ def field(
             help="Path to save the output PDF. Defaults to the original path if not specified.",
         ),
     ] = None,
-):
+) -> None:
     """
     Create PDF form fields.
     """
