@@ -215,6 +215,7 @@ def fill(
     with open(data, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
+    # TODO: support preserve aspect ratio for image/sig
     PdfWrapper(pdf, **ctx.obj).fill(input_data, flatten=flatten).write(output or pdf)
 
 
