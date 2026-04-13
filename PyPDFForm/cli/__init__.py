@@ -6,11 +6,12 @@ It defines the CLI application using Typer, providing commands for
 interacting with PyPDFForm functionality from the terminal.
 """
 
+import json
 from typing import Annotated
 
 import typer
 
-from .. import __version__
+from .. import PdfWrapper, __version__
 from .coordinate import coordinate_cli
 from .create import create_cli
 from .inspect import inspect_cli
@@ -179,6 +180,43 @@ def main(
 ) -> None:
     # pylint: disable=C0116
     ...
+
+
+@cli_app.command(no_args_is_help=True)
+def fill(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    data: Annotated[
+        str,
+        typer.Option(
+            "--file",
+            "-f",
+            help="Path to the JSON file representing the filling data.",
+        ),
+    ],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
+    flatten: Annotated[
+        bool,
+        typer.Option(
+            "--flatten", help="Whether to flatten the filled PDF form or not."
+        ),
+    ] = None,
+) -> None:
+    """
+    Fill a PDF form.
+    """
+    with open(data, "r", encoding="utf-8") as f:
+        input_data = json.load(f)
+
+    # TODO: support preserve aspect ratio for image/sig
+    PdfWrapper(pdf, **ctx.obj).fill(input_data, flatten=flatten).write(output or pdf)
 
 
 __all__ = ["cli_app"]
