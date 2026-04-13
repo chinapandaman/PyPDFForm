@@ -56,9 +56,15 @@ def field(
     with open(data, "r") as f:
         input_data = json.load(f)
 
+    obj = PdfWrapper(pdf, **ctx.obj)
+    font_tracker = 0
     ungrouped_input = []
     for k, v in input_data.items():
         for each in v:
+            if "font" in each:
+                obj.register_font(f"new_font_{font_tracker}", each["font"])
+                each["font"] = f"new_font_{font_tracker}"
+                font_tracker += 1
             ungrouped_input.append(field_map[k](**each))
 
-    PdfWrapper(pdf, **ctx.obj).bulk_create_fields(ungrouped_input).write(output or pdf)
+    obj.bulk_create_fields(ungrouped_input).write(output or pdf)
