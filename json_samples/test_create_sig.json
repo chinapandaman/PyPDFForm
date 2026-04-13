@@ -1,0 +1,14 @@
+{
+    "signature": [
+        {
+            "name": "new_signature",
+            "page_number": 1,
+            "x": 100,
+            "y": 100,
+            "required": false,
+            "tooltip": "this is a signature",
+            "width": 410,
+            "height": 100
+        }
+    ]
+}
