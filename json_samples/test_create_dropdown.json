@@ -1,0 +1,39 @@
+{
+    "dropdown": [
+        {
+            "name": "new_dropdown",
+            "page_number": 1,
+            "x": 57,
+            "y": 700,
+            "options": [
+                "foo",
+                "bar",
+                "foobar"
+            ],
+            "required": false,
+            "tooltip": "this is a dropdown",
+            "width": 120,
+            "height": 40,
+            "font": "./font_samples/LiberationSerif-BoldItalic.ttf",
+            "font_size": 15,
+            "font_color": [
+                0,
+                1,
+                0
+            ],
+            "bg_color": [
+                0,
+                0,
+                1,
+                1
+            ],
+            "border_color": [
+                0,
+                1,
+                0,
+                1
+            ],
+            "border_width": 5
+        }
+    ]
+}
