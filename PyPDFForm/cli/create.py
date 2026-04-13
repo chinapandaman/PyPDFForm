@@ -53,7 +53,7 @@ def field(
         "signature": Fields.SignatureField,
     }
 
-    with open(data, "r") as f:
+    with open(data, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
     obj = PdfWrapper(pdf, **ctx.obj)

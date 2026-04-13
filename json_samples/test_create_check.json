@@ -1,0 +1,32 @@
+{
+    "check": [
+        {
+            "name": "new_checkbox",
+            "page_number": 1,
+            "x": 57,
+            "y": 700,
+            "required": false,
+            "tooltip": "this is a checkbox",
+            "size": 50,
+            "button_style": "cross",
+            "tick_color": [
+                0,
+                1,
+                0
+            ],
+            "bg_color": [
+                0,
+                0,
+                1,
+                1
+            ],
+            "border_color": [
+                1,
+                1,
+                0,
+                1
+            ],
+            "border_width": 5
+        }
+    ]
+}
