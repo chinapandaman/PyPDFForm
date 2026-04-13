@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+"""
+CLI module for creating PDF form fields.
+
+This module provides command-line interfaces to create various types of PDF form fields
+(such as text fields, checkboxes, radio buttons, dropdowns, signatures, and images)
+in an existing PDF. It aims to mimic the field creation features available via the
+Python API as described in the preparation documentation.
+"""
 
 import json
 from typing import Annotated
