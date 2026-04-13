@@ -1,0 +1,30 @@
+{
+    "text": [
+        {
+            "name": "new_text_field_1",
+            "page_number": 1,
+            "x": 100,
+            "y": 100
+        },
+        {
+            "name": "new_text_field_2",
+            "page_number": 1,
+            "x": 100,
+            "y": 300
+        }
+    ],
+    "check": [
+        {
+            "name": "new_checkbox_1",
+            "page_number": 1,
+            "x": 300,
+            "y": 100
+        },
+        {
+            "name": "new_checkbox_2",
+            "page_number": 1,
+            "x": 300,
+            "y": 300
+        }
+    ]
+}
