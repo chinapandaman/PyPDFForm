@@ -1,0 +1,14 @@
+{
+    "image": [
+        {
+            "name": "new_image",
+            "page_number": 1,
+            "x": 100,
+            "y": 100,
+            "required": false,
+            "tooltip": "this is an image",
+            "width": 192,
+            "height": 108
+        }
+    ]
+}

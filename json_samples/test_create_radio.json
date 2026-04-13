@@ -1,0 +1,41 @@
+{
+    "radio": [
+        {
+            "name": "new_radio_group",
+            "page_number": 1,
+            "x": [
+                50,
+                100,
+                150
+            ],
+            "y": [
+                50,
+                100,
+                150
+            ],
+            "required": false,
+            "tooltip": "this is a radio group",
+            "size": 40,
+            "button_style": "circle",
+            "shape": "square",
+            "tick_color": [
+                0,
+                1,
+                0
+            ],
+            "bg_color": [
+                0,
+                0,
+                1,
+                1
+            ],
+            "border_color": [
+                1,
+                0,
+                1,
+                1
+            ],
+            "border_width": 5
+        }
+    ]
+}

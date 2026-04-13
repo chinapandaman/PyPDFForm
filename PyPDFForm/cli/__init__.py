@@ -12,6 +12,7 @@ import typer
 
 from .. import __version__
 from .coordinate import coordinate_cli
+from .create import create_cli
 from .inspect import inspect_cli
 from .update import update_cli
 
@@ -22,6 +23,11 @@ cli_app.add_typer(
     coordinate_cli,
     name="coordinate",
     help="Subcommands for interacting with PDF coordinates and dimensions.",
+)
+cli_app.add_typer(
+    create_cli,
+    name="create",
+    help="Subcommands for creating elements on PDF forms.",
 )
 cli_app.add_typer(
     inspect_cli,
