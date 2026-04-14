@@ -13,7 +13,7 @@ from typing import Annotated
 
 import typer
 
-from .. import Fields, PdfWrapper
+from .. import Fields, PdfWrapper, RawElements
 
 create_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
@@ -68,3 +68,47 @@ def field(
             ungrouped_input.append(field_map[k](**each))
 
     obj.bulk_create_fields(ungrouped_input).write(output or pdf)
+
+
+@create_cli.command(no_args_is_help=True)
+def raw(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    data: Annotated[
+        str,
+        typer.Option(
+            "--file",
+            "-f",
+            help="Path to the JSON file representing the draw parameters.",
+        ),
+    ],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
+) -> None:
+    """
+    Draw raw PDF elements.
+    """
+    raw_element_map = {
+        "text": RawElements.RawText,
+        "image": RawElements.RawImage,
+        "line": RawElements.RawLine,
+        "rectangle": RawElements.RawRectangle,
+        "circle": RawElements.RawCircle,
+        "ellipse": RawElements.RawEllipse,
+    }
+
+    with open(data, "r", encoding="utf-8") as f:
+        input_data = json.load(f)
+
+    ungrouped_input = []
+    for k, v in input_data.items():
+        # TODO: figure out what to do for fonts
+        ungrouped_input.extend([raw_element_map[k](**each) for each in v])
+
+    PdfWrapper(pdf, **ctx.obj).draw(ungrouped_input).write(output or pdf)

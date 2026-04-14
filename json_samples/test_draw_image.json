@@ -1,0 +1,22 @@
+{
+    "image": [
+        {
+            "image": "./image_samples/sample_image.jpg",
+            "page_number": 1,
+            "x": 100,
+            "y": 100,
+            "width": 400,
+            "height": 225,
+            "rotation": 0
+        },
+        {
+            "image": "./image_samples/sample_image.jpg",
+            "page_number": 2,
+            "x": 100,
+            "y": 100,
+            "width": 400,
+            "height": 225,
+            "rotation": 180
+        }
+    ]
+}
