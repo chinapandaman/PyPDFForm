@@ -13,7 +13,7 @@ from typing import Annotated
 
 import typer
 
-from .. import Fields, PdfWrapper, RawElements
+from .. import BlankPage, Fields, PdfWrapper, RawElements
 
 create_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
@@ -112,3 +112,44 @@ def raw(
         ungrouped_input.extend([raw_element_map[k](**each) for each in v])
 
     PdfWrapper(pdf, **ctx.obj).draw(ungrouped_input).write(output or pdf)
+
+
+@create_cli.command(no_args_is_help=True)
+def blank(
+    ctx: typer.Context,
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF.",
+        ),
+    ],
+    count: Annotated[
+        int, typer.Option("--count", "-c", help="Number of blank pages.")
+    ] = None,
+    width: Annotated[
+        float,
+        typer.Option(
+            "--width",
+            help="Width of the blank PDF.",
+        ),
+    ] = None,
+    height: Annotated[
+        float, typer.Option("--height", help="Height of the blank PDF.")
+    ] = None,
+) -> None:
+    """
+    Create a new blank PDF.
+    """
+    params = {}
+    if width is not None:
+        params["width"] = width
+    if height is not None:
+        params["height"] = height
+
+    obj = BlankPage(**params)
+    if count is not None and count > 1:
+        obj = BlankPage(**params) * count
+
+    PdfWrapper(obj, **ctx.obj).write(output)
