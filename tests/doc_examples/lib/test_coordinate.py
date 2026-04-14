@@ -27,6 +27,7 @@ def test_coordinate_grid_view(pdf_samples, static_pdfs, request):
 def test_field_coordinates_dimensions(static_pdfs):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
+    assert form.widgets["test"].page_number == 1
     assert isinstance(form.widgets["test"].x, float)
     assert isinstance(form.widgets["test"].y, float)
     assert isinstance(form.widgets["test"].width, float)
