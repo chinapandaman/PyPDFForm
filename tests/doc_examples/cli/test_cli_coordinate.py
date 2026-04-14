@@ -57,6 +57,7 @@ def test_field_coordinates_dimensions(static_pdfs):
 
     wrapper = PdfWrapper(expected_path)
     obj = json.loads(result.output)
+    assert obj["page_number"] == wrapper.widgets["test"].page_number
     assert obj["x"] == wrapper.widgets["test"].x
     assert obj["y"] == wrapper.widgets["test"].y
     assert obj["width"] == wrapper.widgets["test"].width
