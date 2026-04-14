@@ -1,0 +1,26 @@
+{
+    "circle": [
+        {
+            "page_number": 1,
+            "center_x": 100,
+            "center_y": 100,
+            "radius": 50
+        },
+        {
+            "page_number": 1,
+            "center_x": 250,
+            "center_y": 100,
+            "radius": 100,
+            "color": [
+                1,
+                0,
+                0
+            ],
+            "fill_color": [
+                0,
+                1,
+                0
+            ]
+        }
+    ]
+}
