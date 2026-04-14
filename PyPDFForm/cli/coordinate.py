@@ -90,13 +90,14 @@ def inspect(
     ],
 ) -> None:
     """
-    Inspect the coordinates and dimensions of a form field's rectangular bounding box.
+    Inspect the page number, coordinates, and dimensions of a form field's rectangular bounding box.
     """
     f = PdfWrapper(pdf, **ctx.obj).widgets[field]
 
     print(
         json.dumps(
             {
+                "page_number": f.page_number,
                 "x": f.x,
                 "y": f.y,
                 "width": f.width,
