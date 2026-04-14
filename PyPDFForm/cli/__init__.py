@@ -217,10 +217,11 @@ def fill(
 
     obj = PdfWrapper(pdf, **ctx.obj)
     for k, each in obj.widgets.items():
-        if isinstance(each, (Widgets.Image, Widgets.Signature)):
+        if k in input_data and isinstance(each, (Widgets.Image, Widgets.Signature)):
             each.preserve_aspect_ratio = input_data.get(k, {}).get(
-                "preserve_aspect_ratio", False
+                "preserve_aspect_ratio", each.preserve_aspect_ratio
             )
+            input_data[k] = input_data[k]["path"]
 
     obj.fill(input_data, flatten=flatten).write(output or pdf)
 
