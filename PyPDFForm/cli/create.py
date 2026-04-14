@@ -108,8 +108,7 @@ def raw(
 
     ungrouped_input = []
     for k, v in input_data.items():
-        for each in v:
-            # TODO: figure out what to do for fonts
-            ungrouped_input.append(raw_element_map[k](**each))
+        # TODO: figure out what to do for fonts
+        ungrouped_input.extend([raw_element_map[k](**each) for each in v])
 
     PdfWrapper(pdf, **ctx.obj).draw(ungrouped_input).write(output or pdf)
