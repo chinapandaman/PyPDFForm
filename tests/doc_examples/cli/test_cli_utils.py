@@ -1,0 +1,83 @@
+# -*- coding: utf-8 -*-
+
+import os
+
+import pytest
+from typer.testing import CliRunner
+
+from PyPDFForm.cli import cli_app
+
+runner = CliRunner()
+
+
+@pytest.mark.posix_only
+@pytest.mark.cli_test
+def test_blank_page(pdf_samples, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_blank_page.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "blank",
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+
+
+@pytest.mark.posix_only
+@pytest.mark.cli_test
+def test_blank_page_custom_dimensions(pdf_samples, tmp_path):
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_blank_page_custom_dimensions.pdf"
+    )
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "blank",
+            "-o",
+            output_path,
+            "--width",
+            "595.35",
+            "--height",
+            "841.995",
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+
+
+@pytest.mark.posix_only
+@pytest.mark.cli_test
+def test_blank_page_multiply(pdf_samples, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_blank_page_multiply.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        ["create", "blank", "-o", output_path, "-c", "3"],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
