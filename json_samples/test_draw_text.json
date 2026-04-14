@@ -6,7 +6,11 @@
             "x": 300,
             "y": 225,
             "font_size": 12,
-            "font_color": [1, 0, 0]
+            "font_color": [
+                1,
+                0,
+                0
+            ]
         },
         {
             "text": "random text on page 2",
@@ -14,7 +18,11 @@
             "x": 300,
             "y": 225,
             "font_size": 12,
-            "font_color": [1, 0, 0]
+            "font_color": [
+                1,
+                0,
+                0
+            ]
         }
     ]
 }

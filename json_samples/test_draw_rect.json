@@ -1,0 +1,28 @@
+{
+    "rectangle": [
+        {
+            "page_number": 1,
+            "x": 100,
+            "y": 100,
+            "width": 200,
+            "height": 100
+        },
+        {
+            "page_number": 1,
+            "x": 400,
+            "y": 100,
+            "width": 100,
+            "height": 200,
+            "color": [
+                0,
+                0,
+                1
+            ],
+            "fill_color": [
+                0,
+                1,
+                0
+            ]
+        }
+    ]
+}
