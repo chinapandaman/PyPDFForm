@@ -46,7 +46,7 @@ def test_coordinate_grid_view(pdf_samples, static_pdfs, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_field_coordinates_dimensions(static_pdfs):
+def test_field_page_number_coordinates_dimensions(static_pdfs):
     expected_path = os.path.join(static_pdfs, "sample_template.pdf")
 
     result = runner.invoke(
