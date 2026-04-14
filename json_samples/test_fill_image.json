@@ -1,3 +1,5 @@
 {
-    "image_1": "./image_samples/sample_image.jpg"
+    "image_1": {
+        "path": "./image_samples/sample_image.jpg"
+    }
 }

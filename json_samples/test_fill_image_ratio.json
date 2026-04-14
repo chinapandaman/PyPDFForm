@@ -1,0 +1,6 @@
+{
+    "image_1": {
+        "path": "./image_samples/sample_image.jpg",
+        "preserve_aspect_ratio": true
+    }
+}
