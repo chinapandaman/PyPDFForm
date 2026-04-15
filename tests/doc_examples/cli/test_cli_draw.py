@@ -11,6 +11,7 @@ from PyPDFForm.cli import cli_app
 runner = CliRunner()
 
 
+@pytest.mark.posix_only
 @pytest.mark.cli_test
 def test_draw_text(pdf_samples, static_pdfs, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_text.pdf")
