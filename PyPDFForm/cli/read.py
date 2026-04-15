@@ -15,12 +15,12 @@ import typer
 
 from .. import PdfWrapper
 
-inspect_cli = typer.Typer(
+read_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
 )
 
 
-@inspect_cli.command(no_args_is_help=True)
+@read_cli.command(no_args_is_help=True)
 def schema(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
@@ -31,7 +31,7 @@ def schema(
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).schema))
 
 
-@inspect_cli.command(no_args_is_help=True)
+@read_cli.command(no_args_is_help=True)
 def data(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
@@ -42,7 +42,7 @@ def data(
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).data))
 
 
-@inspect_cli.command(no_args_is_help=True)
+@read_cli.command(no_args_is_help=True)
 def sample(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
