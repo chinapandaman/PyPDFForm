@@ -43,16 +43,16 @@ def _create_elements_from_file(
         input_data = json.load(f)
 
     obj = PdfWrapper(pdf, **ctx.obj)
-    font_tracker = 0
     ungrouped_input = []
     registered_font = {}
     for k, v in input_data.items():
         for each in v:
-            if "font" in each and each["font"] not in registered_font:
-                obj.register_font(f"new_font_{font_tracker}", each["font"])
-                registered_font[each["font"]] = True
-                each["font"] = f"new_font_{font_tracker}"
-                font_tracker += 1
+            if "font" in each:
+                if each["font"] not in registered_font:
+                    font_name = f"new_font_{len(registered_font)}"
+                    obj.register_font(font_name, each["font"])
+                    registered_font[each["font"]] = font_name
+                each["font"] = registered_font[each["font"]]
             ungrouped_input.append(element_map[k](**each))
 
     getattr(obj, method_name)(ungrouped_input).write(output or pdf)
