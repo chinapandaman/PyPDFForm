@@ -26,7 +26,7 @@ def schema(
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
 ) -> None:
     """
-    Generate a JSON schema that describes a PDF form.
+    Retrieve a JSON schema that describes a PDF form.
     """
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).schema))
 
@@ -37,7 +37,7 @@ def data(
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
 ) -> None:
     """
-    Inspect the current filled data of a PDF form.
+    Read the current filled data of a PDF form.
     """
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).data))
 
