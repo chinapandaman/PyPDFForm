@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-CLI commands for inspecting PDF form field data.
+CLI commands for reading PDF form field data.
 
 This module provides command-line interface commands for extracting
 information from PDF forms. Features include generating a JSON schema
-describing the form fields, inspecting the current filled data of a
+describing the form fields, reading the current filled data of a
 PDF form, and generating sample data for filling a form.
 """
 
@@ -25,7 +25,7 @@ def location(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
     field: Annotated[
-        str, typer.Option("--field", "-f", help="Name of the form field to inspect.")
+        str, typer.Option("--field", "-f", help="Name of the form field to read.")
     ],
 ) -> None:
     """
