@@ -59,10 +59,12 @@ def field(
     obj = PdfWrapper(pdf, **ctx.obj)
     font_tracker = 0
     ungrouped_input = []
+    registered_font = {}
     for k, v in input_data.items():
         for each in v:
-            if "font" in each:
+            if "font" in each and each["font"] not in registered_font:
                 obj.register_font(f"new_font_{font_tracker}", each["font"])
+                registered_font[each["font"]] = True
                 each["font"] = f"new_font_{font_tracker}"
                 font_tracker += 1
             ungrouped_input.append(field_map[k](**each))
@@ -106,12 +108,20 @@ def raw(
     with open(data, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
+    obj = PdfWrapper(pdf, **ctx.obj)
+    font_tracker = 0
     ungrouped_input = []
+    registered_font = {}
     for k, v in input_data.items():
-        # TODO: figure out what to do for fonts
-        ungrouped_input.extend([raw_element_map[k](**each) for each in v])
+        for each in v:
+            if "font" in each and each["font"] not in registered_font:
+                obj.register_font(f"new_font_{font_tracker}", each["font"])
+                registered_font[each["font"]] = True
+                each["font"] = f"new_font_{font_tracker}"
+                font_tracker += 1
+            ungrouped_input.append(raw_element_map[k](**each))
 
-    PdfWrapper(pdf, **ctx.obj).draw(ungrouped_input).write(output or pdf)
+    obj.draw(ungrouped_input).write(output or pdf)
 
 
 @create_cli.command(no_args_is_help=True)
