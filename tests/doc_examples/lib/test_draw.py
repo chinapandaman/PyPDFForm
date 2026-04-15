@@ -6,7 +6,7 @@ import os
 from PyPDFForm import PdfWrapper, RawElements
 
 
-def test_draw_text(static_pdfs, pdf_samples, request):
+def test_draw_text(static_pdfs, pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_text.pdf")
 
     texts = [
@@ -15,7 +15,7 @@ def test_draw_text(static_pdfs, pdf_samples, request):
             page_number=1,
             x=300,
             y=225,
-            font="Helvetica",  # optional
+            font="your_registered_font",  # optional
             font_size=12,  # optional
             font_color=(1, 0, 0),  # optional
         ),
@@ -24,13 +24,17 @@ def test_draw_text(static_pdfs, pdf_samples, request):
             page_number=2,
             x=300,
             y=225,
-            font="Helvetica",  # optional
+            font="your_registered_font",  # optional
             font_size=12,  # optional
             font_color=(1, 0, 0),  # optional
         ),
     ]
 
-    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(texts)
+    pdf = (
+        PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
+        .register_font("your_registered_font", sample_font_stream)
+        .draw(texts)
+    )
 
     request.config.results["expected_path"] = expected_path
     request.config.results["stream"] = pdf.read()

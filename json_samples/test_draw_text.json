@@ -5,6 +5,7 @@
             "page_number": 1,
             "x": 300,
             "y": 225,
+            "font": "./font_samples/LiberationSerif-BoldItalic.ttf",
             "font_size": 12,
             "font_color": [
                 1,
@@ -17,6 +18,7 @@
             "page_number": 2,
             "x": 300,
             "y": 225,
+            "font": "./font_samples/LiberationSerif-BoldItalic.ttf",
             "font_size": 12,
             "font_color": [
                 1,
