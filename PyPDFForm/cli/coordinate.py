@@ -6,7 +6,6 @@ This module provides command-line interface commands for working with
 PDF coordinates and dimensions, such as generating a coordinate grid view.
 """
 
-import json
 from typing import Annotated
 
 import typer
@@ -16,32 +15,6 @@ from .. import PdfWrapper
 coordinate_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
 )
-
-
-@coordinate_cli.command(no_args_is_help=True)
-def inspect(
-    ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
-    field: Annotated[
-        str, typer.Option("--field", "-f", help="Name of the form field to inspect.")
-    ],
-) -> None:
-    """
-    Inspect the page number, coordinates, and dimensions of a form field's rectangular bounding box.
-    """
-    f = PdfWrapper(pdf, **ctx.obj).widgets[field]
-
-    print(
-        json.dumps(
-            {
-                "page_number": f.page_number,
-                "x": f.x,
-                "y": f.y,
-                "width": f.width,
-                "height": f.height,
-            }
-        )
-    )
 
 
 @coordinate_cli.command(no_args_is_help=True)
