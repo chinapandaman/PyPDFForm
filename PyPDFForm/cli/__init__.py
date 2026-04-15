@@ -12,18 +12,12 @@ from typing import Annotated
 import typer
 
 from .. import PdfWrapper, Widgets, __version__
-from .coordinate import coordinate_cli
 from .create import create_cli
 from .read import read_cli
 from .update import update_cli
 
 cli_app = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
-)
-cli_app.add_typer(
-    coordinate_cli,
-    name="coordinate",
-    help="Subcommands for interacting with PDF coordinates and dimensions.",
 )
 cli_app.add_typer(
     create_cli,
