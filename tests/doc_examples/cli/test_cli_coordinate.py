@@ -20,7 +20,7 @@ def test_coordinate_grid_view(pdf_samples, static_pdfs, tmp_path):
     result = runner.invoke(
         cli_app,
         [
-            "coordinate",
+            "create",
             "grid",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-r",

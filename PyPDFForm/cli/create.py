@@ -59,6 +59,69 @@ def _create_elements_from_file(
 
 
 @create_cli.command(no_args_is_help=True)
+def grid(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
+    red: Annotated[
+        float,
+        typer.Option(
+            "--red",
+            "-r",
+            help="Red channel of the RGB color.",
+        ),
+    ] = None,
+    green: Annotated[
+        float,
+        typer.Option(
+            "--green",
+            "-g",
+            help="Green channel of the RGB color.",
+        ),
+    ] = None,
+    blue: Annotated[
+        float,
+        typer.Option(
+            "--blue",
+            "-b",
+            help="Blue channel of the RGB color.",
+        ),
+    ] = None,
+    margin: Annotated[
+        float,
+        typer.Option(
+            "--margin",
+            "-m",
+            help="Margin of the grid view in points.",
+        ),
+    ] = None,
+) -> None:
+    """
+    Create a coordinate grid view for a PDF.
+    """
+    params = {}
+    if any(
+        [
+            red is not None,
+            green is not None,
+            blue is not None,
+        ]
+    ):
+        params["color"] = (red or 0, green or 0, blue or 0)
+
+    if margin is not None:
+        params["margin"] = int(margin) if margin.is_integer() else margin
+    PdfWrapper(pdf, **ctx.obj).generate_coordinate_grid(**params).write(output or pdf)
+
+
+@create_cli.command(no_args_is_help=True)
 def field(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
