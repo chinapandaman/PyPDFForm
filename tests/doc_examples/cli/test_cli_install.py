@@ -111,8 +111,8 @@ def test_use_full_widget_name_option(static_pdfs):
         cli_app,
         [
             "--use-full-widget-name",
-            "coordinate",
-            "inspect",
+            "read",
+            "location",
             os.path.join(static_pdfs, "sample_template_with_full_key.pdf"),
             "-f",
             "Gain de 2 classes.0",

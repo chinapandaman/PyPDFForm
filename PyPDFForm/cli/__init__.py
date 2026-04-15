@@ -12,33 +12,27 @@ from typing import Annotated
 import typer
 
 from .. import PdfWrapper, Widgets, __version__
-from .coordinate import coordinate_cli
 from .create import create_cli
-from .inspect import inspect_cli
+from .read import read_cli
 from .update import update_cli
 
 cli_app = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
 )
 cli_app.add_typer(
-    coordinate_cli,
-    name="coordinate",
-    help="Subcommands for interacting with PDF coordinates and dimensions.",
-)
-cli_app.add_typer(
     create_cli,
     name="create",
-    help="Subcommands for creating elements on PDF forms.",
+    help="Create PDF files and elements.",
 )
 cli_app.add_typer(
-    inspect_cli,
-    name="inspect",
-    help="Subcommands for inspecting PDF forms.",
+    read_cli,
+    name="read",
+    help="Read PDF and form field information.",
 )
 cli_app.add_typer(
     update_cli,
     name="update",
-    help="Subcommands for updating PDF files and their elements.",
+    help="Update PDF files and elements.",
 )
 
 

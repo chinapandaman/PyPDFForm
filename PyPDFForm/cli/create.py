@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-CLI module for creating PDF form fields.
+CLI module for creating PDF files and elements.
 
-This module provides command-line interfaces to create various types of PDF form fields
-(such as text fields, checkboxes, radio buttons, dropdowns, signatures, and images)
-in an existing PDF. It aims to mimic the field creation features available via the
-Python API as described in the preparation documentation.
+This module provides command-line interfaces to create PDF elements such as
+coordinate grids, form fields (text fields, checkboxes, radio buttons, dropdowns,
+signatures, and images), raw PDF elements, and blank PDFs.
 """
 
 import json
@@ -56,6 +55,69 @@ def _create_elements_from_file(
             ungrouped_input.append(element_map[k](**each))
 
     getattr(obj, method_name)(ungrouped_input).write(output or pdf)
+
+
+@create_cli.command(no_args_is_help=True)
+def grid(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
+    red: Annotated[
+        float,
+        typer.Option(
+            "--red",
+            "-r",
+            help="Red channel of the RGB color.",
+        ),
+    ] = None,
+    green: Annotated[
+        float,
+        typer.Option(
+            "--green",
+            "-g",
+            help="Green channel of the RGB color.",
+        ),
+    ] = None,
+    blue: Annotated[
+        float,
+        typer.Option(
+            "--blue",
+            "-b",
+            help="Blue channel of the RGB color.",
+        ),
+    ] = None,
+    margin: Annotated[
+        float,
+        typer.Option(
+            "--margin",
+            "-m",
+            help="Margin of the grid view in points.",
+        ),
+    ] = None,
+) -> None:
+    """
+    Create a coordinate grid view for a PDF.
+    """
+    params = {}
+    if any(
+        [
+            red is not None,
+            green is not None,
+            blue is not None,
+        ]
+    ):
+        params["color"] = (red or 0, green or 0, blue or 0)
+
+    if margin is not None:
+        params["margin"] = int(margin) if margin.is_integer() else margin
+    PdfWrapper(pdf, **ctx.obj).generate_coordinate_grid(**params).write(output or pdf)
 
 
 @create_cli.command(no_args_is_help=True)

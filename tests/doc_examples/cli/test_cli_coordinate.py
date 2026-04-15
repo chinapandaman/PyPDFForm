@@ -20,7 +20,7 @@ def test_coordinate_grid_view(pdf_samples, static_pdfs, tmp_path):
     result = runner.invoke(
         cli_app,
         [
-            "coordinate",
+            "create",
             "grid",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-r",
@@ -51,7 +51,7 @@ def test_field_page_number_coordinates_dimensions(static_pdfs):
 
     result = runner.invoke(
         cli_app,
-        ["coordinate", "inspect", expected_path, "-f", "test"],
+        ["read", "location", expected_path, "-f", "test"],
     )
     assert result.exit_code == 0
 
@@ -74,8 +74,8 @@ def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, tmp_path)
     result = runner.invoke(
         cli_app,
         [
+            "update",
             "coordinate",
-            "modify",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
             "test",

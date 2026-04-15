@@ -16,7 +16,7 @@ def test_schema(static_pdfs):
     result = runner.invoke(
         cli_app,
         [
-            "inspect",
+            "read",
             "schema",
             os.path.join(static_pdfs, "sample_template.pdf"),
         ],
@@ -41,7 +41,7 @@ def test_data(static_pdfs):
     result = runner.invoke(
         cli_app,
         [
-            "inspect",
+            "read",
             "data",
             os.path.join(static_pdfs, "sample_template_filled.pdf"),
         ],
@@ -63,7 +63,7 @@ def test_sample_data(static_pdfs):
     result = runner.invoke(
         cli_app,
         [
-            "inspect",
+            "read",
             "sample",
             os.path.join(static_pdfs, "sample_template.pdf"),
         ],
