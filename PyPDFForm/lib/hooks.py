@@ -317,7 +317,7 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
         [
             (
                 ArrayObject([TextStringObject(each[1]), TextStringObject(each[0])])
-                if isinstance(each, tuple)
+                if isinstance(each, (tuple, list))
                 else ArrayObject([TextStringObject(each), TextStringObject(each)])
             )
             for each in val

@@ -334,7 +334,9 @@ def test_change_check_size(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 @pytest.mark.cli_test
 def test_change_dropdown_choices(pdf_samples, static_pdfs, json_samples, tmp_path):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_choices.pdf")
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_change_dropdown_choices.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -345,6 +347,39 @@ def test_change_dropdown_choices(pdf_samples, static_pdfs, json_samples, tmp_pat
             os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
             "-f",
             os.path.join(json_samples, "test_change_dropdown_choices.json"),
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual
+
+
+@pytest.mark.cli_test
+def test_change_dropdown_choices_with_export_values(
+    pdf_samples, static_pdfs, json_samples, tmp_path
+):
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_change_dropdown_choices_with_export_values.pdf"
+    )
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "field",
+            os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
+            "-f",
+            os.path.join(
+                json_samples, "test_change_dropdown_choices_with_export_values.json"
+            ),
             "-o",
             output_path,
         ],

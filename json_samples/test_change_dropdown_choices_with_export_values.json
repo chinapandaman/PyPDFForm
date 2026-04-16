@@ -1,0 +1,26 @@
+{
+    "dropdown_1": {
+        "choices": [
+            [
+                "",
+                "blank_export_value"
+            ],
+            [
+                "apple",
+                "apple_export_value"
+            ],
+            [
+                "banana",
+                "banana_export_value"
+            ],
+            [
+                "cherry",
+                "cherry_export_value"
+            ],
+            [
+                "dates",
+                "dates_export_value"
+            ]
+        ]
+    }
+}
