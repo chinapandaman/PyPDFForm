@@ -477,3 +477,60 @@ def test_change_dropdown_font_color(pdf_samples, static_pdfs, json_samples, tmp_
 
         assert len(expected) == len(actual)
         assert expected == actual
+
+
+@pytest.mark.cli_test
+def test_change_field_editability(pdf_samples, static_pdfs, json_samples, tmp_path):
+    expected_path = os.path.join(
+        pdf_samples, "docs", "test_change_field_editability.pdf"
+    )
+    output_path = os.path.join(tmp_path, "output.pdf")
+    data_json = os.path.join(tmp_path, "data.json")
+    with open(data_json, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "test_1": "test_1",
+                "test_2": "test_2",
+                "test_3": "test_3",
+                "check_1": True,
+                "check_2": True,
+                "check_3": True,
+                "radio_1": 1,
+                "dropdown_1": 0,
+            },
+            f,
+        )
+
+    runner.invoke(
+        cli_app,
+        [
+            "fill",
+            os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
+            "-f",
+            data_json,
+            "-o",
+            output_path,
+            "--flatten",
+        ],
+    )
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "field",
+            output_path,
+            "-f",
+            os.path.join(json_samples, "test_change_field_editability.json"),
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual

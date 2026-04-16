@@ -1,0 +1,14 @@
+{
+    "test_2": {
+        "readonly": false
+    },
+    "check_3": {
+        "readonly": false
+    },
+    "radio_1": {
+        "readonly": false
+    },
+    "dropdown_1": {
+        "readonly": false
+    }
+}
