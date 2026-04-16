@@ -36,7 +36,7 @@ def test_change_text_font(pdf_samples, static_pdfs, json_samples, data_dict, tmp
             "fill",
             output_path,
             "-f",
-            os.path.join(json_samples, "data_dict.json"),
+            os.path.join(json_samples, "test_fill_text_check.json"),
         ],
     )
 
