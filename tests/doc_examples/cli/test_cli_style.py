@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import json
 import os
 
 import pytest
@@ -223,6 +224,56 @@ def test_change_text_comb(pdf_samples, static_pdfs, json_samples, tmp_path):
             output_path,
             "-f",
             os.path.join(json_samples, "test_fill_text_check.json"),
+        ],
+    )
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual
+
+
+@pytest.mark.cli_test
+def test_change_text_multiline(pdf_samples, static_pdfs, json_samples, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_multiline.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    data_json = os.path.join(tmp_path, "data.json")
+    with open(data_json, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "test": "test_1\ntest_1",
+                "check": True,
+                "test_2": "test_2\ntest_2",
+                "check_2": False,
+                "test_3": "test_3\ntest_3",
+                "check_3": True,
+            },
+            f,
+        )
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "field",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "-f",
+            os.path.join(json_samples, "test_change_text_multiline.json"),
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    runner.invoke(
+        cli_app,
+        [
+            "fill",
+            output_path,
+            "-f",
+            data_json,
         ],
     )
 
