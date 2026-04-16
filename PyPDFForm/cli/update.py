@@ -12,6 +12,7 @@ the PdfWrapper class, exposing it through a Typer-based CLI for
 ease of use.
 """
 
+import json
 from typing import Annotated
 
 import typer
@@ -99,5 +100,47 @@ def coordinate(
     f.y = y if y is not None else f.y
     f.width = width if width is not None else f.width
     f.height = height if height is not None else f.height
+
+    obj.write(output or pdf)
+
+
+@update_cli.command(no_args_is_help=True)
+def field(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    data: Annotated[
+        str,
+        typer.Option(
+            "--file",
+            "-f",
+            help="Path to the JSON file containing the updated parameters.",
+        ),
+    ],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
+) -> None:
+    """
+    Modify PDF form field styles.
+    """
+    with open(data, "r", encoding="utf-8") as f:
+        input_data = json.load(f)
+
+    obj = PdfWrapper(pdf, **ctx.obj)
+    registered_font = {}
+    for k, each in input_data.items():
+        if "font" in each:
+            if each["font"] not in registered_font:
+                font_name = f"new_font_{len(registered_font)}"
+                obj.register_font(font_name, each["font"])
+                registered_font[each["font"]] = font_name
+            each["font"] = registered_font[each["font"]]
+        for param, v in each.items():
+            setattr(obj.widgets[k], param, v)
 
     obj.write(output or pdf)
