@@ -12,7 +12,7 @@ from typing import Annotated
 
 import typer
 
-from .. import BlankPage, Fields, PdfWrapper, RawElements
+from .. import Annotations, BlankPage, Fields, PdfWrapper, RawElements
 
 create_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
@@ -188,6 +188,42 @@ def raw(
         "ellipse": RawElements.RawEllipse,
     }
     _create_elements_from_file(pdf, data, raw_element_map, "draw", ctx, output)
+
+
+@create_cli.command(no_args_is_help=True)
+def annotation(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    data: Annotated[
+        str,
+        typer.Option(
+            "--file",
+            "-f",
+            help="Path to the JSON file representing the annotation parameters.",
+        ),
+    ],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
+) -> None:
+    """
+    Create PDF annotations.
+    """
+    annotation_map = {
+        "text": Annotations.TextAnnotation,
+        "link": Annotations.LinkAnnotation,
+        "highlight": Annotations.HighlightAnnotation,
+        "underline": Annotations.UnderlineAnnotation,
+        "squiggly": Annotations.SquigglyAnnotation,
+        "strikeout": Annotations.StrikeOutAnnotation,
+        "stamp": Annotations.RubberStampAnnotation,
+    }
+    _create_elements_from_file(pdf, data, annotation_map, "annotate", ctx, output)
 
 
 @create_cli.command(no_args_is_help=True)
