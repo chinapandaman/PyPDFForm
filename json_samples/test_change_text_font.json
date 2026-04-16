@@ -1,0 +1,11 @@
+{
+    "test": {
+        "font": "./font_samples/LiberationSerif-BoldItalic.ttf"
+    },
+    "test_2": {
+        "font": "./font_samples/LiberationSerif-BoldItalic.ttf"
+    },
+    "test_3": {
+        "font": "./font_samples/LiberationSerif-BoldItalic.ttf"
+    }
+}

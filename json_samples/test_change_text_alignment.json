@@ -1,0 +1,11 @@
+{
+    "test": {
+        "alignment": 2
+    },
+    "test_2": {
+        "alignment": 1
+    },
+    "test_3": {
+        "alignment": 1
+    }
+}

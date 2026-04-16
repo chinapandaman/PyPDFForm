@@ -12,11 +12,13 @@ the PdfWrapper class, exposing it through a Typer-based CLI for
 ease of use.
 """
 
+import json
 from typing import Annotated
 
 import typer
 
 from .. import PdfWrapper
+from .common import handle_font_registration
 
 update_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
@@ -49,7 +51,7 @@ def title(
 def coordinate(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
-    field: Annotated[
+    widget: Annotated[
         str, typer.Option("--field", "-f", help="Name of the form field to modify.")
     ],
     output: Annotated[
@@ -93,11 +95,48 @@ def coordinate(
     Modify the coordinates and dimensions of a form field's rectangular bounding box.
     """
     obj = PdfWrapper(pdf, **ctx.obj)
-    f = obj.widgets[field]
+    f = obj.widgets[widget]
 
     f.x = x if x is not None else f.x
     f.y = y if y is not None else f.y
     f.width = width if width is not None else f.width
     f.height = height if height is not None else f.height
+
+    obj.write(output or pdf)
+
+
+@update_cli.command(no_args_is_help=True)
+def field(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    data: Annotated[
+        str,
+        typer.Option(
+            "--file",
+            "-f",
+            help="Path to the JSON file containing the updated parameters.",
+        ),
+    ],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
+) -> None:
+    """
+    Modify PDF form field styles.
+    """
+    with open(data, "r", encoding="utf-8") as f:
+        input_data = json.load(f)
+
+    obj = PdfWrapper(pdf, **ctx.obj)
+    registered_font = {}
+    for k, each in input_data.items():
+        handle_font_registration(obj, each, registered_font)
+        for param, v in each.items():
+            setattr(obj.widgets[k], param, v)
 
     obj.write(output or pdf)
