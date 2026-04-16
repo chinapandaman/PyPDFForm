@@ -51,7 +51,7 @@ def title(
 def coordinate(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
-    field: Annotated[
+    widget: Annotated[
         str, typer.Option("--field", "-f", help="Name of the form field to modify.")
     ],
     output: Annotated[
@@ -95,7 +95,7 @@ def coordinate(
     Modify the coordinates and dimensions of a form field's rectangular bounding box.
     """
     obj = PdfWrapper(pdf, **ctx.obj)
-    f = obj.widgets[field]
+    f = obj.widgets[widget]
 
     f.x = x if x is not None else f.x
     f.y = y if y is not None else f.y
