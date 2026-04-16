@@ -1,0 +1,14 @@
+{
+    "test": {
+        "max_length": 2,
+        "comb": true
+    },
+    "test_2": {
+        "max_length": 4,
+        "comb": true
+    },
+    "test_3": {
+        "max_length": 4,
+        "comb": true
+    }
+}
