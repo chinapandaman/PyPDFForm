@@ -18,6 +18,7 @@ from typing import Annotated
 import typer
 
 from .. import PdfWrapper
+from .common import handle_font_registration
 
 update_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
@@ -134,12 +135,7 @@ def field(
     obj = PdfWrapper(pdf, **ctx.obj)
     registered_font = {}
     for k, each in input_data.items():
-        if "font" in each:
-            if each["font"] not in registered_font:
-                font_name = f"new_font_{len(registered_font)}"
-                obj.register_font(font_name, each["font"])
-                registered_font[each["font"]] = font_name
-            each["font"] = registered_font[each["font"]]
+        handle_font_registration(obj, each, registered_font)
         for param, v in each.items():
             setattr(obj.widgets[k], param, v)
 
