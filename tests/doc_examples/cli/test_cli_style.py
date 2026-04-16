@@ -394,6 +394,7 @@ def test_change_dropdown_choices_with_export_values(
         assert expected == actual
 
 
+@pytest.mark.posix_only
 @pytest.mark.cli_test
 def test_change_dropdown_font(pdf_samples, static_pdfs, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_font.pdf")
