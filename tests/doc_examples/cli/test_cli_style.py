@@ -283,3 +283,50 @@ def test_change_text_multiline(pdf_samples, static_pdfs, json_samples, tmp_path)
 
         assert len(expected) == len(actual)
         assert expected == actual
+
+
+@pytest.mark.cli_test
+def test_change_check_size(pdf_samples, static_pdfs, json_samples, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_change_check_size.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    data_json = os.path.join(tmp_path, "data.json")
+    with open(data_json, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "check": True,
+                "check_2": True,
+                "check_3": True,
+            },
+            f,
+        )
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "field",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "-f",
+            os.path.join(json_samples, "test_change_check_size.json"),
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    runner.invoke(
+        cli_app,
+        [
+            "fill",
+            output_path,
+            "-f",
+            data_json,
+        ],
+    )
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual
