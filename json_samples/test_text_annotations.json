@@ -1,0 +1,19 @@
+{
+    "text": [
+        {
+            "page_number": 1,
+            "x": 310,
+            "y": 663,
+            "contents": "this is an annotation",
+            "title": "First Annotation"
+        },
+        {
+            "page_number": 2,
+            "x": 310,
+            "y": 672,
+            "contents": "this is another annotation",
+            "title": "Second Annotation",
+            "icon": "/Comment"
+        }
+    ]
+}
