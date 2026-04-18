@@ -113,6 +113,41 @@ def coordinate(
 
 
 @update_cli.command(no_args_is_help=True)
+def key(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    data: Annotated[
+        str,
+        typer.Option(
+            "--file",
+            "-f",
+            help="Path to the JSON file containing the key updates.",
+        ),
+    ],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
+) -> None:
+    """
+    Modify the keys (names) of form fields.
+    """
+    with open(data, "r", encoding="utf-8") as f:
+        input_data = json.load(f)
+
+    obj = PdfWrapper(pdf, **ctx.obj)
+    for item in input_data:
+        for k, v in item.items():
+            obj.update_widget_key(k, v["new_key"], index=v.get("index", 0), defer=True)
+
+    obj.commit_widget_key_updates().write(output or pdf)
+
+
+@update_cli.command(no_args_is_help=True)
 def field(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
@@ -207,38 +242,3 @@ def version(
     Change the PDF version of the document.
     """
     PdfWrapper(pdf, **ctx.obj).change_version(pdf_version).write(output or pdf)
-
-
-@update_cli.command(no_args_is_help=True)
-def key(
-    ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
-    data: Annotated[
-        str,
-        typer.Option(
-            "--file",
-            "-f",
-            help="Path to the JSON file containing the key updates.",
-        ),
-    ],
-    output: Annotated[
-        str,
-        typer.Option(
-            "--output",
-            "-o",
-            help="Path to save the output PDF. Defaults to the original path if not specified.",
-        ),
-    ] = None,
-) -> None:
-    """
-    Modify the keys (names) of form fields.
-    """
-    with open(data, "r", encoding="utf-8") as f:
-        input_data = json.load(f)
-
-    obj = PdfWrapper(pdf, **ctx.obj)
-    for item in input_data:
-        for k, v in item.items():
-            obj.update_widget_key(k, v["new_key"], index=v.get("index", 0), defer=True)
-
-    obj.commit_widget_key_updates().write(output or pdf)
