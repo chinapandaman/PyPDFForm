@@ -1,0 +1,5 @@
+{
+    "test": {
+        "on_hovered_off_javascript": "./js_samples/doc_examples/test_off_hover.js"
+    }
+}

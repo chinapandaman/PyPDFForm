@@ -1,0 +1,5 @@
+{
+    "test": {
+        "on_mouse_released_javascript": "./js_samples/doc_examples/test_mouse_released.js"
+    }
+}

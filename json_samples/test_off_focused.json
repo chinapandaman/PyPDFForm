@@ -1,0 +1,5 @@
+{
+    "test": {
+        "on_blurred_javascript": "./js_samples/doc_examples/test_off_focused.js"
+    }
+}
