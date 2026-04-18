@@ -170,3 +170,30 @@ def test_off_focused(pdf_samples, static_pdfs, json_samples, tmp_path):
 
         assert len(expected) == len(actual)
         assert expected == actual
+
+
+@pytest.mark.cli_test
+def test_on_open(pdf_samples, static_pdfs, js_samples, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_on_open.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "script",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "-s",
+            os.path.join(js_samples, "doc_examples", "test_on_open.js"),
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual
