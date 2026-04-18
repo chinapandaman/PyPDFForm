@@ -161,14 +161,6 @@ def script(
             help="Path to a JavaScript file or the JavaScript string to execute.",
         ),
     ],
-    output: Annotated[
-        str,
-        typer.Option(
-            "--output",
-            "-o",
-            help="Path to save the output PDF. Defaults to the original path if not specified.",
-        ),
-    ] = None,
     event: Annotated[
         DocumentEvent,
         typer.Option(
@@ -177,6 +169,14 @@ def script(
             help="The document-level event to trigger the script.",
         ),
     ] = DocumentEvent.open,
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
 ) -> None:
     """
     Embed a document-level JavaScript action.
@@ -184,3 +184,26 @@ def script(
     obj = PdfWrapper(pdf, **ctx.obj)
     setattr(obj, f"on_{event.value}_javascript", js_script)
     obj.write(output or pdf)
+
+
+@update_cli.command(no_args_is_help=True)
+def version(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf_version: Annotated[
+        str,
+        typer.Option("--version", "-v", help="The new PDF version."),
+    ],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
+) -> None:
+    """
+    Change the PDF version of the document.
+    """
+    PdfWrapper(pdf, **ctx.obj).change_version(pdf_version).write(output or pdf)

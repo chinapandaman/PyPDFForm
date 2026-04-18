@@ -5,6 +5,7 @@ import os
 import pytest
 from typer.testing import CliRunner
 
+from PyPDFForm import PdfWrapper
 from PyPDFForm.cli import cli_app
 
 runner = CliRunner()
@@ -81,3 +82,24 @@ def test_blank_page_multiply(pdf_samples, tmp_path):
         actual = f2.read()
 
         assert len(expected) == len(actual)
+
+
+@pytest.mark.cli_test
+def test_change_version(static_pdfs, tmp_path):
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "version",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "-v",
+            "2.0",
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    assert PdfWrapper(output_path).version == "2.0"
