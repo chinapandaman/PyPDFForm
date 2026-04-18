@@ -13,6 +13,7 @@ ease of use.
 """
 
 import json
+from enum import Enum
 from typing import Annotated
 
 import typer
@@ -23,6 +24,12 @@ from .common import handle_font_registration
 update_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
 )
+
+
+class DocumentEvent(str, Enum):
+    """Document-level JavaScript events."""
+
+    open = "open"
 
 
 @update_cli.command(no_args_is_help=True)
@@ -139,4 +146,41 @@ def field(
         for param, v in each.items():
             setattr(obj.widgets[k], param, v)
 
+    obj.write(output or pdf)
+
+
+@update_cli.command(no_args_is_help=True)
+def script(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    js_script: Annotated[
+        str,
+        typer.Option(
+            "--script",
+            "-s",
+            help="Path to a JavaScript file or the JavaScript string to execute.",
+        ),
+    ],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
+        ),
+    ] = None,
+    event: Annotated[
+        DocumentEvent,
+        typer.Option(
+            "--event",
+            "-e",
+            help="The document-level event to trigger the script.",
+        ),
+    ] = DocumentEvent.open,
+) -> None:
+    """
+    Embed a document-level JavaScript action.
+    """
+    obj = PdfWrapper(pdf, **ctx.obj)
+    setattr(obj, f"on_{event.value}_javascript", js_script)
     obj.write(output or pdf)
