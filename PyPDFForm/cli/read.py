@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-CLI commands for reading PDF form field data.
+This module defines CLI commands for reading PDF form information.
 
-This module provides command-line interface commands for extracting
-information from PDF forms. Features include generating a JSON schema
-describing the form fields, reading the current filled data of a
-PDF form, and generating sample data for filling a form.
+It exposes the `read` command group, which prints JSON for form schemas,
+current form values, generated sample data, and field rectangle metadata.
+Each command wraps read-only `PdfWrapper` properties so users can inspect forms
+from the terminal without writing Python code.
 """
 
 import json
@@ -23,47 +23,37 @@ read_cli = typer.Typer(
 @read_cli.command(no_args_is_help=True)
 def schema(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
 ) -> None:
-    """
-    Retrieve a JSON schema that describes a PDF form.
-    """
+    """Print the form schema as JSON."""
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).schema))
 
 
 @read_cli.command(no_args_is_help=True)
 def data(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
 ) -> None:
-    """
-    Read the current filled data of a PDF form.
-    """
+    """Print current form data as JSON."""
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).data))
 
 
 @read_cli.command(no_args_is_help=True)
 def sample(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
 ) -> None:
-    """
-    Generate sample data for filling a PDF form.
-    """
+    """Print sample fill data as JSON."""
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).sample_data))
 
 
 @read_cli.command(no_args_is_help=True)
 def location(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
-    field: Annotated[
-        str, typer.Option("--field", "-f", help="Name of the form field to read.")
-    ],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    field: Annotated[str, typer.Option("--field", "-f", help="Form field name.")],
 ) -> None:
-    """
-    Retrieve the page number, coordinates, and dimensions of a form field's rectangular bounding box.
-    """
+    """Print a form field's location and size as JSON."""
     f = PdfWrapper(pdf, **ctx.obj).widgets[field]
 
     print(

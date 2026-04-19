@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-CLI module for creating PDF files and elements.
+This module defines CLI commands for creating PDF files and PDF content.
 
-This module provides command-line interfaces to create PDF elements such as
-coordinate grids, form fields (text fields, checkboxes, radio buttons, dropdowns,
-signatures, and images), raw PDF elements, and blank PDFs.
+It exposes the `create` command group for blank PDFs, extracted page ranges,
+merged PDFs, form fields, raw drawn elements, annotations, and coordinate grid
+views. Commands in this module translate command-line arguments or grouped JSON
+input into `PdfWrapper`, `BlankPage`, `Fields`, `RawElements`, and
+`Annotations` operations.
 """
 
 from typing import Annotated
@@ -28,26 +30,24 @@ def blank(
         typer.Option(
             "--output",
             "-o",
-            help="Path to save the output PDF.",
+            help="Output PDF path.",
         ),
     ],
     count: Annotated[
-        int, typer.Option("--count", "-c", help="Number of blank pages.")
+        int, typer.Option("--count", "-c", help="Number of blank pages to create.")
     ] = None,
     width: Annotated[
         float,
         typer.Option(
             "--width",
-            help="Width of the blank PDF.",
+            help="Page width in points.",
         ),
     ] = None,
     height: Annotated[
-        float, typer.Option("--height", help="Height of the blank PDF.")
+        float, typer.Option("--height", help="Page height in points.")
     ] = None,
 ) -> None:
-    """
-    Create a new blank PDF.
-    """
+    """Create a new blank PDF."""
     params = {}
     if width is not None:
         params["width"] = width
@@ -64,13 +64,13 @@ def blank(
 @create_cli.command(no_args_is_help=True)
 def pages(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
     output: Annotated[
         str,
         typer.Option(
             "--output",
             "-o",
-            help="Path to save the output PDF.",
+            help="Output PDF path.",
         ),
     ],
     start: Annotated[
@@ -78,7 +78,7 @@ def pages(
         typer.Option(
             "--start",
             "-s",
-            help="One-based first page to extract. Defaults to the first page.",
+            help="First page to extract, starting at 1.",
         ),
     ] = None,
     end: Annotated[
@@ -86,13 +86,11 @@ def pages(
         typer.Option(
             "--end",
             "-e",
-            help="One-based last page to extract. Defaults to the final page.",
+            help="Last page to extract, starting at 1.",
         ),
     ] = None,
 ) -> None:
-    """
-    Create a new PDF from selected pages.
-    """
+    """Extract pages from an existing PDF."""
     PdfWrapper(pdf, **ctx.obj).pages[slice((start or 1) - 1, end)].write(output)
 
 
@@ -101,33 +99,31 @@ def combine(
     ctx: typer.Context,
     pdfs: Annotated[
         list[str],
-        typer.Argument(help="Paths to input PDF files in merge order."),
+        typer.Argument(help="Input PDF paths in merge order."),
     ],
     output: Annotated[
         str,
         typer.Option(
             "--output",
             "-o",
-            help="Path to save the output PDF.",
+            help="Output PDF path.",
         ),
     ],
 ) -> None:
-    """
-    Create a new PDF by combining multiple PDFs.
-    """
+    """Merge multiple PDFs into one."""
     PdfArray([PdfWrapper(pdf, **ctx.obj) for pdf in pdfs]).merge().write(output)
 
 
 @create_cli.command(no_args_is_help=True)
 def field(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
     data: Annotated[
         str,
         typer.Option(
             "--file",
             "-f",
-            help="Path to the JSON file representing the field creation parameters.",
+            help="JSON file with form field definitions.",
         ),
     ],
     output: Annotated[
@@ -135,13 +131,11 @@ def field(
         typer.Option(
             "--output",
             "-o",
-            help="Path to save the output PDF. Defaults to the original path if not specified.",
+            help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
 ) -> None:
-    """
-    Create PDF form fields.
-    """
+    """Add form fields to a PDF."""
     field_map = {
         "text": Fields.TextField,
         "check": Fields.CheckBoxField,
@@ -156,13 +150,13 @@ def field(
 @create_cli.command(no_args_is_help=True)
 def raw(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
     data: Annotated[
         str,
         typer.Option(
             "--file",
             "-f",
-            help="Path to the JSON file representing the draw parameters.",
+            help="JSON file with raw element definitions.",
         ),
     ],
     output: Annotated[
@@ -170,13 +164,11 @@ def raw(
         typer.Option(
             "--output",
             "-o",
-            help="Path to save the output PDF. Defaults to the original path if not specified.",
+            help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
 ) -> None:
-    """
-    Draw raw PDF elements.
-    """
+    """Draw text, images, and shapes on a PDF."""
     raw_element_map = {
         "text": RawElements.RawText,
         "image": RawElements.RawImage,
@@ -191,13 +183,13 @@ def raw(
 @create_cli.command(no_args_is_help=True)
 def annotation(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
     data: Annotated[
         str,
         typer.Option(
             "--file",
             "-f",
-            help="Path to the JSON file representing the annotation parameters.",
+            help="JSON file with annotation definitions.",
         ),
     ],
     output: Annotated[
@@ -205,13 +197,11 @@ def annotation(
         typer.Option(
             "--output",
             "-o",
-            help="Path to save the output PDF. Defaults to the original path if not specified.",
+            help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
 ) -> None:
-    """
-    Create PDF annotations.
-    """
+    """Add annotations to a PDF."""
     annotation_map = {
         "text": Annotations.TextAnnotation,
         "link": Annotations.LinkAnnotation,
@@ -227,13 +217,13 @@ def annotation(
 @create_cli.command(no_args_is_help=True)
 def grid(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
     output: Annotated[
         str,
         typer.Option(
             "--output",
             "-o",
-            help="Path to save the output PDF. Defaults to the original path if not specified.",
+            help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
     red: Annotated[
@@ -241,7 +231,7 @@ def grid(
         typer.Option(
             "--red",
             "-r",
-            help="Red channel of the RGB color.",
+            help="Grid red value, from 0 to 1.",
         ),
     ] = None,
     green: Annotated[
@@ -249,7 +239,7 @@ def grid(
         typer.Option(
             "--green",
             "-g",
-            help="Green channel of the RGB color.",
+            help="Grid green value, from 0 to 1.",
         ),
     ] = None,
     blue: Annotated[
@@ -257,7 +247,7 @@ def grid(
         typer.Option(
             "--blue",
             "-b",
-            help="Blue channel of the RGB color.",
+            help="Grid blue value, from 0 to 1.",
         ),
     ] = None,
     margin: Annotated[
@@ -265,13 +255,11 @@ def grid(
         typer.Option(
             "--margin",
             "-m",
-            help="Margin of the grid view in points.",
+            help="Grid margin in points.",
         ),
     ] = None,
 ) -> None:
-    """
-    Create a coordinate grid view for a PDF.
-    """
+    """Add a coordinate grid to a PDF."""
     params = {}
     if any(
         [

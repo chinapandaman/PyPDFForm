@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Common utilities for the PyPDFForm CLI.
+This module provides shared helpers for PyPDFForm CLI commands.
 
-This module provides common helper functions used across various
-CLI commands, such as handling font registration and creating
-elements from file definitions.
+It contains utilities for loading JSON command input, registering custom fonts
+once per command invocation, and converting grouped JSON element definitions
+into the objects expected by `PdfWrapper` methods.
 """
 
 import json
@@ -18,20 +18,19 @@ def handle_font_registration(
     obj: PdfWrapper, params: dict, registered_font: dict
 ) -> None:
     """
-    Registers a font if it is not already registered.
+    Registers a custom font referenced by CLI input.
 
-    This function checks if a font is specified in the parameters.
-    If it is, and it hasn't been registered yet, it generates a new
-    font name, registers the font with the PdfWrapper object, and
-    adds it to the registered_font dictionary. It then updates the
-    parameters with the newly registered font name.
+    CLI JSON files may provide a file path in a `font` parameter. This helper
+    registers each unique font path on the supplied `PdfWrapper` once, assigns
+    it a generated internal font name, and mutates `params["font"]` to that
+    registered name so downstream field or element constructors can use it.
 
     Args:
-        obj (PdfWrapper): The PdfWrapper object to register the font with.
-        params (dict): A dictionary of parameters for the element,
-            which may contain a "font" key specifying the path to a TTF file.
-        registered_font (dict): A dictionary tracking already registered fonts,
-            mapping the original font path to the registered font name.
+        obj (PdfWrapper): The wrapper for the PDF currently being modified.
+        params (dict): The element or widget parameters loaded from JSON. This
+            dictionary is mutated when it contains a `font` key.
+        registered_font (dict): Mapping of source font paths to generated
+            `PdfWrapper` font names for the current command invocation.
     """
     if "font" in params:
         if params["font"] not in registered_font:
@@ -50,25 +49,27 @@ def create_elements_from_file(
     output: str = None,
 ) -> None:
     """
-    Creates elements on a PDF form using data loaded from a JSON file.
+    Creates PDF elements from grouped JSON definitions.
 
-    This function reads a JSON file containing element definitions,
-    processes them (including registering any required fonts), and
-    calls a specified method on a PdfWrapper object to create the elements
-    on the PDF. Finally, it writes the modified PDF to the specified output path
-    or overwrites the original file if no output path is provided.
+    The input JSON is expected to group element definitions by type, such as
+    `text`, `image`, or `highlight`. Each group key is resolved through
+    `element_map`, each item is constructed after optional font registration,
+    and the resulting objects are passed to `method_name` on `PdfWrapper`.
+    The modified PDF is written to `output` or back to the input path.
 
     Args:
         pdf (str): The path to the input PDF file.
-        data (str): The path to the JSON file containing element definitions.
-        element_map (dict): A dictionary mapping element types (keys in the JSON file)
-            to their corresponding classes or construction functions.
-        method_name (str): The name of the method to call on the PdfWrapper object
-            to create the elements (e.g., 'bulk_create_fields', 'draw').
-        ctx (typer.Context): The Typer context, used to access global options
-            like `use_full_widget_name` or `need_appearances` to initialize the PdfWrapper.
-        output (str, optional): The path where the modified PDF should be saved.
-            If None, the input PDF file will be overwritten. Defaults to None.
+        data (str): The path to the JSON file containing grouped element
+            definitions.
+        element_map (dict): Mapping from JSON group names to element classes or
+            callables used to construct each object.
+        method_name (str): Name of the `PdfWrapper` method that accepts the
+            constructed elements, such as `bulk_create_fields`, `draw`, or
+            `annotate`.
+        ctx (typer.Context): Typer context containing global wrapper options in
+            `ctx.obj`.
+        output (str, optional): Path where the modified PDF should be saved. If
+            omitted, the input PDF is overwritten. Defaults to None.
     """
     with open(data, "r", encoding="utf-8") as f:
         input_data = json.load(f)
