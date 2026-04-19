@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-CLI module for creating PDF files and elements.
+This module defines CLI commands for creating PDF files and PDF content.
 
-This module provides command-line interfaces to create PDF elements such as
-coordinate grids, form fields (text fields, checkboxes, radio buttons, dropdowns,
-signatures, and images), raw PDF elements, and blank PDFs.
+It exposes the `create` command group for blank PDFs, extracted page ranges,
+merged PDFs, form fields, raw drawn elements, annotations, and coordinate grid
+views. Commands in this module translate command-line arguments or grouped JSON
+input into `PdfWrapper`, `BlankPage`, `Fields`, `RawElements`, and
+`Annotations` operations.
 """
 
 from typing import Annotated
@@ -45,9 +47,7 @@ def blank(
         float, typer.Option("--height", help="Height of the blank PDF.")
     ] = None,
 ) -> None:
-    """
-    Create a new blank PDF.
-    """
+    """Create a new blank PDF."""
     params = {}
     if width is not None:
         params["width"] = width
@@ -90,9 +90,7 @@ def pages(
         ),
     ] = None,
 ) -> None:
-    """
-    Create a new PDF from selected pages.
-    """
+    """Create a new PDF from selected pages."""
     PdfWrapper(pdf, **ctx.obj).pages[slice((start or 1) - 1, end)].write(output)
 
 
@@ -112,9 +110,7 @@ def combine(
         ),
     ],
 ) -> None:
-    """
-    Create a new PDF by combining multiple PDFs.
-    """
+    """Create a new PDF by combining multiple PDFs."""
     PdfArray([PdfWrapper(pdf, **ctx.obj) for pdf in pdfs]).merge().write(output)
 
 
@@ -139,9 +135,7 @@ def field(
         ),
     ] = None,
 ) -> None:
-    """
-    Create PDF form fields.
-    """
+    """Create PDF form fields."""
     field_map = {
         "text": Fields.TextField,
         "check": Fields.CheckBoxField,
@@ -174,9 +168,7 @@ def raw(
         ),
     ] = None,
 ) -> None:
-    """
-    Draw raw PDF elements.
-    """
+    """Draw raw PDF elements."""
     raw_element_map = {
         "text": RawElements.RawText,
         "image": RawElements.RawImage,
@@ -209,9 +201,7 @@ def annotation(
         ),
     ] = None,
 ) -> None:
-    """
-    Create PDF annotations.
-    """
+    """Create PDF annotations."""
     annotation_map = {
         "text": Annotations.TextAnnotation,
         "link": Annotations.LinkAnnotation,
@@ -269,9 +259,7 @@ def grid(
         ),
     ] = None,
 ) -> None:
-    """
-    Create a coordinate grid view for a PDF.
-    """
+    """Create a coordinate grid view for a PDF."""
     params = {}
     if any(
         [

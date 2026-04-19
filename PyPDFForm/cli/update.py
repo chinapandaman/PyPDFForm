@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-CLI commands for updating PDFs.
+This module defines CLI commands for updating existing PDF files.
 
-This module provides command-line interface commands for modifying
-PDF files, such as updating metadata or other elements.
-These commands allow users to update PDF documents directly from
-the terminal without needing to write Python code.
-
-The commands in this module wrap the functionality provided by
-the PdfWrapper class, exposing it through a Typer-based CLI for
-ease of use.
+It exposes the `update` command group for metadata changes, PDF version
+changes, field rectangle edits, field key renames, field style updates, and
+document-level JavaScript actions. Commands in this module load command-line or
+JSON input, apply the matching `PdfWrapper` operation, and write the modified
+PDF to either the requested output path or the original file.
 """
 
 import json
@@ -27,7 +24,15 @@ update_cli = typer.Typer(
 
 
 class DocumentEvent(str, Enum):
-    """Document-level JavaScript events."""
+    """
+    Document-level JavaScript events supported by the CLI.
+
+    This enum constrains the `update script --event` option to events that can
+    be mapped to `PdfWrapper` JavaScript attributes.
+
+    Attributes:
+        open (str): Run the script when the PDF document is opened.
+    """
 
     open = "open"
 
@@ -48,9 +53,7 @@ def title(
         ),
     ] = None,
 ) -> None:
-    """
-    Update the title of a PDF file.
-    """
+    """Update the title of a PDF file."""
     PdfWrapper(pdf, title=new_title, **ctx.obj).write(output or pdf)
 
 
@@ -71,9 +74,7 @@ def version(
         ),
     ] = None,
 ) -> None:
-    """
-    Change the PDF version of the document.
-    """
+    """Change the PDF version of the document."""
     PdfWrapper(pdf, **ctx.obj).change_version(pdf_version).write(output or pdf)
 
 
@@ -121,9 +122,7 @@ def coordinate(
         ),
     ] = None,
 ) -> None:
-    """
-    Modify the coordinates and dimensions of a form field's rectangular bounding box.
-    """
+    """Modify a form field's coordinates and dimensions."""
     obj = PdfWrapper(pdf, **ctx.obj)
     f = obj.widgets[widget]
 
@@ -156,9 +155,7 @@ def key(
         ),
     ] = None,
 ) -> None:
-    """
-    Modify the keys (names) of form fields.
-    """
+    """Modify the keys or names of form fields."""
     with open(data, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
@@ -191,9 +188,7 @@ def field(
         ),
     ] = None,
 ) -> None:
-    """
-    Modify PDF form field styles.
-    """
+    """Modify PDF form field styles."""
     with open(data, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
@@ -236,9 +231,7 @@ def script(
         ),
     ] = None,
 ) -> None:
-    """
-    Embed a document-level JavaScript action.
-    """
+    """Embed a document-level JavaScript action."""
     obj = PdfWrapper(pdf, **ctx.obj)
     setattr(obj, f"on_{event.value}_javascript", js_script)
     obj.write(output or pdf)

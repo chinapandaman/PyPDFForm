@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-CLI commands for reading PDF form field data.
+This module defines CLI commands for reading PDF form information.
 
-This module provides command-line interface commands for extracting
-information from PDF forms. Features include generating a JSON schema
-describing the form fields, reading the current filled data of a
-PDF form, and generating sample data for filling a form.
+It exposes the `read` command group, which prints JSON for form schemas,
+current form values, generated sample data, and field rectangle metadata.
+Each command wraps read-only `PdfWrapper` properties so users can inspect forms
+from the terminal without writing Python code.
 """
 
 import json
@@ -25,9 +25,7 @@ def schema(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
 ) -> None:
-    """
-    Retrieve a JSON schema that describes a PDF form.
-    """
+    """Retrieve a JSON schema that describes a PDF form."""
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).schema))
 
 
@@ -36,9 +34,7 @@ def data(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
 ) -> None:
-    """
-    Read the current filled data of a PDF form.
-    """
+    """Read the current filled data of a PDF form."""
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).data))
 
 
@@ -47,9 +43,7 @@ def sample(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
 ) -> None:
-    """
-    Generate sample data for filling a PDF form.
-    """
+    """Generate sample data for filling a PDF form."""
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).sample_data))
 
 
@@ -61,9 +55,7 @@ def location(
         str, typer.Option("--field", "-f", help="Name of the form field to read.")
     ],
 ) -> None:
-    """
-    Retrieve the page number, coordinates, and dimensions of a form field's rectangular bounding box.
-    """
+    """Retrieve a form field's page number, coordinates, and dimensions."""
     f = PdfWrapper(pdf, **ctx.obj).widgets[field]
 
     print(

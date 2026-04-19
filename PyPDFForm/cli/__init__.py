@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-This module provides the command-line interface for PyPDFForm.
+This module defines the root command-line interface for PyPDFForm.
 
-It defines the CLI application using Typer, providing commands for
-interacting with PyPDFForm functionality from the terminal.
+It creates the Typer application, attaches the `create`, `read`, and `update`
+command groups, and exposes top-level options shared by those commands. The
+callbacks in this module collect global flags in the Typer context so each
+subcommand can initialize `PdfWrapper` with consistent settings.
+
+Commands:
+    - `fill`: Fill an existing PDF form from JSON data.
+    - `create`: Create PDFs, fields, annotations, raw elements, and grid views.
+    - `read`: Print form metadata and field data as JSON.
+    - `update`: Modify PDF metadata, field names, styles, geometry, and scripts.
 """
 
 import json
@@ -38,14 +46,18 @@ cli_app.add_typer(
 
 def version_callback(value: bool) -> None:
     """
-    Callback function to handle the version option.
+    Handles the global version option.
 
-    This is triggered when the --version or -v flag is passed to the CLI.
-    It prints the current version of PyPDFForm and exits the application.
+    This callback is invoked eagerly by Typer when `--version` or `-v` is
+    passed. When the option is enabled, it prints the current PyPDFForm version
+    and exits before command parsing continues.
 
     Args:
-        value (bool): The value passed to the version option. If True,
-            the version information is displayed and the application exits.
+        value (bool): Whether the version flag was supplied.
+
+    Raises:
+        typer.Exit: Raised after printing the version so the CLI exits without
+            running another command.
     """
     if value:
         print(f"v{__version__}")
@@ -54,17 +66,17 @@ def version_callback(value: bool) -> None:
 
 def need_appearances_callback(ctx: typer.Context, value: bool) -> None:
     """
-    Callback function to handle the need_appearances option.
+    Stores the global `NeedAppearances` setting in the Typer context.
 
-    This is triggered when the --need-appearances flag is passed to the CLI.
-    It stores the value in the context object for use by subcommands.
+    Subcommands read this value from `ctx.obj` and pass it to `PdfWrapper`.
+    When enabled, output PDFs ask compatible PDF viewers to synthesize widget
+    appearances for form fields.
 
     Args:
-        ctx (typer.Context): The Typer context object used to pass data
-            between callbacks and commands.
-        value (bool): The value passed to the need_appearances option.
-            If True, PDF viewers will be instructed to generate appearance
-            streams for the output.
+        ctx (typer.Context): The Typer context used to share global options
+            with subcommands.
+        value (bool): Whether `NeedAppearances` should be enabled for output
+            PDFs.
     """
     if not ctx.obj:
         ctx.obj = {}
@@ -73,17 +85,17 @@ def need_appearances_callback(ctx: typer.Context, value: bool) -> None:
 
 def generate_appearance_streams_callback(ctx: typer.Context, value: bool) -> None:
     """
-    Callback function to handle the generate_appearance_streams option.
+    Stores the global appearance stream generation setting.
 
-    This is triggered when the --generate-appearance-streams flag is passed
-    to the CLI. It stores the value in the context object for use by subcommands.
+    Subcommands pass this option to `PdfWrapper` so filled or modified PDFs can
+    explicitly regenerate appearance streams for form fields instead of relying
+    only on viewer behavior.
 
     Args:
-        ctx (typer.Context): The Typer context object used to pass data
-            between callbacks and commands.
-        value (bool): The value passed to the generate_appearance_streams
-            option. If True, appearance streams will be explicitly generated
-            for all form fields in output PDFs using pikepdf.
+        ctx (typer.Context): The Typer context used to share global options
+            with subcommands.
+        value (bool): Whether form field appearance streams should be generated
+            for output PDFs.
     """
     if not ctx.obj:
         ctx.obj = {}
@@ -92,16 +104,15 @@ def generate_appearance_streams_callback(ctx: typer.Context, value: bool) -> Non
 
 def preserve_metadata_callback(ctx: typer.Context, value: bool) -> None:
     """
-    Callback function to handle the preserve_metadata option.
+    Stores the global metadata preservation setting.
 
-    This is triggered when the --preserve-metadata flag is passed to the CLI.
-    It stores the value in the context object for use by subcommands.
+    Subcommands pass this value to `PdfWrapper` so output PDFs can preserve the
+    source document metadata when the library writes the modified file.
 
     Args:
-        ctx (typer.Context): The Typer context object used to pass data
-            between callbacks and commands.
-        value (bool): The value passed to the preserve_metadata option.
-            If True, metadata will be preserved in output PDFs.
+        ctx (typer.Context): The Typer context used to share global options
+            with subcommands.
+        value (bool): Whether output PDFs should preserve input PDF metadata.
     """
     if not ctx.obj:
         ctx.obj = {}
@@ -110,17 +121,15 @@ def preserve_metadata_callback(ctx: typer.Context, value: bool) -> None:
 
 def use_full_widget_name_callback(ctx: typer.Context, value: bool) -> None:
     """
-    Callback function to handle the use_full_widget_name option.
+    Stores the global form field name lookup setting.
 
-    This is triggered when the --use-full-widget-name flag is passed to the CLI.
-    It stores the value in the context object for use by subcommands.
+    Subcommands pass this setting to `PdfWrapper` so form fields can be looked
+    up by their fully qualified widget names instead of short names.
 
     Args:
-        ctx (typer.Context): The Typer context object used to pass data
-            between callbacks and commands.
-        value (bool): The value passed to the use_full_widget_name option.
-            If True, fully qualified names (including parent field names)
-            will be used when looking up form fields.
+        ctx (typer.Context): The Typer context used to share global options
+            with subcommands.
+        value (bool): Whether fully qualified widget names should be used.
     """
     if not ctx.obj:
         ctx.obj = {}
@@ -172,8 +181,7 @@ def main(
         ),
     ] = False,
 ) -> None:
-    # pylint: disable=C0116
-    ...
+    """PyPDFForm command-line interface."""
 
 
 @cli_app.command(no_args_is_help=True)
@@ -203,9 +211,7 @@ def fill(
         ),
     ] = None,
 ) -> None:
-    """
-    Fill a PDF form.
-    """
+    """Fill a PDF form."""
     with open(data, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
