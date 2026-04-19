@@ -127,6 +127,32 @@ def test_extract_pages(static_pdfs, pdf_samples, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+def test_merge(static_pdfs, pdf_samples, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_merge.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "combine",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual
+
+
+@pytest.mark.cli_test
 def test_change_version(static_pdfs, tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
 
