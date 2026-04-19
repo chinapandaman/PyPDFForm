@@ -21,32 +21,6 @@ read_cli = typer.Typer(
 
 
 @read_cli.command(no_args_is_help=True)
-def location(
-    ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
-    field: Annotated[
-        str, typer.Option("--field", "-f", help="Name of the form field to read.")
-    ],
-) -> None:
-    """
-    Retrieve the page number, coordinates, and dimensions of a form field's rectangular bounding box.
-    """
-    f = PdfWrapper(pdf, **ctx.obj).widgets[field]
-
-    print(
-        json.dumps(
-            {
-                "page_number": f.page_number,
-                "x": f.x,
-                "y": f.y,
-                "width": f.width,
-                "height": f.height,
-            }
-        )
-    )
-
-
-@read_cli.command(no_args_is_help=True)
 def schema(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
@@ -77,3 +51,29 @@ def sample(
     Generate sample data for filling a PDF form.
     """
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).sample_data))
+
+
+@read_cli.command(no_args_is_help=True)
+def location(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    field: Annotated[
+        str, typer.Option("--field", "-f", help="Name of the form field to read.")
+    ],
+) -> None:
+    """
+    Retrieve the page number, coordinates, and dimensions of a form field's rectangular bounding box.
+    """
+    f = PdfWrapper(pdf, **ctx.obj).widgets[field]
+
+    print(
+        json.dumps(
+            {
+                "page_number": f.page_number,
+                "x": f.x,
+                "y": f.y,
+                "width": f.width,
+                "height": f.height,
+            }
+        )
+    )

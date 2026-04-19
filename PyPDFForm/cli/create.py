@@ -21,7 +21,48 @@ create_cli = typer.Typer(
 
 
 @create_cli.command(no_args_is_help=True)
-def grid(
+def blank(
+    ctx: typer.Context,
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF.",
+        ),
+    ],
+    count: Annotated[
+        int, typer.Option("--count", "-c", help="Number of blank pages.")
+    ] = None,
+    width: Annotated[
+        float,
+        typer.Option(
+            "--width",
+            help="Width of the blank PDF.",
+        ),
+    ] = None,
+    height: Annotated[
+        float, typer.Option("--height", help="Height of the blank PDF.")
+    ] = None,
+) -> None:
+    """
+    Create a new blank PDF.
+    """
+    params = {}
+    if width is not None:
+        params["width"] = width
+    if height is not None:
+        params["height"] = height
+
+    obj = BlankPage(**params)
+    if count is not None and count > 1:
+        obj = BlankPage(**params) * count
+
+    PdfWrapper(obj, **ctx.obj).write(output)
+
+
+@create_cli.command(no_args_is_help=True)
+def pages(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
     output: Annotated[
@@ -29,58 +70,52 @@ def grid(
         typer.Option(
             "--output",
             "-o",
-            help="Path to save the output PDF. Defaults to the original path if not specified.",
+            help="Path to save the output PDF.",
+        ),
+    ],
+    start: Annotated[
+        int,
+        typer.Option(
+            "--start",
+            "-s",
+            help="One-based first page to extract. Defaults to the first page.",
         ),
     ] = None,
-    red: Annotated[
-        float,
+    end: Annotated[
+        int,
         typer.Option(
-            "--red",
-            "-r",
-            help="Red channel of the RGB color.",
-        ),
-    ] = None,
-    green: Annotated[
-        float,
-        typer.Option(
-            "--green",
-            "-g",
-            help="Green channel of the RGB color.",
-        ),
-    ] = None,
-    blue: Annotated[
-        float,
-        typer.Option(
-            "--blue",
-            "-b",
-            help="Blue channel of the RGB color.",
-        ),
-    ] = None,
-    margin: Annotated[
-        float,
-        typer.Option(
-            "--margin",
-            "-m",
-            help="Margin of the grid view in points.",
+            "--end",
+            "-e",
+            help="One-based last page to extract. Defaults to the final page.",
         ),
     ] = None,
 ) -> None:
     """
-    Create a coordinate grid view for a PDF.
+    Create a new PDF from selected pages.
     """
-    params = {}
-    if any(
-        [
-            red is not None,
-            green is not None,
-            blue is not None,
-        ]
-    ):
-        params["color"] = (red or 0, green or 0, blue or 0)
+    PdfWrapper(pdf, **ctx.obj).pages[slice((start or 1) - 1, end)].write(output)
 
-    if margin is not None:
-        params["margin"] = int(margin) if margin.is_integer() else margin
-    PdfWrapper(pdf, **ctx.obj).generate_coordinate_grid(**params).write(output or pdf)
+
+@create_cli.command(no_args_is_help=True)
+def combine(
+    ctx: typer.Context,
+    pdfs: Annotated[
+        list[str],
+        typer.Argument(help="Paths to input PDF files in merge order."),
+    ],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF.",
+        ),
+    ],
+) -> None:
+    """
+    Create a new PDF by combining multiple PDFs.
+    """
+    PdfArray([PdfWrapper(pdf, **ctx.obj) for pdf in pdfs]).merge().write(output)
 
 
 @create_cli.command(no_args_is_help=True)
@@ -190,48 +225,7 @@ def annotation(
 
 
 @create_cli.command(no_args_is_help=True)
-def blank(
-    ctx: typer.Context,
-    output: Annotated[
-        str,
-        typer.Option(
-            "--output",
-            "-o",
-            help="Path to save the output PDF.",
-        ),
-    ],
-    count: Annotated[
-        int, typer.Option("--count", "-c", help="Number of blank pages.")
-    ] = None,
-    width: Annotated[
-        float,
-        typer.Option(
-            "--width",
-            help="Width of the blank PDF.",
-        ),
-    ] = None,
-    height: Annotated[
-        float, typer.Option("--height", help="Height of the blank PDF.")
-    ] = None,
-) -> None:
-    """
-    Create a new blank PDF.
-    """
-    params = {}
-    if width is not None:
-        params["width"] = width
-    if height is not None:
-        params["height"] = height
-
-    obj = BlankPage(**params)
-    if count is not None and count > 1:
-        obj = BlankPage(**params) * count
-
-    PdfWrapper(obj, **ctx.obj).write(output)
-
-
-@create_cli.command(no_args_is_help=True)
-def pages(
+def grid(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
     output: Annotated[
@@ -239,49 +233,55 @@ def pages(
         typer.Option(
             "--output",
             "-o",
-            help="Path to save the output PDF.",
-        ),
-    ],
-    start: Annotated[
-        int,
-        typer.Option(
-            "--start",
-            "-s",
-            help="One-based first page to extract. Defaults to the first page.",
+            help="Path to save the output PDF. Defaults to the original path if not specified.",
         ),
     ] = None,
-    end: Annotated[
-        int,
+    red: Annotated[
+        float,
         typer.Option(
-            "--end",
-            "-e",
-            help="One-based last page to extract. Defaults to the final page.",
+            "--red",
+            "-r",
+            help="Red channel of the RGB color.",
+        ),
+    ] = None,
+    green: Annotated[
+        float,
+        typer.Option(
+            "--green",
+            "-g",
+            help="Green channel of the RGB color.",
+        ),
+    ] = None,
+    blue: Annotated[
+        float,
+        typer.Option(
+            "--blue",
+            "-b",
+            help="Blue channel of the RGB color.",
+        ),
+    ] = None,
+    margin: Annotated[
+        float,
+        typer.Option(
+            "--margin",
+            "-m",
+            help="Margin of the grid view in points.",
         ),
     ] = None,
 ) -> None:
     """
-    Create a new PDF from selected pages.
+    Create a coordinate grid view for a PDF.
     """
-    PdfWrapper(pdf, **ctx.obj).pages[slice((start or 1) - 1, end)].write(output)
+    params = {}
+    if any(
+        [
+            red is not None,
+            green is not None,
+            blue is not None,
+        ]
+    ):
+        params["color"] = (red or 0, green or 0, blue or 0)
 
-
-@create_cli.command(no_args_is_help=True)
-def combine(
-    ctx: typer.Context,
-    pdfs: Annotated[
-        list[str],
-        typer.Argument(help="Paths to input PDF files in merge order."),
-    ],
-    output: Annotated[
-        str,
-        typer.Option(
-            "--output",
-            "-o",
-            help="Path to save the output PDF.",
-        ),
-    ],
-) -> None:
-    """
-    Create a new PDF by combining multiple PDFs.
-    """
-    PdfArray([PdfWrapper(pdf, **ctx.obj) for pdf in pdfs]).merge().write(output)
+    if margin is not None:
+        params["margin"] = int(margin) if margin.is_integer() else margin
+    PdfWrapper(pdf, **ctx.obj).generate_coordinate_grid(**params).write(output or pdf)
