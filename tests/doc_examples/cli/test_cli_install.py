@@ -111,10 +111,10 @@ def test_use_full_widget_name_option(static_pdfs):
         cli_app,
         [
             "--use-full-widget-name",
-            "read",
+            "inspect",
             "location",
             os.path.join(static_pdfs, "sample_template_with_full_key.pdf"),
-            "-f",
+            "--field",
             "Gain de 2 classes.0",
         ],
     )

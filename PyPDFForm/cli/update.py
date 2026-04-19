@@ -3,7 +3,7 @@
 This module defines CLI commands for updating existing PDF files.
 
 It exposes the `update` command group for metadata changes, PDF version
-changes, field rectangle edits, field key renames, field property updates, and
+changes, field bounds edits, field renames, field property updates, and
 document-level JavaScript actions. Commands in this module load command-line or
 JSON input, apply the matching `PdfWrapper` operation, and write the modified
 PDF to either the requested output path or the original file.
@@ -77,10 +77,10 @@ def version(
 
 
 @update_cli.command(no_args_is_help=True)
-def coordinate(
+def bounds(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
-    widget: Annotated[str, typer.Option("--field", "-f", help="Form field name.")],
+    widget: Annotated[str, typer.Option("--field", help="Form field name.")],
     output: Annotated[
         str,
         typer.Option(
@@ -131,7 +131,7 @@ def coordinate(
 
 
 @update_cli.command(no_args_is_help=True)
-def key(
+def rename(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
     data: Annotated[

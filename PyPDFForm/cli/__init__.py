@@ -2,7 +2,7 @@
 """
 This module defines the root command-line interface for PyPDFForm.
 
-It creates the Typer application, attaches the `create`, `read`, and `update`
+It creates the Typer application, attaches the `create`, `inspect`, and `update`
 command groups, and exposes top-level options shared by those commands. The
 callbacks in this module collect global flags in the Typer context so each
 subcommand can initialize `PdfWrapper` with consistent settings.
@@ -10,7 +10,7 @@ subcommand can initialize `PdfWrapper` with consistent settings.
 Commands:
     - `fill`: Fill an existing PDF form from JSON data.
     - `create`: Create PDFs, fields, annotations, raw elements, and grid views.
-    - `read`: Print form metadata and field data as JSON.
+    - `inspect`: Print form metadata and field data as JSON.
     - `update`: Modify PDF metadata, field names, properties, geometry, and scripts.
 """
 
@@ -21,7 +21,7 @@ import typer
 
 from .. import PdfWrapper, Widgets, __version__
 from .create import create_cli
-from .read import read_cli
+from .inspect import inspect_cli
 from .update import update_cli
 
 cli_app = typer.Typer(
@@ -33,8 +33,8 @@ cli_app.add_typer(
     help="Create PDFs and PDF elements.",
 )
 cli_app.add_typer(
-    read_cli,
-    name="read",
+    inspect_cli,
+    name="inspect",
     help="Inspect PDF form information.",
 )
 cli_app.add_typer(

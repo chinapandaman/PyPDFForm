@@ -243,7 +243,7 @@ def test_update_key(static_pdfs, json_samples, tmp_path):
         cli_app,
         [
             "update",
-            "key",
+            "rename",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
             os.path.join(json_samples, "test_update_key.json"),
@@ -253,7 +253,7 @@ def test_update_key(static_pdfs, json_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    result = runner.invoke(cli_app, ["read", "sample", output_path])
+    result = runner.invoke(cli_app, ["inspect", "sample", output_path])
 
     sample_data = json.loads(result.output)
 
@@ -271,7 +271,7 @@ def test_update_key_index(pdf_samples, static_pdfs, json_samples, tmp_path):
         cli_app,
         [
             "update",
-            "key",
+            "rename",
             os.path.join(static_pdfs, "733.pdf"),
             "-f",
             os.path.join(json_samples, "test_update_key_index.json"),
@@ -283,7 +283,7 @@ def test_update_key_index(pdf_samples, static_pdfs, json_samples, tmp_path):
 
     result = runner.invoke(
         cli_app,
-        ["read", "sample", output_path],
+        ["inspect", "sample", output_path],
     )
 
     with open(sample_data, "w", encoding="utf-8") as f:
@@ -317,7 +317,7 @@ def test_update_key_bulk(pdf_samples, static_pdfs, json_samples, tmp_path):
         cli_app,
         [
             "update",
-            "key",
+            "rename",
             os.path.join(static_pdfs, "733.pdf"),
             "-f",
             os.path.join(json_samples, "test_update_key_bulk.json"),
@@ -329,7 +329,7 @@ def test_update_key_bulk(pdf_samples, static_pdfs, json_samples, tmp_path):
 
     result = runner.invoke(
         cli_app,
-        ["read", "sample", output_path],
+        ["inspect", "sample", output_path],
     )
 
     with open(sample_data, "w", encoding="utf-8") as f:
