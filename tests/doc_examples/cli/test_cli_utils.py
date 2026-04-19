@@ -85,6 +85,48 @@ def test_blank_page_multiply(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+def test_extract_pages(static_pdfs, pdf_samples, json_samples, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_extract_pages.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    extract_result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "pages",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "--start",
+            "1",
+            "--end",
+            "1",
+            "-o",
+            output_path,
+        ],
+    )
+    assert extract_result.exit_code == 0
+
+    fill_result = runner.invoke(
+        cli_app,
+        [
+            "fill",
+            output_path,
+            "-f",
+            os.path.join(json_samples, "test_extract_pages.json"),
+            "-o",
+            output_path,
+        ],
+    )
+    assert fill_result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual
+
+
+@pytest.mark.cli_test
 def test_change_version(static_pdfs, tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
 

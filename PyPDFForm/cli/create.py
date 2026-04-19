@@ -227,3 +227,38 @@ def blank(
         obj = BlankPage(**params) * count
 
     PdfWrapper(obj, **ctx.obj).write(output)
+
+
+@create_cli.command(no_args_is_help=True)
+def pages(
+    ctx: typer.Context,
+    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF.",
+        ),
+    ],
+    start: Annotated[
+        int,
+        typer.Option(
+            "--start",
+            "-s",
+            help="One-based first page to extract. Defaults to the first page.",
+        ),
+    ] = None,
+    end: Annotated[
+        int,
+        typer.Option(
+            "--end",
+            "-e",
+            help="One-based last page to extract. Defaults to the final page.",
+        ),
+    ] = None,
+) -> None:
+    """
+    Create a new PDF from selected pages.
+    """
+    PdfWrapper(pdf, **ctx.obj).pages[slice((start or 1) - 1, end)].write(output)
