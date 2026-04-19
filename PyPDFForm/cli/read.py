@@ -23,39 +23,37 @@ read_cli = typer.Typer(
 @read_cli.command(no_args_is_help=True)
 def schema(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
 ) -> None:
-    """Retrieve a JSON schema that describes a PDF form."""
+    """Print the form schema as JSON."""
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).schema))
 
 
 @read_cli.command(no_args_is_help=True)
 def data(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
 ) -> None:
-    """Read the current filled data of a PDF form."""
+    """Print current form data as JSON."""
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).data))
 
 
 @read_cli.command(no_args_is_help=True)
 def sample(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
 ) -> None:
-    """Generate sample data for filling a PDF form."""
+    """Print sample fill data as JSON."""
     print(json.dumps(PdfWrapper(pdf, **ctx.obj).sample_data))
 
 
 @read_cli.command(no_args_is_help=True)
 def location(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Path to the input PDF file.")],
-    field: Annotated[
-        str, typer.Option("--field", "-f", help="Name of the form field to read.")
-    ],
+    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    field: Annotated[str, typer.Option("--field", "-f", help="Form field name.")],
 ) -> None:
-    """Retrieve a form field's page number, coordinates, and dimensions."""
+    """Print a form field's location and size as JSON."""
     f = PdfWrapper(pdf, **ctx.obj).widgets[field]
 
     print(
