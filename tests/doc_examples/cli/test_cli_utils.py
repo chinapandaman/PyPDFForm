@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 import os
 
 import pytest
@@ -82,6 +83,59 @@ def test_blank_page_multiply(pdf_samples, tmp_path):
         actual = f2.read()
 
         assert len(expected) == len(actual)
+
+
+@pytest.mark.cli_test
+def test_extract_pages(static_pdfs, pdf_samples, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_extract_pages.pdf")
+    extracted_path = os.path.join(tmp_path, "extracted.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    data_path = os.path.join(tmp_path, "data.json")
+
+    extract_result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "pages",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "--start",
+            "1",
+            "--end",
+            "1",
+            "-o",
+            extracted_path,
+        ],
+    )
+    assert extract_result.exit_code == 0
+
+    with open(data_path, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "test": "test_1",
+                "check": True,
+            },
+            f,
+        )
+
+    fill_result = runner.invoke(
+        cli_app,
+        [
+            "fill",
+            extracted_path,
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+    assert fill_result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual
 
 
 @pytest.mark.cli_test
