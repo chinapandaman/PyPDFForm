@@ -51,7 +51,7 @@ def test_field_page_number_coordinates_dimensions(static_pdfs):
 
     result = runner.invoke(
         cli_app,
-        ["read", "location", expected_path, "-f", "test"],
+        ["inspect", "location", expected_path, "--field", "test"],
     )
     assert result.exit_code == 0
 
@@ -75,9 +75,9 @@ def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, tmp_path)
         cli_app,
         [
             "update",
-            "coordinate",
+            "bounds",
             os.path.join(static_pdfs, "sample_template.pdf"),
-            "-f",
+            "--field",
             "test",
             "-o",
             output_path,

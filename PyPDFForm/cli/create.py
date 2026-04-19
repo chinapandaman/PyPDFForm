@@ -62,7 +62,7 @@ def blank(
 
 
 @create_cli.command(no_args_is_help=True)
-def pages(
+def extract(
     ctx: typer.Context,
     pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
     output: Annotated[
@@ -95,7 +95,7 @@ def pages(
 
 
 @create_cli.command(no_args_is_help=True)
-def combine(
+def merge(
     ctx: typer.Context,
     pdfs: Annotated[
         list[str],

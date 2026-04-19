@@ -93,7 +93,7 @@ def test_extract_pages(static_pdfs, pdf_samples, json_samples, tmp_path):
         cli_app,
         [
             "create",
-            "pages",
+            "extract",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "--start",
             "1",
@@ -135,7 +135,7 @@ def test_merge(static_pdfs, pdf_samples, tmp_path):
         cli_app,
         [
             "create",
-            "combine",
+            "merge",
             os.path.join(pdf_samples, "dummy.pdf"),
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-o",
@@ -163,7 +163,7 @@ def test_reorg_pages(static_pdfs, pdf_samples, tmp_path):
         cli_app,
         [
             "create",
-            "pages",
+            "extract",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "--start",
             "1",
@@ -179,7 +179,7 @@ def test_reorg_pages(static_pdfs, pdf_samples, tmp_path):
         cli_app,
         [
             "create",
-            "pages",
+            "extract",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "--start",
             "2",
@@ -193,7 +193,7 @@ def test_reorg_pages(static_pdfs, pdf_samples, tmp_path):
         cli_app,
         [
             "create",
-            "combine",
+            "merge",
             first_page_path,
             os.path.join(pdf_samples, "dummy.pdf"),
             remaining_pages_path,
