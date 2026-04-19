@@ -11,7 +11,8 @@ from typing import Annotated
 
 import typer
 
-from .. import Annotations, BlankPage, Fields, PdfWrapper, RawElements
+from .. import (Annotations, BlankPage, Fields, PdfArray, PdfWrapper,
+                RawElements)
 from .common import create_elements_from_file
 
 create_cli = typer.Typer(
@@ -262,3 +263,25 @@ def pages(
     Create a new PDF from selected pages.
     """
     PdfWrapper(pdf, **ctx.obj).pages[slice((start or 1) - 1, end)].write(output)
+
+
+@create_cli.command(no_args_is_help=True)
+def combine(
+    ctx: typer.Context,
+    pdfs: Annotated[
+        list[str],
+        typer.Argument(help="Paths to input PDF files in merge order."),
+    ],
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path to save the output PDF.",
+        ),
+    ],
+) -> None:
+    """
+    Create a new PDF by combining multiple PDFs.
+    """
+    PdfArray([PdfWrapper(pdf, **ctx.obj) for pdf in pdfs]).merge().write(output)
