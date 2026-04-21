@@ -15,18 +15,29 @@ Using constants improves code readability and maintainability by providing
 meaningful names for frequently used values and reducing the risk of typos.
 """
 
-VERSION_IDENTIFIERS = [
-    b"%PDF-1.0",
-    b"%PDF-1.1",
-    b"%PDF-1.2",
-    b"%PDF-1.3",
-    b"%PDF-1.4",
-    b"%PDF-1.5",
-    b"%PDF-1.6",
-    b"%PDF-1.7",
-    b"%PDF-2.0",
-]
+from enum import Enum
+
 VERSION_IDENTIFIER_PREFIX = "%PDF-".encode("utf-8")
+
+
+class PdfVersion(str, Enum):
+    """PDF versions supported by PyPDFForm."""
+
+    pdf_1_0 = "1.0"
+    pdf_1_1 = "1.1"
+    pdf_1_2 = "1.2"
+    pdf_1_3 = "1.3"
+    pdf_1_4 = "1.4"
+    pdf_1_5 = "1.5"
+    pdf_1_6 = "1.6"
+    pdf_1_7 = "1.7"
+    pdf_2_0 = "2.0"
+
+
+PDF_VERSIONS = tuple(version.value for version in PdfVersion)
+VERSION_IDENTIFIERS = [
+    VERSION_IDENTIFIER_PREFIX + version.encode() for version in PDF_VERSIONS
+]
 
 DEPRECATION_NOTICE = "{} will be deprecated soon."
 DEPRECATION_REPLACE_NOTICE = "Use {} instead."
