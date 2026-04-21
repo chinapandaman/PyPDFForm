@@ -329,7 +329,7 @@ def script(
         ),
     ] = None,
 ) -> None:
-    """Add a document-level JavaScript action from a file."""
+    """Add a document-level JavaScript action."""
     obj = PdfWrapper(str(pdf), **ctx.obj)
     setattr(obj, f"on_{event.value}_javascript", str(js_script))
     obj.write(output or pdf)
