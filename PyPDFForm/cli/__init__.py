@@ -15,6 +15,7 @@ Commands:
 """
 
 import json
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -190,20 +191,39 @@ def main(
 @cli_app.command(no_args_is_help=True)
 def fill(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     data: Annotated[
-        str,
+        Path,
         typer.Option(
             "--file",
             "-f",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
             help="JSON file with form field values.",
         ),
     ],
     output: Annotated[
-        str,
+        Path | None,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
@@ -216,7 +236,7 @@ def fill(
     with open(data, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
-    obj = PdfWrapper(pdf, **ctx.obj)
+    obj = PdfWrapper(str(pdf), **ctx.obj)
     for k, each in obj.widgets.items():
         if k in input_data and isinstance(each, (Widgets.Image, Widgets.Signature)):
             each.preserve_aspect_ratio = input_data.get(k, {}).get(

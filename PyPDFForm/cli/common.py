@@ -8,6 +8,7 @@ into the objects expected by `PdfWrapper` methods.
 """
 
 import json
+from pathlib import Path
 
 import typer
 
@@ -41,12 +42,12 @@ def handle_font_registration(
 
 
 def create_elements_from_file(
-    pdf: str,
-    data: str,
+    pdf: Path,
+    data: Path,
     element_map: dict,
     method_name: str,
     ctx: typer.Context,
-    output: str = None,
+    output: Path | None = None,
 ) -> None:
     """
     Creates PDF elements from grouped JSON definitions.
@@ -58,8 +59,8 @@ def create_elements_from_file(
     The modified PDF is written to `output` or back to the input path.
 
     Args:
-        pdf (str): The path to the input PDF file.
-        data (str): The path to the JSON file containing grouped element
+        pdf (Path): The path to the input PDF file.
+        data (Path): The path to the JSON file containing grouped element
             definitions.
         element_map (dict): Mapping from JSON group names to element classes or
             callables used to construct each object.
@@ -68,13 +69,13 @@ def create_elements_from_file(
             `annotate`.
         ctx (typer.Context): Typer context containing global wrapper options in
             `ctx.obj`.
-        output (str, optional): Path where the modified PDF should be saved. If
+        output (Path, optional): Path where the modified PDF should be saved. If
             omitted, the input PDF is overwritten. Defaults to None.
     """
     with open(data, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
-    obj = PdfWrapper(pdf, **ctx.obj)
+    obj = PdfWrapper(str(pdf), **ctx.obj)
     ungrouped_input = []
     registered_font = {}
     for k, v in input_data.items():
