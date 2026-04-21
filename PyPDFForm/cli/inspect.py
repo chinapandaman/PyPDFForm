@@ -9,12 +9,11 @@ from the terminal without writing Python code.
 """
 
 import json
-from pathlib import Path
-from typing import Annotated
 
 import typer
 
 from .. import PdfWrapper
+from .common import FIELD_NAME, INPUT_PDF
 
 inspect_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
@@ -24,17 +23,7 @@ inspect_cli = typer.Typer(
 @inspect_cli.command(no_args_is_help=True)
 def schema(
     ctx: typer.Context,
-    pdf: Annotated[
-        Path,
-        typer.Argument(
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            readable=True,
-            resolve_path=True,
-            help="Input PDF path.",
-        ),
-    ],
+    pdf: INPUT_PDF,
 ) -> None:
     """Print the form schema as JSON."""
     print(json.dumps(PdfWrapper(str(pdf), **ctx.obj).schema))
@@ -43,17 +32,7 @@ def schema(
 @inspect_cli.command(no_args_is_help=True)
 def data(
     ctx: typer.Context,
-    pdf: Annotated[
-        Path,
-        typer.Argument(
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            readable=True,
-            resolve_path=True,
-            help="Input PDF path.",
-        ),
-    ],
+    pdf: INPUT_PDF,
 ) -> None:
     """Print current form data as JSON."""
     print(json.dumps(PdfWrapper(str(pdf), **ctx.obj).data))
@@ -62,17 +41,7 @@ def data(
 @inspect_cli.command(no_args_is_help=True)
 def sample(
     ctx: typer.Context,
-    pdf: Annotated[
-        Path,
-        typer.Argument(
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            readable=True,
-            resolve_path=True,
-            help="Input PDF path.",
-        ),
-    ],
+    pdf: INPUT_PDF,
 ) -> None:
     """Print sample fill data as JSON."""
     print(json.dumps(PdfWrapper(str(pdf), **ctx.obj).sample_data))
@@ -81,18 +50,8 @@ def sample(
 @inspect_cli.command(no_args_is_help=True)
 def location(
     ctx: typer.Context,
-    pdf: Annotated[
-        Path,
-        typer.Argument(
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            readable=True,
-            resolve_path=True,
-            help="Input PDF path.",
-        ),
-    ],
-    field: Annotated[str, typer.Option("--field", help="Form field name.")],
+    pdf: INPUT_PDF,
+    field: FIELD_NAME,
 ) -> None:
     """Print a form field's location and size as JSON."""
     f = PdfWrapper(str(pdf), **ctx.obj).widgets[field]
