@@ -9,6 +9,7 @@ input into `PdfWrapper`, `BlankPage`, `Fields`, `RawElements`, and
 `Annotations` operations.
 """
 
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -26,10 +27,14 @@ create_cli = typer.Typer(
 def blank(
     ctx: typer.Context,
     output: Annotated[
-        str,
+        Path,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path.",
         ),
     ],
@@ -64,12 +69,26 @@ def blank(
 @create_cli.command(no_args_is_help=True)
 def extract(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     output: Annotated[
-        str,
+        Path,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path.",
         ),
     ],
@@ -91,46 +110,76 @@ def extract(
     ] = None,
 ) -> None:
     """Extract pages from an existing PDF."""
-    PdfWrapper(pdf, **ctx.obj).pages[slice((start or 1) - 1, end)].write(output)
+    PdfWrapper(str(pdf), **ctx.obj).pages[slice((start or 1) - 1, end)].write(output)
 
 
 @create_cli.command(no_args_is_help=True)
 def merge(
     ctx: typer.Context,
     pdfs: Annotated[
-        list[str],
-        typer.Argument(help="Input PDF paths in merge order."),
+        list[Path],
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF paths in merge order.",
+        ),
     ],
     output: Annotated[
-        str,
+        Path,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path.",
         ),
     ],
 ) -> None:
     """Merge multiple PDFs into one."""
-    PdfArray([PdfWrapper(pdf, **ctx.obj) for pdf in pdfs]).merge().write(output)
+    PdfArray([PdfWrapper(str(pdf), **ctx.obj) for pdf in pdfs]).merge().write(output)
 
 
 @create_cli.command(no_args_is_help=True)
 def field(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     data: Annotated[
-        str,
+        Path,
         typer.Option(
             "--file",
             "-f",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
             help="JSON file with form field definitions.",
         ),
     ],
     output: Annotated[
-        str,
+        Path | None,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
@@ -150,20 +199,39 @@ def field(
 @create_cli.command(no_args_is_help=True)
 def raw(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     data: Annotated[
-        str,
+        Path,
         typer.Option(
             "--file",
             "-f",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
             help="JSON file with raw element definitions.",
         ),
     ],
     output: Annotated[
-        str,
+        Path | None,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
@@ -183,20 +251,39 @@ def raw(
 @create_cli.command(no_args_is_help=True)
 def annotation(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     data: Annotated[
-        str,
+        Path,
         typer.Option(
             "--file",
             "-f",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
             help="JSON file with annotation definitions.",
         ),
     ],
     output: Annotated[
-        str,
+        Path | None,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
@@ -217,12 +304,26 @@ def annotation(
 @create_cli.command(no_args_is_help=True)
 def grid(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     output: Annotated[
-        str,
+        Path | None,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
@@ -272,4 +373,6 @@ def grid(
 
     if margin is not None:
         params["margin"] = int(margin) if margin.is_integer() else margin
-    PdfWrapper(pdf, **ctx.obj).generate_coordinate_grid(**params).write(output or pdf)
+    PdfWrapper(str(pdf), **ctx.obj).generate_coordinate_grid(**params).write(
+        output or pdf
+    )

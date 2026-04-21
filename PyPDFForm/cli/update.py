@@ -11,6 +11,7 @@ PDF to either the requested output path or the original file.
 
 import json
 from enum import Enum
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -40,52 +41,94 @@ class DocumentEvent(str, Enum):
 @update_cli.command(no_args_is_help=True)
 def title(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     new_title: Annotated[str, typer.Option("--title", "-t", help="New PDF title.")],
     output: Annotated[
-        str,
+        Path | None,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
 ) -> None:
     """Set the PDF title."""
-    PdfWrapper(pdf, title=new_title, **ctx.obj).write(output or pdf)
+    PdfWrapper(str(pdf), title=new_title, **ctx.obj).write(output or pdf)
 
 
 @update_cli.command(no_args_is_help=True)
 def version(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     pdf_version: Annotated[
         str,
         typer.Option("--version", "-v", help="New PDF version."),
     ],
     output: Annotated[
-        str,
+        Path | None,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
 ) -> None:
     """Set the PDF version."""
-    PdfWrapper(pdf, **ctx.obj).change_version(pdf_version).write(output or pdf)
+    PdfWrapper(str(pdf), **ctx.obj).change_version(pdf_version).write(output or pdf)
 
 
 @update_cli.command(no_args_is_help=True)
 def bounds(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     widget: Annotated[str, typer.Option("--field", help="Form field name.")],
     output: Annotated[
-        str,
+        Path | None,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
@@ -119,7 +162,7 @@ def bounds(
     ] = None,
 ) -> None:
     """Update a form field's position and size."""
-    obj = PdfWrapper(pdf, **ctx.obj)
+    obj = PdfWrapper(str(pdf), **ctx.obj)
     f = obj.widgets[widget]
 
     f.x = x if x is not None else f.x
@@ -133,20 +176,39 @@ def bounds(
 @update_cli.command(no_args_is_help=True)
 def rename(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     data: Annotated[
-        str,
+        Path,
         typer.Option(
             "--file",
             "-f",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
             help="JSON file with form field renames.",
         ),
     ],
     output: Annotated[
-        str,
+        Path | None,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
@@ -155,7 +217,7 @@ def rename(
     with open(data, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
-    obj = PdfWrapper(pdf, **ctx.obj)
+    obj = PdfWrapper(str(pdf), **ctx.obj)
     for item in input_data:
         for k, v in item.items():
             obj.update_widget_key(k, v["new_key"], index=v.get("index", 0), defer=True)
@@ -166,20 +228,39 @@ def rename(
 @update_cli.command(no_args_is_help=True)
 def field(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     data: Annotated[
-        str,
+        Path,
         typer.Option(
             "--file",
             "-f",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
             help="JSON file with form field property updates.",
         ),
     ],
     output: Annotated[
-        str,
+        Path | None,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
@@ -188,7 +269,7 @@ def field(
     with open(data, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
-    obj = PdfWrapper(pdf, **ctx.obj)
+    obj = PdfWrapper(str(pdf), **ctx.obj)
     registered_font = {}
     for k, each in input_data.items():
         handle_font_registration(obj, each, registered_font)
@@ -201,13 +282,28 @@ def field(
 @update_cli.command(no_args_is_help=True)
 def script(
     ctx: typer.Context,
-    pdf: Annotated[str, typer.Argument(help="Input PDF path.")],
+    pdf: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="Input PDF path.",
+        ),
+    ],
     js_script: Annotated[
-        str,
+        Path,
         typer.Option(
             "--script",
             "-s",
-            help="JavaScript file path or inline JavaScript.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="JavaScript file path.",
         ),
     ],
     event: Annotated[
@@ -219,15 +315,19 @@ def script(
         ),
     ] = DocumentEvent.open,
     output: Annotated[
-        str,
+        Path | None,
         typer.Option(
             "--output",
             "-o",
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            resolve_path=True,
             help="Output PDF path. Overwrites the input when omitted.",
         ),
     ] = None,
 ) -> None:
-    """Add a document-level JavaScript action."""
-    obj = PdfWrapper(pdf, **ctx.obj)
-    setattr(obj, f"on_{event.value}_javascript", js_script)
+    """Add a document-level JavaScript action from a file."""
+    obj = PdfWrapper(str(pdf), **ctx.obj)
+    setattr(obj, f"on_{event.value}_javascript", str(js_script))
     obj.write(output or pdf)
