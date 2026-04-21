@@ -17,6 +17,7 @@ from typing import Annotated
 import typer
 
 from .. import PdfWrapper
+from ..lib.constants import PdfVersion
 from .common import (FIELD_NAME, INPUT_PDF, OPTIONAL_OUTPUT_PDF,
                      handle_font_registration, json_file_option)
 
@@ -55,13 +56,15 @@ def version(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     pdf_version: Annotated[
-        str,
+        PdfVersion,
         typer.Option("--version", "-v", help="New PDF version."),
     ],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
     """Set the PDF version."""
-    PdfWrapper(str(pdf), **ctx.obj).change_version(pdf_version).write(output or pdf)
+    PdfWrapper(str(pdf), **ctx.obj).change_version(pdf_version.value).write(
+        output or pdf
+    )
 
 
 @update_cli.command(no_args_is_help=True)

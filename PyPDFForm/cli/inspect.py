@@ -26,7 +26,7 @@ def schema(
     pdf: INPUT_PDF,
 ) -> None:
     """Print the form schema as JSON."""
-    print(json.dumps(PdfWrapper(str(pdf), **ctx.obj).schema))
+    typer.echo(json.dumps(PdfWrapper(str(pdf), **ctx.obj).schema))
 
 
 @inspect_cli.command(no_args_is_help=True)
@@ -35,7 +35,7 @@ def data(
     pdf: INPUT_PDF,
 ) -> None:
     """Print current form data as JSON."""
-    print(json.dumps(PdfWrapper(str(pdf), **ctx.obj).data))
+    typer.echo(json.dumps(PdfWrapper(str(pdf), **ctx.obj).data))
 
 
 @inspect_cli.command(no_args_is_help=True)
@@ -44,7 +44,7 @@ def sample(
     pdf: INPUT_PDF,
 ) -> None:
     """Print sample fill data as JSON."""
-    print(json.dumps(PdfWrapper(str(pdf), **ctx.obj).sample_data))
+    typer.echo(json.dumps(PdfWrapper(str(pdf), **ctx.obj).sample_data))
 
 
 @inspect_cli.command(no_args_is_help=True)
@@ -56,7 +56,7 @@ def location(
     """Print a form field's location and size as JSON."""
     f = PdfWrapper(str(pdf), **ctx.obj).widgets[field]
 
-    print(
+    typer.echo(
         json.dumps(
             {
                 "page_number": f.page_number,

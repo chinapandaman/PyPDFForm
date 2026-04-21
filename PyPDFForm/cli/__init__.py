@@ -62,7 +62,7 @@ def version_callback(value: bool) -> None:
             running another command.
     """
     if value:
-        print(f"v{__version__}")
+        typer.echo(f"v{__version__}")
         raise typer.Exit
 
 
