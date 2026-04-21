@@ -9,10 +9,62 @@ into the objects expected by `PdfWrapper` methods.
 
 import json
 from pathlib import Path
+from typing import Annotated
 
 import typer
 
 from .. import PdfWrapper
+
+INPUT_PDF = Annotated[
+    Path,
+    typer.Argument(
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        resolve_path=True,
+        help="Input PDF path.",
+    ),
+]
+REQUIRED_OUTPUT_PDF = Annotated[
+    Path,
+    typer.Option(
+        "--output",
+        "-o",
+        file_okay=True,
+        dir_okay=False,
+        writable=True,
+        resolve_path=True,
+        help="Output PDF path.",
+    ),
+]
+OPTIONAL_OUTPUT_PDF = Annotated[
+    Path | None,
+    typer.Option(
+        "--output",
+        "-o",
+        file_okay=True,
+        dir_okay=False,
+        writable=True,
+        resolve_path=True,
+        help="Output PDF path. Overwrites the input when omitted.",
+    ),
+]
+FIELD_NAME = Annotated[str, typer.Option("--field", help="Form field name.")]
+
+
+def json_file_option(help_text: str):
+    """Create the common validated --file/-f JSON option."""
+    return typer.Option(
+        "--file",
+        "-f",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        resolve_path=True,
+        help=help_text,
+    )
 
 
 def handle_font_registration(
