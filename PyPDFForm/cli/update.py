@@ -150,6 +150,7 @@ def bounds(
         float,
         typer.Option(
             "--width",
+            min=0.0,
             help="New field width in points.",
         ),
     ] = None,
@@ -157,6 +158,7 @@ def bounds(
         float,
         typer.Option(
             "--height",
+            min=0.0,
             help="New field height in points.",
         ),
     ] = None,
@@ -327,7 +329,7 @@ def script(
         ),
     ] = None,
 ) -> None:
-    """Add a document-level JavaScript action from a file."""
+    """Add a document-level JavaScript action."""
     obj = PdfWrapper(str(pdf), **ctx.obj)
     setattr(obj, f"on_{event.value}_javascript", str(js_script))
     obj.write(output or pdf)
