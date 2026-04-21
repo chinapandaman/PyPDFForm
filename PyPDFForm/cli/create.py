@@ -39,17 +39,29 @@ def blank(
         ),
     ],
     count: Annotated[
-        int, typer.Option("--count", "-c", help="Number of blank pages to create.")
+        int,
+        typer.Option(
+            "--count",
+            "-c",
+            min=1,
+            help="Number of blank pages to create.",
+        ),
     ] = None,
     width: Annotated[
         float,
         typer.Option(
             "--width",
+            min=0.0,
             help="Page width in points.",
         ),
     ] = None,
     height: Annotated[
-        float, typer.Option("--height", help="Page height in points.")
+        float,
+        typer.Option(
+            "--height",
+            min=0.0,
+            help="Page height in points.",
+        ),
     ] = None,
 ) -> None:
     """Create a new blank PDF."""
@@ -97,6 +109,7 @@ def extract(
         typer.Option(
             "--start",
             "-s",
+            min=1,
             help="First page to extract, starting at 1.",
         ),
     ] = None,
@@ -105,6 +118,7 @@ def extract(
         typer.Option(
             "--end",
             "-e",
+            min=1,
             help="Last page to extract, starting at 1.",
         ),
     ] = None,
@@ -332,6 +346,8 @@ def grid(
         typer.Option(
             "--red",
             "-r",
+            min=0.0,
+            max=1.0,
             help="Grid red value, from 0 to 1.",
         ),
     ] = None,
@@ -340,6 +356,8 @@ def grid(
         typer.Option(
             "--green",
             "-g",
+            min=0.0,
+            max=1.0,
             help="Grid green value, from 0 to 1.",
         ),
     ] = None,
@@ -348,6 +366,8 @@ def grid(
         typer.Option(
             "--blue",
             "-b",
+            min=0.0,
+            max=1.0,
             help="Grid blue value, from 0 to 1.",
         ),
     ] = None,
@@ -356,6 +376,7 @@ def grid(
         typer.Option(
             "--margin",
             "-m",
+            min=0.0,
             help="Grid margin in points.",
         ),
     ] = None,

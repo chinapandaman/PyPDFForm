@@ -150,6 +150,7 @@ def bounds(
         float,
         typer.Option(
             "--width",
+            min=0.0,
             help="New field width in points.",
         ),
     ] = None,
@@ -157,6 +158,7 @@ def bounds(
         float,
         typer.Option(
             "--height",
+            min=0.0,
             help="New field height in points.",
         ),
     ] = None,
