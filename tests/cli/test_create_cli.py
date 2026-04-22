@@ -41,6 +41,8 @@ def test_create_blank_invalid_ranges(args):
 )
 @pytest.mark.cli_test
 def test_create_extract_invalid_page_bounds(pdf_samples, tmp_path, option):
+    output_path = os.path.join(tmp_path, "output.pdf")
+
     result = runner.invoke(
         cli_app,
         [
@@ -48,7 +50,7 @@ def test_create_extract_invalid_page_bounds(pdf_samples, tmp_path, option):
             "extract",
             os.path.join(pdf_samples, "dummy.pdf"),
             "-o",
-            str(tmp_path / "output.pdf"),
+            output_path,
             option,
             "0",
         ],

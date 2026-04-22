@@ -79,7 +79,8 @@ def test_update_bounds_invalid_size(pdf_samples, option):
 
 @pytest.mark.cli_test
 def test_update_bounds_unknown_field(pdf_samples, tmp_path):
-    output_path = tmp_path / "output.pdf"
+    output_path = os.path.join(tmp_path, "output.pdf")
+
     result = runner.invoke(
         cli_app,
         [
@@ -91,13 +92,13 @@ def test_update_bounds_unknown_field(pdf_samples, tmp_path):
             "--x",
             "1",
             "-o",
-            str(output_path),
+            output_path,
         ],
     )
 
     assert result.exit_code == 2
     assert "Form field 'missing_name' does not exist" in result.output
-    assert not output_path.exists()
+    assert not os.path.exists(output_path)
 
 
 @pytest.mark.cli_test
