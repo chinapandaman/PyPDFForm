@@ -9,11 +9,12 @@ into the objects expected by `PdfWrapper` methods.
 
 import json
 from pathlib import Path
-from typing import Annotated, Any, NoReturn
+from typing import Annotated, NoReturn
 
 import typer
 
 from .. import PdfWrapper
+from ..lib.middleware.base import Widget
 
 INPUT_PDF = Annotated[
     Path,
@@ -94,7 +95,7 @@ def cli_bad_parameter(
     raise typer.BadParameter(message, param_hint=param_hint) from cause
 
 
-def get_widget(obj: PdfWrapper, field: str, param_hint: str) -> Any:
+def get_widget(obj: PdfWrapper, field: str, param_hint: str) -> Widget:
     """
     Look up a widget and report missing names as CLI input errors.
 
@@ -104,7 +105,7 @@ def get_widget(obj: PdfWrapper, field: str, param_hint: str) -> Any:
         param_hint (str): CLI parameter associated with the field name.
 
     Returns:
-        Any: The matching widget.
+        Widget: The matching widget.
 
     Raises:
         typer.BadParameter: Raised when the widget name is not present.
