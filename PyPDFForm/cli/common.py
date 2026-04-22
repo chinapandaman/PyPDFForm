@@ -73,7 +73,7 @@ def cli_bad_parameter(
     cause: BaseException,
 ) -> NoReturn:
     """Raise a Typer input error with a stable CLI message."""
-    raise typer.BadParameter(message, param_hint=param_hint) from cause  # noqa: TRY003
+    raise typer.BadParameter(message, param_hint=param_hint) from cause
 
 
 def get_widget(obj: PdfWrapper, field: str, param_hint: str) -> Any:
