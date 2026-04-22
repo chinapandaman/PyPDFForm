@@ -60,6 +60,26 @@ def test_create_extract_invalid_page_bounds(pdf_samples, tmp_path, option):
     assert "is not in the range" in result.output
 
 
+@pytest.mark.cli_test
+def test_create_merge_nonexistent_pdf(tmp_path):
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "merge",
+            "missing.pdf",
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "does not exist" in result.output
+    assert not os.path.exists(output_path)
+
+
 @pytest.mark.parametrize(
     ("option", "value"),
     [
