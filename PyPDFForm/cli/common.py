@@ -54,7 +54,15 @@ FIELD_NAME = Annotated[str, typer.Option("--field", help="Form field name.")]
 
 
 def json_file_option(help_text: str):
-    """Create the common validated --file/-f JSON option."""
+    """
+    Creates the common validated JSON file option.
+
+    Args:
+        help_text (str): Help text to display for the option.
+
+    Returns:
+        typer.Option: A configured `--file` / `-f` option for JSON file input.
+    """
     return typer.Option(
         "--file",
         "-f",
@@ -72,7 +80,17 @@ def cli_bad_parameter(
     param_hint: str,
     cause: BaseException,
 ) -> NoReturn:
-    """Raise a Typer input error with a stable CLI message."""
+    """
+    Raises a Typer input error with a stable CLI message.
+
+    Args:
+        message (str): Error message to display to the CLI user.
+        param_hint (str): CLI parameter associated with the error.
+        cause (BaseException): Original exception that caused the CLI error.
+
+    Raises:
+        typer.BadParameter: Raised with the provided message and parameter hint.
+    """
     raise typer.BadParameter(message, param_hint=param_hint) from cause
 
 
