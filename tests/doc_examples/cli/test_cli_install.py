@@ -6,10 +6,23 @@ import pytest
 from pypdf import PdfReader, PdfWriter
 from typer.testing import CliRunner
 
+from PyPDFForm import __version__
 from PyPDFForm.cli import cli_app
 from PyPDFForm.lib.constants import AcroForm, Title
 
 runner = CliRunner()
+
+
+@pytest.mark.cli_test
+def test_get_version():
+    long = runner.invoke(cli_app, ["--version"])
+    short = runner.invoke(cli_app, ["-v"])
+
+    assert long.exit_code == 0
+    assert short.exit_code == 0
+
+    assert long.output == f"v{__version__}\n"
+    assert long.output == short.output
 
 
 @pytest.mark.cli_test
