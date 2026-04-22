@@ -95,12 +95,12 @@ def cli_bad_parameter(
     raise typer.BadParameter(message, param_hint=param_hint) from cause
 
 
-def get_widget(obj: PdfWrapper, field: str, param_hint: str) -> Widget:
+def get_widget(wrapper: PdfWrapper, field: str, param_hint: str) -> Widget:
     """
     Look up a widget and report missing names as CLI input errors.
 
     Args:
-        obj (PdfWrapper): PDF wrapper containing form widgets.
+        wrapper (PdfWrapper): PDF wrapper containing form widgets.
         field (str): Form field name to look up.
         param_hint (str): CLI parameter associated with the field name.
 
@@ -111,7 +111,7 @@ def get_widget(obj: PdfWrapper, field: str, param_hint: str) -> Widget:
         typer.BadParameter: Raised when the widget name is not present.
     """
     try:
-        return obj.widgets[field]
+        return wrapper.widgets[field]
     except KeyError as exc:
         cli_bad_parameter(
             f"Form field '{field}' does not exist.",
