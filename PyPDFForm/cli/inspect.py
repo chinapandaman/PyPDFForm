@@ -54,7 +54,7 @@ def location(
     field: FIELD_NAME,
 ) -> None:
     """Print a form field's location and size as JSON."""
-    f = get_widget(PdfWrapper(str(pdf), **ctx.obj), field)
+    f = get_widget(PdfWrapper(str(pdf), **ctx.obj), field, "--field")
 
     typer.echo(
         json.dumps(

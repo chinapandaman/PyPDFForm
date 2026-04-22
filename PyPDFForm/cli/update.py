@@ -106,7 +106,7 @@ def bounds(
 ) -> None:
     """Update a form field's position and size."""
     obj = PdfWrapper(str(pdf), **ctx.obj)
-    f = get_widget(obj, widget)
+    f = get_widget(obj, widget, "--field")
 
     f.x = x if x is not None else f.x
     f.y = y if y is not None else f.y

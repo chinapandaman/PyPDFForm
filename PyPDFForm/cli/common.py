@@ -68,13 +68,15 @@ def json_file_option(help_text: str):
 
 
 def cli_bad_parameter(
-    message: str, param_hint: str = "--field", cause: BaseException | None = None
+    message: str,
+    param_hint: str,
+    cause: BaseException,
 ) -> NoReturn:
     """Raise a Typer input error with a stable CLI message."""
     raise typer.BadParameter(message, param_hint=param_hint) from cause  # noqa: TRY003
 
 
-def get_widget(obj: PdfWrapper, field: str, param_hint: str = "--field") -> Any:
+def get_widget(obj: PdfWrapper, field: str, param_hint: str) -> Any:
     """
     Look up a widget and report missing names as CLI input errors.
 
