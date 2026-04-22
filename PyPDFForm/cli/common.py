@@ -9,11 +9,12 @@ into the objects expected by `PdfWrapper` methods.
 
 import json
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, NoReturn
 
 import typer
 
 from .. import PdfWrapper
+from ..lib.middleware.base import Widget
 
 INPUT_PDF = Annotated[
     Path,
@@ -54,7 +55,15 @@ FIELD_NAME = Annotated[str, typer.Option("--field", help="Form field name.")]
 
 
 def json_file_option(help_text: str):
-    """Create the common validated --file/-f JSON option."""
+    """
+    Creates the common validated JSON file option.
+
+    Args:
+        help_text (str): Help text to display for the option.
+
+    Returns:
+        typer.Option: A configured `--file` / `-f` option for JSON file input.
+    """
     return typer.Option(
         "--file",
         "-f",
@@ -65,6 +74,50 @@ def json_file_option(help_text: str):
         resolve_path=True,
         help=help_text,
     )
+
+
+def cli_bad_parameter(
+    message: str,
+    param_hint: str,
+    cause: BaseException,
+) -> NoReturn:
+    """
+    Raises a Typer input error with a stable CLI message.
+
+    Args:
+        message (str): Error message to display to the CLI user.
+        param_hint (str): CLI parameter associated with the error.
+        cause (BaseException): Original exception that caused the CLI error.
+
+    Raises:
+        typer.BadParameter: Raised with the provided message and parameter hint.
+    """
+    raise typer.BadParameter(message, param_hint=param_hint) from cause
+
+
+def get_widget(wrapper: PdfWrapper, field: str, param_hint: str) -> Widget:
+    """
+    Look up a widget and report missing names as CLI input errors.
+
+    Args:
+        wrapper (PdfWrapper): PDF wrapper containing form widgets.
+        field (str): Form field name to look up.
+        param_hint (str): CLI parameter associated with the field name.
+
+    Returns:
+        Widget: The matching widget.
+
+    Raises:
+        typer.BadParameter: Raised when the widget name is not present.
+    """
+    try:
+        return wrapper.widgets[field]
+    except KeyError as exc:
+        cli_bad_parameter(
+            f"Form field '{field}' does not exist.",
+            param_hint=param_hint,
+            cause=exc,
+        )
 
 
 def handle_font_registration(
