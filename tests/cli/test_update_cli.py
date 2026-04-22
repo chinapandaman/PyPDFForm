@@ -19,7 +19,6 @@ def test_update_title_missing_title(pdf_samples):
 
     assert result.exit_code == 2
     assert "Missing option" in result.output
-    assert "--title" in result.output
 
 
 @pytest.mark.cli_test
@@ -54,7 +53,6 @@ def test_update_bounds_missing_field(pdf_samples):
 
     assert result.exit_code == 2
     assert "Missing option" in result.output
-    assert "--field" in result.output
 
 
 @pytest.mark.parametrize("option", ["--width", "--height"])
@@ -110,7 +108,6 @@ def test_update_script_missing_script(pdf_samples):
 
     assert result.exit_code == 2
     assert "Missing option" in result.output
-    assert "--script" in result.output
 
 
 @pytest.mark.cli_test

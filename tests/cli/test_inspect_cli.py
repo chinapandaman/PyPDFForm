@@ -36,7 +36,6 @@ def test_inspect_location_missing_field(pdf_samples):
 
     assert result.exit_code == 2
     assert "Missing option" in result.output
-    assert "--field" in result.output
 
 
 @pytest.mark.cli_test

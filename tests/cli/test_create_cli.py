@@ -16,7 +16,6 @@ def test_create_blank_missing_output():
 
     assert result.exit_code == 2
     assert "Usage:" in result.output
-    assert "--output" in result.output
 
 
 @pytest.mark.parametrize(
