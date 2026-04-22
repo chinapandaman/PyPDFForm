@@ -9,7 +9,7 @@ into the objects expected by `PdfWrapper` methods.
 
 import json
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any, NoReturn
 
 import typer
 
@@ -65,6 +65,38 @@ def json_file_option(help_text: str):
         resolve_path=True,
         help=help_text,
     )
+
+
+def cli_bad_parameter(
+    message: str, param_hint: str = "--field", cause: BaseException | None = None
+) -> NoReturn:
+    """Raise a Typer input error with a stable CLI message."""
+    raise typer.BadParameter(message, param_hint=param_hint) from cause  # noqa: TRY003
+
+
+def get_widget(obj: PdfWrapper, field: str, param_hint: str = "--field") -> Any:
+    """
+    Look up a widget and report missing names as CLI input errors.
+
+    Args:
+        obj (PdfWrapper): PDF wrapper containing form widgets.
+        field (str): Form field name to look up.
+        param_hint (str): CLI parameter associated with the field name.
+
+    Returns:
+        Any: The matching widget.
+
+    Raises:
+        typer.BadParameter: Raised when the widget name is not present.
+    """
+    try:
+        return obj.widgets[field]
+    except KeyError as exc:
+        cli_bad_parameter(
+            f"Form field '{field}' does not exist.",
+            param_hint=param_hint,
+            cause=exc,
+        )
 
 
 def handle_font_registration(

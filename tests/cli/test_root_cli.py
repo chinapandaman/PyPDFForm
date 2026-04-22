@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 import pytest
 from typer.testing import CliRunner
 
@@ -29,3 +31,19 @@ def test_root_command_with_version():
 
     assert long.output == f"v{__version__}\n"
     assert long.output == short.output
+
+
+@pytest.mark.cli_test
+def test_fill_nonexistent_input_pdf(json_samples):
+    result = runner.invoke(
+        cli_app,
+        [
+            "fill",
+            "missing.pdf",
+            "-f",
+            os.path.join(json_samples, "test_fill_text_check.json"),
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "does not exist" in result.output

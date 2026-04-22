@@ -18,7 +18,7 @@ import typer
 
 from .. import PdfWrapper
 from ..lib.constants import PdfVersion
-from .common import (FIELD_NAME, INPUT_PDF, OPTIONAL_OUTPUT_PDF,
+from .common import (FIELD_NAME, INPUT_PDF, OPTIONAL_OUTPUT_PDF, get_widget,
                      handle_font_registration, json_file_option)
 
 update_cli = typer.Typer(
@@ -106,7 +106,7 @@ def bounds(
 ) -> None:
     """Update a form field's position and size."""
     obj = PdfWrapper(str(pdf), **ctx.obj)
-    f = obj.widgets[widget]
+    f = get_widget(obj, widget)
 
     f.x = x if x is not None else f.x
     f.y = y if y is not None else f.y
