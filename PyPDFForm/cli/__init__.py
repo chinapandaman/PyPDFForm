@@ -14,14 +14,14 @@ Commands:
     - `update`: Modify PDF metadata, field names, properties, geometry, and scripts.
 """
 
-import json
 from pathlib import Path
 from typing import Annotated
 
 import typer
 
 from .. import PdfWrapper, Widgets, __version__
-from .common import INPUT_PDF, OPTIONAL_OUTPUT_PDF, json_file_option
+from .common import (INPUT_PDF, OPTIONAL_OUTPUT_PDF, json_file_option,
+                     load_json_file)
 from .create import create_cli
 from .inspect import inspect_cli
 from .update import update_cli
@@ -132,10 +132,41 @@ def fill(
     ] = None,
 ) -> None:
     """Fill a PDF form with JSON data."""
-    with open(data, "r", encoding="utf-8") as f:
-        input_data = json.load(f)
-
     obj = PdfWrapper(str(pdf), **ctx.obj)
+    schema = {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": True,
+    }
+
+    for key, widget in obj.widgets.items():
+        if isinstance(widget, (Widgets.Image, Widgets.Signature)):
+            schema["properties"][key] = {
+                "anyOf": [
+                    {"type": "string"},
+                    {
+                        "type": "object",
+                        "properties": {
+                            "path": {"type": "string"},
+                            "preserve_aspect_ratio": {"type": "boolean"},
+                        },
+                        "required": ["path"],
+                        "additionalProperties": False,
+                    },
+                ]
+            }
+        elif isinstance(widget, Widgets.Dropdown):
+            schema["properties"][key] = {
+                "anyOf": [{"type": "integer"}, {"type": "string"}]
+            }
+        elif isinstance(widget, Widgets.Radio):
+            schema["properties"][key] = {"type": "integer"}
+        elif isinstance(widget, Widgets.Checkbox):
+            schema["properties"][key] = {"type": "boolean"}
+        elif isinstance(widget, Widgets.Text):
+            schema["properties"][key] = {"type": "string"}
+
+    input_data = load_json_file(data, schema, "--file")
     for k, each in obj.widgets.items():
         if k in input_data and isinstance(each, (Widgets.Image, Widgets.Signature)):
             each.preserve_aspect_ratio = input_data.get(k, {}).get(

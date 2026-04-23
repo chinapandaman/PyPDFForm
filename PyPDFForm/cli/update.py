@@ -9,7 +9,6 @@ JSON input, apply the matching `PdfWrapper` operation, and write the modified
 PDF to either the requested output path or the original file.
 """
 
-import json
 from enum import Enum
 from pathlib import Path
 from typing import Annotated
@@ -19,7 +18,9 @@ import typer
 from .. import PdfWrapper
 from ..lib.constants import PdfVersion
 from .common import (FIELD_NAME, INPUT_PDF, OPTIONAL_OUTPUT_PDF, get_widget,
-                     handle_font_registration, json_file_option)
+                     handle_font_registration, json_file_option,
+                     load_json_file)
+from .schemas.update import FIELD_SCHEMA, RENAME_SCHEMA
 
 update_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
@@ -124,8 +125,7 @@ def rename(
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
     """Rename form fields from JSON."""
-    with open(data, "r", encoding="utf-8") as f:
-        input_data = json.load(f)
+    input_data = load_json_file(data, RENAME_SCHEMA, "--file")
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     for item in input_data:
@@ -145,8 +145,7 @@ def field(
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
     """Update form field properties from JSON."""
-    with open(data, "r", encoding="utf-8") as f:
-        input_data = json.load(f)
+    input_data = load_json_file(data, FIELD_SCHEMA, "--file")
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     registered_font = {}

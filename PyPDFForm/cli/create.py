@@ -18,6 +18,7 @@ from .. import (Annotations, BlankPage, Fields, PdfArray, PdfWrapper,
                 RawElements)
 from .common import (INPUT_PDF, OPTIONAL_OUTPUT_PDF, REQUIRED_OUTPUT_PDF,
                      create_elements_from_file, json_file_option)
+from .schemas.create import ANNOTATION_SCHEMA, FIELD_SCHEMA, RAW_SCHEMA
 
 create_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
@@ -132,7 +133,16 @@ def field(
         "image": Fields.ImageField,
         "signature": Fields.SignatureField,
     }
-    create_elements_from_file(pdf, data, field_map, "bulk_create_fields", ctx, output)
+    create_elements_from_file(
+        pdf=pdf,
+        data=data,
+        element_map=field_map,
+        schema=FIELD_SCHEMA,
+        method_name="bulk_create_fields",
+        ctx=ctx,
+        param_hint="--file",
+        output=output,
+    )
 
 
 @create_cli.command(no_args_is_help=True)
@@ -151,7 +161,16 @@ def raw(
         "circle": RawElements.RawCircle,
         "ellipse": RawElements.RawEllipse,
     }
-    create_elements_from_file(pdf, data, raw_element_map, "draw", ctx, output)
+    create_elements_from_file(
+        pdf=pdf,
+        data=data,
+        element_map=raw_element_map,
+        schema=RAW_SCHEMA,
+        method_name="draw",
+        ctx=ctx,
+        param_hint="--file",
+        output=output,
+    )
 
 
 @create_cli.command(no_args_is_help=True)
@@ -171,7 +190,16 @@ def annotation(
         "strikeout": Annotations.StrikeOutAnnotation,
         "stamp": Annotations.RubberStampAnnotation,
     }
-    create_elements_from_file(pdf, data, annotation_map, "annotate", ctx, output)
+    create_elements_from_file(
+        pdf=pdf,
+        data=data,
+        element_map=annotation_map,
+        schema=ANNOTATION_SCHEMA,
+        method_name="annotate",
+        ctx=ctx,
+        param_hint="--file",
+        output=output,
+    )
 
 
 @create_cli.command(no_args_is_help=True)
