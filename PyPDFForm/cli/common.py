@@ -77,7 +77,7 @@ def json_file_option(help_text: str):
     )
 
 
-def cli_bad_parameter(
+def _cli_bad_parameter(
     message: str,
     param_hint: str,
     cause: BaseException,
@@ -129,7 +129,7 @@ def load_json_file(data: Path, schema: dict, param_hint: str = "--file") -> Any:
         with open(data, "r", encoding="utf-8") as f:
             input_data = json.load(f)
     except (OSError, json.JSONDecodeError) as exc:
-        cli_bad_parameter(
+        _cli_bad_parameter(
             f"Invalid JSON file: {exc}",
             param_hint=param_hint,
             cause=exc,
@@ -140,7 +140,7 @@ def load_json_file(data: Path, schema: dict, param_hint: str = "--file") -> Any:
     except ValidationError as exc:
         error_path = _validation_error_path(exc)
         location = f" at {error_path}" if error_path else ""
-        cli_bad_parameter(
+        _cli_bad_parameter(
             f"Invalid JSON file{location}: {exc.message}",
             param_hint=param_hint,
             cause=exc,
@@ -167,7 +167,7 @@ def get_widget(wrapper: PdfWrapper, field: str, param_hint: str) -> Widget:
     try:
         return wrapper.widgets[field]
     except KeyError as exc:
-        cli_bad_parameter(
+        _cli_bad_parameter(
             f"Form field '{field}' does not exist.",
             param_hint=param_hint,
             cause=exc,
