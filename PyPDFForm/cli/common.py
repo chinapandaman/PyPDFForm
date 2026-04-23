@@ -109,7 +109,7 @@ def _validation_error_path(exc: ValidationError) -> str:
     return ".".join(str(each) for each in exc.absolute_path)
 
 
-def load_json_file(data: Path, schema: dict, param_hint: str = "--file") -> Any:
+def load_json_file(data: Path, schema: dict, param_hint: str) -> Any:
     """
     Loads a JSON CLI input file and validates it against a schema.
 
