@@ -160,11 +160,11 @@ def test_change_text_max_length(static_pdfs, pdf_samples, request):
 
     form.fill(
         {
-            "test": "test_1",
+            "test": "te",
             "check": True,
-            "test_2": "test_2",
+            "test_2": "test",
             "check_2": False,
-            "test_3": "test_3",
+            "test_3": "test",
             "check_3": True,
         },
     )
@@ -196,11 +196,11 @@ def test_change_text_comb(static_pdfs, pdf_samples, request):
 
     form.fill(
         {
-            "test": "test_1",
+            "test": "te",
             "check": True,
-            "test_2": "test_2",
+            "test_2": "test",
             "check_2": False,
-            "test_3": "test_3",
+            "test_3": "test",
             "check_3": True,
         },
     )
