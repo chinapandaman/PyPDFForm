@@ -149,11 +149,11 @@ form.widgets["test"].max_length = 2
 
 form.fill(
     {
-        "test": "test_1",
+        "test": "te",
         "check": True,
-        "test_2": "test_2",
+        "test_2": "test",
         "check_2": False,
-        "test_3": "test_3",
+        "test_3": "test",
         "check_3": True,
     },
 )
@@ -182,11 +182,11 @@ form.widgets["test"].comb = True
 
 form.fill(
     {
-        "test": "test_1",
+        "test": "te",
         "check": True,
-        "test_2": "test_2",
+        "test_2": "test",
         "check_2": False,
-        "test_3": "test_3",
+        "test_3": "test",
         "check_3": True,
     },
 )
