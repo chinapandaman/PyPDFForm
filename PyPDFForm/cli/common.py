@@ -207,6 +207,7 @@ def create_elements_from_file(
     schema: dict,
     method_name: str,
     ctx: typer.Context,
+    param_hint: str,
     output: Path | None = None,
 ) -> None:
     """
@@ -230,10 +231,11 @@ def create_elements_from_file(
             `annotate`.
         ctx (typer.Context): Typer context containing global wrapper options in
             `ctx.obj`.
+        param_hint (str): CLI parameter associated with the JSON file.
         output (Path, optional): Path where the modified PDF should be saved. If
             omitted, the input PDF is overwritten. Defaults to None.
     """
-    input_data = load_json_file(data, schema, "--file")
+    input_data = load_json_file(data, schema, param_hint)
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     ungrouped_input = []

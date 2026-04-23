@@ -134,7 +134,14 @@ def field(
         "signature": Fields.SignatureField,
     }
     create_elements_from_file(
-        pdf, data, field_map, FIELD_SCHEMA, "bulk_create_fields", ctx, output
+        pdf=pdf,
+        data=data,
+        element_map=field_map,
+        schema=FIELD_SCHEMA,
+        method_name="bulk_create_fields",
+        ctx=ctx,
+        param_hint="--file",
+        output=output,
     )
 
 
@@ -155,7 +162,14 @@ def raw(
         "ellipse": RawElements.RawEllipse,
     }
     create_elements_from_file(
-        pdf, data, raw_element_map, RAW_SCHEMA, "draw", ctx, output
+        pdf=pdf,
+        data=data,
+        element_map=raw_element_map,
+        schema=RAW_SCHEMA,
+        method_name="draw",
+        ctx=ctx,
+        param_hint="--file",
+        output=output,
     )
 
 
@@ -177,7 +191,14 @@ def annotation(
         "stamp": Annotations.RubberStampAnnotation,
     }
     create_elements_from_file(
-        pdf, data, annotation_map, ANNOTATION_SCHEMA, "annotate", ctx, output
+        pdf=pdf,
+        data=data,
+        element_map=annotation_map,
+        schema=ANNOTATION_SCHEMA,
+        method_name="annotate",
+        ctx=ctx,
+        param_hint="--file",
+        output=output,
     )
 
 
