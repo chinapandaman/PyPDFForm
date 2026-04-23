@@ -12,7 +12,9 @@ def test_schema(sample_template_with_dropdown):
 
     for key, value in obj.schema["properties"].items():
         if key == "dropdown_1":
-            assert value["maximum"] == 3
+            for each in value["anyOf"]:
+                if each["type"] == "integer":
+                    assert each["maximum"] == 3
 
     assert obj.sample_data["dropdown_1"] == 3
 

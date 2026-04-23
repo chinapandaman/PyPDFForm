@@ -133,17 +133,13 @@ def fill(
 ) -> None:
     """Fill a PDF form with JSON data."""
     obj = PdfWrapper(str(pdf), **ctx.obj)
-    schema = {
-        "type": "object",
-        "properties": {},
-        "additionalProperties": True,
-    }
 
+    schema = obj.schema
     for key, widget in obj.widgets.items():
         if isinstance(widget, (Widgets.Image, Widgets.Signature)):
             schema["properties"][key] = {
                 "anyOf": [
-                    {"type": "string"},
+                    schema["properties"][key],
                     {
                         "type": "object",
                         "properties": {
@@ -155,21 +151,15 @@ def fill(
                     },
                 ]
             }
-        elif isinstance(widget, Widgets.Dropdown):
-            schema["properties"][key] = {
-                "anyOf": [{"type": "integer"}, {"type": "string"}]
-            }
-        elif isinstance(widget, Widgets.Radio):
-            schema["properties"][key] = {"type": "integer"}
-        elif isinstance(widget, Widgets.Checkbox):
-            schema["properties"][key] = {"type": "boolean"}
-        elif isinstance(widget, Widgets.Text):
-            schema["properties"][key] = {"type": "string"}
 
     input_data = load_json_file(data, schema, "--file")
     for k, each in obj.widgets.items():
-        if k in input_data and isinstance(each, (Widgets.Image, Widgets.Signature)):
-            each.preserve_aspect_ratio = input_data.get(k, {}).get(
+        if (
+            k in input_data
+            and isinstance(each, (Widgets.Image, Widgets.Signature))
+            and isinstance(input_data[k], dict)
+        ):
+            each.preserve_aspect_ratio = input_data[k].get(
                 "preserve_aspect_ratio", each.preserve_aspect_ratio
             )
             input_data[k] = input_data[k]["path"]

@@ -246,6 +246,7 @@ class PdfWrapper:
             "properties": {
                 key: value.schema_definition for key, value in self.widgets.items()
             },
+            "additionalProperties": True,
         }
 
     @property
