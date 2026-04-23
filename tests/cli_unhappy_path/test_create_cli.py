@@ -79,6 +79,138 @@ def test_create_merge_nonexistent_pdf(tmp_path):
     assert not os.path.exists(output_path)
 
 
+@pytest.mark.cli_test
+def test_create_field_malformed_json(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('{"text": [')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "field",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file" in result.output
+    assert "--file" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
+def test_create_field_invalid_top_level_type(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write("[]")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "field",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file" in result.output
+    assert "--file" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
+def test_create_field_unknown_group(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('{"textbox": []}')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "field",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file" in result.output
+    assert "--file" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
+def test_create_raw_missing_required_property(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write(
+            '{"image": [{"image": "image.png", "page_number": 1, "x": 1, "y": 1, "height": 1}]}'
+        )
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "raw",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file" in result.output
+    assert "--file" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
+def test_create_raw_wrong_property_type(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('{"text": [{"text": "hello", "page_number": "1", "x": 1, "y": 1}]}')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "raw",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file at text.0.page_number" in result.output
+    assert "--file" in result.output
+    assert not os.path.exists(output_path)
+
+
 @pytest.mark.parametrize(
     ("option", "value"),
     [

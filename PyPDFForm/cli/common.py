@@ -9,9 +9,10 @@ into the objects expected by `PdfWrapper` methods.
 
 import json
 from pathlib import Path
-from typing import Annotated, NoReturn
+from typing import Annotated, Any, NoReturn
 
 import typer
+from jsonschema import ValidationError, validate
 
 from .. import PdfWrapper
 from ..lib.middleware.base import Widget
@@ -95,6 +96,59 @@ def cli_bad_parameter(
     raise typer.BadParameter(message, param_hint=param_hint) from cause
 
 
+def _validation_error_path(exc: ValidationError) -> str:
+    """
+    Builds a dotted JSON path for a validation error.
+
+    Args:
+        exc (ValidationError): The JSON schema validation error.
+
+    Returns:
+        str: Dotted path for the failing instance location.
+    """
+    return ".".join(str(each) for each in exc.absolute_path)
+
+
+def load_json_file(data: Path, schema: dict, param_hint: str = "--file") -> Any:
+    """
+    Loads a JSON CLI input file and validates it against a schema.
+
+    Args:
+        data (Path): JSON file path.
+        schema (dict): JSON schema to validate against.
+        param_hint (str): CLI parameter associated with the JSON file.
+
+    Returns:
+        Any: Parsed and validated JSON input.
+
+    Raises:
+        typer.BadParameter: Raised when the file cannot be loaded or validation
+            fails.
+    """
+    try:
+        with open(data, "r", encoding="utf-8") as f:
+            input_data = json.load(f)
+    except (OSError, json.JSONDecodeError) as exc:
+        cli_bad_parameter(
+            f"Invalid JSON file: {exc}",
+            param_hint=param_hint,
+            cause=exc,
+        )
+
+    try:
+        validate(instance=input_data, schema=schema)
+    except ValidationError as exc:
+        error_path = _validation_error_path(exc)
+        location = f" at {error_path}" if error_path else ""
+        cli_bad_parameter(
+            f"Invalid JSON file{location}: {exc.message}",
+            param_hint=param_hint,
+            cause=exc,
+        )
+
+    return input_data
+
+
 def get_widget(wrapper: PdfWrapper, field: str, param_hint: str) -> Widget:
     """
     Look up a widget and report missing names as CLI input errors.
@@ -150,6 +204,7 @@ def create_elements_from_file(
     pdf: Path,
     data: Path,
     element_map: dict,
+    schema: dict,
     method_name: str,
     ctx: typer.Context,
     output: Path | None = None,
@@ -169,6 +224,7 @@ def create_elements_from_file(
             definitions.
         element_map (dict): Mapping from JSON group names to element classes or
             callables used to construct each object.
+        schema (dict): JSON schema used to validate the grouped definitions.
         method_name (str): Name of the `PdfWrapper` method that accepts the
             constructed elements, such as `bulk_create_fields`, `draw`, or
             `annotate`.
@@ -177,8 +233,7 @@ def create_elements_from_file(
         output (Path, optional): Path where the modified PDF should be saved. If
             omitted, the input PDF is overwritten. Defaults to None.
     """
-    with open(data, "r", encoding="utf-8") as f:
-        input_data = json.load(f)
+    input_data = load_json_file(data, schema, "--file")
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     ungrouped_input = []

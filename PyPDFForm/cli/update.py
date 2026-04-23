@@ -9,7 +9,6 @@ JSON input, apply the matching `PdfWrapper` operation, and write the modified
 PDF to either the requested output path or the original file.
 """
 
-import json
 from enum import Enum
 from pathlib import Path
 from typing import Annotated
@@ -19,7 +18,8 @@ import typer
 from .. import PdfWrapper
 from ..lib.constants import PdfVersion
 from .common import (FIELD_NAME, INPUT_PDF, OPTIONAL_OUTPUT_PDF, get_widget,
-                     handle_font_registration, json_file_option)
+                     handle_font_registration, json_file_option,
+                     load_json_file)
 
 update_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
@@ -124,8 +124,24 @@ def rename(
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
     """Rename form fields from JSON."""
-    with open(data, "r", encoding="utf-8") as f:
-        input_data = json.load(f)
+    schema = {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 1,
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "new_key": {"type": "string"},
+                    "index": {"type": "integer", "minimum": 0},
+                },
+                "required": ["new_key"],
+                "additionalProperties": False,
+            },
+        },
+    }
+    input_data = load_json_file(data, schema, "--file")
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     for item in input_data:
@@ -145,8 +161,97 @@ def field(
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
     """Update form field properties from JSON."""
-    with open(data, "r", encoding="utf-8") as f:
-        input_data = json.load(f)
+    schema = {
+        "type": "object",
+        "patternProperties": {
+            ".+": {
+                "type": "object",
+                "properties": {
+                    "x": {
+                        "anyOf": [
+                            {"type": "number"},
+                            {
+                                "type": "array",
+                                "items": {"type": "number"},
+                                "minItems": 1,
+                            },
+                        ]
+                    },
+                    "y": {
+                        "anyOf": [
+                            {"type": "number"},
+                            {
+                                "type": "array",
+                                "items": {"type": "number"},
+                                "minItems": 1,
+                            },
+                        ]
+                    },
+                    "width": {
+                        "anyOf": [
+                            {"type": "number"},
+                            {
+                                "type": "array",
+                                "items": {"type": "number"},
+                                "minItems": 1,
+                            },
+                        ]
+                    },
+                    "height": {
+                        "anyOf": [
+                            {"type": "number"},
+                            {
+                                "type": "array",
+                                "items": {"type": "number"},
+                                "minItems": 1,
+                            },
+                        ]
+                    },
+                    "readonly": {"type": "boolean"},
+                    "required": {"type": "boolean"},
+                    "hidden": {"type": "boolean"},
+                    "tooltip": {"type": "string"},
+                    "on_hovered_over_javascript": {"type": "string"},
+                    "on_hovered_off_javascript": {"type": "string"},
+                    "on_mouse_pressed_javascript": {"type": "string"},
+                    "on_mouse_released_javascript": {"type": "string"},
+                    "on_focused_javascript": {"type": "string"},
+                    "on_blurred_javascript": {"type": "string"},
+                    "font": {"type": "string"},
+                    "font_size": {"type": "number"},
+                    "font_color": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "minItems": 3,
+                        "maxItems": 4,
+                    },
+                    "comb": {"type": "boolean"},
+                    "alignment": {"type": "integer", "minimum": 0},
+                    "multiline": {"type": "boolean"},
+                    "max_length": {"type": "integer", "minimum": 0},
+                    "choices": {
+                        "type": "array",
+                        "items": {
+                            "anyOf": [
+                                {"type": "string"},
+                                {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "minItems": 2,
+                                    "maxItems": 2,
+                                },
+                            ]
+                        },
+                        "minItems": 1,
+                    },
+                    "size": {"type": "number"},
+                },
+                "additionalProperties": False,
+            }
+        },
+        "additionalProperties": False,
+    }
+    input_data = load_json_file(data, schema, "--file")
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     registered_font = {}
