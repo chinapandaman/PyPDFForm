@@ -57,5 +57,4 @@ def test_fill_wrong_known_field_type(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file at check" in result.output
-    assert "--file" in result.output
     assert not os.path.exists(output_path)

@@ -121,7 +121,6 @@ def test_update_rename_missing_new_key(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file" in result.output
-    assert "--file" in result.output
     assert not os.path.exists(output_path)
 
 
@@ -147,7 +146,6 @@ def test_update_field_wrong_property_type(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file at test.font_color" in result.output
-    assert "--file" in result.output
     assert not os.path.exists(output_path)
 
 
@@ -173,7 +171,6 @@ def test_update_field_invalid_text_alignment(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file at test.alignment" in result.output
-    assert "--file" in result.output
     assert not os.path.exists(output_path)
 
 

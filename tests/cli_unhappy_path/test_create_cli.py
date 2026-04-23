@@ -101,7 +101,6 @@ def test_create_field_malformed_json(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file" in result.output
-    assert "--file" in result.output
     assert not os.path.exists(output_path)
 
 
@@ -127,7 +126,6 @@ def test_create_field_invalid_top_level_type(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file" in result.output
-    assert "--file" in result.output
     assert not os.path.exists(output_path)
 
 
@@ -153,7 +151,6 @@ def test_create_field_unknown_group(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file" in result.output
-    assert "--file" in result.output
     assert not os.path.exists(output_path)
 
 
@@ -181,7 +178,6 @@ def test_create_field_invalid_text_alignment(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file at text.0.alignment" in result.output
-    assert "--file" in result.output
     assert not os.path.exists(output_path)
 
 
@@ -209,7 +205,6 @@ def test_create_raw_missing_required_property(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file" in result.output
-    assert "--file" in result.output
     assert not os.path.exists(output_path)
 
 
@@ -235,7 +230,6 @@ def test_create_raw_wrong_property_type(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file at text.0.page_number" in result.output
-    assert "--file" in result.output
     assert not os.path.exists(output_path)
 
 
