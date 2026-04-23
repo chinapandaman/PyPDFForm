@@ -34,8 +34,6 @@ cli_app.add_typer(
     name="create",
     help="Create PDFs and PDF elements.",
 )
-
-
 cli_app.add_typer(
     inspect_cli,
     name="inspect",
