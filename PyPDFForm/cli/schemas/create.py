@@ -62,7 +62,10 @@ FIELD_SCHEMA = {
                     "required": {"type": "boolean"},
                     "tooltip": {"type": "string"},
                     "size": {"type": "number"},
-                    "button_style": {"type": "string"},
+                    "button_style": {
+                        "type": "string",
+                        "enum": ["check", "circle", "cross"],
+                    },
                     "tick_color": {
                         "type": "array",
                         "items": {"type": "number"},
@@ -107,7 +110,10 @@ FIELD_SCHEMA = {
                     "required": {"type": "boolean"},
                     "tooltip": {"type": "string"},
                     "size": {"type": "number"},
-                    "button_style": {"type": "string"},
+                    "button_style": {
+                        "type": "string",
+                        "enum": ["check", "circle", "cross"],
+                    },
                     "tick_color": {
                         "type": "array",
                         "items": {"type": "number"},
