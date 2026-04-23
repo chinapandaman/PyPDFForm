@@ -119,9 +119,14 @@ class Dropdown(Widget):
             dict: A dictionary representing the schema definition.
         """
         return {
-            "type": "integer",
-            "maximum": len(self.choices) - 1,
-            **super().schema_definition,
+            "anyOf": [
+                {
+                    "type": "integer",
+                    "maximum": len(self.choices) - 1,
+                    **super().schema_definition,
+                },
+                {"type": "string"},
+            ]
         }
 
     @property
