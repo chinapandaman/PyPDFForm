@@ -1,0 +1,8 @@
+{
+    "test": "te",
+    "check": true,
+    "test_2": "test",
+    "check_2": false,
+    "test_3": "test",
+    "check_3": true
+}
