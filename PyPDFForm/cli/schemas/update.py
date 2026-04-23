@@ -87,7 +87,7 @@ FIELD_SCHEMA = {
                     "maxItems": 4,
                 },
                 "comb": {"type": "boolean"},
-                "alignment": {"type": "integer", "minimum": 0},
+                "alignment": {"type": "integer", "minimum": 0, "maximum": 2},
                 "multiline": {"type": "boolean"},
                 "max_length": {"type": "integer", "minimum": 0},
                 "choices": {
