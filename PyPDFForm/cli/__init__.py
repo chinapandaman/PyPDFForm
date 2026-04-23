@@ -168,8 +168,12 @@ def fill(
 
     input_data = load_json_file(data, schema, "--file")
     for k, each in obj.widgets.items():
-        if k in input_data and isinstance(each, (Widgets.Image, Widgets.Signature)):
-            each.preserve_aspect_ratio = input_data.get(k, {}).get(
+        if (
+            k in input_data
+            and isinstance(each, (Widgets.Image, Widgets.Signature))
+            and isinstance(input_data[k], dict)
+        ):
+            each.preserve_aspect_ratio = input_data[k].get(
                 "preserve_aspect_ratio", each.preserve_aspect_ratio
             )
             input_data[k] = input_data[k]["path"]
