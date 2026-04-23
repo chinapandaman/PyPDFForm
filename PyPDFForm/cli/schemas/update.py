@@ -84,7 +84,7 @@ FIELD_SCHEMA = {
                     "type": "array",
                     "items": {"type": "number"},
                     "minItems": 3,
-                    "maxItems": 4,
+                    "maxItems": 3,
                 },
                 "comb": {"type": "boolean"},
                 "alignment": {"type": "integer", "minimum": 0, "maximum": 2},

@@ -26,7 +26,7 @@ FIELD_SCHEMA = {
                         "type": "array",
                         "items": {"type": "number"},
                         "minItems": 3,
-                        "maxItems": 4,
+                        "maxItems": 3,
                     },
                     "bg_color": {
                         "type": "array",
@@ -152,7 +152,7 @@ FIELD_SCHEMA = {
                         "type": "array",
                         "items": {"type": "number"},
                         "minItems": 3,
-                        "maxItems": 4,
+                        "maxItems": 3,
                     },
                     "bg_color": {
                         "type": "array",
@@ -245,7 +245,7 @@ RAW_SCHEMA = {
                         "type": "array",
                         "items": {"type": "number"},
                         "minItems": 3,
-                        "maxItems": 4,
+                        "maxItems": 3,
                     },
                 },
                 "required": ["text", "page_number", "x", "y"],

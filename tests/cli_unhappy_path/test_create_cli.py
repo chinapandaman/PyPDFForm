@@ -182,6 +182,33 @@ def test_create_field_invalid_text_alignment(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+def test_create_field_font_color_rejects_alpha_channel(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write(
+            '{"text": [{"name": "new_text", "page_number": 1, "x": 1, "y": 1, "font_color": [1, 0, 0, 1]}]}'
+        )
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "field",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file at text.0.font_color" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
 def test_create_raw_missing_required_property(pdf_samples, tmp_path):
     data_path = os.path.join(tmp_path, "invalid.json")
     output_path = os.path.join(tmp_path, "output.pdf")
@@ -205,6 +232,33 @@ def test_create_raw_missing_required_property(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
+def test_create_raw_font_color_rejects_alpha_channel(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write(
+            '{"text": [{"text": "hello", "page_number": 1, "x": 1, "y": 1, "font_color": [1, 0, 0, 1]}]}'
+        )
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "raw",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file at text.0.font_color" in result.output
     assert not os.path.exists(output_path)
 
 
