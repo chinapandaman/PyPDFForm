@@ -100,12 +100,12 @@ FIELD_SCHEMA = {
                     "x": {
                         "type": "array",
                         "items": {"type": "number"},
-                        "minItems": 1,
+                        "minItems": 2,
                     },
                     "y": {
                         "type": "array",
                         "items": {"type": "number"},
-                        "minItems": 1,
+                        "minItems": 2,
                     },
                     "required": {"type": "boolean"},
                     "tooltip": {"type": "string"},
