@@ -412,7 +412,6 @@ ANNOTATION_SCHEMA = {
                     "y": {"type": "number"},
                     "width": {"type": "number"},
                     "height": {"type": "number"},
-                    "contents": {"type": "string"},
                     "uri": {"type": "string"},
                     "page": {"type": "integer", "minimum": 1},
                 },
