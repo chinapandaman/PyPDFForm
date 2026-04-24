@@ -130,7 +130,10 @@ def rename(
     obj = PdfWrapper(str(pdf), **ctx.obj)
     for item in input_data:
         for k, v in item.items():
-            obj.update_widget_key(k, v["new_key"], index=v.get("index", 0), defer=True)
+            widget = get_widget(obj, k, "--file")
+            obj.update_widget_key(
+                widget.name, v["new_key"], index=v.get("index", 0), defer=True
+            )
 
     obj.commit_widget_key_updates().write(output or pdf)
 
@@ -150,9 +153,10 @@ def field(
     obj = PdfWrapper(str(pdf), **ctx.obj)
     registered_font = {}
     for k, each in input_data.items():
+        widget = get_widget(obj, k, "--file")
         handle_font_registration(obj, each, registered_font)
         for param, v in each.items():
-            setattr(obj.widgets[k], param, v)
+            setattr(widget, param, v)
 
     obj.write(output or pdf)
 
