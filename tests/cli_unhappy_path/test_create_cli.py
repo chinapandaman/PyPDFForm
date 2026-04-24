@@ -506,6 +506,33 @@ def test_create_raw_rectangle_fill_color_rejects_alpha_channel(pdf_samples, tmp_
 
 
 @pytest.mark.cli_test
+def test_create_raw_rectangle_fill_color_rejects_null(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write(
+            '{"rectangle": [{"page_number": 1, "x": 1, "y": 1, "width": 2, "height": 2, "fill_color": null}]}'
+        )
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "raw",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file at rectangle.0.fill_color" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
 def test_create_raw_wrong_property_type(pdf_samples, tmp_path):
     data_path = os.path.join(tmp_path, "invalid.json")
     output_path = os.path.join(tmp_path, "output.pdf")

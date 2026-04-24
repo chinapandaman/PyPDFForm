@@ -316,15 +316,10 @@ RAW_SCHEMA = {
                         "maxItems": 3,
                     },
                     "fill_color": {
-                        "anyOf": [
-                            {
-                                "type": "array",
-                                "items": {"type": "number"},
-                                "minItems": 3,
-                                "maxItems": 3,
-                            },
-                            {"type": "null"},
-                        ]
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "minItems": 3,
+                        "maxItems": 3,
                     },
                 },
                 "required": ["page_number", "x", "y", "width", "height"],
@@ -347,15 +342,10 @@ RAW_SCHEMA = {
                         "maxItems": 3,
                     },
                     "fill_color": {
-                        "anyOf": [
-                            {
-                                "type": "array",
-                                "items": {"type": "number"},
-                                "minItems": 3,
-                                "maxItems": 3,
-                            },
-                            {"type": "null"},
-                        ]
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "minItems": 3,
+                        "maxItems": 3,
                     },
                 },
                 "required": ["page_number", "center_x", "center_y", "radius"],
@@ -379,15 +369,10 @@ RAW_SCHEMA = {
                         "maxItems": 3,
                     },
                     "fill_color": {
-                        "anyOf": [
-                            {
-                                "type": "array",
-                                "items": {"type": "number"},
-                                "minItems": 3,
-                                "maxItems": 3,
-                            },
-                            {"type": "null"},
-                        ]
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "minItems": 3,
+                        "maxItems": 3,
                     },
                 },
                 "required": ["page_number", "x1", "y1", "x2", "y2"],
