@@ -133,7 +133,10 @@ FIELD_SCHEMA = {
                         "maxItems": 4,
                     },
                     "border_width": {"type": "number"},
-                    "shape": {"type": "string"},
+                    "shape": {
+                        "type": "string",
+                        "enum": ["square", "circle"],
+                    },
                 },
                 "required": ["name", "page_number", "x", "y"],
                 "additionalProperties": False,
