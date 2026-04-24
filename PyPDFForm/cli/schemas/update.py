@@ -39,10 +39,10 @@ FIELD_SCHEMA = {
                 "on_focused_javascript": {"type": "string"},
                 "on_blurred_javascript": {"type": "string"},
                 "font": {"type": "string"},
-                "font_size": {"type": "number"},
+                "font_size": {"type": "number", "minimum": 0},
                 "font_color": {
                     "type": "array",
-                    "items": {"type": "number"},
+                    "items": {"type": "number", "minimum": 0, "maximum": 1},
                     "minItems": 3,
                     "maxItems": 3,
                 },
@@ -65,7 +65,7 @@ FIELD_SCHEMA = {
                     },
                     "minItems": 1,
                 },
-                "size": {"type": "number"},
+                "size": {"type": "number", "minimum": 0},
             },
             "additionalProperties": False,
         }
