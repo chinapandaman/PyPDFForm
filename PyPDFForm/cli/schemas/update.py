@@ -28,46 +28,6 @@ FIELD_SCHEMA = {
         ".+": {
             "type": "object",
             "properties": {
-                "x": {
-                    "anyOf": [
-                        {"type": "number"},
-                        {
-                            "type": "array",
-                            "items": {"type": "number"},
-                            "minItems": 1,
-                        },
-                    ]
-                },
-                "y": {
-                    "anyOf": [
-                        {"type": "number"},
-                        {
-                            "type": "array",
-                            "items": {"type": "number"},
-                            "minItems": 1,
-                        },
-                    ]
-                },
-                "width": {
-                    "anyOf": [
-                        {"type": "number"},
-                        {
-                            "type": "array",
-                            "items": {"type": "number"},
-                            "minItems": 1,
-                        },
-                    ]
-                },
-                "height": {
-                    "anyOf": [
-                        {"type": "number"},
-                        {
-                            "type": "array",
-                            "items": {"type": "number"},
-                            "minItems": 1,
-                        },
-                    ]
-                },
                 "readonly": {"type": "boolean"},
                 "required": {"type": "boolean"},
                 "hidden": {"type": "boolean"},
