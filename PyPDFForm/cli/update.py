@@ -130,8 +130,10 @@ def rename(
     obj = PdfWrapper(str(pdf), **ctx.obj)
     for item in input_data:
         for k, v in item.items():
-            get_widget(obj, k, "--file")
-            obj.update_widget_key(k, v["new_key"], index=v.get("index", 0), defer=True)
+            widget = get_widget(obj, k, "--file")
+            obj.update_widget_key(
+                widget.name, v["new_key"], index=v.get("index", 0), defer=True
+            )
 
     obj.commit_widget_key_updates().write(output or pdf)
 
