@@ -415,7 +415,11 @@ ANNOTATION_SCHEMA = {
                     "uri": {"type": "string"},
                     "page": {"type": "integer", "minimum": 1},
                 },
-                "required": ["page_number", "x", "y"],
+                "required": ["page_number", "x", "y", "width", "height"],
+                "anyOf": [
+                    {"required": ["uri"]},
+                    {"required": ["page"]},
+                ],
                 "additionalProperties": False,
             },
         },
