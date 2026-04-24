@@ -192,7 +192,7 @@ FIELD_SCHEMA = {
                         "minItems": 1,
                     },
                 },
-                "required": ["name", "page_number", "x", "y"],
+                "required": ["name", "page_number", "x", "y", "options"],
                 "additionalProperties": False,
             },
         },

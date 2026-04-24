@@ -371,6 +371,33 @@ def test_create_field_radio_invalid_shape(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+def test_create_field_dropdown_missing_options(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write(
+            '{"dropdown": [{"name": "new_dropdown", "page_number": 1, "x": 1, "y": 1}]}'
+        )
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "field",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
 def test_create_raw_missing_required_property(pdf_samples, tmp_path):
     data_path = os.path.join(tmp_path, "invalid.json")
     output_path = os.path.join(tmp_path, "output.pdf")
