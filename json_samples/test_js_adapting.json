@@ -1,0 +1,5 @@
+{
+    "test": {
+        "on_hovered_over_javascript": "app.alert(\"Hello World!\");\n"
+    }
+}

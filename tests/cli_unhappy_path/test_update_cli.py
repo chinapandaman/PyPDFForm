@@ -125,6 +125,31 @@ def test_update_rename_missing_new_key(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+def test_update_rename_unknown_field(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('[{"missing_name": {"new_key": "new_name"}}]')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "rename",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Form field 'missing_name' does not exist" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
 def test_update_field_wrong_property_type(pdf_samples, tmp_path):
     data_path = os.path.join(tmp_path, "invalid.json")
     output_path = os.path.join(tmp_path, "output.pdf")
@@ -296,6 +321,31 @@ def test_update_field_invalid_text_alignment(pdf_samples, tmp_path):
 
     assert result.exit_code == 2
     assert "Invalid JSON file at test.alignment" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
+def test_update_field_unknown_field(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('{"missing_name": {"font_size": 12}}')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "field",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Form field 'missing_name' does not exist" in result.output
     assert not os.path.exists(output_path)
 
 
