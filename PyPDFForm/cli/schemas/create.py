@@ -292,7 +292,7 @@ RAW_SCHEMA = {
                         "type": "array",
                         "items": {"type": "number"},
                         "minItems": 3,
-                        "maxItems": 4,
+                        "maxItems": 3,
                     },
                 },
                 "required": ["page_number", "src_x", "src_y", "dest_x", "dest_y"],
@@ -313,7 +313,7 @@ RAW_SCHEMA = {
                         "type": "array",
                         "items": {"type": "number"},
                         "minItems": 3,
-                        "maxItems": 4,
+                        "maxItems": 3,
                     },
                     "fill_color": {
                         "anyOf": [
@@ -321,7 +321,7 @@ RAW_SCHEMA = {
                                 "type": "array",
                                 "items": {"type": "number"},
                                 "minItems": 3,
-                                "maxItems": 4,
+                                "maxItems": 3,
                             },
                             {"type": "null"},
                         ]
@@ -344,7 +344,7 @@ RAW_SCHEMA = {
                         "type": "array",
                         "items": {"type": "number"},
                         "minItems": 3,
-                        "maxItems": 4,
+                        "maxItems": 3,
                     },
                     "fill_color": {
                         "anyOf": [
@@ -352,7 +352,7 @@ RAW_SCHEMA = {
                                 "type": "array",
                                 "items": {"type": "number"},
                                 "minItems": 3,
-                                "maxItems": 4,
+                                "maxItems": 3,
                             },
                             {"type": "null"},
                         ]
@@ -376,7 +376,7 @@ RAW_SCHEMA = {
                         "type": "array",
                         "items": {"type": "number"},
                         "minItems": 3,
-                        "maxItems": 4,
+                        "maxItems": 3,
                     },
                     "fill_color": {
                         "anyOf": [
@@ -384,7 +384,7 @@ RAW_SCHEMA = {
                                 "type": "array",
                                 "items": {"type": "number"},
                                 "minItems": 3,
-                                "maxItems": 4,
+                                "maxItems": 3,
                             },
                             {"type": "null"},
                         ]
