@@ -689,11 +689,65 @@ def test_create_annotation_highlight_requires_dimensions(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+def test_create_annotation_highlight_rejects_contents(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write(
+            '{"highlight": [{"page_number": 1, "x": 1, "y": 1, "width": 10, "height": 10, "contents": "hello"}]}'
+        )
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "annotation",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
 def test_create_annotation_stamp_requires_dimensions(pdf_samples, tmp_path):
     data_path = os.path.join(tmp_path, "invalid.json")
     output_path = os.path.join(tmp_path, "output.pdf")
     with open(data_path, "w", encoding="utf-8") as f:
         f.write('{"stamp": [{"page_number": 1, "x": 1, "y": 1}]}')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "annotation",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
+def test_create_annotation_stamp_rejects_contents(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write(
+            '{"stamp": [{"page_number": 1, "x": 1, "y": 1, "width": 10, "height": 10, "contents": "hello"}]}'
+        )
 
     result = runner.invoke(
         cli_app,
