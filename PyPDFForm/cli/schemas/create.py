@@ -394,8 +394,6 @@ ANNOTATION_SCHEMA = {
                     "page_number": {"type": "integer", "minimum": 1},
                     "x": {"type": "number"},
                     "y": {"type": "number"},
-                    "width": {"type": "number"},
-                    "height": {"type": "number"},
                     "contents": {"type": "string"},
                     "title": {"type": "string"},
                     "icon": {"type": "string"},

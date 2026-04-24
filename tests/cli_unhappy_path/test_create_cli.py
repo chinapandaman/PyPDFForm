@@ -557,6 +557,31 @@ def test_create_raw_wrong_property_type(pdf_samples, tmp_path):
     assert not os.path.exists(output_path)
 
 
+@pytest.mark.cli_test
+def test_create_annotation_text_rejects_width(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('{"text": [{"page_number": 1, "x": 1, "y": 1, "width": 10}]}')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "annotation",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file" in result.output
+    assert not os.path.exists(output_path)
+
+
 @pytest.mark.parametrize(
     ("option", "value"),
     [
