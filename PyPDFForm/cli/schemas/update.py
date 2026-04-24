@@ -28,46 +28,6 @@ FIELD_SCHEMA = {
         ".+": {
             "type": "object",
             "properties": {
-                "x": {
-                    "anyOf": [
-                        {"type": "number"},
-                        {
-                            "type": "array",
-                            "items": {"type": "number"},
-                            "minItems": 1,
-                        },
-                    ]
-                },
-                "y": {
-                    "anyOf": [
-                        {"type": "number"},
-                        {
-                            "type": "array",
-                            "items": {"type": "number"},
-                            "minItems": 1,
-                        },
-                    ]
-                },
-                "width": {
-                    "anyOf": [
-                        {"type": "number"},
-                        {
-                            "type": "array",
-                            "items": {"type": "number"},
-                            "minItems": 1,
-                        },
-                    ]
-                },
-                "height": {
-                    "anyOf": [
-                        {"type": "number"},
-                        {
-                            "type": "array",
-                            "items": {"type": "number"},
-                            "minItems": 1,
-                        },
-                    ]
-                },
                 "readonly": {"type": "boolean"},
                 "required": {"type": "boolean"},
                 "hidden": {"type": "boolean"},
@@ -79,12 +39,12 @@ FIELD_SCHEMA = {
                 "on_focused_javascript": {"type": "string"},
                 "on_blurred_javascript": {"type": "string"},
                 "font": {"type": "string"},
-                "font_size": {"type": "number"},
+                "font_size": {"type": "number", "minimum": 0},
                 "font_color": {
                     "type": "array",
-                    "items": {"type": "number"},
+                    "items": {"type": "number", "minimum": 0, "maximum": 1},
                     "minItems": 3,
-                    "maxItems": 4,
+                    "maxItems": 3,
                 },
                 "comb": {"type": "boolean"},
                 "alignment": {"type": "integer", "minimum": 0, "maximum": 2},
@@ -105,7 +65,7 @@ FIELD_SCHEMA = {
                     },
                     "minItems": 1,
                 },
-                "size": {"type": "number"},
+                "size": {"type": "number", "minimum": 0},
             },
             "additionalProperties": False,
         }

@@ -150,6 +150,131 @@ def test_update_field_wrong_property_type(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+def test_update_field_font_color_rejects_alpha_channel(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('{"test": {"font_color": [1, 0, 0, 1]}}')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "field",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file at test.font_color" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
+def test_update_field_font_color_rejects_channel_out_of_range(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('{"test": {"font_color": [1.1, 0, 0]}}')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "field",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file at test.font_color.0" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
+def test_update_field_rejects_negative_size(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('{"check": {"size": -1}}')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "field",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file at check.size" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
+def test_update_field_rejects_x_property(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('{"test": {"x": 1}}')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "field",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file at test" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
+def test_update_field_rejects_width_property(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "invalid.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('{"test": {"width": 1}}')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "field",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Invalid JSON file at test" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
 def test_update_field_invalid_text_alignment(pdf_samples, tmp_path):
     data_path = os.path.join(tmp_path, "invalid.json")
     output_path = os.path.join(tmp_path, "output.pdf")
