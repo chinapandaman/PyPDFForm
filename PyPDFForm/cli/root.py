@@ -165,6 +165,3 @@ def fill(
             input_data[k] = input_data[k]["path"]
 
     obj.fill(input_data, flatten=flatten).write(output or pdf)
-
-
-__all__ = ["cli_app"]
