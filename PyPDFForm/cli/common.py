@@ -77,10 +77,10 @@ def json_file_option(help_text: str):
     )
 
 
-def _cli_bad_parameter(
+def cli_bad_parameter(
     message: str,
     param_hint: str,
-    cause: BaseException,
+    cause: BaseException | None = None,
 ) -> NoReturn:
     """
     Raises a Typer input error with a stable CLI message.
@@ -88,11 +88,15 @@ def _cli_bad_parameter(
     Args:
         message (str): Error message to display to the CLI user.
         param_hint (str): CLI parameter associated with the error.
-        cause (BaseException): Original exception that caused the CLI error.
+        cause (BaseException, optional): Original exception that caused the CLI
+            error. Defaults to None.
 
     Raises:
         typer.BadParameter: Raised with the provided message and parameter hint.
     """
+    if cause is None:
+        raise typer.BadParameter(message, param_hint=param_hint)
+
     raise typer.BadParameter(message, param_hint=param_hint) from cause
 
 
@@ -129,7 +133,7 @@ def load_json_file(data: Path, schema: dict, param_hint: str) -> Any:
         with open(data, "r", encoding="utf-8") as f:
             input_data = json.load(f)
     except (OSError, json.JSONDecodeError) as exc:
-        _cli_bad_parameter(
+        cli_bad_parameter(
             f"Invalid JSON file: {exc}",
             param_hint=param_hint,
             cause=exc,
@@ -140,7 +144,7 @@ def load_json_file(data: Path, schema: dict, param_hint: str) -> Any:
     except ValidationError as exc:
         error_path = _validation_error_path(exc)
         location = f" at {error_path}" if error_path else ""
-        _cli_bad_parameter(
+        cli_bad_parameter(
             f"Invalid JSON file{location}: {exc.message}",
             param_hint=param_hint,
             cause=exc,
@@ -167,7 +171,7 @@ def get_widget(wrapper: PdfWrapper, field: str, param_hint: str) -> Widget:
     try:
         return wrapper.widgets[field]
     except KeyError as exc:
-        _cli_bad_parameter(
+        cli_bad_parameter(
             f"Form field '{field}' does not exist.",
             param_hint=param_hint,
             cause=exc,

@@ -60,6 +60,31 @@ def test_create_extract_invalid_page_bounds(pdf_samples, tmp_path, option):
 
 
 @pytest.mark.cli_test
+def test_create_extract_start_after_end(pdf_samples, tmp_path):
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "extract",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "-o",
+            output_path,
+            "--start",
+            "3",
+            "--end",
+            "1",
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "End page must be greater than or equal to start" in result.output
+    assert "page." in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
 def test_create_merge_nonexistent_pdf(tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
 
