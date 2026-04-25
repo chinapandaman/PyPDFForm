@@ -17,7 +17,8 @@ import typer
 from .. import (Annotations, BlankPage, Fields, PdfArray, PdfWrapper,
                 RawElements)
 from .common import (INPUT_PDF, OPTIONAL_OUTPUT_PDF, REQUIRED_OUTPUT_PDF,
-                     create_elements_from_file, json_file_option)
+                     cli_bad_parameter, create_elements_from_file,
+                     json_file_option)
 from .schemas.create import ANNOTATION_SCHEMA, FIELD_SCHEMA, RAW_SCHEMA
 
 create_cli = typer.Typer(
@@ -94,6 +95,13 @@ def extract(
     ] = None,
 ) -> None:
     """Extract pages from an existing PDF."""
+    if start is not None and end is not None and start > end:
+        message = "End page must be greater than or equal to start page."
+        cli_bad_parameter(
+            message,
+            param_hint="--end",
+        )
+
     PdfWrapper(str(pdf), **ctx.obj).pages[slice((start or 1) - 1, end)].write(output)
 
 
