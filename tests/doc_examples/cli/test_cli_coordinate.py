@@ -7,7 +7,7 @@ import pytest
 from typer.testing import CliRunner
 
 from PyPDFForm import PdfWrapper
-from PyPDFForm.cli import cli_app
+from PyPDFForm.cli.root import cli_app
 
 runner = CliRunner()
 

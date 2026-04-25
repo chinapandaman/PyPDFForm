@@ -4,16 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 
-import PyPDFForm.cli as cli
 from PyPDFForm.cli.entry import main
-
-
-@pytest.mark.cli_test
-def test_cli_unknown_lazy_export():
-    with pytest.raises(AttributeError) as exc_info:
-        cli.__getattr__("missing")
-
-    assert str(exc_info.value) == "missing"
 
 
 @pytest.mark.cli_test
