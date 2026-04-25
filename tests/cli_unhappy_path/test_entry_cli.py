@@ -10,6 +10,7 @@ from PyPDFForm.cli.entry import main
 @pytest.mark.cli_test
 def test_entrypoint_missing_cli_dependency(monkeypatch, capsys):
     def missing_cli_dependency(module_name):
+        assert module_name == "PyPDFForm.cli.root"
         message = "No module named 'typer'"
         raise ModuleNotFoundError(
             message,
@@ -34,6 +35,7 @@ def test_entrypoint_missing_cli_dependency(monkeypatch, capsys):
 @pytest.mark.cli_test
 def test_entrypoint_reraises_non_cli_dependency(monkeypatch, capsys):
     def missing_non_cli_dependency(module_name):
+        assert module_name == "PyPDFForm.cli.root"
         message = "No module named 'missing_dependency'"
         raise ModuleNotFoundError(
             message,
