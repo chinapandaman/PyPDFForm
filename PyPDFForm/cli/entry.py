@@ -23,7 +23,7 @@ def main() -> None:
             missing.
     """
     try:
-        cli_module = importlib.import_module("PyPDFForm.cli")
+        cli_module = importlib.import_module("PyPDFForm.cli.root")
     except ModuleNotFoundError as exc:
         if exc.name in CLI_DEPENDENCIES:
             print(

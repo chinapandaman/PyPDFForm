@@ -7,7 +7,7 @@ from pypdf import PdfReader, PdfWriter
 from typer.testing import CliRunner
 
 from PyPDFForm import __version__
-from PyPDFForm.cli import cli_app
+from PyPDFForm.cli.root import cli_app
 from PyPDFForm.lib.constants import AcroForm, Title
 
 runner = CliRunner()

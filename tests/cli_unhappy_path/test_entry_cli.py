@@ -4,12 +4,13 @@ from types import SimpleNamespace
 
 import pytest
 
-from PyPDFForm.cli_entry import main
+from PyPDFForm.cli.entry import main
 
 
 @pytest.mark.cli_test
 def test_entrypoint_missing_cli_dependency(monkeypatch, capsys):
     def missing_cli_dependency(module_name):
+        assert module_name == "PyPDFForm.cli.root"
         message = "No module named 'typer'"
         raise ModuleNotFoundError(
             message,
@@ -17,7 +18,7 @@ def test_entrypoint_missing_cli_dependency(monkeypatch, capsys):
         )
 
     monkeypatch.setattr(
-        "PyPDFForm.cli_entry.importlib.import_module",
+        "PyPDFForm.cli.entry.importlib.import_module",
         missing_cli_dependency,
     )
 
@@ -34,6 +35,7 @@ def test_entrypoint_missing_cli_dependency(monkeypatch, capsys):
 @pytest.mark.cli_test
 def test_entrypoint_reraises_non_cli_dependency(monkeypatch, capsys):
     def missing_non_cli_dependency(module_name):
+        assert module_name == "PyPDFForm.cli.root"
         message = "No module named 'missing_dependency'"
         raise ModuleNotFoundError(
             message,
@@ -41,7 +43,7 @@ def test_entrypoint_reraises_non_cli_dependency(monkeypatch, capsys):
         )
 
     monkeypatch.setattr(
-        "PyPDFForm.cli_entry.importlib.import_module",
+        "PyPDFForm.cli.entry.importlib.import_module",
         missing_non_cli_dependency,
     )
 
@@ -62,11 +64,11 @@ def test_entrypoint_runs_cli_app(monkeypatch):
         state["called"] = True
 
     def import_cli_module(module_name):
-        assert module_name == "PyPDFForm.cli"
+        assert module_name == "PyPDFForm.cli.root"
         return SimpleNamespace(cli_app=cli_app)
 
     monkeypatch.setattr(
-        "PyPDFForm.cli_entry.importlib.import_module",
+        "PyPDFForm.cli.entry.importlib.import_module",
         import_cli_module,
     )
 
