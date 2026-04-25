@@ -55,7 +55,7 @@ dev = [
 ]
 
 [project.scripts]
-pypdfform = "PyPDFForm.cli:cli_app"
+pypdfform = "PyPDFForm.cli_entry:main"
 
 [tool.coverage.run]
 include = ["PyPDFForm/*"]
