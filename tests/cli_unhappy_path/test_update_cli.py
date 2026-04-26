@@ -150,6 +150,34 @@ def test_update_rename_unknown_field(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+def test_update_rename_rejects_full_widget_name_option(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "rename.json")
+    output_path = os.path.join(tmp_path, "output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        f.write('[{"Gain de 2 classes.0": {"new_key": "new_name"}}]')
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "--use-full-widget-name",
+            "update",
+            "rename",
+            os.path.join(pdf_samples, "sample_template_with_full_key.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Renaming form fields" in result.output
+    assert "supported when" in result.output
+    assert "--use-full-widget-name" in result.output
+    assert not os.path.exists(output_path)
+
+
+@pytest.mark.cli_test
 def test_update_field_wrong_property_type(pdf_samples, tmp_path):
     data_path = os.path.join(tmp_path, "invalid.json")
     output_path = os.path.join(tmp_path, "output.pdf")
