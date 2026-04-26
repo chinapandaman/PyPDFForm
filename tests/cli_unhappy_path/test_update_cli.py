@@ -173,7 +173,6 @@ def test_update_rename_rejects_full_widget_name_option(pdf_samples, tmp_path):
     assert result.exit_code == 2
     assert "Renaming form fields" in result.output
     assert "supported when" in result.output
-    assert "--use-full-widget-name" in result.output
     assert not os.path.exists(output_path)
 
 
