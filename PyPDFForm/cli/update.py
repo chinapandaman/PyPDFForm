@@ -17,9 +17,9 @@ import typer
 
 from .. import PdfWrapper
 from ..lib.constants import PdfVersion
-from .common import (FIELD_NAME, INPUT_PDF, OPTIONAL_OUTPUT_PDF, get_widget,
-                     handle_font_registration, json_file_option,
-                     load_json_file)
+from .common import (FIELD_NAME, INPUT_PDF, OPTIONAL_OUTPUT_PDF,
+                     cli_bad_parameter, get_widget, handle_font_registration,
+                     json_file_option, load_json_file)
 from .schemas.update import FIELD_SCHEMA, RENAME_SCHEMA
 
 update_cli = typer.Typer(
@@ -125,6 +125,13 @@ def rename(
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
     """Rename form fields from JSON."""
+    if ctx.obj.get("use_full_widget_name"):
+        cli_bad_parameter(
+            "Renaming form fields is not supported when "
+            "--use-full-widget-name is enabled.",
+            param_hint="--use-full-widget-name",
+        )
+
     input_data = load_json_file(data, RENAME_SCHEMA, "--file")
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
