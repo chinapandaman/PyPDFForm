@@ -27,7 +27,7 @@ requires-python = ">=3.10"
 dependencies = [
     "cryptography>=47.0.0,<48.0.0",
     "fonttools>=4.62.1,<5.0.0",
-    "pikepdf>=10.5.0,<11.0.0",
+    "pikepdf>=10.5.1,<11.0.0",
     "pillow>=12.2.0,<13.0.0",
     "pypdf>=6.10.1,<7.0.0",
     "reportlab>=4.4.6,<5.0.0",
