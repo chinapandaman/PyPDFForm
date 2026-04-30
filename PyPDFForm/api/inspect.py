@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 from .. import PdfWrapper
 from .common import PdfWrapperOptions, pdf_wrapper_options
@@ -32,3 +32,22 @@ def sample(
     pdf: Annotated[UploadFile, File()],
 ):
     return PdfWrapper(pdf.file.read(), **options.as_kwargs()).sample_data
+
+
+@inspect_router.post(
+    "/location", summary="Return a form field's location and size as JSON."
+)
+def location(
+    options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
+    pdf: Annotated[UploadFile, File()],
+    field: Annotated[str, Form()],
+):
+    f = PdfWrapper(pdf.file.read(), **options.as_kwargs()).widgets[field]
+
+    return {
+        "page_number": f.page_number,
+        "x": f.x,
+        "y": f.y,
+        "width": f.width,
+        "height": f.height,
+    }
