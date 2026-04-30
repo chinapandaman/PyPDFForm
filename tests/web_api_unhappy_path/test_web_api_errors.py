@@ -10,7 +10,7 @@ client = TestClient(app)
 
 @pytest.mark.web_api_test
 def test_index_redirect_to_docs():
-    response = client.get("/")
+    response = client.get("/", follow_redirects=False)
 
-    assert response.status_code == 200
-    assert b"Swagger UI" in response.content
+    assert response.status_code == 307
+    assert response.headers["location"] == "/docs"

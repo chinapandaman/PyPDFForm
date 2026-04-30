@@ -9,5 +9,12 @@ learning a different workflow model.
 """
 
 from fastapi import APIRouter
+from fastapi.responses import RedirectResponse
 
 root_router = APIRouter()
+
+
+@root_router.get("/", include_in_schema=False)
+async def index():
+    """Redirect the API root to the generated OpenAPI documentation."""
+    return RedirectResponse(url="/docs")
