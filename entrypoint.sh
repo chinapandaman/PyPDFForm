@@ -9,6 +9,7 @@ export PYPDFFORM_ENV=container
 echo "PS1='\[\e[34m\]Enter \[\e[38;5;220m\]?\[\e[34m\] for commands > \[\e[0m\]'" >> ~/.bashrc
 echo "alias ?='cat ~/.container_docs.txt'" >> ~/.bashrc
 
+echo "alias api='make api'" >> ~/.bashrc
 echo "alias clean='make clean-temp'" >> ~/.bashrc
 echo "alias compare='(trap \"kill 0\" SIGINT; make serve-files > /dev/null 2>&1 & make compare-pdf-diffs && echo \"Finished comparing.\" & wait)'" >> ~/.bashrc
 echo "alias coverage='make coverage-all'" >> ~/.bashrc
@@ -37,6 +38,7 @@ Welcome to the PyPDFForm development container!
 
 | Command   | Usage                                                   | Documentation                                                                       |
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
+| api       | Start the web API debug server locally.                 | N/A                                                                                 |
 | clean     | Remove any temporarily generated PDFs.                  | N/A                                                                                 |
 | compare   | Compare PDF samples before and after changing the code. | N/A                                                                                 |
 | coverage  | Run all tests and generate HTML coverage reports.       | https://chinapandaman.github.io/PyPDFForm/latest/dev_test/#generate-coverage-report |

@@ -31,5 +31,8 @@ serve-docs:
 serve-files:
 	bash ./scripts/http_server.sh
 
+api:
+	bash ./scripts/serve_web_api.sh
+
 clean-temp:
 	rm -f ./temp/*.pdf ./temp/*.png

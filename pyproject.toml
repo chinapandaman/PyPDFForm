@@ -39,6 +39,7 @@ Documentation = "https://chinapandaman.github.io/PyPDFForm/"
 
 [project.optional-dependencies]
 cli = ["typer>=0.25.0,<1.0.0", "jsonschema>=4.26.0,<5.0.0"]
+web_api = ["fastapi[standard]>=0.136.1,<1.0.0"]
 dev = [
     "black>=26.3.1,<27.0.0",
     "coverage>=7.13.5,<8.0.0",
@@ -137,6 +138,7 @@ include = ["PyPDFForm*"]
 
 [tool.pytest.ini_options]
 markers = [
-    "posix_only", # mainly because of zlib vs zlib-ng
+    "posix_only",   # mainly because of zlib vs zlib-ng
     "cli_test",
+    "web_api_test",
 ]

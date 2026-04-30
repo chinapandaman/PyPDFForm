@@ -83,5 +83,5 @@ jobs:
             rm -rf PyPDFForm
             pip uninstall PyPDFForm -y
             pip install PyPDFForm
-            PYTHONPATH=. pytest -m 'not cli_test'
+            PYTHONPATH=. pytest -m 'not cli_test and not web_api_test'
           "
