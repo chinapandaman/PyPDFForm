@@ -15,5 +15,4 @@ def schema(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
     pdf: Annotated[UploadFile, File()],
 ):
-    """Return the form schema as JSON."""
     return PdfWrapper(pdf.file.read(), **options.as_kwargs()).schema
