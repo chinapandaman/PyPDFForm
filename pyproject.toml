@@ -138,6 +138,7 @@ include = ["PyPDFForm*"]
 
 [tool.pytest.ini_options]
 markers = [
-    "posix_only", # mainly because of zlib vs zlib-ng
+    "posix_only",   # mainly because of zlib vs zlib-ng
     "cli_test",
+    "web_api_test",
 ]
