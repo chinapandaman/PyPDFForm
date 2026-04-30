@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter
 
-app = FastAPI()
+root_router = APIRouter()
 
 
-@app.get("/", include_in_schema=False)
-async def index():
-    return RedirectResponse(url="/docs")
+@root_router.post("/fill")
+async def fill():
+    return "fill"
