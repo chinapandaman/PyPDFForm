@@ -24,3 +24,11 @@ def data(
     pdf: Annotated[UploadFile, File()],
 ):
     return PdfWrapper(pdf.file.read(), **options.as_kwargs()).data
+
+
+@inspect_router.post("/sample", summary="Return sample fill data as JSON.")
+def sample(
+    options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
+    pdf: Annotated[UploadFile, File()],
+):
+    return PdfWrapper(pdf.file.read(), **options.as_kwargs()).sample_data
