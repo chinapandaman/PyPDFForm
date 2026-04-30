@@ -16,3 +16,11 @@ def schema(
     pdf: Annotated[UploadFile, File()],
 ):
     return PdfWrapper(pdf.file.read(), **options.as_kwargs()).schema
+
+
+@inspect_router.post("/data", summary="Return current form data as JSON.")
+def data(
+    options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
+    pdf: Annotated[UploadFile, File()],
+):
+    return PdfWrapper(pdf.file.read(), **options.as_kwargs()).data
