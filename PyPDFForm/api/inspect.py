@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+"""
+This module defines web API routes for inspecting PDF form information.
+
+It exposes `/inspect` endpoints that return JSON for form schemas, current
+form values, generated sample data, and field rectangle metadata. Each endpoint
+wraps read-only `PdfWrapper` properties for clients calling PyPDFForm over HTTP.
+"""
 
 from typing import Annotated
 
@@ -15,6 +22,16 @@ def schema(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
     pdf: Annotated[UploadFile, File()],
 ) -> dict:
+    """
+    Return the form schema for an uploaded PDF.
+
+    Args:
+        options (PdfWrapperOptions): Common `PdfWrapper` construction options.
+        pdf (UploadFile): Uploaded PDF file to inspect.
+
+    Returns:
+        dict: JSON-serializable form schema.
+    """
     return PdfWrapper(pdf.file.read(), **options.as_kwargs()).schema
 
 
@@ -23,6 +40,16 @@ def data(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
     pdf: Annotated[UploadFile, File()],
 ) -> dict:
+    """
+    Return current form data for an uploaded PDF.
+
+    Args:
+        options (PdfWrapperOptions): Common `PdfWrapper` construction options.
+        pdf (UploadFile): Uploaded PDF file to inspect.
+
+    Returns:
+        dict: JSON-serializable current form data.
+    """
     return PdfWrapper(pdf.file.read(), **options.as_kwargs()).data
 
 
@@ -31,6 +58,16 @@ def sample(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
     pdf: Annotated[UploadFile, File()],
 ) -> dict:
+    """
+    Return sample fill data for an uploaded PDF.
+
+    Args:
+        options (PdfWrapperOptions): Common `PdfWrapper` construction options.
+        pdf (UploadFile): Uploaded PDF file to inspect.
+
+    Returns:
+        dict: JSON-serializable sample fill data.
+    """
     return PdfWrapper(pdf.file.read(), **options.as_kwargs()).sample_data
 
 
@@ -42,6 +79,17 @@ def location(
     pdf: Annotated[UploadFile, File()],
     field: Annotated[str, Form()],
 ) -> dict:
+    """
+    Return a form field's location and size for an uploaded PDF.
+
+    Args:
+        options (PdfWrapperOptions): Common `PdfWrapper` construction options.
+        pdf (UploadFile): Uploaded PDF file to inspect.
+        field (str): Name of the form field to locate.
+
+    Returns:
+        dict: JSON-serializable field page number, coordinates, and dimensions.
+    """
     f = PdfWrapper(pdf.file.read(), **options.as_kwargs()).widgets[field]
 
     return {

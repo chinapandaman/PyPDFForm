@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+This module defines web API routes for updating existing PDF files.
+
+It exposes `/update` endpoints that accept uploaded PDFs, apply matching
+`PdfWrapper` operations, and return modified PDF bytes to HTTP clients.
+"""
 
 from typing import Annotated
 
@@ -27,6 +33,17 @@ def title(
     pdf: Annotated[UploadFile, File()],
     new_title: Annotated[str, Form()],
 ) -> PdfResponse:
+    """
+    Set the title of an uploaded PDF.
+
+    Args:
+        options (PdfWrapperOptions): Common `PdfWrapper` construction options.
+        pdf (UploadFile): Uploaded PDF file to update.
+        new_title (str): New title to write into the PDF metadata.
+
+    Returns:
+        PdfResponse: PDF response containing the updated document bytes.
+    """
     return PdfResponse(
         content=PdfWrapper(
             pdf.file.read(), title=new_title, **options.as_kwargs()
