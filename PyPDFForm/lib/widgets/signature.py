@@ -121,7 +121,6 @@ class SignatureWidget:
             annot_type_to_annot[key] = annot.get_object()
 
         for i, p in enumerate(input_pdf.pages):
-            # pylint: disable=R0801
             watermark = BytesIO()
             canvas = Canvas(
                 watermark,
