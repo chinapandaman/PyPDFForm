@@ -15,6 +15,6 @@ root_router = APIRouter()
 
 
 @root_router.get("/", include_in_schema=False)
-def index():
+def index() -> RedirectResponse:
     """Redirect the API root to the generated OpenAPI documentation."""
     return RedirectResponse(url="/docs")

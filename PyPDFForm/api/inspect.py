@@ -14,7 +14,7 @@ inspect_router = APIRouter(prefix="/inspect", tags=["inspect"])
 def schema(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
     pdf: Annotated[UploadFile, File()],
-):
+) -> dict:
     return PdfWrapper(pdf.file.read(), **options.as_kwargs()).schema
 
 
@@ -22,7 +22,7 @@ def schema(
 def data(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
     pdf: Annotated[UploadFile, File()],
-):
+) -> dict:
     return PdfWrapper(pdf.file.read(), **options.as_kwargs()).data
 
 
@@ -30,7 +30,7 @@ def data(
 def sample(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
     pdf: Annotated[UploadFile, File()],
-):
+) -> dict:
     return PdfWrapper(pdf.file.read(), **options.as_kwargs()).sample_data
 
 
@@ -41,7 +41,7 @@ def location(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
     pdf: Annotated[UploadFile, File()],
     field: Annotated[str, Form()],
-):
+) -> dict:
     f = PdfWrapper(pdf.file.read(), **options.as_kwargs()).widgets[field]
 
     return {

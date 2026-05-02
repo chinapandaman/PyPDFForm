@@ -26,7 +26,7 @@ def title(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
     pdf: Annotated[UploadFile, File()],
     new_title: Annotated[str, Form()],
-):
+) -> PdfResponse:
     return PdfResponse(
         content=PdfWrapper(
             pdf.file.read(), title=new_title, **options.as_kwargs()
