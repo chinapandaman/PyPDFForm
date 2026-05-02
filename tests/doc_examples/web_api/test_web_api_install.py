@@ -5,7 +5,7 @@ from io import BytesIO
 
 import pytest
 from fastapi.testclient import TestClient
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter
 
 from PyPDFForm.api import app
 from PyPDFForm.lib.constants import AcroForm, Title
@@ -67,6 +67,30 @@ def test_generate_appearance_streams_option(static_pdfs):
 
     reader = PdfReader(BytesIO(response.content))
     assert "/NeedAppearances" not in reader.root_object[AcroForm]
+
+
+@pytest.mark.web_api_test
+def test_preserve_metadata_option(static_pdfs, tmp_path):
+    with_metadata = os.path.join(tmp_path, "metadata.pdf")
+    writer = PdfWriter(os.path.join(static_pdfs, "sample_template.pdf"))
+    writer.add_metadata({"/foo": "bar"})
+    writer.write(with_metadata)
+
+    with open(with_metadata, "rb") as f:
+        response = client.post(
+            "/update/title",
+            params={"preserve_metadata": True},
+            data={"new_title": "My PDF"},
+            files={
+                "pdf": ("metadata.pdf", f, "application/pdf"),
+            },
+        )
+
+    assert response.status_code == 200
+
+    reader = PdfReader(BytesIO(response.content))
+    assert (reader.metadata or {}).get(Title) == "My PDF"
+    assert (reader.metadata or {}).get("/foo") == "bar"
 
 
 @pytest.mark.web_api_test
