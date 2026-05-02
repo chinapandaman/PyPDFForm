@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from pypdf import PdfReader
 
 from PyPDFForm.api import app
-from PyPDFForm.lib.constants import Title
+from PyPDFForm.lib.constants import AcroForm, Title
 
 client = TestClient(app)
 
@@ -29,6 +29,25 @@ def test_change_title(static_pdfs):
 
     reader = PdfReader(BytesIO(response.content))
     assert (reader.metadata or {}).get(Title) == "My PDF"
+
+
+@pytest.mark.web_api_test
+def test_need_appearances_option(static_pdfs):
+    path = os.path.join(static_pdfs, "sample_template.pdf")
+    with open(path, "rb") as f:
+        response = client.post(
+            "/update/title",
+            params={"need_appearances": True},
+            data={"new_title": "My PDF"},
+            files={
+                "pdf": ("sample_template.pdf", f, "application/pdf"),
+            },
+        )
+
+    assert response.status_code == 200
+
+    reader = PdfReader(BytesIO(response.content))
+    assert reader.root_object[AcroForm]["/NeedAppearances"]
 
 
 @pytest.mark.web_api_test
