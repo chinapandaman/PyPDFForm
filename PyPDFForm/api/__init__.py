@@ -11,6 +11,7 @@ PDF forms, while exposing those operations over HTTP.
 from fastapi import FastAPI
 
 from .. import __version__
+from .create import create_router
 from .inspect import inspect_router
 from .root import root_router
 from .update import update_router
@@ -22,5 +23,6 @@ app = FastAPI(
 )
 
 app.include_router(root_router)
+app.include_router(create_router)
 app.include_router(inspect_router)
 app.include_router(update_router)
