@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from fastapi import Query
+from fastapi import Query, Response
 from pydantic import BaseModel
+
+
+class PdfResponse(Response):
+    media_type = "application/pdf"
 
 
 class PdfWrapperOptions(BaseModel):
