@@ -92,6 +92,7 @@ def location(
     """
     f = PdfWrapper(pdf.file.read(), **options.as_kwargs()).widgets[field]
 
+    # pylint: disable=R0801
     return {
         "page_number": f.page_number,
         "x": f.x,
