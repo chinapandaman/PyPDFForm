@@ -59,3 +59,26 @@ def test_data(static_pdfs):
         "test_2": "test2",
         "test_3": "test3",
     }
+
+
+@pytest.mark.web_api_test
+def test_sample_data(static_pdfs):
+    path = os.path.join(static_pdfs, "sample_template.pdf")
+    with open(path, "rb") as f:
+        response = client.post(
+            "/inspect/sample",
+            files={
+                "pdf": ("sample_template.pdf", f, "application/pdf"),
+            },
+        )
+
+    assert response.status_code == 200
+
+    assert json.loads(response.content) == {
+        "check": True,
+        "check_2": True,
+        "check_3": True,
+        "test": "test",
+        "test_2": "test_2",
+        "test_3": "test_3",
+    }
