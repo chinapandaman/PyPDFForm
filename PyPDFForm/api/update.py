@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 from .. import PdfWrapper
 from .common import PdfResponse, PdfWrapperOptions, pdf_wrapper_options
@@ -25,8 +25,10 @@ update_router = APIRouter(prefix="/update", tags=["update"])
 def title(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
     pdf: Annotated[UploadFile, File()],
-    new_title: Annotated[str, Body()],
+    new_title: Annotated[str, Form()],
 ):
     return PdfResponse(
-        PdfWrapper(pdf.file.read(), title=new_title, **options.as_kwargs()).read()
+        content=PdfWrapper(
+            pdf.file.read(), title=new_title, **options.as_kwargs()
+        ).read()
     )
