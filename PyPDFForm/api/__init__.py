@@ -10,8 +10,17 @@ PDF forms, while exposing those operations over HTTP.
 
 from fastapi import FastAPI
 
+from .. import __version__
+from .inspect import inspect_router
 from .root import root_router
+from .update import update_router
 
-app = FastAPI()
+app = FastAPI(
+    title="PyPDFForm Web API",
+    summary="Create, fill, inspect, and update PDF forms.",
+    version=__version__,
+)
 
 app.include_router(root_router)
+app.include_router(inspect_router)
+app.include_router(update_router)
