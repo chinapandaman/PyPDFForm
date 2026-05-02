@@ -89,7 +89,6 @@ class DropdownField(Field):
     options: Optional[List[str | Tuple[str, str]]] = None
     width: Optional[float] = None
     height: Optional[float] = None
-    # pylint: disable=R0801
     font: Optional[str] = None
     font_size: Optional[float] = None
     font_color: Optional[Tuple[float, ...]] = None

@@ -74,6 +74,7 @@ disable = [
     "C2801",
     "C0301",
     "W0511",
+    "R0801",
 ]
 
 [tool.ruff.lint]
