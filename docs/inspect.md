@@ -70,6 +70,31 @@ To inspect the current filled data of a PDF form, use the `.data` attribute. For
     'test_3': 'test3'}
     ```
 
+## Inspect individual form field widgets
+
+The `.widgets` attribute gives you a dictionary mapping each field name to its widget object. Each widget exposes properties such as `name`, `value`, `page_number`, `x`, `y`,`width`,`height`,`tooltip`,`readonly`,`required`, and`hidden`.
+
+You can iterate over all widgets to see their types and current state:
+
+=== "Code"
+    ```python
+    from pprint import pprint
+    from PyPDFForm import PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf")
+
+    pprint(pdf.widgets)
+    ```
+=== "Output"
+    ```sh
+   {'check': Checkbox(name='check', value=None, readonly=False, required=False, hidden=False, page_number=1, x=358.874, y=664.717, width=18.47999999999996, height=18.480000000000018),
+ 'check_2': Checkbox(name='check_2', value=None, readonly=False, required=False, hidden=False, page_number=2, x=349.637, y=673.954, width=18.478999999999985, height=18.480000000000018),
+ 'check_3': Checkbox(name='check_3', value=None, readonly=False, required=False, hidden=False, page_number=3, x=349.305, y=667.344, width=18.480000000000018, height=18.479999999999905),
+ 'test': Text(name='test', value=None, readonly=False, required=False, hidden=False, page_number=1, x=73.3365, y=662.692, width=232.4235, height=21.067999999999984, comb=False, multiline=False),
+ 'test_2': Text(name='test_2', value=None, readonly=False, required=False, hidden=False, page_number=2, x=71.4095, y=671.626, width=232.42350000000005, height=21.067999999999984, comb=False, multiline=False),
+ 'test_3': Text(name='test_3', value=None, readonly=False, required=False, hidden=False, page_number=3, x=70.5919, y=665.349, width=232.42309999999998, height=21.067999999999984, comb=False, multiline=False)}
+    ```
+
 ## Generate sample data
 
 PyPDFForm can also generate sample data for filling a PDF form:

@@ -104,6 +104,15 @@ class Widget:
 
         super().__setattr__(name, value)
 
+    def __repr__(self) -> str:
+        _internal = {"SET_ATTR_TRIGGER_HOOK_MAP", "attr_set_tracker", "hooks_to_trigger"}
+        parts = [f"name={self._name!r}", f"value={self._value!r}"]
+        for k, v in self.__dict__.items():
+            if k.startswith("_") or k in _internal or v is None:
+                continue
+            parts.append(f"{k}={v!r}")
+        return f"{self.__class__.__name__}({', '.join(parts)})"
+
     @property
     def name(self) -> str:
         """

@@ -3,6 +3,8 @@
 import os
 
 from PyPDFForm import PdfWrapper
+from PyPDFForm.lib.middleware.checkbox import Checkbox
+from PyPDFForm.lib.middleware.text import Text
 
 
 def test_text_check_values(pdf_samples, data_dict):
@@ -155,6 +157,82 @@ def test_text_field_comb(max_length_expected_directory):
     )
 
     assert obj.widgets["LastName"].comb
+
+
+def test_widget_repr_text(template_stream):
+    obj = PdfWrapper(template_stream)
+    widget = obj.widgets["test"]
+    result = repr(widget)
+
+    assert result.startswith("Text(")
+    assert "comb=False" in result
+    assert "height=" in result
+    assert "hidden=False" in result
+    assert "multiline=False" in result
+    assert "name='test'" in result
+    assert "page_number=1" in result
+    assert "readonly=False" in result
+    assert "required=False" in result
+    assert "value=None" in result
+    assert "width=" in result
+    assert "x=" in result
+    assert "y=" in result
+
+    # None-valued optional attributes should be omitted
+    assert "font=" not in result
+    assert "font_size=" not in result
+    # internal attrs should be omitted
+    assert "SET_ATTR_TRIGGER_HOOK_MAP" not in result
+    assert "attr_set_tracker" not in result
+    assert "hooks_to_trigger" not in result
+
+
+def test_widget_repr_checkbox(template_stream):
+    obj = PdfWrapper(template_stream)
+    widget = obj.widgets["check"]
+    result = repr(widget)
+
+    assert result.startswith("Checkbox(")
+    assert "name='check'" in result
+    assert "value=None" in result
+    assert "SET_ATTR_TRIGGER_HOOK_MAP" not in result
+
+
+def test_widget_repr_includes_non_none_attrs():
+    widget = Text("my_field")
+    widget.font_size = 12.0
+    widget.readonly = True
+    result = repr(widget)
+
+    assert "font_size=12.0" in result
+    assert "readonly=True" in result
+    assert "font=" not in result
+
+
+def test_widget_repr_checkbox_includes_size():
+    widget = Checkbox("my_check")
+    widget.size = 20.0
+    result = repr(widget)
+
+    assert result.startswith("Checkbox(")
+    assert "width=20.0" in result
+    assert "height=20.0" in result
+
+
+def test_widget_repr_value_shown_when_set():
+    widget = Text("field_name", value="hello")
+    result = repr(widget)
+
+    assert "name='field_name'" in result
+    assert "value='hello'" in result
+
+
+def test_widget_repr_all_fields_in_widgets(template_stream):
+    obj = PdfWrapper(template_stream)
+    for name, widget in obj.widgets.items():
+        result = repr(widget)
+        assert f"name={name!r}" in result
+        assert "value=" in result
 
 
 def test_text_field_comb_sejda(pdf_samples):
