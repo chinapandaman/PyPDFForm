@@ -6,7 +6,9 @@ It defines the PDF response class and common query parameter parsing used by
 endpoint groups that construct `PdfWrapper` instances from uploaded PDF files.
 """
 
-from fastapi import Query, Response
+from typing import NoReturn
+
+from fastapi import HTTPException, Query, Response, status
 from pydantic import BaseModel
 
 
@@ -81,3 +83,19 @@ def pdf_wrapper_options(
         preserve_metadata=preserve_metadata,
         use_full_widget_name=use_full_widget_name,
     )
+
+
+def api_widget_key_error(message: str, cause: KeyError) -> NoReturn:
+    """
+    Raise a web API error for a missing form field.
+
+    Args:
+        message (str): Error message to return to the API client.
+        cause (KeyError): Original lookup error.
+
+    Raises:
+        HTTPException: Raised with a 404 response for the missing field.
+    """
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail=message
+    ) from cause
