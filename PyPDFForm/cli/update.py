@@ -137,10 +137,9 @@ def rename(
     input_data = load_json_file(data, RENAME_SCHEMA, "--file")
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
-    missing_widget = cli_widget_key_error("--file")
     for item in input_data:
         for k, v in item.items():
-            widget = get_widget(obj, k, missing_widget)
+            widget = get_widget(obj, k, "--file")
             obj.update_widget_key(
                 widget.name, v["new_key"], index=v.get("index", 0), defer=True
             )
@@ -162,9 +161,8 @@ def field(
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     registered_font = {}
-    missing_widget = cli_widget_key_error("--file")
     for k, each in input_data.items():
-        widget = get_widget(obj, k, missing_widget)
+        widget = get_widget(obj, k, "--file")
         handle_font_registration(obj, each, registered_font)
         for param, v in each.items():
             setattr(widget, param, v)
