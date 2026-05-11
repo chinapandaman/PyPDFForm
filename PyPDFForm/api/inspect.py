@@ -13,7 +13,8 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 from .. import PdfWrapper
 from ..shared.utils import get_widget
-from .common import PdfWrapperOptions, api_widget_key_error, pdf_wrapper_options
+from .common import (PdfWrapperOptions, api_widget_key_error,
+                     pdf_wrapper_options)
 
 inspect_router = APIRouter(prefix="/inspect", tags=["inspect"])
 

@@ -23,22 +23,6 @@ class PdfResponse(Response):
     media_type = "application/pdf"
 
 
-def api_widget_key_error(message: str, cause: KeyError) -> NoReturn:
-    """
-    Raise a web API error for a missing form field.
-
-    Args:
-        message (str): Error message to return to the API client.
-        cause (KeyError): Original lookup error.
-
-    Raises:
-        HTTPException: Raised with a 404 response for the missing field.
-    """
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail=message
-    ) from cause
-
-
 class PdfWrapperOptions(BaseModel):
     """
     Common `PdfWrapper` options accepted by web API endpoints.
@@ -99,3 +83,19 @@ def pdf_wrapper_options(
         preserve_metadata=preserve_metadata,
         use_full_widget_name=use_full_widget_name,
     )
+
+
+def api_widget_key_error(message: str, cause: KeyError) -> NoReturn:
+    """
+    Raise a web API error for a missing form field.
+
+    Args:
+        message (str): Error message to return to the API client.
+        cause (KeyError): Original lookup error.
+
+    Raises:
+        HTTPException: Raised with a 404 response for the missing field.
+    """
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail=message
+    ) from cause
