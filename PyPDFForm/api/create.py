@@ -38,7 +38,12 @@ def grid(
     margin: Annotated[float, Form()] = None,
 ) -> PdfResponse:
     """
-    Add a coordinate grid to an uploaded PDF.
+    Upload a PDF and return a copy with a coordinate grid overlaid on each page.
+
+    Use the optional RGB components to choose the grid color and `margin` to
+    adjust the grid spacing from the page edges.
+
+    \f
 
     Args:
         options (PdfWrapperOptions): Common `PdfWrapper` construction options.
