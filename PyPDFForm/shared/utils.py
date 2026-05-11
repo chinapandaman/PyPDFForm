@@ -39,4 +39,4 @@ def get_widget(
     try:
         return wrapper.widgets[field]
     except KeyError as exc:
-        key_error_handler(f"Form field '{field}' does not exist.", exc)
+        return key_error_handler(f"Form field '{field}' does not exist.", exc)
