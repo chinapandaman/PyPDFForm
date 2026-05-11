@@ -12,7 +12,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 from .. import PdfWrapper
-from .common import PdfWrapperOptions, pdf_wrapper_options
+from ..shared.utils import get_widget
+from .common import PdfWrapperOptions, api_widget_key_error, pdf_wrapper_options
 
 inspect_router = APIRouter(prefix="/inspect", tags=["inspect"])
 
@@ -90,9 +91,10 @@ def location(
     Returns:
         dict: JSON-serializable field page number, coordinates, and dimensions.
     """
-    f = PdfWrapper(pdf.file.read(), **options.as_kwargs()).widgets[field]
+    f = get_widget(
+        PdfWrapper(pdf.file.read(), **options.as_kwargs()), field, api_widget_key_error
+    )
 
-    # pylint: disable=R0801
     return {
         "page_number": f.page_number,
         "x": f.x,

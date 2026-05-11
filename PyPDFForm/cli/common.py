@@ -15,7 +15,7 @@ import typer
 from jsonschema import ValidationError, validate
 
 from .. import PdfWrapper
-from ..lib.middleware.base import Widget
+from ..shared.utils import WidgetKeyErrorHandler
 
 INPUT_PDF = Annotated[
     Path,
@@ -100,6 +100,23 @@ def cli_bad_parameter(
     raise typer.BadParameter(message, param_hint=param_hint) from cause
 
 
+def cli_widget_key_error(param_hint: str) -> WidgetKeyErrorHandler:
+    """
+    Build a CLI error handler for missing form fields.
+
+    Args:
+        param_hint (str): CLI parameter associated with the field name.
+
+    Returns:
+        WidgetKeyErrorHandler: Handler that raises a Typer input error.
+    """
+
+    def _raise_cli_bad_parameter(message: str, cause: KeyError) -> NoReturn:
+        cli_bad_parameter(message, param_hint=param_hint, cause=cause)
+
+    return _raise_cli_bad_parameter
+
+
 def _validation_error_path(exc: ValidationError) -> str:
     """
     Builds a dotted JSON path for a validation error.
@@ -151,31 +168,6 @@ def load_json_file(data: Path, schema: dict, param_hint: str) -> Any:
         )
 
     return input_data
-
-
-def get_widget(wrapper: PdfWrapper, field: str, param_hint: str) -> Widget:
-    """
-    Look up a widget and report missing names as CLI input errors.
-
-    Args:
-        wrapper (PdfWrapper): PDF wrapper containing form widgets.
-        field (str): Form field name to look up.
-        param_hint (str): CLI parameter associated with the field name.
-
-    Returns:
-        Widget: The matching widget.
-
-    Raises:
-        typer.BadParameter: Raised when the widget name is not present.
-    """
-    try:
-        return wrapper.widgets[field]
-    except KeyError as exc:
-        cli_bad_parameter(
-            f"Form field '{field}' does not exist.",
-            param_hint=param_hint,
-            cause=exc,
-        )
 
 
 def handle_font_registration(
