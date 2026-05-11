@@ -18,7 +18,7 @@ WidgetKeyErrorHandler = Callable[[str, KeyError], NoReturn]
 def get_widget(
     wrapper: PdfWrapper,
     field: str,
-    key_error_handler: WidgetKeyErrorHandler | None = None,
+    key_error_handler: WidgetKeyErrorHandler,
 ) -> Widget:
     """
     Look up a widget by field name.
@@ -39,8 +39,4 @@ def get_widget(
     try:
         return wrapper.widgets[field]
     except KeyError as exc:
-        message = f"Form field '{field}' does not exist."
-        if key_error_handler is not None:
-            key_error_handler(message, exc)
-
-        raise KeyError(message) from exc
+        key_error_handler(f"Form field '{field}' does not exist.", exc)
