@@ -25,7 +25,13 @@ def schema(
     pdf: Annotated[UploadFile, File()],
 ) -> dict:
     """
-    Return the form schema for an uploaded PDF.
+    Upload a PDF form and return the JSON schema PyPDFForm detects for its
+    fields.
+
+    Use this response to discover field names, value types, and validation
+    constraints before filling or updating a form.
+
+    \f
 
     Args:
         options (PdfWrapperOptions): Common `PdfWrapper` construction options.
@@ -43,7 +49,12 @@ def data(
     pdf: Annotated[UploadFile, File()],
 ) -> dict:
     """
-    Return current form data for an uploaded PDF.
+    Upload a PDF form and return the values currently stored in its fields.
+
+    Empty fields are included in the response so clients can distinguish
+    missing form fields from blank values.
+
+    \f
 
     Args:
         options (PdfWrapperOptions): Common `PdfWrapper` construction options.
@@ -61,7 +72,12 @@ def sample(
     pdf: Annotated[UploadFile, File()],
 ) -> dict:
     """
-    Return sample fill data for an uploaded PDF.
+    Upload a PDF form and return example data matching the detected schema.
+
+    Use this response as a starting payload when testing form filling or when
+    building a client-side editor for a PDF form.
+
+    \f
 
     Args:
         options (PdfWrapperOptions): Common `PdfWrapper` construction options.
@@ -82,7 +98,13 @@ def location(
     field: Annotated[str, Form()],
 ) -> dict:
     """
-    Return a form field's location and size for an uploaded PDF.
+    Upload a PDF form and field name, then return that field's page number,
+    coordinates, width, and height.
+
+    Use this endpoint when placing overlays, annotations, or generated content
+    relative to an existing form field.
+
+    \f
 
     Args:
         options (PdfWrapperOptions): Common `PdfWrapper` construction options.

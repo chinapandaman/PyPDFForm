@@ -34,7 +34,12 @@ def title(
     new_title: Annotated[str, Form()],
 ) -> PdfResponse:
     """
-    Set the title of an uploaded PDF.
+    Upload a PDF and return a copy with its document title metadata updated.
+
+    The response body is the modified PDF file, preserving other behavior from
+    the common `PdfWrapper` options supplied as query parameters.
+
+    \f
 
     Args:
         options (PdfWrapperOptions): Common `PdfWrapper` construction options.
