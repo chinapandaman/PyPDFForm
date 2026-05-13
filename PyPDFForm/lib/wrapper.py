@@ -666,28 +666,6 @@ class PdfWrapper:
 
         return self
 
-    @deprecation_notice(to_replace="bulk_create_fields")
-    def create_field(
-        self,
-        field: FieldTypes,
-    ) -> PdfWrapper:
-        """
-        Creates a new form field (widget) on the PDF using a `FieldTypes` object.
-
-        This method simplifies widget creation by taking a `FieldTypes` object
-        and delegating to the internal `_bulk_create_fields` method.
-
-        Args:
-            field (FieldTypes): An object representing the field to create.
-                This object encapsulates all necessary properties like name,
-                page number, coordinates, and type of the field.
-
-        Returns:
-            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
-        """
-
-        return self._bulk_create_fields([field])
-
     def update_widget_key(
         self, old_key: str, new_key: str, index: int = 0, defer: bool = False
     ) -> PdfWrapper:
