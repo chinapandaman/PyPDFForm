@@ -671,9 +671,9 @@ class PdfWrapper:
         """
         Updates the key (name) of a widget, allowing you to rename form fields.
 
-        This method allows you to change the name of a form field in the PDF.  This can be useful for
-        standardizing field names or resolving naming conflicts.  The update can be performed immediately
-        or deferred until `commit_widget_key_updates` is called.
+        This method queues a change to the name of a form field in the PDF.  This can be useful for
+        standardizing field names or resolving naming conflicts.  The queued update is applied when
+        `commit_widget_key_updates` is called.
 
         Args:
             old_key (str): The old key of the widget that you want to rename.
@@ -694,8 +694,8 @@ class PdfWrapper:
         """
         Commits deferred widget key updates, applying all queued key renames to the PDF.
 
-        This method applies all widget key updates that were deferred using the `defer=True` option
-        in the `update_widget_key` method.  It updates the underlying PDF stream with the new key names.
+        This method applies all widget key updates queued by the `update_widget_key` method.  It updates
+        the underlying PDF stream with the new key names.
 
         Returns:
             PdfWrapper: The PdfWrapper object.
