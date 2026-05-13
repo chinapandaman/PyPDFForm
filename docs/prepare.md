@@ -259,10 +259,10 @@ new_form.write("output.pdf")
 
 ## Modify the key of a field
 
-PyPDFForm allows you to modify the keys of existing fields.
+PyPDFForm lets you rename existing fields by updating their keys.
 
 === "Update Multiple Fields"
-    For example, to change the key of the first text field, `test`, to `test_text` and the second text field, `test_2`, to `test_text_2` using [this PDF](pdfs/sample_template.pdf), use the following code:
+    To change the key of the first text field from `test` to `test_text` and the second text field from `test_2` to `test_text_2` in [this PDF](pdfs/sample_template.pdf), use:
 
     ```python
     from PyPDFForm import PdfWrapper
@@ -276,8 +276,8 @@ PyPDFForm allows you to modify the keys of existing fields.
 
     form.write("output.pdf")
     ```
-=== "Using Index for Fields with Same Key"
-    If multiple fields share the same key, use the `index` parameter to specify which one to update. For instance, to change the key of the second row's text field with the key `Description[0]` to `Description[1]` using [this PDF](pdfs/733.pdf), use the following code:
+=== "Using Index for Fields with the Same Key"
+    If multiple fields share the same key, use the `index` parameter to choose which one to update. For example, to change the second row's text field from `Description[0]` to `Description[1]` in [this PDF](pdfs/733.pdf), use:
 
     ```python
     from PyPDFForm import PdfWrapper
