@@ -29,7 +29,6 @@ from .adapter import (fp_or_f_obj_or_f_content_to_content,
                       fp_or_f_obj_or_stream_to_stream)
 from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
-from .deprecation import deprecation_notice
 from .egress import appearance_streams_handler, preserve_pdf_properties
 from .filler import fill
 from .font import (get_all_available_fonts, register_font_acroform,
@@ -160,7 +159,7 @@ class PdfWrapper:
         unique_suffix = generate_unique_suffix()
         for k in self.widgets:
             if k in other.widgets:
-                other.update_widget_key(k, f"{k}-{unique_suffix}", defer=True)
+                other.update_widget_key(k, f"{k}-{unique_suffix}")
 
         other.commit_widget_key_updates()
 
@@ -667,7 +666,7 @@ class PdfWrapper:
         return self
 
     def update_widget_key(
-        self, old_key: str, new_key: str, index: int = 0, defer: bool = False
+        self, old_key: str, new_key: str, index: int = 0
     ) -> PdfWrapper:
         """
         Updates the key (name) of a widget, allowing you to rename form fields.
@@ -680,8 +679,6 @@ class PdfWrapper:
             old_key (str): The old key of the widget that you want to rename.
             new_key (str): The new key to assign to the widget.
             index (int): The index of the widget if there are multiple widgets with the same name (default: 0).
-            defer (bool): Whether to defer the update. If True, the update is added to a queue and applied
-                when `commit_widget_key_updates` is called. If False, the update is applied immediately (default: False).
 
         Returns:
             PdfWrapper: The PdfWrapper object.
@@ -690,19 +687,7 @@ class PdfWrapper:
         if getattr(self, "use_full_widget_name"):
             raise NotImplementedError
 
-        if defer:
-            deprecation_notice(to_replace="", param="defer").emit_notice(
-                self, "update_widget_key"
-            )
-            self._keys_to_update.append((old_key, new_key, index))
-            return self
-
-        self._key_update_tracker[new_key] = old_key
-        self._stream = update_widget_keys(
-            self._read(), self.widgets, [old_key], [new_key], [index]
-        )
-        self._init_helper()
-
+        self._keys_to_update.append((old_key, new_key, index))
         return self
 
     def commit_widget_key_updates(self) -> PdfWrapper:
