@@ -20,7 +20,7 @@ You can describe the dictionary used to fill a PDF form using a JSON schema. For
 === "Output"
     ```json
     {
-        "additionalProperties": true,
+        "additionalProperties": false,
         "properties": {
             "check": {
                 "type": "boolean"

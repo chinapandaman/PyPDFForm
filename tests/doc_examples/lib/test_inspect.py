@@ -20,7 +20,7 @@ def test_schema(static_pdfs):
             "test_3": {"type": "string"},
             "check_3": {"type": "boolean"},
         },
-        "additionalProperties": True,
+        "additionalProperties": False,
     }
 
 
