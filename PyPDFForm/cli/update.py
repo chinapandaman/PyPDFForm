@@ -140,9 +140,7 @@ def rename(
     for item in input_data:
         for k, v in item.items():
             widget = get_widget(obj, k, cli_widget_key_error("--file"))
-            obj.update_widget_key(
-                widget.name, v["new_key"], index=v.get("index", 0), defer=True
-            )
+            obj.update_widget_key(widget.name, v["new_key"], index=v.get("index", 0))
 
     obj.commit_widget_key_updates().write(output or pdf)
 

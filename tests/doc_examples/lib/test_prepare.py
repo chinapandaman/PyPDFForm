@@ -301,6 +301,7 @@ def test_update_key(static_pdfs):
     new_form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     assert "test" in new_form.widgets
     new_form.update_widget_key("test", "test_text")
+    new_form.commit_widget_key_updates()
     assert "test" not in new_form.widgets
     assert "test_text" in new_form.widgets
 
@@ -311,6 +312,7 @@ def test_update_key_index(pdf_samples, static_pdfs, request):
     new_form = PdfWrapper(os.path.join(static_pdfs, "733.pdf")).update_widget_key(
         "Description[0]", "Description[1]", index=1
     )
+    new_form.commit_widget_key_updates()
 
     new_form.fill(new_form.sample_data)
 
@@ -329,9 +331,7 @@ def test_update_key_bulk(pdf_samples, static_pdfs, request):
 
     new_form = PdfWrapper(os.path.join(static_pdfs, "733.pdf"))
     for i in range(1, 10):
-        new_form.update_widget_key(
-            "Description[0]", f"Description[{i}]", index=1, defer=True
-        )
+        new_form.update_widget_key("Description[0]", f"Description[{i}]", index=1)
     new_form.commit_widget_key_updates()
 
     new_form.fill(new_form.sample_data)
