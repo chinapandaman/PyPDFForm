@@ -40,7 +40,7 @@ def test_coordinate_grid_view(pdf_samples, static_pdfs):
 
 
 @pytest.mark.web_api_test
-def test_field_page_number_coordinates_dimensions(static_pdfs):
+def test_field_locations_dimensions(static_pdfs):
     path = os.path.join(static_pdfs, "sample_template.pdf")
     with open(path, "rb") as f:
         response = client.post(
