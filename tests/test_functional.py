@@ -645,6 +645,7 @@ def test_update_radio_key(template_with_radiobutton_stream, pdf_samples, request
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(template_with_radiobutton_stream)
         obj.update_widget_key("radio_3", "RADIO")
+        obj.commit_widget_key_updates()
         obj.fill({"RADIO": 0})
 
         request.config.results["expected_path"] = expected_path
@@ -664,6 +665,7 @@ def test_update_sejda_key(sejda_template, pdf_samples, request):
         obj.update_widget_key("at_future_date", "FUTURE_DATE")
         obj.update_widget_key("purchase_option", "PURCHASE_OPTION")
         obj.update_widget_key("buyer_signed_date", "BUYER_SIGNED_DATE")
+        obj.commit_widget_key_updates()
         obj.fill(
             {
                 "YEAR": "12",
