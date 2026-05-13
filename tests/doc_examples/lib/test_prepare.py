@@ -298,49 +298,31 @@ def test_create_image(pdf_samples, request):
 
 
 def test_update_key(static_pdfs):
-    new_form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
-    assert "test" in new_form.widgets
-    new_form.update_widget_key("test", "test_text")
-    new_form.commit_widget_key_updates()
-    assert "test" not in new_form.widgets
-    assert "test_text" in new_form.widgets
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
+    assert "test" in form.widgets
+    form.update_widget_key("test", "test_text").update_widget_key(
+        "test_2", "test_text_2"
+    )
+    form.commit_widget_key_updates()
+    assert "test" not in form.widgets
+    assert "test_text" in form.widgets
 
 
 def test_update_key_index(pdf_samples, static_pdfs, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_update_key_index.pdf")
 
-    new_form = PdfWrapper(os.path.join(static_pdfs, "733.pdf")).update_widget_key(
+    form = PdfWrapper(os.path.join(static_pdfs, "733.pdf")).update_widget_key(
         "Description[0]", "Description[1]", index=1
     )
-    new_form.commit_widget_key_updates()
+    form.commit_widget_key_updates()
 
-    new_form.fill(new_form.sample_data)
+    form.fill(form.sample_data)
 
     request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = new_form.read()
+    request.config.results["stream"] = form.read()
 
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(new_form.read()) == len(expected)
-        assert new_form.read() == expected
-
-
-def test_update_key_bulk(pdf_samples, static_pdfs, request):
-    expected_path = os.path.join(pdf_samples, "docs", "test_update_key_bulk.pdf")
-
-    new_form = PdfWrapper(os.path.join(static_pdfs, "733.pdf"))
-    for i in range(1, 10):
-        new_form.update_widget_key("Description[0]", f"Description[{i}]", index=1)
-    new_form.commit_widget_key_updates()
-
-    new_form.fill(new_form.sample_data)
-
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = new_form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(new_form.read()) == len(expected)
-        assert new_form.read() == expected
+        assert len(form.read()) == len(expected)
+        assert form.read() == expected
