@@ -4,15 +4,7 @@ The most common tool for creating PDF form fields is Adobe Acrobat, and a tutori
 
 PyPDFForm also allows creating PDF form fields on existing PDFs through coding.
 
-This section of the documentation will primarily use [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
-
-Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
-
-All optional parameters will have a comment `# optional` after each of them.
-
-## Bulk create fields
-
-PyPDFForm's create field functionality is done through a bulk method that takes a list of fields:
+Field creation is done with `PdfWrapper.bulk_create_fields`, which accepts a list of field definitions. Use the same method whether you are adding one field or several:
 
 ```python
 from PyPDFForm import Fields, PdfWrapper
@@ -47,6 +39,12 @@ fields = [
 new_form = PdfWrapper("dummy.pdf").bulk_create_fields(fields)
 new_form.write("output.pdf")
 ```
+
+This section of the documentation will primarily use [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
+
+Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
+
+All optional parameters will have a comment `# optional` after each of them.
 
 ## Create a text field
 
