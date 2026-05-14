@@ -304,8 +304,12 @@ def test_update_key(static_pdfs):
         "test_2", "test_text_2"
     )
     form.commit_widget_key_updates()
+
     assert "test" not in form.widgets
     assert "test_text" in form.widgets
+
+    assert "test_2" not in form.widgets
+    assert "test_text_2" in form.widgets
 
 
 def test_update_key_index(pdf_samples, static_pdfs, request):

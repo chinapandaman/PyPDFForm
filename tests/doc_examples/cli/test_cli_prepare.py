@@ -260,6 +260,9 @@ def test_update_key(static_pdfs, json_samples, tmp_path):
     assert "test" not in sample_data
     assert "test_text" in sample_data
 
+    assert "test_2" not in sample_data
+    assert "test_text_2" in sample_data
+
 
 @pytest.mark.cli_test
 def test_update_key_index(pdf_samples, static_pdfs, json_samples, tmp_path):
