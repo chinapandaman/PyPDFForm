@@ -7,6 +7,7 @@ nav:
     - index.md
   - 'User Guide':
     - install.md
+    - basic.md
     - coordinate.md
     - font.md
     - prepare.md
