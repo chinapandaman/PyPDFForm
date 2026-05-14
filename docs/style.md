@@ -1,8 +1,33 @@
-# Modify PDF/form fields
+# Modify PDF & form fields
 
-PyPDFForm enables you to modify some field styles through code, allowing you to change field appearances without altering the PDF form template.
+PyPDFForm enables you to modify PDF-level metadata and form field settings through code, allowing you to update document titles, field appearances, and field behavior without altering the PDF form template.
 
 This section of the documentation will primarily use [this PDF](pdfs/sample_template.pdf) as an example.
+
+## Change PDF title
+
+The PDF title can be set during `PdfWrapper` instantiation or via the `.title` property. Accessing it retrieves the current title.
+
+=== "Instantiate with Title"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf", title="My PDF")
+    ```
+=== "Set Title via Attribute"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf")
+    pdf.title = "My PDF"
+    ```
+=== "Get Title via Attribute"
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    pdf = PdfWrapper("sample_template.pdf", title="My PDF")
+    print(pdf.title)
+    ```
 
 ## Change text field font
 
