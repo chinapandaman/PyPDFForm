@@ -254,36 +254,3 @@ new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
 
 new_form.write("output.pdf")
 ```
-
-## Modify the key of a field
-
-PyPDFForm lets you rename existing fields by updating their keys.
-
-=== "Update Multiple Fields"
-    To change the key of the first text field from `test` to `test_text` and the second text field from `test_2` to `test_text_2` in [this PDF](pdfs/sample_template.pdf), use:
-
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    form = (
-        PdfWrapper("sample_template.pdf")
-        .update_widget_key("test", "test_text")
-        .update_widget_key("test_2", "test_text_2")
-    )
-    form.commit_widget_key_updates()
-
-    form.write("output.pdf")
-    ```
-=== "Using Index for Fields with the Same Key"
-    If multiple fields share the same key, use the `index` parameter to choose which one to update. For example, to change the second row's text field from `Description[0]` to `Description[1]` in [this PDF](pdfs/733.pdf), use:
-
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    form = PdfWrapper("733.pdf").update_widget_key(
-        "Description[0]", "Description[1]", index=1
-    )
-    form.commit_widget_key_updates()
-
-    form.write("output.pdf")
-    ```
