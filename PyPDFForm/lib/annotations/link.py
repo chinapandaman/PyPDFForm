@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# TODO: finish other features
 """
 This module defines the class for link annotations in PyPDFForm.
 
