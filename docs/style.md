@@ -1,4 +1,4 @@
-# Change form field styles
+# Modify PDF/form fields
 
 PyPDFForm enables you to modify some field styles through code, allowing you to change field appearances without altering the PDF form template.
 
