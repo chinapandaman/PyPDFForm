@@ -26,27 +26,6 @@ def test_get_version():
 
 
 @pytest.mark.cli_test
-def test_change_title(static_pdfs, tmp_path):
-    output_path = os.path.join(tmp_path, "output.pdf")
-    result = runner.invoke(
-        cli_app,
-        [
-            "update",
-            "title",
-            os.path.join(static_pdfs, "sample_template.pdf"),
-            "-t",
-            "My PDF",
-            "-o",
-            output_path,
-        ],
-    )
-    assert result.exit_code == 0
-
-    reader = PdfReader(output_path)
-    assert (reader.metadata or {}).get(Title) == "My PDF"
-
-
-@pytest.mark.cli_test
 def test_need_appearances_option(static_pdfs, tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
     result = runner.invoke(

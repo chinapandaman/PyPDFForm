@@ -7,6 +7,16 @@ import pytest
 from PyPDFForm import PdfWrapper, Widgets
 
 
+def test_change_title(static_pdfs):
+    pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"), title="My PDF")
+
+    assert pdf.title == "My PDF"
+
+    pdf.title = "My PDF"
+
+    assert pdf.title == "My PDF"
+
+
 @pytest.mark.posix_only
 def test_change_text_font(static_pdfs, sample_font_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
