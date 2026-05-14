@@ -348,6 +348,39 @@ form.widgets["dropdown_1"].font_color = (1, 0, 0)
 form.write("output.pdf")
 ```
 
+## Change field name
+
+PyPDFForm lets you rename existing fields by updating their keys.
+
+=== "Update Multiple Fields"
+    To change the key of the first text field from `test` to `test_text` and the second text field from `test_2` to `test_text_2` in [this PDF](pdfs/sample_template.pdf), use:
+
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    form = (
+        PdfWrapper("sample_template.pdf")
+        .update_widget_key("test", "test_text")
+        .update_widget_key("test_2", "test_text_2")
+    )
+    form.commit_widget_key_updates()
+
+    form.write("output.pdf")
+    ```
+=== "Using Index for Fields with the Same Key"
+    If multiple fields share the same key, use the `index` parameter to choose which one to update. For example, to change the second row's text field from `Description[0]` to `Description[1]` in [this PDF](pdfs/733.pdf), use:
+
+    ```python
+    from PyPDFForm import PdfWrapper
+
+    form = PdfWrapper("733.pdf").update_widget_key(
+        "Description[0]", "Description[1]", index=1
+    )
+    form.commit_widget_key_updates()
+
+    form.write("output.pdf")
+    ```
+
 ## Change field editability
 
 The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. For example, the following code snippet shows how you can make different form fields editable in [this PDF form](pdfs/sample_template_with_dropdown.pdf) after they have been flattened:
