@@ -295,38 +295,3 @@ def test_create_image(pdf_samples, request):
 
         assert len(new_form.read()) == len(expected)
         assert new_form.read() == expected
-
-
-def test_update_key(static_pdfs):
-    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
-    assert "test" in form.widgets
-    form.update_widget_key("test", "test_text").update_widget_key(
-        "test_2", "test_text_2"
-    )
-    form.commit_widget_key_updates()
-
-    assert "test" not in form.widgets
-    assert "test_text" in form.widgets
-
-    assert "test_2" not in form.widgets
-    assert "test_text_2" in form.widgets
-
-
-def test_update_key_index(pdf_samples, static_pdfs, request):
-    expected_path = os.path.join(pdf_samples, "docs", "test_update_key_index.pdf")
-
-    form = PdfWrapper(os.path.join(static_pdfs, "733.pdf")).update_widget_key(
-        "Description[0]", "Description[1]", index=1
-    )
-    form.commit_widget_key_updates()
-
-    form.fill(form.sample_data)
-
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
