@@ -70,7 +70,6 @@ def blank(
 
     obj = BlankPage(**params)
     if body.count is not None and body.count > 1:
-        print(body.count)
         obj = BlankPage(**params) * body.count
 
     return PdfResponse(PdfWrapper(obj, **options.as_kwargs()).read())
