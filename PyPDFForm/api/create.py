@@ -10,11 +10,48 @@ clients.
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
+from pydantic import BaseModel
 
-from .. import PdfWrapper
+from .. import BlankPage, PdfWrapper
 from .common import PdfResponse, PdfWrapperOptions, pdf_wrapper_options
 
 create_router = APIRouter(prefix="/create", tags=["create"])
+
+
+class BlankBody(BaseModel):
+    count: int | None = None
+    width: float | None = None
+    height: float | None = None
+
+
+@create_router.post(
+    "/blank",
+    summary="Create a new blank PDF.",
+    response_class=PdfResponse,
+    responses={
+        200: {
+            "content": {
+                "application/pdf": {"schema": {"type": "string", "format": "binary"}}
+            },
+        }
+    },
+)
+def blank(
+    options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
+    body: BlankBody,
+) -> PdfResponse:
+    params = {}
+    if body.width is not None:
+        params["width"] = body.width
+    if body.height is not None:
+        params["height"] = body.height
+
+    obj = BlankPage(**params)
+    if body.count is not None and body.count > 1:
+        print(body.count)
+        obj = BlankPage(**params) * body.count
+
+    return PdfResponse(PdfWrapper(obj, **options.as_kwargs()).read())
 
 
 @create_router.post(
