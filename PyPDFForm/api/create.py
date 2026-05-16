@@ -10,11 +10,71 @@ clients.
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
+from pydantic import BaseModel
 
-from .. import PdfWrapper
+from .. import BlankPage, PdfWrapper
 from .common import PdfResponse, PdfWrapperOptions, pdf_wrapper_options
 
 create_router = APIRouter(prefix="/create", tags=["create"])
+
+
+class BlankPdfOptions(BaseModel):
+    """
+    Options for the blank PDF to create.
+
+    All fields are optional. Omit dimensions to use the default page size and
+    omit count to create a single page.
+    """
+
+    count: int | None = None
+    width: float | None = None
+    height: float | None = None
+
+
+@create_router.post(
+    "/blank",
+    summary="Create a new blank PDF.",
+    response_class=PdfResponse,
+    responses={
+        200: {
+            "content": {
+                "application/pdf": {"schema": {"type": "string", "format": "binary"}}
+            },
+        }
+    },
+)
+def blank(
+    options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
+    body: BlankPdfOptions = None,
+) -> PdfResponse:
+    """
+    Create and return a new PDF containing one or more blank pages.
+
+    Use the optional dimensions to size each page and `count` to request
+    multiple pages.
+
+    \f
+
+    Args:
+        options (PdfWrapperOptions): Common `PdfWrapper` construction options.
+        body (BlankBody): Blank page count and page dimension options.
+
+    Returns:
+        PdfResponse: PDF response containing the generated blank document.
+    """
+    body = body or BlankPdfOptions()
+
+    params = {}
+    if body.width is not None:
+        params["width"] = body.width
+    if body.height is not None:
+        params["height"] = body.height
+
+    obj = BlankPage(**params)
+    if body.count is not None and body.count > 1:
+        obj = BlankPage(**params) * body.count
+
+    return PdfResponse(PdfWrapper(obj, **options.as_kwargs()).read())
 
 
 @create_router.post(
