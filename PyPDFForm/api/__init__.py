@@ -20,6 +20,7 @@ app = FastAPI(
     title="PyPDFForm Web API",
     summary="Create, fill, inspect, and update PDF forms.",
     version=__version__,
+    swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
 
 app.include_router(root_router)
