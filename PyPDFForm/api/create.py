@@ -19,6 +19,15 @@ create_router = APIRouter(prefix="/create", tags=["create"])
 
 
 class BlankBody(BaseModel):
+    """
+    Request body for creating a blank PDF.
+
+    Attributes:
+        count (int): Number of blank pages to create.
+        width (float): Width of each blank page in points.
+        height (float): Height of each blank page in points.
+    """
+
     count: int | None = None
     width: float | None = None
     height: float | None = None
@@ -40,6 +49,21 @@ def blank(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
     body: BlankBody,
 ) -> PdfResponse:
+    """
+    Create and return a new PDF containing one or more blank pages.
+
+    Use the optional dimensions to size each page and `count` to request
+    multiple pages.
+
+    \f
+
+    Args:
+        options (PdfWrapperOptions): Common `PdfWrapper` construction options.
+        body (BlankBody): Blank page count and page dimension options.
+
+    Returns:
+        PdfResponse: PDF response containing the generated blank document.
+    """
     params = {}
     if body.width is not None:
         params["width"] = body.width
