@@ -20,12 +20,10 @@ create_router = APIRouter(prefix="/create", tags=["create"])
 
 class BlankBody(BaseModel):
     """
-    Request body for creating a blank PDF.
+    Options for the blank PDF to create.
 
-    Attributes:
-        count (int): Number of blank pages to create.
-        width (float): Width of each blank page in points.
-        height (float): Height of each blank page in points.
+    All fields are optional. Omit dimensions to use the default page size and
+    omit count to create a single page.
     """
 
     count: int | None = None
