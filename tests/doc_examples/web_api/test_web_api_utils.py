@@ -26,7 +26,7 @@ def test_blank_page(pdf_samples):
 
 
 @pytest.mark.posix_only
-@pytest.mark.cli_test
+@pytest.mark.web_api_test
 def test_blank_page_custom_dimensions(pdf_samples):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_blank_page_custom_dimensions.pdf"
@@ -43,7 +43,7 @@ def test_blank_page_custom_dimensions(pdf_samples):
 
 
 @pytest.mark.posix_only
-@pytest.mark.cli_test
+@pytest.mark.web_api_test
 def test_blank_page_multiply(pdf_samples):
     expected_path = os.path.join(pdf_samples, "docs", "test_blank_page_multiply.pdf")
 
