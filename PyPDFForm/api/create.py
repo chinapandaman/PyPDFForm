@@ -18,7 +18,7 @@ from .common import PdfResponse, PdfWrapperOptions, pdf_wrapper_options
 create_router = APIRouter(prefix="/create", tags=["create"])
 
 
-class BlankBody(BaseModel):
+class BlankPdfOptions(BaseModel):
     """
     Options for the blank PDF to create.
 
@@ -45,7 +45,7 @@ class BlankBody(BaseModel):
 )
 def blank(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
-    body: BlankBody = None,
+    body: BlankPdfOptions = None,
 ) -> PdfResponse:
     """
     Create and return a new PDF containing one or more blank pages.
@@ -62,7 +62,7 @@ def blank(
     Returns:
         PdfResponse: PDF response containing the generated blank document.
     """
-    body = body or BlankBody()
+    body = body or BlankPdfOptions()
 
     params = {}
     if body.width is not None:
