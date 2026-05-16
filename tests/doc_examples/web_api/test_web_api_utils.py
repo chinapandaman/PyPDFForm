@@ -15,7 +15,7 @@ client = TestClient(app)
 def test_blank_page(pdf_samples):
     expected_path = os.path.join(pdf_samples, "docs", "test_blank_page.pdf")
 
-    response = client.post("/create/blank", json={})
+    response = client.post("/create/blank")
 
     assert response.status_code == 200
 

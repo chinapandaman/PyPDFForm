@@ -45,7 +45,7 @@ class BlankBody(BaseModel):
 )
 def blank(
     options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
-    body: BlankBody,
+    body: BlankBody = None,
 ) -> PdfResponse:
     """
     Create and return a new PDF containing one or more blank pages.
@@ -62,6 +62,8 @@ def blank(
     Returns:
         PdfResponse: PDF response containing the generated blank document.
     """
+    body = body or BlankBody()
+
     params = {}
     if body.width is not None:
         params["width"] = body.width
