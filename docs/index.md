@@ -40,6 +40,8 @@ Here's a quick look at how PyPDFForm works:
     from pprint import pprint
 
     pprint(pdf.schema)
+
+    pprint(pdf.widgets)
     ```
 === "Style"
     ```python
