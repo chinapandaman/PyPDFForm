@@ -41,7 +41,7 @@ Documentation = "https://chinapandaman.github.io/PyPDFForm/"
 cli = ["typer>=0.25.1,<1.0.0", "jsonschema>=4.26.0,<5.0.0"]
 web_api = ["fastapi[standard]>=0.136.1,<1.0.0"]
 dev = [
-    "black>=26.3.1,<27.0.0",
+    "black>=26.5.1,<27.0.0",
     "coverage>=7.14.0,<8.0.0",
     "isort>=8.0.1,<9.0.0",
     "mike>=2.2.0,<3.0.0",
