@@ -45,6 +45,25 @@ def fill(
     data: Annotated[str, Form()],
     flatten: Annotated[bool, Form()] = None,
 ) -> PdfResponse:
+    """
+    Upload a PDF form and JSON field data, then return the filled PDF.
+
+    `data` must be a JSON object keyed by form field name. Image and signature
+    fields may also be provided as an object with `path` and optional
+    `preserve_aspect_ratio` values. Use `flatten` to make filled fields
+    read-only in the returned PDF.
+
+    \f
+
+    Args:
+        options (PdfWrapperOptions): Common `PdfWrapper` construction options.
+        pdf (UploadFile): Uploaded PDF form to fill.
+        data (str): JSON string containing form field values.
+        flatten (bool): Whether to flatten form fields after filling.
+
+    Returns:
+        PdfResponse: PDF response containing the filled document bytes.
+    """
     obj = PdfWrapper(pdf.file.read(), **options.as_kwargs())
 
     schema = obj.schema
