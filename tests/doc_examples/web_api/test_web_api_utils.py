@@ -64,7 +64,6 @@ def test_extract_pages(static_pdfs, pdf_samples, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_extract_pages.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
     path = os.path.join(static_pdfs, "sample_template.pdf")
-
     with open(path, "rb") as f:
         extract_result = client.post(
             "/create/extract",

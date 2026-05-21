@@ -26,6 +26,21 @@ def test_index_redirect_to_docs():
 
 
 @pytest.mark.web_api_test
+def test_create_extract_start_after_end(pdf_samples):
+    path = os.path.join(pdf_samples, "sample_template.pdf")
+    with open(path, "rb") as f:
+        response = client.post(
+            "/create/extract",
+            data={"start": 3, "end": 1},
+            files={"pdf": ("sample_template.pdf", f, "application/pdf")},
+        )
+
+    assert_web_api_error(
+        response, 400, "End page must be greater than or equal to start page."
+    )
+
+
+@pytest.mark.web_api_test
 def test_inspect_location_unknown_field(pdf_samples):
     path = os.path.join(pdf_samples, "sample_template.pdf")
     with open(path, "rb") as f:
