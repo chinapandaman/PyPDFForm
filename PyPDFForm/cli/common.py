@@ -7,15 +7,13 @@ once per command invocation, and converting grouped JSON element definitions
 into the objects expected by `PdfWrapper` methods.
 """
 
-import json
 from pathlib import Path
-from typing import Annotated, Any, NoReturn
+from typing import Annotated, NoReturn
 
 import typer
-from jsonschema import ValidationError, validate
 
 from .. import PdfWrapper
-from ..shared.utils import WidgetKeyErrorHandler
+from ..shared.utils import JsonErrorHandler, WidgetKeyErrorHandler, load_json
 
 INPUT_PDF = Annotated[
     Path,
@@ -117,57 +115,21 @@ def cli_widget_key_error(param_hint: str) -> WidgetKeyErrorHandler:
     return _raise_cli_bad_parameter
 
 
-def _validation_error_path(exc: ValidationError) -> str:
+def cli_json_error(param_hint: str) -> JsonErrorHandler:
     """
-    Builds a dotted JSON path for a validation error.
+    Build a CLI error handler for JSON input failures.
 
     Args:
-        exc (ValidationError): The JSON schema validation error.
+        param_hint (str): CLI parameter associated with the JSON input.
 
     Returns:
-        str: Dotted path for the failing instance location.
+        JsonErrorHandler: Handler that raises a Typer input error.
     """
-    return ".".join(str(each) for each in exc.absolute_path)
 
+    def _raise_cli_bad_parameter(message: str, cause: BaseException) -> NoReturn:
+        cli_bad_parameter(message, param_hint=param_hint, cause=cause)
 
-def load_json_file(data: Path, schema: dict, param_hint: str) -> Any:
-    """
-    Loads a JSON CLI input file and validates it against a schema.
-
-    Args:
-        data (Path): JSON file path.
-        schema (dict): JSON schema to validate against.
-        param_hint (str): CLI parameter associated with the JSON file.
-
-    Returns:
-        Any: Parsed and validated JSON input.
-
-    Raises:
-        typer.BadParameter: Raised when the file cannot be loaded or validation
-            fails.
-    """
-    try:
-        with open(data, "r", encoding="utf-8") as f:
-            input_data = json.load(f)
-    except (OSError, json.JSONDecodeError) as exc:
-        cli_bad_parameter(
-            f"Invalid JSON file: {exc}",
-            param_hint=param_hint,
-            cause=exc,
-        )
-
-    try:
-        validate(instance=input_data, schema=schema)
-    except ValidationError as exc:
-        error_path = _validation_error_path(exc)
-        location = f" at {error_path}" if error_path else ""
-        cli_bad_parameter(
-            f"Invalid JSON file{location}: {exc.message}",
-            param_hint=param_hint,
-            cause=exc,
-        )
-
-    return input_data
+    return _raise_cli_bad_parameter
 
 
 def handle_font_registration(
@@ -231,7 +193,7 @@ def create_elements_from_file(
         output (Path, optional): Path where the modified PDF should be saved. If
             omitted, the input PDF is overwritten. Defaults to None.
     """
-    input_data = load_json_file(data, schema, param_hint)
+    input_data = load_json(data, schema, cli_json_error(param_hint))
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     ungrouped_input = []
