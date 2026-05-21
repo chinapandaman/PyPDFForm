@@ -12,6 +12,8 @@ from os import PathLike
 from pathlib import Path
 from typing import Any, NoReturn
 
+from jsonschema import ValidationError, validate
+
 from .. import PdfWrapper
 from ..lib.middleware.base import Widget
 
@@ -68,8 +70,6 @@ def load_json(
     Returns:
         Any: Parsed and validated JSON input.
     """
-    from jsonschema import ValidationError, validate
-
     is_json_file = _is_json_file(data)
     source = "JSON file" if is_json_file else "JSON"
     try:
