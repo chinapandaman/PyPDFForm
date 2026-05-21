@@ -9,7 +9,8 @@ clients.
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import (APIRouter, Depends, File, Form, HTTPException, UploadFile,
+                     status)
 from pydantic import BaseModel
 
 from .. import BlankPage, PdfWrapper
@@ -75,6 +76,35 @@ def blank(
         obj = BlankPage(**params) * body.count
 
     return PdfResponse(PdfWrapper(obj, **options.as_kwargs()).read())
+
+
+@create_router.post(
+    "/extract",
+    summary="Extract pages from an existing PDF.",
+    response_class=PdfResponse,
+    responses={
+        200: {
+            "content": {
+                "application/pdf": {"schema": {"type": "string", "format": "binary"}}
+            },
+        }
+    },
+)
+def extract(
+    options: Annotated[PdfWrapperOptions, Depends(pdf_wrapper_options)],
+    pdf: Annotated[UploadFile, File()],
+    start: Annotated[int, Form()] = None,
+    end: Annotated[int, Form()] = None,
+) -> PdfResponse:
+    if start is not None and end is not None and start > end:
+        message = "End page must be greater than or equal to start page."
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
+
+    return PdfResponse(
+        PdfWrapper(pdf.file.read(), **options.as_kwargs())
+        .pages[slice((start or 1) - 1, end)]
+        .read()
+    )
 
 
 @create_router.post(
