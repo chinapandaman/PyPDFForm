@@ -99,3 +99,19 @@ def api_widget_key_error(message: str, cause: KeyError) -> NoReturn:
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=message
     ) from cause
+
+
+def api_json_error(message: str, cause: BaseException) -> NoReturn:
+    """
+    Raise a web API error for invalid JSON input.
+
+    Args:
+        message (str): Error message to return to the API client.
+        cause (BaseException): Original parse, read, or validation error.
+
+    Raises:
+        HTTPException: Raised with a 400 response for invalid JSON input.
+    """
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST, detail=message
+    ) from cause

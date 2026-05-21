@@ -17,11 +17,10 @@ import typer
 
 from .. import PdfWrapper
 from ..lib.constants import PdfVersion
-from ..shared.utils import get_widget
+from ..shared.utils import get_widget, load_json
 from .common import (FIELD_NAME, INPUT_PDF, OPTIONAL_OUTPUT_PDF,
-                     cli_bad_parameter, cli_widget_key_error,
-                     handle_font_registration, json_file_option,
-                     load_json_file)
+                     cli_bad_parameter, cli_json_error, cli_widget_key_error,
+                     handle_font_registration, json_file_option)
 from .schemas.update import FIELD_SCHEMA, RENAME_SCHEMA
 
 update_cli = typer.Typer(
@@ -134,7 +133,7 @@ def rename(
             param_hint="--use-full-widget-name",
         )
 
-    input_data = load_json_file(data, RENAME_SCHEMA, "--file")
+    input_data = load_json(data, RENAME_SCHEMA, cli_json_error("--file"))
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     for item in input_data:
@@ -155,7 +154,7 @@ def field(
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
     """Update form field properties from JSON."""
-    input_data = load_json_file(data, FIELD_SCHEMA, "--file")
+    input_data = load_json(data, FIELD_SCHEMA, cli_json_error("--file"))
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     registered_font = {}

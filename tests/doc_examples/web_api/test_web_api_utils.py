@@ -6,7 +6,6 @@ import os
 import pytest
 from fastapi.testclient import TestClient
 
-from PyPDFForm import PdfWrapper
 from PyPDFForm.api import app
 
 client = TestClient(app)
@@ -76,13 +75,21 @@ def test_extract_pages(static_pdfs, pdf_samples, json_samples, tmp_path):
     with open(output_path, "wb") as f:
         f.write(extract_result.content)
 
-    # TODO: fix below with web api calls
-    with open(os.path.join(json_samples, "test_extract_pages.json"), "r") as f:
-        fill_result = PdfWrapper(output_path).fill(json.load(f))
+    with (
+        open(output_path, "rb") as f,
+        open(os.path.join(json_samples, "test_extract_pages.json"), "r") as j,
+    ):
+        fill_result = client.post(
+            "/fill",
+            data={"data": json.dumps(json.load(j))},
+            files={
+                "pdf": ("output.pdf", f, "application/pdf"),
+            },
+        )
 
     with open(expected_path, "rb") as f:
         expected = f.read()
-        actual = fill_result.read()
+        actual = fill_result.content
 
         assert len(expected) == len(actual)
         assert expected == actual

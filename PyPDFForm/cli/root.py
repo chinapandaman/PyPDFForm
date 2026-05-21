@@ -20,8 +20,9 @@ from typing import Annotated
 import typer
 
 from .. import PdfWrapper, Widgets, __version__
-from .common import (INPUT_PDF, OPTIONAL_OUTPUT_PDF, json_file_option,
-                     load_json_file)
+from ..shared.utils import load_json
+from .common import (INPUT_PDF, OPTIONAL_OUTPUT_PDF, cli_json_error,
+                     json_file_option)
 from .create import create_cli
 from .inspect import inspect_cli
 from .update import update_cli
@@ -152,7 +153,7 @@ def fill(
                 ]
             }
 
-    input_data = load_json_file(data, schema, "--file")
+    input_data = load_json(data, schema, cli_json_error("--file"))
     for k, each in obj.widgets.items():
         if (
             k in input_data
