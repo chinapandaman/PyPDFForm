@@ -47,10 +47,7 @@ def _is_json_file(data: str | PathLike[str]) -> bool:
     if isinstance(data, PathLike):
         return True
 
-    try:
-        return Path(data).is_file()
-    except (OSError, ValueError):
-        return False
+    return Path(data).is_file()
 
 
 def load_json(
