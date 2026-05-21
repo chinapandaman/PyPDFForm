@@ -96,6 +96,23 @@ def extract(
     start: Annotated[int, Form()] = None,
     end: Annotated[int, Form()] = None,
 ) -> PdfResponse:
+    """
+    Upload a PDF and return a new PDF containing only the selected page range.
+
+    `start` and `end` are 1-based page numbers. Omit `start` to begin with the
+    first page and omit `end` to continue through the final page.
+
+    \f
+
+    Args:
+        options (PdfWrapperOptions): Common `PdfWrapper` construction options.
+        pdf (UploadFile): Uploaded PDF file to extract pages from.
+        start (int): First page to extract, starting at 1.
+        end (int): Last page to extract, starting at 1.
+
+    Returns:
+        PdfResponse: PDF response containing the extracted page range.
+    """
     if start is not None and end is not None and start > end:
         message = "End page must be greater than or equal to start page."
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
