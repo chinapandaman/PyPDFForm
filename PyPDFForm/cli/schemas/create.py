@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=R0801
 """
 JSON schemas for the PyPDFForm create CLI commands.
 """

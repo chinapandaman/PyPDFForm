@@ -13,8 +13,7 @@ import json
 import typer
 
 from .. import PdfWrapper
-from ..shared.utils import get_widget
-from .common import FIELD_NAME, INPUT_PDF, cli_widget_key_error
+from .common import FIELD_NAME, INPUT_PDF, get_widget
 
 inspect_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
@@ -55,9 +54,7 @@ def location(
     field: FIELD_NAME,
 ) -> None:
     """Print a form field's location and size as JSON."""
-    f = get_widget(
-        PdfWrapper(str(pdf), **ctx.obj), field, cli_widget_key_error("--field")
-    )
+    f = get_widget(PdfWrapper(str(pdf), **ctx.obj), field, "--field")
 
     typer.echo(
         json.dumps(
