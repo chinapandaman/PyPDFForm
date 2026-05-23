@@ -4,7 +4,7 @@ fi
 
 rm -f ./temp/*.png
 
-PYTHONPATH=. pytest --regenerate=1
+PYTHONPATH=. pytest -m 'not cli_test' --regenerate=1
 
 BEFORE=()
 
