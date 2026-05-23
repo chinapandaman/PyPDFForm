@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=R0801
 """
 Contains the RawRectangle class, which represents a rectangle that can be drawn
 directly onto a PDF page at specified coordinates and dimensions.
