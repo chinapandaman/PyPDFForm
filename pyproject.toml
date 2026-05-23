@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "PyPDFForm"
 dynamic = ["version"]
-description = "The Python library for PDF forms."
+description = "The Python library & CLI for PDF forms."
 readme = "README.md"
 authors = [{ name = "Jinge Li" }]
 license = "MIT"
