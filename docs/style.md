@@ -771,13 +771,29 @@ PyPDFForm lets you rename existing fields by updating their keys.
 
 ## Change field visibility
 
-The `hidden` property of each form field controls its visibility. Setting `hidden` to `True` hides the field, while setting it to `False` makes it visible:
+=== "Library"
+    The `hidden` property of each form field controls its visibility. Setting `hidden` to `True` hides the field, while setting it to `False` makes it visible:
 
-```python
-from PyPDFForm import PdfWrapper
+    ```python
+    from PyPDFForm import PdfWrapper
 
-form = PdfWrapper("sample_template.pdf")
-form.widgets["test"].hidden = True
+    form = PdfWrapper("sample_template.pdf")
+    form.widgets["test"].hidden = True
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `update field` command:
+
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "hidden": true
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
