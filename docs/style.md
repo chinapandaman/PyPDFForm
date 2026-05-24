@@ -378,28 +378,44 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 
 ## Enable multiline text field
 
-To enable multiline input for a text field, set its `.multiline` property to `True`. This effectively transforms it into a paragraph field:
+=== "Library"
+    To enable multiline input for a text field, set its `.multiline` property to `True`. This effectively transforms it into a paragraph field:
 
-```python
-from PyPDFForm import PdfWrapper
+    ```python
+    from PyPDFForm import PdfWrapper
 
-form = PdfWrapper("sample_template.pdf")
+    form = PdfWrapper("sample_template.pdf")
 
-form.widgets["test"].multiline = True
+    form.widgets["test"].multiline = True
 
-form.fill(
-    {
-        "test": "test_1\ntest_1",
-        "check": True,
-        "test_2": "test_2\ntest_2",
-        "check_2": False,
-        "test_3": "test_3\ntest_3",
-        "check_3": True,
-    },
-)
+    form.fill(
+        {
+            "test": "test_1\ntest_1",
+            "check": True,
+            "test_2": "test_2\ntest_2",
+            "check_2": False,
+            "test_3": "test_3\ntest_3",
+            "check_3": True,
+        },
+    )
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `update field` command:
+
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "multiline": true
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Change checkbox/radio button size
 
