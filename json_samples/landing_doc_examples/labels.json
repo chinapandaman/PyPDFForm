@@ -1,0 +1,16 @@
+{
+    "text": [
+        {
+            "text": "My Textfield:",
+            "page_number": 1,
+            "x": 100,
+            "y": 600
+        },
+        {
+            "text": "My Checkbox:",
+            "page_number": 1,
+            "x": 100,
+            "y": 550
+        }
+    ]
+}

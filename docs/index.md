@@ -61,7 +61,7 @@ The same can be achieved using the CLI:
     pypdfform create blank -o output.pdf
     pypdfform create raw output.pdf -f labels.json
     pypdfform create field output.pdf -f fields.json
-    pypdfform inspect output.pdf
+    pypdfform inspect schema output.pdf
     pypdfform update field output.pdf -f styles.json
     pypdfform fill output.pdf -f data.json
     ```
