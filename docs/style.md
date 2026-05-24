@@ -93,34 +93,56 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 
 ## Change text field font size
 
-You can change the font size using a `float` value in PyPDFForm:
+=== "Library"
+    You can change the font size using a `float` value in PyPDFForm:
 
-```python
-from PyPDFForm import PdfWrapper, Widgets
+    ```python
+    from PyPDFForm import PdfWrapper, Widgets
 
-form = PdfWrapper("sample_template.pdf")
+    form = PdfWrapper("sample_template.pdf")
 
-# change globally by iterating each text field
-for field in form.widgets.values():
-    if isinstance(field, Widgets.Text):
-        field.font_size = 20
+    # change globally by iterating each text field
+    for field in form.widgets.values():
+        if isinstance(field, Widgets.Text):
+            field.font_size = 20
 
-# or change at each field's widget level
-form.widgets["test"].font_size = 30.5
+    # or change at each field's widget level
+    form.widgets["test"].font_size = 30.5
 
-form.fill(
-    {
-        "test": "test_1",
-        "check": True,
-        "test_2": "test_2",
-        "check_2": False,
-        "test_3": "test_3",
-        "check_3": True,
-    },
-)
+    form.fill(
+        {
+            "test": "test_1",
+            "check": True,
+            "test_2": "test_2",
+            "check_2": False,
+            "test_3": "test_3",
+            "check_3": True,
+        },
+    )
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `update field` command:
+
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "font_size": 30.5
+            },
+            "test_2": {
+                "font_size": 20
+            },
+            "test_3": {
+                "font_size": 20
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Change text field font color
 
