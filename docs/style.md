@@ -465,36 +465,87 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 
 ## Change dropdown field choices
 
-To modify the options available in a dropdown field, assign a new list of strings to the `.choices` attribute of the corresponding field. For instance, the following code snippet updates the `dropdown_1` field in [this PDF form](pdfs/sample_template_with_dropdown.pdf) with a new set of choices:
+=== "Library"
+    To modify the options available in a dropdown field, assign a new list of strings to the `.choices` attribute of the corresponding field. For instance, the following code snippet updates the `dropdown_1` field in [this PDF form](pdfs/sample_template_with_dropdown.pdf) with a new set of choices:
 
-=== "Default Export Values"
-    ```python
-    from PyPDFForm import PdfWrapper
+    === "Default Export Values"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template_with_dropdown.pdf")
+        form = PdfWrapper("sample_template_with_dropdown.pdf")
 
-    form.widgets["dropdown_1"].choices = ["", "apple", "banana", "cherry", "dates"]
+        form.widgets["dropdown_1"].choices = ["", "apple", "banana", "cherry", "dates"]
 
-    form.write("output.pdf")
-    ```
-=== "Custom Export Values"
-    If you want different export values from the displayed options, you can specify a list of tuples for the `.choices` attribute, where the first value of each tuple is the displayed option and the second value is the export value:
+        form.write("output.pdf")
+        ```
+    === "Custom Export Values"
+        If you want different export values from the displayed options, you can specify a list of tuples for the `.choices` attribute, where the first value of each tuple is the displayed option and the second value is the export value:
 
-    ```python
-    from PyPDFForm import PdfWrapper
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template_with_dropdown.pdf")
+        form = PdfWrapper("sample_template_with_dropdown.pdf")
 
-    form.widgets["dropdown_1"].choices = [
-        ("", "blank_export_value"),
-        ("apple", "apple_export_value"),
-        ("banana", "banana_export_value"),
-        ("cherry", "cherry_export_value"),
-        ("dates", "dates_export_value"),
-    ]
+        form.widgets["dropdown_1"].choices = [
+            ("", "blank_export_value"),
+            ("apple", "apple_export_value"),
+            ("banana", "banana_export_value"),
+            ("cherry", "cherry_export_value"),
+            ("dates", "dates_export_value"),
+        ]
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    Use the `update field` command:
+
+    === "data.json"
+        ```json
+        {
+            "dropdown_1": {
+                "choices": [
+                    "",
+                    "apple",
+                    "banana",
+                    "cherry",
+                    "dates"
+                ]
+            }
+        }
+        ```
+    === "custom_export.json"
+        ```json
+        {
+            "dropdown_1": {
+                "choices": [
+                    [
+                        "",
+                        "blank_export_value"
+                    ],
+                    [
+                        "apple",
+                        "apple_export_value"
+                    ],
+                    [
+                        "banana",
+                        "banana_export_value"
+                    ],
+                    [
+                        "cherry",
+                        "cherry_export_value"
+                    ],
+                    [
+                        "dates",
+                        "dates_export_value"
+                    ]
+                ]
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Change dropdown field font
 
