@@ -439,6 +439,33 @@ All optional parameters will have a comment `# optional` after each of them.
             ]
         }
         ```
+    === "custom_export.json"
+        ```json
+        {
+            "dropdown": [
+                {
+                    "name": "new_dropdown",
+                    "page_number": 1,
+                    "x": 57,
+                    "y": 700,
+                    "options": [
+                        [
+                            "option_1",
+                            "option_1_export_value"
+                        ],
+                        [
+                            "option_2",
+                            "option_2_export_value"
+                        ],
+                        [
+                            "option_3",
+                            "option_3_export_value"
+                        ]
+                    ]
+                }
+            ]
+        }
+        ```
     === "Command"
         ```shell
         pypdfform create field dummy.pdf -f data.json -o output.pdf
