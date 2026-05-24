@@ -48,20 +48,34 @@ A radio button group is a collection of radio buttons sharing the same name on a
 
 A [PDF form](pdfs/sample_template_with_radio_button.pdf) with radio button groups can be filled using `integer` values, where the value indicates which radio button to select within each group:
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Library"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper("sample_template_with_radio_button.pdf").fill(
-    {
-        "radio_1": 0,
-        "radio_2": 1,
-        "radio_3": 2,
-    },
-    flatten=False   # optional, set to True to flatten the filled PDF form
-)
+    filled = PdfWrapper("sample_template_with_radio_button.pdf").fill(
+        {
+            "radio_1": 0,
+            "radio_2": 1,
+            "radio_3": 2,
+        },
+        flatten=False   # optional, set to True to flatten the filled PDF form
+    )
 
-filled.write("output.pdf")
-```
+    filled.write("output.pdf")
+    ```
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "radio_1": 0,
+            "radio_2": 1,
+            "radio_3": 2
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform fill sample_template_with_radio_button.pdf -f data.json -o output.pdf
+        ```
 
 ## Fill dropdown field
 
