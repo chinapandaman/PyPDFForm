@@ -101,7 +101,7 @@ The same can be achieved using the CLI:
                 "name": "my_checkbox",
                 "page_number": 1,
                 "x": 180,
-                "y": 596,
+                "y": 546,
                 "size": 16
             }
         ]

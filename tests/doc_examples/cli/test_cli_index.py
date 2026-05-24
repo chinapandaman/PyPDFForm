@@ -11,6 +11,7 @@ from PyPDFForm.cli.root import cli_app
 runner = CliRunner()
 
 
+@pytest.mark.posix_only
 @pytest.mark.cli_test
 def test_index_snippets(pdf_samples, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
