@@ -79,8 +79,6 @@ def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, tmp_path)
             os.path.join(static_pdfs, "sample_template.pdf"),
             "--field",
             "test",
-            "-o",
-            output_path,
             "--x",
             "68.3365",
             "--y",
@@ -89,6 +87,8 @@ def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, tmp_path)
             "242.4235",
             "--height",
             "31.067999999999984",
+            "-o",
+            output_path,
         ],
     )
     assert result.exit_code == 0
