@@ -2,255 +2,567 @@
 
 The most common tool for creating PDF form fields is Adobe Acrobat, and a tutorial is available [here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html). Alternative free tools like [DocFly](https://www.docfly.com/) offer similar functionality.
 
-PyPDFForm also allows creating PDF form fields on existing PDFs through coding.
+PyPDFForm also allows creating PDF form fields on existing PDFs programmatically.
 
-Field creation is done with `PdfWrapper.bulk_create_fields`, which accepts a list of field definitions. Use the same method whether you are adding one field or several:
+=== "Library"
+    Field creation is done with `PdfWrapper.bulk_create_fields`, which accepts a list of field definitions. Use the same method whether you are adding one field or several:
 
-```python
-from PyPDFForm import Fields, PdfWrapper
+    ```python
+    from PyPDFForm import Fields, PdfWrapper
 
-fields = [
-    Fields.TextField(
-        name="new_text_field_1",
-        page_number=1,
-        x=100,
-        y=100,
-    ),
-    Fields.TextField(
-        name="new_text_field_2",
-        page_number=1,
-        x=100,
-        y=300,
-    ),
-    Fields.CheckBoxField(
-        name="new_checkbox_1",
-        page_number=1,
-        x=300,
-        y=100,
-    ),
-    Fields.CheckBoxField(
-        name="new_checkbox_2",
-        page_number=1,
-        x=300,
-        y=300,
-    ),
-]
+    fields = [
+        Fields.TextField(
+            name="new_text_field_1",
+            page_number=1,
+            x=100,
+            y=100,
+        ),
+        Fields.TextField(
+            name="new_text_field_2",
+            page_number=1,
+            x=100,
+            y=300,
+        ),
+        Fields.CheckBoxField(
+            name="new_checkbox_1",
+            page_number=1,
+            x=300,
+            y=100,
+        ),
+        Fields.CheckBoxField(
+            name="new_checkbox_2",
+            page_number=1,
+            x=300,
+            y=300,
+        ),
+    ]
 
-new_form = PdfWrapper("dummy.pdf").bulk_create_fields(fields)
-new_form.write("output.pdf")
-```
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields(fields)
+    new_form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `create field` command with a JSON file that defines the fields to create:
+
+    === "data.json"
+        ```json
+        {
+            "text": [
+                {
+                    "name": "new_text_field_1",
+                    "page_number": 1,
+                    "x": 100,
+                    "y": 100
+                },
+                {
+                    "name": "new_text_field_2",
+                    "page_number": 1,
+                    "x": 100,
+                    "y": 300
+                }
+            ],
+            "check": [
+                {
+                    "name": "new_checkbox_1",
+                    "page_number": 1,
+                    "x": 300,
+                    "y": 100
+                },
+                {
+                    "name": "new_checkbox_2",
+                    "page_number": 1,
+                    "x": 300,
+                    "y": 300
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
 
 This section of the documentation will primarily use [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
 
 Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
 
-All optional parameters will have a comment `# optional` after each of them.
+In the library examples, optional parameters are marked with `# optional`.
 
 ## Create a text field
 
-A text field can be created by running the following snippet:
+=== "Library"
+    Use `Fields.TextField` to create a text field:
 
-```python
-from PyPDFForm import Fields, PdfWrapper
-
-new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-    Fields.TextField(
-        name="new_text_field",
-        page_number=1,
-        x=57.5,
-        y=700.9,
-        required=False,  # optional
-        tooltip="this is a text field",  # optional
-        width=120.3,  # optional
-        height=40.7,  # optional
-        max_length=5,  # optional, number of characters
-        comb=True,  # optional, when set to True, max_length must also be set (1)
-        font="your_registered_font",  # optional (2)
-        font_size=15,  # optional
-        font_color=(1, 0, 0),  # optional
-        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-        border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
-        border_width=5,  # optional
-        alignment=0,  # optional, 0=left, 1=center, 2=right
-        multiline=True,  # optional
-    ),
-])
-
-new_form.write("output.pdf")
-```
-
-1.  For the `comb` option, refer to the documentation [here](style.md/#enable-text-field-character-spacing-combs).
-2.  To use a custom font, see how to register it [here](font.md).
-
-## Create a checkbox
-
-A checkbox can be created using the same method with some changes to the parameters:
-
-```python
-from PyPDFForm import Fields, PdfWrapper
-
-new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-    Fields.CheckBoxField(
-        name="new_checkbox",
-        page_number=1,
-        x=57,
-        y=700,
-        required=False,  # optional
-        tooltip="this is a checkbox",  # optional
-        size=30,  # optional
-        button_style="check",  # optional (1)
-        tick_color=(0, 1, 0),  # optional
-        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-        border_color=(1, 1, 0, 1),  # optional, (r, g, b, alpha)
-        border_width=5,  # optional
-    ),
-])
-
-new_form.write("output.pdf")
-```
-
-1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
-
-???+ bug
-    To remove the border of a checkbox, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
-
-## Create a radio button group
-
-Unlike other field types, radio buttons must be created as a group. Therefore, for the coordinate parameters `x` and `y`, you must specify a list of coordinates for each radio button within the group, and the list must contain more than one coordinate.
-
-Otherwise, radio button creation shares almost the same parameters as a checkbox:
-
-```python
-from PyPDFForm import Fields, PdfWrapper
-
-new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-    Fields.RadioGroup(
-        name="new_radio_group",
-        page_number=1,
-        x=[50, 100, 150],
-        y=[50, 100, 150],
-        required=False,  # optional
-        tooltip="this is a radio group",  # optional
-        size=30,  # optional
-        button_style="check",  # optional (1)
-        shape="square",  # optional, circle or square
-        tick_color=(0, 1, 0),  # optional
-        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-        border_color=(1, 0, 1, 1),  # optional, (r, g, b, alpha)
-        border_width=5,  # optional
-    ),
-])
-
-new_form.write("output.pdf")
-```
-
-1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
-
-???+ bug
-    To remove the border of a group of radio buttons, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
-
-## Create a dropdown field
-
-A dropdown field shares a similar set of parameters as a text field. The only significant difference is that a list of `options` needs to be specified:
-
-=== "Default Export Values"
     ```python
     from PyPDFForm import Fields, PdfWrapper
 
     new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-        Fields.DropdownField(
-            name="new_dropdown",
+        Fields.TextField(
+            name="new_text_field",
             page_number=1,
-            x=57,
-            y=700,
-            options=[
-                "foo",
-                "bar",
-                "foobar",
-            ],
+            x=57.5,
+            y=700.9,
             required=False,  # optional
-            tooltip="this is a dropdown",  # optional
-            width=120,  # optional
-            height=40,  # optional
-            font="your_registered_font",  # optional (1)
+            tooltip="this is a text field",  # optional
+            width=120.3,  # optional
+            height=40.7,  # optional
+            max_length=5,  # optional, number of characters
+            comb=True,  # optional, when set to True, max_length must also be set (1)
+            font="your_registered_font",  # optional (2)
             font_size=15,  # optional
             font_color=(1, 0, 0),  # optional
             bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-            border_color=(0, 1, 0, 1),  # optional, (r, g, b, alpha)
+            border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+            border_width=5,  # optional
+            alignment=0,  # optional, 0=left, 1=center, 2=right
+            multiline=True,  # optional
+        ),
+    ])
+
+    new_form.write("output.pdf")
+    ```
+
+    1.  For the `comb` option, refer to the documentation [here](style.md/#enable-text-field-character-spacing-combs).
+    2.  To use a custom font, see how to register it [here](font.md).
+=== "CLI"
+    Put text field definitions under the `text` key in the JSON file:
+
+    === "data.json"
+        ```json
+        {
+            "text": [
+                {
+                    "name": "new_text_field",
+                    "page_number": 1,
+                    "x": 57.5,
+                    "y": 700.9,
+                    "required": false,
+                    "tooltip": "this is a text field",
+                    "width": 120.3,
+                    "height": 40.7,
+                    "max_length": 5,
+                    "comb": true,
+                    "font": "path_to_a_ttf_file",
+                    "font_size": 15,
+                    "font_color": [
+                        1,
+                        0,
+                        0
+                    ],
+                    "bg_color": [
+                        0,
+                        0,
+                        1,
+                        1
+                    ],
+                    "border_color": [
+                        1,
+                        0,
+                        0,
+                        1
+                    ],
+                    "border_width": 5,
+                    "alignment": 0,
+                    "multiline": true
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
+
+## Create a checkbox
+
+=== "Library"
+    Use `Fields.CheckBoxField` to create a checkbox:
+
+    ```python
+    from PyPDFForm import Fields, PdfWrapper
+
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
+        Fields.CheckBoxField(
+            name="new_checkbox",
+            page_number=1,
+            x=57,
+            y=700,
+            required=False,  # optional
+            tooltip="this is a checkbox",  # optional
+            size=30,  # optional
+            button_style="check",  # optional (1)
+            tick_color=(0, 1, 0),  # optional
+            bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+            border_color=(1, 1, 0, 1),  # optional, (r, g, b, alpha)
             border_width=5,  # optional
         ),
     ])
 
     new_form.write("output.pdf")
     ```
-    { .annotate }
 
-    1.  To use a custom font, see how to register it [here](font.md).
-=== "Custom Export Values"
-    If you want different export values from the displayed options, you can specify a list of tuples for the `options` parameter, where the first value of each tuple is the displayed option and the second value is the export value:
+    1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
+=== "CLI"
+    Put checkbox field definitions under the `check` key in the JSON file:
+
+    === "data.json"
+        ```json
+        {
+            "check": [
+                {
+                    "name": "new_checkbox",
+                    "page_number": 1,
+                    "x": 57,
+                    "y": 700,
+                    "required": false,
+                    "tooltip": "this is a checkbox",
+                    "size": 30,
+                    "button_style": "check",
+                    "tick_color": [
+                        0,
+                        1,
+                        0
+                    ],
+                    "bg_color": [
+                        0,
+                        0,
+                        1,
+                        1
+                    ],
+                    "border_color": [
+                        1,
+                        1,
+                        0,
+                        1
+                    ],
+                    "border_width": 5
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
+
+???+ bug
+    To remove the border of a checkbox, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
+
+## Create a radio button group
+
+=== "Library"
+    Unlike other field types, radio buttons must be created as a group. Therefore, for the coordinate parameters `x` and `y`, you must specify a list of coordinates for each radio button within the group, and the list must contain more than one coordinate.
+
+    Otherwise, radio button creation shares almost the same parameters as a checkbox:
 
     ```python
     from PyPDFForm import Fields, PdfWrapper
 
     new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-        Fields.DropdownField(
-            name="new_dropdown",
+        Fields.RadioGroup(
+            name="new_radio_group",
             page_number=1,
-            x=57,
-            y=700,
-            options=[
-                ("option_1", "option_1_export_value"),
-                ("option_2", "option_2_export_value"),
-                ("option_3", "option_3_export_value"),
-            ],
+            x=[50, 100, 150],
+            y=[50, 100, 150],
+            required=False,  # optional
+            tooltip="this is a radio group",  # optional
+            size=30,  # optional
+            button_style="check",  # optional (1)
+            shape="square",  # optional, circle or square
+            tick_color=(0, 1, 0),  # optional
+            bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+            border_color=(1, 0, 1, 1),  # optional, (r, g, b, alpha)
+            border_width=5,  # optional
         ),
     ])
 
     new_form.write("output.pdf")
     ```
 
+    1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
+=== "CLI"
+    Put radio group definitions under the `radio` key in the JSON file:
+
+    === "data.json"
+        ```json
+        {
+            "radio": [
+                {
+                    "name": "new_radio_group",
+                    "page_number": 1,
+                    "x": [
+                        50,
+                        100,
+                        150
+                    ],
+                    "y": [
+                        50,
+                        100,
+                        150
+                    ],
+                    "required": false,
+                    "tooltip": "this is a radio group",
+                    "size": 30,
+                    "button_style": "check",
+                    "shape": "square",
+                    "tick_color": [
+                        0,
+                        1,
+                        0
+                    ],
+                    "bg_color": [
+                        0,
+                        0,
+                        1,
+                        1
+                    ],
+                    "border_color": [
+                        1,
+                        0,
+                        1,
+                        1
+                    ],
+                    "border_width": 5
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
+
+???+ bug
+    To remove the border of a group of radio buttons, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
+
+## Create a dropdown field
+
+=== "Library"
+    A dropdown field shares many parameters with a text field. The main difference is that you must specify a list of `options`:
+
+    === "Default Export Values"
+        ```python
+        from PyPDFForm import Fields, PdfWrapper
+
+        new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
+            Fields.DropdownField(
+                name="new_dropdown",
+                page_number=1,
+                x=57,
+                y=700,
+                options=[
+                    "foo",
+                    "bar",
+                    "foobar",
+                ],
+                required=False,  # optional
+                tooltip="this is a dropdown",  # optional
+                width=120,  # optional
+                height=40,  # optional
+                font="your_registered_font",  # optional (1)
+                font_size=15,  # optional
+                font_color=(1, 0, 0),  # optional
+                bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+                border_color=(0, 1, 0, 1),  # optional, (r, g, b, alpha)
+                border_width=5,  # optional
+            ),
+        ])
+
+        new_form.write("output.pdf")
+        ```
+        { .annotate }
+
+        1.  To use a custom font, see how to register it [here](font.md).
+    === "Custom Export Values"
+        To use export values that differ from the displayed options, specify a list of tuples for the `options` parameter. The first value in each tuple is the displayed option, and the second value is the export value:
+
+        ```python
+        from PyPDFForm import Fields, PdfWrapper
+
+        new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
+            Fields.DropdownField(
+                name="new_dropdown",
+                page_number=1,
+                x=57,
+                y=700,
+                options=[
+                    ("option_1", "option_1_export_value"),
+                    ("option_2", "option_2_export_value"),
+                    ("option_3", "option_3_export_value"),
+                ],
+            ),
+        ])
+
+        new_form.write("output.pdf")
+        ```
+=== "CLI"
+    Put dropdown field definitions under the `dropdown` key in the JSON file:
+
+    === "data.json"
+        ```json
+        {
+            "dropdown": [
+                {
+                    "name": "new_dropdown",
+                    "page_number": 1,
+                    "x": 57,
+                    "y": 700,
+                    "options": [
+                        "foo",
+                        "bar",
+                        "foobar"
+                    ],
+                    "required": false,
+                    "tooltip": "this is a dropdown",
+                    "width": 120,
+                    "height": 40,
+                    "font": "path_to_a_ttf_file",
+                    "font_size": 15,
+                    "font_color": [
+                        1,
+                        0,
+                        0
+                    ],
+                    "bg_color": [
+                        0,
+                        0,
+                        1,
+                        1
+                    ],
+                    "border_color": [
+                        0,
+                        1,
+                        0,
+                        1
+                    ],
+                    "border_width": 5
+                }
+            ]
+        }
+        ```
+    === "custom_export.json"
+        ```json
+        {
+            "dropdown": [
+                {
+                    "name": "new_dropdown",
+                    "page_number": 1,
+                    "x": 57,
+                    "y": 700,
+                    "options": [
+                        [
+                            "option_1",
+                            "option_1_export_value"
+                        ],
+                        [
+                            "option_2",
+                            "option_2_export_value"
+                        ],
+                        [
+                            "option_3",
+                            "option_3_export_value"
+                        ]
+                    ]
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
+
 ## Create a signature field
 
-A signature field is only interactive in tools that support it. Otherwise, it is displayed as a rectangle, and clicking it will not trigger any action:
+=== "Library"
+    A signature field is only interactive in tools that support it. Otherwise, it is displayed as a rectangle, and clicking it will not trigger any action:
 
-```python
-from PyPDFForm import Fields, PdfWrapper
+    ```python
+    from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-    Fields.SignatureField(
-        name="new_signature",
-        page_number=1,
-        x=100,
-        y=100,
-        required=False,  # optional
-        tooltip="this is a signature",  # optional
-        width=410,  # optional
-        height=100,  # optional
-    ),
-])
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
+        Fields.SignatureField(
+            name="new_signature",
+            page_number=1,
+            x=100,
+            y=100,
+            required=False,  # optional
+            tooltip="this is a signature",  # optional
+            width=410,  # optional
+            height=100,  # optional
+        ),
+    ])
 
-new_form.write("output.pdf")
-```
+    new_form.write("output.pdf")
+    ```
+=== "CLI"
+    Put signature field definitions under the `signature` key in the JSON file:
+
+    === "data.json"
+        ```json
+        {
+            "signature": [
+                {
+                    "name": "new_signature",
+                    "page_number": 1,
+                    "x": 100,
+                    "y": 100,
+                    "required": false,
+                    "tooltip": "this is a signature",
+                    "width": 410,
+                    "height": 100
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
 
 ## Create an image field
 
-Similar to a signature field, an image field is also only interactive in tools that support it:
+=== "Library"
+    Similar to a signature field, an image field is also only interactive in tools that support it:
 
-```python
-from PyPDFForm import Fields, PdfWrapper
+    ```python
+    from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-    Fields.ImageField(
-        name="new_image",
-        page_number=1,
-        x=100,
-        y=100,
-        required=False,  # optional
-        tooltip="this is an image",  # optional
-        width=192,  # optional
-        height=108,  # optional
-    ),
-])
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
+        Fields.ImageField(
+            name="new_image",
+            page_number=1,
+            x=100,
+            y=100,
+            required=False,  # optional
+            tooltip="this is an image",  # optional
+            width=192,  # optional
+            height=108,  # optional
+        ),
+    ])
 
-new_form.write("output.pdf")
-```
+    new_form.write("output.pdf")
+    ```
+=== "CLI"
+    Put image field definitions under the `image` key in the JSON file:
+
+    === "data.json"
+        ```json
+        {
+            "image": [
+                {
+                    "name": "new_image",
+                    "page_number": 1,
+                    "x": 100,
+                    "y": 100,
+                    "required": false,
+                    "tooltip": "this is an image",
+                    "width": 192,
+                    "height": 108
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
