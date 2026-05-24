@@ -1,6 +1,6 @@
 # Basic Usage
 
-This section covers the basic entry point and some global options for scaffolding PyPDFForm's APIs.
+This section covers the basic entry points for PyPDFForm's Python API and CLI, along with global options that affect PyPDFForm behavior.
 
 === "Library"
     The main user interface of the library is the `PdfWrapper` class. It implements most PyPDFForm APIs and accepts various optional parameters, the most important of which is the PDF form template.
@@ -31,20 +31,20 @@ This section covers the basic entry point and some global options for scaffoldin
     ???+ tip
         PyPDFForm provides an adapter for different file interaction methods in Python, which allows you to pass your PDF form to `PdfWrapper` as a file path, an open file object, or a `bytes` file stream. This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
 === "CLI"
-    To use the CLI, simply run:
+    To see CLI help, run:
 
     ```shell
-    pypdfform
+    pypdfform -h
     ```
 
-    And it will prompt help messages on commands and their usages. This applies to other subcommands as well when run without any arguments or options.
+    The CLI shows help for available commands and usage. Subcommands show their own help when run without arguments or options.
 
 ## Handling appearance streams
 
 For a PDF viewer to display content in a form field (especially text fields), it needs an "appearance stream." This stream defines how the field's content is rendered. PyPDFForm offers two ways to handle this.
 
 === "Library"
-    Appearance stream handling options are set via flags during `PdfWrapper` instantiation.
+    Appearance stream handling options are set with keyword arguments when instantiating `PdfWrapper`.
 
     === "Let the Viewer Generate Appearances"
         Set `need_appearances=True` to instruct the PDF viewer to generate appearance streams. This is often the best choice when you expect the PDF to be opened in powerful, proprietary software like Adobe Acrobat, which has sophisticated rendering capabilities.
@@ -63,8 +63,15 @@ For a PDF viewer to display content in a form field (especially text fields), it
 
         pdf = PdfWrapper("sample_template.pdf", generate_appearance_streams=True)
         ```
+
+        ???+ warning
+            PyPDFForm's internal appearance stream generation relies on [qpdf](https://github.com/qpdf/qpdf) and shares its limitations. Some known limitations include:
+
+            * **Limited to ASCII text:** Only ASCII characters are supported.
+            * **Single-line text fields only:** It does not support multi-line text fields.
+            * **No text alignment handling:** Text alignment (left, center, right) is not preserved or applied.
 === "CLI"
-    Appearance stream handling options are set via global options when running any commands.
+    Appearance stream handling options are set with global options when running a command.
 
     === "Let the Viewer Generate Appearances"
         ```shell
@@ -74,13 +81,6 @@ For a PDF viewer to display content in a form field (especially text fields), it
         ```shell
         pypdfform --generate-appearance-streams
         ```
-
-    ???+ warning
-        PyPDFForm's internal appearance stream generation relies on [qpdf](https://github.com/qpdf/qpdf) and shares its limitations. Some known limitations include:
-
-        * **Limited to ASCII text:** Only ASCII characters are supported.
-        * **Single-line text fields only:** It does not support multi-line text fields.
-        * **No text alignment handling:** Text alignment (left, center, right) is not preserved or applied.
 
 ## Handling metadata
 
@@ -96,7 +96,7 @@ For a PDF viewer to display content in a form field (especially text fields), it
     pdf = PdfWrapper("sample_template.pdf", preserve_metadata=True)
     ```
 === "CLI"
-    For CLI, simply set the global option `--preserve-metadata` when running any commands:
+    For the CLI, set the global option `--preserve-metadata` when running a command:
 
     ```shell
     pypdfform --preserve-metadata
@@ -120,14 +120,14 @@ PyPDFForm allows you to access fields by their full names. For example, to use [
     ???+ warning
         When using full names, the `update_widget_key` and `commit_widget_key_updates` methods of `PdfWrapper` are disabled and raise a `NotImplementedError` because full names involve both the field and its parent.
 === "CLI"
-    Set the global option `--use-full-widget-name` when running commands:
+    Set the global option `--use-full-widget-name` when running a command:
 
     ```shell
     pypdfform --use-full-widget-name
     ```
 
     ???+ warning
-        Similar to the library, `pypdfform update rename` will error out when called with `--use-full-widget-name`.
+        As with the library API, `pypdfform update rename` raises an error when called with `--use-full-widget-name`.
 
 This enables accessing fields by their full names. For instance, you can access the checkbox labeled `Gain de 2 classes` using its full name `Gain de 2 classes.0` instead of its partial name `0`.
 
@@ -178,4 +178,4 @@ This enables accessing fields by their full names. For instance, you can access 
         buff.seek(0)
         ```
 === "CLI"
-    The CLI runs rather stateless. When any command needs to output a file, it either modifies the input file in place or writes the output file to the location specified by the `--output/-o` option.
+    The CLI is stateless. When a command writes a file, it either updates the input file in place or writes to the location specified by the `--output/-o` option.
