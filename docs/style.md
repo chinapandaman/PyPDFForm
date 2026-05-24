@@ -747,9 +747,22 @@ PyPDFForm lets you rename existing fields by updating their keys.
     form.write("output.pdf")
     ```
 === "CLI"
-    After filling and flattening a form, set `readonly` to `false` for the fields that should become editable again:
+    The following example starts with a filled, flattened form and then makes selected fields editable again by setting `readonly` to `false`:
 
-    === "data.json"
+    === "fill.json"
+        ```json
+        {
+            "test_1": "test_1",
+            "test_2": "test_2",
+            "test_3": "test_3",
+            "check_1": true,
+            "check_2": true,
+            "check_3": true,
+            "radio_1": 1,
+            "dropdown_1": 0
+        }
+        ```
+    === "editable.json"
         ```json
         {
             "test_2": {
@@ -767,10 +780,9 @@ PyPDFForm lets you rename existing fields by updating their keys.
         }
         ```
     === "Command"
-        If the flattened file is named `flattened.pdf`, run:
-
         ```shell
-        pypdfform update field flattened.pdf -f data.json -o output.pdf
+        pypdfform fill sample_template_with_dropdown.pdf -f fill.json -o flattened.pdf --flatten
+        pypdfform update field flattened.pdf -f editable.json -o output.pdf
         ```
 
 ## Change field visibility
