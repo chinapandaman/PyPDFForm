@@ -4,7 +4,7 @@ The PDF coordinate system originates at the bottom left of the page. The unit of
 
 ## Generate a coordinate grid view
 
-To enhance the user experience with the coordinate system, PyPDFForm provides a grid view that helps determine the optimal placement of elements on a PDF.
+To make PDF coordinates easier to work with, PyPDFForm provides a grid view that helps you determine the optimal placement of elements on a PDF.
 
 To generate a coordinate grid view for [this PDF](pdfs/sample_template.pdf):
 
@@ -22,7 +22,7 @@ To generate a coordinate grid view for [this PDF](pdfs/sample_template.pdf):
     grid_view_pdf.write("output.pdf")
     ```
 
-    The `generate_coordinate_grid` method accepts two optional parameters: `color` and `margin`. The `color` parameter sets the grid view color (defaulting to red), and the `margin` parameter adjusts the coordinate grid view's margin in points (defaulting to 100 points).
+    The `generate_coordinate_grid` method accepts two optional parameters: `color` and `margin`. The `color` parameter sets the grid color (defaulting to red), and the `margin` parameter sets the grid margin in points (defaulting to 100 points).
 
 === "CLI"
     Use the `create grid` command:
@@ -31,7 +31,7 @@ To generate a coordinate grid view for [this PDF](pdfs/sample_template.pdf):
     pypdfform create grid sample_template.pdf -r 1 -g 0 -b 0 -m 100 -o output.pdf
     ```
 
-    Similar to the library, the options `-r`, `-g`, and `-b` are entirely optional and can be specified to change the grid view color, and the `-m` option can be used to set the margin.
+    As with the library API, the `-r`, `-g`, and `-b` options are optional and set the grid color. The `-m` option sets the margin.
 
 ## Inspect form field locations & dimensions
 
@@ -50,7 +50,7 @@ To generate a coordinate grid view for [this PDF](pdfs/sample_template.pdf):
     print(form.widgets["test"].height)
     ```
 === "CLI"
-    The CLI command is `inspect location`, use the `--field` option to specify the field name to inspect:
+    To inspect a field with the CLI, use `inspect location` and pass the field name with `--field`:
 
     ```shell
     pypdfform inspect location sample_template.pdf --field test
@@ -59,10 +59,10 @@ To generate a coordinate grid view for [this PDF](pdfs/sample_template.pdf):
 ## Change form field coordinates & dimensions
 
 ???+ tip
-    For checkbox/radio button, consider modifying [size](style.md#change-checkboxradio-button-size) instead of `width` or `height`.
+    For a checkbox or radio button, consider modifying [size](style.md#change-checkboxradio-button-size) instead of `width` or `height`.
 
 === "Library"
-    You can modify these same attributes to reposition and/or reshape the field's rectangular bounding box:
+    You can modify these same attributes to reposition or resize the field's rectangular bounding box:
 
     ```python
     from PyPDFForm import PdfWrapper
@@ -77,7 +77,7 @@ To generate a coordinate grid view for [this PDF](pdfs/sample_template.pdf):
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update bounds` command with options specifying the field and coordinates or dimensions to change:
+    Use the `update bounds` command with options that specify the field and the coordinates or dimensions to change:
 
     ```shell
     pypdfform update bounds sample_template.pdf \
