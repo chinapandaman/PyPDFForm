@@ -43,10 +43,6 @@ PyPDFForm also allows creating PDF form fields on existing PDFs programmatically
 === "CLI"
     Use the `create field` command with a JSON file that describes the fields to create:
 
-    === "Command"
-        ```shell
-        pypdfform create field dummy.pdf -f data.json -o output.pdf
-        ```
     === "data.json"
         ```json
         {
@@ -80,6 +76,10 @@ PyPDFForm also allows creating PDF form fields on existing PDFs programmatically
             ]
         }
         ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
 
 This section of the documentation will primarily use [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
 
@@ -89,39 +89,88 @@ All optional parameters will have a comment `# optional` after each of them.
 
 ## Create a text field
 
-A text field can be created by running the following snippet:
+=== "Library"
+    Uses `Fields.TextField` to create text fields:
 
-```python
-from PyPDFForm import Fields, PdfWrapper
+    ```python
+    from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-    Fields.TextField(
-        name="new_text_field",
-        page_number=1,
-        x=57.5,
-        y=700.9,
-        required=False,  # optional
-        tooltip="this is a text field",  # optional
-        width=120.3,  # optional
-        height=40.7,  # optional
-        max_length=5,  # optional, number of characters
-        comb=True,  # optional, when set to True, max_length must also be set (1)
-        font="your_registered_font",  # optional (2)
-        font_size=15,  # optional
-        font_color=(1, 0, 0),  # optional
-        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-        border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
-        border_width=5,  # optional
-        alignment=0,  # optional, 0=left, 1=center, 2=right
-        multiline=True,  # optional
-    ),
-])
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
+        Fields.TextField(
+            name="new_text_field",
+            page_number=1,
+            x=57.5,
+            y=700.9,
+            required=False,  # optional
+            tooltip="this is a text field",  # optional
+            width=120.3,  # optional
+            height=40.7,  # optional
+            max_length=5,  # optional, number of characters
+            comb=True,  # optional, when set to True, max_length must also be set (1)
+            font="your_registered_font",  # optional (2)
+            font_size=15,  # optional
+            font_color=(1, 0, 0),  # optional
+            bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+            border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+            border_width=5,  # optional
+            alignment=0,  # optional, 0=left, 1=center, 2=right
+            multiline=True,  # optional
+        ),
+    ])
 
-new_form.write("output.pdf")
-```
+    new_form.write("output.pdf")
+    ```
 
-1.  For the `comb` option, refer to the documentation [here](style.md/#enable-text-field-character-spacing-combs).
-2.  To use a custom font, see how to register it [here](font.md).
+    1.  For the `comb` option, refer to the documentation [here](style.md/#enable-text-field-character-spacing-combs).
+    2.  To use a custom font, see how to register it [here](font.md).
+=== "CLI"
+    Text field creation configs are grouped by `text` in the JSON file:
+
+    === "data.json"
+        ```json
+        {
+            "text": [
+                {
+                    "name": "new_text_field",
+                    "page_number": 1,
+                    "x": 57.5,
+                    "y": 700.9,
+                    "required": false,
+                    "tooltip": "this is a text field",
+                    "width": 120.3,
+                    "height": 40.7,
+                    "max_length": 5,
+                    "comb": true,
+                    "font": "path_to_a_ttf_file",
+                    "font_size": 15,
+                    "font_color": [
+                        0,
+                        1,
+                        0
+                    ],
+                    "bg_color": [
+                        0,
+                        0,
+                        1,
+                        1
+                    ],
+                    "border_color": [
+                        1,
+                        0,
+                        0,
+                        1
+                    ],
+                    "border_width": 5,
+                    "alignment": 2,
+                    "multiline": True
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
 
 ## Create a checkbox
 
