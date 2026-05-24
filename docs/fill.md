@@ -213,7 +213,7 @@ To fill a signature field, consider [this PDF](pdfs/sample_template_with_signatu
         ```
     === "Command"
         ```shell
-        pypdfform fill sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        pypdfform fill sample_template_with_signature.pdf -f data.json -o output.pdf
         ```
 
 ## Fill image field
@@ -222,60 +222,81 @@ Fill an image field similarly to a signature field, using a file path, file obje
 
 To fill an image field, consider [this PDF](pdfs/sample_template_with_image_field.pdf) and [this image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_image.jpg):
 
-=== "File Path"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "File Path"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
-        {
-            "image_1": "sample_image.jpg"
-        },
-        flatten=False   # optional, set to True to flatten the filled PDF form
-    )
-
-    filled.write("output.pdf")
-    ```
-=== "Open File Object"
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    with open("sample_image.jpg", "rb+") as img:
         filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
             {
-                "image_1": img
+                "image_1": "sample_image.jpg"
             },
             flatten=False   # optional, set to True to flatten the filled PDF form
         )
 
-    filled.write("output.pdf")
-    ```
-=== "Bytes File Stream"
-    ```python
-    from PyPDFForm import PdfWrapper
+        filled.write("output.pdf")
+        ```
+    === "Open File Object"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    with open("sample_image.jpg", "rb+") as img:
-        filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
+        with open("sample_image.jpg", "rb+") as img:
+            filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
+                {
+                    "image_1": img
+                },
+                flatten=False   # optional, set to True to flatten the filled PDF form
+            )
+
+        filled.write("output.pdf")
+        ```
+    === "Bytes File Stream"
+        ```python
+        from PyPDFForm import PdfWrapper
+
+        with open("sample_image.jpg", "rb+") as img:
+            filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
+                {
+                    "image_1": img.read()
+                },
+                flatten=False   # optional, set to True to flatten the filled PDF form
+            )
+
+        filled.write("output.pdf")
+        ```
+    === "Aspect Ratio"
+        Unlike the signature field, the library does not preserve the aspect ratio of a regular image by default. You can enable this by setting the `preserve_aspect_ratio` property to `True` on the image field:
+
+        ```python
+        from PyPDFForm import PdfWrapper
+
+        pdf = PdfWrapper("sample_template_with_image_field.pdf")
+        pdf.widgets["image_1"].preserve_aspect_ratio = True
+        pdf.fill(
             {
-                "image_1": img.read()
+                "image_1": "sample_image.jpg"
             },
-            flatten=False   # optional, set to True to flatten the filled PDF form
         )
 
-    filled.write("output.pdf")
-    ```
-=== "Aspect Ratio"
-    Unlike the signature field, the library does not preserve the aspect ratio of a regular image by default. You can enable this by setting the `preserve_aspect_ratio` property to `True` on the image field:
-
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    pdf = PdfWrapper("sample_template_with_image_field.pdf")
-    pdf.widgets["image_1"].preserve_aspect_ratio = True
-    pdf.fill(
+        pdf.write("output.pdf")
+        ```
+=== "CLI"
+    === "data.json"
+        ```json
         {
             "image_1": "sample_image.jpg"
-        },
-    )
-
-    pdf.write("output.pdf")
-    ```
+        }
+        ```
+    === "aspect_ratio.json"
+        ```json
+        {
+            "image_1": {
+                "path": "sample_image.jpg",
+                "preserve_aspect_ratio": true
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform fill sample_template_with_image_field.pdf -f data.json -o output.pdf
+        ```
