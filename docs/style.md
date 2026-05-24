@@ -1,13 +1,13 @@
 # Modify PDF & form fields
 
-PyPDFForm enables you to modify PDF-level metadata and form field settings programmatically, allowing you to update document titles, field appearances, and field behavior without altering the PDF form template.
+PyPDFForm lets you modify PDF-level metadata and form field settings in code. You can update document titles, field appearances, and field behavior without altering the PDF form template.
 
-This section of the documentation will primarily use [this PDF](pdfs/sample_template.pdf) as an example.
+The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
 
 ## Change PDF title
 
 === "Library"
-    The PDF title can be set during `PdfWrapper` instantiation or via the `.title` property. Accessing it retrieves the current title.
+    Set the PDF title during `PdfWrapper` instantiation or via the `.title` property. Accessing it retrieves the current title.
 
     === "Instantiate with Title"
         ```python
@@ -33,7 +33,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     Use the `update title` command:
 
     ```shell
-    pypdfform update title sample_template.pdf -t "My PDF"
+    pypdfform update title sample_template.pdf -t "My PDF" -o output.pdf
     ```
 
 ## Change text field font
@@ -70,7 +70,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file. For `font`, provide a `.ttf` file path:
 
     === "data.json"
         ```json
@@ -94,7 +94,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 ## Change text field font size
 
 === "Library"
-    You can change the font size using a `float` value in PyPDFForm:
+    You can change the font size using a numeric value in PyPDFForm:
 
     ```python
     from PyPDFForm import PdfWrapper, Widgets
@@ -123,7 +123,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
@@ -176,7 +176,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
@@ -222,7 +222,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     # change globally by iterating each text field
     for field in form.widgets.values():
         if isinstance(field, Widgets.Text):
-            field.alignment = 1 # center
+            field.alignment = 1  # center
 
     # or change at each field's widget level
     form.widgets["test"].alignment = 2  # right
@@ -241,7 +241,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
@@ -294,7 +294,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
@@ -318,7 +318,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 ## Enable text field character spacing (combs)
 
 === "Library"
-    To enable character spacing in a text field, set its `.comb` property to `True`. This will evenly space out the characters of the text filled into the field.
+    To enable character spacing in a text field, set its `.comb` property to `True`. This spaces out the filled text evenly across the field.
 
     ```python
     from PyPDFForm import PdfWrapper, Widgets
@@ -349,7 +349,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
@@ -379,7 +379,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 ## Enable multiline text field
 
 === "Library"
-    To enable multiline input for a text field, set its `.multiline` property to `True`. This effectively transforms it into a paragraph field:
+    To enable multiline input for a text field, set its `.multiline` property to `True`. This lets it accept paragraph-style input:
 
     ```python
     from PyPDFForm import PdfWrapper
@@ -402,7 +402,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
@@ -420,7 +420,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 ## Change checkbox/radio button size
 
 === "Library"
-    You can change the size of a checkbox or a group of radio buttons using a `float` value:
+    You can change the size of a checkbox or a group of radio buttons using a numeric value:
 
     ```python
     from PyPDFForm import PdfWrapper
@@ -442,7 +442,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
@@ -466,7 +466,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 ## Change dropdown field choices
 
 === "Library"
-    To modify the options available in a dropdown field, assign a new list of strings to the `.choices` attribute of the corresponding field. For instance, the following code snippet updates the `dropdown_1` field in [this PDF form](pdfs/sample_template_with_dropdown.pdf) with a new set of choices:
+    To modify the options available in a dropdown field, assign a new list of strings to the `.choices` attribute of the corresponding field. For example, the following snippet updates the `dropdown_1` field in [this PDF form](pdfs/sample_template_with_dropdown.pdf) with a new set of choices:
 
     === "Default Export Values"
         ```python
@@ -479,7 +479,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
         form.write("output.pdf")
         ```
     === "Custom Export Values"
-        If you want different export values from the displayed options, you can specify a list of tuples for the `.choices` attribute, where the first value of each tuple is the displayed option and the second value is the export value:
+        If the export values should differ from the displayed options, specify a list of tuples for the `.choices` attribute. The first value of each tuple is the displayed option, and the second value is the export value:
 
         ```python
         from PyPDFForm import PdfWrapper
@@ -497,7 +497,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
         form.write("output.pdf")
         ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
@@ -564,7 +564,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file. For `font`, provide a `.ttf` file path:
 
     === "data.json"
         ```json
@@ -582,7 +582,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 ## Change dropdown field font size
 
 === "Library"
-    You can change a dropdown field's font size using a `float` value in PyPDFForm:
+    You can change a dropdown field's font size using a numeric value in PyPDFForm:
 
     ```python
     from PyPDFForm import PdfWrapper
@@ -594,7 +594,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
@@ -624,7 +624,7 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
@@ -677,6 +677,8 @@ PyPDFForm lets you rename existing fields by updating their keys.
         form.write("output.pdf")
         ```
 === "CLI"
+    Use the `update rename` command with a JSON file:
+
     === "Update Multiple Fields"
         === "data.json"
             ```json
@@ -695,7 +697,7 @@ PyPDFForm lets you rename existing fields by updating their keys.
             ```
         === "Command"
             ```shell
-            pypdfform rename sample_template.pdf -f data.json -o output.pdf
+            pypdfform update rename sample_template.pdf -f data.json -o output.pdf
             ```
     === "Using Index for Fields with the Same Key"
         === "data.json"
@@ -711,13 +713,13 @@ PyPDFForm lets you rename existing fields by updating their keys.
             ```
         === "Command"
             ```shell
-            pypdfform rename 733.pdf -f data.json -o output.pdf
+            pypdfform update rename 733.pdf -f data.json -o output.pdf
             ```
 
 ## Change field editability
 
 === "Library"
-    The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. For example, the following code snippet shows how you can make different form fields editable in [this PDF form](pdfs/sample_template_with_dropdown.pdf) after they have been flattened:
+    The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. The following example makes different form fields editable in [this PDF form](pdfs/sample_template_with_dropdown.pdf) after they have been flattened:
 
     ```python
     from PyPDFForm import PdfWrapper
@@ -745,7 +747,7 @@ PyPDFForm lets you rename existing fields by updating their keys.
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    After filling and flattening a form, use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
@@ -765,8 +767,10 @@ PyPDFForm lets you rename existing fields by updating their keys.
         }
         ```
     === "Command"
+        If the flattened file is named `flattened.pdf`, run:
+
         ```shell
-        pypdfform update field sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        pypdfform update field flattened.pdf -f data.json -o output.pdf
         ```
 
 ## Change field visibility
@@ -783,7 +787,7 @@ PyPDFForm lets you rename existing fields by updating their keys.
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command:
+    Use the `update field` command with a JSON file:
 
     === "data.json"
         ```json
