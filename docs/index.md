@@ -1,16 +1,20 @@
 # Welcome to PyPDFForm
 
-PyPDFForm is a Python library for PDF form processing. It contains the essential functionalities needed to interact with PDF forms:
+PyPDFForm is a Python library and command line tool for working with PDF forms. It provides a practical set of APIs for creating, inspecting, updating, and filling forms, plus common PDF utilities.
 
-* Inspect what data a PDF form needs to be filled with.
-* Fill a PDF form by simply creating a Python dictionary.
-* Create form fields on a PDF.
+With PyPDFForm, you can:
 
-It also supports other common utilities such as extracting pages and merging multiple PDFs together.
+* Create PDF forms, form fields, and raw elements.
+* Inspect form fields, metadata, and values.
+* Update field styling, behavior, and scripts.
+* Fill PDF forms.
+* Extract pages and merge PDFs.
+
+The goal is to make PDF form work straightforward, whether you are handling one document or building a larger workflow.
 
 ## Quickstart
 
-Here's a quick look at how PyPDFForm works. The blow snippet uses PyPDFForm as a Python library:
+Here's a quick look at PyPDFForm as a Python library:
 
 ```python
 from pprint import pprint
@@ -54,7 +58,7 @@ pdf.fill(
 pdf.write("output.pdf")
 ```
 
-The same can be achieved using the CLI:
+The same workflow can be run from the CLI:
 
 === "Commands"
     ```shell
