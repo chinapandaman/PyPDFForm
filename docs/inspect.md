@@ -8,7 +8,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
 You can describe the dictionary used to fill a PDF form using a JSON schema. For example:
 
-=== "Code"
+=== "Library"
     ```python
     import json
     from PyPDFForm import PdfWrapper
@@ -16,6 +16,10 @@ You can describe the dictionary used to fill a PDF form using a JSON schema. For
     pdf_form_schema = PdfWrapper("sample_template.pdf").schema
 
     print(json.dumps(pdf_form_schema, indent=4, sort_keys=True))
+    ```
+=== "CLI"
+    ```shell
+    pypdfform inspect schema sample_template.pdf | jq
     ```
 === "Output"
     ```json
@@ -53,15 +57,19 @@ You can use the PyPDFForm-generated JSON schema to validate the data used for fi
 
 To inspect the current filled data of a PDF form, use the `.data` attribute. For example, the following snippet inspects the current filled data for [this PDF](pdfs/sample_template_filled.pdf):
 
-=== "Code"
+=== "Library"
     ```python
     from pprint import pprint
     from PyPDFForm import PdfWrapper
 
     pprint(PdfWrapper("sample_template_filled.pdf").data)
     ```
+=== "CLI"
+    ```shell
+    pypdfform inspect data sample_template_filled.pdf | jq
+    ```
 === "Output"
-    ```sh
+    ```shell
     {'check': True,
     'check_2': True,
     'check_3': True,
@@ -74,15 +82,19 @@ To inspect the current filled data of a PDF form, use the `.data` attribute. For
 
 PyPDFForm can also generate sample data for filling a PDF form:
 
-=== "Code"
+=== "Library"
     ```python
     from pprint import pprint
     from PyPDFForm import PdfWrapper
 
     pprint(PdfWrapper("sample_template.pdf").sample_data)
     ```
+=== "CLI"
+    ```shell
+    pypdfform inspect sample sample_template.pdf | jq
+    ```
 === "Output"
-    ```sh
+    ```shell
     {'check': True,
     'check_2': True,
     'check_3': True,

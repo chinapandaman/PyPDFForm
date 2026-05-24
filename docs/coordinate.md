@@ -53,7 +53,7 @@ To generate a coordinate grid view for [this PDF](pdfs/sample_template.pdf):
     To inspect a field with the CLI, use `inspect location` and pass the field name with `--field`:
 
     ```shell
-    pypdfform inspect location sample_template.pdf --field test
+    pypdfform inspect location sample_template.pdf --field test | jq
     ```
 
 ## Change form field coordinates & dimensions
