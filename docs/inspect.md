@@ -4,7 +4,7 @@ Once a PDF form is prepared, PyPDFForm can help you inspect its fields to determ
 
 This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
 
-The CLI examples pipe JSON output through `jq` for readability.
+The CLI examples pipe JSON output through `jq -S` for sorted, readable output.
 
 ## Generate a JSON schema that describes a PDF form
 
@@ -21,7 +21,7 @@ PyPDFForm can describe the data needed to fill a PDF form as a JSON schema:
     ```
 === "CLI"
     ```shell
-    pypdfform inspect schema sample_template.pdf | jq
+    pypdfform inspect schema sample_template.pdf | jq -S
     ```
 === "Output"
     ```json
@@ -70,7 +70,7 @@ To inspect the current values in a filled PDF form, use the `.data` attribute. F
     ```
 === "CLI"
     ```shell
-    pypdfform inspect data sample_template_filled.pdf | jq
+    pypdfform inspect data sample_template_filled.pdf | jq -S
     ```
 === "Output"
     ```json
@@ -99,7 +99,7 @@ PyPDFForm can also generate sample fill data for a PDF form:
     ```
 === "CLI"
     ```shell
-    pypdfform inspect sample sample_template.pdf | jq
+    pypdfform inspect sample sample_template.pdf | jq -S
     ```
 === "Output"
     ```json
