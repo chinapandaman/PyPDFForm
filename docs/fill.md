@@ -1,11 +1,14 @@
 # Fill PDF forms
 
-PyPDFForm fills a PDF form using a flat, non-nested dictionary/JSON object in most cases.
-The filled form is editable by default. When you call the `fill` method, you can set the optional parameter `flatten` to `True` (or set the `--flatten` option in the case of the CLI) to flatten the filled form, making it uneditable.
+PyPDFForm fills PDF forms from a mapping of field names to values. In the library, that mapping is a Python dictionary; in the CLI, it is a JSON object.
+
+Most fields use flat, non-nested values. Image and signature fields can also use nested CLI objects when you need per-field options such as `preserve_aspect_ratio`.
+
+Filled forms stay editable by default. Pass `flatten=True` to `fill`, or add `--flatten` to the CLI command, to flatten fields after filling so their values can no longer be edited.
 
 ## Fill text field and checkbox
 
-To fill a text field, provide a `string` value, and for a checkbox, use a `boolean` value. The following example demonstrates how to fill [this PDF](pdfs/sample_template.pdf):
+Use string values for text fields and boolean values for checkboxes. The following example fills [this PDF](pdfs/sample_template.pdf):
 
 === "Library"
     ```python
@@ -46,7 +49,7 @@ To fill a text field, provide a `string` value, and for a checkbox, use a `boole
 
 A radio button group is a collection of radio buttons sharing the same name on a PDF form.
 
-A [PDF form](pdfs/sample_template_with_radio_button.pdf) with radio button groups can be filled using `integer` values, where the value indicates which radio button to select within each group:
+Fill each radio button group with the zero-based index of the option to select. For example, to fill [this PDF](pdfs/sample_template_with_radio_button.pdf):
 
 === "Library"
     ```python
@@ -79,7 +82,7 @@ A [PDF form](pdfs/sample_template_with_radio_button.pdf) with radio button group
 
 ## Fill dropdown field
 
-As with radio buttons, a dropdown choice can be selected by specifying its `integer` value. For example, to fill [this PDF](pdfs/sample_template_with_dropdown.pdf):
+A dropdown can be filled with either the zero-based option index or the option text. For example, to fill [this PDF](pdfs/sample_template_with_dropdown.pdf):
 
 === "Library"
     === "Using Option Index"
@@ -133,9 +136,9 @@ As with radio buttons, a dropdown choice can be selected by specifying its `inte
 
 ## Fill signature field
 
-A signature field enables signing a PDF form with a handwritten signature image.
+A signature field can be filled with a handwritten signature image.
 
-To fill a signature field, consider [this PDF](pdfs/sample_template_with_signature.pdf) and [this signature image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png):
+The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [this signature image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png):
 
 === "Library"
     === "File Path"
@@ -180,7 +183,7 @@ To fill a signature field, consider [this PDF](pdfs/sample_template_with_signatu
         signed.write("output.pdf")
         ```
     === "Aspect Ratio"
-        By default, the library preserves the aspect ratio of the signature image when filling it. You can disable this by setting the `preserve_aspect_ratio` property to `False` on the signature field:
+        By default, PyPDFForm preserves a signature image's aspect ratio. To stretch the image to the field bounds, set the `preserve_aspect_ratio` property to `False` on the signature field:
 
         ```python
         from PyPDFForm import PdfWrapper
@@ -218,9 +221,9 @@ To fill a signature field, consider [this PDF](pdfs/sample_template_with_signatu
 
 ## Fill image field
 
-Fill an image field similarly to a signature field, using a file path, file object, or file stream.
+An image field accepts the same input types as a signature field: a file path, an open file object, or a bytes stream.
 
-To fill an image field, consider [this PDF](pdfs/sample_template_with_image_field.pdf) and [this image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_image.jpg):
+The examples below use [this PDF](pdfs/sample_template_with_image_field.pdf) and [this image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_image.jpg):
 
 === "Library"
     === "File Path"
@@ -265,7 +268,7 @@ To fill an image field, consider [this PDF](pdfs/sample_template_with_image_fiel
         filled.write("output.pdf")
         ```
     === "Aspect Ratio"
-        Unlike the signature field, the library does not preserve the aspect ratio of a regular image by default. You can enable this by setting the `preserve_aspect_ratio` property to `True` on the image field:
+        Unlike signature fields, image fields are stretched to the field bounds by default. To preserve the original image aspect ratio, set the `preserve_aspect_ratio` property to `True` on the image field:
 
         ```python
         from PyPDFForm import PdfWrapper
