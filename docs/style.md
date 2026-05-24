@@ -544,24 +544,40 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template_with_dropdown.pdf -f data.json -o output.pdf
         ```
 
 ## Change dropdown field font
 
-Before changing a dropdown field's font, you must first [register](font.md) the desired font.
+=== "Library"
+    Before changing a dropdown field's font, you must first [register](font.md) the desired font.
 
-After registration, you can apply the registered font to any dropdown field:
+    After registration, you can apply the registered font to any dropdown field:
 
-```python
-from PyPDFForm import PdfWrapper
+    ```python
+    from PyPDFForm import PdfWrapper
 
-form = PdfWrapper("sample_template_with_dropdown.pdf")
+    form = PdfWrapper("sample_template_with_dropdown.pdf")
 
-form.widgets["dropdown_1"].font = "your_registered_font"
+    form.widgets["dropdown_1"].font = "your_registered_font"
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `update field` command:
+
+    === "data.json"
+        ```json
+        {
+            "dropdown_1": {
+                "font": "path_to_a_ttf_file"
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        ```
 
 ## Change dropdown field font size
 
