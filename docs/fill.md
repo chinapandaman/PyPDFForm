@@ -1,29 +1,46 @@
 # Fill PDF forms
 
-PyPDFForm fills a PDF form using a flat, non-nested dictionary.
-The filled form is editable by default. When you call the `fill` method, you can set the optional parameter `flatten` to `True` to flatten the filled form, making it uneditable.
+PyPDFForm fills a PDF form using a flat, non-nested dictionary/JSON object in most cases.
+The filled form is editable by default. When you call the `fill` method, you can set the optional parameter `flatten` to `True` (or set the `--flatten` option in the case of the CLI) to flatten the filled form, making it uneditable.
 
 ## Fill text field and checkbox
 
 To fill a text field, provide a `string` value, and for a checkbox, use a `boolean` value. The following example demonstrates how to fill [this PDF](pdfs/sample_template.pdf):
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Library"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper("sample_template.pdf").fill(
-    {
-        "test": "test_1",
-        "check": True,
-        "test_2": "test_2",
-        "check_2": False,
-        "test_3": "test_3",
-        "check_3": True,
-    },
-    flatten=False   # optional, set to True to flatten the filled PDF form
-)
+    filled = PdfWrapper("sample_template.pdf").fill(
+        {
+            "test": "test_1",
+            "check": True,
+            "test_2": "test_2",
+            "check_2": False,
+            "test_3": "test_3",
+            "check_3": True,
+        },
+        flatten=False   # optional, set to True to flatten the filled PDF form
+    )
 
-filled.write("output.pdf")
-```
+    filled.write("output.pdf")
+    ```
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "test": "test_1",
+            "check": true,
+            "test_2": "test_2",
+            "check_2": false,
+            "test_3": "test_3",
+            "check_3": true
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform fill sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Fill radio button group
 
