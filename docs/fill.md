@@ -1,210 +1,305 @@
 # Fill PDF forms
 
-PyPDFForm fills a PDF form using a flat, non-nested dictionary.
-The filled form is editable by default. When you call the `fill` method, you can set the optional parameter `flatten` to `True` to flatten the filled form, making it uneditable.
+PyPDFForm fills PDF forms from a mapping of field names to values. In the library, that mapping is a Python dictionary; in the CLI, it is a JSON object.
+
+Most fields use flat, non-nested values. Image and signature fields can also use nested CLI objects when you need per-field options such as `preserve_aspect_ratio`.
+
+Filled forms stay editable by default. Pass `flatten=True` to `fill`, or add `--flatten` to the CLI command, to flatten fields after filling so their values can no longer be edited.
 
 ## Fill text field and checkbox
 
-To fill a text field, provide a `string` value, and for a checkbox, use a `boolean` value. The following example demonstrates how to fill [this PDF](pdfs/sample_template.pdf):
+Use string values for text fields and boolean values for checkboxes. The following example fills [this PDF](pdfs/sample_template.pdf):
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Library"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper("sample_template.pdf").fill(
-    {
-        "test": "test_1",
-        "check": True,
-        "test_2": "test_2",
-        "check_2": False,
-        "test_3": "test_3",
-        "check_3": True,
-    },
-    flatten=False   # optional, set to True to flatten the filled PDF form
-)
+    filled = PdfWrapper("sample_template.pdf").fill(
+        {
+            "test": "test_1",
+            "check": True,
+            "test_2": "test_2",
+            "check_2": False,
+            "test_3": "test_3",
+            "check_3": True,
+        },
+        flatten=False   # optional, set to True to flatten the filled PDF form
+    )
 
-filled.write("output.pdf")
-```
+    filled.write("output.pdf")
+    ```
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "test": "test_1",
+            "check": true,
+            "test_2": "test_2",
+            "check_2": false,
+            "test_3": "test_3",
+            "check_3": true
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform fill sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Fill radio button group
 
 A radio button group is a collection of radio buttons sharing the same name on a PDF form.
 
-A [PDF form](pdfs/sample_template_with_radio_button.pdf) with radio button groups can be filled using `integer` values, where the value indicates which radio button to select within each group:
+Fill each radio button group with the zero-based index of the option to select. For example, to fill [this PDF](pdfs/sample_template_with_radio_button.pdf):
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Library"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-filled = PdfWrapper("sample_template_with_radio_button.pdf").fill(
-    {
-        "radio_1": 0,
-        "radio_2": 1,
-        "radio_3": 2,
-    },
-    flatten=False   # optional, set to True to flatten the filled PDF form
-)
+    filled = PdfWrapper("sample_template_with_radio_button.pdf").fill(
+        {
+            "radio_1": 0,
+            "radio_2": 1,
+            "radio_3": 2,
+        },
+        flatten=False   # optional, set to True to flatten the filled PDF form
+    )
 
-filled.write("output.pdf")
-```
+    filled.write("output.pdf")
+    ```
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "radio_1": 0,
+            "radio_2": 1,
+            "radio_3": 2
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform fill sample_template_with_radio_button.pdf -f data.json -o output.pdf
+        ```
 
 ## Fill dropdown field
 
-As with radio buttons, a dropdown choice can be selected by specifying its `integer` value. For example, to fill [this PDF](pdfs/sample_template_with_dropdown.pdf):
+A dropdown can be filled with either the zero-based option index or the option text. For example, to fill [this PDF](pdfs/sample_template_with_dropdown.pdf):
 
-=== "Using Option Index"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "Using Option Index"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
+        filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
+            {
+                "dropdown_1": 1
+            },
+            flatten=False   # optional, set to True to flatten the filled PDF form
+        )
+
+        filled.write("output.pdf")
+        ```
+    === "Using String Value"
+        You can also specify a dropdown option by its `string` value:
+
+        ```python
+        from PyPDFForm import PdfWrapper
+
+        filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
+            {
+                "dropdown_1": "bar"
+            },
+            flatten=False   # optional, set to True to flatten the filled PDF form
+        )
+
+        filled.write("output.pdf")
+        ```
+=== "CLI"
+    === "data.json"
+        ```json
         {
             "dropdown_1": 1
-        },
-        flatten=False   # optional, set to True to flatten the filled PDF form
-    )
-
-    filled.write("output.pdf")
-    ```
-=== "Using String Value"
-    You can also specify a dropdown option by its `string` value:
-
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
+        }
+        ```
+    === "string_value.json"
+        ```json
         {
             "dropdown_1": "bar"
-        },
-        flatten=False   # optional, set to True to flatten the filled PDF form
-    )
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform fill sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        ```
 
-    filled.write("output.pdf")
-    ```
-    ???+ note
-        If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
+???+ note
+    If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
 
 ## Fill signature field
 
-A signature field enables signing a PDF form with a handwritten signature image.
+A signature field can be filled with a handwritten signature image.
 
-To fill a signature field, consider [this PDF](pdfs/sample_template_with_signature.pdf) and [this signature image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png):
+The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [this signature image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png):
 
-=== "File Path"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "File Path"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    signed = PdfWrapper("sample_template_with_signature.pdf").fill(
-        {
-            "signature": "sample_signature.png"
-        },
-        flatten=False   # optional, set to True to flatten the filled PDF form
-    )
-
-    signed.write("output.pdf")
-    ```
-=== "Open File Object"
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    with open("sample_signature.png", "rb+") as sig:
         signed = PdfWrapper("sample_template_with_signature.pdf").fill(
             {
-                "signature": sig
+                "signature": "sample_signature.png"
             },
             flatten=False   # optional, set to True to flatten the filled PDF form
         )
 
-    signed.write("output.pdf")
-    ```
-=== "Bytes File Stream"
-    ```python
-    from PyPDFForm import PdfWrapper
+        signed.write("output.pdf")
+        ```
+    === "Open File Object"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    with open("sample_signature.png", "rb+") as sig:
-        signed = PdfWrapper("sample_template_with_signature.pdf").fill(
+        with open("sample_signature.png", "rb+") as sig:
+            signed = PdfWrapper("sample_template_with_signature.pdf").fill(
+                {
+                    "signature": sig
+                },
+                flatten=False   # optional, set to True to flatten the filled PDF form
+            )
+
+        signed.write("output.pdf")
+        ```
+    === "Bytes File Stream"
+        ```python
+        from PyPDFForm import PdfWrapper
+
+        with open("sample_signature.png", "rb+") as sig:
+            signed = PdfWrapper("sample_template_with_signature.pdf").fill(
+                {
+                    "signature": sig.read()
+                },
+                flatten=False   # optional, set to True to flatten the filled PDF form
+            )
+
+        signed.write("output.pdf")
+        ```
+    === "Aspect Ratio"
+        By default, PyPDFForm preserves a signature image's aspect ratio. To stretch the image to the field bounds, set the `preserve_aspect_ratio` property to `False` on the signature field:
+
+        ```python
+        from PyPDFForm import PdfWrapper
+
+        pdf = PdfWrapper("sample_template_with_signature.pdf")
+        pdf.widgets["signature"].preserve_aspect_ratio = False
+        pdf.fill(
             {
-                "signature": sig.read()
+                "signature": "sample_signature.png"
             },
-            flatten=False   # optional, set to True to flatten the filled PDF form
         )
 
-    signed.write("output.pdf")
-    ```
-=== "Aspect Ratio"
-    By default, the library preserves the aspect ratio of the signature image when filling it. You can disable this by setting the `preserve_aspect_ratio` property to `False` on the signature field:
-
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    pdf = PdfWrapper("sample_template_with_signature.pdf")
-    pdf.widgets["signature"].preserve_aspect_ratio = False
-    pdf.fill(
+        pdf.write("output.pdf")
+        ```
+=== "CLI"
+    === "data.json"
+        ```json
         {
             "signature": "sample_signature.png"
-        },
-    )
-
-    pdf.write("output.pdf")
-    ```
+        }
+        ```
+    === "aspect_ratio.json"
+        ```json
+        {
+            "signature": {
+                "path": "sample_signature.png",
+                "preserve_aspect_ratio": false
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform fill sample_template_with_signature.pdf -f data.json -o output.pdf
+        ```
 
 ## Fill image field
 
-Fill an image field similarly to a signature field, using a file path, file object, or file stream.
+An image field accepts the same input types as a signature field: a file path, an open file object, or a bytes stream.
 
-To fill an image field, consider [this PDF](pdfs/sample_template_with_image_field.pdf) and [this image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_image.jpg):
+The examples below use [this PDF](pdfs/sample_template_with_image_field.pdf) and [this image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_image.jpg):
 
-=== "File Path"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "File Path"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
-        {
-            "image_1": "sample_image.jpg"
-        },
-        flatten=False   # optional, set to True to flatten the filled PDF form
-    )
-
-    filled.write("output.pdf")
-    ```
-=== "Open File Object"
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    with open("sample_image.jpg", "rb+") as img:
         filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
             {
-                "image_1": img
+                "image_1": "sample_image.jpg"
             },
             flatten=False   # optional, set to True to flatten the filled PDF form
         )
 
-    filled.write("output.pdf")
-    ```
-=== "Bytes File Stream"
-    ```python
-    from PyPDFForm import PdfWrapper
+        filled.write("output.pdf")
+        ```
+    === "Open File Object"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    with open("sample_image.jpg", "rb+") as img:
-        filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
+        with open("sample_image.jpg", "rb+") as img:
+            filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
+                {
+                    "image_1": img
+                },
+                flatten=False   # optional, set to True to flatten the filled PDF form
+            )
+
+        filled.write("output.pdf")
+        ```
+    === "Bytes File Stream"
+        ```python
+        from PyPDFForm import PdfWrapper
+
+        with open("sample_image.jpg", "rb+") as img:
+            filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
+                {
+                    "image_1": img.read()
+                },
+                flatten=False   # optional, set to True to flatten the filled PDF form
+            )
+
+        filled.write("output.pdf")
+        ```
+    === "Aspect Ratio"
+        Unlike signature fields, image fields are stretched to the field bounds by default. To preserve the original image aspect ratio, set the `preserve_aspect_ratio` property to `True` on the image field:
+
+        ```python
+        from PyPDFForm import PdfWrapper
+
+        pdf = PdfWrapper("sample_template_with_image_field.pdf")
+        pdf.widgets["image_1"].preserve_aspect_ratio = True
+        pdf.fill(
             {
-                "image_1": img.read()
+                "image_1": "sample_image.jpg"
             },
-            flatten=False   # optional, set to True to flatten the filled PDF form
         )
 
-    filled.write("output.pdf")
-    ```
-=== "Aspect Ratio"
-    Unlike the signature field, the library does not preserve the aspect ratio of a regular image by default. You can enable this by setting the `preserve_aspect_ratio` property to `True` on the image field:
-
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    pdf = PdfWrapper("sample_template_with_image_field.pdf")
-    pdf.widgets["image_1"].preserve_aspect_ratio = True
-    pdf.fill(
+        pdf.write("output.pdf")
+        ```
+=== "CLI"
+    === "data.json"
+        ```json
         {
             "image_1": "sample_image.jpg"
-        },
-    )
-
-    pdf.write("output.pdf")
-    ```
+        }
+        ```
+    === "aspect_ratio.json"
+        ```json
+        {
+            "image_1": {
+                "path": "sample_image.jpg",
+                "preserve_aspect_ratio": true
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform fill sample_template_with_image_field.pdf -f data.json -o output.pdf
+        ```
