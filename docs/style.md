@@ -30,7 +30,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
         print(pdf.title)
         ```
 === "CLI"
-    Use the `update title` command:
+    Set the same title from the command line with `update title`:
 
     ```shell
     pypdfform update title sample_template.pdf -t "My PDF" -o output.pdf
@@ -70,7 +70,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file. For `font`, provide a `.ttf` file path:
+    In the CLI, provide a `.ttf` file path for each text field's `font` value:
 
     === "data.json"
         ```json
@@ -123,7 +123,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file:
+    Set each text field's `font_size` in JSON:
 
     === "data.json"
         ```json
@@ -176,7 +176,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file:
+    Express each text field's RGB font color as a three-item JSON array:
 
     === "data.json"
         ```json
@@ -241,7 +241,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file:
+    Set each text field's `alignment` value in JSON, using `0` for left, `1` for center, and `2` for right:
 
     === "data.json"
         ```json
@@ -294,7 +294,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file:
+    Set each text field's `max_length` in JSON:
 
     === "data.json"
         ```json
@@ -349,7 +349,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file:
+    Set `comb` alongside the required `max_length` values in JSON:
 
     === "data.json"
         ```json
@@ -402,7 +402,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file:
+    Set `multiline` to `true` for fields that should accept paragraph-style input:
 
     === "data.json"
         ```json
@@ -442,7 +442,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file:
+    Set each checkbox's size, or each radio button group's size, in JSON:
 
     === "data.json"
         ```json
@@ -497,7 +497,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
         form.write("output.pdf")
         ```
 === "CLI"
-    Use the `update field` command with a JSON file:
+    Put the replacement dropdown choices in JSON. Use strings for default export values or two-item arrays for custom export values:
 
     === "data.json"
         ```json
@@ -564,7 +564,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file. For `font`, provide a `.ttf` file path:
+    In the CLI, provide a `.ttf` file path for the dropdown field's `font` value:
 
     === "data.json"
         ```json
@@ -594,7 +594,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file:
+    Set the dropdown field's `font_size` in JSON:
 
     === "data.json"
         ```json
@@ -624,7 +624,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file:
+    Express the dropdown field's RGB font color as a three-item JSON array:
 
     === "data.json"
         ```json
@@ -677,7 +677,7 @@ PyPDFForm lets you rename existing fields by updating their keys.
         form.write("output.pdf")
         ```
 === "CLI"
-    Use the `update rename` command with a JSON file:
+    Provide the old field keys and their `new_key` values to `update rename`:
 
     === "Update Multiple Fields"
         === "data.json"
@@ -747,7 +747,7 @@ PyPDFForm lets you rename existing fields by updating their keys.
     form.write("output.pdf")
     ```
 === "CLI"
-    After filling and flattening a form, use the `update field` command with a JSON file:
+    After filling and flattening a form, set `readonly` to `false` for the fields that should become editable again:
 
     === "data.json"
         ```json
@@ -787,7 +787,7 @@ PyPDFForm lets you rename existing fields by updating their keys.
     form.write("output.pdf")
     ```
 === "CLI"
-    Use the `update field` command with a JSON file:
+    Set `hidden` to `true` or `false` for the fields whose visibility should change:
 
     === "data.json"
         ```json
