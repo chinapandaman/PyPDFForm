@@ -611,17 +611,37 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 
 ## Change dropdown field font color
 
-You can change a dropdown field's font color using an RGB `tuple`:
+=== "Library"
+    You can change a dropdown field's font color using an RGB `tuple`:
 
-```python
-from PyPDFForm import PdfWrapper
+    ```python
+    from PyPDFForm import PdfWrapper
 
-form = PdfWrapper("sample_template_with_dropdown.pdf")
+    form = PdfWrapper("sample_template_with_dropdown.pdf")
 
-form.widgets["dropdown_1"].font_color = (1, 0, 0)
+    form.widgets["dropdown_1"].font_color = (1, 0, 0)
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `update field` command:
+
+    === "data.json"
+        ```json
+        {
+            "dropdown_1": {
+                "font_color": [
+                    1,
+                    0,
+                    0
+                ]
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        ```
 
 ## Change field name
 
