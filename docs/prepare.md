@@ -2,43 +2,84 @@
 
 The most common tool for creating PDF form fields is Adobe Acrobat, and a tutorial is available [here](https://helpx.adobe.com/acrobat/using/creating-distributing-pdf-forms.html). Alternative free tools like [DocFly](https://www.docfly.com/) offer similar functionality.
 
-PyPDFForm also allows creating PDF form fields on existing PDFs through coding.
+PyPDFForm also allows creating PDF form fields on existing PDFs programmatically.
 
-Field creation is done with `PdfWrapper.bulk_create_fields`, which accepts a list of field definitions. Use the same method whether you are adding one field or several:
+=== "Library"
+    Field creation is done with `PdfWrapper.bulk_create_fields`, which accepts a list of field definitions. Use the same method whether you are adding one field or several:
 
-```python
-from PyPDFForm import Fields, PdfWrapper
+    ```python
+    from PyPDFForm import Fields, PdfWrapper
 
-fields = [
-    Fields.TextField(
-        name="new_text_field_1",
-        page_number=1,
-        x=100,
-        y=100,
-    ),
-    Fields.TextField(
-        name="new_text_field_2",
-        page_number=1,
-        x=100,
-        y=300,
-    ),
-    Fields.CheckBoxField(
-        name="new_checkbox_1",
-        page_number=1,
-        x=300,
-        y=100,
-    ),
-    Fields.CheckBoxField(
-        name="new_checkbox_2",
-        page_number=1,
-        x=300,
-        y=300,
-    ),
-]
+    fields = [
+        Fields.TextField(
+            name="new_text_field_1",
+            page_number=1,
+            x=100,
+            y=100,
+        ),
+        Fields.TextField(
+            name="new_text_field_2",
+            page_number=1,
+            x=100,
+            y=300,
+        ),
+        Fields.CheckBoxField(
+            name="new_checkbox_1",
+            page_number=1,
+            x=300,
+            y=100,
+        ),
+        Fields.CheckBoxField(
+            name="new_checkbox_2",
+            page_number=1,
+            x=300,
+            y=300,
+        ),
+    ]
 
-new_form = PdfWrapper("dummy.pdf").bulk_create_fields(fields)
-new_form.write("output.pdf")
-```
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields(fields)
+    new_form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `create field` command with a JSON file that describes the fields to create:
+
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
+    === "data.json"
+        ```json
+        {
+            "text": [
+                {
+                    "name": "new_text_field_1",
+                    "page_number": 1,
+                    "x": 100,
+                    "y": 100
+                },
+                {
+                    "name": "new_text_field_2",
+                    "page_number": 1,
+                    "x": 100,
+                    "y": 300
+                }
+            ],
+            "check": [
+                {
+                    "name": "new_checkbox_1",
+                    "page_number": 1,
+                    "x": 300,
+                    "y": 100
+                },
+                {
+                    "name": "new_checkbox_2",
+                    "page_number": 1,
+                    "x": 300,
+                    "y": 300
+                }
+            ]
+        }
+        ```
 
 This section of the documentation will primarily use [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
 
