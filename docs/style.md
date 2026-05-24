@@ -716,33 +716,58 @@ PyPDFForm lets you rename existing fields by updating their keys.
 
 ## Change field editability
 
-The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. For example, the following code snippet shows how you can make different form fields editable in [this PDF form](pdfs/sample_template_with_dropdown.pdf) after they have been flattened:
+=== "Library"
+    The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. For example, the following code snippet shows how you can make different form fields editable in [this PDF form](pdfs/sample_template_with_dropdown.pdf) after they have been flattened:
 
-```python
-from PyPDFForm import PdfWrapper
+    ```python
+    from PyPDFForm import PdfWrapper
 
-form = PdfWrapper("sample_template_with_dropdown.pdf")
+    form = PdfWrapper("sample_template_with_dropdown.pdf")
 
-form.fill(
-    {
-        "test_1": "test_1",
-        "test_2": "test_2",
-        "test_3": "test_3",
-        "check_1": True,
-        "check_2": True,
-        "check_3": True,
-        "radio_1": 1,
-        "dropdown_1": 0,
-    },
-    flatten=True,
-)
-form.widgets["test_2"].readonly = False  # text
-form.widgets["check_3"].readonly = False  # checkbox
-form.widgets["radio_1"].readonly = False  # radio button group
-form.widgets["dropdown_1"].readonly = False  # dropdown
+    form.fill(
+        {
+            "test_1": "test_1",
+            "test_2": "test_2",
+            "test_3": "test_3",
+            "check_1": True,
+            "check_2": True,
+            "check_3": True,
+            "radio_1": 1,
+            "dropdown_1": 0,
+        },
+        flatten=True,
+    )
+    form.widgets["test_2"].readonly = False  # text
+    form.widgets["check_3"].readonly = False  # checkbox
+    form.widgets["radio_1"].readonly = False  # radio button group
+    form.widgets["dropdown_1"].readonly = False  # dropdown
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `update field` command:
+
+    === "data.json"
+        ```json
+        {
+            "test_2": {
+                "readonly": false
+            },
+            "check_3": {
+                "readonly": false
+            },
+            "radio_1": {
+                "readonly": false
+            },
+            "dropdown_1": {
+                "readonly": false
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        ```
 
 ## Change field visibility
 
