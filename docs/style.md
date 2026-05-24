@@ -581,17 +581,33 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 
 ## Change dropdown field font size
 
-You can change a dropdown field's font size using a `float` value in PyPDFForm:
+=== "Library"
+    You can change a dropdown field's font size using a `float` value in PyPDFForm:
 
-```python
-from PyPDFForm import PdfWrapper
+    ```python
+    from PyPDFForm import PdfWrapper
 
-form = PdfWrapper("sample_template_with_dropdown.pdf")
+    form = PdfWrapper("sample_template_with_dropdown.pdf")
 
-form.widgets["dropdown_1"].font_size = 30
+    form.widgets["dropdown_1"].font_size = 30
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `update field` command:
+
+    === "data.json"
+        ```json
+        {
+            "dropdown_1": {
+                "font_size": 30
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        ```
 
 ## Change dropdown field font color
 
