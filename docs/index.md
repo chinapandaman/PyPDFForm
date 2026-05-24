@@ -42,6 +42,17 @@ Here's a quick look at how PyPDFForm works:
     # Change the field styles
     pdf.widgets["my_textfield"].font_color = (1, 0, 0)
     pdf.widgets["my_textfield"].alignment = 1
+
+    # Fill the newly created form
+    pdf.fill(
+        {
+            "my_textfield": "this is a text field",
+            "my_checkbox": True,
+        }
+    )
+
+    # Save the new form
+    pdf.write("output.pdf")
     ```
 
 ## What's next?
