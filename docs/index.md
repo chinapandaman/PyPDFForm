@@ -1,61 +1,135 @@
 # Welcome to PyPDFForm
 
-PyPDFForm is a Python library for PDF form processing. It contains the essential functionalities needed to interact with PDF forms:
+PyPDFForm is a Python library and command line tool for working with PDF forms. It provides a practical set of APIs for creating, inspecting, updating, and filling forms, plus common PDF utilities.
 
-* Inspect what data a PDF form needs to be filled with.
-* Fill a PDF form by simply creating a Python dictionary.
-* Create form fields on a PDF.
+With PyPDFForm, you can:
 
-It also supports other common utilities such as extracting pages and merging multiple PDFs together.
+* Create PDF forms, form fields, and raw elements.
+* Inspect form fields, metadata, and values.
+* Update field styling, behavior, and scripts.
+* Fill PDF forms.
+* Extract pages and merge PDFs.
+
+The goal is to make PDF form work straightforward, whether you are handling one document or building a larger workflow.
 
 ## Quickstart
 
-Here's a quick look at how PyPDFForm works:
+Here's a quick look at PyPDFForm as a Python library:
 
-=== "Install"
-    ```shell
-    pip install PyPDFForm
-    ```
-=== "Instantiate"
-    ```python
-    from PyPDFForm import BlankPage, PdfWrapper
+```python
+from pprint import pprint
+from PyPDFForm import BlankPage, Fields, PdfWrapper, RawElements
 
-    pdf = PdfWrapper(BlankPage())
-    ```
-=== "Create"
-    ```python
-    from PyPDFForm import Fields, RawElements
+# Create a blank PDF
+pdf = PdfWrapper(BlankPage())
 
-    pdf.draw([
+# Draw labeling texts
+pdf.draw(
+    [
         RawElements.RawText("My Textfield:", 1, 100, 600),
         RawElements.RawText("My Checkbox:", 1, 100, 550),
-    ])
-    pdf.bulk_create_fields([
+    ]
+)
+
+# Create text and checkbox fields
+pdf.bulk_create_fields(
+    [
         Fields.TextField("my_textfield", 1, 180, 596, height=16),
         Fields.CheckBoxField("my_checkbox", 1, 180, 546, size=16),
-    ])
-    ```
-=== "Inspect"
-    ```python
-    from pprint import pprint
+    ]
+)
 
-    pprint(pdf.schema)
-    ```
-=== "Style"
-    ```python
-    pdf.widgets["my_textfield"].font_color = (1, 0, 0)
-    pdf.widgets["my_textfield"].alignment = 1
-    ```
-=== "Fill"
-    ```python
-    pdf.fill({
+# Inspect the fields via JSON schema
+pprint(pdf.schema)
+
+# Change the field styles
+pdf.widgets["my_textfield"].font_color = (1, 0, 0)
+pdf.widgets["my_textfield"].alignment = 1
+
+# Fill the newly created form
+pdf.fill(
+    {
         "my_textfield": "this is a text field",
         "my_checkbox": True,
-    })
+    }
+)
+
+# Save the new form
+pdf.write("output.pdf")
+```
+
+The same workflow can be run from the CLI:
+
+=== "Commands"
+    ```shell
+    pypdfform create blank -o output.pdf
+    pypdfform create raw output.pdf -f labels.json
+    pypdfform create field output.pdf -f fields.json
+    pypdfform inspect schema output.pdf
+    pypdfform update field output.pdf -f styles.json
+    pypdfform fill output.pdf -f data.json
     ```
-=== "Save"
-    ```python
-    pdf.write("output.pdf")
+=== "labels.json"
+    ```json
+    {
+        "text": [
+            {
+                "text": "My Textfield:",
+                "page_number": 1,
+                "x": 100,
+                "y": 600
+            },
+            {
+                "text": "My Checkbox:",
+                "page_number": 1,
+                "x": 100,
+                "y": 550
+            }
+        ]
+    }
+    ```
+=== "fields.json"
+    ```json
+    {
+        "text": [
+            {
+                "name": "my_textfield",
+                "page_number": 1,
+                "x": 180,
+                "y": 596,
+                "height": 16
+            }
+        ],
+        "check": [
+            {
+                "name": "my_checkbox",
+                "page_number": 1,
+                "x": 180,
+                "y": 546,
+                "size": 16
+            }
+        ]
+    }
+    ```
+=== "styles.json"
+    ```json
+    {
+        "my_textfield": {
+            "font_color": [
+                1,
+                0,
+                0
+            ],
+            "alignment": 1
+        }
+    }
+    ```
+=== "data.json"
+    ```json
+    {
+        "my_textfield": "this is a text field",
+        "my_checkbox": true
+    }
     ```
 
 ## What's next?
