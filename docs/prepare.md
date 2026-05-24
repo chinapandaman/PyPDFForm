@@ -41,7 +41,7 @@ PyPDFForm also allows creating PDF form fields on existing PDFs programmatically
     new_form.write("output.pdf")
     ```
 === "CLI"
-    Use the `create field` command with a JSON file that describes the fields to create:
+    Use the `create field` command with a JSON file that defines the fields to create:
 
     === "data.json"
         ```json
@@ -85,12 +85,12 @@ This section of the documentation will primarily use [this PDF](https://www.w3.o
 
 Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
 
-All optional parameters will have a comment `# optional` after each of them.
+In the library examples, optional parameters are marked with `# optional`.
 
 ## Create a text field
 
 === "Library"
-    Uses `Fields.TextField` to create text fields:
+    Use `Fields.TextField` to create a text field:
 
     ```python
     from PyPDFForm import Fields, PdfWrapper
@@ -124,7 +124,7 @@ All optional parameters will have a comment `# optional` after each of them.
     1.  For the `comb` option, refer to the documentation [here](style.md/#enable-text-field-character-spacing-combs).
     2.  To use a custom font, see how to register it [here](font.md).
 === "CLI"
-    Text field creation configs are grouped by `text` in the JSON file:
+    Put text field definitions under the `text` key in the JSON file:
 
     === "data.json"
         ```json
@@ -175,7 +175,7 @@ All optional parameters will have a comment `# optional` after each of them.
 ## Create a checkbox
 
 === "Library"
-    Uses `Fields.CheckBoxField` to create checkbox fields:
+    Use `Fields.CheckBoxField` to create a checkbox:
 
     ```python
     from PyPDFForm import Fields, PdfWrapper
@@ -202,7 +202,7 @@ All optional parameters will have a comment `# optional` after each of them.
 
     1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
 === "CLI"
-    Checkbox field creation configs are grouped by `check` in the JSON file:
+    Put checkbox field definitions under the `check` key in the JSON file:
 
     === "data.json"
         ```json
@@ -280,7 +280,7 @@ All optional parameters will have a comment `# optional` after each of them.
 
     1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
 === "CLI"
-    Radio group field creation configs are grouped by `radio` in the JSON file:
+    Put radio group definitions under the `radio` key in the JSON file:
 
     === "data.json"
         ```json
@@ -337,7 +337,7 @@ All optional parameters will have a comment `# optional` after each of them.
 ## Create a dropdown field
 
 === "Library"
-    A dropdown field shares a similar set of parameters as a text field. The only significant difference is that a list of `options` needs to be specified:
+    A dropdown field shares many parameters with a text field. The main difference is that you must specify a list of `options`:
 
     === "Default Export Values"
         ```python
@@ -373,7 +373,7 @@ All optional parameters will have a comment `# optional` after each of them.
 
         1.  To use a custom font, see how to register it [here](font.md).
     === "Custom Export Values"
-        If you want different export values from the displayed options, you can specify a list of tuples for the `options` parameter, where the first value of each tuple is the displayed option and the second value is the export value:
+        To use export values that differ from the displayed options, specify a list of tuples for the `options` parameter. The first value in each tuple is the displayed option, and the second value is the export value:
 
         ```python
         from PyPDFForm import Fields, PdfWrapper
@@ -395,7 +395,7 @@ All optional parameters will have a comment `# optional` after each of them.
         new_form.write("output.pdf")
         ```
 === "CLI"
-    Dropdown field creation configs are grouped by `dropdown` in the JSON file:
+    Put dropdown field definitions under the `dropdown` key in the JSON file:
 
     === "data.json"
         ```json
@@ -495,7 +495,7 @@ All optional parameters will have a comment `# optional` after each of them.
     new_form.write("output.pdf")
     ```
 === "CLI"
-    Signature field creation configs are grouped by `signature` in the JSON file:
+    Put signature field definitions under the `signature` key in the JSON file:
 
     === "data.json"
         ```json
@@ -543,7 +543,7 @@ All optional parameters will have a comment `# optional` after each of them.
     new_form.write("output.pdf")
     ```
 === "CLI"
-    Image field creation configs are grouped by `image` in the JSON file:
+    Put image field definitions under the `image` key in the JSON file:
 
     === "data.json"
         ```json
