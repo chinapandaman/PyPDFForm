@@ -81,36 +81,55 @@ A [PDF form](pdfs/sample_template_with_radio_button.pdf) with radio button group
 
 As with radio buttons, a dropdown choice can be selected by specifying its `integer` value. For example, to fill [this PDF](pdfs/sample_template_with_dropdown.pdf):
 
-=== "Using Option Index"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "Using Option Index"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
+        filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
+            {
+                "dropdown_1": 1
+            },
+            flatten=False   # optional, set to True to flatten the filled PDF form
+        )
+
+        filled.write("output.pdf")
+        ```
+    === "Using String Value"
+        You can also specify a dropdown option by its `string` value:
+
+        ```python
+        from PyPDFForm import PdfWrapper
+
+        filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
+            {
+                "dropdown_1": "bar"
+            },
+            flatten=False   # optional, set to True to flatten the filled PDF form
+        )
+
+        filled.write("output.pdf")
+        ```
+=== "CLI"
+    === "data.json"
+        ```json
         {
             "dropdown_1": 1
-        },
-        flatten=False   # optional, set to True to flatten the filled PDF form
-    )
-
-    filled.write("output.pdf")
-    ```
-=== "Using String Value"
-    You can also specify a dropdown option by its `string` value:
-
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
+        }
+        ```
+    === "string_value.json"
+        ```json
         {
             "dropdown_1": "bar"
-        },
-        flatten=False   # optional, set to True to flatten the filled PDF form
-    )
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform fill sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        ```
 
-    filled.write("output.pdf")
-    ```
-    ???+ note
-        If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
+???+ note
+    If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
 
 ## Fill signature field
 
