@@ -211,34 +211,56 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 
 ## Change text field alignment
 
-You can change the alignment of the text filled into a text field by setting its `alignment` property to an integer value: `0` for left, `1` for center, and `2` for right.
+=== "Library"
+    You can change the alignment of the text filled into a text field by setting its `alignment` property to an integer value: `0` for left, `1` for center, and `2` for right.
 
-```python
-from PyPDFForm import PdfWrapper, Widgets
+    ```python
+    from PyPDFForm import PdfWrapper, Widgets
 
-form = PdfWrapper("sample_template.pdf")
+    form = PdfWrapper("sample_template.pdf")
 
-# change globally by iterating each text field
-for field in form.widgets.values():
-    if isinstance(field, Widgets.Text):
-        field.alignment = 1 # center
+    # change globally by iterating each text field
+    for field in form.widgets.values():
+        if isinstance(field, Widgets.Text):
+            field.alignment = 1 # center
 
-# or change at each field's widget level
-form.widgets["test"].alignment = 2  # right
+    # or change at each field's widget level
+    form.widgets["test"].alignment = 2  # right
 
-form.fill(
-    {
-        "test": "test_1",
-        "check": True,
-        "test_2": "test_2",
-        "check_2": False,
-        "test_3": "test_3",
-        "check_3": True,
-    },
-)
+    form.fill(
+        {
+            "test": "test_1",
+            "check": True,
+            "test_2": "test_2",
+            "check_2": False,
+            "test_3": "test_3",
+            "check_3": True,
+        },
+    )
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `update field` command:
+
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "alignment": 2
+            },
+            "test_2": {
+                "alignment": 1
+            },
+            "test_3": {
+                "alignment": 1
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Change text field max length
 
