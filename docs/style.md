@@ -317,36 +317,61 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 
 ## Enable text field character spacing (combs)
 
-To enable character spacing in a text field, set its `.comb` property to `True`. This will evenly space out the characters of the text filled into the field.
+=== "Library"
+    To enable character spacing in a text field, set its `.comb` property to `True`. This will evenly space out the characters of the text filled into the field.
 
-```python
-from PyPDFForm import PdfWrapper, Widgets
+    ```python
+    from PyPDFForm import PdfWrapper, Widgets
 
-form = PdfWrapper("sample_template.pdf")
+    form = PdfWrapper("sample_template.pdf")
 
-# change globally by iterating each text field
-for field in form.widgets.values():
-    if isinstance(field, Widgets.Text):
-        field.max_length = 4
-        field.comb = True
+    # change globally by iterating each text field
+    for field in form.widgets.values():
+        if isinstance(field, Widgets.Text):
+            field.max_length = 4
+            field.comb = True
 
-# or change at each field's widget level
-form.widgets["test"].max_length = 2
-form.widgets["test"].comb = True
+    # or change at each field's widget level
+    form.widgets["test"].max_length = 2
+    form.widgets["test"].comb = True
 
-form.fill(
-    {
-        "test": "te",
-        "check": True,
-        "test_2": "test",
-        "check_2": False,
-        "test_3": "test",
-        "check_3": True,
-    },
-)
+    form.fill(
+        {
+            "test": "te",
+            "check": True,
+            "test_2": "test",
+            "check_2": False,
+            "test_3": "test",
+            "check_3": True,
+        },
+    )
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `update field` command:
+
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "max_length": 2,
+                "comb": true
+            },
+            "test_2": {
+                "max_length": 4,
+                "comb": true
+            },
+            "test_3": {
+                "max_length": 4,
+                "comb": true
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ???+ warning
     This property only takes effect when the text field also has a `max_length` set.
