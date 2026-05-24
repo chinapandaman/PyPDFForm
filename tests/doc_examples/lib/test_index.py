@@ -11,14 +11,18 @@ from PyPDFForm import BlankPage, Fields, PdfWrapper, RawElements
 def test_index_snippets(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
 
+    # Create a blank PDF
     pdf = PdfWrapper(BlankPage())
 
+    # Draw labeling texts
     pdf.draw(
         [
             RawElements.RawText("My Textfield:", 1, 100, 600),
             RawElements.RawText("My Checkbox:", 1, 100, 550),
         ]
     )
+
+    # Create text and checkbox fields
     pdf.bulk_create_fields(
         [
             Fields.TextField("my_textfield", 1, 180, 596, height=16),
@@ -26,12 +30,15 @@ def test_index_snippets(pdf_samples, request):
         ]
     )
 
+    # Inspect the fields via JSON schema
     assert pdf.schema["properties"]["my_textfield"]["type"] == "string"
     assert pdf.schema["properties"]["my_checkbox"]["type"] == "boolean"
 
+    # Change the field styles
     pdf.widgets["my_textfield"].font_color = (1, 0, 0)
     pdf.widgets["my_textfield"].alignment = 1
 
+    # Fill the newly created form
     pdf.fill({"my_textfield": "this is a text field", "my_checkbox": True})
 
     request.config.results["expected_path"] = expected_path
