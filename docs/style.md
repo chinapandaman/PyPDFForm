@@ -419,27 +419,49 @@ This section of the documentation will primarily use [this PDF](pdfs/sample_temp
 
 ## Change checkbox/radio button size
 
-You can change the size of a checkbox or a group of radio buttons using a `float` value:
+=== "Library"
+    You can change the size of a checkbox or a group of radio buttons using a `float` value:
 
-```python
-from PyPDFForm import PdfWrapper
+    ```python
+    from PyPDFForm import PdfWrapper
 
-form = PdfWrapper("sample_template.pdf")
+    form = PdfWrapper("sample_template.pdf")
 
-form.widgets["check"].size = 50
-form.widgets["check_2"].size = 40
-form.widgets["check_3"].size = 60
+    form.widgets["check"].size = 50
+    form.widgets["check_2"].size = 40
+    form.widgets["check_3"].size = 60
 
-form.fill(
-    {
-        "check": True,
-        "check_2": True,
-        "check_3": True,
-    },
-)
+    form.fill(
+        {
+            "check": True,
+            "check_2": True,
+            "check_3": True,
+        },
+    )
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `update field` command:
+
+    === "data.json"
+        ```json
+        {
+            "check": {
+                "size": 50
+            },
+            "check_2": {
+                "size": 40
+            },
+            "check_3": {
+                "size": 60
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Change dropdown field choices
 
