@@ -82,6 +82,13 @@ For a PDF viewer to display content in a form field (especially text fields), it
         pypdfform --generate-appearance-streams
         ```
 
+        ???+ warning
+            PyPDFForm's internal appearance stream generation relies on [qpdf](https://github.com/qpdf/qpdf) and shares its limitations. Some known limitations include:
+
+            * **Limited to ASCII text:** Only ASCII characters are supported.
+            * **Single-line text fields only:** It does not support multi-line text fields.
+            * **No text alignment handling:** Text alignment (left, center, right) is not preserved or applied.
+
 ## Handling metadata
 
 ???+ note
