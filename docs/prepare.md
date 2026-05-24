@@ -473,26 +473,51 @@ All optional parameters will have a comment `# optional` after each of them.
 
 ## Create a signature field
 
-A signature field is only interactive in tools that support it. Otherwise, it is displayed as a rectangle, and clicking it will not trigger any action:
+=== "Library"
+    A signature field is only interactive in tools that support it. Otherwise, it is displayed as a rectangle, and clicking it will not trigger any action:
 
-```python
-from PyPDFForm import Fields, PdfWrapper
+    ```python
+    from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-    Fields.SignatureField(
-        name="new_signature",
-        page_number=1,
-        x=100,
-        y=100,
-        required=False,  # optional
-        tooltip="this is a signature",  # optional
-        width=410,  # optional
-        height=100,  # optional
-    ),
-])
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
+        Fields.SignatureField(
+            name="new_signature",
+            page_number=1,
+            x=100,
+            y=100,
+            required=False,  # optional
+            tooltip="this is a signature",  # optional
+            width=410,  # optional
+            height=100,  # optional
+        ),
+    ])
 
-new_form.write("output.pdf")
-```
+    new_form.write("output.pdf")
+    ```
+=== "CLI"
+    Signature field creation configs are grouped by `signature` in the JSON file:
+
+    === "data.json"
+        ```json
+        {
+            "signature": [
+                {
+                    "name": "new_signature",
+                    "page_number": 1,
+                    "x": 100,
+                    "y": 100,
+                    "required": false,
+                    "tooltip": "this is a signature",
+                    "width": 410,
+                    "height": 100
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
 
 ## Create an image field
 
