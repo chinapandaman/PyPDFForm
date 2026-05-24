@@ -521,23 +521,48 @@ All optional parameters will have a comment `# optional` after each of them.
 
 ## Create an image field
 
-Similar to a signature field, an image field is also only interactive in tools that support it:
+=== "Library"
+    Similar to a signature field, an image field is also only interactive in tools that support it:
 
-```python
-from PyPDFForm import Fields, PdfWrapper
+    ```python
+    from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-    Fields.ImageField(
-        name="new_image",
-        page_number=1,
-        x=100,
-        y=100,
-        required=False,  # optional
-        tooltip="this is an image",  # optional
-        width=192,  # optional
-        height=108,  # optional
-    ),
-])
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
+        Fields.ImageField(
+            name="new_image",
+            page_number=1,
+            x=100,
+            y=100,
+            required=False,  # optional
+            tooltip="this is an image",  # optional
+            width=192,  # optional
+            height=108,  # optional
+        ),
+    ])
 
-new_form.write("output.pdf")
-```
+    new_form.write("output.pdf")
+    ```
+=== "CLI"
+    Image field creation configs are grouped by `image` in the JSON file:
+
+    === "data.json"
+        ```json
+        {
+            "image": [
+                {
+                    "name": "new_image",
+                    "page_number": 1,
+                    "x": 100,
+                    "y": 100,
+                    "required": false,
+                    "tooltip": "this is an image",
+                    "width": 192,
+                    "height": 108
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
