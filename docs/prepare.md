@@ -336,63 +336,113 @@ All optional parameters will have a comment `# optional` after each of them.
 
 ## Create a dropdown field
 
-A dropdown field shares a similar set of parameters as a text field. The only significant difference is that a list of `options` needs to be specified:
+=== "Library"
+    A dropdown field shares a similar set of parameters as a text field. The only significant difference is that a list of `options` needs to be specified:
 
-=== "Default Export Values"
-    ```python
-    from PyPDFForm import Fields, PdfWrapper
+    === "Default Export Values"
+        ```python
+        from PyPDFForm import Fields, PdfWrapper
 
-    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-        Fields.DropdownField(
-            name="new_dropdown",
-            page_number=1,
-            x=57,
-            y=700,
-            options=[
-                "foo",
-                "bar",
-                "foobar",
-            ],
-            required=False,  # optional
-            tooltip="this is a dropdown",  # optional
-            width=120,  # optional
-            height=40,  # optional
-            font="your_registered_font",  # optional (1)
-            font_size=15,  # optional
-            font_color=(1, 0, 0),  # optional
-            bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-            border_color=(0, 1, 0, 1),  # optional, (r, g, b, alpha)
-            border_width=5,  # optional
-        ),
-    ])
+        new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
+            Fields.DropdownField(
+                name="new_dropdown",
+                page_number=1,
+                x=57,
+                y=700,
+                options=[
+                    "foo",
+                    "bar",
+                    "foobar",
+                ],
+                required=False,  # optional
+                tooltip="this is a dropdown",  # optional
+                width=120,  # optional
+                height=40,  # optional
+                font="your_registered_font",  # optional (1)
+                font_size=15,  # optional
+                font_color=(1, 0, 0),  # optional
+                bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+                border_color=(0, 1, 0, 1),  # optional, (r, g, b, alpha)
+                border_width=5,  # optional
+            ),
+        ])
 
-    new_form.write("output.pdf")
-    ```
-    { .annotate }
+        new_form.write("output.pdf")
+        ```
+        { .annotate }
 
-    1.  To use a custom font, see how to register it [here](font.md).
-=== "Custom Export Values"
-    If you want different export values from the displayed options, you can specify a list of tuples for the `options` parameter, where the first value of each tuple is the displayed option and the second value is the export value:
+        1.  To use a custom font, see how to register it [here](font.md).
+    === "Custom Export Values"
+        If you want different export values from the displayed options, you can specify a list of tuples for the `options` parameter, where the first value of each tuple is the displayed option and the second value is the export value:
 
-    ```python
-    from PyPDFForm import Fields, PdfWrapper
+        ```python
+        from PyPDFForm import Fields, PdfWrapper
 
-    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-        Fields.DropdownField(
-            name="new_dropdown",
-            page_number=1,
-            x=57,
-            y=700,
-            options=[
-                ("option_1", "option_1_export_value"),
-                ("option_2", "option_2_export_value"),
-                ("option_3", "option_3_export_value"),
-            ],
-        ),
-    ])
+        new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
+            Fields.DropdownField(
+                name="new_dropdown",
+                page_number=1,
+                x=57,
+                y=700,
+                options=[
+                    ("option_1", "option_1_export_value"),
+                    ("option_2", "option_2_export_value"),
+                    ("option_3", "option_3_export_value"),
+                ],
+            ),
+        ])
 
-    new_form.write("output.pdf")
-    ```
+        new_form.write("output.pdf")
+        ```
+=== "CLI"
+    Dropdown field creation configs are grouped by `dropdown` in the JSON file:
+
+    === "data.json"
+        ```json
+        {
+            "dropdown": [
+                {
+                    "name": "new_dropdown",
+                    "page_number": 1,
+                    "x": 57,
+                    "y": 700,
+                    "options": [
+                        "foo",
+                        "bar",
+                        "foobar"
+                    ],
+                    "required": false,
+                    "tooltip": "this is a dropdown",
+                    "width": 120,
+                    "height": 40,
+                    "font": "path_to_a_ttf_file",
+                    "font_size": 15,
+                    "font_color": [
+                        1,
+                        0,
+                        0
+                    ],
+                    "bg_color": [
+                        0,
+                        0,
+                        1,
+                        1
+                    ],
+                    "border_color": [
+                        0,
+                        1,
+                        0,
+                        1
+                    ],
+                    "border_width": 5
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
 
 ## Create a signature field
 
