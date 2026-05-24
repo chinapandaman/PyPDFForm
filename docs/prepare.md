@@ -144,8 +144,8 @@ All optional parameters will have a comment `# optional` after each of them.
                     "font": "path_to_a_ttf_file",
                     "font_size": 15,
                     "font_color": [
-                        0,
                         1,
+                        0,
                         0
                     ],
                     "bg_color": [
@@ -161,8 +161,8 @@ All optional parameters will have a comment `# optional` after each of them.
                         1
                     ],
                     "border_width": 5,
-                    "alignment": 2,
-                    "multiline": True
+                    "alignment": 0,
+                    "multiline": true
                 }
             ]
         }
@@ -174,32 +174,75 @@ All optional parameters will have a comment `# optional` after each of them.
 
 ## Create a checkbox
 
-A checkbox can be created using the same method with some changes to the parameters:
+=== "Library"
+    Uses `Fields.CheckBoxField` to create checkbox fields:
 
-```python
-from PyPDFForm import Fields, PdfWrapper
+    ```python
+    from PyPDFForm import Fields, PdfWrapper
 
-new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-    Fields.CheckBoxField(
-        name="new_checkbox",
-        page_number=1,
-        x=57,
-        y=700,
-        required=False,  # optional
-        tooltip="this is a checkbox",  # optional
-        size=30,  # optional
-        button_style="check",  # optional (1)
-        tick_color=(0, 1, 0),  # optional
-        bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-        border_color=(1, 1, 0, 1),  # optional, (r, g, b, alpha)
-        border_width=5,  # optional
-    ),
-])
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
+        Fields.CheckBoxField(
+            name="new_checkbox",
+            page_number=1,
+            x=57,
+            y=700,
+            required=False,  # optional
+            tooltip="this is a checkbox",  # optional
+            size=30,  # optional
+            button_style="check",  # optional (1)
+            tick_color=(0, 1, 0),  # optional
+            bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+            border_color=(1, 1, 0, 1),  # optional, (r, g, b, alpha)
+            border_width=5,  # optional
+        ),
+    ])
 
-new_form.write("output.pdf")
-```
+    new_form.write("output.pdf")
+    ```
 
-1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
+    1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
+=== "CLI"
+    Checkbox field creation configs are grouped by `check` in the JSON file:
+
+    === "data.json"
+        ```json
+        {
+            "check": [
+                {
+                    "name": "new_checkbox",
+                    "page_number": 1,
+                    "x": 57,
+                    "y": 700,
+                    "required": false,
+                    "tooltip": "this is a checkbox",
+                    "size": 30,
+                    "button_style": "check",
+                    "tick_color": [
+                        0,
+                        1,
+                        0
+                    ],
+                    "bg_color": [
+                        0,
+                        0,
+                        1,
+                        1
+                    ],
+                    "border_color": [
+                        1,
+                        1,
+                        0,
+                        1
+                    ],
+                    "border_width": 5
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        ```
 
 ???+ bug
     To remove the border of a checkbox, set the alpha channel of the `border_color` to 0, for example: `border_color=(1, 0, 0, 0)`. Setting `border_width` to 0 may still render a border with a width of 1 due to a PDF specification quirk.
