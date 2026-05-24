@@ -137,63 +137,84 @@ A signature field enables signing a PDF form with a handwritten signature image.
 
 To fill a signature field, consider [this PDF](pdfs/sample_template_with_signature.pdf) and [this signature image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png):
 
-=== "File Path"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "File Path"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    signed = PdfWrapper("sample_template_with_signature.pdf").fill(
-        {
-            "signature": "sample_signature.png"
-        },
-        flatten=False   # optional, set to True to flatten the filled PDF form
-    )
-
-    signed.write("output.pdf")
-    ```
-=== "Open File Object"
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    with open("sample_signature.png", "rb+") as sig:
         signed = PdfWrapper("sample_template_with_signature.pdf").fill(
             {
-                "signature": sig
+                "signature": "sample_signature.png"
             },
             flatten=False   # optional, set to True to flatten the filled PDF form
         )
 
-    signed.write("output.pdf")
-    ```
-=== "Bytes File Stream"
-    ```python
-    from PyPDFForm import PdfWrapper
+        signed.write("output.pdf")
+        ```
+    === "Open File Object"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    with open("sample_signature.png", "rb+") as sig:
-        signed = PdfWrapper("sample_template_with_signature.pdf").fill(
+        with open("sample_signature.png", "rb+") as sig:
+            signed = PdfWrapper("sample_template_with_signature.pdf").fill(
+                {
+                    "signature": sig
+                },
+                flatten=False   # optional, set to True to flatten the filled PDF form
+            )
+
+        signed.write("output.pdf")
+        ```
+    === "Bytes File Stream"
+        ```python
+        from PyPDFForm import PdfWrapper
+
+        with open("sample_signature.png", "rb+") as sig:
+            signed = PdfWrapper("sample_template_with_signature.pdf").fill(
+                {
+                    "signature": sig.read()
+                },
+                flatten=False   # optional, set to True to flatten the filled PDF form
+            )
+
+        signed.write("output.pdf")
+        ```
+    === "Aspect Ratio"
+        By default, the library preserves the aspect ratio of the signature image when filling it. You can disable this by setting the `preserve_aspect_ratio` property to `False` on the signature field:
+
+        ```python
+        from PyPDFForm import PdfWrapper
+
+        pdf = PdfWrapper("sample_template_with_signature.pdf")
+        pdf.widgets["signature"].preserve_aspect_ratio = False
+        pdf.fill(
             {
-                "signature": sig.read()
+                "signature": "sample_signature.png"
             },
-            flatten=False   # optional, set to True to flatten the filled PDF form
         )
 
-    signed.write("output.pdf")
-    ```
-=== "Aspect Ratio"
-    By default, the library preserves the aspect ratio of the signature image when filling it. You can disable this by setting the `preserve_aspect_ratio` property to `False` on the signature field:
-
-    ```python
-    from PyPDFForm import PdfWrapper
-
-    pdf = PdfWrapper("sample_template_with_signature.pdf")
-    pdf.widgets["signature"].preserve_aspect_ratio = False
-    pdf.fill(
+        pdf.write("output.pdf")
+        ```
+=== "CLI"
+    === "data.json"
+        ```json
         {
             "signature": "sample_signature.png"
-        },
-    )
-
-    pdf.write("output.pdf")
-    ```
+        }
+        ```
+    === "aspect_ratio.json"
+        ```json
+        {
+            "signature": {
+                "path": "sample_signature.png",
+                "preserve_aspect_ratio": false
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform fill sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        ```
 
 ## Fill image field
 
