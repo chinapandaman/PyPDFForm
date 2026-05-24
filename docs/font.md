@@ -1,5 +1,8 @@
 # Register fonts
 
+???+ info
+    This section applies to PyPDFForm's Python API. In the CLI, you do not register fonts separately or reference them by a custom registered name. For CLI commands that accept a `font` value provide the path to the `.ttf` file directly.
+
 PyPDFForm enables the use of custom fonts in certain APIs. To use a custom font, you must first register its TrueType (.ttf) file.
 
 For example, to use a font from the [Liberation Serif](https://fonts.adobe.com/fonts/liberation-serif) family, register its TrueType file (e.g., [LiberationSerif-BoldItalic.ttf](https://github.com/chinapandaman/PyPDFForm/blob/master/font_samples/LiberationSerif-BoldItalic.ttf)) as follows:
