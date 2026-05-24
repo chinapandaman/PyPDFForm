@@ -56,6 +56,8 @@ To generate a coordinate grid view for [this PDF](pdfs/sample_template.pdf):
     pypdfform inspect location sample_template.pdf --field test | jq
     ```
 
+    The command prints JSON; `jq` formats it for readability.
+
 ## Change form field coordinates & dimensions
 
 ???+ tip

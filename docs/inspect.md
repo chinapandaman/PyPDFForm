@@ -4,9 +4,11 @@ Once a PDF form is prepared, PyPDFForm can help you inspect its fields to determ
 
 This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
 
+The CLI examples pipe JSON output through `jq` for readability.
+
 ## Generate a JSON schema that describes a PDF form
 
-You can describe the dictionary used to fill a PDF form using a JSON schema. For example:
+PyPDFForm can describe the data needed to fill a PDF form as a JSON schema:
 
 === "Library"
     ```python
@@ -55,50 +57,58 @@ You can use the PyPDFForm-generated JSON schema to validate the data used for fi
 
 ## Inspect PDF form data
 
-To inspect the current filled data of a PDF form, use the `.data` attribute. For example, the following snippet inspects the current filled data for [this PDF](pdfs/sample_template_filled.pdf):
+To inspect the current values in a filled PDF form, use the `.data` attribute. For example, the following snippet inspects the values in [this PDF](pdfs/sample_template_filled.pdf):
 
 === "Library"
     ```python
-    from pprint import pprint
+    import json
     from PyPDFForm import PdfWrapper
 
-    pprint(PdfWrapper("sample_template_filled.pdf").data)
+    current_data = PdfWrapper("sample_template_filled.pdf").data
+
+    print(json.dumps(current_data, indent=4, sort_keys=True))
     ```
 === "CLI"
     ```shell
     pypdfform inspect data sample_template_filled.pdf | jq
     ```
 === "Output"
-    ```shell
-    {'check': True,
-    'check_2': True,
-    'check_3': True,
-    'test': 'test',
-    'test_2': 'test2',
-    'test_3': 'test3'}
+    ```json
+    {
+        "check": true,
+        "check_2": true,
+        "check_3": true,
+        "test": "test",
+        "test_2": "test2",
+        "test_3": "test3"
+    }
     ```
 
 ## Generate sample data
 
-PyPDFForm can also generate sample data for filling a PDF form:
+PyPDFForm can also generate sample fill data for a PDF form:
 
 === "Library"
     ```python
-    from pprint import pprint
+    import json
     from PyPDFForm import PdfWrapper
 
-    pprint(PdfWrapper("sample_template.pdf").sample_data)
+    sample_data = PdfWrapper("sample_template.pdf").sample_data
+
+    print(json.dumps(sample_data, indent=4, sort_keys=True))
     ```
 === "CLI"
     ```shell
     pypdfform inspect sample sample_template.pdf | jq
     ```
 === "Output"
-    ```shell
-    {'check': True,
-    'check_2': True,
-    'check_3': True,
-    'test': 'test',
-    'test_2': 'test_2',
-    'test_3': 'test_3'}
+    ```json
+    {
+        "check": true,
+        "check_2": true,
+        "check_3": true,
+        "test": "test",
+        "test_2": "test_2",
+        "test_3": "test_3"
+    }
     ```
