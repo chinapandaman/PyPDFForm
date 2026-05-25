@@ -10,9 +10,9 @@ All optional parameters will have a comment `# optional` after each of them.
 
 ## Draw text
 
-=== "Library"
-    When drawing multiple elements, it is more performant to create a list of those elements and draw them in a single operation.
+When drawing multiple elements, it is more performant to create a list of those elements and draw them in a single operation.
 
+=== "Library"
     ```python
     from PyPDFForm import PdfWrapper, RawElements
 
@@ -87,93 +87,124 @@ All optional parameters will have a comment `# optional` after each of them.
 
 For the `rotation` parameter, a positive value rotates the image counter-clockwise, and a negative value rotates it clockwise.
 
-=== "File Path"
-    ```python
-    from PyPDFForm import PdfWrapper, RawElements
+=== "Library"
+    === "File Path"
+        ```python
+        from PyPDFForm import PdfWrapper, RawElements
 
-    images = [
-        RawElements.RawImage(
-            image="sample_image.jpg",
-            page_number=1,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=0,  # optional
-        ),
-        RawElements.RawImage(
-            image="sample_image.jpg",
-            page_number=2,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=180,  # optional
-        ),
-    ]
+        images = [
+            RawElements.RawImage(
+                image="sample_image.jpg",
+                page_number=1,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=0,  # optional
+            ),
+            RawElements.RawImage(
+                image="sample_image.jpg",
+                page_number=2,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=180,  # optional
+            ),
+        ]
 
-    pdf = PdfWrapper("sample_template.pdf").draw(images)
+        pdf = PdfWrapper("sample_template.pdf").draw(images)
 
-    pdf.write("output.pdf")
-    ```
-=== "Open File Object"
-    ```python
-    from PyPDFForm import PdfWrapper, RawElements
+        pdf.write("output.pdf")
+        ```
+    === "Open File Object"
+        ```python
+        from PyPDFForm import PdfWrapper, RawElements
 
-    images = [
-        RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+"),  # in practice, use a context manager
-            page_number=1,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=0,  # optional
-        ),
-        RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+"),  # in practice, use a context manager
-            page_number=2,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=180,  # optional
-        ),
-    ]
+        images = [
+            RawElements.RawImage(
+                image=open("sample_image.jpg", "rb+"),  # in practice, use a context manager
+                page_number=1,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=0,  # optional
+            ),
+            RawElements.RawImage(
+                image=open("sample_image.jpg", "rb+"),  # in practice, use a context manager
+                page_number=2,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=180,  # optional
+            ),
+        ]
 
-    pdf = PdfWrapper("sample_template.pdf").draw(images)
+        pdf = PdfWrapper("sample_template.pdf").draw(images)
 
-    pdf.write("output.pdf")
-    ```
-=== "Bytes File Stream"
-    ```python
-    from PyPDFForm import PdfWrapper, RawElements
+        pdf.write("output.pdf")
+        ```
+    === "Bytes File Stream"
+        ```python
+        from PyPDFForm import PdfWrapper, RawElements
 
-    images = [
-        RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
-            page_number=1,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=0,  # optional
-        ),
-        RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
-            page_number=2,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=180,  # optional
-        ),
-    ]
+        images = [
+            RawElements.RawImage(
+                image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
+                page_number=1,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=0,  # optional
+            ),
+            RawElements.RawImage(
+                image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
+                page_number=2,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=180,  # optional
+            ),
+        ]
 
-    pdf = PdfWrapper("sample_template.pdf").draw(images)
+        pdf = PdfWrapper("sample_template.pdf").draw(images)
 
-    pdf.write("output.pdf")
-    ```
+        pdf.write("output.pdf")
+        ```
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "image": [
+                {
+                    "image": "sample_image.jpg",
+                    "page_number": 1,
+                    "x": 100,
+                    "y": 100,
+                    "width": 400,
+                    "height": 225,
+                    "rotation": 0
+                },
+                {
+                    "image": "sample_image.jpg",
+                    "page_number": 2,
+                    "x": 100,
+                    "y": 100,
+                    "width": 400,
+                    "height": 225,
+                    "rotation": 180
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Draw line
 
