@@ -1,6 +1,6 @@
 <p align="center"><img src="https://github.com/chinapandaman/PyPDFForm/raw/master/docs/img/logo.png"></p>
 <p align="center">
-    <em>PDF Form Automation Simplified – Create, Inspect, Style, and Fill Forms Programmatically.</em>
+    <em>PDF Form Automation Simplified - Create, Inspect, Style, and Fill Forms in Python or from the Command Line.</em>
 </p>
 <p align="center">
     <a href="https://pypi.org/project/PyPDFForm/"><img src="https://img.shields.io/pypi/v/pypdfform?label=version&color=magenta"></a>
@@ -27,16 +27,22 @@ The goal is to make PDF form work straightforward, whether you are handling one 
 
 ## Installing
 
-Install using [pip](https://pypi.org/project/PyPDFForm/):
+To use PyPDFForm as a Python library, install the base package with [pip](https://pypi.org/project/PyPDFForm/):
 
-```shell script
+```shell
 pip install PyPDFForm
+```
+
+To use the CLI, install PyPDFForm with the `cli` extra using [pipx](https://pipx.pypa.io/stable/):
+
+```shell
+pipx install "PyPDFForm[cli]"
 ```
 
 ## Quick Example
 ![Check out the GitHub repository for a live demo if you can't see it here.](https://github.com/chinapandaman/PyPDFForm/raw/master/docs/img/demo.gif)
 
-A sample PDF form can be found [here](https://chinapandaman.github.io/PyPDFForm/latest/pdfs/sample_template.pdf). Download it and try:
+The GIF above shows the CLI filling a PDF form. To try the same workflow with the Python library, download the [sample PDF form](https://chinapandaman.github.io/PyPDFForm/latest/pdfs/sample_template.pdf) and run:
 
 ```python
 from PyPDFForm import PdfWrapper
@@ -55,8 +61,7 @@ filled = PdfWrapper("sample_template.pdf", need_appearances=True).fill(
 filled.write("output.pdf")
 ```
 
-After running the above code snippet you can find `output.pdf` at the location you specified, 
-and it should look like [this](https://chinapandaman.github.io/PyPDFForm/latest/pdfs/sample_filled.pdf).
+After running this snippet, `output.pdf` will be written to the location you specified and should look like [this](https://chinapandaman.github.io/PyPDFForm/latest/pdfs/sample_filled.pdf).
 
 ## Documentation
 
