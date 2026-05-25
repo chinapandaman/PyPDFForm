@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-PyPDFForm is a pure Python library designed to streamline the process of filling PDF forms programmatically.
+PyPDFForm provides Python APIs and CLI commands for working with PDF forms.
 
-It provides a simple and intuitive API for interacting with PDF forms, allowing users to:
+It helps users create, inspect, update, and fill PDF forms, plus handle common
+PDF utilities such as extracting pages and merging documents.
 
-- Fill text fields with custom data.
-- Check or uncheck checkboxes.
-- Select radio button options.
-- Add images to image fields.
-- Flatten the filled form to prevent further modifications.
+The project supports PDF form features including:
 
-The library supports various PDF form features, including:
+- Text, checkbox, radio, dropdown, signature, and image fields.
+- Field styling, sizing, positioning, visibility, and editability.
+- Form data inspection and JSON schema generation.
+- PDF annotations, raw drawing elements, metadata, scripts, and versions.
 
-- Text field alignment (left, center, right).
-- Font customization (size, color, family).
-- Image field resizing and positioning.
-- Handling of complex form structures.
-
-PyPDFForm aims to simplify PDF form manipulation, making it accessible to developers of all skill levels.
+PyPDFForm aims to make PDF form automation straightforward whether it is used
+from Python code or from the command line.
 """
 
 import logging
