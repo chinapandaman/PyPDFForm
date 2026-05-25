@@ -1,258 +1,471 @@
 # Draw elements
 
-PyPDFForm enables you to draw elements on a PDF, which is useful when a field is missing from your PDF form or when you need to add text or images.
+PyPDFForm enables you to draw elements on a PDF, which is useful when a field is missing from your PDF form or when you need to add text, images, lines, or shapes.
 
 This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
 
-Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
+Review [the PDF coordinate system](coordinate.md) before using these examples.
 
-All optional parameters will have a comment `# optional` after each of them.
+In the library examples, optional parameters are marked with `# optional`.
+
+When drawing multiple elements, collect them in a list and draw them in a single operation for better performance.
 
 ## Draw text
 
-When drawing multiple elements, it is more performant to create a list of those elements and draw them in a single operation.
+Text can be drawn by specifying its content, coordinates, and optionally its font, font size, and font color.
 
-```python
-from PyPDFForm import PdfWrapper, RawElements
+=== "Library"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
 
-texts = [
-    RawElements.RawText(
-        text="random text",
-        page_number=1,
-        x=300,
-        y=225,
-        font="your_registered_font",  # optional (1)
-        font_size=12,  # optional
-        font_color=(1, 0, 0),  # optional
-    ),
-    RawElements.RawText(
-        text="random text on page 2",
-        page_number=2,
-        x=300,
-        y=225,
-        font="your_registered_font",  # optional (2)
-        font_size=12,  # optional
-        font_color=(1, 0, 0),  # optional
-    ),
-]
+    texts = [
+        RawElements.RawText(
+            text="random text",
+            page_number=1,
+            x=300,
+            y=225,
+            font="your_registered_font",  # optional (1)
+            font_size=12,  # optional
+            font_color=(1, 0, 0),  # optional
+        ),
+        RawElements.RawText(
+            text="random text on page 2",
+            page_number=2,
+            x=300,
+            y=225,
+            font="your_registered_font",  # optional (2)
+            font_size=12,  # optional
+            font_color=(1, 0, 0),  # optional
+        ),
+    ]
 
-pdf = PdfWrapper("sample_template.pdf").draw(texts)
+    pdf = PdfWrapper("sample_template.pdf").draw(texts)
 
-pdf.write("output.pdf")
-```
+    pdf.write("output.pdf")
+    ```
 
-1.  To use a custom font, see how to register it [here](font.md).
-2.  To use a custom font, see how to register it [here](font.md).
+    1.  To use a custom font, see how to register it [here](font.md).
+    2.  To use a custom font, see how to register it [here](font.md).
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "text": [
+                {
+                    "text": "random text",
+                    "page_number": 1,
+                    "x": 300,
+                    "y": 225,
+                    "font": "path_to_a_ttf_file",
+                    "font_size": 12,
+                    "font_color": [
+                        1,
+                        0,
+                        0
+                    ]
+                },
+                {
+                    "text": "random text on page 2",
+                    "page_number": 2,
+                    "x": 300,
+                    "y": 225,
+                    "font": "path_to_a_ttf_file",
+                    "font_size": 12,
+                    "font_color": [
+                        1,
+                        0,
+                        0
+                    ]
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Draw image
 
-For the `rotation` parameter, a positive value rotates the image counter-clockwise, and a negative value rotates it clockwise.
+For the `rotation` parameter, positive values rotate images counterclockwise, and negative values rotate them clockwise.
 
-=== "File Path"
-    ```python
-    from PyPDFForm import PdfWrapper, RawElements
+=== "Library"
+    === "File Path"
+        ```python
+        from PyPDFForm import PdfWrapper, RawElements
 
-    images = [
-        RawElements.RawImage(
-            image="sample_image.jpg",
-            page_number=1,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=0,  # optional
-        ),
-        RawElements.RawImage(
-            image="sample_image.jpg",
-            page_number=2,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=180,  # optional
-        ),
-    ]
+        images = [
+            RawElements.RawImage(
+                image="sample_image.jpg",
+                page_number=1,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=0,  # optional
+            ),
+            RawElements.RawImage(
+                image="sample_image.jpg",
+                page_number=2,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=180,  # optional
+            ),
+        ]
 
-    pdf = PdfWrapper("sample_template.pdf").draw(images)
+        pdf = PdfWrapper("sample_template.pdf").draw(images)
 
-    pdf.write("output.pdf")
-    ```
-=== "Open File Object"
-    ```python
-    from PyPDFForm import PdfWrapper, RawElements
+        pdf.write("output.pdf")
+        ```
+    === "Open File Object"
+        ```python
+        from PyPDFForm import PdfWrapper, RawElements
 
-    images = [
-        RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+"),  # in practice, use a context manager
-            page_number=1,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=0,  # optional
-        ),
-        RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+"),  # in practice, use a context manager
-            page_number=2,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=180,  # optional
-        ),
-    ]
+        images = [
+            RawElements.RawImage(
+                image=open("sample_image.jpg", "rb+"),  # in practice, use a context manager
+                page_number=1,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=0,  # optional
+            ),
+            RawElements.RawImage(
+                image=open("sample_image.jpg", "rb+"),  # in practice, use a context manager
+                page_number=2,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=180,  # optional
+            ),
+        ]
 
-    pdf = PdfWrapper("sample_template.pdf").draw(images)
+        pdf = PdfWrapper("sample_template.pdf").draw(images)
 
-    pdf.write("output.pdf")
-    ```
-=== "Bytes File Stream"
-    ```python
-    from PyPDFForm import PdfWrapper, RawElements
+        pdf.write("output.pdf")
+        ```
+    === "Bytes File Stream"
+        ```python
+        from PyPDFForm import PdfWrapper, RawElements
 
-    images = [
-        RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
-            page_number=1,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=0,  # optional
-        ),
-        RawElements.RawImage(
-            image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
-            page_number=2,
-            x=100,
-            y=100,
-            width=400,
-            height=225,
-            rotation=180,  # optional
-        ),
-    ]
+        images = [
+            RawElements.RawImage(
+                image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
+                page_number=1,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=0,  # optional
+            ),
+            RawElements.RawImage(
+                image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
+                page_number=2,
+                x=100,
+                y=100,
+                width=400,
+                height=225,
+                rotation=180,  # optional
+            ),
+        ]
 
-    pdf = PdfWrapper("sample_template.pdf").draw(images)
+        pdf = PdfWrapper("sample_template.pdf").draw(images)
 
-    pdf.write("output.pdf")
-    ```
+        pdf.write("output.pdf")
+        ```
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "image": [
+                {
+                    "image": "sample_image.jpg",
+                    "page_number": 1,
+                    "x": 100,
+                    "y": 100,
+                    "width": 400,
+                    "height": 225,
+                    "rotation": 0
+                },
+                {
+                    "image": "sample_image.jpg",
+                    "page_number": 2,
+                    "x": 100,
+                    "y": 100,
+                    "width": 400,
+                    "height": 225,
+                    "rotation": 180
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Draw line
 
 A line can be drawn by specifying starting and ending coordinates, and optionally its color.
 
-```python
-from PyPDFForm import PdfWrapper, RawElements
+=== "Library"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
 
-lines = [
-    RawElements.RawLine(
-        page_number=1,
-        src_x=100,
-        src_y=100,
-        dest_x=100,
-        dest_y=200,
-    ),
-    RawElements.RawLine(
-        page_number=1,
-        src_x=100,
-        src_y=100,
-        dest_x=200,
-        dest_y=100,
-        color=(0, 0, 1),  # optional
-    ),
-]
+    lines = [
+        RawElements.RawLine(
+            page_number=1,
+            src_x=100,
+            src_y=100,
+            dest_x=100,
+            dest_y=200,
+        ),
+        RawElements.RawLine(
+            page_number=1,
+            src_x=100,
+            src_y=100,
+            dest_x=200,
+            dest_y=100,
+            color=(0, 0, 1),  # optional
+        ),
+    ]
 
-pdf = PdfWrapper("sample_template.pdf").draw(lines)
+    pdf = PdfWrapper("sample_template.pdf").draw(lines)
 
-pdf.write("output.pdf")
-```
+    pdf.write("output.pdf")
+    ```
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "line": [
+                {
+                    "page_number": 1,
+                    "src_x": 100,
+                    "src_y": 100,
+                    "dest_x": 100,
+                    "dest_y": 200
+                },
+                {
+                    "page_number": 1,
+                    "src_x": 100,
+                    "src_y": 100,
+                    "dest_x": 200,
+                    "dest_y": 100,
+                    "color": [
+                        0,
+                        0,
+                        1
+                    ]
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Draw rectangle
 
-A rectangle can be drawn by specifying its coordinates and dimensions, and optionally its color and fill color.
+A rectangle can be drawn by specifying its coordinates and dimensions, and optionally its outline color and fill color.
 
-```python
-from PyPDFForm import PdfWrapper, RawElements
+=== "Library"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
 
-rectangles = [
-    RawElements.RawRectangle(
-        page_number=1,
-        x=100,
-        y=100,
-        width=200,
-        height=100,
-    ),
-    RawElements.RawRectangle(
-        page_number=1,
-        x=400,
-        y=100,
-        width=100,
-        height=200,
-        color=(0, 0, 1),  # optional
-        fill_color=(0, 1, 0),  # optional
-    ),
-]
+    rectangles = [
+        RawElements.RawRectangle(
+            page_number=1,
+            x=100,
+            y=100,
+            width=200,
+            height=100,
+        ),
+        RawElements.RawRectangle(
+            page_number=1,
+            x=400,
+            y=100,
+            width=100,
+            height=200,
+            color=(0, 0, 1),  # optional
+            fill_color=(0, 1, 0),  # optional
+        ),
+    ]
 
-pdf = PdfWrapper("sample_template.pdf").draw(rectangles)
+    pdf = PdfWrapper("sample_template.pdf").draw(rectangles)
 
-pdf.write("output.pdf")
-```
+    pdf.write("output.pdf")
+    ```
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "rectangle": [
+                {
+                    "page_number": 1,
+                    "x": 100,
+                    "y": 100,
+                    "width": 200,
+                    "height": 100
+                },
+                {
+                    "page_number": 1,
+                    "x": 400,
+                    "y": 100,
+                    "width": 100,
+                    "height": 200,
+                    "color": [
+                        0,
+                        0,
+                        1
+                    ],
+                    "fill_color": [
+                        0,
+                        1,
+                        0
+                    ]
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Draw circle
 
-A circle can be drawn by specifying its center coordinates and radius, and optionally its color and fill color.
+A circle can be drawn by specifying its center coordinates and radius, and optionally its outline color and fill color.
 
-```python
-from PyPDFForm import PdfWrapper, RawElements
+=== "Library"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
 
-circles = [
-    RawElements.RawCircle(
-        page_number=1,
-        center_x=100,
-        center_y=100,
-        radius=50,
-    ),
-    RawElements.RawCircle(
-        page_number=1,
-        center_x=250,
-        center_y=100,
-        radius=100,
-        color=(1, 0, 0),  # optional
-        fill_color=(0, 1, 0),  # optional
-    ),
-]
+    circles = [
+        RawElements.RawCircle(
+            page_number=1,
+            center_x=100,
+            center_y=100,
+            radius=50,
+        ),
+        RawElements.RawCircle(
+            page_number=1,
+            center_x=250,
+            center_y=100,
+            radius=100,
+            color=(1, 0, 0),  # optional
+            fill_color=(0, 1, 0),  # optional
+        ),
+    ]
 
-pdf = PdfWrapper("sample_template.pdf").draw(circles)
+    pdf = PdfWrapper("sample_template.pdf").draw(circles)
 
-pdf.write("output.pdf")
-```
+    pdf.write("output.pdf")
+    ```
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "circle": [
+                {
+                    "page_number": 1,
+                    "center_x": 100,
+                    "center_y": 100,
+                    "radius": 50
+                },
+                {
+                    "page_number": 1,
+                    "center_x": 250,
+                    "center_y": 100,
+                    "radius": 100,
+                    "color": [
+                        1,
+                        0,
+                        0
+                    ],
+                    "fill_color": [
+                        0,
+                        1,
+                        0
+                    ]
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Draw ellipse
 
-An ellipse can be drawn by specifying its bounding box coordinates, and optionally its color and fill color.
+An ellipse can be drawn by specifying its bounding box coordinates, and optionally its outline color and fill color.
 
-```python
-from PyPDFForm import PdfWrapper, RawElements
+=== "Library"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
 
-ellipses = [
-    RawElements.RawEllipse(
-        page_number=1,
-        x1=100,
-        y1=100,
-        x2=250,
-        y2=200,
-    ),
-    RawElements.RawEllipse(
-        page_number=1,
-        x1=300,
-        y1=100,
-        x2=500,
-        y2=250,
-        color=(1, 0, 0),  # optional
-        fill_color=(0, 1, 0),  # optional
-    ),
-]
+    ellipses = [
+        RawElements.RawEllipse(
+            page_number=1,
+            x1=100,
+            y1=100,
+            x2=250,
+            y2=200,
+        ),
+        RawElements.RawEllipse(
+            page_number=1,
+            x1=300,
+            y1=100,
+            x2=500,
+            y2=250,
+            color=(1, 0, 0),  # optional
+            fill_color=(0, 1, 0),  # optional
+        ),
+    ]
 
-pdf = PdfWrapper("sample_template.pdf").draw(ellipses)
+    pdf = PdfWrapper("sample_template.pdf").draw(ellipses)
 
-pdf.write("output.pdf")
-```
+    pdf.write("output.pdf")
+    ```
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "ellipse": [
+                {
+                    "page_number": 1,
+                    "x1": 100,
+                    "y1": 100,
+                    "x2": 250,
+                    "y2": 200
+                },
+                {
+                    "page_number": 1,
+                    "x1": 300,
+                    "y1": 100,
+                    "x2": 500,
+                    "y2": 250,
+                    "color": [
+                        1,
+                        0,
+                        0
+                    ],
+                    "fill_color": [
+                        0,
+                        1,
+                        0
+                    ]
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        ```
