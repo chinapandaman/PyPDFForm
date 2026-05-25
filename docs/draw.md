@@ -12,6 +12,8 @@ When drawing multiple elements, collect them in a list and draw them in a single
 
 ## Draw text
 
+Text can be drawn by specifying its content, coordinates, and optionally its font, font size, and font color.
+
 === "Library"
     ```python
     from PyPDFForm import PdfWrapper, RawElements
