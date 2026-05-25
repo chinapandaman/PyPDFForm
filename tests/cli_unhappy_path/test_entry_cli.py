@@ -29,6 +29,7 @@ def test_entrypoint_missing_cli_dependency(monkeypatch, capsys):
 
     assert exc_info.value.code == 1
     assert "PyPDFForm CLI dependencies are not installed" in captured.err
+    assert 'pipx install "PyPDFForm[cli]"' in captured.err
     assert "pip install 'PyPDFForm[cli]'" in captured.err
 
 

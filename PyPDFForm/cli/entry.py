@@ -11,7 +11,8 @@ import importlib
 import sys
 
 CLI_DEPENDENCIES = {"jsonschema", "typer"}
-CLI_INSTALL_HINT = "pip install 'PyPDFForm[cli]'"
+CLI_INSTALL_HINT = 'pipx install "PyPDFForm[cli]"'
+CLI_ENV_INSTALL_HINT = "pip install 'PyPDFForm[cli]'"
 
 
 def main() -> None:
@@ -28,7 +29,8 @@ def main() -> None:
         if exc.name in CLI_DEPENDENCIES:
             print(
                 "PyPDFForm CLI dependencies are not installed. "
-                f"Install them with: {CLI_INSTALL_HINT}",
+                f"Install them with: {CLI_INSTALL_HINT}. "
+                f"Inside an existing environment, use: {CLI_ENV_INSTALL_HINT}",
                 file=sys.stderr,
             )
             raise SystemExit(1) from None
