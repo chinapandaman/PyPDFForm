@@ -1,4 +1,4 @@
-# AGENTS.md
+# Agent Instructions
 
 ## Scope
 
@@ -45,8 +45,8 @@ content.
 
 ## Documentation
 
-PyPDFForm uses MkDocs. Check `Makefile`, `mkdocs.yml`, and the Developer Guide
-for the current way to serve, build, and validate documentation locally.
+Check `Makefile`, `mkdocs.yml`, and the Developer Guide for the current way to
+serve, build, and validate documentation locally.
 
 ## Issues And Pull Requests
 
