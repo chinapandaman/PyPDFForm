@@ -120,48 +120,42 @@ A link annotation opens a destination when clicked. The destination can be a URI
         pdf.write("output.pdf")
         ```
 === "CLI"
-    Use the `create annotation` command with a JSON file that contains a `link` array. Each link must include either `uri` or `page`:
+    Use the `create annotation` command with a JSON file that contains a `link` array. Each link must include exactly one of `uri` or `page`. The command example uses `uri.json`; replace it with `page.json` to create a link to another page.
 
-    === "URI"
-        === "data.json"
-            ```json
-            {
-                "link": [
-                    {
-                        "page_number": 1,
-                        "x": 70,
-                        "y": 705,
-                        "width": 95,
-                        "height": 20,
-                        "uri": "https://www.google.com/"
-                    }
-                ]
-            }
-            ```
-        === "Command"
-            ```shell
-            pypdfform create annotation sample_template.pdf -f data.json -o output.pdf
-            ```
-    === "Another Page"
-        === "data.json"
-            ```json
-            {
-                "link": [
-                    {
-                        "page_number": 1,
-                        "x": 70,
-                        "y": 705,
-                        "width": 95,
-                        "height": 20,
-                        "page": 2
-                    }
-                ]
-            }
-            ```
-        === "Command"
-            ```shell
-            pypdfform create annotation sample_template.pdf -f data.json -o output.pdf
-            ```
+    === "uri.json"
+        ```json
+        {
+            "link": [
+                {
+                    "page_number": 1,
+                    "x": 70,
+                    "y": 705,
+                    "width": 95,
+                    "height": 20,
+                    "uri": "https://www.google.com/"
+                }
+            ]
+        }
+        ```
+    === "page.json"
+        ```json
+        {
+            "link": [
+                {
+                    "page_number": 1,
+                    "x": 70,
+                    "y": 705,
+                    "width": 95,
+                    "height": 20,
+                    "page": 2
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create annotation sample_template.pdf -f uri.json -o output.pdf
+        ```
 
 ## Create text markup annotations
 
