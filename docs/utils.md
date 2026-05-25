@@ -145,9 +145,14 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
 PyPDFForm allows you to modify the PDF version up to 2.0:
 
-```python
-from PyPDFForm import PdfWrapper
+=== "Library"
+    ```python
+    from PyPDFForm import PdfWrapper
 
-new_version = PdfWrapper("sample_template.pdf").change_version("2.0")
-new_version.write("output.pdf")
-```
+    new_version = PdfWrapper("sample_template.pdf").change_version("2.0")
+    new_version.write("output.pdf")
+    ```
+=== "CLI"
+    ```shell
+    pypdfform update version sample_template.pdf -v 2.0 -o output.pdf
+    ```
