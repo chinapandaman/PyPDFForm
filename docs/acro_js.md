@@ -7,6 +7,8 @@ These examples use [sample_template.pdf](pdfs/sample_template.pdf).
 
 PDFs can execute JavaScript during interactions if supported by the viewer. PyPDFForm provides APIs to embed scripts into both the PDF document and its form fields.
 
+In CLI examples, field-level scripts are configured in `data.json` and applied with `update field`, unless the section says otherwise.
+
 The examples below embed a script that displays an alert when the pointer hovers over the `test` field:
 
 === "Library"
@@ -42,8 +44,6 @@ The examples below embed a script that displays an alert when the pointer hovers
         form.write("output.pdf")
         ```
 === "CLI"
-    Set the field-level JavaScript property in JSON and pass it to `update field`:
-
     === "alert.js"
         ```javascript
         app.alert("Hello World!");
@@ -83,8 +83,6 @@ Set `on_hovered_over_javascript` to run code when the pointer hovers over a fiel
         form.write("output.pdf")
         ```
 === "CLI"
-    Set the same field-level JavaScript property in JSON and pass it to `update field`:
-
     === "script.js"
         ```javascript
         this.getField("test").value = "hovered over";
@@ -121,8 +119,6 @@ Set `on_hovered_off_javascript` to run code when the pointer leaves a field:
         form.write("output.pdf")
         ```
 === "CLI"
-    Set the same field-level JavaScript property in JSON and pass it to `update field`:
-
     === "script.js"
         ```javascript
         this.getField("test").value = "hovered off";
@@ -159,8 +155,6 @@ Set `on_mouse_pressed_javascript` to run code when a mouse button is pressed ins
         form.write("output.pdf")
         ```
 === "CLI"
-    Set the same field-level JavaScript property in JSON and pass it to `update field`:
-
     === "script.js"
         ```javascript
         this.getField("test").value = "mouse pressed";
@@ -197,8 +191,6 @@ Set `on_mouse_released_javascript` to run code when a mouse button is released i
         form.write("output.pdf")
         ```
 === "CLI"
-    Set the same field-level JavaScript property in JSON and pass it to `update field`:
-
     === "script.js"
         ```javascript
         this.getField("test").value = "mouse released";
@@ -235,8 +227,6 @@ Set `on_focused_javascript` to run code when a field gains focus:
         form.write("output.pdf")
         ```
 === "CLI"
-    Set the same field-level JavaScript property in JSON and pass it to `update field`:
-
     === "script.js"
         ```javascript
         this.getField("test").value = "focused";
@@ -273,8 +263,6 @@ Set `on_blurred_javascript` to run code when a field loses focus:
         form.write("output.pdf")
         ```
 === "CLI"
-    Set the same field-level JavaScript property in JSON and pass it to `update field`:
-
     === "script.js"
         ```javascript
         this.getField("test").value = "not focused";
