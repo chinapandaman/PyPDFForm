@@ -155,6 +155,17 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
             assert expected == actual
     ```
 
+    The `runner` is a `CliRunner` from `typer.testing`, and the command under test is the
+    PyPDFForm CLI app:
+
+    ```python
+    from typer.testing import CliRunner
+
+    from PyPDFForm.cli.root import cli_app
+
+    runner = CliRunner()
+    ```
+
     The test starts by defining the expected PDF path, the temporary JSON input path, and the output path:
 
     ```python
