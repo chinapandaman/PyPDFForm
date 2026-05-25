@@ -165,46 +165,108 @@ Optional parameters are marked with an `# optional` comment.
 
 There are four types of text markup annotations: highlight, underline, squiggly, and strikeout. To create them, specify the coordinates and dimensions for the bounding box:
 
-=== "Highlight"
-    ```python
-    from PyPDFForm import Annotations, PdfWrapper
+=== "Library"
+    === "Highlight"
+        ```python
+        from PyPDFForm import Annotations, PdfWrapper
 
-    pdf = PdfWrapper("sample_template.pdf").annotate(
-        [Annotations.HighlightAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
-    )
+        pdf = PdfWrapper("sample_template.pdf").annotate(
+            [Annotations.HighlightAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
+        )
 
-    pdf.write("output.pdf")
-    ```
-=== "Underline"
-    ```python
-    from PyPDFForm import Annotations, PdfWrapper
+        pdf.write("output.pdf")
+        ```
+    === "Underline"
+        ```python
+        from PyPDFForm import Annotations, PdfWrapper
 
-    pdf = PdfWrapper("sample_template.pdf").annotate(
-        [Annotations.UnderlineAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
-    )
+        pdf = PdfWrapper("sample_template.pdf").annotate(
+            [Annotations.UnderlineAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
+        )
 
-    pdf.write("output.pdf")
-    ```
-=== "Squiggly"
-    ```python
-    from PyPDFForm import Annotations, PdfWrapper
+        pdf.write("output.pdf")
+        ```
+    === "Squiggly"
+        ```python
+        from PyPDFForm import Annotations, PdfWrapper
 
-    pdf = PdfWrapper("sample_template.pdf").annotate(
-        [Annotations.SquigglyAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
-    )
+        pdf = PdfWrapper("sample_template.pdf").annotate(
+            [Annotations.SquigglyAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
+        )
 
-    pdf.write("output.pdf")
-    ```
-=== "Strikeout"
-    ```python
-    from PyPDFForm import Annotations, PdfWrapper
+        pdf.write("output.pdf")
+        ```
+    === "Strikeout"
+        ```python
+        from PyPDFForm import Annotations, PdfWrapper
 
-    pdf = PdfWrapper("sample_template.pdf").annotate(
-        [Annotations.StrikeOutAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
-    )
+        pdf = PdfWrapper("sample_template.pdf").annotate(
+            [Annotations.StrikeOutAnnotation(page_number=1, x=70, y=705, width=95, height=20)]
+        )
 
-    pdf.write("output.pdf")
-    ```
+        pdf.write("output.pdf")
+        ```
+=== "CLI"
+    === "highlight.json"
+        ```json
+        {
+            "highlight": [
+                {
+                    "page_number": 1,
+                    "x": 70,
+                    "y": 705,
+                    "width": 95,
+                    "height": 20
+                }
+            ]
+        }
+        ```
+    === "underline.json"
+        ```json
+        {
+            "underline": [
+                {
+                    "page_number": 1,
+                    "x": 70,
+                    "y": 705,
+                    "width": 95,
+                    "height": 20
+                }
+            ]
+        }
+        ```
+    === "squiggly.json"
+        ```json
+        {
+            "squiggly": [
+                {
+                    "page_number": 1,
+                    "x": 70,
+                    "y": 705,
+                    "width": 95,
+                    "height": 20
+                }
+            ]
+        }
+        ```
+    === "strikeout.json"
+        ```json
+        {
+            "strikeout": [
+                {
+                    "page_number": 1,
+                    "x": 70,
+                    "y": 705,
+                    "width": 95,
+                    "height": 20
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create annotation sample_template.pdf -f highlight.json -o output.pdf
+        ```
 
 ## Create rubber stamp annotations
 
