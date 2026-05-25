@@ -6,12 +6,14 @@ This section uses [this PDF](pdfs/sample_template.pdf) as an example.
 
 Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
 
-Optional parameters are marked with an `# optional` comment.
+In the library examples, optional parameters are marked with an `# optional` comment.
 
 ## Create text annotations
 
+Text annotations appear as sticky notes on a PDF.
+
 === "Library"
-    Text annotations appear as sticky notes on a PDF. To create them, use the `PdfWrapper.annotate` method and pass a list of annotations:
+    Use the `PdfWrapper.annotate` method and pass a list of annotations:
 
     ```python
     from PyPDFForm import Annotations, PdfWrapper
@@ -39,9 +41,9 @@ Optional parameters are marked with an `# optional` comment.
     pdf.write("output.pdf")
     ```
 
-    1. Default is `note_icon`. Other options are `comment_icon`, `help_icon`, `key_icon`, and `insert_icon`.
+    1. The default icon is `note_icon`. Other options are `comment_icon`, `help_icon`, `key_icon`, and `insert_icon`.
 === "CLI"
-    Use the `create annotation` command:
+    Use the `create annotation` command with a JSON file that contains a `text` array:
 
     === "data.json"
         ```json
@@ -72,11 +74,11 @@ Optional parameters are marked with an `# optional` comment.
 
 ## Create link annotations
 
-=== "Library"
-    A link annotation navigates to a specified destination when clicked. A destination can be a URI or another page of the same PDF.
+A link annotation opens a destination when clicked. The destination can be a URI or another page in the same PDF.
 
+=== "Library"
     === "URI"
-        The following snippet creates a link annotation on top of the text `TEST PDF TEMPLATE` that redirects to `https://www.google.com/`:
+        The following snippet creates a link annotation over the text `TEST PDF TEMPLATE` that opens `https://www.google.com/`:
 
         ```python
         from PyPDFForm import Annotations, PdfWrapper
@@ -97,7 +99,7 @@ Optional parameters are marked with an `# optional` comment.
         pdf.write("output.pdf")
         ```
     === "Another Page"
-        The following snippet creates a link annotation on top of the text `TEST PDF TEMPLATE` that redirects to the second page of the PDF:
+        The following snippet creates a link annotation over the text `TEST PDF TEMPLATE` that jumps to the second page of the PDF:
 
         ```python
         from PyPDFForm import Annotations, PdfWrapper
@@ -118,7 +120,7 @@ Optional parameters are marked with an `# optional` comment.
         pdf.write("output.pdf")
         ```
 === "CLI"
-    Use the `create annotation` command:
+    Use the `create annotation` command with a JSON file that contains a `link` array. Each link must include either `uri` or `page`:
 
     === "URI"
         === "data.json"
@@ -207,6 +209,8 @@ There are four types of text markup annotations: highlight, underline, squiggly,
         pdf.write("output.pdf")
         ```
 === "CLI"
+    Use the `create annotation` command with a JSON file whose top-level key matches the markup type. The command example uses `highlight.json`; replace it with the file for the markup type you want.
+
     === "highlight.json"
         ```json
         {
@@ -273,7 +277,7 @@ There are four types of text markup annotations: highlight, underline, squiggly,
 ???+ note
     Currently, Chromium-based browsers have trouble rendering rubber stamp annotations correctly.
 
-A rubber stamp annotation displays text or graphics intended to look as if they were stamped on the page with a rubber stamp. PyPDFForm supports a collection of predefined rubber stamps you can use to annotate PDFs:
+A rubber stamp annotation places stamp text or graphics on the page. PyPDFForm supports a collection of predefined rubber stamps you can use to annotate PDFs:
 
 === "Library"
     ```python
@@ -295,8 +299,10 @@ A rubber stamp annotation displays text or graphics intended to look as if they 
     pdf.write("output.pdf")
     ```
 
-    1. Supported options are `approved`, `experimental`, `not_approved`, `as_is`, `expired`, `not_for_public_release`, `confidential`, `final`, `sold`, `departmental`, `for_comment`, `top_secret`, `draft`, and `for_public_release`.
+    1. Supported stamp names are `approved`, `experimental`, `not_approved`, `as_is`, `expired`, `not_for_public_release`, `confidential`, `final`, `sold`, `departmental`, `for_comment`, `top_secret`, `draft`, and `for_public_release`.
 === "CLI"
+    Use the `create annotation` command with a JSON file that contains a `stamp` array:
+
     === "data.json"
         ```json
         {
