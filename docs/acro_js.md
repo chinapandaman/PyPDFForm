@@ -280,19 +280,31 @@ For example, this snippet embeds a script that triggers an alert when the `test`
 
 ## Execute JavaScript on PDF open
 
-The `PdfWrapper.on_open_javascript` property sets or retrieves the script executed when the PDF opens:
+=== "Library"
+    The `PdfWrapper.on_open_javascript` property sets or retrieves the script executed when the PDF opens:
 
-=== "script.js"
-    ```javascript
-    this.getField("test").value = "opened";
-    ```
-=== "main.py"
-    ```python
-    from PyPDFForm import PdfWrapper
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "opened";
+        ```
+    === "main.py"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.on_open_javascript = "./script.js"
-    print(form.on_open_javascript)
+        form = PdfWrapper("sample_template.pdf")
+        form.on_open_javascript = "./script.js"
+        print(form.on_open_javascript)
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    Use the `update script` command:
+
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "opened";
+        ```
+    === "Command"
+        ```shell
+        pypdfform update script sample_template.pdf -s script.js -o output.pdf
+        ```
