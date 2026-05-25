@@ -59,21 +59,31 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
 ## Extract pages
 
-The `PdfWrapper` object has a `.pages` attribute, which is a `PdfArray` of `PdfWrapper` objects representing individual pages:
+=== "Library"
+    The `PdfWrapper` object has a `.pages` attribute, which is a `PdfArray` of `PdfWrapper` objects representing individual pages:
 
-```python
-from PyPDFForm import PdfWrapper
+    ```python
+    from PyPDFForm import PdfWrapper
 
-first_page = PdfWrapper("sample_template.pdf").pages[0]
-first_page.fill(
-    {
-        "test": "test_1",
-        "check": True,
-    },
-)
+    first_page = PdfWrapper("sample_template.pdf").pages[0]
+    first_page.fill(
+        {
+            "test": "test_1",
+            "check": True,
+        },
+    )
 
-first_page.write("output.pdf")
-```
+    first_page.write("output.pdf")
+    ```
+=== "CLI"
+    Use the `create extract` command:
+
+    ```shell
+    pypdfform create extract sample_template.pdf \
+        --start 1 \
+        --end 1 \
+        -o output.pdf
+    ```
 
 ## Merge multiple PDFs
 
