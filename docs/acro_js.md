@@ -172,21 +172,39 @@ For example, this snippet embeds a script that triggers an alert when the `test`
 
 ## Execute JavaScript on mouse released
 
-Set the `on_mouse_released_javascript` attribute to run code when a mouse button is released within a field:
+=== "Library"
+    Set the `on_mouse_released_javascript` attribute to run code when a mouse button is released within a field:
 
-=== "script.js"
-    ```javascript
-    this.getField("test").value = "mouse released";
-    ```
-=== "main.py"
-    ```python
-    from PyPDFForm import PdfWrapper
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "mouse released";
+        ```
+    === "main.py"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_mouse_released_javascript = "./script.js"
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_mouse_released_javascript = "./script.js"
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+     === "script.js"
+        ```javascript
+        this.getField("test").value = "mouse released";
+        ```
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "on_mouse_released_javascript": "./script.js"
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Execute JavaScript on focus
 
