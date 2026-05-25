@@ -340,30 +340,65 @@ A rectangle can be drawn by specifying its coordinates and dimensions, and optio
 
 A circle can be drawn by specifying its center coordinates and radius, and optionally its color and fill color.
 
-```python
-from PyPDFForm import PdfWrapper, RawElements
+=== "Library"
+    ```python
+    from PyPDFForm import PdfWrapper, RawElements
 
-circles = [
-    RawElements.RawCircle(
-        page_number=1,
-        center_x=100,
-        center_y=100,
-        radius=50,
-    ),
-    RawElements.RawCircle(
-        page_number=1,
-        center_x=250,
-        center_y=100,
-        radius=100,
-        color=(1, 0, 0),  # optional
-        fill_color=(0, 1, 0),  # optional
-    ),
-]
+    circles = [
+        RawElements.RawCircle(
+            page_number=1,
+            center_x=100,
+            center_y=100,
+            radius=50,
+        ),
+        RawElements.RawCircle(
+            page_number=1,
+            center_x=250,
+            center_y=100,
+            radius=100,
+            color=(1, 0, 0),  # optional
+            fill_color=(0, 1, 0),  # optional
+        ),
+    ]
 
-pdf = PdfWrapper("sample_template.pdf").draw(circles)
+    pdf = PdfWrapper("sample_template.pdf").draw(circles)
 
-pdf.write("output.pdf")
-```
+    pdf.write("output.pdf")
+    ```
+=== "CLI"
+    === "data.json"
+        ```json
+        {
+            "circle": [
+                {
+                    "page_number": 1,
+                    "center_x": 100,
+                    "center_y": 100,
+                    "radius": 50
+                },
+                {
+                    "page_number": 1,
+                    "center_x": 250,
+                    "center_y": 100,
+                    "radius": 100,
+                    "color": [
+                        1,
+                        0,
+                        0
+                    ],
+                    "fill_color": [
+                        0,
+                        1,
+                        0
+                    ]
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Draw ellipse
 
