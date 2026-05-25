@@ -3,170 +3,310 @@
 ???+ warning
     Do NOT trust user input; always sanitize it. Although PDF JavaScript runs in a sandbox, arbitrary execution is dangerous and can lead to remote code execution vulnerabilities.
 
-This documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
+These examples use [sample_template.pdf](pdfs/sample_template.pdf).
 
 PDFs can execute JavaScript during interactions if supported by the viewer. PyPDFForm provides APIs to embed scripts into both the PDF document and its form fields.
 
-For example, this snippet embeds a script that triggers an alert when the `test` field is hovered:
+In CLI examples, field-level scripts are configured in `data.json` and applied with `update field`, unless the section says otherwise.
 
-=== "alert.js"
-    ```javascript
-    app.alert("Hello World!");
-    ```
-=== "File Path"
-    ```python
-    from PyPDFForm import PdfWrapper
+The examples below embed a script that displays an alert when the pointer hovers over the `test` field:
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_hovered_over_javascript = "./alert.js"
+=== "Library"
+    === "alert.js"
+        ```javascript
+        app.alert("Hello World!");
+        ```
+    === "File Path"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form.write("output.pdf")
-    ```
-=== "File Object"
-    ```python
-    from PyPDFForm import PdfWrapper
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_hovered_over_javascript = "./alert.js"
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_hovered_over_javascript = open("./alert.js")  # in practice, use a context manager
+        form.write("output.pdf")
+        ```
+    === "File Object"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form.write("output.pdf")
-    ```
-=== "File Content"
-    ```python
-    from PyPDFForm import PdfWrapper
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_hovered_over_javascript = open("./alert.js")  # in practice, use a context manager
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_hovered_over_javascript = open("./alert.js").read()  # in practice, use a context manager
+        form.write("output.pdf")
+        ```
+    === "File Content"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form.write("output.pdf")
-    ```
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_hovered_over_javascript = open("./alert.js").read()  # in practice, use a context manager
+
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    === "alert.js"
+        ```javascript
+        app.alert("Hello World!");
+        ```
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "on_hovered_over_javascript": "./alert.js"
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ???+ tip
-    Please refer to [this link](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/jsapiref/index.html) for JavaScript that can be executed in PDF forms.
+    For supported Acrobat JavaScript APIs, see the [Adobe JavaScript API reference](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/jsapiref/index.html).
 
 ## Execute JavaScript on hover
 
-Set the `on_hovered_over_javascript` attribute to run code when a field is hovered over:
+Set `on_hovered_over_javascript` to run code when the pointer hovers over a field:
 
-=== "script.js"
-    ```javascript
-    this.getField("test").value = "hovered over";
-    ```
-=== "main.py"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "hovered over";
+        ```
+    === "main.py"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_hovered_over_javascript = "./script.js"
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_hovered_over_javascript = "./script.js"
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "hovered over";
+        ```
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "on_hovered_over_javascript": "./script.js"
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
-## Execute JavaScript on hover off
+## Execute JavaScript when hover ends
 
-Set the `on_hovered_off_javascript` attribute to run code when the mouse moves away from a field:
+Set `on_hovered_off_javascript` to run code when the pointer leaves a field:
 
-=== "script.js"
-    ```javascript
-    this.getField("test").value = "hovered off";
-    ```
-=== "main.py"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "hovered off";
+        ```
+    === "main.py"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_hovered_off_javascript = "./script.js"
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_hovered_off_javascript = "./script.js"
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "hovered off";
+        ```
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "on_hovered_off_javascript": "./script.js"
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
-## Execute JavaScript on mouse pressed
+## Execute JavaScript on mouse press
 
-Set the `on_mouse_pressed_javascript` attribute to run code when a mouse button is pressed within a field:
+Set `on_mouse_pressed_javascript` to run code when a mouse button is pressed inside a field:
 
-=== "script.js"
-    ```javascript
-    this.getField("test").value = "mouse pressed";
-    ```
-=== "main.py"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "mouse pressed";
+        ```
+    === "main.py"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_mouse_pressed_javascript = "./script.js"
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_mouse_pressed_javascript = "./script.js"
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "mouse pressed";
+        ```
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "on_mouse_pressed_javascript": "./script.js"
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
-## Execute JavaScript on mouse released
+## Execute JavaScript on mouse release
 
-Set the `on_mouse_released_javascript` attribute to run code when a mouse button is released within a field:
+Set `on_mouse_released_javascript` to run code when a mouse button is released inside a field:
 
-=== "script.js"
-    ```javascript
-    this.getField("test").value = "mouse released";
-    ```
-=== "main.py"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "mouse released";
+        ```
+    === "main.py"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_mouse_released_javascript = "./script.js"
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_mouse_released_javascript = "./script.js"
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "mouse released";
+        ```
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "on_mouse_released_javascript": "./script.js"
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Execute JavaScript on focus
 
-Set the `on_focused_javascript` attribute to run code when a field gains focus:
+Set `on_focused_javascript` to run code when a field gains focus:
 
-=== "script.js"
-    ```javascript
-    this.getField("test").value = "focused";
-    ```
-=== "main.py"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "focused";
+        ```
+    === "main.py"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_focused_javascript = "./script.js"
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_focused_javascript = "./script.js"
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "focused";
+        ```
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "on_focused_javascript": "./script.js"
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Execute JavaScript on blur
 
-Set the `on_blurred_javascript` attribute to run code when a field loses focus:
+Set `on_blurred_javascript` to run code when a field loses focus:
 
-=== "script.js"
-    ```javascript
-    this.getField("test").value = "not focused";
-    ```
-=== "main.py"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "not focused";
+        ```
+    === "main.py"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_blurred_javascript = "./script.js"
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_blurred_javascript = "./script.js"
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "not focused";
+        ```
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "on_blurred_javascript": "./script.js"
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Execute JavaScript on PDF open
 
-The `PdfWrapper.on_open_javascript` property sets or retrieves the script executed when the PDF opens:
+=== "Library"
+    Use `PdfWrapper.on_open_javascript` to set or read the script that runs when the PDF opens:
 
-=== "script.js"
-    ```javascript
-    this.getField("test").value = "opened";
-    ```
-=== "main.py"
-    ```python
-    from PyPDFForm import PdfWrapper
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "opened";
+        ```
+    === "main.py"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.on_open_javascript = "./script.js"
-    print(form.on_open_javascript)
+        form = PdfWrapper("sample_template.pdf")
+        form.on_open_javascript = "./script.js"
+        print(form.on_open_javascript)
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    Use `update script` to set document-level JavaScript that runs when the PDF opens:
+
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "opened";
+        ```
+    === "Command"
+        ```shell
+        pypdfform update script sample_template.pdf -s script.js -o output.pdf
+        ```
