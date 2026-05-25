@@ -3,11 +3,11 @@
 ???+ warning
     Do NOT trust user input; always sanitize it. Although PDF JavaScript runs in a sandbox, arbitrary execution is dangerous and can lead to remote code execution vulnerabilities.
 
-This documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
+These examples use [sample_template.pdf](pdfs/sample_template.pdf).
 
 PDFs can execute JavaScript during interactions if supported by the viewer. PyPDFForm provides APIs to embed scripts into both the PDF document and its form fields.
 
-For example, this snippet embeds a script that triggers an alert when the `test` field is hovered:
+The examples below embed a script that displays an alert when the pointer hovers over the `test` field:
 
 === "Library"
     === "alert.js"
@@ -42,6 +42,8 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         form.write("output.pdf")
         ```
 === "CLI"
+    Set the field-level JavaScript property in JSON and pass it to `update field`:
+
     === "alert.js"
         ```javascript
         app.alert("Hello World!");
@@ -60,13 +62,13 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         ```
 
 ???+ tip
-    Please refer to [this link](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/jsapiref/index.html) for JavaScript that can be executed in PDF forms.
+    For supported Acrobat JavaScript APIs, see the [Adobe JavaScript API reference](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/jsapiref/index.html).
 
 ## Execute JavaScript on hover
 
-=== "Library"
-    Set the `on_hovered_over_javascript` attribute to run code when a field is hovered over:
+Set `on_hovered_over_javascript` to run code when the pointer hovers over a field:
 
+=== "Library"
     === "script.js"
         ```javascript
         this.getField("test").value = "hovered over";
@@ -81,6 +83,8 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         form.write("output.pdf")
         ```
 === "CLI"
+    Set the same field-level JavaScript property in JSON and pass it to `update field`:
+
     === "script.js"
         ```javascript
         this.getField("test").value = "hovered over";
@@ -98,11 +102,11 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         pypdfform update field sample_template.pdf -f data.json -o output.pdf
         ```
 
-## Execute JavaScript on hover off
+## Execute JavaScript when hover ends
+
+Set `on_hovered_off_javascript` to run code when the pointer leaves a field:
 
 === "Library"
-    Set the `on_hovered_off_javascript` attribute to run code when the mouse moves away from a field:
-
     === "script.js"
         ```javascript
         this.getField("test").value = "hovered off";
@@ -117,6 +121,8 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         form.write("output.pdf")
         ```
 === "CLI"
+    Set the same field-level JavaScript property in JSON and pass it to `update field`:
+
     === "script.js"
         ```javascript
         this.getField("test").value = "hovered off";
@@ -134,11 +140,11 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         pypdfform update field sample_template.pdf -f data.json -o output.pdf
         ```
 
-## Execute JavaScript on mouse pressed
+## Execute JavaScript on mouse press
+
+Set `on_mouse_pressed_javascript` to run code when a mouse button is pressed inside a field:
 
 === "Library"
-    Set the `on_mouse_pressed_javascript` attribute to run code when a mouse button is pressed within a field:
-
     === "script.js"
         ```javascript
         this.getField("test").value = "mouse pressed";
@@ -153,6 +159,8 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         form.write("output.pdf")
         ```
 === "CLI"
+    Set the same field-level JavaScript property in JSON and pass it to `update field`:
+
     === "script.js"
         ```javascript
         this.getField("test").value = "mouse pressed";
@@ -170,11 +178,11 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         pypdfform update field sample_template.pdf -f data.json -o output.pdf
         ```
 
-## Execute JavaScript on mouse released
+## Execute JavaScript on mouse release
+
+Set `on_mouse_released_javascript` to run code when a mouse button is released inside a field:
 
 === "Library"
-    Set the `on_mouse_released_javascript` attribute to run code when a mouse button is released within a field:
-
     === "script.js"
         ```javascript
         this.getField("test").value = "mouse released";
@@ -189,6 +197,8 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         form.write("output.pdf")
         ```
 === "CLI"
+    Set the same field-level JavaScript property in JSON and pass it to `update field`:
+
     === "script.js"
         ```javascript
         this.getField("test").value = "mouse released";
@@ -208,9 +218,9 @@ For example, this snippet embeds a script that triggers an alert when the `test`
 
 ## Execute JavaScript on focus
 
-=== "Library"
-    Set the `on_focused_javascript` attribute to run code when a field gains focus:
+Set `on_focused_javascript` to run code when a field gains focus:
 
+=== "Library"
     === "script.js"
         ```javascript
         this.getField("test").value = "focused";
@@ -225,6 +235,8 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         form.write("output.pdf")
         ```
 === "CLI"
+    Set the same field-level JavaScript property in JSON and pass it to `update field`:
+
     === "script.js"
         ```javascript
         this.getField("test").value = "focused";
@@ -244,9 +256,9 @@ For example, this snippet embeds a script that triggers an alert when the `test`
 
 ## Execute JavaScript on blur
 
-=== "Library"
-    Set the `on_blurred_javascript` attribute to run code when a field loses focus:
+Set `on_blurred_javascript` to run code when a field loses focus:
 
+=== "Library"
     === "script.js"
         ```javascript
         this.getField("test").value = "not focused";
@@ -261,6 +273,8 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         form.write("output.pdf")
         ```
 === "CLI"
+    Set the same field-level JavaScript property in JSON and pass it to `update field`:
+
     === "script.js"
         ```javascript
         this.getField("test").value = "not focused";
@@ -280,9 +294,9 @@ For example, this snippet embeds a script that triggers an alert when the `test`
 
 ## Execute JavaScript on PDF open
 
-=== "Library"
-    The `PdfWrapper.on_open_javascript` property sets or retrieves the script executed when the PDF opens:
+Use `PdfWrapper.on_open_javascript` to set or read the script that runs when the PDF opens:
 
+=== "Library"
     === "script.js"
         ```javascript
         this.getField("test").value = "opened";
@@ -298,7 +312,7 @@ For example, this snippet embeds a script that triggers an alert when the `test`
         form.write("output.pdf")
         ```
 === "CLI"
-    Use the `update script` command:
+    Use `update script` to set document-level JavaScript that runs when the PDF opens:
 
     === "script.js"
         ```javascript
