@@ -118,6 +118,7 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
     Consider this example test:
 
     ```python
+    @pytest.mark.cli_test
     def test_fill(pdf_samples, tmp_path):
         expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
         input_path = os.path.join(tmp_path, "input.json")
@@ -155,10 +156,11 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
             assert expected == actual
     ```
 
-    The `runner` is a `CliRunner` from `typer.testing`, and the command under test is the
-    PyPDFForm CLI app:
+    Mark CLI tests with `@pytest.mark.cli_test`. The `runner` is a `CliRunner` from
+    `typer.testing`, and the command under test is the PyPDFForm CLI app:
 
     ```python
+    import pytest
     from typer.testing import CliRunner
 
     from PyPDFForm.cli.root import cli_app
