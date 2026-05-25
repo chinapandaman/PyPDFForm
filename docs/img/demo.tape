@@ -1,8 +1,8 @@
 # brew install vhs
 Output demo.gif
 
-Set FontSize 24
-Set Width 1150
+Set FontSize 19
+Set Width 1200
 Set Height 600
 
 Sleep 500ms
@@ -23,7 +23,7 @@ Enter
 
 Sleep 500ms
 
-Type "pypdfform fill sample_template.pdf -f data.json -o output.pdf"
+Type "pypdfform --need-appearances fill sample_template.pdf -f data.json -o output.pdf"
 
 Sleep 500ms
 
