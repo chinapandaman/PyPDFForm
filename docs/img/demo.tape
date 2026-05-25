@@ -3,7 +3,7 @@ Output demo.gif
 
 Set FontSize 19
 Set Width 1200
-Set Height 500
+Set Height 450
 
 Sleep 500ms
 
@@ -29,7 +29,7 @@ Sleep 500ms
 
 Enter
 
-Sleep 200ms
+Sleep 300ms
 
 Type "ls"
 
