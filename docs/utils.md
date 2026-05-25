@@ -40,7 +40,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
         blank_pdf.write("output.pdf")
         ```
 === "CLI"
-    Use the `create blank` command:
+    From the CLI, create blank PDFs with `create blank`:
 
     === "Single Page"
         ```shell
@@ -76,7 +76,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
     first_page.write("output.pdf")
     ```
 === "CLI"
-    Use the `create extract` command:
+    The CLI equivalent is `create extract`:
 
     ```shell
     pypdfform create extract sample_template.pdf \
@@ -128,7 +128,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
         merged.write("output.pdf")
         ```
 === "CLI"
-    Use the `create merge` command:
+    For CLI merges, pass the input PDFs to `create merge`:
 
     === "Default Page Order"
         ```shell
@@ -153,7 +153,7 @@ PyPDFForm allows you to set the PDF version to any supported value up to 2.0:
     new_version.write("output.pdf")
     ```
 === "CLI"
-    Use the `update version` command:
+    From the CLI, set the version with `update version`:
 
     ```shell
     pypdfform update version sample_template.pdf -v 2.0 -o output.pdf
