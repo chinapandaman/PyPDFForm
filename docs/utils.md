@@ -6,38 +6,56 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
 ## Blank PDFs
 
-Use the `BlankPage` class with `PdfWrapper` to create new blank PDFs.
+=== "Library"
+    Use the `BlankPage` class with `PdfWrapper` to create new blank PDFs.
 
-=== "Single Page"
-    The following example generates a PDF with a single blank page:
+    === "Single Page"
+        The following example generates a PDF with a single blank page:
 
-    ```python
-    from PyPDFForm import BlankPage, PdfWrapper
+        ```python
+        from PyPDFForm import BlankPage, PdfWrapper
 
-    blank_pdf = PdfWrapper(BlankPage())
+        blank_pdf = PdfWrapper(BlankPage())
 
-    blank_pdf.write("output.pdf")
-    ```
-=== "Custom Resolution"
-    By default, `BlankPage` generates a letter-size (612 x 792 points or 8.5 x 11 inches) blank PDF page. To change the dimensions, specify `width` and `height` (in points) when you instantiate the object:
+        blank_pdf.write("output.pdf")
+        ```
+    === "Custom Resolution"
+        By default, `BlankPage` generates a letter-size (612 x 792 points or 8.5 x 11 inches) blank PDF page. To change the dimensions, specify `width` and `height` (in points) when you instantiate the object:
 
-    ```python
-    from PyPDFForm import BlankPage, PdfWrapper
+        ```python
+        from PyPDFForm import BlankPage, PdfWrapper
 
-    blank_pdf = PdfWrapper(BlankPage(width=595.35, height=841.995)) # A4 size
+        blank_pdf = PdfWrapper(BlankPage(width=595.35, height=841.995)) # A4 size
 
-    blank_pdf.write("output.pdf")
-    ```
-=== "Multiple Pages"
-    To create a blank PDF with multiple pages, multiply the `BlankPage` object by the number of pages you need:
+        blank_pdf.write("output.pdf")
+        ```
+    === "Multiple Pages"
+        To create a blank PDF with multiple pages, multiply the `BlankPage` object by the number of pages you need:
 
-    ```python
-    from PyPDFForm import BlankPage, PdfWrapper
+        ```python
+        from PyPDFForm import BlankPage, PdfWrapper
 
-    blank_pdf = PdfWrapper(BlankPage() * 3) # 3 pages of letter size
+        blank_pdf = PdfWrapper(BlankPage() * 3) # 3 pages of letter size
 
-    blank_pdf.write("output.pdf")
-    ```
+        blank_pdf.write("output.pdf")
+        ```
+=== "CLI"
+    Use the `create blank` command:
+
+    === "Single Page"
+        ```shell
+        pypdfform create blank -o output.pdf
+        ```
+    === "Custom Resolution"
+        ```shell
+        pypdfform create blank -o output.pdf \
+            --width 595.35 \
+            --height 841.995
+        ```
+    === "Multiple Pages"
+        ```shell
+        pypdfform create blank -o output.pdf -c 3
+        ```
 
 ## Extract pages
 
