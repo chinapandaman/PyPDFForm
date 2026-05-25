@@ -1,6 +1,6 @@
 # Developer Intro
 
-PyPDFForm is a library built with Python. This part of the documentation is specifically for those who want to contribute to the project's development.
+PyPDFForm is a project built with Python. This part of the documentation is specifically for those who want to contribute to the project's development.
 
 ## Setup
 
