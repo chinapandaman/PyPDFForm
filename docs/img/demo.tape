@@ -5,6 +5,8 @@ Set FontSize 24
 Set Width 1150
 Set Height 600
 
+Sleep 500ms
+
 Type "ls"
 
 Sleep 500ms
