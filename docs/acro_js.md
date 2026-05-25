@@ -9,37 +9,55 @@ PDFs can execute JavaScript during interactions if supported by the viewer. PyPD
 
 For example, this snippet embeds a script that triggers an alert when the `test` field is hovered:
 
-=== "alert.js"
-    ```javascript
-    app.alert("Hello World!");
-    ```
-=== "File Path"
-    ```python
-    from PyPDFForm import PdfWrapper
+=== "Library"
+    === "alert.js"
+        ```javascript
+        app.alert("Hello World!");
+        ```
+    === "File Path"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_hovered_over_javascript = "./alert.js"
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_hovered_over_javascript = "./alert.js"
 
-    form.write("output.pdf")
-    ```
-=== "File Object"
-    ```python
-    from PyPDFForm import PdfWrapper
+        form.write("output.pdf")
+        ```
+    === "File Object"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_hovered_over_javascript = open("./alert.js")  # in practice, use a context manager
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_hovered_over_javascript = open("./alert.js")  # in practice, use a context manager
 
-    form.write("output.pdf")
-    ```
-=== "File Content"
-    ```python
-    from PyPDFForm import PdfWrapper
+        form.write("output.pdf")
+        ```
+    === "File Content"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_hovered_over_javascript = open("./alert.js").read()  # in practice, use a context manager
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_hovered_over_javascript = open("./alert.js").read()  # in practice, use a context manager
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    === "alert.js"
+        ```javascript
+        app.alert("Hello World!");
+        ```
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "on_hovered_over_javascript": "./alert.js"
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ???+ tip
     Please refer to [this link](https://opensource.adobe.com/dc-acrobat-sdk-docs/library/jsapiref/index.html) for JavaScript that can be executed in PDF forms.
