@@ -5,7 +5,7 @@
 
 These examples use [sample_template.pdf](pdfs/sample_template.pdf).
 
-PDFs can execute JavaScript during interactions if supported by the viewer. PyPDFForm provides APIs to embed scripts into both the PDF document and its form fields.
+PDFs can execute JavaScript during interactions if supported by the viewer. PyPDFForm provides Python APIs and CLI commands to embed scripts into both the PDF document and its form fields.
 
 In CLI examples, field-level scripts are configured in `data.json` and applied with `update field`, unless the section says otherwise.
 

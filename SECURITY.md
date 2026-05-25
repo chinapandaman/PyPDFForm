@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-PyPDFForm only fixes vulnerabilities in the latest version of the library. 
+PyPDFForm only fixes vulnerabilities in the latest version of the project.
 Please consider upgrading your version before reporting any potential vulnerabilities.
 
 | Version  | Supported          |
