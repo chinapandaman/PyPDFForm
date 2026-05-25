@@ -87,45 +87,59 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
 ## Merge multiple PDFs
 
-You can merge multiple PDF files by adding their `PdfWrapper` objects. For example, to merge [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) and [this PDF](pdfs/sample_template.pdf):
+=== "Library"
+    You can merge multiple PDF files by adding their `PdfWrapper` objects. For example, to merge [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) and [this PDF](pdfs/sample_template.pdf):
 
-=== "Default Page Order"
-    ```python
-    from PyPDFForm import PdfWrapper
+    === "Default Page Order"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    pdf_one = PdfWrapper("dummy.pdf")
-    pdf_two = PdfWrapper("sample_template.pdf")
-    merged = pdf_one + pdf_two
+        pdf_one = PdfWrapper("dummy.pdf")
+        pdf_two = PdfWrapper("sample_template.pdf")
+        merged = pdf_one + pdf_two
 
-    merged.write("output.pdf")
-    ```
-=== "Rearrange Page Order"
-    ```python
-    from PyPDFForm import PdfWrapper
+        merged.write("output.pdf")
+        ```
+    === "Rearrange Page Order"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    pdf_one = PdfWrapper("dummy.pdf")
-    pdf_two = PdfWrapper("sample_template.pdf")
-    merged = pdf_two.pages[0] + pdf_one + pdf_two.pages[1:]
+        pdf_one = PdfWrapper("dummy.pdf")
+        pdf_two = PdfWrapper("sample_template.pdf")
+        merged = pdf_two.pages[0] + pdf_one + pdf_two.pages[1:]
 
-    merged.write("output.pdf")
-    ```
-=== "Bulk Merge"
-    When merging a large number of PDF files, it is more performant to use the `PdfArray.merge` method:
+        merged.write("output.pdf")
+        ```
+    === "Bulk Merge"
+        When merging a large number of PDF files, it is more performant to use the `PdfArray.merge` method:
 
-    ```python
-    from PyPDFForm import PdfArray, PdfWrapper
+        ```python
+        from PyPDFForm import PdfArray, PdfWrapper
 
-    pdfs = PdfArray(
-        [
-            PdfWrapper("dummy.pdf"),
-            PdfWrapper("sample_template.pdf"),
-            # can get very large
-        ]
-    )
-    merged = pdfs.merge()
+        pdfs = PdfArray(
+            [
+                PdfWrapper("dummy.pdf"),
+                PdfWrapper("sample_template.pdf"),
+                # can get very large
+            ]
+        )
+        merged = pdfs.merge()
 
-    merged.write("output.pdf")
-    ```
+        merged.write("output.pdf")
+        ```
+=== "CLI"
+    Use the `create merge` command:
+
+    === "Default Page Order"
+        ```shell
+        pypdfform create merge dummy.pdf sample_template.pdf -o output.pdf
+        ```
+    === "Rearrange Page Order"
+        ```shell
+        pypdfform create extract sample_template.pdf --start 1 --end 1 -o first_page.pdf
+        pypdfform create extract sample_template.pdf --start 2 -o remaining_pages.pdf
+        pypdfform create merge first_page.pdf dummy.pdf remaining_pages.pdf -o output.pdf
+        ```
 
 ## Change PDF version
 
