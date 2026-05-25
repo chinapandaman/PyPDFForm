@@ -282,9 +282,9 @@ Set `on_blurred_javascript` to run code when a field loses focus:
 
 ## Execute JavaScript on PDF open
 
-Use `PdfWrapper.on_open_javascript` to set or read the script that runs when the PDF opens:
-
 === "Library"
+    Use `PdfWrapper.on_open_javascript` to set or read the script that runs when the PDF opens:
+
     === "script.js"
         ```javascript
         this.getField("test").value = "opened";
