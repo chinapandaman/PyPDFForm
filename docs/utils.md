@@ -7,7 +7,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 ## Blank PDFs
 
 === "Library"
-    Use the `BlankPage` class with `PdfWrapper` to create new blank PDFs.
+    Use the `BlankPage` class with `PdfWrapper` to create blank PDFs.
 
     === "Single Page"
         The following example generates a PDF with a single blank page:
@@ -19,8 +19,8 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
         blank_pdf.write("output.pdf")
         ```
-    === "Custom Resolution"
-        By default, `BlankPage` generates a letter-size (612 x 792 points or 8.5 x 11 inches) blank PDF page. To change the dimensions, specify `width` and `height` (in points) when you instantiate the object:
+    === "Custom Page Size"
+        By default, `BlankPage` creates a letter-size blank page (612 x 792 points, or 8.5 x 11 inches). To change the dimensions, specify `width` and `height` in points:
 
         ```python
         from PyPDFForm import BlankPage, PdfWrapper
@@ -46,7 +46,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
         ```shell
         pypdfform create blank -o output.pdf
         ```
-    === "Custom Resolution"
+    === "Custom Page Size"
         ```shell
         pypdfform create blank -o output.pdf \
             --width 595.35 \
@@ -60,7 +60,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 ## Extract pages
 
 === "Library"
-    The `PdfWrapper` object has a `.pages` attribute, which is a `PdfArray` of `PdfWrapper` objects representing individual pages:
+    The `PdfWrapper` object has a `.pages` attribute, which is a `PdfArray` containing one `PdfWrapper` object per page:
 
     ```python
     from PyPDFForm import PdfWrapper
@@ -88,7 +88,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 ## Merge multiple PDFs
 
 === "Library"
-    You can merge multiple PDF files by adding their `PdfWrapper` objects. For example, to merge [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) and [this PDF](pdfs/sample_template.pdf):
+    You can merge multiple PDF files by adding their `PdfWrapper` objects together. For example, to merge [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) and [this PDF](pdfs/sample_template.pdf):
 
     === "Default Page Order"
         ```python
@@ -100,7 +100,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
         merged.write("output.pdf")
         ```
-    === "Rearrange Page Order"
+    === "Custom Page Order"
         ```python
         from PyPDFForm import PdfWrapper
 
@@ -111,7 +111,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
         merged.write("output.pdf")
         ```
     === "Bulk Merge"
-        When merging a large number of PDF files, it is more performant to use the `PdfArray.merge` method:
+        When merging a large number of PDF files, use the `PdfArray.merge` method for better performance:
 
         ```python
         from PyPDFForm import PdfArray, PdfWrapper
@@ -134,7 +134,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
         ```shell
         pypdfform create merge dummy.pdf sample_template.pdf -o output.pdf
         ```
-    === "Rearrange Page Order"
+    === "Custom Page Order"
         ```shell
         pypdfform create extract sample_template.pdf --start 1 --end 1 -o first_page.pdf
         pypdfform create extract sample_template.pdf --start 2 -o remaining_pages.pdf
@@ -143,7 +143,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
 ## Change PDF version
 
-PyPDFForm allows you to modify the PDF version up to 2.0:
+PyPDFForm allows you to set the PDF version to any supported value up to 2.0:
 
 === "Library"
     ```python
@@ -153,6 +153,8 @@ PyPDFForm allows you to modify the PDF version up to 2.0:
     new_version.write("output.pdf")
     ```
 === "CLI"
+    Use the `update version` command:
+
     ```shell
     pypdfform update version sample_template.pdf -v 2.0 -o output.pdf
     ```
