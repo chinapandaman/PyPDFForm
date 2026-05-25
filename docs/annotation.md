@@ -10,35 +10,65 @@ Optional parameters are marked with an `# optional` comment.
 
 ## Create text annotations
 
-Text annotations appear as sticky notes on a PDF. To create them, use the `PdfWrapper.annotate` method and pass a list of annotations:
+=== "Library"
+    Text annotations appear as sticky notes on a PDF. To create them, use the `PdfWrapper.annotate` method and pass a list of annotations:
 
-```python
-from PyPDFForm import Annotations, PdfWrapper
+    ```python
+    from PyPDFForm import Annotations, PdfWrapper
 
-annotations = [
-    Annotations.TextAnnotation(
-        page_number=1,
-        x=310,
-        y=663,
-        contents="this is an annotation",  # optional
-        title="First Annotation",  # optional
-    ),
-    Annotations.TextAnnotation(
-        page_number=2,
-        x=310,
-        y=672,
-        contents="this is another annotation",  # optional
-        title="Second Annotation",  # optional
-        icon=Annotations.TextAnnotation.comment_icon,  # optional (1)
-    ),
-]
+    annotations = [
+        Annotations.TextAnnotation(
+            page_number=1,
+            x=310,
+            y=663,
+            contents="this is an annotation",  # optional
+            title="First Annotation",  # optional
+        ),
+        Annotations.TextAnnotation(
+            page_number=2,
+            x=310,
+            y=672,
+            contents="this is another annotation",  # optional
+            title="Second Annotation",  # optional
+            icon=Annotations.TextAnnotation.comment_icon,  # optional (1)
+        ),
+    ]
 
-pdf = PdfWrapper("sample_template.pdf").annotate(annotations)
+    pdf = PdfWrapper("sample_template.pdf").annotate(annotations)
 
-pdf.write("output.pdf")
-```
+    pdf.write("output.pdf")
+    ```
 
-1. Default is `note_icon`. Other options are `comment_icon`, `help_icon`, `key_icon`, and `insert_icon`.
+    1. Default is `note_icon`. Other options are `comment_icon`, `help_icon`, `key_icon`, and `insert_icon`.
+=== "CLI"
+    Use the `create annotation` command:
+
+    === "data.json"
+        ```json
+        {
+            "text": [
+                {
+                    "page_number": 1,
+                    "x": 310,
+                    "y": 663,
+                    "contents": "this is an annotation",
+                    "title": "First Annotation"
+                },
+                {
+                    "page_number": 2,
+                    "x": 310,
+                    "y": 672,
+                    "contents": "this is another annotation",
+                    "title": "Second Annotation",
+                    "icon": "/Comment"
+                }
+            ]
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform create annotation sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Create link annotations
 
