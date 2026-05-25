@@ -1,6 +1,6 @@
 <p align="center"><img src="https://github.com/chinapandaman/PyPDFForm/raw/master/docs/img/logo.png"></p>
 <p align="center">
-    <em>PDF Form Automation Simplified – Create, Inspect, Style, and Fill Forms Programmatically.</em>
+    <em>PDF Form Automation Simplified - Create, Inspect, Style, and Fill Forms in Python or from the Command Line.</em>
 </p>
 <p align="center">
     <a href="https://pypi.org/project/PyPDFForm/"><img src="https://img.shields.io/pypi/v/pypdfform?label=version&color=magenta"></a>
