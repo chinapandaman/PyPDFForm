@@ -13,7 +13,7 @@
 
 ## Introduction
 
-PyPDFForm is a Python library and command line tool for working with PDF forms. It provides a practical set of APIs for creating, inspecting, updating, and filling forms, plus common PDF utilities.
+PyPDFForm is a Python library and command line tool for working with PDF forms. It provides Python APIs and CLI commands for creating, inspecting, updating, and filling forms, plus common PDF utilities.
 
 With PyPDFForm, you can:
 

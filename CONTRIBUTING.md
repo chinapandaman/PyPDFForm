@@ -4,6 +4,6 @@ Check out the developer guide on how to contribute to PyPDFForm: https://chinapa
 
 ## Other Ways to Contribute
 
-It is difficult to make sure that the library supports all the PDF form creating tools out 
-there. So if you run into a case where the library does not work for certain PDF forms created by certain tools, feel free to open an issue with the problematic PDF form attached. I will seek 
-to make the library support the attached PDF form as well as the tool used to create it.
+It is difficult to make sure that PyPDFForm supports all the PDF form creating tools out
+there. So if you run into a case where PyPDFForm does not work for certain PDF forms created by certain tools, feel free to open an issue with the problematic PDF form attached. I will seek
+to make PyPDFForm support the attached PDF form as well as the tool used to create it.
