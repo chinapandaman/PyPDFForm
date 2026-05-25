@@ -64,21 +64,39 @@ For example, this snippet embeds a script that triggers an alert when the `test`
 
 ## Execute JavaScript on hover
 
-Set the `on_hovered_over_javascript` attribute to run code when a field is hovered over:
+=== "Library"
+    Set the `on_hovered_over_javascript` attribute to run code when a field is hovered over:
 
-=== "script.js"
-    ```javascript
-    this.getField("test").value = "hovered over";
-    ```
-=== "main.py"
-    ```python
-    from PyPDFForm import PdfWrapper
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "hovered over";
+        ```
+    === "main.py"
+        ```python
+        from PyPDFForm import PdfWrapper
 
-    form = PdfWrapper("sample_template.pdf")
-    form.widgets["test"].on_hovered_over_javascript = "./script.js"
+        form = PdfWrapper("sample_template.pdf")
+        form.widgets["test"].on_hovered_over_javascript = "./script.js"
 
-    form.write("output.pdf")
-    ```
+        form.write("output.pdf")
+        ```
+=== "CLI"
+    === "script.js"
+        ```javascript
+        this.getField("test").value = "hovered over";
+        ```
+    === "data.json"
+        ```json
+        {
+            "test": {
+                "on_hovered_over_javascript": "./script.js"
+            }
+        }
+        ```
+    === "Command"
+        ```shell
+        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        ```
 
 ## Execute JavaScript on hover off
 
