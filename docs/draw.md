@@ -1,16 +1,16 @@
 # Draw elements
 
-PyPDFForm enables you to draw elements on a PDF, which is useful when a field is missing from your PDF form or when you need to add text or images.
+PyPDFForm enables you to draw elements on a PDF, which is useful when a field is missing from your PDF form or when you need to add text, images, lines, or shapes.
 
 This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
 
-Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
+Review [the PDF coordinate system](coordinate.md) before using these examples.
 
-All optional parameters will have a comment `# optional` after each of them.
+In the library examples, optional parameters are marked with `# optional`.
+
+When drawing multiple elements, collect them in a list and draw them in a single operation for better performance.
 
 ## Draw text
-
-When drawing multiple elements, it is more performant to create a list of those elements and draw them in a single operation.
 
 === "Library"
     ```python
@@ -85,7 +85,7 @@ When drawing multiple elements, it is more performant to create a list of those 
 
 ## Draw image
 
-For the `rotation` parameter, a positive value rotates the image counter-clockwise, and a negative value rotates it clockwise.
+For the `rotation` parameter, positive values rotate images counterclockwise, and negative values rotate them clockwise.
 
 === "Library"
     === "File Path"
@@ -270,7 +270,7 @@ A line can be drawn by specifying starting and ending coordinates, and optionall
 
 ## Draw rectangle
 
-A rectangle can be drawn by specifying its coordinates and dimensions, and optionally its color and fill color.
+A rectangle can be drawn by specifying its coordinates and dimensions, and optionally its outline color and fill color.
 
 === "Library"
     ```python
@@ -338,7 +338,7 @@ A rectangle can be drawn by specifying its coordinates and dimensions, and optio
 
 ## Draw circle
 
-A circle can be drawn by specifying its center coordinates and radius, and optionally its color and fill color.
+A circle can be drawn by specifying its center coordinates and radius, and optionally its outline color and fill color.
 
 === "Library"
     ```python
@@ -402,7 +402,7 @@ A circle can be drawn by specifying its center coordinates and radius, and optio
 
 ## Draw ellipse
 
-An ellipse can be drawn by specifying its bounding box coordinates, and optionally its color and fill color.
+An ellipse can be drawn by specifying its bounding box coordinates, and optionally its outline color and fill color.
 
 === "Library"
     ```python
