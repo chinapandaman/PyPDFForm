@@ -3,7 +3,7 @@ Output demo.gif
 
 Set FontSize 19
 Set Width 1200
-Set Height 500
+Set Height 485
 
 Sleep 500ms
 
