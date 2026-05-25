@@ -27,10 +27,16 @@ The goal is to make PDF form work straightforward, whether you are handling one 
 
 ## Installing
 
-Install using [pip](https://pypi.org/project/PyPDFForm/):
+To use PyPDFForm as a Python library, install the base package with [pip](https://pypi.org/project/PyPDFForm/):
 
-```shell script
+```shell
 pip install PyPDFForm
+```
+
+To use the CLI, install PyPDFForm with the `cli` extra using [pipx](https://pipx.pypa.io/stable/):
+
+```shell
+pipx install "PyPDFForm[cli]"
 ```
 
 ## Quick Example
