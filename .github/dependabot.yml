@@ -11,7 +11,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    versioning-strategy: "increase-if-necessary"
+    versioning-strategy: "increase"
     commit-message:
       prefix: "chore"
       include: "scope"
