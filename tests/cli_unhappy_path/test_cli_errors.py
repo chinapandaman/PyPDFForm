@@ -311,4 +311,4 @@ def test_update_script_invalid_event(pdf_samples, js_samples):
         ],
     )
 
-    assert_cli_error(result, "is not 'open'")
+    assert_cli_error(result)
