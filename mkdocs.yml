@@ -98,7 +98,7 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to system preference
-  logo: img/logo.png
+  logo: img/site_logo.png
   favicon: img/favicon.ico
 
 extra_css:
