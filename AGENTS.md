@@ -19,6 +19,23 @@ sample generation, and related maintenance tasks.
 For focused commands, use the relevant project tool in a way that is consistent
 with `Makefile` and the Developer Guide.
 
+## Clarifying Ambiguous Requests
+
+When a request leaves consequential decisions unstated, do not guess and quietly
+move on. Challenge the ambiguity directly, identify what is missing, and resolve
+the blocking decision before editing.
+
+Work through unresolved decisions in dependency order, one question at a time.
+For each question, include the answer you recommend and a brief reason for it so
+the human can confirm, reject, or correct the direction quickly.
+
+Treat vague prompts as something to interrogate, especially when a wrong
+assumption could change behavior, scope, public API, generated artifacts, or
+contributor workflow.
+
+If the answer can be discovered from this repository, the Developer Guide, the
+`Makefile`, or existing code, inspect those sources instead of asking.
+
 ## Environment
 
 Use the local `./venv` virtual environment as the default non-containerized
