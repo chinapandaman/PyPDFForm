@@ -666,9 +666,22 @@ class PdfWrapper:
         return self
 
     def remove_fields(self, keys: List[str]) -> PdfWrapper:
-        self._stream = remove_widgets_by_keys(self._read(), keys)
+        """
+        Removes form fields from the PDF by their keys.
 
+        This method removes any fields whose keys are included in `keys` and
+        refreshes the wrapper's widget metadata after the PDF stream is updated.
+
+        Args:
+            keys (List[str]): A list of form field keys to remove.
+
+        Returns:
+            PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
+        """
+
+        self._stream = remove_widgets_by_keys(self._read(), keys)
         self._init_helper()
+
         return self
 
     def update_widget_key(

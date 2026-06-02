@@ -367,6 +367,20 @@ def create_annotations(
 
 
 def remove_widgets_by_keys(pdf: bytes, keys: List[str]) -> bytes:
+    """
+    Removes specific widgets from a PDF by their keys.
+
+    This function removes any widget annotation whose key matches one of the
+    provided keys. If no keys are provided, the original PDF stream is returned
+    unchanged.
+
+    Args:
+        pdf (bytes): The PDF stream to remove widgets from.
+        keys (List[str]): A list of widget keys to remove.
+
+    Returns:
+        bytes: The updated PDF stream with the matching widgets removed.
+    """
     if not keys:
         return pdf
 
