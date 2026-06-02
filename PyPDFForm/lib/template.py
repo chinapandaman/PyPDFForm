@@ -366,6 +366,47 @@ def create_annotations(
         return f.read()
 
 
+def remove_widgets_by_keys(pdf: bytes, keys: List[str]) -> bytes:
+    """
+    Removes specific widgets from a PDF by their keys.
+
+    This function removes any widget annotation whose key matches one of the
+    provided keys. If no keys are provided, the original PDF stream is returned
+    unchanged.
+
+    Args:
+        pdf (bytes): The PDF stream to remove widgets from.
+        keys (List[str]): A list of widget keys to remove.
+
+    Returns:
+        bytes: The updated PDF stream with the matching widgets removed.
+    """
+    if not keys:
+        return pdf
+
+    writer = PdfWriter(BytesIO(pdf))
+
+    for page in writer.pages:
+        needs_update = False
+        page_annots = ArrayObject([])
+
+        for annot in page.get(Annots, []):
+            annot = cast(DictionaryObject, annot.get_object())
+            key = get_widget_key(annot.get_object(), False)
+            if key not in keys:
+                page_annots.append(annot)
+            else:
+                needs_update = True
+
+        if needs_update:
+            page[NameObject(Annots)] = page_annots
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
+
+
 def update_widget_keys(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
