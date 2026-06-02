@@ -22,8 +22,8 @@ from collections import defaultdict
 from dataclasses import asdict
 from functools import cached_property
 from os import PathLike
-from typing import (TYPE_CHECKING, BinaryIO, Dict, Optional, Sequence, TextIO,
-                    Tuple)
+from typing import (TYPE_CHECKING, BinaryIO, Dict, List, Optional, Sequence,
+                    TextIO, Tuple)
 
 from .adapter import (fp_or_f_obj_or_f_content_to_content,
                       fp_or_f_obj_or_stream_to_stream)
@@ -38,7 +38,7 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .template import (build_widgets, create_annotations, get_metadata,
-                       update_widget_keys)
+                       remove_widgets_by_keys, update_widget_keys)
 from .types import PdfArray
 from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
                     remove_all_widgets)
@@ -663,6 +663,12 @@ class PdfWrapper:
             for k, v in widget.hook_params:
                 self.widgets[widget.name].__setattr__(k, v)
 
+        return self
+
+    def remove_fields(self, keys: List[str]) -> PdfWrapper:
+        self._stream = remove_widgets_by_keys(self._read(), keys)
+
+        self._init_helper()
         return self
 
     def update_widget_key(
