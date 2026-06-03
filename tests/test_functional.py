@@ -834,25 +834,6 @@ def test_hidden_sejda(sejda_template, pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_remove_fields(template_stream, pdf_samples, request):
-    expected_path = os.path.join(pdf_samples, "test_remove_fields.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream)
-        obj.remove_fields(["test", "test_2", "check_2"])
-
-        assert "test" not in obj.widgets
-        assert "test_2" not in obj.widgets
-        assert "check_2" not in obj.widgets
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
 def test_remove_fields_no_keys_specified(template_stream):
     assert PdfWrapper(template_stream).remove_fields([]).read() == template_stream
 

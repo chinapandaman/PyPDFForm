@@ -468,3 +468,19 @@ def test_change_field_visibility(static_pdfs, pdf_samples, request):
 
         assert len(form.read()) == len(expected)
         assert form.read() == expected
+
+
+def test_remove_fields(static_pdfs, pdf_samples, request):
+    expected_path = os.path.join(pdf_samples, "docs", "test_remove_fields.pdf")
+
+    form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
+    form.remove_fields(["test", "test_2", "check_2"])
+
+    request.config.results["expected_path"] = expected_path
+    request.config.results["stream"] = form.read()
+
+    with open(expected_path, "rb+") as f:
+        expected = f.read()
+
+        assert len(form.read()) == len(expected)
+        assert form.read() == expected
