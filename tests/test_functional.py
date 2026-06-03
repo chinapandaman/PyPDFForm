@@ -834,6 +834,15 @@ def test_hidden_sejda(sejda_template, pdf_samples, request):
         assert obj.read() == expected
 
 
+def test_remove_fields_update_widgets(template_stream):
+    obj = PdfWrapper(template_stream)
+    obj.remove_fields(["test", "test_2", "check_2"])
+
+    assert "test" not in obj.widgets
+    assert "test_2" not in obj.widgets
+    assert "check_2" not in obj.widgets
+
+
 def test_remove_fields_no_keys_specified(template_stream):
     assert PdfWrapper(template_stream).remove_fields([]).read() == template_stream
 
