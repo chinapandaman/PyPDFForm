@@ -41,7 +41,7 @@ Welcome to the PyPDFForm development container!
 | compare   | Compare PDF samples before and after changing the code. | N/A                                                                                 |
 | coverage  | Run all tests and generate HTML coverage reports.       | https://chinapandaman.github.io/PyPDFForm/latest/dev_test/#generate-coverage-report |
 | docs      | Host the documentation site locally.                    | https://chinapandaman.github.io/PyPDFForm/latest/dev_doc/                           |
-| format    | Format the code with black and isort.                   | N/A                                                                                 |
+| format    | Format the code with ruff.                              | N/A                                                                                 |
 | pypdfform | Run the PyPDFForm CLI.                                  | N/A                                                                                 |
 | server    | Start an HTTP file server from the root of the code.    | N/A                                                                                 |
 | linting   | Run all linters on the code.                            | N/A                                                                                 |

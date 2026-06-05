@@ -17,8 +17,7 @@ from pikepdf import Pdf
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import DictionaryObject, NameObject, TextStringObject
 
-from .constants import (JS, XFA, AcroForm, JavaScript, OpenAction, Root, S,
-                        Title)
+from .constants import JS, XFA, AcroForm, JavaScript, OpenAction, Root, S, Title
 
 
 @lru_cache

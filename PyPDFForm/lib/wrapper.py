@@ -22,30 +22,61 @@ from collections import defaultdict
 from dataclasses import asdict
 from functools import cached_property
 from os import PathLike
-from typing import (TYPE_CHECKING, BinaryIO, Dict, List, Optional, Sequence,
-                    TextIO, Tuple)
+from typing import (
+    TYPE_CHECKING,
+    BinaryIO,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    TextIO,
+    Tuple,
+)
 
-from .adapter import (fp_or_f_obj_or_f_content_to_content,
-                      fp_or_f_obj_or_stream_to_stream)
+from .adapter import (
+    fp_or_f_obj_or_f_content_to_content,
+    fp_or_f_obj_or_stream_to_stream,
+)
 from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
 from .egress import appearance_streams_handler, preserve_pdf_properties
 from .filler import fill
-from .font import (get_all_available_fonts, register_font_acroform,
-                   temporary_font_registration, validate_font)
+from .font import (
+    get_all_available_fonts,
+    register_font_acroform,
+    temporary_font_registration,
+    validate_font,
+)
 from .hooks import trigger_widget_hooks
 from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .template import (build_widgets, create_annotations, get_metadata,
-                       remove_widgets_by_keys, update_widget_keys)
+from .template import (
+    build_widgets,
+    create_annotations,
+    get_metadata,
+    remove_widgets_by_keys,
+    update_widget_keys,
+)
 from .types import PdfArray
-from .utils import (generate_unique_suffix, get_page_streams, merge_pdfs,
-                    remove_all_widgets)
-from .watermark import (copy_watermark_widgets, create_watermarks_and_draw,
-                        merge_watermarks_with_pdf)
-from .widgets import (CheckBoxField, DropdownField, ImageField, RadioGroup,
-                      SignatureField)
+from .utils import (
+    generate_unique_suffix,
+    get_page_streams,
+    merge_pdfs,
+    remove_all_widgets,
+)
+from .watermark import (
+    copy_watermark_widgets,
+    create_watermarks_and_draw,
+    merge_watermarks_with_pdf,
+)
+from .widgets import (
+    CheckBoxField,
+    DropdownField,
+    ImageField,
+    RadioGroup,
+    SignatureField,
+)
 
 if TYPE_CHECKING:
     from .annotations import AnnotationTypes

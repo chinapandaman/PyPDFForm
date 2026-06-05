@@ -14,11 +14,15 @@ from typing import Annotated
 
 import typer
 
-from .. import (Annotations, BlankPage, Fields, PdfArray, PdfWrapper,
-                RawElements)
-from .common import (INPUT_PDF, OPTIONAL_OUTPUT_PDF, REQUIRED_OUTPUT_PDF,
-                     cli_bad_parameter, create_elements_from_file,
-                     json_file_option)
+from .. import Annotations, BlankPage, Fields, PdfArray, PdfWrapper, RawElements
+from .common import (
+    INPUT_PDF,
+    OPTIONAL_OUTPUT_PDF,
+    REQUIRED_OUTPUT_PDF,
+    cli_bad_parameter,
+    create_elements_from_file,
+    json_file_option,
+)
 from .schemas.create import ANNOTATION_SCHEMA, FIELD_SCHEMA, RAW_SCHEMA
 
 create_cli = typer.Typer(

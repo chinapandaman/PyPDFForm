@@ -13,9 +13,16 @@ from fontTools.ttLib import TTLibError
 from pypdf import PdfWriter
 
 from PyPDFForm import PdfWrapper
-from PyPDFForm.lib.constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR,
-                                     ENCODING_TABLE_SIZE, AcroForm, Font,
-                                     FontDescriptor, MissingWidth, Widths)
+from PyPDFForm.lib.constants import (
+    DEFAULT_ASSUMED_GLYPH_WIDTH,
+    DR,
+    ENCODING_TABLE_SIZE,
+    AcroForm,
+    Font,
+    FontDescriptor,
+    MissingWidth,
+    Widths,
+)
 from PyPDFForm.lib.font import compute_font_glyph_widths
 
 
