@@ -14,8 +14,12 @@ from dataclasses import dataclass
 from .link import LinkAnnotation
 from .stamp import RubberStampAnnotation
 from .text import TextAnnotation
-from .text_markup import (HighlightAnnotation, SquigglyAnnotation,
-                          StrikeOutAnnotation, UnderlineAnnotation)
+from .text_markup import (
+    HighlightAnnotation,
+    SquigglyAnnotation,
+    StrikeOutAnnotation,
+    UnderlineAnnotation,
+)
 
 AnnotationTypes = (
     TextAnnotation

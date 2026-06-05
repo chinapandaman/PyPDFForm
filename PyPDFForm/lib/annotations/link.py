@@ -12,8 +12,13 @@ Classes:
 from dataclasses import dataclass
 from typing import Optional
 
-from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
-                           NumberObject, TextStringObject)
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    NameObject,
+    NumberObject,
+    TextStringObject,
+)
 
 from ..constants import A, S
 from .base import Annotation

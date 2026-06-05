@@ -17,9 +17,16 @@ import typer
 
 from .. import PdfWrapper
 from ..lib.constants import PdfVersion
-from .common import (FIELD_NAME, INPUT_PDF, OPTIONAL_OUTPUT_PDF,
-                     cli_bad_parameter, get_widget, handle_font_registration,
-                     json_file_option, load_json_file)
+from .common import (
+    FIELD_NAME,
+    INPUT_PDF,
+    OPTIONAL_OUTPUT_PDF,
+    cli_bad_parameter,
+    get_widget,
+    handle_font_registration,
+    json_file_option,
+    load_json_file,
+)
 from .schemas.update import FIELD_SCHEMA, RENAME_SCHEMA
 
 update_cli = typer.Typer(

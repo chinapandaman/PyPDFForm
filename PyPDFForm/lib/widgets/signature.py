@@ -19,8 +19,7 @@ from io import BytesIO
 from typing import List, Optional, Type
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (ArrayObject, FloatObject, NameObject,
-                           TextStringObject)
+from pypdf.generic import ArrayObject, FloatObject, NameObject, TextStringObject
 from reportlab.pdfgen.canvas import Canvas
 
 from ..assets.bedrock import BEDROCK_PDF

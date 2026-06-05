@@ -16,20 +16,52 @@ from zlib import compress
 
 from fontTools.ttLib import TTFont as FT_TTFont
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
-                           NameObject, NumberObject, StreamObject)
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    FloatObject,
+    NameObject,
+    NumberObject,
+    StreamObject,
+)
 from reportlab.pdfbase.pdfmetrics import _fonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from .assets.blank import BlankPage
-from .constants import (DEFAULT_ASSUMED_GLYPH_WIDTH, DR, EM_TO_PDF_FACTOR,
-                        ENCODING_TABLE_SIZE, FIRST_CHAR_CODE, FONT_NAME_PREFIX,
-                        LAST_CHAR_CODE, AcroForm, BaseFont, Encoding, Fields,
-                        Filter, FirstChar, FlateDecode, Font, FontCmap,
-                        FontDescriptor, FontFile2, FontHead, FontHmtx,
-                        FontName, FontNotdef, LastChar, Length, Length1,
-                        MissingWidth, Resources, Subtype, TrueType, Type,
-                        Widths, WinAnsiEncoding)
+from .constants import (
+    DEFAULT_ASSUMED_GLYPH_WIDTH,
+    DR,
+    EM_TO_PDF_FACTOR,
+    ENCODING_TABLE_SIZE,
+    FIRST_CHAR_CODE,
+    FONT_NAME_PREFIX,
+    LAST_CHAR_CODE,
+    AcroForm,
+    BaseFont,
+    Encoding,
+    Fields,
+    Filter,
+    FirstChar,
+    FlateDecode,
+    Font,
+    FontCmap,
+    FontDescriptor,
+    FontFile2,
+    FontHead,
+    FontHmtx,
+    FontName,
+    FontNotdef,
+    LastChar,
+    Length,
+    Length1,
+    MissingWidth,
+    Resources,
+    Subtype,
+    TrueType,
+    Type,
+    Widths,
+    WinAnsiEncoding,
+)
 from .raw.text import RawText
 from .watermark import create_watermarks_and_draw
 
@@ -287,7 +319,9 @@ def register_font_acroform(
     font_dict_ref = writer._add_object(font_dict)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 
     if AcroForm not in writer._root_object:  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
-        writer._root_object[NameObject(AcroForm)] = DictionaryObject({NameObject(Fields): ArrayObject([])})  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+        writer._root_object[NameObject(AcroForm)] = DictionaryObject(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
+            {NameObject(Fields): ArrayObject([])}
+        )
     acroform = writer._root_object[AcroForm]  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 
     if DR not in acroform:

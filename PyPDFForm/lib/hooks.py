@@ -14,15 +14,47 @@ from io import BytesIO
 from typing import TextIO, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import (ArrayObject, DictionaryObject, FloatObject,
-                           NameObject, NumberObject, TextStringObject)
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    FloatObject,
+    NameObject,
+    NumberObject,
+    TextStringObject,
+)
 
 from .adapter import fp_or_f_obj_or_f_content_to_content
-from .constants import (AA, COMB, DA, FONT_COLOR_IDENTIFIER,
-                        FONT_SIZE_IDENTIFIER, HIDDEN, JS, MULTILINE, READ_ONLY,
-                        REQUIRED, TU, Action, Annots, Bl, D, E, F, Ff, Fo,
-                        JavaScript, MaxLen, Opt, Parent, Q, Rect, S, Type, U,
-                        X)
+from .constants import (
+    AA,
+    COMB,
+    DA,
+    FONT_COLOR_IDENTIFIER,
+    FONT_SIZE_IDENTIFIER,
+    HIDDEN,
+    JS,
+    MULTILINE,
+    READ_ONLY,
+    REQUIRED,
+    TU,
+    Action,
+    Annots,
+    Bl,
+    D,
+    E,
+    F,
+    Ff,
+    Fo,
+    JavaScript,
+    MaxLen,
+    Opt,
+    Parent,
+    Q,
+    Rect,
+    S,
+    Type,
+    U,
+    X,
+)
 from .patterns import get_widget_key
 
 

@@ -10,12 +10,45 @@ for updating these widgets.
 
 from typing import Tuple
 
-from pypdf.generic import (ArrayObject, DictionaryObject, NameObject,
-                           NumberObject, TextStringObject)
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    NameObject,
+    NumberObject,
+    TextStringObject,
+)
 
-from .constants import (AP, AS, DV, FT, HIDDEN, IMAGE_FIELD_IDENTIFIER, JS,
-                        SLASH, TU, A, Btn, Ch, F, Ff, I, MaxLen, N, Off, Opt,
-                        Parent, Q, Rect, Sig, Subtype, T, Tx, V, Widget, Yes)
+from .constants import (
+    AP,
+    AS,
+    DV,
+    FT,
+    HIDDEN,
+    IMAGE_FIELD_IDENTIFIER,
+    JS,
+    SLASH,
+    TU,
+    A,
+    Btn,
+    Ch,
+    F,
+    Ff,
+    I,
+    MaxLen,
+    N,
+    Off,
+    Opt,
+    Parent,
+    Q,
+    Rect,
+    Sig,
+    Subtype,
+    T,
+    Tx,
+    V,
+    Widget,
+    Yes,
+)
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.image import Image

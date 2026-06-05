@@ -20,8 +20,7 @@ from typing import Annotated
 import typer
 
 from .. import PdfWrapper, Widgets, __version__
-from .common import (INPUT_PDF, OPTIONAL_OUTPUT_PDF, json_file_option,
-                     load_json_file)
+from .common import INPUT_PDF, OPTIONAL_OUTPUT_PDF, json_file_option, load_json_file
 from .create import create_cli
 from .inspect import inspect_cli
 from .update import update_cli
