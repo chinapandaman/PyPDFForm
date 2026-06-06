@@ -53,6 +53,13 @@ OPTIONAL_OUTPUT_PDF = Annotated[
     ),
 ]
 FIELD_NAME = Annotated[str, typer.Option("--field", help="Form field name.")]
+FIELD_NAMES = Annotated[
+    list[str],
+    typer.Option(
+        "--field",
+        help="Form field name. Repeat this option to select multiple fields.",
+    ),
+]
 
 
 def json_file_option(help_text: str):
