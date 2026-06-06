@@ -3,4 +3,4 @@ if [ "$PYPDFFORM_ENV" != "container" ]; then
 fi
 
 ruff format .
-ruff check --fix .
+ruff check --fix --select I .

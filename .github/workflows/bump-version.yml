@@ -35,7 +35,7 @@ jobs:
       - name: If needed, format the code, then bump version based on the input
         run: |
           ruff format .
-          ruff check --fix .
+          ruff check --fix --select I .
           NEW_VERSION=$(python scripts/bump_version.py ${{ inputs.version-segment }})
           git config --global user.name 'release-bot'
           git config --global user.email 'bot@domain.com'
