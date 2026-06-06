@@ -816,13 +816,24 @@ PyPDFForm lets you rename existing fields by updating their keys.
 
 ## Remove form fields
 
-Use `PdfWrapper.remove_fields()` to remove form fields by their keys:
+=== "Library"
+    Use `PdfWrapper.remove_fields()` to remove form fields by their keys:
 
-```python
-from PyPDFForm import PdfWrapper
+    ```python
+    from PyPDFForm import PdfWrapper
 
-form = PdfWrapper("sample_template.pdf")
-form.remove_fields(["test", "test_2", "check_2"])
+    form = PdfWrapper("sample_template.pdf")
+    form.remove_fields(["test", "test_2", "check_2"])
 
-form.write("output.pdf")
-```
+    form.write("output.pdf")
+    ```
+=== "CLI"
+    Repeat `--key` or `-k` for each form field key to remove:
+
+    ```shell
+    pypdfform remove field sample_template.pdf \
+        --key test \
+        --key test_2 \
+        --key check_2 \
+        -o output.pdf
+    ```

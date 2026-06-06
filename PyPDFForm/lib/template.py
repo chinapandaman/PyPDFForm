@@ -376,7 +376,9 @@ def create_annotations(
         return f.read()
 
 
-def remove_widgets_by_keys(pdf: bytes, keys: List[str]) -> bytes:
+def remove_widgets_by_keys(
+    pdf: bytes, keys: List[str], use_full_widget_name: bool = False
+) -> bytes:
     """
     Removes specific widgets from a PDF by their keys.
 
@@ -387,6 +389,8 @@ def remove_widgets_by_keys(pdf: bytes, keys: List[str]) -> bytes:
     Args:
         pdf (bytes): The PDF stream to remove widgets from.
         keys (List[str]): A list of widget keys to remove.
+        use_full_widget_name (bool): Whether to match widgets by their full
+            names, including parent names.
 
     Returns:
         bytes: The updated PDF stream with the matching widgets removed.
@@ -402,7 +406,7 @@ def remove_widgets_by_keys(pdf: bytes, keys: List[str]) -> bytes:
 
         for annot in page.get(Annots, []):
             annot = cast(DictionaryObject, annot.get_object())
-            key = get_widget_key(annot.get_object(), False)
+            key = get_widget_key(annot.get_object(), use_full_widget_name)
             if key not in keys:
                 page_annots.append(annot)
             else:

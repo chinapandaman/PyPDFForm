@@ -45,3 +45,11 @@ def test_schema(sample_template_with_full_key):
     obj = PdfWrapper(sample_template_with_full_key, use_full_widget_name=True)
     assert "Gain de 2 classes.0" in obj.schema["properties"]
     assert "0" not in obj.schema
+
+
+def test_remove_fields(sample_template_with_full_key):
+    obj = PdfWrapper(sample_template_with_full_key, use_full_widget_name=True)
+    obj.remove_fields(["Gain de 2 classes.0"])
+
+    assert "Gain de 2 classes.0" not in obj.widgets
+    assert "0" not in obj.widgets

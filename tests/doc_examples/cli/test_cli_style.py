@@ -662,3 +662,34 @@ def test_change_field_visibility(pdf_samples, static_pdfs, json_samples, tmp_pat
 
         assert len(expected) == len(actual)
         assert expected == actual
+
+
+@pytest.mark.cli_test
+def test_remove_fields(pdf_samples, static_pdfs, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_remove_fields.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "remove",
+            "field",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "--key",
+            "test",
+            "--key",
+            "test_2",
+            "--key",
+            "check_2",
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual

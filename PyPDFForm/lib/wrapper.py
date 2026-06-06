@@ -710,7 +710,9 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        self._stream = remove_widgets_by_keys(self._read(), keys)
+        self._stream = remove_widgets_by_keys(
+            self._read(), keys, getattr(self, "use_full_widget_name")
+        )
         self._init_helper()
 
         return self
