@@ -74,7 +74,7 @@ def version_callback(value: bool) -> None:
 
 @cli_app.callback(
     invoke_without_command=True,
-    help="Create, fill, inspect, update, and remove PDF forms.",
+    help="Work with PDF forms from the command line.",
 )
 def main(
     ctx: typer.Context,
@@ -117,7 +117,7 @@ def main(
         ),
     ] = False,
 ) -> None:
-    """Create, fill, inspect, update, and remove PDF forms."""
+    """Work with PDF forms from the command line."""
     ctx.obj = {
         "need_appearances": need_appearances,
         "generate_appearance_streams": generate_appearance_streams,

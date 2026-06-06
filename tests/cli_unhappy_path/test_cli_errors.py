@@ -29,7 +29,7 @@ def test_root_command_no_arg_help():
     result = runner.invoke(cli_app)
 
     assert_cli_error(
-        result, "Create, fill, inspect, update, and remove PDF forms.", "Usage:"
+        result, "Work with PDF forms from the command line.", "Usage:"
     )
     assert "main" not in result.output
 
