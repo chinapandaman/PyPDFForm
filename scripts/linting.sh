@@ -4,5 +4,5 @@ fi
 
 pylint PyPDFForm/
 pyright .
-ruff check --ignore I .
+ruff check .
 python ./scripts/doc_examples_type_check.py
