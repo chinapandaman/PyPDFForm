@@ -828,7 +828,7 @@ PyPDFForm lets you rename existing fields by updating their keys.
     form.write("output.pdf")
     ```
 === "CLI"
-    Pass each form field key to remove with `--key` or `-k`:
+    Repeat `--key` or `-k` for each form field key to remove:
 
     ```shell
     pypdfform remove field sample_template.pdf --key test --key test_2 --key check_2 -o output.pdf

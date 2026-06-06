@@ -29,7 +29,7 @@ def field(
         typer.Option(
             "--key",
             "-k",
-            help="Form field keys to remove.",
+            help="Form field key to remove. Repeat this option to remove multiple fields.",
         ),
     ],
     output: OPTIONAL_OUTPUT_PDF = None,
