@@ -98,3 +98,35 @@ def test_use_full_widget_name_option(static_pdfs):
         ],
     )
     assert result.exit_code == 0
+
+
+@pytest.mark.cli_test
+def test_use_full_widget_name_remove_field(static_pdfs, tmp_path):
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "--use-full-widget-name",
+            "remove",
+            "field",
+            os.path.join(static_pdfs, "sample_template_with_full_key.pdf"),
+            "--key",
+            "Gain de 2 classes.0",
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "--use-full-widget-name",
+            "inspect",
+            "sample",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+    assert "Gain de 2 classes.0" not in result.output
