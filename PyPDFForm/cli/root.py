@@ -2,16 +2,17 @@
 """
 This module defines the root command-line interface for PyPDFForm.
 
-It creates the Typer application, attaches the `create`, `inspect`, and `update`
-command groups, and exposes top-level options shared by those commands. The root
-callback collects global flags in the Typer context so each subcommand can
-initialize `PdfWrapper` with consistent settings.
+It creates the Typer application, attaches the `create`, `inspect`, `update`,
+and `remove` command groups, and exposes top-level options shared by those
+commands. The root callback collects global flags in the Typer context so each
+subcommand can initialize `PdfWrapper` with consistent settings.
 
 Commands:
     - `fill`: Fill an existing PDF form from JSON data.
     - `create`: Create PDFs, fields, annotations, raw elements, and grid views.
     - `inspect`: Print form metadata and field data as JSON.
     - `update`: Modify PDF metadata, field names, properties, geometry, and scripts.
+    - `remove`: Remove PDF form fields.
 """
 
 from pathlib import Path
@@ -23,6 +24,7 @@ from .. import PdfWrapper, Widgets, __version__
 from .common import INPUT_PDF, OPTIONAL_OUTPUT_PDF, json_file_option, load_json_file
 from .create import create_cli
 from .inspect import inspect_cli
+from .remove import remove_cli
 from .update import update_cli
 
 cli_app = typer.Typer(
@@ -42,6 +44,11 @@ cli_app.add_typer(
     update_cli,
     name="update",
     help="Update PDF metadata, fields, and scripts.",
+)
+cli_app.add_typer(
+    remove_cli,
+    name="remove",
+    help="Remove PDF form content.",
 )
 
 
@@ -67,7 +74,7 @@ def version_callback(value: bool) -> None:
 
 @cli_app.callback(
     invoke_without_command=True,
-    help="Create, fill, inspect, and update PDF forms.",
+    help="Create, fill, inspect, update, and remove PDF forms.",
 )
 def main(
     ctx: typer.Context,
@@ -110,7 +117,7 @@ def main(
         ),
     ] = False,
 ) -> None:
-    """Create, fill, inspect, and update PDF forms."""
+    """Create, fill, inspect, update, and remove PDF forms."""
     ctx.obj = {
         "need_appearances": need_appearances,
         "generate_appearance_streams": generate_appearance_streams,

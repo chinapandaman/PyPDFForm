@@ -28,7 +28,9 @@ def assert_cli_error(result, *expected_messages, output_path=None):
 def test_root_command_no_arg_help():
     result = runner.invoke(cli_app)
 
-    assert_cli_error(result, "Create, fill, inspect, and update PDF forms.", "Usage:")
+    assert_cli_error(
+        result, "Create, fill, inspect, update, and remove PDF forms.", "Usage:"
+    )
     assert "main" not in result.output
 
 
