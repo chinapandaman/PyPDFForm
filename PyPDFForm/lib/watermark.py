@@ -9,6 +9,7 @@ and to copy specific widgets from the watermarks to the original PDF.
 """
 
 from collections import defaultdict
+from functools import lru_cache
 from io import BytesIO
 from typing import Any, Dict, List, Optional
 
@@ -19,6 +20,20 @@ from reportlab.pdfgen.canvas import Canvas
 
 from .constants import Annots
 from .patterns import get_widget_key
+
+
+@lru_cache(maxsize=128)
+def _get_image_reader(image_stream: bytes) -> ImageReader:
+    """
+    Creates a cached ReportLab image reader for an image byte stream.
+
+    Args:
+        image_stream (bytes): The image data as a byte stream.
+
+    Returns:
+        ImageReader: The cached ReportLab image reader.
+    """
+    return ImageReader(BytesIO(image_stream))
 
 
 def draw_text(canvas: Canvas, **kwargs) -> None:
@@ -206,20 +221,14 @@ def draw_image(canvas: Canvas, **kwargs) -> None:
     width = kwargs["width"]
     height = kwargs["height"]
 
-    image_buff = BytesIO()
-    image_buff.write(image_stream)
-    image_buff.seek(0)
-
     canvas.drawImage(
-        ImageReader(image_buff),
+        _get_image_reader(image_stream),
         coordinate_x,
         coordinate_y,
         width=width,
         height=height,
         mask="auto",
     )
-
-    image_buff.close()
 
 
 def create_watermarks_and_draw(
