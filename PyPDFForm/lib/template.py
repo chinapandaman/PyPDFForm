@@ -449,7 +449,7 @@ def update_widget_keys(
     out = PdfWriter()
     out.append(pdf)
 
-    _update_widget_keys_in_single_pass(out, widgets, old_keys, new_keys, indices)
+    _apply_widget_key_updates(out, widgets, old_keys, new_keys, indices)
 
     with BytesIO() as f:
         out.write(f)
@@ -457,7 +457,7 @@ def update_widget_keys(
         return f.read()
 
 
-def _update_widget_keys_in_single_pass(
+def _apply_widget_key_updates(
     writer: PdfWriter,
     widgets: Dict[str, WIDGET_TYPES],
     old_keys: List[str],
@@ -465,7 +465,7 @@ def _update_widget_keys_in_single_pass(
     indices: List[int],
 ) -> None:
     """
-    Applies queued widget key updates while scanning annotations once.
+    Applies queued widget key updates to matching annotations.
 
     The update queue is converted into a lookup keyed by old widget name, then
     each annotation is checked against that lookup as pages are traversed.
