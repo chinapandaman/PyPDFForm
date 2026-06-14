@@ -120,6 +120,11 @@ class SignatureWidget:
             annot_type_to_annot[key] = annot.get_object()
 
         for i, p in enumerate(input_pdf.pages):
+            page_widgets = page_to_widgets.get(i + 1, [])
+            if not page_widgets:
+                result.append(b"")
+                continue
+
             # pylint: disable=R0801
             watermark = BytesIO()
             canvas = Canvas(
@@ -134,8 +139,6 @@ class SignatureWidget:
             watermark.seek(0)
 
             out = PdfWriter(watermark)
-
-            page_widgets = page_to_widgets.get(i + 1, [])
 
             widgets_to_copy = []
             for widget in page_widgets:
