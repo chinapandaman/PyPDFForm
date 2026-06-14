@@ -7,6 +7,7 @@ calculating the resolutions for drawing an image on a PDF page, taking into
 account whether to preserve the aspect ratio.
 """
 
+from functools import lru_cache
 from io import BytesIO
 from typing import Tuple
 
@@ -50,12 +51,13 @@ def rotate_image(image_stream: bytes, rotation: float | int) -> bytes:
     return result
 
 
+@lru_cache
 def get_image_dimensions(image_stream: bytes) -> Tuple[float, float]:
     """
     Retrieves the width and height of an image from its byte stream.
 
-    This function uses the PIL library to open the image from the provided byte stream
-    and returns its dimensions (width and height) as a tuple of floats.
+    This cached function uses the PIL library to open the image from the provided
+    byte stream and returns its dimensions (width and height) as a tuple of floats.
 
     Args:
         image_stream (bytes): The image data as bytes.
@@ -63,13 +65,8 @@ def get_image_dimensions(image_stream: bytes) -> Tuple[float, float]:
     Returns:
         Tuple[float, float]: The width and height of the image in pixels.
     """
-    buff = BytesIO()
-    buff.write(image_stream)
-    buff.seek(0)
-
-    image = Image.open(buff)
-
-    return image.size
+    with Image.open(BytesIO(image_stream)) as image:
+        return image.size
 
 
 def get_draw_image_resolutions(

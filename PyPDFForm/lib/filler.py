@@ -57,7 +57,11 @@ def signature_image_handler(
     any_image_to_draw = False
     if stream is not None:
         any_image_to_draw = True
-        image_width, image_height = get_image_dimensions(stream)
+        image_width, image_height = (
+            get_image_dimensions(stream)
+            if middleware.preserve_aspect_ratio
+            else (0, 0)
+        )
         x, y, width, height = get_draw_image_resolutions(
             widget, middleware.preserve_aspect_ratio, image_width, image_height
         )
