@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import asdict
-from functools import cached_property
+from functools import lru_cache
 from os import PathLike
 from typing import (
     TYPE_CHECKING,
@@ -241,6 +241,26 @@ class PdfWrapper:
         if self._read():
             self._available_fonts.update(**get_all_available_fonts(self._read()))
 
+    @staticmethod
+    @lru_cache
+    def _get_page_streams_with_widgets(stream: bytes) -> tuple[bytes, ...]:
+        """
+        Extracts page streams while preserving the original page widgets.
+
+        Args:
+            stream (bytes): The PDF stream to split into pages.
+
+        Returns:
+            tuple[bytes, ...]: Single-page PDF streams with widgets preserved.
+        """
+        return tuple(
+            # Case: Single watermark PDF, extracting a specific page to the first output page.
+            copy_watermark_widgets(page_stream, stream, None, i)
+            for i, page_stream in enumerate(
+                get_page_streams(remove_all_widgets(stream))
+            )
+        )
+
     def _reregister_font(self) -> PdfWrapper:
         """
         Reregisters fonts after PDF content modifications.
@@ -334,7 +354,7 @@ class PdfWrapper:
 
         return list(self._available_fonts.keys())
 
-    @cached_property
+    @property
     def pages(self) -> Sequence[PdfWrapper]:
         """
         Returns a list of `PdfWrapper` objects, each representing a single page in the PDF document.
@@ -347,11 +367,10 @@ class PdfWrapper:
 
         result = [
             self.__class__(
-                # Case: Single watermark PDF, extracting a specific page to the first output page.
-                copy_watermark_widgets(each, self._read(), None, i),
+                each,
                 **{param: getattr(self, param) for param, _ in self.USER_PARAMS},
             )
-            for i, each in enumerate(get_page_streams(remove_all_widgets(self._read())))
+            for each in self._get_page_streams_with_widgets(self._read())
         ]
 
         # because copy_watermark_widgets and remove_all_widgets

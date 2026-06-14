@@ -15,6 +15,7 @@ Classes:
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 from inspect import signature
 from io import BytesIO
 from typing import List, Optional
@@ -102,6 +103,28 @@ class Widget:
             if each in kwargs:
                 self.hook_params.append((each, kwargs.get(each)))
 
+    @staticmethod
+    @lru_cache
+    def _get_default_field_flags(acro_form_class: type, acro_form_func: str) -> tuple:
+        """
+        Retrieves the default field flags for a ReportLab AcroForm method.
+
+        Args:
+            acro_form_class (type): The ReportLab AcroForm class.
+            acro_form_func (str): The AcroForm method name.
+
+        Returns:
+            tuple: The default field flags split into individual flag names.
+        """
+        default_flags = signature(
+            getattr(acro_form_class, acro_form_func)
+        ).parameters.get(fieldFlags)
+        return (
+            tuple(default_flags.default.split(" "))
+            if default_flags and default_flags.default
+            else ()
+        )
+
     def _required_handler(self, canvas: Canvas) -> None:
         """
         Handles the 'Required' flag for the widget's AcroForm field.
@@ -115,13 +138,8 @@ class Widget:
         Args:
             canvas (Canvas): The ReportLab canvas object used for PDF operations.
         """
-        default_flags = signature(
-            getattr(canvas.acroForm, self.ACRO_FORM_FUNC)
-        ).parameters.get(fieldFlags)
-        default_flags = (
-            default_flags.default.split(" ")
-            if default_flags and default_flags.default
-            else []
+        default_flags = list(
+            self._get_default_field_flags(type(canvas.acroForm), self.ACRO_FORM_FUNC)
         )
 
         if self.acro_form_params.get(required):
