@@ -449,8 +449,7 @@ def update_widget_keys(
     out = PdfWriter()
     out.append(pdf)
 
-    for i, old_key in enumerate(old_keys):
-        _update_single_widget_key(out, widgets, old_key, new_keys[i], indices[i])
+    _update_widget_keys_in_single_pass(out, widgets, old_keys, new_keys, indices)
 
     with BytesIO() as f:
         out.write(f)
@@ -458,35 +457,44 @@ def update_widget_keys(
         return f.read()
 
 
-def _update_single_widget_key(
+def _update_widget_keys_in_single_pass(
     writer: PdfWriter,
     widgets: Dict[str, WIDGET_TYPES],
-    old_key: str,
-    new_key: str,
-    index: int,
+    old_keys: List[str],
+    new_keys: List[str],
+    indices: List[int],
 ) -> None:
     """
-    Updates a single widget key in a PDF template.
+    Applies queued widget key updates while scanning annotations once.
+
+    The update queue is converted into a lookup keyed by old widget name, then
+    each annotation is checked against that lookup as pages are traversed.
+    Non-radio widgets honor the requested occurrence index, while radio widgets
+    update every annotation in the radio group.
 
     Args:
         writer (PdfWriter): The PDF writer object.
         widgets (Dict[str, WIDGET_TYPES]): A dictionary of widgets in the template.
-        old_key (str): The old widget key to be replaced.
-        new_key (str): The new widget key to replace the old key.
-        index (int): The index of the widget to update if multiple widgets have the same name.
+        old_keys (List[str]): The old widget keys to replace.
+        new_keys (List[str]): The new widget keys to apply.
+        indices (List[int]): Widget occurrence indices for duplicate field names.
     """
-    tracker = -1
+    updates = {old_key: (new_keys[i], indices[i]) for i, old_key in enumerate(old_keys)}
+    trackers = {}
+
     for page in writer.pages:
         for annot in page.get(Annots, []):
             annot = cast(DictionaryObject, annot.get_object())
             key = get_widget_key(annot.get_object(), False)
 
+            if key not in updates:
+                continue
+
             widget = widgets.get(key)
-            if widget is None or old_key != key:
-                continue
+            if widget is not None:
+                trackers[key] = trackers.get(key, -1) + 1
+                new_key, index = updates[key]
+                if not isinstance(widget, Radio) and trackers[key] != index:
+                    continue
 
-            tracker += 1
-            if not isinstance(widget, Radio) and tracker != index:
-                continue
-
-            update_annotation_name(annot, new_key)
+                update_annotation_name(annot, new_key)
