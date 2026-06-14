@@ -253,6 +253,7 @@ class PdfWrapper:
         Returns:
             tuple[bytes, ...]: Single-page PDF streams with widgets preserved.
         """
+
         return tuple(
             # Case: Single watermark PDF, extracting a specific page to the first output page.
             copy_watermark_widgets(page_stream, stream, None, i)
