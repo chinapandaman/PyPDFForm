@@ -18,7 +18,7 @@ class PdfArray(list):
 
     When sliced, this list automatically merges the contained PdfWrapper
     objects using the PdfWrapper.__add__ method, returning a single
-    merged PdfWrapper object. If the slice is empty, it returns an empty list.
+    merged PdfWrapper object. If the slice is empty, it returns None.
     For non-slice indexing, it behaves like a standard list.
     """
 

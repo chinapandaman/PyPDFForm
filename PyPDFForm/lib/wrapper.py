@@ -131,7 +131,7 @@ class PdfWrapper:
                 - str: The file path to the PDF.
                 - BinaryIO: An open file-like object containing the PDF data.
                 - BlankPage: A blank page object.
-                Defaults to an empty byte string (b""), which creates a blank PDF.
+                Defaults to an empty byte string (b"").
             **kwargs: Additional keyword arguments to configure the `PdfWrapper`.
                 These arguments are used to set the user-configurable parameters defined in `USER_PARAMS`.
                 For example: `use_full_widget_name=True` or `need_appearances=False`.
@@ -796,7 +796,7 @@ class PdfWrapper:
         Draws raw elements (text, images, etc.) directly onto the PDF pages.
 
         This method is the primary mechanism for drawing non-form field content.
-        It takes a list of `RawText` or `RawImage` objects and renders them
+        It takes a list of raw element objects and renders them
         onto the PDF document as watermarks.
 
         Args:

@@ -333,7 +333,8 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
     This function determines the current value of the dropdown, considering
     whether it's a child annotation or a top-level one. It then iterates
     through the widget's choices to find a match and sets the widget's
-    value to the index of the matched choice.
+    value to the index of the matched choice, or None when the first choice
+    is selected.
 
     Args:
         annot (DictionaryObject): The dropdown annotation dictionary.
