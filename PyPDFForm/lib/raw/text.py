@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Contains the RawText class, which represents a text annotation
+Contains the RawText class, which represents a text element
 that can be drawn directly onto a PDF page without relying on existing form fields.
 """
 
@@ -38,7 +38,7 @@ class RawText:
             y: The y-coordinate (vertical position) of the text.
             font: The name of the font to use for the text (defaults to DEFAULT_FONT).
             font_size: The size of the font (defaults to DEFAULT_FONT_SIZE).
-            font_color: The color of the text as an RGB tuple (0-255 for each channel).
+            font_color: The color of the text as an RGB tuple (0-1 for each channel).
         """
         super().__init__()
 
