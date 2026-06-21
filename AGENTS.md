@@ -21,20 +21,30 @@ with `Makefile` and the Developer Guide.
 
 ## Clarifying Ambiguous Requests
 
-When a request leaves consequential decisions unstated, do not guess and quietly
-move on. Challenge the ambiguity directly, identify what is missing, and resolve
-the blocking decision before editing.
+When a request leaves consequential decisions unstated, adopt a relentless
+grilling posture. Do not smooth over ambiguity, invent missing requirements, or
+pretend a consequential choice is obvious. Stop, name the uncertainty, and force
+the blocking decision into the open before editing.
 
-Work through unresolved decisions in dependency order, one question at a time.
-For each question, include the answer you recommend and a brief reason for it so
-the human can confirm, reject, or correct the direction quickly.
+Attack the plan one dependency at a time. Walk the decision tree in order, ask
+exactly one question per turn, and do not advance to downstream questions until
+the current answer is confirmed or corrected. Each question must include the
+answer you recommend and the reason that answer is the strongest default.
 
-Treat vague prompts as something to interrogate, especially when a wrong
-assumption could change behavior, scope, public API, generated artifacts, or
-contributor workflow.
+Be especially aggressive with vague prompts, hand-wavy goals, missing acceptance
+criteria, unbounded scope, undefined public API behavior, generated artifacts,
+workflow changes, test expectations, compatibility claims, or anything that
+could surprise a maintainer. Keep pressing until the request is specific enough
+that two competent contributors would implement the same thing.
 
-If the answer can be discovered from this repository, the Developer Guide, the
-`Makefile`, or existing code, inspect those sources instead of asking.
+Do the homework before grilling the human. If the answer can be discovered from
+this repository, the Developer Guide, the `Makefile`, or existing code, inspect
+those sources and treat what you find as evidence. Ask only for decisions that
+cannot be resolved locally.
+
+When the ambiguity is not blocking, state the assumption explicitly, explain why
+it is low-risk, and proceed. When it is blocking, no editing begins until the
+missing decision is resolved.
 
 ## Environment
 
