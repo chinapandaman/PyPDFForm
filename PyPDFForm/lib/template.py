@@ -42,7 +42,7 @@ from .patterns import (
 from .utils import extract_widget_property, find_pattern_match
 
 
-@lru_cache
+@lru_cache(maxsize=128)
 def get_metadata(pdf: bytes) -> dict:
     """
     Retrieves the metadata of a PDF.
@@ -83,7 +83,7 @@ def build_widgets(
     return deepcopy(_build_widget_cache(pdf_stream, use_full_widget_name))
 
 
-@lru_cache
+@lru_cache(maxsize=128)
 def _build_widget_cache(
     pdf_stream: bytes,
     use_full_widget_name: bool,
@@ -241,7 +241,7 @@ def _handle_radio_widget(
         radio.value = radio.number_of_options - 1
 
 
-@lru_cache()
+@lru_cache(maxsize=128)
 def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
     """
     Retrieves widgets from a PDF stream, organized by page number.

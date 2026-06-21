@@ -49,7 +49,7 @@ def rotate_image(image_stream: bytes, rotation: float | int) -> bytes:
     return result
 
 
-@lru_cache
+@lru_cache(maxsize=128)
 def get_image_dimensions(image_stream: bytes) -> Tuple[float, float]:
     """
     Retrieves the width and height of an image from its byte stream.

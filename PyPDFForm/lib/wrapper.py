@@ -260,7 +260,7 @@ class PdfWrapper:
         return self._available_fonts
 
     @staticmethod
-    @lru_cache
+    @lru_cache(maxsize=128)
     def _get_page_streams_with_widgets(stream: bytes) -> tuple[bytes, ...]:
         """
         Extracts page streams while preserving the original page widgets.

@@ -26,7 +26,7 @@ from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 from .constants import SLASH, UNIQUE_SUFFIX_LENGTH, Annots
 
 
-@lru_cache
+@lru_cache(maxsize=128)
 def remove_all_widgets(pdf: bytes) -> bytes:
     """
     Removes all widgets (form fields) from a PDF, effectively flattening the form.

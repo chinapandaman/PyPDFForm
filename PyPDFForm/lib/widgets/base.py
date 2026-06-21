@@ -104,7 +104,7 @@ class Widget:
                 self.hook_params.append((each, kwargs.get(each)))
 
     @staticmethod
-    @lru_cache
+    @lru_cache(maxsize=128)
     def _get_default_field_flags(acro_form_class: type, acro_form_func: str) -> tuple:
         """
         Retrieves the default field flags for a ReportLab AcroForm method.
