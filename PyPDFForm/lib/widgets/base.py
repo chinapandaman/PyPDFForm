@@ -192,9 +192,9 @@ class Widget:
                          watermark for that page. Pages without any widgets will
                          have an empty byte string (b"").
         """
-        result = []
-
         pdf = PdfReader(BytesIO(stream))
+        page_count = len(pdf.pages)
+        result = [b""] * page_count
 
         widgets_by_page = {}
         for widget in widgets:
@@ -202,15 +202,14 @@ class Widget:
                 widgets_by_page[widget.page_number] = []
             widgets_by_page[widget.page_number].append(widget)
 
-        for i, page in enumerate(pdf.pages):
-            page_num = i + 1
+        for page_num in range(1, page_count + 1):
             if page_num not in widgets_by_page:
-                result.append(b"")
                 continue
 
             # Use a fresh buffer per page to avoid stale trailing bytes
             # when the current page watermark is smaller than a previous page.
             watermark = BytesIO()
+            page = pdf.pages[page_num - 1]
 
             canvas = Canvas(
                 watermark,
@@ -227,7 +226,7 @@ class Widget:
             canvas.showPage()
             canvas.save()
             watermark.seek(0)
-            result.append(watermark.read())
+            result[page_num - 1] = watermark.read()
 
         return result
 
