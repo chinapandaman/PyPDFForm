@@ -146,6 +146,7 @@ class PdfWrapper:
         )
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
+        self._available_fonts_loaded = False
         self._font_register_events = []  # for reregister
         self._key_update_tracker = {}  # for update key preserve old key attrs
         self._keys_to_update = []  # for bulk update keys
@@ -208,19 +209,21 @@ class PdfWrapper:
 
     def _init_helper(self) -> None:
         """
-        Helper method to initialize widgets and available fonts.
+        Helper method to initialize widgets.
 
         This method is called during initialization and after certain operations
         that modify the PDF content (e.g., filling, creating widgets, updating keys).
-        It rebuilds the widget dictionary and updates the available fonts.
+        It rebuilds the widget dictionary and invalidates the lazily loaded font cache.
         """
 
+        stream = self._read()
+        self._available_fonts_loaded = False
         new_widgets = (
             build_widgets(
-                self._read(),
+                stream,
                 getattr(self, "use_full_widget_name"),
             )
-            if self._read()
+            if stream
             else {}
         )
         # ensure old widgets don't get overwritten
@@ -238,8 +241,23 @@ class PdfWrapper:
 
         self.widgets = new_widgets
 
-        if self._read():
-            self._available_fonts.update(**get_all_available_fonts(self._read()))
+    def _ensure_available_fonts_loaded(self) -> dict:
+        """
+        Loads AcroForm fonts from the PDF stream the first time they are needed.
+
+        Custom fonts registered through `register_font` are stored in the same
+        mapping, so loading updates the existing dictionary instead of replacing it.
+
+        Returns:
+            dict: A mapping from font names to internal PDF font identifiers.
+        """
+
+        if not self._available_fonts_loaded:
+            if self._stream:
+                self._available_fonts.update(**get_all_available_fonts(self._stream))
+            self._available_fonts_loaded = True
+
+        return self._available_fonts
 
     @staticmethod
     @lru_cache
@@ -349,11 +367,14 @@ class PdfWrapper:
         """
         Returns a list of the names of the currently registered fonts.
 
+        Accessing this property loads AcroForm fonts from the PDF stream if
+        they have not already been loaded.
+
         Returns:
             list: A list of font names (str).
         """
 
-        return list(self._available_fonts.keys())
+        return list(self._ensure_available_fonts_loaded().keys())
 
     @property
     def pages(self) -> Sequence[PdfWrapper]:
@@ -453,15 +474,15 @@ class PdfWrapper:
         """
 
         if any(widget.hooks_to_trigger for widget in self.widgets.values()):
+            available_fonts = self._ensure_available_fonts_loaded()
             for widget in self.widgets.values():
                 if (
                     isinstance(widget, (Text, Dropdown))
-                    and widget.font not in self._available_fonts.values()
-                    and widget.font in self._available_fonts
+                    and widget.font not in available_fonts.values()
+                    and widget.font in available_fonts
                 ):
-                    widget.font = self._available_fonts.get(
-                        widget.font
-                    )  # from `new_font` to `/F1`
+                    # from `new_font` to `/F1`
+                    widget.font = available_fonts.get(widget.font)
 
             self._stream = trigger_widget_hooks(
                 self._stream,
@@ -844,6 +865,7 @@ class PdfWrapper:
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
 
         if validate_font(font_name, ttf_file) if ttf_file is not None else False:
+            self._ensure_available_fonts_loaded()
             self._stream, new_font_name = register_font_acroform(
                 self._read(), ttf_file, getattr(self, "need_appearances")
             )
