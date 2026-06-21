@@ -398,6 +398,7 @@ def remove_widgets_by_keys(
     if not keys:
         return pdf
 
+    key_set = set(keys)
     writer = PdfWriter(BytesIO(pdf))
 
     for page in writer.pages:
@@ -407,7 +408,7 @@ def remove_widgets_by_keys(
         for annot in page.get(Annots, []):
             annot = cast(DictionaryObject, annot.get_object())
             key = get_widget_key(annot.get_object(), use_full_widget_name)
-            if key not in keys:
+            if key not in key_set:
                 page_annots.append(annot)
             else:
                 needs_update = True

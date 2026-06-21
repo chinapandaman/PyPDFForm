@@ -263,20 +263,21 @@ def create_watermarks_and_draw(
         "ellipse": draw_ellipse,
     }
 
-    result = []
-
     page_to_to_draw = defaultdict(list)
     for each in to_draw:
         page_to_to_draw[each["page_number"]].append(each)
 
     pdf_file = PdfReader(BytesIO(pdf))
+    page_count = len(pdf_file.pages)
+    result = [b""] * page_count
+    font_mapping = font_mapping or {}
 
-    for i, page in enumerate(pdf_file.pages):
-        elements = page_to_to_draw[i + 1]
+    for page_num in range(1, page_count + 1):
+        elements = page_to_to_draw.get(page_num, [])
         if not elements:
-            result.append(b"")
             continue
 
+        page = pdf_file.pages[page_num - 1]
         buff = BytesIO()
 
         canvas = Canvas(
@@ -288,13 +289,11 @@ def create_watermarks_and_draw(
         )
 
         for element in elements:
-            type_to_func[element["type"]](
-                canvas, **element, font_mapping=font_mapping or {}
-            )
+            type_to_func[element["type"]](canvas, **element, font_mapping=font_mapping)
 
         canvas.save()
         buff.seek(0)
-        result.append(buff.read())
+        result[page_num - 1] = buff.read()
 
     return result
 
@@ -335,7 +334,7 @@ def merge_watermarks_with_pdf(
 def _clone_page_widgets(
     writer: PdfWriter,
     page: PageObject,
-    keys: Optional[List[str]],
+    keys: Optional[set[str]],
 ) -> List[Any]:
     """
     Clones matching widgets from a single PDF page.
@@ -343,7 +342,7 @@ def _clone_page_widgets(
     Args:
         writer (PdfWriter): The PdfWriter for cloning.
         page (PageObject): The source PDF page object.
-        keys (Optional[List[str]]): Keys of widgets to clone.
+        keys (Optional[set[str]]): Keys of widgets to clone.
 
     Returns:
         List[Any]: A list of cloned widget objects.
@@ -359,7 +358,7 @@ def _clone_page_widgets(
 def _collect_from_single_watermark_specific_page(
     writer: PdfWriter,
     watermark: bytes,
-    keys: Optional[List[str]],
+    keys: Optional[set[str]],
     page_num: int,
 ) -> Dict[int, List[Any]]:
     """
@@ -368,7 +367,7 @@ def _collect_from_single_watermark_specific_page(
     Args:
         writer (PdfWriter): The PdfWriter for cloning.
         watermark (bytes): The watermark PDF byte stream.
-        keys (Optional[List[str]]): Keys of widgets to clone.
+        keys (Optional[set[str]]): Keys of widgets to clone.
         page_num (int): The page index within the watermark PDF.
 
     Returns:
@@ -386,7 +385,7 @@ def _collect_from_single_watermark_specific_page(
 def _collect_from_single_watermark_1_to_1(
     writer: PdfWriter,
     watermark: bytes,
-    keys: Optional[List[str]],
+    keys: Optional[set[str]],
 ) -> Dict[int, List[Any]]:
     """
     Maps pages 1:1 between a single watermark PDF and the output PDF.
@@ -394,7 +393,7 @@ def _collect_from_single_watermark_1_to_1(
     Args:
         writer (PdfWriter): The PdfWriter for cloning.
         watermark (bytes): The watermark PDF byte stream.
-        keys (Optional[List[str]]): Keys of widgets to clone.
+        keys (Optional[set[str]]): Keys of widgets to clone.
 
     Returns:
         Dict[int, List[Any]]: A dictionary mapping output page indices to cloned widgets.
@@ -409,7 +408,7 @@ def _collect_from_single_watermark_1_to_1(
 def _collect_from_multiple_watermarks(
     writer: PdfWriter,
     watermarks: List[bytes],
-    keys: Optional[List[str]],
+    keys: Optional[set[str]],
     page_num: Optional[int],
 ) -> Dict[int, List[Any]]:
     """
@@ -418,7 +417,7 @@ def _collect_from_multiple_watermarks(
     Args:
         writer (PdfWriter): The PdfWriter for cloning.
         watermarks (List[bytes]): A list of watermark PDF byte streams.
-        keys (Optional[List[str]]): Keys of widgets to clone.
+        keys (Optional[set[str]]): Keys of widgets to clone.
         page_num (Optional[int]): The page index within each watermark PDF.
 
     Returns:
@@ -453,17 +452,19 @@ def _collect_widgets_to_copy(
     Returns:
         Dict[int, List[Any]]: A dictionary mapping output page indices to lists of cloned widgets.
     """
+    key_set = set(keys) if keys is not None else None
+
     if isinstance(watermarks, bytes):
         if page_num is not None:
             # Case: Single watermark PDF, extracting a specific page to the first output page.
             return _collect_from_single_watermark_specific_page(
-                writer, watermarks, keys, page_num
+                writer, watermarks, key_set, page_num
             )
         # Case: Single watermark PDF, mapping pages 1:1 to output pages.
-        return _collect_from_single_watermark_1_to_1(writer, watermarks, keys)
+        return _collect_from_single_watermark_1_to_1(writer, watermarks, key_set)
 
     # Case: List of watermark PDFs, each corresponding to an output page.
-    return _collect_from_multiple_watermarks(writer, watermarks, keys, page_num)
+    return _collect_from_multiple_watermarks(writer, watermarks, key_set, page_num)
 
 
 def _apply_widgets_to_pages(

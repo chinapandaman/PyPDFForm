@@ -104,13 +104,13 @@ class SignatureWidget:
             List[bytes]: A list of watermark PDF streams. Each element corresponds to
             a page in the input PDF.
         """
-        result = []
-
         page_to_widgets = defaultdict(list)
         for widget in widgets:
             page_to_widgets[widget.page_number].append(widget)
 
         input_pdf = PdfReader(BytesIO(stream))
+        page_count = len(input_pdf.pages)
+        result = [b""] * page_count
 
         bedrock = PdfReader(BytesIO(BEDROCK_PDF))
         page = bedrock.pages[0]
@@ -119,14 +119,14 @@ class SignatureWidget:
             key = get_widget_key(annot.get_object(), False)
             annot_type_to_annot[key] = annot.get_object()
 
-        for i, p in enumerate(input_pdf.pages):
-            page_widgets = page_to_widgets.get(i + 1, [])
+        for page_num in range(1, page_count + 1):
+            page_widgets = page_to_widgets.get(page_num, [])
             if not page_widgets:
-                result.append(b"")
                 continue
 
             # pylint: disable=R0801
             watermark = BytesIO()
+            p = input_pdf.pages[page_num - 1]
             canvas = Canvas(
                 watermark,
                 pagesize=(
@@ -169,7 +169,7 @@ class SignatureWidget:
             with BytesIO() as f:
                 out.write(f)
                 f.seek(0)
-                result.append(f.read())
+                result[page_num - 1] = f.read()
 
         return result
 
