@@ -230,6 +230,20 @@ def _get_watermark_with_font(ttf_stream: bytes) -> bytes:
         )[0]
 
 
+@lru_cache(maxsize=128)
+def _compress_ttf(ttf_stream: bytes) -> bytes:
+    """
+    Compresses a TrueType font stream for embedding in a PDF.
+
+    Args:
+        ttf_stream (bytes): The font file data in TTF format.
+
+    Returns:
+        bytes: The compressed font stream.
+    """
+    return compress(ttf_stream)
+
+
 def register_font_acroform(
     pdf: bytes, ttf_stream: bytes, need_appearances: bool
 ) -> tuple:
@@ -266,7 +280,7 @@ def register_font_acroform(
         )
 
     font_file_stream = StreamObject()
-    compressed_ttf = compress(ttf_stream)
+    compressed_ttf = _compress_ttf(ttf_stream)
     font_file_stream.set_data(compressed_ttf)
     font_file_stream.update(
         {

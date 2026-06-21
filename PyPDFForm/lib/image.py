@@ -16,6 +16,7 @@ from PIL import Image
 from .constants import Rect
 
 
+@lru_cache(maxsize=128)
 def rotate_image(image_stream: bytes, rotation: float | int) -> bytes:
     """
     Rotates an image by a specified angle in degrees.
@@ -33,10 +34,7 @@ def rotate_image(image_stream: bytes, rotation: float | int) -> bytes:
     Returns:
         bytes: The rotated image data as bytes.
     """
-    buff = BytesIO()
-    buff.write(image_stream)
-    buff.seek(0)
-
+    buff = BytesIO(image_stream)
     image = Image.open(buff)
 
     rotated_buff = BytesIO()
