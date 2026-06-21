@@ -8,6 +8,7 @@ and defines specific patterns for identifying and constructing different
 types of widgets.
 """
 
+from copy import deepcopy
 from functools import lru_cache
 from io import BytesIO
 from typing import Dict, List, cast
@@ -64,13 +65,11 @@ def build_widgets(
     use_full_widget_name: bool,
 ) -> Dict[str, WIDGET_TYPES]:
     """
-    Builds a dictionary of widgets from a PDF stream.
+    Builds an independent dictionary of widgets from a PDF stream.
 
-    This function parses a PDF stream to identify and construct widgets
-    present in the PDF form. It iterates through each page and its annotations,
-    extracting widget properties such as key, description, max length (for text fields),
-    and choices (for dropdowns). The constructed widgets are stored in a dictionary
-    where the keys are the widget keys and the values are the widget objects.
+    Widget discovery and construction are cached internally, then deep-copied
+    before returning so callers can safely mutate widget attributes without
+    changing cached objects or widgets returned by other calls.
 
     Args:
         pdf_stream (bytes): The PDF stream to parse.
@@ -80,6 +79,28 @@ def build_widgets(
     Returns:
         Dict[str, WIDGET_TYPES]: A dictionary of widgets, where keys are widget
             keys and values are widget objects.
+    """
+    return deepcopy(_build_widget_cache(pdf_stream, use_full_widget_name))
+
+
+@lru_cache
+def _build_widget_cache(
+    pdf_stream: bytes,
+    use_full_widget_name: bool,
+) -> Dict[str, WIDGET_TYPES]:
+    """
+    Builds and caches reusable widget objects from a PDF stream.
+
+    The cached widgets must be treated as prototypes only. Use `build_widgets`
+    to get independent copies that are safe to mutate.
+
+    Args:
+        pdf_stream (bytes): The PDF stream to parse.
+        use_full_widget_name (bool): Whether to use the full widget name
+            (including parent names) as the widget key.
+
+    Returns:
+        Dict[str, WIDGET_TYPES]: Cached widget prototypes keyed by widget name.
     """
     results = {}
 
