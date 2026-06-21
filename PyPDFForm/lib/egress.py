@@ -21,7 +21,7 @@ from pypdf.generic import DictionaryObject, NameObject, TextStringObject
 from .constants import JS, XFA, AcroForm, JavaScript, OpenAction, Root, S, Title
 
 
-@lru_cache
+@lru_cache(maxsize=128)
 def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) -> bytes:
     """
     Handles appearance streams and the /NeedAppearances flag for a PDF form.
