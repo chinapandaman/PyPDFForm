@@ -12,6 +12,7 @@ called right before the final PDF byte stream is returned by the wrapper module.
 
 from functools import lru_cache
 from io import BytesIO
+from warnings import catch_warnings, simplefilter
 
 from pikepdf import Pdf
 from pypdf import PdfReader, PdfWriter
@@ -57,7 +58,9 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
         result = f.read()
 
     if generate_appearance_streams:
-        with Pdf.open(BytesIO(result)) as f:
+        # TODO: remove after fixing /Annots /Fields mismatch
+        with Pdf.open(BytesIO(result)) as f, catch_warnings():
+            simplefilter("ignore")
             f.generate_appearance_streams()
             with BytesIO() as r:
                 f.save(r)
