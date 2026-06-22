@@ -18,14 +18,35 @@ remove_cli = typer.Typer(
 )
 
 
-@remove_cli.command(no_args_is_help=True)
+@remove_cli.command(
+    no_args_is_help=True,
+    help="Remove form fields from a PDF.",
+)
 def field(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     fields: FIELD_NAMES,
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
-    """Remove form fields from a PDF."""
+    """
+    Remove one or more named form fields from an existing PDF.
+
+    The command loads the PDF with the global CLI options stored in `ctx.obj`,
+    validates each requested field name before changing the document, removes
+    the fields through `PdfWrapper.remove_fields`, and writes the modified PDF
+    to the requested output path or back to the input file.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        fields (list[str]): Form field names to remove.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+
+    Raises:
+        typer.BadParameter: Raised when any requested field does not exist.
+    """
     obj = PdfWrapper(str(pdf), **ctx.obj)
     for field_name in fields:
         get_widget(obj, field_name, "--field")

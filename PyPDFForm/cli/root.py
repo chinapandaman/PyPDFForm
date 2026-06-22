@@ -117,7 +117,24 @@ def main(
         ),
     ] = False,
 ) -> None:
-    """Work with PDF forms from the command line."""
+    """
+    Initialize shared CLI options for the selected command.
+
+    Typer runs this callback before dispatching to a subcommand. The callback
+    stores global PDF handling options on `ctx.obj` so command groups can pass
+    a consistent set of keyword arguments to `PdfWrapper`.
+
+    Args:
+        ctx (typer.Context): Typer context for the current CLI invocation.
+        version (bool): Whether to print the package version and exit.
+        need_appearances (bool): Whether to ask PDF viewers to render form
+            field appearances.
+        generate_appearance_streams (bool): Whether to generate form field
+            appearance streams while handling PDFs.
+        preserve_metadata (bool): Whether to preserve input PDF metadata.
+        use_full_widget_name (bool): Whether widget lookups should use full
+            form field names.
+    """
     ctx.obj = {
         "need_appearances": need_appearances,
         "generate_appearance_streams": generate_appearance_streams,
@@ -126,7 +143,10 @@ def main(
     }
 
 
-@cli_app.command(no_args_is_help=True)
+@cli_app.command(
+    no_args_is_help=True,
+    help="Fill a PDF form with JSON data.",
+)
 def fill(
     ctx: typer.Context,
     pdf: INPUT_PDF,
@@ -137,7 +157,25 @@ def fill(
         typer.Option("--flatten", help="Flatten form fields after filling."),
     ] = None,
 ) -> None:
-    """Fill a PDF form with JSON data."""
+    """
+    Fill an existing PDF form from a validated JSON file.
+
+    The command loads the input PDF with the global options stored by the root
+    callback, expands the generated schema so image and signature widgets can
+    accept path objects, validates the JSON input, normalizes image and
+    signature values, and writes the filled PDF to the requested output path or
+    back to the input file.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF form path.
+        data (Path): JSON file containing form field values.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+        flatten (bool, optional): Whether to flatten form fields after filling.
+            Defaults to None.
+    """
     obj = PdfWrapper(str(pdf), **ctx.obj)
 
     schema = obj.schema

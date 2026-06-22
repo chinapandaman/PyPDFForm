@@ -30,7 +30,10 @@ create_cli = typer.Typer(
 )
 
 
-@create_cli.command(no_args_is_help=True)
+@create_cli.command(
+    no_args_is_help=True,
+    help="Create a new blank PDF.",
+)
 def blank(
     ctx: typer.Context,
     output: REQUIRED_OUTPUT_PDF,
@@ -60,7 +63,23 @@ def blank(
         ),
     ] = None,
 ) -> None:
-    """Create a new blank PDF."""
+    """
+    Create a blank PDF with optional page size and page count.
+
+    The command builds a `BlankPage` using the supplied dimensions, duplicates
+    it when multiple pages are requested, wraps the result with the global CLI
+    options stored in `ctx.obj`, and writes the new PDF to the required output
+    path.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        output (Path): Output PDF path.
+        count (int, optional): Number of blank pages to create. Defaults to
+            None.
+        width (float, optional): Page width in points. Defaults to None.
+        height (float, optional): Page height in points. Defaults to None.
+    """
     params = {}
     if width is not None:
         params["width"] = width
@@ -74,7 +93,10 @@ def blank(
     PdfWrapper(obj, **ctx.obj).write(output)
 
 
-@create_cli.command(no_args_is_help=True)
+@create_cli.command(
+    no_args_is_help=True,
+    help="Extract pages from an existing PDF.",
+)
 def extract(
     ctx: typer.Context,
     pdf: INPUT_PDF,
@@ -98,7 +120,28 @@ def extract(
         ),
     ] = None,
 ) -> None:
-    """Extract pages from an existing PDF."""
+    """
+    Extract a page range from an existing PDF.
+
+    The command validates that the requested end page does not precede the
+    start page, converts the 1-based CLI page numbers into the slice expected
+    by `PdfWrapper.pages`, and writes the extracted pages to the required
+    output path.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        output (Path): Output PDF path.
+        start (int, optional): First page to extract, starting at 1. Defaults
+            to None.
+        end (int, optional): Last page to extract, starting at 1. Defaults to
+            None.
+
+    Raises:
+        typer.BadParameter: Raised when both page bounds are supplied and the
+            start page is after the end page.
+    """
     if start is not None and end is not None and start > end:
         message = "End page must be greater than or equal to start page."
         cli_bad_parameter(
@@ -109,7 +152,10 @@ def extract(
     PdfWrapper(str(pdf), **ctx.obj).pages[slice((start or 1) - 1, end)].write(output)
 
 
-@create_cli.command(no_args_is_help=True)
+@create_cli.command(
+    no_args_is_help=True,
+    help="Merge multiple PDFs into one.",
+)
 def merge(
     ctx: typer.Context,
     pdfs: Annotated[
@@ -125,18 +171,48 @@ def merge(
     ],
     output: REQUIRED_OUTPUT_PDF,
 ) -> None:
-    """Merge multiple PDFs into one."""
+    """
+    Merge input PDFs in the order provided on the command line.
+
+    Each path is loaded into a `PdfWrapper` with the global CLI options, passed
+    to `PdfArray`, merged into one document, and written to the required output
+    path.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdfs (list[Path]): Input PDF paths in merge order.
+        output (Path): Output PDF path.
+    """
     PdfArray([PdfWrapper(str(pdf), **ctx.obj) for pdf in pdfs]).merge().write(output)
 
 
-@create_cli.command(no_args_is_help=True)
+@create_cli.command(
+    no_args_is_help=True,
+    help="Add form fields to a PDF.",
+)
 def field(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[Path, json_file_option("JSON file with form field definitions.")],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
-    """Add form fields to a PDF."""
+    """
+    Add form fields described by grouped JSON definitions.
+
+    The command maps JSON groups such as `text`, `check`, and `signature` to
+    PyPDFForm field classes, validates the input file against the CLI field
+    schema, creates the corresponding field objects, and calls
+    `PdfWrapper.bulk_create_fields` before writing the modified PDF.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        data (Path): JSON file containing grouped form field definitions.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+    """
     field_map = {
         "text": Fields.TextField,
         "check": Fields.CheckBoxField,
@@ -157,14 +233,32 @@ def field(
     )
 
 
-@create_cli.command(no_args_is_help=True)
+@create_cli.command(
+    no_args_is_help=True,
+    help="Draw text, images, and shapes on a PDF.",
+)
 def raw(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[Path, json_file_option("JSON file with raw element definitions.")],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
-    """Draw text, images, and shapes on a PDF."""
+    """
+    Draw raw elements described by grouped JSON definitions.
+
+    The command maps JSON groups such as `text`, `image`, and `rectangle` to
+    raw element classes, validates the input file against the CLI raw element
+    schema, creates the corresponding drawable objects, and calls
+    `PdfWrapper.draw` before writing the modified PDF.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        data (Path): JSON file containing grouped raw element definitions.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+    """
     raw_element_map = {
         "text": RawElements.RawText,
         "image": RawElements.RawImage,
@@ -185,14 +279,32 @@ def raw(
     )
 
 
-@create_cli.command(no_args_is_help=True)
+@create_cli.command(
+    no_args_is_help=True,
+    help="Add annotations to a PDF.",
+)
 def annotation(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[Path, json_file_option("JSON file with annotation definitions.")],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
-    """Add annotations to a PDF."""
+    """
+    Add annotations described by grouped JSON definitions.
+
+    The command maps JSON groups such as `text`, `link`, and `highlight` to
+    annotation classes, validates the input file against the CLI annotation
+    schema, creates the corresponding annotation objects, and calls
+    `PdfWrapper.annotate` before writing the modified PDF.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        data (Path): JSON file containing grouped annotation definitions.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+    """
     annotation_map = {
         "text": Annotations.TextAnnotation,
         "link": Annotations.LinkAnnotation,
@@ -214,7 +326,10 @@ def annotation(
     )
 
 
-@create_cli.command(no_args_is_help=True)
+@create_cli.command(
+    no_args_is_help=True,
+    help="Add a coordinate grid to a PDF.",
+)
 def grid(
     ctx: typer.Context,
     pdf: INPUT_PDF,
@@ -259,7 +374,26 @@ def grid(
         ),
     ] = None,
 ) -> None:
-    """Add a coordinate grid to a PDF."""
+    """
+    Overlay a coordinate grid on an existing PDF.
+
+    The command collects optional RGB color components and margin values,
+    normalizes whole-number margins to integers for stable output, generates a
+    coordinate grid through `PdfWrapper.generate_coordinate_grid`, and writes
+    the result to the requested output path or back to the input file.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+        red (float, optional): Grid red value from 0 to 1. Defaults to None.
+        green (float, optional): Grid green value from 0 to 1. Defaults to
+            None.
+        blue (float, optional): Grid blue value from 0 to 1. Defaults to None.
+        margin (float, optional): Grid margin in points. Defaults to None.
+    """
     params = {}
     if any(
         [
