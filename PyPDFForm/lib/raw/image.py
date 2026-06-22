@@ -58,7 +58,8 @@ class RawImage:
         """
         Converts the raw image object into a dictionary format ready for drawing.
 
-        The image is converted to a stream and rotated if necessary before being included in the dictionary.
+        The image is converted to bytes and rotated if necessary before being
+        included in the dictionary consumed by the watermark drawing helpers.
 
         Returns:
             A dictionary containing drawing parameters: page number, object type ("image"),

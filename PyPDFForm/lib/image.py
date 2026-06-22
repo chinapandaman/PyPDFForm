@@ -77,9 +77,10 @@ def get_draw_image_resolutions(
     Calculates the position and dimensions for drawing an image on a PDF page.
 
     This function determines the x, y coordinates, width, and height for drawing an
-    image within a specified widget area on a PDF page. It takes into account whether
-    the aspect ratio of the image should be preserved and adjusts the dimensions
-    accordingly.
+    image within a specified widget rectangle on a PDF page. When aspect ratio
+    preservation is enabled, the image is scaled to fit inside the field and
+    centered within the original rectangle. Otherwise, the image is stretched to
+    the full field bounds and the source image dimensions are ignored.
 
     Args:
         widget (dict): A dictionary containing the widget's rectangle coordinates

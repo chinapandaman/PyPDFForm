@@ -120,6 +120,11 @@ def _process_widget(
     """
     Processes a single widget and adds it to the results dictionary.
 
+    Common geometry and flags are populated for every recognized widget. Text,
+    checkbox, dropdown, and radio widgets then get type-specific state. Radio
+    annotations that share a key are aggregated into one middleware object with
+    per-option geometry and a selected option index.
+
     Args:
         widget (dict): The widget dictionary from the PDF.
         page_number (int): The 1-indexed page number the widget appears on.
@@ -152,6 +157,9 @@ def _populate_common_properties(
     """
     Populates common properties for a widget.
 
+    Properties are written directly to ``__dict__`` so extracting existing PDF
+    state does not queue update hooks on the middleware object.
+
     Args:
         widget (dict): The widget dictionary from the PDF.
         page_number (int): The 1-indexed page number the widget appears on.
@@ -178,6 +186,10 @@ def _populate_text_properties(widget: dict, _widget: Text) -> None:
     """
     Populates properties specific to text widgets.
 
+    This includes text flags, alignment, maximum length, and current value. The
+    attributes are assigned directly where needed so loading existing PDF state
+    does not trigger write hooks.
+
     Args:
         widget (dict): The widget dictionary from the PDF.
         _widget (Text): The text widget object to populate.
@@ -192,6 +204,9 @@ def _populate_text_properties(widget: dict, _widget: Text) -> None:
 def _populate_dropdown_properties(widget: dict, _widget: Dropdown) -> None:
     """
     Populates properties specific to dropdown widgets.
+
+    Dropdown choices are assigned directly before reading the selected value so
+    the value can be normalized to an option index without queuing update hooks.
 
     Args:
         widget (dict): The widget dictionary from the PDF.
@@ -208,6 +223,11 @@ def _handle_radio_widget(
 ) -> None:
     """
     Handles the logic for radio widgets, including aggregating multiple options.
+
+    Each radio annotation contributes one option to a shared `Radio` object. The
+    method stores per-option rectangles as lists, increments the option count for
+    schema generation, and records the selected option index when the annotation
+    is currently selected.
 
     Args:
         widget (dict): The widget dictionary from the PDF.
@@ -246,9 +266,9 @@ def get_widgets_by_page(pdf: bytes) -> Dict[int, List[dict]]:
     """
     Retrieves widgets from a PDF stream, organized by page number.
 
-    This function parses a PDF stream and extracts all the widgets (annotations)
-    present on each page. It returns a dictionary where the keys are the page
-    numbers and the values are lists of widget dictionaries.
+    This function parses a PDF stream and extracts recognized widget annotations
+    present on each page. It returns a dictionary for every page in the document;
+    pages without recognized widgets are mapped to empty lists.
 
     Args:
         pdf (bytes): The PDF stream to parse.
@@ -271,6 +291,9 @@ def _get_widgets_on_page(page) -> List[dict]:
     """
     Retrieves widgets from a single PDF page.
 
+    Page annotations are dereferenced and copied into plain dictionaries before
+    they are filtered against the supported widget patterns.
+
     Args:
         page: The PDF page object.
 
@@ -290,6 +313,9 @@ def _get_widgets_on_page(page) -> List[dict]:
 def _is_widget(widget: dict) -> bool:
     """
     Checks if a dictionary represents a valid widget.
+
+    A widget is considered valid when it satisfies all patterns for one of the
+    supported middleware widget types.
 
     Args:
         widget (dict): The dictionary to check.
@@ -312,7 +338,8 @@ def construct_widget(widget: dict, key: str) -> WIDGET_TYPES | None:
     Constructs a widget object based on the widget dictionary and key.
 
     This function determines the type of widget based on predefined patterns
-    and constructs the corresponding widget object.
+    and constructs the corresponding middleware widget object using the supplied
+    key as its name.
 
     Args:
         widget (dict): The widget dictionary to construct the object from.
@@ -362,9 +389,10 @@ def create_annotations(
     """
     Creates and adds annotations to a PDF template.
 
-    This function takes a PDF template and a list of annotation objects, and
-    renders each annotation onto its specified page in the PDF. It supports
-    various annotation types defined in the `PyPDFForm.lib.annotations` package.
+    This function takes a PDF template and a list of annotation objects, builds
+    their PDF dictionaries, and appends them to the `/Annots` array for each
+    target page. Existing annotations are preserved, and annotation page numbers
+    are 1-based.
 
     Args:
         template (bytes): The PDF template to add annotations to.
@@ -453,9 +481,10 @@ def update_widget_keys(
     """
     Updates the keys of widgets in a PDF template.
 
-    This function updates the keys of widgets in a PDF template based on the provided old keys and new keys.
-    It iterates through each page and annotation, finds the widgets with the old keys, and updates their names with the corresponding new keys.
-    The `indices` parameter is used when multiple widgets have the same name, to differentiate which one to update.
+    This function updates queued widget names in a PDF template based on
+    parallel lists of old keys, new keys, and occurrence indices. Non-radio
+    widgets use `indices` to disambiguate duplicate field names. Radio widgets
+    update every annotation in the radio group.
 
     Args:
         template (bytes): The PDF template to update.

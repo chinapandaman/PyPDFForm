@@ -124,6 +124,9 @@ class PdfWrapper:
         Constructor method for the `PdfWrapper` class.
 
         Initializes a new `PdfWrapper` object with the given template PDF and optional keyword arguments.
+        The template is normalized to bytes, existing widgets are loaded immediately, and
+        original metadata is captured only when `preserve_metadata` is requested.
+        Enabling `generate_appearance_streams` also enables `need_appearances`.
 
         Args:
             template (bytes | str | BinaryIO | BlankPage): The template PDF, provided as either:
@@ -166,7 +169,9 @@ class PdfWrapper:
 
         This method allows you to combine PDF forms into a single form. It handles potential
         naming conflicts between form fields by adding a unique suffix to the field names in the
-        form being merged.
+        form being merged, commits those queued renames before merging, and returns a new wrapper
+        configured with the left-hand wrapper's user parameters. Registered custom fonts from the
+        left-hand wrapper are carried into the result.
 
         Args:
             other (PdfWrapper | Sequence[PdfWrapper]): The other `PdfWrapper` object or
@@ -265,6 +270,10 @@ class PdfWrapper:
         """
         Extracts page streams while preserving the original page widgets.
 
+        Widgets are removed before splitting the PDF into pages, then cloned back
+        from the original stream onto the matching single-page PDF. This avoids
+        page extraction losing form field annotations.
+
         Args:
             stream (bytes): The PDF stream to split into pages.
 
@@ -286,7 +295,9 @@ class PdfWrapper:
 
         This method is called after operations that modify the PDF content
         (e.g., drawing text, drawing images) to ensure that custom fonts
-        are correctly registered and available for use.
+        are correctly registered and available for use. It replays the font
+        registration events that existed at method entry, then trims those
+        replayed events so only newly added events remain queued.
         """
 
         font_register_events_len = len(self._font_register_events)
@@ -381,7 +392,10 @@ class PdfWrapper:
         """
         Returns a list of `PdfWrapper` objects, each representing a single page in the PDF document.
 
-        This allows you to work with individual pages of the PDF, for example, to extract text or images from a specific page.
+        This allows you to work with individual pages of the PDF. Each page wrapper
+        preserves the page's original widgets and inherits the current wrapper's user
+        parameters. Custom font registration events are replayed onto the page wrappers
+        when needed.
 
         Returns:
             Sequence[PdfWrapper]: A list of `PdfWrapper` objects, one for each page in the PDF.
@@ -438,6 +452,7 @@ class PdfWrapper:
            generating appearance streams.
         3. If `preserve_metadata`, title, or on-open JavaScript are set, it preserves
            or updates the corresponding PDF properties accordingly.
+        The wrapper's stored stream is not replaced by these final egress-only changes.
 
         Returns:
             bytes: The processed PDF document content as a byte string.
@@ -465,9 +480,10 @@ class PdfWrapper:
         """
         Reads the PDF stream, triggering widget hooks and updating fonts if necessary.
 
-        This internal method ensures that all widget hooks are executed and that
-        fonts are correctly mapped to their internal PDF names before returning
-        the raw PDF stream.
+        This internal method ensures that all queued widget hooks are executed and that
+        user-facing registered font names are mapped to their internal PDF resource names
+        before returning the raw PDF stream. Applying hooks updates the wrapper's stored
+        stream and clears each widget's hook queue.
 
         Returns:
             bytes: The raw PDF stream.
@@ -496,6 +512,9 @@ class PdfWrapper:
         """
         Writes the PDF to a file.
 
+        String, bytes, and PathLike destinations are opened in binary write mode.
+        Other objects are treated as already-open writable binary streams.
+
         Args:
             dest (str | BinaryIO): The destination to write the PDF to.
                 Can be a file path (str) or a file-like object (BinaryIO).
@@ -515,6 +534,10 @@ class PdfWrapper:
     def change_version(self, version: str) -> PdfWrapper:
         """
         Changes the PDF version of the underlying document.
+
+        The method replaces the first PDF header version marker in the current stream.
+        It does not otherwise validate or rewrite the document for version-specific
+        compatibility.
 
         Args:
             version (str): The new PDF version string (e.g., "1.7").
@@ -536,6 +559,10 @@ class PdfWrapper:
     ) -> PdfWrapper:
         """
         Generates a coordinate grid on the PDF, useful for debugging layout issues.
+
+        Existing widgets are temporarily removed while the grid is drawn as page
+        watermarks, then copied back onto the resulting stream. Registered fonts are
+        restored afterward because the remove/copy cycle rewrites the PDF.
 
         Args:
             color (Tuple[float, float, float]): The color of the grid lines, specified as an RGB tuple (default: red).
@@ -569,6 +596,12 @@ class PdfWrapper:
     ) -> PdfWrapper:
         """
         Fills the PDF form with data from a dictionary.
+
+        Only keys that already exist in `self.widgets` are applied. Filling delegates
+        to the lower-level filler, then handles the special image/signature path by
+        drawing those values as watermarks and copying the remaining widgets back onto
+        the output. The wrapper's widget cache is intentionally left in place so
+        subsequent style updates can still refer to the same middleware objects.
 
         Args:
             data (Dict[str, str | bool | int | BinaryIO | bytes]): A dictionary where keys
@@ -617,7 +650,8 @@ class PdfWrapper:
         Adds annotations to the PDF.
 
         This method allows you to add various types of annotations (e.g., text
-        annotations/sticky notes) to the PDF pages.
+        annotations/sticky notes) to the PDF pages. The annotation objects are
+        converted to PDF dictionaries and appended to the target pages.
 
         Args:
             annotations (Sequence[AnnotationTypes]): A list of annotation objects
@@ -636,10 +670,11 @@ class PdfWrapper:
         Creates multiple new form fields (widgets) on the PDF in a single operation.
 
         This method takes a list of field definition objects (`FieldTypes`),
-        groups them by type (if necessary for specific widget handling, like CheckBoxField),
-        and then delegates the creation to the internal `_bulk_create_fields` method.
-        This is the preferred method for creating multiple fields as it minimizes
-        PDF manipulation overhead.
+        groups them by creation strategy, and then delegates each group to the
+        internal `_bulk_create_fields` method. Signatures and images are grouped
+        together because both copy bedrock annotations; checkboxes and radio groups
+        are grouped together because they share ReportLab button handling; multiple
+        dropdown fields are routed through the general creation path.
 
         Args:
             fields (Sequence[FieldTypes]): A list of field definition objects
@@ -689,9 +724,10 @@ class PdfWrapper:
         Internal method to create multiple new form fields (widgets) on the PDF in a single operation.
 
         This method takes a list of field definition objects (`FieldTypes`),
-        converts them into `Widget` objects, and efficiently draws them onto the
-        PDF using bulk watermarking. It is designed to be called by the public
-        `bulk_create_fields` method after fields have been grouped for creation.
+        converts them into widget objects, creates page-aligned watermark PDFs for
+        those widgets, copies the generated widget annotations into the current PDF,
+        refreshes the widget cache, and applies any hook parameters captured during
+        field construction.
 
         Args:
             fields (Sequence[FieldTypes]): A list of field definition objects
@@ -764,9 +800,10 @@ class PdfWrapper:
         """
         Updates the key (name) of a widget, allowing you to rename form fields.
 
-        This method queues a change to the name of a form field in the PDF.  This can be useful for
-        standardizing field names or resolving naming conflicts.  The queued update is applied when
-        `commit_widget_key_updates` is called.
+        This method queues a change to the name of a form field in the PDF. This can be useful for
+        standardizing field names or resolving naming conflicts. The queued update is applied when
+        `commit_widget_key_updates` is called. Renaming is not supported while full widget names are
+        being used for lookup.
 
         Args:
             old_key (str): The old key of the widget that you want to rename.
@@ -787,8 +824,9 @@ class PdfWrapper:
         """
         Commits deferred widget key updates, applying all queued key renames to the PDF.
 
-        This method applies all widget key updates queued by the `update_widget_key` method.  It updates
-        the underlying PDF stream with the new key names.
+        This method applies all widget key updates queued by the `update_widget_key` method. It updates
+        the underlying PDF stream with the new key names, rebuilds the widget cache, preserves attributes
+        that were set on the old widget objects, and clears the queue.
 
         Returns:
             PdfWrapper: The PdfWrapper object.
@@ -817,8 +855,9 @@ class PdfWrapper:
         Draws raw elements (text, images, etc.) directly onto the PDF pages.
 
         This method is the primary mechanism for drawing non-form field content.
-        It takes a list of raw element objects and renders them
-        onto the PDF document as watermarks.
+        It takes a list of raw element objects, temporarily registers custom fonts
+        for ReportLab drawing, renders the elements onto page watermarks, merges those
+        watermarks into the PDF, and copies the original widgets back onto the output.
 
         Args:
             elements (Sequence[RawTypes]): A list of raw elements to draw (e.g., [RawText(...), RawImage(...)]).
@@ -850,6 +889,11 @@ class PdfWrapper:
     ) -> PdfWrapper:
         """
         Registers a custom font for use in the PDF.
+
+        Valid TrueType font data is embedded into the PDF's AcroForm resources and
+        recorded under the user-provided `font_name`. The original registration input
+        is kept so font resources can be replayed after operations that rewrite the
+        PDF stream. Invalid font streams are ignored.
 
         Args:
             font_name (str): The name of the font. This name will be used to reference the font when drawing text.

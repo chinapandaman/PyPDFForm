@@ -18,9 +18,9 @@ class Signature(Widget):
     Represents a signature widget.
 
     The Signature class provides a concrete implementation for
-    signature form fields. It inherits from the Widget class and
-    implements the schema_definition, sample_value, and stream
-    properties.
+    signature form fields. It inherits from the Widget class, preserves image
+    aspect ratio by default, and adapts the field value into an image byte stream
+    when the PDF is filled.
     """
 
     preserve_aspect_ratio: bool = True
@@ -58,9 +58,9 @@ class Signature(Widget):
         """
         Returns the stream of the signature image.
 
-        This method reads the signature image from the file path
-        specified in the value attribute and returns the image data
-        as a stream of bytes.
+        This method adapts the signature value into image bytes. The value may be
+        a path, bytes, or a readable object. When no value is set, None is returned
+        so filling can leave the field unchanged.
 
         Returns:
             bytes | None: The stream of the signature image.

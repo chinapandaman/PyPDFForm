@@ -16,7 +16,9 @@ class Dropdown(Widget):
     Represents a dropdown widget in a PDF form.
 
     Inherits from the Widget class and provides specific functionality
-    for handling dropdown form fields.
+    for handling dropdown form fields. The stored value is an option index; string
+    assignments are normalized to an existing option index or appended as a new
+    choice.
 
     Key attributes:
         font (str): The font of the dropdown field.
@@ -35,6 +37,9 @@ class Dropdown(Widget):
     ) -> None:
         """
         Initializes a dropdown widget.
+
+        Besides common widget state, dropdowns register hooks for font updates
+        and choice replacement.
 
         Args:
             name (str): The name of the dropdown.
@@ -76,7 +81,8 @@ class Dropdown(Widget):
 
         If the value is a string, it attempts to find the corresponding
         index in the choices list. If not found, the string value is
-        added to the choices, and its new index is used.
+        added to the choices, and its new index is used. Integer values are stored
+        directly as indices.
 
         Args:
             value (str | int): The value to set. Can be a string
@@ -112,8 +118,9 @@ class Dropdown(Widget):
         """
         Returns the schema definition for the dropdown.
 
-        The schema definition is a dictionary that describes the
-        data type and other constraints for the dropdown value.
+        The schema definition accepts either an integer option index bounded by
+        the current choices or a string value that can be normalized by the value
+        setter.
 
         Returns:
             dict: A dictionary representing the schema definition.
@@ -135,7 +142,7 @@ class Dropdown(Widget):
         Returns a sample value for the dropdown.
 
         The sample value is used to generate example data for the
-        dropdown field.
+        dropdown field. It selects the last available option.
 
         Returns:
             int: A sample value for the dropdown.

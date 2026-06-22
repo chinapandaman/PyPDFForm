@@ -40,6 +40,8 @@ def draw_text(canvas: Canvas, **kwargs) -> None:
     """
     Draws a text string on the given canvas using the specified font, size, and color.
     Supports multiline text by splitting the input string by newline characters.
+    The optional `font_mapping` keyword maps PyPDFForm font names to temporary
+    ReportLab font names registered for the current drawing operation.
 
     Args:
         canvas (Canvas): The ReportLab Canvas object to draw on.
@@ -96,6 +98,8 @@ def draw_line(canvas: Canvas, **kwargs) -> None:
 def draw_rect(canvas: Canvas, **kwargs) -> None:
     """
     Draws a rectangle on the given canvas with the specified coordinates, dimensions, and color.
+    The rectangle is filled only when `fill_color` is truthy; otherwise only the
+    outline is drawn.
 
     Args:
         canvas (Canvas): The ReportLab Canvas object to draw on.
@@ -132,6 +136,8 @@ def draw_rect(canvas: Canvas, **kwargs) -> None:
 def draw_circle(canvas: Canvas, **kwargs) -> None:
     """
     Draws a circle on the given canvas with the specified center coordinates, radius, and color.
+    The circle is filled only when `fill_color` is truthy; otherwise only the
+    outline is drawn.
 
     Args:
         canvas (Canvas): The ReportLab Canvas object to draw on.
@@ -166,6 +172,8 @@ def draw_circle(canvas: Canvas, **kwargs) -> None:
 def draw_ellipse(canvas: Canvas, **kwargs) -> None:
     """
     Draws an ellipse on the given canvas defined by its bounding box coordinates and color.
+    The ellipse is filled only when `fill_color` is truthy; otherwise only the
+    outline is drawn.
 
     Args:
         canvas (Canvas): The ReportLab Canvas object to draw on.
@@ -239,7 +247,8 @@ def create_watermarks_and_draw(
 
     This function reads the input PDF to determine page sizes, then uses ReportLab
     to create a separate, single-page PDF (a watermark) for each page that has
-    drawing instructions.
+    drawing instructions. The returned list is aligned to the input PDF page
+    count; pages without drawing instructions contain ``b""``.
 
     Args:
         pdf (bytes): The original PDF file as a byte stream.
@@ -305,8 +314,9 @@ def merge_watermarks_with_pdf(
     """
     Merges the generated watermarks with the original PDF content.
 
-    This function takes a PDF file and a list of watermarks as input.
-    It then merges each watermark with its corresponding page in the PDF.
+    This function takes a PDF file and a list of page-aligned watermarks as
+    input. Each non-empty watermark stream is read as a single-page PDF and
+    merged into the corresponding output page.
 
     Args:
         pdf (bytes): The PDF file as a byte stream.
@@ -339,6 +349,9 @@ def _clone_page_widgets(
     """
     Clones matching widgets from a single PDF page.
 
+    When `keys` is None, every widget annotation on the page is cloned. When it
+    is a set, only annotations whose short widget key is present are cloned.
+
     Args:
         writer (PdfWriter): The PdfWriter for cloning.
         page (PageObject): The source PDF page object.
@@ -363,6 +376,9 @@ def _collect_from_single_watermark_specific_page(
 ) -> Dict[int, List[Any]]:
     """
     Extracts widgets from a specific page of a single watermark PDF.
+
+    The selected watermark page is mapped to output page index 0. `page_num` is
+    zero-based.
 
     Args:
         writer (PdfWriter): The PdfWriter for cloning.
@@ -390,6 +406,9 @@ def _collect_from_single_watermark_1_to_1(
     """
     Maps pages 1:1 between a single watermark PDF and the output PDF.
 
+    Each page in the watermark PDF contributes cloned widgets to the output page
+    with the same zero-based index.
+
     Args:
         writer (PdfWriter): The PdfWriter for cloning.
         watermark (bytes): The watermark PDF byte stream.
@@ -413,6 +432,10 @@ def _collect_from_multiple_watermarks(
 ) -> Dict[int, List[Any]]:
     """
     Collects widgets from a list of watermark PDFs.
+
+    Each watermark stream corresponds to one output page by list index. If
+    `page_num` is provided, only that zero-based page within each watermark PDF
+    contributes widgets.
 
     Args:
         writer (PdfWriter): The PdfWriter for cloning.
@@ -442,6 +465,10 @@ def _collect_widgets_to_copy(
 ) -> Dict[int, List[Any]]:
     """
     Identifies and clones widgets from watermarks to be copied.
+
+    A single watermark byte stream can either map all pages 1:1 or copy one
+    zero-based page to the first output page. A list of watermark streams maps
+    each list entry to the output page with the same index.
 
     Args:
         writer (PdfWriter): The PdfWriter for the output PDF.
@@ -473,6 +500,9 @@ def _apply_widgets_to_pages(
 ) -> None:
     """
     Applies the collected widgets to the corresponding pages in the output PDF.
+
+    Cloned widgets are appended to existing page annotations when present, or a
+    new `/Annots` array is created for pages that do not yet have annotations.
 
     Args:
         out (PdfWriter): The PdfWriter object for the output PDF.

@@ -102,10 +102,10 @@ def _get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
     """
     Retrieves additional font parameters from a PDF document for a given base font name.
 
-    This function searches the PDF's resources for a font dictionary matching the provided
-    base font name. If a match is found, it extracts the font descriptor parameters and
-    the font dictionary parameters. These parameters can be used to further describe
-    and define the font within the PDF.
+    This function searches the first page's font resources for a font dictionary matching
+    the provided base font name. If a match is found, it extracts the font descriptor
+    parameters and the font dictionary parameters so they can be copied into a new
+    AcroForm font resource.
 
     Args:
         pdf (bytes): The PDF file data as bytes.
@@ -141,9 +141,10 @@ def compute_font_glyph_widths(ttf_file: BytesIO, missing_width: float) -> list[f
     `unitsPerEm`, then scales these widths to a 1000-unit text space, which is standard
     for PDF font metrics.
 
-    If any of the required font tables ('head', 'cmap', 'hmtx') are missing or
-    cannot be accessed, the function returns a list populated with a specified
-    `missing_width` for all expected glyphs, ensuring a fallback mechanism.
+    If any of the required font tables ('head', 'cmap', 'hmtx') are missing, the
+    function returns a list populated with a specified `missing_width` for all expected
+    glyphs. When the tables exist, widths are generated from the best cmap for codepoints
+    in the 0-255 WinAnsi range.
 
     Args:
         ttf_file (BytesIO): A BytesIO stream containing the TrueType Font (TTF) data.
@@ -188,6 +189,9 @@ def temporary_font_registration(
     Registers a list of fonts temporarily with unique names, yielding a mapping
     from the original font names to the unique names.
 
+    The fonts are inserted into ReportLab's global font registry for the duration
+    of the context manager and removed again on exit.
+
     Args:
         fonts (list[tuple[str, bytes]]): A list of tuples, each containing a font name and its TTF stream.
 
@@ -214,8 +218,9 @@ def _get_watermark_with_font(ttf_stream: bytes) -> bytes:
     Creates a watermark PDF with a single space character using the specified font.
 
     This function is primarily used to generate a dummy PDF page that includes
-    a specific font, which can then be merged with another PDF to ensure the
-    font is available or embedded. The result is cached for performance.
+    a specific font. `register_font_acroform` can then inspect that page's font
+    resources for descriptor values needed when `/NeedAppearances` support is
+    requested. The result is cached for performance.
 
     Args:
         ttf_stream (bytes): The TrueType font stream to use.
@@ -251,8 +256,11 @@ def register_font_acroform(
     Registers a TrueType font within the PDF's AcroForm dictionary.
 
     This allows the font to be used when filling form fields within the PDF.
-    The function adds the font as a resource to the PDF, making it available
-    for use in form fields.
+    The function embeds a compressed TTF stream, creates the font descriptor and
+    font dictionary, ensures the AcroForm default resources exist, and stores the
+    font under the next available `/F#` key. When `need_appearances` is enabled,
+    descriptor and font dictionary defaults are copied from a temporary watermark
+    generated with the same TTF.
 
     Args:
         pdf (bytes): The PDF file data as bytes. This is the PDF document that
@@ -360,9 +368,8 @@ def _get_base_font_name(ttf_stream: bytes) -> str:
     """
     Extracts the base font name from a TrueType font stream.
 
-    This function parses the TTF stream to extract the font's face name,
-    which is used as the base font name. The result is cached using lru_cache
-    for performance.
+    This function parses the TTF stream with ReportLab to extract the font's face
+    name, prefixes it with ``/`` for use as a PDF name, and caches the result.
 
     Args:
         ttf_stream (bytes): The font file data in TTF format.
@@ -377,8 +384,8 @@ def _get_new_font_name(fonts: dict) -> str:
     """
     Generates a new unique font name to avoid conflicts with existing fonts in the PDF.
 
-    This function iterates through the existing fonts in the PDF and generates a new
-    font name with the prefix '/F' followed by a unique integer.
+    This function inspects existing AcroForm resource keys that look like `/F#`
+    and returns the lowest unused numbered key with the same prefix.
 
     Args:
         fonts (dict): A dictionary of existing fonts in the PDF.
@@ -402,8 +409,9 @@ def get_all_available_fonts(pdf: bytes) -> dict:
     """
     Retrieves all available fonts from a PDF document's AcroForm.
 
-    This function extracts the font resources from the PDF's AcroForm dictionary
-    and returns them as a dictionary.
+    This function extracts font resources from the PDF's AcroForm default resources
+    and maps each base font name without its leading slash to the resource key used
+    in the PDF, such as `/F1`.
 
     Args:
         pdf (bytes): The PDF file data.

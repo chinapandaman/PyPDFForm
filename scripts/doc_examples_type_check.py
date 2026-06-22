@@ -25,7 +25,7 @@ import yaml
 
 
 def setup_artifact_dir(artifact_dir):
-    """Creates the artifact directory and pyrightconfig.json."""
+    """Creates the artifact directory and a pyrightconfig.json with repo imports."""
     if not os.path.exists(artifact_dir):
         os.makedirs(artifact_dir)
 
@@ -34,7 +34,7 @@ def setup_artifact_dir(artifact_dir):
 
 
 def get_user_guide_docs(mkdocs_path):
-    """Extracts User Guide document paths from mkdocs.yml."""
+    """Extracts User Guide document paths from mkdocs.yml after sanitizing custom tags."""
     with open(mkdocs_path, "r") as f:
         content = f.read()
 
@@ -51,7 +51,7 @@ def get_user_guide_docs(mkdocs_path):
 def _extract_snippets_from_file(
     lines, doc_file, doc_path, artifact_dir, snippet_map, snippet_idx
 ):
-    """Helper to extract snippets from a single file's lines."""
+    """Extracts Python code blocks from one doc file and records source locations."""
     in_code_block = False
     code_lines = []
     start_line = 0
@@ -84,7 +84,7 @@ def _extract_snippets_from_file(
 
 
 def extract_snippets(user_guide_docs, artifact_dir):
-    """Extracts Python snippets from documentation and saves them to files."""
+    """Extracts Python snippets from existing User Guide docs and saves them to files."""
     snippet_map = {}
     snippet_idx = 0
 
@@ -107,7 +107,7 @@ def extract_snippets(user_guide_docs, artifact_dir):
 
 
 def run_pyright(artifact_dir):
-    """Runs pyright on the artifact directory and returns diagnostics."""
+    """Runs pyright on generated snippets and returns JSON diagnostics."""
     cmd = [
         "pyright",
         "--outputjson",
@@ -126,7 +126,7 @@ def run_pyright(artifact_dir):
 
 
 def map_diagnostics(diagnostics, snippet_map):
-    """Maps pyright diagnostics back to original documentation files."""
+    """Maps pyright diagnostics back to original documentation files and lines."""
     errors_by_location = {}
 
     for diag in diagnostics:
@@ -163,7 +163,7 @@ def report_errors(errors_by_location):
 
 
 def cleanup(artifact_dir):
-    """Removes the artifact directory."""
+    """Removes the artifact directory when it exists."""
     if os.path.exists(artifact_dir):
         shutil.rmtree(artifact_dir)
 

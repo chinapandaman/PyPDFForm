@@ -31,9 +31,11 @@ class Widget:
     """
     Base class for all widgets in PyPDFForm.
 
-    This class provides a common interface for interacting with different types of
-    form fields. It handles basic properties like name, page number, and
-    coordinates, and provides methods for rendering the widget on a PDF page.
+    This class provides a common interface for creating different types of form
+    fields. It maps public field parameters to ReportLab AcroForm parameters,
+    converts color tuples to ReportLab colors, captures hook parameters that must
+    be applied after creation, and provides methods for rendering widgets onto
+    page watermark PDFs.
 
     Attributes:
         USER_PARAMS (list): List of user-defined parameters for the widget.
@@ -60,9 +62,10 @@ class Widget:
         """
         Initializes a Widget object.
 
-        This method sets up the basic properties of the widget, such as its name,
-        page number, and coordinates. It also handles user-defined parameters,
-        color parameters, and hook parameters.
+        This method sets up the widget's page, name, coordinates, AcroForm
+        parameter dictionary, and deferred hook parameters. User-facing keyword
+        arguments are copied into ReportLab parameter names according to
+        `USER_PARAMS`; configured color parameters are converted to `Color`.
 
         Args:
             name (str): Name of the widget.
@@ -158,8 +161,8 @@ class Widget:
         Performs canvas operations for the widget.
 
         This method uses the ReportLab library to draw the widget on the PDF canvas.
-        It retrieves the appropriate AcroForm function from the canvas and calls it
-        with the widget's parameters.
+        It retrieves the configured AcroForm function from the canvas and calls it
+        with the widget's prepared ReportLab parameters.
 
         Args:
             canvas (Canvas): Canvas object to operate on.
@@ -236,9 +239,9 @@ class Field:
     """
     Base dataclass for all PDF form fields.
 
-    This class defines the common properties that all types of form fields
-    (e.g., text fields, checkboxes, radio buttons) share. Specific field types
-    will extend this class to add their unique attributes.
+    This class defines the common user-facing properties that all field definitions
+    share before they are converted into renderable widget objects. Specific field
+    types extend this class to add their unique creation and styling attributes.
 
     Attributes:
         name (str): The name of the form field. This is used to identify the

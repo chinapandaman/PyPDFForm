@@ -26,10 +26,10 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     """
     Handles appearance streams and the /NeedAppearances flag for a PDF form.
 
-    This function prepares a PDF for form filling by:
+    This function prepares a PDF for output by:
     1. Removing the XFA dictionary if present, as it can interfere with standard
        AcroForm processing.
-    2. Setting the /NeedAppearances flag in the AcroForm dictionary, which instructs
+    2. Setting the /NeedAppearances flag in the AcroForm dictionary, which asks
        PDF viewers to generate appearance streams for form fields.
     3. Optionally generating appearance streams explicitly using pikepdf if
        `generate_appearance_streams` is True.
@@ -77,7 +77,9 @@ def preserve_pdf_properties(
     Preserves and updates PDF properties such as metadata, title, and OpenAction scripts.
 
     This function allows setting or updating the PDF's title and metadata, and
-    attaching a JavaScript script that executes when the PDF is opened.
+    attaching a JavaScript script that executes when the PDF is opened. Metadata
+    is merged into the reader's current metadata when provided; the title and
+    OpenAction JavaScript are written only when non-empty values are supplied.
 
     Args:
         pdf (bytes): The PDF file content as a bytes stream.

@@ -190,7 +190,8 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
 
     This function extracts the widget key from a widget dictionary based on
     predefined patterns. If `use_full_widget_name` is True, it recursively
-    constructs the full widget name by concatenating the parent widget keys.
+    constructs the full widget name by concatenating parent and child names with
+    dots, while handling child annotations that inherit the parent name.
 
     Args:
         widget (dict): The widget dictionary to extract the key from.
@@ -224,7 +225,8 @@ def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
     Updates the value of a checkbox annotation, setting it to checked or unchecked.
 
     This function modifies the appearance state (AS) and value (V) of the checkbox
-    annotation to reflect the desired state (checked or unchecked).
+    annotation to reflect the desired state. For a checked value, it selects the
+    first non-`/Off` appearance state. For an unchecked value, it selects `/Off`.
 
     Args:
         annot (DictionaryObject): The checkbox annotation dictionary.
@@ -242,8 +244,10 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     Retrieves the boolean value of a checkbox annotation.
 
     This function checks the value (V) of the checkbox annotation. If the value
-    is not 'Off', it means the checkbox is checked, and True is returned.
-    Otherwise, if the value is 'Off' or not present, None is returned.
+    is not `/Off`, it means the checkbox is checked, and True is returned.
+    Otherwise, if the value is `/Off` or not present, None is returned rather
+    than False so unspecified fill data can be distinguished from an explicit
+    unchecked value.
 
     Args:
         annot (DictionaryObject): The checkbox annotation dictionary.
@@ -259,7 +263,8 @@ def update_radio_value(annot: DictionaryObject) -> None:
     Updates the value of a radio button annotation, selecting it.
 
     This function modifies the appearance state (AS) and value (V) of the radio button's
-    parent dictionary to reflect the selected state.
+    parent dictionary to reflect the selected state. It also removes the parent's
+    Opt entry when present so the selected appearance state is used directly.
 
     Args:
         annot (DictionaryObject): The radio button annotation dictionary.
@@ -303,8 +308,10 @@ def update_dropdown_value(
     Updates the value of a dropdown annotation, selecting an option from the list.
 
     This function modifies the value (V) and appearance (AP) of the dropdown
-    annotation to reflect the selected option. It also updates the index (I)
-    of the selected option.
+    annotation to reflect the selected option. Top-level dropdowns also receive
+    the selected index (I). Child annotations write the value to their parent
+    field dictionary. Appearance updates are skipped when `need_appearances` is
+    enabled.
 
     Args:
         annot (DictionaryObject): The dropdown annotation dictionary.
@@ -425,7 +432,9 @@ def get_dropdown_choices(widget: dict) -> Tuple[str, ...] | None:
     """
     Extracts the choices from a dropdown widget dictionary.
 
-    This function extracts the choices from a dropdown widget dictionary.
+    This function extracts the choices from a dropdown widget dictionary. Direct
+    string options are returned as-is. Two-item PDF option arrays return the
+    display value stored at index 1.
 
     Args:
         widget (dict): The widget dictionary to extract the choices from.
@@ -450,7 +459,8 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
     Updates the name of an annotation, setting the T (title) entry.
 
     This function modifies the T (title) entry in the annotation dictionary to
-    change the name or title of the annotation.
+    change the field name. For child annotations that inherit their name from a
+    parent field dictionary, the parent name is updated instead.
 
     Args:
         annot (DictionaryObject): The annotation dictionary.

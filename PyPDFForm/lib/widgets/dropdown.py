@@ -21,8 +21,10 @@ class DropdownWidget(TextWidget):
     """
     Represents a dropdown widget in a PDF form.
 
-    Inherits from the base TextWidget class and adds specific parameters for
-    dropdown styling, such as options.
+    Inherits from the base TextWidget class and replaces text-field creation with
+    ReportLab's choice-field path. The first option is used as the initial value,
+    with a single space substituted for an empty first option to work around
+    ReportLab behavior.
 
     Attributes:
         NONE_DEFAULTS (list): A list of parameters that default to None.
@@ -43,6 +45,10 @@ class DropdownWidget(TextWidget):
     ) -> None:
         """
         Initializes a DropdownWidget object.
+
+        The text field parameter set is reused except `max_length`, and the
+        required `options` parameter is added before the widget is configured as
+        a choice field.
 
         Args:
             name (str): Name of the widget.
@@ -72,8 +78,9 @@ class DropdownField(Field):
     Attributes:
         _widget_class (Type[Widget]): The widget class associated with this field type.
         options (Optional[List[str | Tuple[str, str]]]): A list of options
-            available in the dropdown. Each option can be a string (display value)
-            or a tuple of strings (display value, export value).
+            available in the dropdown. Each option can be a string, using the
+            same display and export value, or a tuple of strings
+            (display value, export value).
         width (Optional[float]): The width of the dropdown field.
         height (Optional[float]): The height of the dropdown field.
         font (Optional[str]): The font to use for the dropdown text.

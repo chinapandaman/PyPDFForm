@@ -3,14 +3,12 @@
 This module provides a collection of utility functions used throughout the PyPDFForm library.
 
 It includes functions for:
-- Converting byte streams to BinaryIO objects.
 - Removing all widgets (form fields) from a PDF.
-- Extracting the content stream of each page in a PDF.
-- Merging two PDFs into one.
+- Splitting PDFs into single-page streams.
+- Merging PDF byte streams while preserving page annotations.
 - Finding and traversing patterns within PDF widgets.
 - Extracting widget properties based on defined patterns.
 - Generating unique suffixes for internal use.
-- Setting the `NeedAppearances` flag in the PDF to ensure proper rendering of form fields.
 """
 
 from collections.abc import Callable
@@ -32,8 +30,9 @@ def remove_all_widgets(pdf: bytes) -> bytes:
     Removes all widgets (form fields) from a PDF, effectively flattening the form.
 
     This function takes a PDF as a bytes stream, removes all of its interactive
-    form fields (widgets), and returns the modified PDF as a bytes stream. This
-    is useful for creating a non-interactive version of a PDF form.
+    form field annotations from each page, and returns the modified PDF as a
+    bytes stream. This is useful for creating a non-interactive version of a PDF
+    form or for temporarily stripping widgets before copying them back.
 
     Args:
         pdf (bytes): The PDF as a bytes stream.
@@ -58,8 +57,9 @@ def get_page_streams(pdf: bytes) -> List[bytes]:
     """
     Extracts the content stream of each page in a PDF as a list of byte streams.
 
-    This function takes a PDF as a bytes stream and returns a list of bytes streams,
-    where each element in the list represents the content stream of a page in the PDF.
+    This function takes a PDF as a bytes stream and returns a list of single-page
+    PDF byte streams. Each element contains a complete one-page PDF produced by a
+    writer, not just the page's raw `/Contents` stream.
 
     Args:
         pdf (bytes): The PDF as a bytes stream.
@@ -87,7 +87,8 @@ def generic_merge(items: list, merger: Callable[[Any, Any], Any]) -> Any:
 
     This function takes a list of items and a merger function. It merges the items
     in pairs until only a single merged item remains. This is efficient for
-    combining multiple items.
+    combining multiple items. Callers must provide at least two items because the
+    final step always merges the remaining two entries.
 
     Args:
         items (list): The list of items to merge.
@@ -119,6 +120,8 @@ def merge_pdfs(pdf_list: list[bytes]) -> bytes:
     merges all available PDFs in pairs in a single pass. This process repeats until
     only a single merged PDF remains, offering better performance for large lists of
     PDFs.
+
+    The list must contain at least two PDF byte streams.
 
     Args:
         pdf_list (list[bytes]): A list of PDF files as byte streams to be merged.
@@ -189,6 +192,10 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
     """
     Checks if a widget value matches a pattern value.
 
+    Nested dictionaries delegate to `find_pattern_match`. Tuple pattern values
+    support matching any listed value, and a tuple containing ``"/"`` also
+    matches PDF names with arbitrary slash-prefixed values.
+
     Args:
         pattern_value (Any): The value from the pattern.
         widget_value (Any): The value from the widget.
@@ -213,9 +220,10 @@ def find_pattern_match(pattern: dict, widget: dict | DictionaryObject) -> bool:
     """
     Recursively finds a pattern match within a PDF widget (annotation dictionary).
 
-    This function searches for a specific pattern within a PDF widget's properties.
-    It recursively traverses the widget's dictionary, comparing keys and values
-    to the provided pattern.
+    This function searches for a specific pattern within a PDF widget's
+    properties. It checks the widget's immediate keys and recursively descends
+    only when the pattern value and widget value are both dictionary-like.
+    A match is found as soon as any requested key/value pair matches.
 
     Args:
         pattern (dict): The pattern to search for, represented as a dictionary.
@@ -238,9 +246,10 @@ def traverse_pattern(
     """
     Recursively traverses a pattern within a PDF widget (annotation dictionary) and returns the value.
 
-    This function searches for a specific pattern within a PDF widget's properties.
-    It recursively traverses the widget's dictionary, comparing keys and values
-    to the provided pattern and returns the value if the pattern is True.
+    This function searches for a specific pattern within a PDF widget's
+    properties. It recursively follows nested pattern dictionaries and returns
+    the first truthy widget value whose pattern entry is the sentinel ``True``.
+    Falsey values are ignored and treated as not found.
 
     Args:
         pattern (dict): The pattern to traverse, represented as a dictionary.
@@ -275,9 +284,10 @@ def extract_widget_property(
     """
     Extracts a specific property from a PDF widget based on a list of patterns.
 
-    This function iterates through a list of patterns, attempting to find a match
-    within the provided widget. If a match is found, the corresponding value is
-    extracted and returned. If no match is found, a default value is returned.
+    This function iterates through a list of patterns, attempting to find a
+    truthy value within the provided widget. If a value is found, an optional
+    conversion function is applied before returning it. If every pattern
+    returns ``None`` or another falsey value, the default value is returned.
 
     Args:
         widget (dict | DictionaryObject): The widget to extract the property from.

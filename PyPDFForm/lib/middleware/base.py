@@ -15,10 +15,10 @@ class Widget:
     """
     Base class for form widget.
 
-    The Widget class provides a base implementation for form widgets,
-    which are used to represent form fields in a PDF document. It
-    defines common attributes and methods for all form widgets, such
-    as name, value, and schema definition.
+    The Widget class provides a base implementation for middleware objects
+    built from existing PDF form fields. It stores extracted field state,
+    queues hook calls when mutable attributes are changed, and exposes schema
+    and sample-data helpers used by `PdfWrapper`.
     """
 
     def __init__(
@@ -28,6 +28,9 @@ class Widget:
     ) -> None:
         """
         Initialize a new widget.
+
+        The constructor initializes common metadata, geometry, JavaScript hook
+        attributes, and the map from public attribute names to hook functions.
 
         Args:
             name (str): The name of the widget.
@@ -81,8 +84,9 @@ class Widget:
         Set an attribute on the widget.
 
         This method overrides the default __setattr__ method to
-        trigger hooks when certain attributes are set. It also
-        tracks the attributes that have been set.
+        trigger hooks when certain attributes are set to non-None values. It also
+        tracks existing attributes that were explicitly set so those values can be
+        preserved across widget-cache rebuilds.
 
         Args:
             name (str): The name of the attribute.
@@ -139,9 +143,10 @@ class Widget:
         """
         Get the schema definition of the widget.
 
-        This method returns a dictionary that defines the schema
-        for the widget. The schema definition is used to validate
-        the widget's value.
+        This method returns the common schema fragment for the widget. Subclasses
+        merge their type-specific schema into this fragment. The base fragment
+        currently contributes the tooltip as a JSON Schema description when one
+        is available.
 
         Returns:
             dict: The schema definition of the widget.
