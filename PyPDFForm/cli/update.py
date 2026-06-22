@@ -48,18 +48,38 @@ class DocumentEvent(str, Enum):
     open = "open"
 
 
-@update_cli.command(no_args_is_help=True)
+@update_cli.command(
+    no_args_is_help=True,
+    help="Set the PDF title.",
+)
 def title(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     new_title: Annotated[str, typer.Option("--title", "-t", help="New PDF title.")],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
-    """Set the PDF title."""
+    """
+    Set the document title metadata on an existing PDF.
+
+    The command loads the input PDF with the requested title and the global CLI
+    options stored in `ctx.obj`, then writes the result to the requested output
+    path or back to the input file.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        new_title (str): New PDF title.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+    """
     PdfWrapper(str(pdf), title=new_title, **ctx.obj).write(output or pdf)
 
 
-@update_cli.command(no_args_is_help=True)
+@update_cli.command(
+    no_args_is_help=True,
+    help="Set the PDF version.",
+)
 def version(
     ctx: typer.Context,
     pdf: INPUT_PDF,
@@ -69,13 +89,31 @@ def version(
     ],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
-    """Set the PDF version."""
+    """
+    Change the PDF file version metadata.
+
+    The command converts the selected `PdfVersion` option to its PDF version
+    string, applies it through `PdfWrapper.change_version`, and writes the
+    modified PDF to the requested output path or back to the input file.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        pdf_version (PdfVersion): New PDF version enum value selected by the
+            CLI option.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+    """
     PdfWrapper(str(pdf), **ctx.obj).change_version(pdf_version.value).write(
         output or pdf
     )
 
 
-@update_cli.command(no_args_is_help=True)
+@update_cli.command(
+    no_args_is_help=True,
+    help="Update a form field's position and size.",
+)
 def bounds(
     ctx: typer.Context,
     pdf: INPUT_PDF,
@@ -112,7 +150,29 @@ def bounds(
         ),
     ] = None,
 ) -> None:
-    """Update a form field's position and size."""
+    """
+    Update the rectangle bounds of a form field.
+
+    The command loads the PDF with the global CLI options stored in `ctx.obj`,
+    resolves the requested widget, applies only the coordinate or size values
+    supplied by the user, and writes the modified PDF to the requested output
+    path or back to the input file.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        widget (str): Form field name to update.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+        x (float, optional): New x-coordinate in points. Defaults to None.
+        y (float, optional): New y-coordinate in points. Defaults to None.
+        width (float, optional): New field width in points. Defaults to None.
+        height (float, optional): New field height in points. Defaults to None.
+
+    Raises:
+        typer.BadParameter: Raised when the requested field does not exist.
+    """
     obj = PdfWrapper(str(pdf), **ctx.obj)
     f = get_widget(obj, widget, "--field")
 
@@ -124,14 +184,36 @@ def bounds(
     obj.write(output or pdf)
 
 
-@update_cli.command(no_args_is_help=True)
+@update_cli.command(
+    no_args_is_help=True,
+    help="Rename form fields from JSON.",
+)
 def rename(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[Path, json_file_option("JSON file with form field renames.")],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
-    """Rename form fields from JSON."""
+    """
+    Rename form fields using a validated JSON mapping file.
+
+    The command rejects full widget name mode, validates the JSON file against
+    the rename schema, resolves each existing field, queues the requested key
+    updates on the `PdfWrapper`, commits the rename operations, and writes the
+    modified PDF to the requested output path or back to the input file.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        data (Path): JSON file containing form field rename definitions.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+
+    Raises:
+        typer.BadParameter: Raised when full widget name mode is enabled, the
+            JSON file is invalid, or a requested field does not exist.
+    """
     if ctx.obj.get("use_full_widget_name"):
         cli_bad_parameter(
             "Renaming form fields is not supported when "
@@ -150,7 +232,10 @@ def rename(
     obj.commit_widget_key_updates().write(output or pdf)
 
 
-@update_cli.command(no_args_is_help=True)
+@update_cli.command(
+    no_args_is_help=True,
+    help="Update form field properties from JSON.",
+)
 def field(
     ctx: typer.Context,
     pdf: INPUT_PDF,
@@ -159,7 +244,27 @@ def field(
     ],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
-    """Update form field properties from JSON."""
+    """
+    Update form field properties from a validated JSON file.
+
+    The command validates the JSON input against the field update schema, loads
+    the PDF with the global CLI options stored in `ctx.obj`, resolves each
+    field name, registers any referenced fonts once per invocation, assigns the
+    requested widget properties, and writes the modified PDF to the requested
+    output path or back to the input file.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        data (Path): JSON file containing form field property updates.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+
+    Raises:
+        typer.BadParameter: Raised when the JSON file is invalid or a requested
+            field does not exist.
+    """
     input_data = load_json_file(data, FIELD_SCHEMA, "--file")
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
@@ -173,7 +278,10 @@ def field(
     obj.write(output or pdf)
 
 
-@update_cli.command(no_args_is_help=True)
+@update_cli.command(
+    no_args_is_help=True,
+    help="Add a document-level JavaScript action.",
+)
 def script(
     ctx: typer.Context,
     pdf: INPUT_PDF,
@@ -200,7 +308,24 @@ def script(
     ] = DocumentEvent.open,
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
-    """Add a document-level JavaScript action."""
+    """
+    Attach a JavaScript file to a document-level PDF event.
+
+    The command loads the PDF with the global CLI options stored in `ctx.obj`,
+    maps the selected event to the matching `PdfWrapper` JavaScript attribute,
+    assigns the script path, and writes the modified PDF to the requested
+    output path or back to the input file.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+        js_script (Path): JavaScript file path.
+        event (DocumentEvent): Document event that runs the script. Defaults to
+            `DocumentEvent.open`.
+        output (Path, optional): Output PDF path. If omitted, the input PDF is
+            overwritten. Defaults to None.
+    """
     obj = PdfWrapper(str(pdf), **ctx.obj)
     setattr(obj, f"on_{event.value}_javascript", str(js_script))
     obj.write(output or pdf)
