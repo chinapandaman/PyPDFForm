@@ -480,25 +480,36 @@ class PdfWrapper:
         """
         Reads the PDF stream, triggering widget hooks and updating fonts if necessary.
 
-        This internal method ensures that all queued widget hooks are executed and that
-        user-facing registered font names are mapped to their internal PDF resource names
-        before returning the raw PDF stream. Applying hooks updates the wrapper's stored
-        stream and clears each widget's hook queue.
+        This internal method executes queued widget hooks. When a pending font hook
+        exists, user-facing registered font names are mapped to their internal PDF
+        resource names before hooks are applied. Applying hooks updates the wrapper's
+        stored stream and clears each widget's hook queue.
 
         Returns:
             bytes: The raw PDF stream.
         """
 
-        if any(widget.hooks_to_trigger for widget in self.widgets.values()):
-            available_fonts = self._ensure_available_fonts_loaded()
-            for widget in self.widgets.values():
-                if (
-                    isinstance(widget, (Text, Dropdown))
-                    and widget.font not in available_fonts.values()
-                    and widget.font in available_fonts
-                ):
-                    # from `new_font` to `/F1`
-                    widget.font = available_fonts.get(widget.font)
+        widgets_with_hooks = [
+            widget for widget in self.widgets.values() if widget.hooks_to_trigger
+        ]
+
+        if widgets_with_hooks:
+            has_font_hook = any(
+                hook[0] == "update_text_field_font"
+                for widget in widgets_with_hooks
+                for hook in widget.hooks_to_trigger
+            )
+
+            if has_font_hook:
+                available_fonts = self._ensure_available_fonts_loaded()
+                for widget in self.widgets.values():
+                    if (
+                        isinstance(widget, (Text, Dropdown))
+                        and widget.font not in available_fonts.values()
+                        and widget.font in available_fonts
+                    ):
+                        # from `new_font` to `/F1`
+                        widget.font = available_fonts.get(widget.font)
 
             self._stream = trigger_widget_hooks(
                 self._stream,
