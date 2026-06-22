@@ -70,7 +70,8 @@ def trigger_widget_hooks(
     if a widget is associated with an annotation and has hooks to trigger,
     it executes those hooks. Hooks are functions defined in this module that
     modify the annotation dictionary, allowing for dynamic changes to the form field's
-    appearance or behavior.
+    appearance or behavior. After writing the modified PDF, all widget hook queues are
+    cleared so the same changes are not applied repeatedly.
 
     Args:
         pdf (bytes): The PDF file data as bytes.
@@ -113,8 +114,9 @@ def _update_field_flag(annot: DictionaryObject, flag: int, should_set: bool) -> 
     Sets or unsets a bit flag for a form field annotation.
 
     This internal helper function modifies the 'Ff' (field flags) entry in the
-    annotation dictionary or its parent dictionary to set or unset a specific
-    bit flag.
+    annotation dictionary or, for child annotations whose field flags live on the
+    parent, the parent dictionary. It preserves all other bits while setting or
+    unsetting the requested flag.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
@@ -271,7 +273,8 @@ def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
     Updates the multiline property of a text field annotation.
 
     This function modifies the Ff (flags) entry in the annotation dictionary to
-    enable or disable the multiline property of the text field.
+    enable the multiline property of the text field. A false value is ignored and
+    does not unset an existing multiline flag.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
@@ -286,8 +289,9 @@ def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
     Updates the comb property of a text field annotation.
 
     This function modifies the Ff (flags) entry in the annotation dictionary to
-    enable or disable the comb property of the text field, which limits the
-    number of characters that can be entered in each line.
+    enable the comb property of the text field, which displays fixed character
+    positions for fields with a maximum length. A false value is ignored and does
+    not unset an existing comb flag.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
@@ -316,7 +320,8 @@ def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
     Updates the size of a check box or radio button annotation.
 
     This function modifies the Rect entry in the annotation dictionary to change
-    the size of the check box or radio button.
+    the size of the check box or radio button. The lower-left corner stays fixed
+    and the upper-right corner is moved to make the field square.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the check box or
@@ -339,7 +344,9 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
     Updates the choices in a dropdown field annotation.
 
     This function modifies the Opt entry in the annotation dictionary to change
-    the available choices in the dropdown field.
+    the available choices in the dropdown field. String choices use the same
+    export and display value. Two-item sequences are written as `[export, display]`
+    PDF option arrays from the user-facing `(display, export)` order.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the dropdown field.
@@ -378,8 +385,8 @@ def update_field_x(annot: DictionaryObject, val: float) -> None:
     Updates the X-coordinate (horizontal position) of a form field annotation.
 
     This function modifies the 'Rect' entry of the annotation dictionary to change
-    the starting X-coordinate of the field and adjusts the ending X-coordinate
-    accordingly to maintain the field's width.
+    the left X-coordinate of the field and adjusts the right X-coordinate by the
+    same delta to maintain the field's width. Non-float values are ignored.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
@@ -396,8 +403,8 @@ def update_field_y(annot: DictionaryObject, val: float) -> None:
     Updates the Y-coordinate (vertical position) of a form field annotation.
 
     This function modifies the 'Rect' entry of the annotation dictionary to change
-    the starting Y-coordinate of the field and adjusts the ending Y-coordinate
-    accordingly to maintain the field's height.
+    the bottom Y-coordinate of the field and adjusts the top Y-coordinate by the
+    same delta to maintain the field's height. Non-float values are ignored.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
@@ -415,7 +422,7 @@ def update_field_width(annot: DictionaryObject, val: float) -> None:
 
     This function modifies the 'Rect' entry of the annotation dictionary to set
     the new width of the field, adjusting the rightmost coordinate while keeping
-    the leftmost coordinate fixed.
+    the leftmost coordinate fixed. Non-float values are ignored.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
@@ -431,7 +438,7 @@ def update_field_height(annot: DictionaryObject, val: float) -> None:
 
     This function modifies the 'Rect' entry of the annotation dictionary to set
     the new height of the field, adjusting the topmost coordinate while keeping
-    the bottommost coordinate fixed.
+    the bottommost coordinate fixed. Non-float values are ignored.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
@@ -446,7 +453,8 @@ def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
     Updates the tooltip (alternate field name) of a form field annotation.
 
     This function sets the 'TU' entry in the annotation dictionary, which
-    provides a text string that can be used as a tooltip for the field.
+    provides a text string that can be used as a tooltip for the field. Falsey
+    values are ignored, so this helper does not clear an existing tooltip.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
@@ -499,6 +507,8 @@ def _update_field_javascript(
 
     This internal helper function adds or updates a JavaScript action in the
     annotation's additional actions dictionary (AA) for a specific trigger event.
+    The JavaScript value can be literal code, a path, or a readable object; it is
+    normalized to string content before being written.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.

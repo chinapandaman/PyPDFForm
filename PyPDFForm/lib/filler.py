@@ -43,7 +43,8 @@ def signature_image_handler(
     image data from the widget's middleware and prepares it for drawing on the form. The
     function calculates the position and dimensions of the image based on the widget's
     properties and the `preserve_aspect_ratio` setting. The image data is then stored in a
-    list for later drawing.
+    list for later drawing. Widgets without image data are left unchanged and report that
+    no image needs to be drawn.
 
     Args:
         widget (dict): The widget dictionary representing the signature or image field.
@@ -87,8 +88,11 @@ def update_widget(
 ) -> bool:
     """Updates a single widget's value and handles its properties.
 
-    This function updates the value of a single PDF form widget based on its type. It also
-    handles widget flattening and prepares images or signatures for drawing if applicable.
+    This function updates the value of a single PDF form widget based on its type. It sets
+    the read-only flag first when flattening is requested, skips value updates when the
+    middleware value is ``None``, tracks radio option indices within each group, and
+    prepares images or signatures for later drawing instead of writing image data directly
+    into the annotation.
 
     Args:
         annot (DictionaryObject): The annotation object representing the widget in the PDF.
@@ -133,7 +137,8 @@ def handle_image_drawing(
     """Merges prepared images and signatures with the filled PDF.
 
     This function takes the filled PDF and a dictionary of images to draw (from signatures
-    or image fields) and merges them into the PDF as watermarks.
+    or image fields), flattens that page-indexed structure into watermark drawing
+    instructions, and merges those image watermarks into the PDF.
 
     Args:
         result (bytes): The filled PDF as bytes.
@@ -162,9 +167,10 @@ def fill(
 
     This function fills a PDF template with the provided widget values. It iterates through the
     widgets on each page of the PDF and updates their values based on the provided `widgets`
-    dictionary. The function supports various widget types, including text fields, checkboxes,
-    radio buttons, dropdowns, images, and signatures. It also supports flattening the filled
-    form to prevent further modifications.
+    dictionary. The function supports text fields, checkboxes, radio buttons, dropdowns,
+    images, and signatures. It can set fields read-only during filling, and when images or
+    signatures are present it returns both the filled form stream and a second stream with
+    the image watermarks applied so callers can preserve non-image widgets separately.
 
     Args:
         template (bytes): The PDF template as bytes.
@@ -178,9 +184,9 @@ def fill(
         flatten (bool): Whether to flatten the filled PDF. Defaults to False.
 
     Returns:
-        tuple: A tuple containing the filled PDF as bytes and the image drawn stream as bytes, if any.
-               The image drawn stream is only returned if there are any image or signature widgets
-               in the form.
+        tuple: A tuple containing the filled PDF as bytes and the image-drawn
+               stream as bytes when an image or signature was drawn. The second
+               tuple item is None when no image drawing is needed.
     """
     pdf = PdfReader(BytesIO(template))
     out = PdfWriter()

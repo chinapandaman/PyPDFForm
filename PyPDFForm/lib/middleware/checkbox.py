@@ -49,8 +49,9 @@ class Checkbox(Widget):
         Custom attribute setter for the Checkbox class.
 
         If the attribute being set is 'size', it sets both 'width' and 'height'
-        attributes of the widget to the given value, ensuring the checkbox remains
-        square. For all other attributes, it defers to the parent class's setter.
+        attributes of the widget to the given value before setting `size`, ensuring
+        the checkbox remains square and all relevant hooks are queued. For all other
+        attributes, it defers to the parent class's setter.
 
         Args:
             name (str): The name of the attribute to set.

@@ -55,7 +55,8 @@ class PdfArray(list):
         Merges all PdfWrapper objects in the list into a single PdfWrapper.
 
         This method uses a pairwise merging strategy to combine all PdfWrapper
-        objects contained in the list into one.
+        objects contained in the list into one. It follows the same expectations
+        as `generic_merge`, so the array must contain at least two wrappers.
 
         Returns:
             Any: A single merged PdfWrapper object.

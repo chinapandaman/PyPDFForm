@@ -57,7 +57,7 @@ class RawText:
 
         Returns:
             A dictionary containing the page number, object type, an initialized Text widget,
-            and the coordinates for drawing.
+            and the coordinates expected by the watermark drawing helpers.
         """
         widget = Text("new", self.text)
         widget.font = self.font

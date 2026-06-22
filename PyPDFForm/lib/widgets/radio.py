@@ -45,6 +45,10 @@ class RadioWidget(CheckBoxWidget):
         """
         Initializes a RadioWidget object.
 
+        The `shape` parameter is added to the checkbox parameter mapping before
+        common widget initialization so ReportLab can render each button with the
+        requested shape.
+
         Args:
             name (str): Name of the widget.
             page_number (int): Page number of the widget.
@@ -60,8 +64,8 @@ class RadioWidget(CheckBoxWidget):
         Performs canvas operations for the radio button widget.
 
         This method iterates through the X and Y coordinates of each radio button
-        and draws it on the PDF canvas. It also sets the value of the radio button
-        based on its index in the list of coordinates.
+        and draws one AcroForm radio annotation for each coordinate pair. Each
+        annotation receives a string value matching its zero-based option index.
 
         Args:
             canvas (Canvas): Canvas object to operate on.

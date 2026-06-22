@@ -42,6 +42,8 @@ def fp_or_f_obj_or_stream_to_stream(
         - byte streams (bytes)
         - file paths (str)
         - file-like objects with a read() method (BinaryIO)
+    Unsupported inputs and string paths that do not point to files are treated
+    as empty input and return ``b""``.
 
     Args:
         fp_or_f_obj_or_stream (bytes | str | BinaryIO): The input to adapt.
@@ -76,6 +78,9 @@ def fp_or_f_obj_or_f_content_to_content(
         - file content (str)
         - file paths (str)
         - file-like objects with a read() method (BinaryIO)
+    Existing string paths are opened as UTF-8 text. Other strings are returned
+    unchanged, so callers can pass literal script or text content directly.
+    Readable objects are read and converted with ``str(...)``.
 
     Args:
         fp_or_f_obj_or_f_content (str | BinaryIO): The input to adapt.

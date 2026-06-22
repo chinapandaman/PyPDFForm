@@ -22,9 +22,9 @@ class ImageWidget(SignatureWidget):
     Represents an image widget in a PDF form.
 
     This class inherits from the SignatureWidget and is specifically designed
-    for handling image fields in PDF forms. It reuses the signature widget's
-    infrastructure for positioning and rendering, but instead of capturing
-    a signature, it inserts a provided image.
+    for creating image fields in PDF forms. It reuses the signature widget's
+    bedrock-copy infrastructure for positioning and annotation rendering, but
+    selects the bedrock image annotation.
 
     Attributes:
         BEDROCK_WIDGET_TO_COPY (str): The name of the bedrock widget to copy,
@@ -39,9 +39,9 @@ class ImageField(SignatureField):
     """
     Represents an image field in a PDF document.
 
-    This dataclass extends the `SignatureField` base class and defines the
-    specific attributes for an image input field. It inherits `width` and
-    `height` from `SignatureField` as images also have dimensions.
+    This dataclass extends the `SignatureField` base class and defines an image
+    input field. It inherits `width` and `height` from `SignatureField` because
+    image and signature placeholders share the same creation path.
 
     Attributes:
         _widget_class (Type[ImageWidget]): The widget class associated with this field type.

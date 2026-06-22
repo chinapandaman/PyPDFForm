@@ -64,6 +64,10 @@ class SignatureWidget:
         """
         Initializes a SignatureWidget object.
 
+        The widget records placement information, resolves width and height with
+        defaults, and captures supported hook parameters so they can be applied
+        after the copied annotation is inserted into the target PDF.
+
         Args:
             name (str): The name of the signature widget.
             page_number (int): The page number of the signature widget.
@@ -91,9 +95,10 @@ class SignatureWidget:
         Generates watermarks for multiple signature widgets in bulk.
 
         This static method processes a list of SignatureWidget objects and a PDF stream
-        to create a list of watermark PDF streams, one for each page of the input PDF.
-        Each watermark PDF contains all the signature widgets that belong to that page.
-        This is more efficient than generating watermarks one by one.
+        to create a list of watermark PDF streams aligned to the input PDF pages.
+        For each page, it copies the configured bedrock annotation, renames it,
+        adjusts its rectangle, and writes those cloned annotations into the page's
+        `/Annots` array.
 
         Args:
             widgets (List[SignatureWidget]): A list of SignatureWidget objects to be
@@ -180,7 +185,9 @@ class SignatureField(Field):
     Represents a signature field in a PDF document.
 
     This dataclass extends the `Field` base class and defines the specific
-    attributes that can be configured for a signature input field.
+    dimensions that can be configured for a signature input field. The rendered
+    field is created by copying a bedrock signature annotation rather than by
+    calling ReportLab's AcroForm API.
 
     Attributes:
         _widget_class (Type[SignatureWidget]): The widget class associated with this field type.
