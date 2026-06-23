@@ -1267,7 +1267,7 @@
 <li>Try to submit small, incremental changes. For large changes, request a feature branch in your issue and open your PR against that branch, as they will likely need revision before merging into master.</li>
 <li>Ensure your changes pass all linters. PyPDFForm uses rules from <a href="https://www.pylint.org/">pylint</a>, <a href="https://docs.astral.sh/ruff/">ruff</a>, and <a href="https://microsoft.github.io/pyright/#/">pyright</a>. Run <code>linting</code> inside the development container to check.</li>
 <li>Your changes must pass all tests and have 100% coverage. You can read more about testing <a href="../dev_test/">here</a>.</li>
-<li>If you are changing the Python API, CLI, or any other parts of the code that are relevant, please update the appropriate documentation too.</li>
+<li>If you are changing the Python API, CLI, or any other relevant code behavior, please update the appropriate documentation and, when applicable, the respective docstrings too.</li>
 </ul>
 <h2 id="merge-process">Merge process<a class="headerlink" href="#merge-process" title="Permanent link">⚓︎</a></h2>
 <p>Your PR will be reviewed before merging into the master branch. If your changes are too extensive for inline comments, you may need to reopen your PR against a new feature branch for revision.</p>
