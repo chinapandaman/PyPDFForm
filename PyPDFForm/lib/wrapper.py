@@ -149,7 +149,7 @@ class PdfWrapper:
         )
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
-        self._available_fonts_loaded = False
+        self._available_fonts_loaded = None  # for lazy loading fonts
         self._font_register_events = []  # for reregister
         self._key_update_tracker = {}  # for update key preserve old key attrs
         self._keys_to_update = []  # for bulk update keys
@@ -221,8 +221,8 @@ class PdfWrapper:
         It rebuilds the widget dictionary and invalidates the lazily loaded font cache.
         """
 
-        stream = self._read()
         self._available_fonts_loaded = False
+        stream = self._read()
         new_widgets = (
             build_widgets(
                 stream,
