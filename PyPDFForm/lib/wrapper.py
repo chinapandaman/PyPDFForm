@@ -39,7 +39,11 @@ from .adapter import (
 )
 from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
-from .egress import appearance_streams_handler, preserve_pdf_properties
+from .egress import (
+    appearance_streams_handler,
+    preserve_pdf_properties,
+    rebuild_field_tree,
+)
 from .filler import fill
 from .font import (
     get_all_available_fonts,
@@ -474,6 +478,7 @@ class PdfWrapper:
                 self._metadata if getattr(self, "preserve_metadata") else None,
             )
 
+        result = rebuild_field_tree(result)
         return result
 
     def _read(self) -> bytes:

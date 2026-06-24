@@ -16,9 +16,20 @@ from warnings import catch_warnings, simplefilter
 
 from pikepdf import Pdf
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DictionaryObject, NameObject, TextStringObject
+from pypdf.generic import ArrayObject, DictionaryObject, NameObject, TextStringObject
 
-from .constants import JS, XFA, AcroForm, JavaScript, OpenAction, Root, S, Title
+from .constants import (
+    JS,
+    XFA,
+    AcroForm,
+    Annots,
+    Fields,
+    JavaScript,
+    OpenAction,
+    Root,
+    S,
+    Title,
+)
 
 
 @lru_cache(maxsize=128)
@@ -109,6 +120,28 @@ def preserve_pdf_properties(
         open_action[NameObject(JS)] = TextStringObject(script)
 
         writer._root_object.update({NameObject(OpenAction): open_action})  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
+
+
+@lru_cache(maxsize=128)
+def rebuild_field_tree(pdf: bytes) -> bytes:
+    writer = PdfWriter(BytesIO(pdf))
+    root = writer._root_object  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+
+    if AcroForm in root and Fields in root[AcroForm]:
+        del root[AcroForm][Fields]
+
+    if AcroForm not in root:
+        root[NameObject(AcroForm)] = DictionaryObject({})
+    root[AcroForm][NameObject(Fields)] = ArrayObject([])
+
+    for page in writer.pages:
+        for annot in page.get(Annots, []):
+            root[AcroForm][Fields].append(annot)
 
     with BytesIO() as f:
         writer.write(f)
