@@ -116,6 +116,7 @@ class PdfWrapper:
         ("need_appearances", False),
         ("generate_appearance_streams", False),
         ("preserve_metadata", False),
+        ("preserve_field_tree", False),
         ("title", None),
     ]
 
@@ -477,7 +478,7 @@ class PdfWrapper:
                 self.on_open_javascript,
                 self._metadata if getattr(self, "preserve_metadata") else None,
             )
-        if result:
+        if result and getattr(self, "preserve_field_tree"):
             result = preserve_field_tree(
                 result, set(self.widgets.keys()), getattr(self, "use_full_widget_name")
             )
