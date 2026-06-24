@@ -95,9 +95,9 @@ def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
 
 
-def test_write(template_stream, pdf_samples):
+def test_write(template_stream, tmp_path):
     assert PdfWrapper(template_stream).write(
-        os.path.join(pdf_samples, "sample_template.pdf")
+        os.path.join(tmp_path, "sample_template.pdf")
     )
 
 
