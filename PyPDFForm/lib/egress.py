@@ -30,6 +30,7 @@ from .constants import (
     S,
     Title,
 )
+from .template import get_widget_key
 
 
 @lru_cache(maxsize=128)
@@ -127,8 +128,9 @@ def preserve_pdf_properties(
         return f.read()
 
 
-@lru_cache(maxsize=128)
-def rebuild_field_tree(pdf: bytes) -> bytes:
+def preserve_field_tree(
+    pdf: bytes, widget_keys: set, use_full_widget_name: bool
+) -> bytes:
     writer = PdfWriter(BytesIO(pdf))
     root = writer._root_object  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 
@@ -141,7 +143,9 @@ def rebuild_field_tree(pdf: bytes) -> bytes:
 
     for page in writer.pages:
         for annot in page.get(Annots, []):
-            root[AcroForm][Fields].append(annot)
+            key = get_widget_key(annot.get_object(), use_full_widget_name)
+            if key in widget_keys:
+                root[AcroForm][Fields].append(annot)
 
     with BytesIO() as f:
         writer.write(f)
