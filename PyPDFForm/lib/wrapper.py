@@ -477,8 +477,8 @@ class PdfWrapper:
                 self.on_open_javascript,
                 self._metadata if getattr(self, "preserve_metadata") else None,
             )
-
-        result = rebuild_field_tree(result)
+        if result:
+            result = rebuild_field_tree(result)
         return result
 
     def _read(self) -> bytes:
