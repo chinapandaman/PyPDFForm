@@ -39,7 +39,11 @@ from .adapter import (
 )
 from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
-from .egress import appearance_streams_handler, preserve_pdf_properties
+from .egress import (
+    appearance_streams_handler,
+    preserve_pdf_properties,
+    rebuild_acroform_fields,
+)
 from .filler import fill
 from .font import (
     get_all_available_fonts,
@@ -153,6 +157,9 @@ class PdfWrapper:
         self._font_register_events = []  # for reregister
         self._key_update_tracker = {}  # for update key preserve old key attrs
         self._keys_to_update = []  # for bulk update keys
+
+        # future code will modify/replace this
+        self._rebuild_acroform_fields_on_read = None
 
         # sets attrs from kwargs
         for attr, default in self.USER_PARAMS:
@@ -452,6 +459,8 @@ class PdfWrapper:
            generating appearance streams.
         3. If `preserve_metadata`, title, or on-open JavaScript are set, it preserves
            or updates the corresponding PDF properties accordingly.
+        4. If internal AcroForm field rebuilding is enabled, it rebuilds the
+           `/Fields` array from page annotations for widgets known to this wrapper.
         The wrapper's stored stream is not replaced by these final egress-only changes.
 
         Returns:
@@ -464,8 +473,15 @@ class PdfWrapper:
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
 
-        if any(
-            [getattr(self, "preserve_metadata"), self.title, self.on_open_javascript]
+        if (
+            any(
+                [
+                    getattr(self, "preserve_metadata"),
+                    self.title,
+                    self.on_open_javascript,
+                ]
+            )
+            and result
         ):
             result = preserve_pdf_properties(
                 result,
@@ -474,6 +490,11 @@ class PdfWrapper:
                 self._metadata if getattr(self, "preserve_metadata") else None,
             )
 
+        if self._rebuild_acroform_fields_on_read and result:
+            # for now this code path should never be hit
+            result = rebuild_acroform_fields(
+                result, set(self.widgets.keys()), getattr(self, "use_full_widget_name")
+            )
         return result
 
     def _read(self) -> bytes:

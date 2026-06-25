@@ -5,12 +5,22 @@ from io import BytesIO
 
 import pytest
 from jsonschema import ValidationError, validate
+from pypdf import PdfReader
 
 from PyPDFForm import Annotations, BlankPage, Fields, PdfArray, PdfWrapper
-from PyPDFForm.lib.constants import DA, UNIQUE_SUFFIX_LENGTH, T, V
+from PyPDFForm.lib.constants import (
+    DA,
+    UNIQUE_SUFFIX_LENGTH,
+    AcroForm,
+    T,
+    V,
+)
+from PyPDFForm.lib.constants import (
+    Fields as FieldsConst,
+)
 from PyPDFForm.lib.deprecation import deprecation_notice
 from PyPDFForm.lib.middleware.base import Widget
-from PyPDFForm.lib.template import get_widgets_by_page
+from PyPDFForm.lib.template import get_widget_key, get_widgets_by_page
 
 
 def test_deprecation_warning():
@@ -95,9 +105,9 @@ def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
 
 
-def test_write(template_stream, pdf_samples):
+def test_write(template_stream, tmp_path):
     assert PdfWrapper(template_stream).write(
-        os.path.join(pdf_samples, "sample_template.pdf")
+        os.path.join(tmp_path, "sample_template.pdf")
     )
 
 
@@ -1102,3 +1112,17 @@ def test_rubber_stamp_annotation(template_stream, pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_rebuild_acroform_fields():
+    pdf = PdfWrapper(BlankPage() * 2)
+    pdf._rebuild_acroform_fields_on_read = True  # type: ignore # noqa: SLF001
+
+    pdf.bulk_create_fields(
+        [Fields.TextField("foo", 1, 100, 100), Fields.TextField("bar", 2, 100, 200)]
+    )
+
+    reader = PdfReader(BytesIO(pdf.read()))
+
+    assert get_widget_key(reader.root_object[AcroForm][FieldsConst][0], False) == "foo"
+    assert get_widget_key(reader.root_object[AcroForm][FieldsConst][1], False) == "bar"
