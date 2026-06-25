@@ -6,13 +6,15 @@ This module provides functionalities that prepare the final PDF for output (egre
 ensuring that it is properly formatted and ready for the end-user. This includes
 managing appearance streams (so form fields display correctly after being filled),
 handling the /NeedAppearances flag, and preserving or updating document-level
-properties like metadata, title, and OpenAction scripts. These functions are typically
-called right before the final PDF byte stream is returned by the wrapper module.
+properties like metadata, title, and OpenAction scripts. It can also rebuild the
+AcroForm `/Fields` array from the widget annotations present on each page. These
+functions are typically called right before the final PDF byte stream is returned by
+the wrapper module.
 """
 
 from functools import lru_cache
 from io import BytesIO
-from warnings import catch_warnings, simplefilter
+from warnings import catch_warnings, filterwarnings
 
 from pikepdf import Pdf
 from pypdf import PdfReader, PdfWriter
@@ -70,9 +72,11 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
         result = f.read()
 
     if generate_appearance_streams:
-        # TODO: remove after fixing /Annots /Fields mismatch
         with Pdf.open(BytesIO(result)) as f, catch_warnings():
-            simplefilter("ignore")
+            filterwarnings(
+                "ignore", message=".*/AcroForm.*"
+            )  # handled by rebuild_acroform_fields
+
             f.generate_appearance_streams()
             with BytesIO() as r:
                 f.save(r)
@@ -128,14 +132,28 @@ def preserve_pdf_properties(
         return f.read()
 
 
-def preserve_field_tree(
+def rebuild_acroform_fields(
     pdf: bytes, widget_keys: set, use_full_widget_name: bool
 ) -> bytes:
+    """
+    Rebuilds the AcroForm `/Fields` array from matching page annotations.
+
+    The existing `/Fields` array is replaced, creating an AcroForm dictionary
+    when necessary. Each page annotation is resolved to a widget key, and only
+    annotations whose keys are present in `widget_keys` are added to the new
+    array. Page annotation arrays are left unchanged.
+
+    Args:
+        pdf (bytes): The PDF stream whose AcroForm fields should be rebuilt.
+        widget_keys (set): Widget keys to include in the rebuilt `/Fields` array.
+        use_full_widget_name (bool): Whether to resolve annotations using their
+            full widget names, including parent names.
+
+    Returns:
+        bytes: The PDF stream with a rebuilt AcroForm `/Fields` array.
+    """
     writer = PdfWriter(BytesIO(pdf))
     root = writer._root_object  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
-
-    if AcroForm in root and Fields in root[AcroForm]:
-        del root[AcroForm][Fields]
 
     if AcroForm not in root:
         root[NameObject(AcroForm)] = DictionaryObject({})
