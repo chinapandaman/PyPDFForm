@@ -79,7 +79,7 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
 
             f.generate_appearance_streams()
             with BytesIO() as r:
-                f.save(r)
+                f.save(r, deterministic_id=True)
                 r.seek(0)
                 result = r.read()
 
