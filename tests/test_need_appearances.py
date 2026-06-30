@@ -106,10 +106,7 @@ def run_sample_template_library_test(
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
-        if generate_appearance_streams:
-            request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
-        else:
-            assert obj.read() == expected
+        assert obj.read() == expected
 
 
 def test_fill(template_stream, pdf_samples, data_dict, request):
