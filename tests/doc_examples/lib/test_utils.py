@@ -67,6 +67,9 @@ def test_extract_pages(static_pdfs, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_extract_pages.pdf")
 
     first_page = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).pages[0]
+    first_page = PdfWrapper(
+        first_page.read()
+    )  # not in docs, to keep artifact consistent with CLI
     first_page.fill(
         {
             "test": "test_1",

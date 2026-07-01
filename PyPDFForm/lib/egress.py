@@ -141,7 +141,9 @@ def rebuild_acroform_fields(
     The existing `/Fields` array is replaced, creating an AcroForm dictionary
     when necessary. Each page annotation is resolved to a widget key, and only
     annotations whose keys are present in `widget_keys` are added to the new
-    array. Page annotation arrays are left unchanged.
+    array. Page annotation arrays are left unchanged. When no matching page
+    annotations are found, the original PDF stream is returned unchanged to
+    avoid an unnecessary rewrite.
 
     Args:
         pdf (bytes): The PDF stream whose AcroForm fields should be rebuilt.
@@ -150,7 +152,8 @@ def rebuild_acroform_fields(
             full widget names, including parent names.
 
     Returns:
-        bytes: The PDF stream with a rebuilt AcroForm `/Fields` array.
+        bytes: The PDF stream with a rebuilt AcroForm `/Fields` array, or the
+            original stream when there are no matching widgets to rebuild.
     """
     writer = PdfWriter(BytesIO(pdf))
     root = writer._root_object  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
@@ -159,11 +162,16 @@ def rebuild_acroform_fields(
         root[NameObject(AcroForm)] = DictionaryObject({})
     root[AcroForm][NameObject(Fields)] = ArrayObject([])
 
+    needs_update = False
     for page in writer.pages:
         for annot in page.get(Annots, []):
             key = get_widget_key(annot.get_object(), use_full_widget_name)
             if key in widget_keys:
                 root[AcroForm][Fields].append(annot)
+                needs_update = True
+
+    if not needs_update:
+        return pdf
 
     with BytesIO() as f:
         writer.write(f)

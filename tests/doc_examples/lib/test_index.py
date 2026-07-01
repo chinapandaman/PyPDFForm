@@ -13,6 +13,7 @@ def test_index_snippets(pdf_samples, request):
 
     # Create a blank PDF
     pdf = PdfWrapper(BlankPage())
+    pdf = PdfWrapper(pdf.read())  # not in docs, to keep artifact consistent with CLI
 
     # Draw labeling texts
     pdf.draw(
@@ -21,6 +22,7 @@ def test_index_snippets(pdf_samples, request):
             RawElements.RawText("My Checkbox:", 1, 100, 550),
         ]
     )
+    pdf = PdfWrapper(pdf.read())  # not in docs, to keep artifact consistent with CLI
 
     # Create text and checkbox fields
     pdf.bulk_create_fields(
@@ -29,6 +31,7 @@ def test_index_snippets(pdf_samples, request):
             Fields.CheckBoxField("my_checkbox", 1, 180, 546, size=16),
         ]
     )
+    pdf = PdfWrapper(pdf.read())  # not in docs, to keep artifact consistent with CLI
 
     # Inspect the fields via JSON schema
     assert pdf.schema["properties"]["my_textfield"]["type"] == "string"
@@ -37,6 +40,7 @@ def test_index_snippets(pdf_samples, request):
     # Change the field styles
     pdf.widgets["my_textfield"].font_color = (1, 0, 0)
     pdf.widgets["my_textfield"].alignment = 1
+    pdf = PdfWrapper(pdf.read())  # not in docs, to keep artifact consistent with CLI
 
     # Fill the newly created form
     pdf.fill({"my_textfield": "this is a text field", "my_checkbox": True})
