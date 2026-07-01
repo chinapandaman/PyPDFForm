@@ -15,8 +15,14 @@ done
 
 git restore --source=HEAD --staged --worktree -- ./pdf_samples ./docs/pdfs
 
+TOTAL=${#BEFORE[@]}
+COUNT=1
+SEPARATOR="==============="
+
 for i in "${BEFORE[@]}"; do
+  printf '%s\n%s/%s\n%s\n' "$SEPARATOR" "$COUNT" "$TOTAL" "$SEPARATOR"
   python ./scripts/open_pdf_diff.py "$i"
   read -p "Press any key to continue..."$'\n' -n1 -s -r
   rm -f ./temp/*.png
+  COUNT=$((COUNT + 1))
 done
