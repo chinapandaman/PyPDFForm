@@ -1116,7 +1116,6 @@ def test_rubber_stamp_annotation(template_stream, pdf_samples, request):
 
 def test_rebuild_acroform_fields():
     pdf = PdfWrapper(BlankPage() * 2)
-    pdf._rebuild_acroform_fields_on_read = True  # type: ignore # noqa: SLF001
 
     pdf.bulk_create_fields(
         [Fields.TextField("foo", 1, 100, 100), Fields.TextField("bar", 2, 100, 200)]

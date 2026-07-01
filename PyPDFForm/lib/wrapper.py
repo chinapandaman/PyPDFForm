@@ -158,9 +158,6 @@ class PdfWrapper:
         self._key_update_tracker = {}  # for update key preserve old key attrs
         self._keys_to_update = []  # for bulk update keys
 
-        # future code will modify/replace this
-        self._rebuild_acroform_fields_on_read = None
-
         # sets attrs from kwargs
         for attr, default in self.USER_PARAMS:
             setattr(self, attr, kwargs.get(attr, default))
@@ -490,12 +487,9 @@ class PdfWrapper:
                 self._metadata if getattr(self, "preserve_metadata") else None,
             )
 
-        if self._rebuild_acroform_fields_on_read and result:
-            # for now this code path should never be hit
-            result = rebuild_acroform_fields(
-                result, set(self.widgets.keys()), getattr(self, "use_full_widget_name")
-            )
-        return result
+        return rebuild_acroform_fields(
+            result, set(self.widgets.keys()), getattr(self, "use_full_widget_name")
+        )
 
     def _read(self) -> bytes:
         """
