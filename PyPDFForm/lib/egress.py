@@ -159,11 +159,16 @@ def rebuild_acroform_fields(
         root[NameObject(AcroForm)] = DictionaryObject({})
     root[AcroForm][NameObject(Fields)] = ArrayObject([])
 
+    needs_update = False
     for page in writer.pages:
         for annot in page.get(Annots, []):
             key = get_widget_key(annot.get_object(), use_full_widget_name)
             if key in widget_keys:
                 root[AcroForm][Fields].append(annot)
+                needs_update = True
+
+    if not needs_update:
+        return pdf
 
     with BytesIO() as f:
         writer.write(f)

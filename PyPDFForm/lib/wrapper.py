@@ -487,9 +487,11 @@ class PdfWrapper:
                 self._metadata if getattr(self, "preserve_metadata") else None,
             )
 
-        return rebuild_acroform_fields(
-            result, set(self.widgets.keys()), getattr(self, "use_full_widget_name")
-        )
+        if result:
+            result = rebuild_acroform_fields(
+                result, set(self.widgets.keys()), getattr(self, "use_full_widget_name")
+            )
+        return result
 
     def _read(self) -> bytes:
         """
