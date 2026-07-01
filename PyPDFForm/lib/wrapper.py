@@ -370,6 +370,10 @@ class PdfWrapper:
         """
         Returns the PDF version of the underlying PDF document.
 
+        The version is read from the PDF header lazily and cached so egress-only
+        rewrites can restore the wrapper's original version even if an underlying
+        PDF writer emits a different default header.
+
         Returns:
             str | None: The PDF version as a string, or None if the version cannot be determined.
         """
@@ -458,8 +462,11 @@ class PdfWrapper:
            generating appearance streams.
         3. If `preserve_metadata`, title, or on-open JavaScript are set, it preserves
            or updates the corresponding PDF properties accordingly.
-        4. If internal AcroForm field rebuilding is enabled, it rebuilds the
-           `/Fields` array from page annotations for widgets known to this wrapper.
+        4. Rebuilds the AcroForm `/Fields` array from page annotations for
+           widgets known to this wrapper, leaving the stream unchanged when no
+           matching widget annotations are found.
+        5. Restores the wrapper's cached PDF header version after egress
+           processing, since PDF writers may emit their own default version.
         The wrapper's stored stream is not replaced by these final egress-only changes.
 
         Returns:
@@ -566,9 +573,9 @@ class PdfWrapper:
         """
         Changes the PDF version of the underlying document.
 
-        The method replaces the first PDF header version marker in the current stream.
-        It does not otherwise validate or rewrite the document for version-specific
-        compatibility.
+        The method replaces the first PDF header version marker in the current stream
+        and updates the cached version used by later egress processing. It does not
+        otherwise validate or rewrite the document for version-specific compatibility.
 
         Args:
             version (str): The new PDF version string (e.g., "1.7").

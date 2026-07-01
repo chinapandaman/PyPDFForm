@@ -338,6 +338,22 @@ def generate_unique_suffix() -> str:
 
 
 def get_version(pdf: bytes) -> str | None:
+    """
+    Extracts the PDF header version from a byte stream.
+
+    The stream is checked against the supported PDF header identifiers defined
+    in constants. The function inspects the original bytes directly so callers
+    can capture a document's version before handing it to tools that may rewrite
+    the header during output processing.
+
+    Args:
+        pdf (bytes): The PDF stream to inspect.
+
+    Returns:
+        str | None: The PDF version string, or None when the stream does not
+            start with a known PDF version identifier.
+    """
+
     result = None
     for each in VERSION_IDENTIFIERS:
         if pdf.startswith(each):
@@ -347,6 +363,23 @@ def get_version(pdf: bytes) -> str | None:
 
 
 def set_version(pdf: bytes, old: str, new: str) -> bytes:
+    """
+    Replaces the first PDF header version marker in a byte stream.
+
+    This helper only changes the literal header marker, such as `%PDF-1.7`; it
+    does not validate or rewrite the document for version-specific feature
+    compatibility. It is used after egress rewrites so output keeps the wrapper's
+    cached version instead of inheriting a writer-selected version.
+
+    Args:
+        pdf (bytes): The PDF stream to update.
+        old (str): The currently present PDF version string.
+        new (str): The PDF version string to write into the header.
+
+    Returns:
+        bytes: The PDF stream with the first matching version marker replaced.
+    """
+
     return pdf.replace(
         VERSION_IDENTIFIER_PREFIX + bytes(old, "utf-8"),
         VERSION_IDENTIFIER_PREFIX + bytes(new, "utf-8"),
