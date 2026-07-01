@@ -94,7 +94,9 @@ def run_sample_template_library_test(
 
         obj.widgets["new_text_field_widget"].font = "new_font"
         obj.widgets["new_text_field_widget"].font_color = (1, 0, 0)
-        # TODO: why is alignment not rendered right in the appearance stream?
+
+        # Currently alignment is not respected due to qpdf limitations
+        # https://github.com/qpdf/qpdf/blob/503d401615a842f7c5220a3ee425f5db2f25f537/TODO.md#text-appearance-streams
         obj.widgets["new_text_field_widget"].alignment = 2
 
         obj.widgets["new_checkbox_widget"].size = 40
