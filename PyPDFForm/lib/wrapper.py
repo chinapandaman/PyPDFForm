@@ -500,7 +500,8 @@ class PdfWrapper:
             result = rebuild_acroform_fields(
                 result, set(self.widgets.keys()), getattr(self, "use_full_widget_name")
             )
-            result = set_version(result, get_version(result), self.version)
+            if self.version:
+                result = set_version(result, get_version(result), self.version)
         return result
 
     def _read(self) -> bytes:
@@ -584,8 +585,9 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        self._stream = set_version(self._read(), self.version, version)
-        self._version = version
+        if self.version:
+            self._stream = set_version(self._read(), self.version, version)
+            self._version = version
 
         return self
 
