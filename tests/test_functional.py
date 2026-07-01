@@ -145,7 +145,7 @@ def test_register_bad_fonts():
     assert "foo" not in obj.fonts
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_fill_with_customized_widgets(
     template_stream, pdf_samples, sample_font_stream, data_dict, request
 ):
@@ -175,7 +175,7 @@ def test_fill_with_customized_widgets(
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_fill_with_customized_widgets_flatten(
     template_stream, pdf_samples, sample_font_stream, data_dict, request
 ):
@@ -509,7 +509,7 @@ def test_version(pdf_samples):
     assert obj.version is None
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_fill_font_color.pdf")
     with open(expected_path, "rb+") as f:
@@ -531,7 +531,7 @@ def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request)
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_fill_complex_fonts.pdf")
     with open(expected_path, "rb+") as f:
@@ -561,7 +561,7 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_pages_preserve_font(template_stream, pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "pages", "test_pages_preserve_font.pdf")
     obj = PdfWrapper(template_stream)
@@ -713,7 +713,7 @@ def test_uncheck_checkbox(pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_blank_page(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "test_blank_page.pdf")
     with open(expected_path, "rb+") as f:
@@ -728,7 +728,7 @@ def test_blank_page(pdf_samples, request):
         request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_blank_page_custom_size_multiply(pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "test_blank_page_custom_size_multiply.pdf"

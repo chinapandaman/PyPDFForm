@@ -7,7 +7,7 @@ import pytest
 from PyPDFForm import Fields, PdfWrapper
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_checkbox_complex_fill(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_checkbox_complex_fill.pdf"
@@ -42,7 +42,7 @@ def test_create_checkbox_complex_fill(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_checkbox_check_fill(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_checkbox_check_fill.pdf"
@@ -70,7 +70,7 @@ def test_create_checkbox_check_fill(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_checkbox_circle_fill(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_checkbox_circle_fill.pdf"
@@ -98,7 +98,7 @@ def test_create_checkbox_circle_fill(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_checkbox_cross_fill(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_checkbox_cross_fill.pdf"
@@ -126,7 +126,7 @@ def test_create_checkbox_cross_fill(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_text_alpha_bg_color(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_text_alpha_bg_color.pdf"
@@ -154,7 +154,7 @@ def test_create_text_alpha_bg_color(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_text_align_center(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_text_align_center.pdf"
@@ -182,7 +182,7 @@ def test_create_text_align_center(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_text_multiline(template_stream, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_text_align_multiline.pdf"
@@ -210,7 +210,7 @@ def test_create_text_multiline(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_text_complex_filled(
     template_stream, pdf_samples, sample_font_stream, request
 ):
@@ -252,7 +252,7 @@ def test_create_text_complex_filled(
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_text_comb(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "test_create_text_comb.pdf")
     with open(expected_path, "rb+") as f:
@@ -278,7 +278,7 @@ def test_create_text_comb(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_checkbox_persist_old_widgets_fill(
     template_stream, pdf_samples, request
 ):
@@ -310,7 +310,7 @@ def test_create_checkbox_persist_old_widgets_fill(
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_widget_sejda_fill_flatten_before(sejda_template, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_widget_sejda_fill_flatten_before.pdf"
@@ -344,7 +344,7 @@ def test_create_widget_sejda_fill_flatten_before(sejda_template, pdf_samples, re
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_widget_sejda_fill_flatten_after(sejda_template, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_widget_sejda_fill_flatten_after.pdf"
@@ -422,7 +422,7 @@ def test_fill_cmyk_color(pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_radio_complex(template_stream, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "widget", "test_create_radio_complex.pdf")
     with open(expected_path, "rb+") as f:
@@ -454,7 +454,7 @@ def test_create_radio_complex(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_required_fields(pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_required_fields.pdf"
@@ -505,7 +505,7 @@ def test_create_required_fields(pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_not_required_fields(pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_not_required_fields.pdf"
@@ -556,7 +556,7 @@ def test_create_not_required_fields(pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_create_fields_with_tooltips(pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "widget", "test_create_fields_with_tooltips.pdf"

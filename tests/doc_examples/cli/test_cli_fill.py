@@ -114,7 +114,7 @@ def test_fill_dropdown_via_str(pdf_samples, static_pdfs, json_samples, tmp_path)
         assert expected == actual
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_fill_sig(pdf_samples, static_pdfs, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig.pdf")
@@ -141,7 +141,7 @@ def test_fill_sig(pdf_samples, static_pdfs, json_samples, tmp_path):
         assert expected == actual
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_fill_sig_ratio(pdf_samples, static_pdfs, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig_ratio.pdf")

@@ -35,7 +35,7 @@ def test_change_title(static_pdfs, tmp_path):
     assert (reader.metadata or {}).get(Title) == "My PDF"
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_change_text_font(pdf_samples, static_pdfs, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
@@ -417,7 +417,7 @@ def test_change_dropdown_choices_with_export_values(
         assert expected == actual
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_change_dropdown_font(pdf_samples, static_pdfs, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_font.pdf")

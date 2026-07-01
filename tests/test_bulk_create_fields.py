@@ -10,7 +10,7 @@ from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.constants import Annots, Subtype, Widget
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_bulk_create_fields_stress_max(pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "bulk_create_fields", "test_bulk_create_fields_stress_max.pdf"
@@ -86,7 +86,7 @@ def test_bulk_create_fields_stress_max(pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_bulk_create_fields_stress_max_mixed(pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples,

@@ -142,7 +142,7 @@ def test_draw_image_on_sejda_template(
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_draw_png_image_on_one_page(
     template_stream, image_samples, pdf_samples, request
 ):
@@ -169,7 +169,7 @@ def test_draw_png_image_on_one_page(
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_draw_transparent_png_image_on_one_page(
     template_stream, image_samples, pdf_samples, request
 ):

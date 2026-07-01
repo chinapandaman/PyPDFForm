@@ -1,6 +1,9 @@
 build-all:
 	bash ./scripts/build.sh
 
+check-zlib:
+	bash ./scripts/check_zlib.sh
+
 test-all:
 	bash ./scripts/test.sh
 
