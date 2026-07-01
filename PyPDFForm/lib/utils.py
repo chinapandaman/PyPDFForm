@@ -358,6 +358,7 @@ def get_version(pdf: bytes) -> str | None:
     for each in VERSION_IDENTIFIERS:
         if pdf.startswith(each):
             result = each.replace(VERSION_IDENTIFIER_PREFIX, b"").decode()
+            break
 
     return result
 
