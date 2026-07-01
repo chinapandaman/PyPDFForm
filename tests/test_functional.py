@@ -853,6 +853,10 @@ def test_remove_fields_update_widgets(template_stream):
     assert "check_2" not in obj.widgets
 
 
+def test_remove_fields_no_keys_specified(template_stream):
+    assert PdfWrapper(template_stream).remove_fields([]).read()
+
+
 def test_merge(template_stream):
     pdf_list = PdfArray()
     for i in range(20):

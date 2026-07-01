@@ -21,7 +21,13 @@ from typing import Any, List
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
-from .constants import SLASH, UNIQUE_SUFFIX_LENGTH, Annots
+from .constants import (
+    SLASH,
+    UNIQUE_SUFFIX_LENGTH,
+    VERSION_IDENTIFIER_PREFIX,
+    VERSION_IDENTIFIERS,
+    Annots,
+)
 
 
 @lru_cache(maxsize=128)
@@ -328,4 +334,21 @@ def generate_unique_suffix() -> str:
             choice(ascii_letters + digits + punctuation.replace("-", ""))
             for _ in range(UNIQUE_SUFFIX_LENGTH)
         ]
+    )
+
+
+def get_version(pdf: bytes) -> str | None:
+    result = None
+    for each in VERSION_IDENTIFIERS:
+        if pdf.startswith(each):
+            result = each.replace(VERSION_IDENTIFIER_PREFIX, b"").decode()
+
+    return result
+
+
+def set_version(pdf: bytes, old: str, new: str) -> bytes:
+    return pdf.replace(
+        VERSION_IDENTIFIER_PREFIX + bytes(old, "utf-8"),
+        VERSION_IDENTIFIER_PREFIX + bytes(new, "utf-8"),
+        1,
     )

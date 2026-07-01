@@ -37,7 +37,6 @@ from .adapter import (
     fp_or_f_obj_or_f_content_to_content,
     fp_or_f_obj_or_stream_to_stream,
 )
-from .constants import VERSION_IDENTIFIER_PREFIX, VERSION_IDENTIFIERS
 from .coordinate import generate_coordinate_grid
 from .egress import (
     appearance_streams_handler,
@@ -66,8 +65,10 @@ from .types import PdfArray
 from .utils import (
     generate_unique_suffix,
     get_page_streams,
+    get_version,
     merge_pdfs,
     remove_all_widgets,
+    set_version,
 )
 from .watermark import (
     copy_watermark_widgets,
@@ -148,6 +149,8 @@ class PdfWrapper:
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
         self.title: Optional[str] = None
+
+        self._version = None
         self._metadata = (
             get_metadata(self._read()) if kwargs.get("preserve_metadata") else {}
         )
@@ -371,11 +374,10 @@ class PdfWrapper:
             str | None: The PDF version as a string, or None if the version cannot be determined.
         """
 
-        for each in VERSION_IDENTIFIERS:
-            if self._read().startswith(each):
-                return each.replace(VERSION_IDENTIFIER_PREFIX, b"").decode()
+        if self._version is None:
+            self._version = get_version(self._read())
 
-        return None
+        return self._version
 
     @property
     def fonts(self) -> list:
@@ -491,6 +493,7 @@ class PdfWrapper:
             result = rebuild_acroform_fields(
                 result, set(self.widgets.keys()), getattr(self, "use_full_widget_name")
             )
+            result = set_version(result, get_version(result), self.version)
         return result
 
     def _read(self) -> bytes:
@@ -574,11 +577,8 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        self._stream = self._read().replace(
-            VERSION_IDENTIFIER_PREFIX + bytes(self.version, "utf-8"),
-            VERSION_IDENTIFIER_PREFIX + bytes(version, "utf-8"),
-            1,
-        )
+        self._stream = set_version(self._read(), self.version, version)
+        self._version = version
 
         return self
 
