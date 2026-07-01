@@ -11,7 +11,7 @@ from PyPDFForm.cli.root import cli_app
 runner = CliRunner()
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_blank_page(pdf_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_blank_page.pdf")
@@ -35,7 +35,7 @@ def test_blank_page(pdf_samples, tmp_path):
         assert len(expected) == len(actual)
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_blank_page_custom_dimensions(pdf_samples, tmp_path):
     expected_path = os.path.join(
@@ -65,7 +65,7 @@ def test_blank_page_custom_dimensions(pdf_samples, tmp_path):
         assert len(expected) == len(actual)
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_blank_page_multiply(pdf_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_blank_page_multiply.pdf")

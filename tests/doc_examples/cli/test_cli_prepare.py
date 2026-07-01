@@ -10,7 +10,7 @@ from PyPDFForm.cli.root import cli_app
 runner = CliRunner()
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_bulk_create_fields(pdf_samples, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_bulk_create_fields.pdf")
@@ -38,7 +38,7 @@ def test_bulk_create_fields(pdf_samples, json_samples, tmp_path):
         assert expected == actual
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_create_text(pdf_samples, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_text.pdf")
@@ -66,7 +66,7 @@ def test_create_text(pdf_samples, json_samples, tmp_path):
         assert expected == actual
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_create_check(pdf_samples, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_check.pdf")
@@ -94,7 +94,7 @@ def test_create_check(pdf_samples, json_samples, tmp_path):
         assert expected == actual
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_create_radio(pdf_samples, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_radio.pdf")
@@ -122,7 +122,7 @@ def test_create_radio(pdf_samples, json_samples, tmp_path):
         assert expected == actual
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_create_dropdown(pdf_samples, json_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_dropdown.pdf")
@@ -150,7 +150,7 @@ def test_create_dropdown(pdf_samples, json_samples, tmp_path):
         assert expected == actual
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
 def test_create_dropdown_with_export_values(pdf_samples, json_samples, tmp_path):
     expected_path = os.path.join(

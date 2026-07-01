@@ -8,7 +8,7 @@ import pytest
 from PyPDFForm import PdfWrapper, RawElements
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_draw_text(static_pdfs, pdf_samples, sample_font_stream, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_text.pdf")
 

@@ -7,7 +7,7 @@ import pytest
 from PyPDFForm import BlankPage, PdfArray, PdfWrapper
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_blank_page(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_blank_page.pdf")
 
@@ -25,7 +25,7 @@ def test_blank_page(pdf_samples, request):
         )
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_blank_page_custom_dimensions(pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_blank_page_custom_dimensions.pdf"
@@ -45,7 +45,7 @@ def test_blank_page_custom_dimensions(pdf_samples, request):
         )
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_blank_page_multiply(pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "docs", "test_blank_page_multiply.pdf")
 

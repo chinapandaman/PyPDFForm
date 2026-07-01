@@ -46,7 +46,7 @@ def test_fill_sejda_complex_flatten(
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "paragraph", "test_paragraph_complex.pdf")
     with open(expected_path, "rb+") as f:
@@ -70,7 +70,7 @@ def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, reque
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_paragraph_max_length(
     sample_template_with_paragraph_max_length, pdf_samples, request
 ):

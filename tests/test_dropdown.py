@@ -65,7 +65,7 @@ def test_dropdown_one_flatten(sample_template_with_dropdown, pdf_samples, reques
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
     expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_alignment.pdf")
     with open(expected_path, "rb+") as f:
@@ -86,7 +86,7 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_dropdown_alignment_flatten_then_unflatten(
     dropdown_alignment, pdf_samples, request
 ):

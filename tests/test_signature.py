@@ -25,7 +25,7 @@ def test_signature_sample_value(pdf_samples):
     )
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_fill_signature_overlap(pdf_samples, image_samples, request):
     expected_path = os.path.join(
         pdf_samples, "signature", "test_fill_signature_overlap.pdf"
@@ -46,7 +46,7 @@ def test_fill_signature_overlap(pdf_samples, image_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_fill_small_icon(pdf_samples, image_samples, request):
     expected_path = os.path.join(pdf_samples, "signature", "test_fill_small_icon.pdf")
     with open(expected_path, "rb+") as f:
@@ -66,7 +66,7 @@ def test_fill_small_icon(pdf_samples, image_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.posix_only
+@pytest.mark.requires_zlib_over_zlib_ng
 def test_fill_small_icon_not_preserve_aspect_ratio(pdf_samples, image_samples, request):
     expected_path = os.path.join(
         pdf_samples, "signature", "test_fill_small_icon_not_preserve_aspect_ratio.pdf"
