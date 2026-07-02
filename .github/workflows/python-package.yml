@@ -28,11 +28,19 @@ jobs:
     - name: Install dependencies
       run: |
         uv pip install -U -r pyproject.toml --all-extras --system
+    - name: Check zlib backend
+      id: zlib
+      shell: bash
+      run: |
+        zlib_info="$(python ./scripts/check_zlib.py)"
+        echo "$zlib_info"
+        zlib_backend="$(python -c "import json, sys; print(json.load(sys.stdin)['zlib_backend'])" <<< "$zlib_info")"
+        echo "backend=$zlib_backend" >> "$GITHUB_OUTPUT"
     - name: Test with pytest
-      if: matrix.os != 'windows-latest'
+      if: steps.zlib.outputs.backend == 'zlib' && matrix.os != 'windows-latest'
       run: |
         coverage run -m pytest && coverage report --fail-under=100
-    - name: Test with pytest (Windows)
-      if: matrix.os == 'windows-latest'
+    - name: Test with pytest without zlib-only expected streams
+      if: steps.zlib.outputs.backend != 'zlib' || matrix.os == 'windows-latest'
       run: |
-        coverage run -m pytest -v -m "not requires_zlib_over_zlib_ng"
+        python -m pytest -v -m "not requires_zlib_over_zlib_ng"

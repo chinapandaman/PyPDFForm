@@ -56,11 +56,11 @@ make check-zlib
 ```
 
 Use the local `./venv` virtual environment as the default non-containerized
-runner only when this reports `zlib backend: zlib`. This matches the
+runner only when this reports `"zlib_backend": "zlib"`. This matches the
 virtual environment flow described by the Developer Guide and the repository
 build scripts.
 
-When it reports `zlib backend: zlib-ng`, use the development container
+When it reports `"zlib_backend": "zlib-ng"`, use the development container
 for runners instead of the local virtual environment. This includes tests,
 coverage, linting, formatting, documentation, sample generation, and comparison
 scripts.
