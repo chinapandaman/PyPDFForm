@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Reports whether the active Python zlib module uses zlib or zlib-ng.
+Reports structured information about the active Python zlib module.
 """
 
+import json
 import sys
 import zlib
 
@@ -17,8 +18,18 @@ def zlib_backend():
     return "zlib"
 
 
+def zlib_info():
+    return {
+        "python_executable": sys.executable,
+        "zlib_backend": zlib_backend(),
+        "zlib_compile_time_version": zlib.ZLIB_VERSION,
+        "zlib_runtime_version": getattr(zlib, "ZLIB_RUNTIME_VERSION", "unknown"),
+    }
+
+
+def main():
+    print(json.dumps(zlib_info(), sort_keys=True))
+
+
 if __name__ == "__main__":
-    print(f"Python executable: {sys.executable}")
-    print(f"zlib compile-time version: {zlib.ZLIB_VERSION}")
-    print(f"zlib runtime version: {getattr(zlib, 'ZLIB_RUNTIME_VERSION', 'unknown')}")
-    print(f"zlib backend: {zlib_backend()}")
+    main()
