@@ -37,10 +37,10 @@ jobs:
         zlib_backend="$(python -c "import json, sys; print(json.load(sys.stdin)['zlib_backend'])" <<< "$zlib_info")"
         echo "backend=$zlib_backend" >> "$GITHUB_OUTPUT"
     - name: Test with pytest
-      if: steps.zlib.outputs.backend == 'zlib'
+      if: steps.zlib.outputs.backend == 'zlib' && matrix.os != 'windows-latest'
       run: |
         coverage run -m pytest && coverage report --fail-under=100
     - name: Test with pytest without zlib-only expected streams
-      if: steps.zlib.outputs.backend != 'zlib'
+      if: steps.zlib.outputs.backend != 'zlib' || matrix.os == 'windows-latest'
       run: |
         python -m pytest -v -m "not requires_zlib_over_zlib_ng"
