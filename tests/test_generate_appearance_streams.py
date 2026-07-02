@@ -26,6 +26,29 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
         assert obj.read() == expected
 
 
+def test_fill_sejda_complex(
+    sejda_template_complex, sejda_complex_data, pdf_samples, request
+):
+    expected_path = os.path.join(
+        pdf_samples,
+        "generate_appearance_streams",
+        "paragraph",
+        "sample_filled_sejda_complex.pdf",
+    )
+    with open(expected_path, "rb+") as f:
+        obj = PdfWrapper(sejda_template_complex, generate_appearance_streams=True).fill(
+            sejda_complex_data,
+        )
+
+        request.config.results["expected_path"] = expected_path
+        request.config.results["stream"] = obj.read()
+
+        expected = f.read()
+
+        assert len(obj.read()) == len(expected)
+        assert obj.read() == expected
+
+
 def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(
         pdf_samples, "generate_appearance_streams", "dropdown", "dropdown_two.pdf"
@@ -44,29 +67,6 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
                 "radio_1": 1,
                 "dropdown_1": 1,
             },
-        )
-
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
-
-
-def test_fill_sejda_complex(
-    sejda_template_complex, sejda_complex_data, pdf_samples, request
-):
-    expected_path = os.path.join(
-        pdf_samples,
-        "generate_appearance_streams",
-        "paragraph",
-        "sample_filled_sejda_complex.pdf",
-    )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sejda_template_complex, generate_appearance_streams=True).fill(
-            sejda_complex_data,
         )
 
         request.config.results["expected_path"] = expected_path
