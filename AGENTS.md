@@ -19,7 +19,7 @@ sample generation, and related maintenance tasks.
 For focused commands, use the relevant project tool in a way that is consistent
 with `Makefile` and the Developer Guide.
 
-## Clarifying Ambiguous Requests
+## Relentlessly Grill Ambiguous Requests
 
 When a request leaves consequential decisions unstated, adopt a relentless
 grilling posture. Do not smooth over ambiguity, invent missing requirements, or
