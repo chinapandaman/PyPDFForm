@@ -21,6 +21,7 @@ from PyPDFForm.lib.constants import (
 from PyPDFForm.lib.deprecation import deprecation_notice
 from PyPDFForm.lib.middleware.base import Widget
 from PyPDFForm.lib.template import get_widget_key, get_widgets_by_page
+from PyPDFForm.lib.utils import get_version, set_version
 
 
 def test_deprecation_warning():
@@ -507,7 +508,14 @@ def test_version(pdf_samples):
 
     obj = PdfWrapper(os.path.join(pdf_samples, "versions", "unknown.pdf"))
     assert obj.version is None
-    assert obj.read()
+    stream = obj.read()
+    assert stream.startswith(b"%PDF-2.1")
+    assert get_version(b"not a pdf") is None
+    assert set_version(stream, obj.version, None) == stream
+    assert set_version(b"not a pdf", None, "2.0") == b"not a pdf"
+    assert set_version(b"prefix %PDF-1.7\n", "1.7", "2.0") == b"prefix %PDF-2.0\n"
+    assert obj.change_version("2.0").version == "2.0"
+    assert obj.read().startswith(b"%PDF-2.0")
 
 
 @pytest.mark.requires_zlib_over_zlib_ng
