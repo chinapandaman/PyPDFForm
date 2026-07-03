@@ -114,10 +114,11 @@ def test_write(template_stream, tmp_path):
 
 def test_write_io(template_stream):
     buff = BytesIO()
-    PdfWrapper(template_stream).write(buff)
+    obj = PdfWrapper(template_stream)
+    obj.write(buff)
     buff.seek(0)
 
-    assert buff.read()
+    assert PdfWrapper(buff.read()).widgets.keys() == obj.widgets.keys()
 
 
 def test_fill_flatten_then_unflatten(template_stream, pdf_samples, data_dict, request):
@@ -863,7 +864,10 @@ def test_remove_fields_update_widgets(template_stream):
 
 
 def test_remove_fields_no_keys_specified(template_stream):
-    assert PdfWrapper(template_stream).remove_fields([]).read()
+    assert (
+        PdfWrapper(template_stream).remove_fields([]).widgets.keys()
+        == PdfWrapper(template_stream).widgets.keys()
+    )
 
 
 def test_merge(template_stream):
