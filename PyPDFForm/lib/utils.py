@@ -354,13 +354,17 @@ def get_version(pdf: bytes) -> str | None:
             start with a known PDF version identifier.
     """
 
-    result = None
-    for each in VERSION_IDENTIFIERS:
-        if pdf.startswith(each):
-            result = each.replace(VERSION_IDENTIFIER_PREFIX, b"").decode()
-            break
+    if not pdf.startswith(VERSION_IDENTIFIER_PREFIX):
+        return None
 
-    return result
+    version_identifier_prefix_length = len(VERSION_IDENTIFIER_PREFIX)
+    version_identifier_length = len(VERSION_IDENTIFIERS[0])
+    version_identifier_to_version = {
+        identifier: identifier[version_identifier_prefix_length:].decode()
+        for identifier in VERSION_IDENTIFIERS
+    }
+
+    return version_identifier_to_version.get(pdf[:version_identifier_length])
 
 
 def set_version(pdf: bytes, old: str | None, new: str | None) -> bytes:
@@ -383,24 +387,26 @@ def set_version(pdf: bytes, old: str | None, new: str | None) -> bytes:
         bytes: The PDF stream with the first matching version marker replaced.
     """
 
-    if new is None:
+    if new is None or old == new:
         return pdf
 
+    new_header = VERSION_IDENTIFIER_PREFIX + new.encode()
+
     if old is None:
+        if not pdf.startswith(VERSION_IDENTIFIER_PREFIX):
+            return pdf
+
         header_end = len(pdf)
+        version_identifier_prefix_length = len(VERSION_IDENTIFIER_PREFIX)
         for separator in (b"\r", b"\n"):
-            separator_index = pdf.find(separator, len(VERSION_IDENTIFIER_PREFIX))
+            separator_index = pdf.find(separator, version_identifier_prefix_length)
             if separator_index != -1:
                 header_end = min(header_end, separator_index)
 
-        return (
-            VERSION_IDENTIFIER_PREFIX + bytes(new, "utf-8") + pdf[header_end:]
-            if pdf.startswith(VERSION_IDENTIFIER_PREFIX)
-            else pdf
-        )
+        return new_header + pdf[header_end:]
 
-    return pdf.replace(
-        VERSION_IDENTIFIER_PREFIX + bytes(old, "utf-8"),
-        VERSION_IDENTIFIER_PREFIX + bytes(new, "utf-8"),
-        1,
-    )
+    old_header = VERSION_IDENTIFIER_PREFIX + old.encode()
+    if pdf.startswith(old_header):
+        return new_header + pdf[len(old_header) :]
+
+    return pdf.replace(old_header, new_header, 1)
