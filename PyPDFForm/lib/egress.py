@@ -145,7 +145,7 @@ def rebuild_acroform_fields(
     top-level field object to the new array. Page annotation arrays are left
     unchanged. When no matching page annotations are found, the original PDF
     stream is returned unchanged to avoid an unnecessary rewrite unless
-    `force` is enabled.
+    `force` is enabled and there is AcroForm state to repair.
 
     Args:
         pdf (bytes): The PDF stream whose AcroForm fields should be rebuilt.
@@ -159,13 +159,15 @@ def rebuild_acroform_fields(
     Returns:
         bytes: The PDF stream with a rebuilt AcroForm `/Fields` array, or the
             original stream when there are no matching widgets to rebuild and
-            `force` is disabled.
+            `force` is disabled or no AcroForm repair is needed.
     """
     if not widget_keys and not force:
         return pdf
 
     writer = PdfWriter(BytesIO(pdf))
     root = writer._root_object  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+    if not widget_keys and AcroForm not in root:
+        return pdf
 
     fields = ArrayObject([])
     seen_fields = set()
