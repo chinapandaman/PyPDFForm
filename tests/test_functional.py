@@ -507,7 +507,9 @@ def test_version(pdf_samples):
 
     obj = PdfWrapper(os.path.join(pdf_samples, "versions", "unknown.pdf"))
     assert obj.version is None
-    assert obj.read()
+    assert obj.read().startswith(b"%PDF-2.1")
+    assert obj.change_version("2.0").version == "2.0"
+    assert obj.read().startswith(b"%PDF-2.0")
 
 
 @pytest.mark.requires_zlib_over_zlib_ng

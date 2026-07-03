@@ -363,7 +363,7 @@ def get_version(pdf: bytes) -> str | None:
     return result
 
 
-def set_version(pdf: bytes, old: str, new: str) -> bytes:
+def set_version(pdf: bytes, old: str | None, new: str | None) -> bytes:
     """
     Replaces the first PDF header version marker in a byte stream.
 
@@ -374,12 +374,30 @@ def set_version(pdf: bytes, old: str, new: str) -> bytes:
 
     Args:
         pdf (bytes): The PDF stream to update.
-        old (str): The currently present PDF version string.
-        new (str): The PDF version string to write into the header.
+        old (str | None): The currently present PDF version string. When
+            None, the header token after `%PDF-` is replaced if one exists.
+        new (str | None): The PDF version string to write into the header. When
+            None, the PDF stream is returned unchanged.
 
     Returns:
         bytes: The PDF stream with the first matching version marker replaced.
     """
+
+    if new is None:
+        return pdf
+
+    if old is None:
+        header_end = len(pdf)
+        for separator in (b"\r", b"\n"):
+            separator_index = pdf.find(separator, len(VERSION_IDENTIFIER_PREFIX))
+            if separator_index != -1:
+                header_end = min(header_end, separator_index)
+
+        return (
+            VERSION_IDENTIFIER_PREFIX + bytes(new, "utf-8") + pdf[header_end:]
+            if pdf.startswith(VERSION_IDENTIFIER_PREFIX)
+            else pdf
+        )
 
     return pdf.replace(
         VERSION_IDENTIFIER_PREFIX + bytes(old, "utf-8"),
