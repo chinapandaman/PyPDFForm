@@ -175,6 +175,9 @@ class PdfWrapper:
     def _mark_acroform_fields_dirty(self) -> None:
         """
         Marks the catalog `/AcroForm/Fields` array for egress repair.
+
+        The wrapper uses this flag to defer AcroForm field rebuilding until the
+        final output stream is requested.
         """
 
         self._acroform_fields_dirty = True

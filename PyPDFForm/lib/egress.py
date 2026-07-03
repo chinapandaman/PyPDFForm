@@ -200,6 +200,13 @@ def _get_root_field_reference(writer: PdfWriter, annot):
     catalog `/AcroForm/Fields` array must point at root fields rather than
     child widgets, otherwise readers such as pypdf will not expose hierarchical
     fields like radio groups via `get_fields`.
+
+    Args:
+        writer (PdfWriter): The PDF writer that owns the annotation objects.
+        annot: The widget annotation reference or object.
+
+    Returns:
+        IndirectObject: The top-level AcroForm field reference.
     """
     field = annot
     field_object = field.get_object()
@@ -221,6 +228,13 @@ def _ensure_indirect_reference(writer: PdfWriter, field):
     when it builds field objects. Parent fields cloned from page annotations can
     appear as direct dictionaries that still know their original indirect
     reference, so prefer that before adding a new indirect object.
+
+    Args:
+        writer (PdfWriter): The PDF writer that will own newly added objects.
+        field: The field reference or direct field object to normalize.
+
+    Returns:
+        IndirectObject: An indirect reference to the field object.
     """
     field_object = field.get_object()
     indirect_reference = getattr(field_object, "indirect_reference", None)
@@ -236,6 +250,12 @@ def _ensure_indirect_reference(writer: PdfWriter, field):
 def _field_reference_key(field_ref) -> tuple:
     """
     Returns a stable key for deduplicating root fields in one writer.
+
+    Args:
+        field_ref: The field reference to identify.
+
+    Returns:
+        tuple: A stable key for the field reference.
     """
     field_object = field_ref.get_object()
     indirect_reference = getattr(field_object, "indirect_reference", field_ref)

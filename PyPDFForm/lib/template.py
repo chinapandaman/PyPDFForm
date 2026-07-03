@@ -44,7 +44,16 @@ from .utils import extract_widget_property, find_pattern_match
 
 def acroform_fields_dirty(method):
     """
-    Marks methods that rewrite page widget annotations without maintaining root fields.
+    Marks methods that rewrite page widget annotations as dirty.
+
+    The wrapped method runs first. If widgets remain afterward, the wrapper's
+    AcroForm fields are marked for egress repair.
+
+    Args:
+        method: The wrapper method to decorate.
+
+    Returns:
+        callable: The decorated wrapper method.
     """
 
     @wraps(method)
