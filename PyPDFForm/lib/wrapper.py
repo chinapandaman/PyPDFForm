@@ -55,6 +55,7 @@ from .middleware.dropdown import Dropdown
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .template import (
+    acroform_fields_dirty,
     build_widgets,
     create_annotations,
     get_metadata,
@@ -160,6 +161,7 @@ class PdfWrapper:
         self._font_register_events = []  # for reregister
         self._key_update_tracker = {}  # for update key preserve old key attrs
         self._keys_to_update = []  # for bulk update keys
+        self._acroform_fields_dirty = False
 
         # sets attrs from kwargs
         for attr, default in self.USER_PARAMS:
@@ -169,6 +171,13 @@ class PdfWrapper:
             self.need_appearances = True
 
         self._init_helper()
+
+    def _mark_acroform_fields_dirty(self) -> None:
+        """
+        Marks the catalog `/AcroForm/Fields` array for egress repair.
+        """
+
+        self._acroform_fields_dirty = True
 
     def __add__(self, other: PdfWrapper | Sequence[PdfWrapper]) -> PdfWrapper:
         """
@@ -216,6 +225,9 @@ class PdfWrapper:
         # inherit fonts
         for event in self._font_register_events:
             result.register_font(event[0], event[1])
+
+        if result.widgets:
+            result._mark_acroform_fields_dirty()
 
         return result
 
@@ -425,6 +437,10 @@ class PdfWrapper:
                 for page in result:
                     page.register_font(event[0], event[1])
 
+        for page in result:
+            if page.widgets:
+                page._mark_acroform_fields_dirty()  # noqa: SLF001
+
         return PdfArray(result)
 
     @property
@@ -462,9 +478,8 @@ class PdfWrapper:
            generating appearance streams.
         3. If `preserve_metadata`, title, or on-open JavaScript are set, it preserves
            or updates the corresponding PDF properties accordingly.
-        4. Rebuilds the AcroForm `/Fields` array from page annotations for
-           widgets known to this wrapper, leaving the stream unchanged when no
-           matching widget annotations are found.
+        4. Rebuilds the AcroForm `/Fields` array from page annotations when
+           previous operations marked it dirty.
         5. Restores the wrapper's cached PDF header version after egress
            processing, since PDF writers may emit their own default version.
         The wrapper's stored stream is not replaced by these final egress-only changes.
@@ -497,9 +512,13 @@ class PdfWrapper:
             )
 
         if result:
-            result = rebuild_acroform_fields(
-                result, set(self.widgets.keys()), getattr(self, "use_full_widget_name")
-            )
+            if self._acroform_fields_dirty:
+                result = rebuild_acroform_fields(
+                    result,
+                    set(self.widgets.keys()),
+                    getattr(self, "use_full_widget_name"),
+                    force=True,
+                )
             if self.version:
                 result = set_version(result, get_version(result), self.version)
         return result
@@ -593,6 +612,7 @@ class PdfWrapper:
 
         return self
 
+    @acroform_fields_dirty
     def generate_coordinate_grid(
         self, color: Tuple[float, float, float] = (1, 0, 0), margin: float = 100
     ) -> PdfWrapper:
@@ -681,6 +701,7 @@ class PdfWrapper:
         if image_drawn_stream is not None:
             # because copy_watermark_widgets and remove_all_widgets
             self._reregister_font()
+            self._mark_acroform_fields_dirty()
 
         return self
 
@@ -758,6 +779,7 @@ class PdfWrapper:
 
         return self
 
+    @acroform_fields_dirty
     def _bulk_create_fields(self, fields: Sequence[FieldTypes]) -> PdfWrapper:
         """
         Internal method to create multiple new form fields (widgets) on the PDF in a single operation.
@@ -830,6 +852,8 @@ class PdfWrapper:
             self._read(), keys, getattr(self, "use_full_widget_name")
         )
         self._init_helper()
+        if keys:
+            self._mark_acroform_fields_dirty()
 
         return self
 
@@ -889,6 +913,7 @@ class PdfWrapper:
 
         return self
 
+    @acroform_fields_dirty
     def draw(self, elements: Sequence[RawTypes]) -> PdfWrapper:
         """
         Draws raw elements (text, images, etc.) directly onto the PDF pages.

@@ -9,7 +9,7 @@ types of widgets.
 """
 
 from copy import deepcopy
-from functools import lru_cache
+from functools import lru_cache, wraps
 from io import BytesIO
 from typing import Dict, List, cast
 
@@ -40,6 +40,21 @@ from .patterns import (
     update_annotation_name,
 )
 from .utils import extract_widget_property, find_pattern_match
+
+
+def acroform_fields_dirty(method):
+    """
+    Marks methods that rewrite page widget annotations without maintaining root fields.
+    """
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        result = method(self, *args, **kwargs)
+        if self.widgets:
+            self._mark_acroform_fields_dirty()
+        return result
+
+    return wrapper
 
 
 @lru_cache(maxsize=128)

@@ -28,6 +28,7 @@ from .constants import (
     Fields,
     JavaScript,
     OpenAction,
+    Parent,
     Root,
     S,
     Title,
@@ -133,47 +134,114 @@ def preserve_pdf_properties(
 
 
 def rebuild_acroform_fields(
-    pdf: bytes, widget_keys: set, use_full_widget_name: bool
+    pdf: bytes, widget_keys: set, use_full_widget_name: bool, force: bool = False
 ) -> bytes:
     """
     Rebuilds the AcroForm `/Fields` array from matching page annotations.
 
     The existing `/Fields` array is replaced, creating an AcroForm dictionary
     when necessary. Each page annotation is resolved to a widget key, and only
-    annotations whose keys are present in `widget_keys` are added to the new
-    array. Page annotation arrays are left unchanged. When no matching page
-    annotations are found, the original PDF stream is returned unchanged to
-    avoid an unnecessary rewrite.
+    annotations whose keys are present in `widget_keys` contribute their
+    top-level field object to the new array. Page annotation arrays are left
+    unchanged. When no matching page annotations are found, the original PDF
+    stream is returned unchanged to avoid an unnecessary rewrite unless
+    `force` is enabled.
 
     Args:
         pdf (bytes): The PDF stream whose AcroForm fields should be rebuilt.
         widget_keys (set): Widget keys to include in the rebuilt `/Fields` array.
         use_full_widget_name (bool): Whether to resolve annotations using their
             full widget names, including parent names.
+        force (bool): Whether to rewrite `/Fields` even when no matching
+            widgets are found. This is useful after removals, where the correct
+            rebuilt array may be empty.
 
     Returns:
         bytes: The PDF stream with a rebuilt AcroForm `/Fields` array, or the
-            original stream when there are no matching widgets to rebuild.
+            original stream when there are no matching widgets to rebuild and
+            `force` is disabled.
     """
+    if not widget_keys and not force:
+        return pdf
+
     writer = PdfWriter(BytesIO(pdf))
     root = writer._root_object  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 
-    if AcroForm not in root:
-        root[NameObject(AcroForm)] = DictionaryObject({})
-    root[AcroForm][NameObject(Fields)] = ArrayObject([])
-
-    needs_update = False
+    fields = ArrayObject([])
+    seen_fields = set()
     for page in writer.pages:
         for annot in page.get(Annots, []):
             key = get_widget_key(annot.get_object(), use_full_widget_name)
             if key in widget_keys:
-                root[AcroForm][Fields].append(annot)
-                needs_update = True
+                field_ref = _get_root_field_reference(writer, annot)
+                field_key = _field_reference_key(field_ref)
+                if field_key not in seen_fields:
+                    fields.append(field_ref)
+                    seen_fields.add(field_key)
 
-    if not needs_update:
+    if not seen_fields and not force:
         return pdf
+
+    if AcroForm not in root:
+        root[NameObject(AcroForm)] = DictionaryObject({})
+    root[AcroForm][NameObject(Fields)] = fields
 
     with BytesIO() as f:
         writer.write(f)
         f.seek(0)
         return f.read()
+
+
+def _get_root_field_reference(writer: PdfWriter, annot):
+    """
+    Returns the top-level AcroForm field reference for an annotation.
+
+    Widget annotations can be leaf nodes under a parent field dictionary. The
+    catalog `/AcroForm/Fields` array must point at root fields rather than
+    child widgets, otherwise readers such as pypdf will not expose hierarchical
+    fields like radio groups via `get_fields`.
+    """
+    field = annot
+    field_object = field.get_object()
+    visited = set()
+
+    while Parent in field_object and id(field_object) not in visited:
+        visited.add(id(field_object))
+        field = field_object[Parent]
+        field_object = field.get_object()
+
+    return _ensure_indirect_reference(writer, field)
+
+
+def _ensure_indirect_reference(writer: PdfWriter, field):
+    """
+    Returns an indirect reference for a field object.
+
+    pypdf expects entries in `/AcroForm/Fields` to have an indirect reference
+    when it builds field objects. Parent fields cloned from page annotations can
+    appear as direct dictionaries that still know their original indirect
+    reference, so prefer that before adding a new indirect object.
+    """
+    field_object = field.get_object()
+    indirect_reference = getattr(field_object, "indirect_reference", None)
+    if indirect_reference is not None:
+        return indirect_reference
+
+    if hasattr(field, "idnum"):
+        return field
+
+    return writer._add_object(field_object)  # type: ignore[attr-defined] # noqa: SLF001 # pylint: disable=W0212
+
+
+def _field_reference_key(field_ref) -> tuple:
+    """
+    Returns a stable key for deduplicating root fields in one writer.
+    """
+    field_object = field_ref.get_object()
+    indirect_reference = getattr(field_object, "indirect_reference", field_ref)
+    idnum = getattr(indirect_reference, "idnum", None)
+    generation = getattr(indirect_reference, "generation", None)
+    if idnum is not None:
+        return idnum, generation
+
+    return (id(field_object),)
