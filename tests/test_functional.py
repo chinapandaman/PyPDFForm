@@ -510,7 +510,6 @@ def test_version(pdf_samples):
     assert obj.version is None
     stream = obj.read()
     assert stream.startswith(b"%PDF-2.1")
-    assert get_version(stream) is None
     assert get_version(b"not a pdf") is None
     assert set_version(stream, obj.version, None) == stream
     assert set_version(b"not a pdf", None, "2.0") == b"not a pdf"

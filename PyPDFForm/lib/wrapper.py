@@ -585,9 +585,8 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        current_version = self.version
         current_stream = self._read()
-        updated_stream = set_version(current_stream, current_version, version)
+        updated_stream = set_version(current_stream, self.version, version)
         if updated_stream != current_stream:
             self._stream = updated_stream
             self._version = version

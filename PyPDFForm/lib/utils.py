@@ -354,17 +354,12 @@ def get_version(pdf: bytes) -> str | None:
             start with a known PDF version identifier.
     """
 
-    if not pdf.startswith(VERSION_IDENTIFIER_PREFIX):
+    version_identifier_length = len(VERSION_IDENTIFIERS[0])
+    version_identifier = pdf[:version_identifier_length]
+    if version_identifier not in VERSION_IDENTIFIERS:
         return None
 
-    version_identifier_prefix_length = len(VERSION_IDENTIFIER_PREFIX)
-    version_identifier_length = len(VERSION_IDENTIFIERS[0])
-    version_identifier_to_version = {
-        identifier: identifier[version_identifier_prefix_length:].decode()
-        for identifier in VERSION_IDENTIFIERS
-    }
-
-    return version_identifier_to_version.get(pdf[:version_identifier_length])
+    return version_identifier[len(VERSION_IDENTIFIER_PREFIX) :].decode()
 
 
 def set_version(pdf: bytes, old: str | None, new: str | None) -> bytes:
@@ -397,9 +392,8 @@ def set_version(pdf: bytes, old: str | None, new: str | None) -> bytes:
             return pdf
 
         header_end = len(pdf)
-        version_identifier_prefix_length = len(VERSION_IDENTIFIER_PREFIX)
         for separator in (b"\r", b"\n"):
-            separator_index = pdf.find(separator, version_identifier_prefix_length)
+            separator_index = pdf.find(separator, len(VERSION_IDENTIFIER_PREFIX))
             if separator_index != -1:
                 header_end = min(header_end, separator_index)
 
