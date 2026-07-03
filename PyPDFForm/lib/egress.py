@@ -236,10 +236,11 @@ def _ensure_indirect_reference(writer: PdfWriter, field):
     if indirect_reference is not None:
         return indirect_reference
 
-    if hasattr(field, "idnum"):
-        return field
+    result = field
+    if not hasattr(field, "idnum"):
+        result = writer._add_object(field_object)  # type: ignore[attr-defined] # noqa: SLF001 # pylint: disable=W0212
 
-    return writer._add_object(field_object)  # type: ignore[attr-defined] # noqa: SLF001 # pylint: disable=W0212
+    return result
 
 
 def _field_reference_key(field_ref) -> tuple:
@@ -256,7 +257,9 @@ def _field_reference_key(field_ref) -> tuple:
     indirect_reference = getattr(field_object, "indirect_reference", field_ref)
     idnum = getattr(indirect_reference, "idnum", None)
     generation = getattr(indirect_reference, "generation", None)
-    if idnum is not None:
-        return idnum, generation
 
-    return (id(field_object),)
+    result = (id(field_object),)
+    if idnum is not None:
+        result = idnum, generation
+
+    return result
