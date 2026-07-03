@@ -134,7 +134,7 @@ def preserve_pdf_properties(
 
 
 def rebuild_acroform_fields(
-    pdf: bytes, widget_keys: set, use_full_widget_name: bool, force: bool = False
+    pdf: bytes, widget_keys: set, use_full_widget_name: bool
 ) -> bytes:
     """
     Rebuilds the AcroForm `/Fields` array from matching page annotations.
@@ -144,30 +144,23 @@ def rebuild_acroform_fields(
     annotations whose keys are present in `widget_keys` contribute their
     top-level field object to the new array. Page annotation arrays are left
     unchanged. When no matching page annotations are found, the original PDF
-    stream is returned unchanged to avoid an unnecessary rewrite unless
-    `force` is enabled and there is AcroForm state to repair.
+    stream is returned unchanged to avoid an unnecessary rewrite.
 
     Args:
         pdf (bytes): The PDF stream whose AcroForm fields should be rebuilt.
         widget_keys (set): Widget keys to include in the rebuilt `/Fields` array.
         use_full_widget_name (bool): Whether to resolve annotations using their
             full widget names, including parent names.
-        force (bool): Whether to rewrite `/Fields` even when no matching
-            widgets are found. This is useful after removals, where the correct
-            rebuilt array may be empty.
 
     Returns:
         bytes: The PDF stream with a rebuilt AcroForm `/Fields` array, or the
-            original stream when there are no matching widgets to rebuild and
-            `force` is disabled or no AcroForm repair is needed.
+            original stream when there are no matching widgets to rebuild.
     """
-    if not widget_keys and not force:
+    if not widget_keys:
         return pdf
 
     writer = PdfWriter(BytesIO(pdf))
     root = writer._root_object  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
-    if not widget_keys and AcroForm not in root:
-        return pdf
 
     fields = ArrayObject([])
     seen_fields = set()
@@ -181,7 +174,7 @@ def rebuild_acroform_fields(
                     fields.append(field_ref)
                     seen_fields.add(field_key)
 
-    if not seen_fields and not force:
+    if not seen_fields:
         return pdf
 
     if AcroForm not in root:
