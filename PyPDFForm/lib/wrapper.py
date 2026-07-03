@@ -462,7 +462,9 @@ class PdfWrapper:
            generating appearance streams.
         3. If `preserve_metadata`, title, or on-open JavaScript are set, it preserves
            or updates the corresponding PDF properties accordingly.
-        4. Rebuilds the AcroForm `/Fields` array from page annotations.
+        4. Rebuilds the AcroForm `/Fields` array from page annotations for
+           widgets known to this wrapper, leaving the stream unchanged when no
+           matching widget annotations are found.
         5. Restores the wrapper's cached PDF header version after egress
            processing, since PDF writers may emit their own default version.
         The wrapper's stored stream is not replaced by these final egress-only changes.
@@ -496,9 +498,7 @@ class PdfWrapper:
 
         if result:
             result = rebuild_acroform_fields(
-                result,
-                set(self.widgets.keys()),
-                getattr(self, "use_full_widget_name"),
+                result, set(self.widgets.keys()), getattr(self, "use_full_widget_name")
             )
             if self.version:
                 result = set_version(result, get_version(result), self.version)
