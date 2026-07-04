@@ -61,7 +61,6 @@ FIELD_NAMES = Annotated[
         help="Form field name. Repeat this option to select multiple fields.",
     ),
 ]
-YAML_FILE_EXTENSIONS = {".yaml", ".yml"}
 
 
 def json_file_option(help_text: str):
@@ -132,7 +131,7 @@ def _input_file_kind(data: Path) -> str:
     Returns:
         str: The upper-case format name for user-facing messages.
     """
-    if data.suffix.lower() in YAML_FILE_EXTENSIONS:
+    if data.suffix.lower() in {".yaml", ".yml"}:
         return "YAML"
 
     return "JSON"
