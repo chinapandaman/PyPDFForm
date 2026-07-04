@@ -18,7 +18,7 @@ from Python code or from the command line.
 
 import logging
 
-__version__ = "5.2.4"
+__version__ = "5.2.5"
 
 from .lib.annotations import Annotations
 from .lib.assets.blank import BlankPage
