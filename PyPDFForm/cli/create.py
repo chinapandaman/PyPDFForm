@@ -4,8 +4,8 @@ This module defines CLI commands for creating PDF files and PDF content.
 
 It exposes the `create` command group for blank PDFs, extracted page ranges,
 merged PDFs, form fields, raw drawn elements, annotations, and coordinate grid
-views. Commands in this module translate command-line arguments or grouped JSON
-input into `PdfWrapper`, `BlankPage`, `Fields`, `RawElements`, and
+views. Commands in this module translate command-line arguments or grouped
+JSON/YAML input into `PdfWrapper`, `BlankPage`, `Fields`, `RawElements`, and
 `Annotations` operations.
 """
 
@@ -194,13 +194,15 @@ def merge(
 def field(
     ctx: typer.Context,
     pdf: INPUT_PDF,
-    data: Annotated[Path, json_file_option("JSON file with form field definitions.")],
+    data: Annotated[
+        Path, json_file_option("JSON or YAML file with form field definitions.")
+    ],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
     """
-    Add form fields described by grouped JSON definitions.
+    Add form fields described by grouped JSON or YAML definitions.
 
-    The command maps JSON groups such as `text`, `check`, and `signature` to
+    The command maps input groups such as `text`, `check`, and `signature` to
     PyPDFForm field classes, validates the input file against the CLI field
     schema, creates the corresponding field objects, and calls
     `PdfWrapper.bulk_create_fields` before writing the modified PDF.
@@ -209,7 +211,8 @@ def field(
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
-        data (Path): JSON file containing grouped form field definitions.
+        data (Path): JSON or YAML file containing grouped form field
+            definitions.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
     """
@@ -240,13 +243,15 @@ def field(
 def raw(
     ctx: typer.Context,
     pdf: INPUT_PDF,
-    data: Annotated[Path, json_file_option("JSON file with raw element definitions.")],
+    data: Annotated[
+        Path, json_file_option("JSON or YAML file with raw element definitions.")
+    ],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
     """
-    Draw raw elements described by grouped JSON definitions.
+    Draw raw elements described by grouped JSON or YAML definitions.
 
-    The command maps JSON groups such as `text`, `image`, and `rectangle` to
+    The command maps input groups such as `text`, `image`, and `rectangle` to
     raw element classes, validates the input file against the CLI raw element
     schema, creates the corresponding drawable objects, and calls
     `PdfWrapper.draw` before writing the modified PDF.
@@ -255,7 +260,8 @@ def raw(
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
-        data (Path): JSON file containing grouped raw element definitions.
+        data (Path): JSON or YAML file containing grouped raw element
+            definitions.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
     """
@@ -286,13 +292,15 @@ def raw(
 def annotation(
     ctx: typer.Context,
     pdf: INPUT_PDF,
-    data: Annotated[Path, json_file_option("JSON file with annotation definitions.")],
+    data: Annotated[
+        Path, json_file_option("JSON or YAML file with annotation definitions.")
+    ],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
     """
-    Add annotations described by grouped JSON definitions.
+    Add annotations described by grouped JSON or YAML definitions.
 
-    The command maps JSON groups such as `text`, `link`, and `highlight` to
+    The command maps input groups such as `text`, `link`, and `highlight` to
     annotation classes, validates the input file against the CLI annotation
     schema, creates the corresponding annotation objects, and calls
     `PdfWrapper.annotate` before writing the modified PDF.
@@ -301,7 +309,8 @@ def annotation(
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
-        data (Path): JSON file containing grouped annotation definitions.
+        data (Path): JSON or YAML file containing grouped annotation
+            definitions.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
     """

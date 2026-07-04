@@ -16,6 +16,12 @@ def write_invalid_json(tmp_path, content):
     return str(data_path)
 
 
+def write_invalid_yaml(tmp_path, content):
+    data_path = tmp_path / "invalid.yaml"
+    data_path.write_text(content, encoding="utf-8")
+    return str(data_path)
+
+
 def assert_cli_error(result, *expected_messages, output_path=None):
     assert result.exit_code == 2
     for message in expected_messages:
@@ -65,6 +71,46 @@ def test_fill_wrong_known_field_type(pdf_samples, tmp_path):
     )
 
     assert_cli_error(result, "Invalid JSON file at check", output_path=output_path)
+
+
+@pytest.mark.cli_test
+def test_fill_malformed_yaml(pdf_samples, tmp_path):
+    data_path = write_invalid_yaml(tmp_path, "test: [")
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "fill",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert_cli_error(result, "Invalid YAML file", output_path=output_path)
+
+
+@pytest.mark.cli_test
+def test_fill_yaml_schema_error(pdf_samples, tmp_path):
+    data_path = write_invalid_yaml(tmp_path, 'check: "yes"')
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "fill",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "-f",
+            data_path,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert_cli_error(result, "Invalid YAML file at check", output_path=output_path)
 
 
 @pytest.mark.cli_test

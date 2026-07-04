@@ -2,8 +2,8 @@
 """
 This module provides shared helpers for PyPDFForm CLI commands.
 
-It contains utilities for loading JSON command input, registering custom fonts
-once per command invocation, and converting grouped JSON element definitions
+It contains utilities for loading structured command input, registering custom
+fonts once per command invocation, and converting grouped element definitions
 into the objects expected by `PdfWrapper` methods.
 """
 
@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Annotated, Any, NoReturn
 
 import typer
+import yaml
 from jsonschema import ValidationError, validate
 
 from .. import PdfWrapper
@@ -60,17 +61,18 @@ FIELD_NAMES = Annotated[
         help="Form field name. Repeat this option to select multiple fields.",
     ),
 ]
+YAML_FILE_EXTENSIONS = {".yaml", ".yml"}
 
 
 def json_file_option(help_text: str):
     """
-    Creates the common validated JSON file option.
+    Creates the common validated structured data file option.
 
     Args:
         help_text (str): Help text to display for the option.
 
     Returns:
-        typer.Option: A configured `--file` / `-f` option for JSON file input.
+        typer.Option: A configured `--file` / `-f` option for file input.
     """
     return typer.Option(
         "--file",
@@ -109,7 +111,7 @@ def cli_bad_parameter(
 
 def _validation_error_path(exc: ValidationError) -> str:
     """
-    Builds a dotted JSON path for a validation error.
+    Builds a dotted input data path for a validation error.
 
     Args:
         exc (ValidationError): The JSON schema validation error.
@@ -120,28 +122,45 @@ def _validation_error_path(exc: ValidationError) -> str:
     return ".".join(str(each) for each in exc.absolute_path)
 
 
-def load_json_file(data: Path, schema: dict, param_hint: str) -> Any:
+def _input_file_kind(data: Path) -> str:
     """
-    Loads a JSON CLI input file and validates it against a schema.
+    Gets the structured data format to use for a CLI input file.
 
     Args:
-        data (Path): JSON file path.
-        schema (dict): JSON schema to validate against.
-        param_hint (str): CLI parameter associated with the JSON file.
+        data (Path): Input file path.
 
     Returns:
-        Any: Parsed and validated JSON input.
+        str: The upper-case format name for user-facing messages.
+    """
+    if data.suffix.lower() in YAML_FILE_EXTENSIONS:
+        return "YAML"
+
+    return "JSON"
+
+
+def load_json_file(data: Path, schema: dict, param_hint: str) -> Any:
+    """
+    Loads a JSON or YAML CLI input file and validates it against a schema.
+
+    Args:
+        data (Path): JSON or YAML file path.
+        schema (dict): JSON schema to validate against.
+        param_hint (str): CLI parameter associated with the input file.
+
+    Returns:
+        Any: Parsed and validated input data.
 
     Raises:
         typer.BadParameter: Raised when the file cannot be loaded or validation
             fails.
     """
+    input_kind = _input_file_kind(data)
     try:
         with open(data, "r", encoding="utf-8") as f:
-            input_data = json.load(f)
-    except (OSError, json.JSONDecodeError) as exc:
+            input_data = yaml.safe_load(f) if input_kind == "YAML" else json.load(f)
+    except (OSError, json.JSONDecodeError, yaml.YAMLError) as exc:
         cli_bad_parameter(
-            f"Invalid JSON file: {exc}",
+            f"Invalid {input_kind} file: {exc}",
             param_hint=param_hint,
             cause=exc,
         )
@@ -152,7 +171,7 @@ def load_json_file(data: Path, schema: dict, param_hint: str) -> Any:
         error_path = _validation_error_path(exc)
         location = f" at {error_path}" if error_path else ""
         cli_bad_parameter(
-            f"Invalid JSON file{location}: {exc.message}",
+            f"Invalid {input_kind} file{location}: {exc.message}",
             param_hint=param_hint,
             cause=exc,
         )
@@ -191,14 +210,15 @@ def handle_font_registration(
     """
     Registers a custom font referenced by CLI input.
 
-    CLI JSON files may provide a file path in a `font` parameter. This helper
+    CLI input files may provide a file path in a `font` parameter. This helper
     registers each unique font path on the supplied `PdfWrapper` once, assigns
     it a generated internal font name, and mutates `params["font"]` to that
     registered name so downstream field or element constructors can use it.
 
     Args:
         obj (PdfWrapper): The wrapper for the PDF currently being modified.
-        params (dict): The element or widget parameters loaded from JSON. This
+        params (dict): The element or widget parameters loaded from the input
+            file. This
             dictionary is mutated when it contains a `font` key.
         registered_font (dict): Mapping of source font paths to generated
             `PdfWrapper` font names for the current command invocation.
@@ -222,9 +242,9 @@ def create_elements_from_file(
     output: Path | None = None,
 ) -> None:
     """
-    Creates PDF elements from grouped JSON definitions.
+    Creates PDF elements from grouped file definitions.
 
-    The input JSON is expected to group element definitions by type, such as
+    The input data is expected to group element definitions by type, such as
     `text`, `image`, or `highlight`. Each group key is resolved through
     `element_map`, each item is constructed after optional font registration,
     and the resulting objects are passed to `method_name` on `PdfWrapper`.
@@ -232,17 +252,17 @@ def create_elements_from_file(
 
     Args:
         pdf (Path): The path to the input PDF file.
-        data (Path): The path to the JSON file containing grouped element
+        data (Path): The path to the input file containing grouped element
             definitions.
-        element_map (dict): Mapping from JSON group names to element classes or
-            callables used to construct each object.
+        element_map (dict): Mapping from input group names to element classes
+            or callables used to construct each object.
         schema (dict): JSON schema used to validate the grouped definitions.
         method_name (str): Name of the `PdfWrapper` method that accepts the
             constructed elements, such as `bulk_create_fields`, `draw`, or
             `annotate`.
         ctx (typer.Context): Typer context containing global wrapper options in
             `ctx.obj`.
-        param_hint (str): CLI parameter associated with the JSON file.
+        param_hint (str): CLI parameter associated with the input file.
         output (Path, optional): Path where the modified PDF should be saved. If
             omitted, the input PDF is overwritten. Defaults to None.
     """

@@ -39,6 +39,33 @@ This section covers the basic entry points for PyPDFForm's Python API and CLI, a
 
     The CLI shows help for available commands and usage. Subcommands show their own help when run without arguments or options.
 
+    Structured input passed with `--file/-f` can be JSON or YAML. For example, the [fill](fill.md) command accepts the same field mapping in either format:
+
+    === "data.json"
+        ```json
+        {
+            "test": "test_1",
+            "check": true,
+            "test_2": "test_2",
+            "check_2": false,
+            "test_3": "test_3",
+            "check_3": true
+        }
+        ```
+    === "data.yaml"
+        ```yaml
+        test: test_1
+        check: true
+        test_2: test_2
+        check_2: false
+        test_3: test_3
+        check_3: true
+        ```
+    === "Command"
+        ```shell
+        pypdfform fill sample_template.pdf -f data.yaml -o output.pdf
+        ```
+
 ## Handling appearance streams
 
 For a PDF viewer to display content in a form field (especially text fields), it needs an "appearance stream." This stream defines how the field's content is rendered. PyPDFForm offers two ways to handle this.

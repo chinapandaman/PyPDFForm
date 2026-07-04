@@ -98,3 +98,29 @@ def test_use_full_widget_name_option(static_pdfs):
         ],
     )
     assert result.exit_code == 0
+
+
+@pytest.mark.cli_test
+def test_yaml_file_input_for_fill(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "fill",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "-f",
+            os.path.join(yaml_samples, "test_fill_text_check.yaml"),
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual
