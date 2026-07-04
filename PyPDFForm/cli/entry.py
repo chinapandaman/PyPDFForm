@@ -10,7 +10,7 @@ of an import traceback when those optional dependencies are absent.
 import importlib
 import sys
 
-CLI_DEPENDENCIES = {"jsonschema", "typer"}
+CLI_DEPENDENCIES = {"jsonschema", "typer", "yaml"}
 CLI_INSTALL_HINT = 'pipx install "PyPDFForm[cli]"'
 CLI_ENV_INSTALL_HINT = "pip install 'PyPDFForm[cli]'"
 

@@ -42,6 +42,11 @@ def json_samples():
 
 
 @pytest.fixture
+def yaml_samples():
+    return os.path.join(os.path.dirname(__file__), "..", "yaml_samples")
+
+
+@pytest.fixture
 def static_pdfs():
     return os.path.join(os.path.dirname(__file__), "..", "docs", "pdfs")
 
