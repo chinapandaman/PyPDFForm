@@ -11,7 +11,7 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_js_adapting(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_js_adapting(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_js_adapting.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -22,7 +22,7 @@ def test_js_adapting(pdf_samples, static_pdfs, json_samples, tmp_path):
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_js_adapting.json"),
+            os.path.join(yaml_samples, "test_js_adapting.yaml"),
             "-o",
             output_path,
         ],
@@ -38,7 +38,7 @@ def test_js_adapting(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_on_hover(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_on_hover(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_on_hover.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -49,7 +49,7 @@ def test_on_hover(pdf_samples, static_pdfs, json_samples, tmp_path):
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_on_hover.json"),
+            os.path.join(yaml_samples, "test_on_hover.yaml"),
             "-o",
             output_path,
         ],
@@ -65,7 +65,7 @@ def test_on_hover(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_off_hover(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_off_hover(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_off_hover.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -76,7 +76,7 @@ def test_off_hover(pdf_samples, static_pdfs, json_samples, tmp_path):
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_off_hover.json"),
+            os.path.join(yaml_samples, "test_off_hover.yaml"),
             "-o",
             output_path,
         ],
@@ -92,7 +92,7 @@ def test_off_hover(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_mouse_pressed(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_mouse_pressed(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_mouse_pressed.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -103,7 +103,7 @@ def test_mouse_pressed(pdf_samples, static_pdfs, json_samples, tmp_path):
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_mouse_pressed.json"),
+            os.path.join(yaml_samples, "test_mouse_pressed.yaml"),
             "-o",
             output_path,
         ],
@@ -119,7 +119,7 @@ def test_mouse_pressed(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_mouse_released(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_mouse_released(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_mouse_released.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -130,7 +130,7 @@ def test_mouse_released(pdf_samples, static_pdfs, json_samples, tmp_path):
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_mouse_released.json"),
+            os.path.join(yaml_samples, "test_mouse_released.yaml"),
             "-o",
             output_path,
         ],
@@ -146,7 +146,7 @@ def test_mouse_released(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_on_focused(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_on_focused(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_on_focused.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -157,7 +157,7 @@ def test_on_focused(pdf_samples, static_pdfs, json_samples, tmp_path):
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_on_focused.json"),
+            os.path.join(yaml_samples, "test_on_focused.yaml"),
             "-o",
             output_path,
         ],
@@ -173,7 +173,7 @@ def test_on_focused(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_off_focused(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_off_focused(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_off_focused.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -184,7 +184,7 @@ def test_off_focused(pdf_samples, static_pdfs, json_samples, tmp_path):
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_off_focused.json"),
+            os.path.join(yaml_samples, "test_off_focused.yaml"),
             "-o",
             output_path,
         ],

@@ -11,7 +11,7 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_fill_text_check(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_fill_text_check(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -21,7 +21,7 @@ def test_fill_text_check(pdf_samples, static_pdfs, json_samples, tmp_path):
             "fill",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_fill_text_check.json"),
+            os.path.join(yaml_samples, "test_fill_text_check.yaml"),
             "-o",
             output_path,
         ],
@@ -37,7 +37,7 @@ def test_fill_text_check(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_fill_radio(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_fill_radio(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_radio.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -47,7 +47,7 @@ def test_fill_radio(pdf_samples, static_pdfs, json_samples, tmp_path):
             "fill",
             os.path.join(static_pdfs, "sample_template_with_radio_button.pdf"),
             "-f",
-            os.path.join(json_samples, "test_fill_radio.json"),
+            os.path.join(yaml_samples, "test_fill_radio.yaml"),
             "-o",
             output_path,
         ],
@@ -63,7 +63,7 @@ def test_fill_radio(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_fill_dropdown(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_fill_dropdown(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_dropdown.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -73,7 +73,7 @@ def test_fill_dropdown(pdf_samples, static_pdfs, json_samples, tmp_path):
             "fill",
             os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
             "-f",
-            os.path.join(json_samples, "test_fill_dropdown.json"),
+            os.path.join(yaml_samples, "test_fill_dropdown.yaml"),
             "-o",
             output_path,
         ],
@@ -89,7 +89,7 @@ def test_fill_dropdown(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_fill_dropdown_via_str(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_fill_dropdown_via_str(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_dropdown.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -99,7 +99,7 @@ def test_fill_dropdown_via_str(pdf_samples, static_pdfs, json_samples, tmp_path)
             "fill",
             os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
             "-f",
-            os.path.join(json_samples, "test_fill_dropdown_via_str.json"),
+            os.path.join(yaml_samples, "test_fill_dropdown_via_str.yaml"),
             "-o",
             output_path,
         ],
@@ -116,7 +116,7 @@ def test_fill_dropdown_via_str(pdf_samples, static_pdfs, json_samples, tmp_path)
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_fill_sig(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_fill_sig(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -126,7 +126,7 @@ def test_fill_sig(pdf_samples, static_pdfs, json_samples, tmp_path):
             "fill",
             os.path.join(static_pdfs, "sample_template_with_signature.pdf"),
             "-f",
-            os.path.join(json_samples, "test_fill_sig.json"),
+            os.path.join(yaml_samples, "test_fill_sig.yaml"),
             "-o",
             output_path,
         ],
@@ -143,7 +143,7 @@ def test_fill_sig(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_fill_sig_ratio(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_fill_sig_ratio(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig_ratio.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -153,7 +153,7 @@ def test_fill_sig_ratio(pdf_samples, static_pdfs, json_samples, tmp_path):
             "fill",
             os.path.join(static_pdfs, "sample_template_with_signature.pdf"),
             "-f",
-            os.path.join(json_samples, "test_fill_sig_ratio.json"),
+            os.path.join(yaml_samples, "test_fill_sig_ratio.yaml"),
             "-o",
             output_path,
         ],
@@ -169,7 +169,7 @@ def test_fill_sig_ratio(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_fill_image(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_fill_image(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_image.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -179,7 +179,7 @@ def test_fill_image(pdf_samples, static_pdfs, json_samples, tmp_path):
             "fill",
             os.path.join(static_pdfs, "sample_template_with_image_field.pdf"),
             "-f",
-            os.path.join(json_samples, "test_fill_image.json"),
+            os.path.join(yaml_samples, "test_fill_image.yaml"),
             "-o",
             output_path,
         ],
@@ -195,7 +195,7 @@ def test_fill_image(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_fill_image_ratio(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_fill_image_ratio(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_image_ratio.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -205,7 +205,7 @@ def test_fill_image_ratio(pdf_samples, static_pdfs, json_samples, tmp_path):
             "fill",
             os.path.join(static_pdfs, "sample_template_with_image_field.pdf"),
             "-f",
-            os.path.join(json_samples, "test_fill_image_ratio.json"),
+            os.path.join(yaml_samples, "test_fill_image_ratio.yaml"),
             "-o",
             output_path,
         ],

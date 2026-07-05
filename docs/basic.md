@@ -39,8 +39,17 @@ This section covers the basic entry points for PyPDFForm's Python API and CLI, a
 
     The CLI shows help for available commands and usage. Subcommands show their own help when run without arguments or options.
 
-    Structured input passed with `--file/-f` can be JSON or YAML. For example, the [fill](fill.md) command accepts the same field mapping in either format:
+    Structured input passed with `--file/-f` can be YAML or JSON. For example, the [fill](fill.md) command accepts the same field mapping in either format:
 
+    === "data.yaml"
+        ```yaml
+        test: test_1
+        check: true
+        test_2: test_2
+        check_2: false
+        test_3: test_3
+        check_3: true
+        ```
     === "data.json"
         ```json
         {
@@ -51,15 +60,6 @@ This section covers the basic entry points for PyPDFForm's Python API and CLI, a
             "test_3": "test_3",
             "check_3": true
         }
-        ```
-    === "data.yaml"
-        ```yaml
-        test: test_1
-        check: true
-        test_2: test_2
-        check_2: false
-        test_3: test_3
-        check_3: true
         ```
     === "Command"
         ```shell

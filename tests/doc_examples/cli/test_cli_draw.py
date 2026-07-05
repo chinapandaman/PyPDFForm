@@ -13,7 +13,7 @@ runner = CliRunner()
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_draw_text(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_draw_text(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_text.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -24,7 +24,7 @@ def test_draw_text(pdf_samples, static_pdfs, json_samples, tmp_path):
             "raw",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_draw_text.json"),
+            os.path.join(yaml_samples, "test_draw_text.yaml"),
             "-o",
             output_path,
         ],
@@ -40,7 +40,7 @@ def test_draw_text(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_draw_image(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_draw_image(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_image.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -51,7 +51,7 @@ def test_draw_image(pdf_samples, static_pdfs, json_samples, tmp_path):
             "raw",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_draw_image.json"),
+            os.path.join(yaml_samples, "test_draw_image.yaml"),
             "-o",
             output_path,
         ],
@@ -67,7 +67,7 @@ def test_draw_image(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_draw_line(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_draw_line(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_line.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -78,7 +78,7 @@ def test_draw_line(pdf_samples, static_pdfs, json_samples, tmp_path):
             "raw",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_draw_line.json"),
+            os.path.join(yaml_samples, "test_draw_line.yaml"),
             "-o",
             output_path,
         ],
@@ -94,7 +94,7 @@ def test_draw_line(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_draw_rect(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_draw_rect(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_rect.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -105,7 +105,7 @@ def test_draw_rect(pdf_samples, static_pdfs, json_samples, tmp_path):
             "raw",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_draw_rect.json"),
+            os.path.join(yaml_samples, "test_draw_rect.yaml"),
             "-o",
             output_path,
         ],
@@ -121,7 +121,7 @@ def test_draw_rect(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_draw_circle(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_draw_circle(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_circle.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -132,7 +132,7 @@ def test_draw_circle(pdf_samples, static_pdfs, json_samples, tmp_path):
             "raw",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_draw_circle.json"),
+            os.path.join(yaml_samples, "test_draw_circle.yaml"),
             "-o",
             output_path,
         ],
@@ -148,7 +148,7 @@ def test_draw_circle(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_draw_ellipse(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_draw_ellipse(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_ellipse.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -159,7 +159,7 @@ def test_draw_ellipse(pdf_samples, static_pdfs, json_samples, tmp_path):
             "raw",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_draw_ellipse.json"),
+            os.path.join(yaml_samples, "test_draw_ellipse.yaml"),
             "-o",
             output_path,
         ],

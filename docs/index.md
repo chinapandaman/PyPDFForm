@@ -65,73 +65,52 @@ The goal is to make PDF form work straightforward, whether you are handling one 
     === "Commands"
         ```shell
         pypdfform create blank -o output.pdf
-        pypdfform create raw output.pdf -f labels.json
-        pypdfform create field output.pdf -f fields.json
+        pypdfform create raw output.pdf -f labels.yaml
+        pypdfform create field output.pdf -f fields.yaml
         pypdfform inspect schema output.pdf
-        pypdfform update field output.pdf -f styles.json
-        pypdfform fill output.pdf -f data.json
+        pypdfform update field output.pdf -f styles.yaml
+        pypdfform fill output.pdf -f data.yaml
         ```
-    === "labels.json"
-        ```json
-        {
-            "text": [
-                {
-                    "text": "My Textfield:",
-                    "page_number": 1,
-                    "x": 100,
-                    "y": 600
-                },
-                {
-                    "text": "My Checkbox:",
-                    "page_number": 1,
-                    "x": 100,
-                    "y": 550
-                }
-            ]
-        }
+    === "labels.yaml"
+        ```yaml
+        text:
+          - text: 'My Textfield:'
+            page_number: 1
+            x: 100
+            y: 600
+          - text: 'My Checkbox:'
+            page_number: 1
+            x: 100
+            y: 550
         ```
-    === "fields.json"
-        ```json
-        {
-            "text": [
-                {
-                    "name": "my_textfield",
-                    "page_number": 1,
-                    "x": 180,
-                    "y": 596,
-                    "height": 16
-                }
-            ],
-            "check": [
-                {
-                    "name": "my_checkbox",
-                    "page_number": 1,
-                    "x": 180,
-                    "y": 546,
-                    "size": 16
-                }
-            ]
-        }
+    === "fields.yaml"
+        ```yaml
+        text:
+          - name: my_textfield
+            page_number: 1
+            x: 180
+            y: 596
+            height: 16
+        check:
+          - name: my_checkbox
+            page_number: 1
+            x: 180
+            y: 546
+            size: 16
         ```
-    === "styles.json"
-        ```json
-        {
-            "my_textfield": {
-                "font_color": [
-                    1,
-                    0,
-                    0
-                ],
-                "alignment": 1
-            }
-        }
+    === "styles.yaml"
+        ```yaml
+        my_textfield:
+          font_color:
+            - 1
+            - 0
+            - 0
+          alignment: 1
         ```
-    === "data.json"
-        ```json
-        {
-            "my_textfield": "this is a text field",
-            "my_checkbox": true
-        }
+    === "data.yaml"
+        ```yaml
+        my_textfield: this is a text field
+        my_checkbox: true
         ```
 
 ## What's next?

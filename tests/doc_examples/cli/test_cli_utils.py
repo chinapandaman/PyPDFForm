@@ -85,7 +85,7 @@ def test_blank_page_multiply(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_extract_pages(static_pdfs, pdf_samples, json_samples, tmp_path):
+def test_extract_pages(static_pdfs, pdf_samples, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_extract_pages.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -111,7 +111,7 @@ def test_extract_pages(static_pdfs, pdf_samples, json_samples, tmp_path):
             "fill",
             output_path,
             "-f",
-            os.path.join(json_samples, "test_extract_pages.json"),
+            os.path.join(yaml_samples, "test_extract_pages.yaml"),
             "-o",
             output_path,
         ],

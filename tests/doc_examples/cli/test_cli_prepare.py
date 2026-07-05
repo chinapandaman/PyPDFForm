@@ -12,7 +12,7 @@ runner = CliRunner()
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_bulk_create_fields(pdf_samples, json_samples, tmp_path):
+def test_bulk_create_fields(pdf_samples, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_bulk_create_fields.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -23,7 +23,7 @@ def test_bulk_create_fields(pdf_samples, json_samples, tmp_path):
             "field",
             os.path.join(pdf_samples, "dummy.pdf"),
             "-f",
-            os.path.join(json_samples, "test_bulk_create_fields.json"),
+            os.path.join(yaml_samples, "test_bulk_create_fields.yaml"),
             "-o",
             output_path,
         ],
@@ -40,7 +40,7 @@ def test_bulk_create_fields(pdf_samples, json_samples, tmp_path):
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_create_text(pdf_samples, json_samples, tmp_path):
+def test_create_text(pdf_samples, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_text.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -51,7 +51,7 @@ def test_create_text(pdf_samples, json_samples, tmp_path):
             "field",
             os.path.join(pdf_samples, "dummy.pdf"),
             "-f",
-            os.path.join(json_samples, "test_create_text.json"),
+            os.path.join(yaml_samples, "test_create_text.yaml"),
             "-o",
             output_path,
         ],
@@ -68,7 +68,7 @@ def test_create_text(pdf_samples, json_samples, tmp_path):
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_create_check(pdf_samples, json_samples, tmp_path):
+def test_create_check(pdf_samples, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_check.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -79,7 +79,7 @@ def test_create_check(pdf_samples, json_samples, tmp_path):
             "field",
             os.path.join(pdf_samples, "dummy.pdf"),
             "-f",
-            os.path.join(json_samples, "test_create_check.json"),
+            os.path.join(yaml_samples, "test_create_check.yaml"),
             "-o",
             output_path,
         ],
@@ -96,7 +96,7 @@ def test_create_check(pdf_samples, json_samples, tmp_path):
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_create_radio(pdf_samples, json_samples, tmp_path):
+def test_create_radio(pdf_samples, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_radio.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -107,7 +107,7 @@ def test_create_radio(pdf_samples, json_samples, tmp_path):
             "field",
             os.path.join(pdf_samples, "dummy.pdf"),
             "-f",
-            os.path.join(json_samples, "test_create_radio.json"),
+            os.path.join(yaml_samples, "test_create_radio.yaml"),
             "-o",
             output_path,
         ],
@@ -124,7 +124,7 @@ def test_create_radio(pdf_samples, json_samples, tmp_path):
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_create_dropdown(pdf_samples, json_samples, tmp_path):
+def test_create_dropdown(pdf_samples, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_dropdown.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -135,7 +135,7 @@ def test_create_dropdown(pdf_samples, json_samples, tmp_path):
             "field",
             os.path.join(pdf_samples, "dummy.pdf"),
             "-f",
-            os.path.join(json_samples, "test_create_dropdown.json"),
+            os.path.join(yaml_samples, "test_create_dropdown.yaml"),
             "-o",
             output_path,
         ],
@@ -152,7 +152,7 @@ def test_create_dropdown(pdf_samples, json_samples, tmp_path):
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_create_dropdown_with_export_values(pdf_samples, json_samples, tmp_path):
+def test_create_dropdown_with_export_values(pdf_samples, yaml_samples, tmp_path):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_create_dropdown_with_export_values.pdf"
     )
@@ -165,7 +165,7 @@ def test_create_dropdown_with_export_values(pdf_samples, json_samples, tmp_path)
             "field",
             os.path.join(pdf_samples, "dummy.pdf"),
             "-f",
-            os.path.join(json_samples, "test_create_dropdown_with_export_values.json"),
+            os.path.join(yaml_samples, "test_create_dropdown_with_export_values.yaml"),
             "-o",
             output_path,
         ],
@@ -181,7 +181,7 @@ def test_create_dropdown_with_export_values(pdf_samples, json_samples, tmp_path)
 
 
 @pytest.mark.cli_test
-def test_create_sig(pdf_samples, json_samples, tmp_path):
+def test_create_sig(pdf_samples, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_sig.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -192,7 +192,7 @@ def test_create_sig(pdf_samples, json_samples, tmp_path):
             "field",
             os.path.join(pdf_samples, "dummy.pdf"),
             "-f",
-            os.path.join(json_samples, "test_create_sig.json"),
+            os.path.join(yaml_samples, "test_create_sig.yaml"),
             "-o",
             output_path,
         ],
@@ -208,7 +208,7 @@ def test_create_sig(pdf_samples, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_create_image(pdf_samples, json_samples, tmp_path):
+def test_create_image(pdf_samples, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_image.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -219,7 +219,7 @@ def test_create_image(pdf_samples, json_samples, tmp_path):
             "field",
             os.path.join(pdf_samples, "dummy.pdf"),
             "-f",
-            os.path.join(json_samples, "test_create_image.json"),
+            os.path.join(yaml_samples, "test_create_image.yaml"),
             "-o",
             output_path,
         ],

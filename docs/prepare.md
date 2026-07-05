@@ -41,44 +41,32 @@ PyPDFForm also allows creating PDF form fields on existing PDFs programmatically
     new_form.write("output.pdf")
     ```
 === "CLI"
-    Use the `create field` command with a JSON file that defines the fields to create:
+    Use the `create field` command with a YAML file that defines the fields to create:
 
-    === "data.json"
-        ```json
-        {
-            "text": [
-                {
-                    "name": "new_text_field_1",
-                    "page_number": 1,
-                    "x": 100,
-                    "y": 100
-                },
-                {
-                    "name": "new_text_field_2",
-                    "page_number": 1,
-                    "x": 100,
-                    "y": 300
-                }
-            ],
-            "check": [
-                {
-                    "name": "new_checkbox_1",
-                    "page_number": 1,
-                    "x": 300,
-                    "y": 100
-                },
-                {
-                    "name": "new_checkbox_2",
-                    "page_number": 1,
-                    "x": 300,
-                    "y": 300
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        text:
+          - name: new_text_field_1
+            page_number: 1
+            x: 100
+            y: 100
+          - name: new_text_field_2
+            page_number: 1
+            x: 100
+            y: 300
+        check:
+          - name: new_checkbox_1
+            page_number: 1
+            x: 300
+            y: 100
+          - name: new_checkbox_2
+            page_number: 1
+            x: 300
+            y: 300
         ```
     === "Command"
         ```shell
-        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        pypdfform create field dummy.pdf -f data.yaml -o output.pdf
         ```
 
 This section of the documentation will primarily use [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) as an example.
@@ -124,52 +112,44 @@ In the library examples, optional parameters are marked with `# optional`.
     1.  For the `comb` option, refer to the documentation [here](style.md/#enable-text-field-character-spacing-combs).
     2.  To use a custom font, see how to register it [here](font.md).
 === "CLI"
-    Put text field definitions under the `text` key in the JSON file:
+    Put text field definitions under the `text` key in the YAML file:
 
-    === "data.json"
-        ```json
-        {
-            "text": [
-                {
-                    "name": "new_text_field",
-                    "page_number": 1,
-                    "x": 57.5,
-                    "y": 700.9,
-                    "required": false,
-                    "tooltip": "this is a text field",
-                    "width": 120.3,
-                    "height": 40.7,
-                    "max_length": 5,
-                    "comb": true,
-                    "font": "path_to_a_ttf_file",
-                    "font_size": 15,
-                    "font_color": [
-                        1,
-                        0,
-                        0
-                    ],
-                    "bg_color": [
-                        0,
-                        0,
-                        1,
-                        1
-                    ],
-                    "border_color": [
-                        1,
-                        0,
-                        0,
-                        1
-                    ],
-                    "border_width": 5,
-                    "alignment": 0,
-                    "multiline": true
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        text:
+          - name: new_text_field
+            page_number: 1
+            x: 57.5
+            y: 700.9
+            required: false
+            tooltip: this is a text field
+            width: 120.3
+            height: 40.7
+            max_length: 5
+            comb: true
+            font: path_to_a_ttf_file
+            font_size: 15
+            font_color:
+              - 1
+              - 0
+              - 0
+            bg_color:
+              - 0
+              - 0
+              - 1
+              - 1
+            border_color:
+              - 1
+              - 0
+              - 0
+              - 1
+            border_width: 5
+            alignment: 0
+            multiline: true
         ```
     === "Command"
         ```shell
-        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        pypdfform create field dummy.pdf -f data.yaml -o output.pdf
         ```
 
 ## Create a checkbox
@@ -202,46 +182,38 @@ In the library examples, optional parameters are marked with `# optional`.
 
     1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
 === "CLI"
-    Put checkbox field definitions under the `check` key in the JSON file:
+    Put checkbox field definitions under the `check` key in the YAML file:
 
-    === "data.json"
-        ```json
-        {
-            "check": [
-                {
-                    "name": "new_checkbox",
-                    "page_number": 1,
-                    "x": 57,
-                    "y": 700,
-                    "required": false,
-                    "tooltip": "this is a checkbox",
-                    "size": 30,
-                    "button_style": "check",
-                    "tick_color": [
-                        0,
-                        1,
-                        0
-                    ],
-                    "bg_color": [
-                        0,
-                        0,
-                        1,
-                        1
-                    ],
-                    "border_color": [
-                        1,
-                        1,
-                        0,
-                        1
-                    ],
-                    "border_width": 5
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        check:
+          - name: new_checkbox
+            page_number: 1
+            x: 57
+            y: 700
+            required: false
+            tooltip: this is a checkbox
+            size: 30
+            button_style: check
+            tick_color:
+              - 0
+              - 1
+              - 0
+            bg_color:
+              - 0
+              - 0
+              - 1
+              - 1
+            border_color:
+              - 1
+              - 1
+              - 0
+              - 1
+            border_width: 5
         ```
     === "Command"
         ```shell
-        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        pypdfform create field dummy.pdf -f data.yaml -o output.pdf
         ```
 
 ???+ bug
@@ -280,55 +252,45 @@ In the library examples, optional parameters are marked with `# optional`.
 
     1.  The `button_style` parameter currently supports three options: `check`, `circle`, and `cross`.
 === "CLI"
-    Put radio group definitions under the `radio` key in the JSON file:
+    Put radio group definitions under the `radio` key in the YAML file:
 
-    === "data.json"
-        ```json
-        {
-            "radio": [
-                {
-                    "name": "new_radio_group",
-                    "page_number": 1,
-                    "x": [
-                        50,
-                        100,
-                        150
-                    ],
-                    "y": [
-                        50,
-                        100,
-                        150
-                    ],
-                    "required": false,
-                    "tooltip": "this is a radio group",
-                    "size": 30,
-                    "button_style": "check",
-                    "shape": "square",
-                    "tick_color": [
-                        0,
-                        1,
-                        0
-                    ],
-                    "bg_color": [
-                        0,
-                        0,
-                        1,
-                        1
-                    ],
-                    "border_color": [
-                        1,
-                        0,
-                        1,
-                        1
-                    ],
-                    "border_width": 5
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        radio:
+          - name: new_radio_group
+            page_number: 1
+            x:
+              - 50
+              - 100
+              - 150
+            y:
+              - 50
+              - 100
+              - 150
+            required: false
+            tooltip: this is a radio group
+            size: 30
+            button_style: check
+            shape: square
+            tick_color:
+              - 0
+              - 1
+              - 0
+            bg_color:
+              - 0
+              - 0
+              - 1
+              - 1
+            border_color:
+              - 1
+              - 0
+              - 1
+              - 1
+            border_width: 5
         ```
     === "Command"
         ```shell
-        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        pypdfform create field dummy.pdf -f data.yaml -o output.pdf
         ```
 
 ???+ bug
@@ -395,80 +357,59 @@ In the library examples, optional parameters are marked with `# optional`.
         new_form.write("output.pdf")
         ```
 === "CLI"
-    Put dropdown field definitions under the `dropdown` key in the JSON file:
+    Put dropdown field definitions under the `dropdown` key in the YAML file:
 
-    === "data.json"
-        ```json
-        {
-            "dropdown": [
-                {
-                    "name": "new_dropdown",
-                    "page_number": 1,
-                    "x": 57,
-                    "y": 700,
-                    "options": [
-                        "foo",
-                        "bar",
-                        "foobar"
-                    ],
-                    "required": false,
-                    "tooltip": "this is a dropdown",
-                    "width": 120,
-                    "height": 40,
-                    "font": "path_to_a_ttf_file",
-                    "font_size": 15,
-                    "font_color": [
-                        1,
-                        0,
-                        0
-                    ],
-                    "bg_color": [
-                        0,
-                        0,
-                        1,
-                        1
-                    ],
-                    "border_color": [
-                        0,
-                        1,
-                        0,
-                        1
-                    ],
-                    "border_width": 5
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        dropdown:
+          - name: new_dropdown
+            page_number: 1
+            x: 57
+            y: 700
+            options:
+              - foo
+              - bar
+              - foobar
+            required: false
+            tooltip: this is a dropdown
+            width: 120
+            height: 40
+            font: path_to_a_ttf_file
+            font_size: 15
+            font_color:
+              - 1
+              - 0
+              - 0
+            bg_color:
+              - 0
+              - 0
+              - 1
+              - 1
+            border_color:
+              - 0
+              - 1
+              - 0
+              - 1
+            border_width: 5
         ```
-    === "custom_export.json"
-        ```json
-        {
-            "dropdown": [
-                {
-                    "name": "new_dropdown",
-                    "page_number": 1,
-                    "x": 57,
-                    "y": 700,
-                    "options": [
-                        [
-                            "option_1",
-                            "option_1_export_value"
-                        ],
-                        [
-                            "option_2",
-                            "option_2_export_value"
-                        ],
-                        [
-                            "option_3",
-                            "option_3_export_value"
-                        ]
-                    ]
-                }
-            ]
-        }
+    === "custom_export.yaml"
+        ```yaml
+        dropdown:
+          - name: new_dropdown
+            page_number: 1
+            x: 57
+            y: 700
+            options:
+              - - option_1
+                - option_1_export_value
+              - - option_2
+                - option_2_export_value
+              - - option_3
+                - option_3_export_value
         ```
     === "Command"
         ```shell
-        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        pypdfform create field dummy.pdf -f data.yaml -o output.pdf
         ```
 
 ## Create a signature field
@@ -495,28 +436,23 @@ In the library examples, optional parameters are marked with `# optional`.
     new_form.write("output.pdf")
     ```
 === "CLI"
-    Put signature field definitions under the `signature` key in the JSON file:
+    Put signature field definitions under the `signature` key in the YAML file:
 
-    === "data.json"
-        ```json
-        {
-            "signature": [
-                {
-                    "name": "new_signature",
-                    "page_number": 1,
-                    "x": 100,
-                    "y": 100,
-                    "required": false,
-                    "tooltip": "this is a signature",
-                    "width": 410,
-                    "height": 100
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        signature:
+          - name: new_signature
+            page_number: 1
+            x: 100
+            y: 100
+            required: false
+            tooltip: this is a signature
+            width: 410
+            height: 100
         ```
     === "Command"
         ```shell
-        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        pypdfform create field dummy.pdf -f data.yaml -o output.pdf
         ```
 
 ## Create an image field
@@ -543,26 +479,21 @@ In the library examples, optional parameters are marked with `# optional`.
     new_form.write("output.pdf")
     ```
 === "CLI"
-    Put image field definitions under the `image` key in the JSON file:
+    Put image field definitions under the `image` key in the YAML file:
 
-    === "data.json"
-        ```json
-        {
-            "image": [
-                {
-                    "name": "new_image",
-                    "page_number": 1,
-                    "x": 100,
-                    "y": 100,
-                    "required": false,
-                    "tooltip": "this is an image",
-                    "width": 192,
-                    "height": 108
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        image:
+          - name: new_image
+            page_number: 1
+            x: 100
+            y: 100
+            required: false
+            tooltip: this is an image
+            width: 192
+            height: 108
         ```
     === "Command"
         ```shell
-        pypdfform create field dummy.pdf -f data.json -o output.pdf
+        pypdfform create field dummy.pdf -f data.yaml -o output.pdf
         ```

@@ -12,7 +12,7 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_text_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_text_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_text_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -23,7 +23,7 @@ def test_text_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
             "annotation",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_text_annotations.json"),
+            os.path.join(yaml_samples, "test_text_annotations.yaml"),
             "-o",
             output_path,
         ],
@@ -39,7 +39,7 @@ def test_text_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_uri_link_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_uri_link_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_uri_link_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -50,7 +50,7 @@ def test_uri_link_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
             "annotation",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_uri_link_annotations.json"),
+            os.path.join(yaml_samples, "test_uri_link_annotations.yaml"),
             "-o",
             output_path,
         ],
@@ -66,7 +66,7 @@ def test_uri_link_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_page_link_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_page_link_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_page_link_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -77,7 +77,7 @@ def test_page_link_annotations(pdf_samples, static_pdfs, json_samples, tmp_path)
             "annotation",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_page_link_annotations.json"),
+            os.path.join(yaml_samples, "test_page_link_annotations.yaml"),
             "-o",
             output_path,
         ],
@@ -93,7 +93,7 @@ def test_page_link_annotations(pdf_samples, static_pdfs, json_samples, tmp_path)
 
 
 @pytest.mark.cli_test
-def test_highlight_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_highlight_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_highlight_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -104,7 +104,7 @@ def test_highlight_annotations(pdf_samples, static_pdfs, json_samples, tmp_path)
             "annotation",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_highlight_annotations.json"),
+            os.path.join(yaml_samples, "test_highlight_annotations.yaml"),
             "-o",
             output_path,
         ],
@@ -120,7 +120,7 @@ def test_highlight_annotations(pdf_samples, static_pdfs, json_samples, tmp_path)
 
 
 @pytest.mark.cli_test
-def test_underline_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_underline_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_underline_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -131,7 +131,7 @@ def test_underline_annotations(pdf_samples, static_pdfs, json_samples, tmp_path)
             "annotation",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_underline_annotations.json"),
+            os.path.join(yaml_samples, "test_underline_annotations.yaml"),
             "-o",
             output_path,
         ],
@@ -147,7 +147,7 @@ def test_underline_annotations(pdf_samples, static_pdfs, json_samples, tmp_path)
 
 
 @pytest.mark.cli_test
-def test_squiggly_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_squiggly_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_squiggly_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -158,7 +158,7 @@ def test_squiggly_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
             "annotation",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_squiggly_annotations.json"),
+            os.path.join(yaml_samples, "test_squiggly_annotations.yaml"),
             "-o",
             output_path,
         ],
@@ -174,7 +174,7 @@ def test_squiggly_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_strikeout_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_strikeout_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_strikeout_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -185,7 +185,7 @@ def test_strikeout_annotations(pdf_samples, static_pdfs, json_samples, tmp_path)
             "annotation",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_strikeout_annotations.json"),
+            os.path.join(yaml_samples, "test_strikeout_annotations.yaml"),
             "-o",
             output_path,
         ],
@@ -201,7 +201,7 @@ def test_strikeout_annotations(pdf_samples, static_pdfs, json_samples, tmp_path)
 
 
 @pytest.mark.cli_test
-def test_rubber_stamp_annotations(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_rubber_stamp_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_rubber_stamp_annotations.pdf"
     )
@@ -214,7 +214,7 @@ def test_rubber_stamp_annotations(pdf_samples, static_pdfs, json_samples, tmp_pa
             "annotation",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_rubber_stamp_annotations.json"),
+            os.path.join(yaml_samples, "test_rubber_stamp_annotations.yaml"),
             "-o",
             output_path,
         ],

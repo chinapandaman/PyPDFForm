@@ -139,10 +139,10 @@ def _input_file_kind(data: Path) -> str:
 
 def load_data_file(data: Path, schema: dict, param_hint: str) -> Any:
     """
-    Loads a JSON or YAML CLI input file and validates it against a schema.
+    Loads a YAML or JSON CLI input file and validates it against a schema.
 
     Args:
-        data (Path): JSON or YAML file path.
+        data (Path): YAML or JSON file path.
         schema (dict): JSON schema to validate against.
         param_hint (str): CLI parameter associated with the input file.
 
