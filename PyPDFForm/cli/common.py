@@ -63,7 +63,7 @@ FIELD_NAMES = Annotated[
 ]
 
 
-def json_file_option(help_text: str):
+def data_file_option(help_text: str):
     """
     Creates the common validated structured data file option.
 
@@ -137,7 +137,7 @@ def _input_file_kind(data: Path) -> str:
     return "JSON"
 
 
-def load_json_file(data: Path, schema: dict, param_hint: str) -> Any:
+def load_data_file(data: Path, schema: dict, param_hint: str) -> Any:
     """
     Loads a JSON or YAML CLI input file and validates it against a schema.
 
@@ -217,8 +217,7 @@ def handle_font_registration(
     Args:
         obj (PdfWrapper): The wrapper for the PDF currently being modified.
         params (dict): The element or widget parameters loaded from the input
-            file. This
-            dictionary is mutated when it contains a `font` key.
+            file. This dictionary is mutated when it contains a `font` key.
         registered_font (dict): Mapping of source font paths to generated
             `PdfWrapper` font names for the current command invocation.
     """
@@ -265,7 +264,7 @@ def create_elements_from_file(
         output (Path, optional): Path where the modified PDF should be saved. If
             omitted, the input PDF is overwritten. Defaults to None.
     """
-    input_data = load_json_file(data, schema, param_hint)
+    input_data = load_data_file(data, schema, param_hint)
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     ungrouped_input = []

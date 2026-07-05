@@ -22,10 +22,10 @@ from .common import (
     INPUT_PDF,
     OPTIONAL_OUTPUT_PDF,
     cli_bad_parameter,
+    data_file_option,
     get_widget,
     handle_font_registration,
-    json_file_option,
-    load_json_file,
+    load_data_file,
 )
 from .schemas.update import FIELD_SCHEMA, RENAME_SCHEMA
 
@@ -192,7 +192,7 @@ def rename(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, json_file_option("JSON or YAML file with form field renames.")
+        Path, data_file_option("JSON or YAML file with form field renames.")
     ],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
@@ -224,7 +224,7 @@ def rename(
             param_hint="--use-full-widget-name",
         )
 
-    input_data = load_json_file(data, RENAME_SCHEMA, "--file")
+    input_data = load_data_file(data, RENAME_SCHEMA, "--file")
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     for item in input_data:
@@ -243,7 +243,7 @@ def field(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, json_file_option("JSON or YAML file with form field property updates.")
+        Path, data_file_option("JSON or YAML file with form field property updates.")
     ],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
@@ -268,7 +268,7 @@ def field(
         typer.BadParameter: Raised when the input file is invalid or a requested
             field does not exist.
     """
-    input_data = load_json_file(data, FIELD_SCHEMA, "--file")
+    input_data = load_data_file(data, FIELD_SCHEMA, "--file")
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     registered_font = {}

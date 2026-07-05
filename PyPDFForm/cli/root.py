@@ -21,7 +21,7 @@ from typing import Annotated
 import typer
 
 from .. import PdfWrapper, Widgets, __version__
-from .common import INPUT_PDF, OPTIONAL_OUTPUT_PDF, json_file_option, load_json_file
+from .common import INPUT_PDF, OPTIONAL_OUTPUT_PDF, data_file_option, load_data_file
 from .create import create_cli
 from .inspect import inspect_cli
 from .remove import remove_cli
@@ -151,7 +151,7 @@ def fill(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, json_file_option("JSON or YAML file with form field values.")
+        Path, data_file_option("JSON or YAML file with form field values.")
     ],
     output: OPTIONAL_OUTPUT_PDF = None,
     flatten: Annotated[
@@ -198,7 +198,7 @@ def fill(
                 ]
             }
 
-    input_data = load_json_file(data, schema, "--file")
+    input_data = load_data_file(data, schema, "--file")
     for k, each in obj.widgets.items():
         if (
             k in input_data
