@@ -3,7 +3,12 @@ Output demo.gif
 
 Set FontSize 19
 Set Width 1200
-Set Height 485
+Set Height 450
+
+Hide
+Type "export PS1='$ '" Enter
+Ctrl+L
+Show
 
 Sleep 500ms
 
@@ -15,7 +20,7 @@ Enter
 
 Sleep 500ms
 
-Type "cat data.json | jq"
+Type "cat data.yaml | yq"
 
 Sleep 500ms
 
@@ -23,13 +28,13 @@ Enter
 
 Sleep 500ms
 
-Type "pypdfform --need-appearances fill sample_template.pdf -f data.json -o output.pdf"
+Type "pypdfform --need-appearances fill sample_template.pdf -f data.yaml -o output.pdf"
 
 Sleep 500ms
 
 Enter
 
-Sleep 200ms
+Sleep 350ms
 
 Type "ls"
 
