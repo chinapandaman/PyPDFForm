@@ -46,7 +46,7 @@ Documentation = "https://chinapandaman.github.io/PyPDFForm/"
 cli = [
     "typer>=0.26.1,<1.0.0",
     "jsonschema>=4.26.0,<5.0.0",
-    "PyYAML>=6.0.2,<7.0.0",
+    "PyYAML>=6.0.3,<7.0.0",
 ]
 dev = [
     "coverage>=7.14.1,<8.0.0",

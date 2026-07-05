@@ -21,7 +21,7 @@ from .common import (
     REQUIRED_OUTPUT_PDF,
     cli_bad_parameter,
     create_elements_from_file,
-    json_file_option,
+    data_file_option,
 )
 from .schemas.create import ANNOTATION_SCHEMA, FIELD_SCHEMA, RAW_SCHEMA
 
@@ -195,7 +195,7 @@ def field(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, json_file_option("JSON or YAML file with form field definitions.")
+        Path, data_file_option("JSON or YAML file with form field definitions.")
     ],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
@@ -244,7 +244,7 @@ def raw(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, json_file_option("JSON or YAML file with raw element definitions.")
+        Path, data_file_option("JSON or YAML file with raw element definitions.")
     ],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
@@ -293,7 +293,7 @@ def annotation(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, json_file_option("JSON or YAML file with annotation definitions.")
+        Path, data_file_option("JSON or YAML file with annotation definitions.")
     ],
     output: OPTIONAL_OUTPUT_PDF = None,
 ) -> None:
