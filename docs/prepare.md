@@ -129,20 +129,9 @@ In the library examples, optional parameters are marked with `# optional`.
             comb: true
             font: path_to_a_ttf_file
             font_size: 15
-            font_color:
-              - 1
-              - 0
-              - 0
-            bg_color:
-              - 0
-              - 0
-              - 1
-              - 1
-            border_color:
-              - 1
-              - 0
-              - 0
-              - 1
+            font_color: [1, 0, 0]
+            bg_color: [0, 0, 1, 1]
+            border_color: [1, 0, 0, 1]
             border_width: 5
             alignment: 0
             multiline: true
@@ -195,20 +184,9 @@ In the library examples, optional parameters are marked with `# optional`.
             tooltip: this is a checkbox
             size: 30
             button_style: check
-            tick_color:
-              - 0
-              - 1
-              - 0
-            bg_color:
-              - 0
-              - 0
-              - 1
-              - 1
-            border_color:
-              - 1
-              - 1
-              - 0
-              - 1
+            tick_color: [0, 1, 0]
+            bg_color: [0, 0, 1, 1]
+            border_color: [1, 1, 0, 1]
             border_width: 5
         ```
     === "Command"
@@ -259,33 +237,16 @@ In the library examples, optional parameters are marked with `# optional`.
         radio:
           - name: new_radio_group
             page_number: 1
-            x:
-              - 50
-              - 100
-              - 150
-            y:
-              - 50
-              - 100
-              - 150
+            x: [50, 100, 150]
+            y: [50, 100, 150]
             required: false
             tooltip: this is a radio group
             size: 30
             button_style: check
             shape: square
-            tick_color:
-              - 0
-              - 1
-              - 0
-            bg_color:
-              - 0
-              - 0
-              - 1
-              - 1
-            border_color:
-              - 1
-              - 0
-              - 1
-              - 1
+            tick_color: [0, 1, 0]
+            bg_color: [0, 0, 1, 1]
+            border_color: [1, 0, 1, 1]
             border_width: 5
         ```
     === "Command"
@@ -366,30 +327,16 @@ In the library examples, optional parameters are marked with `# optional`.
             page_number: 1
             x: 57
             y: 700
-            options:
-              - foo
-              - bar
-              - foobar
+            options: [foo, bar, foobar]
             required: false
             tooltip: this is a dropdown
             width: 120
             height: 40
             font: path_to_a_ttf_file
             font_size: 15
-            font_color:
-              - 1
-              - 0
-              - 0
-            bg_color:
-              - 0
-              - 0
-              - 1
-              - 1
-            border_color:
-              - 0
-              - 1
-              - 0
-              - 1
+            font_color: [1, 0, 0]
+            bg_color: [0, 0, 1, 1]
+            border_color: [0, 1, 0, 1]
             border_width: 5
         ```
     === "custom_export.yaml"
@@ -400,12 +347,9 @@ In the library examples, optional parameters are marked with `# optional`.
             x: 57
             y: 700
             options:
-              - - option_1
-                - option_1_export_value
-              - - option_2
-                - option_2_export_value
-              - - option_3
-                - option_3_export_value
+              - [option_1, option_1_export_value]
+              - [option_2, option_2_export_value]
+              - [option_3, option_3_export_value]
         ```
     === "Command"
         ```shell

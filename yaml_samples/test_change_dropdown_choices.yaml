@@ -1,7 +1,2 @@
 dropdown_1:
-  choices:
-    - ''
-    - apple
-    - banana
-    - cherry
-    - dates
+  choices: ['', apple, banana, cherry, dates]

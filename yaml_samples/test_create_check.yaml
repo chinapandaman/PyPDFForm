@@ -7,18 +7,7 @@ check:
     tooltip: this is a checkbox
     size: 50
     button_style: cross
-    tick_color:
-      - 0
-      - 1
-      - 0
-    bg_color:
-      - 0
-      - 0
-      - 1
-      - 1
-    border_color:
-      - 1
-      - 1
-      - 0
-      - 1
+    tick_color: [0, 1, 0]
+    bg_color: [0, 0, 1, 1]
+    border_color: [1, 1, 0, 1]
     border_width: 5
