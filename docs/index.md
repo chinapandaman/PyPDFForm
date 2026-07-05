@@ -101,10 +101,7 @@ The goal is to make PDF form work straightforward, whether you are handling one 
     === "styles.yaml"
         ```yaml
         my_textfield:
-          font_color:
-            - 1
-            - 0
-            - 0
+          font_color: [1, 0, 0]
           alignment: 1
         ```
     === "data.yaml"

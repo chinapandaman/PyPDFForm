@@ -171,20 +171,11 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     === "data.yaml"
         ```yaml
         test:
-          font_color:
-            - 0.2
-            - 0
-            - 0.5
+          font_color: [0.2, 0, 0.5]
         test_2:
-          font_color:
-            - 1
-            - 0
-            - 0
+          font_color: [1, 0, 0]
         test_3:
-          font_color:
-            - 1
-            - 0
-            - 0
+          font_color: [1, 0, 0]
         ```
     === "Command"
         ```shell
@@ -461,27 +452,17 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     === "data.yaml"
         ```yaml
         dropdown_1:
-          choices:
-            - ''
-            - apple
-            - banana
-            - cherry
-            - dates
+          choices: ['', apple, banana, cherry, dates]
         ```
     === "custom_export.yaml"
         ```yaml
         dropdown_1:
           choices:
-            - - ''
-              - blank_export_value
-            - - apple
-              - apple_export_value
-            - - banana
-              - banana_export_value
-            - - cherry
-              - cherry_export_value
-            - - dates
-              - dates_export_value
+            - ['', blank_export_value]
+            - [apple, apple_export_value]
+            - [banana, banana_export_value]
+            - [cherry, cherry_export_value]
+            - [dates, dates_export_value]
         ```
     === "Command"
         ```shell
@@ -564,10 +545,7 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     === "data.yaml"
         ```yaml
         dropdown_1:
-          font_color:
-            - 1
-            - 0
-            - 0
+          font_color: [1, 0, 0]
         ```
     === "Command"
         ```shell

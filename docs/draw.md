@@ -56,20 +56,14 @@ Text can be drawn by specifying its content, coordinates, and optionally its fon
             y: 225
             font: path_to_a_ttf_file
             font_size: 12
-            font_color:
-              - 1
-              - 0
-              - 0
+            font_color: [1, 0, 0]
           - text: random text on page 2
             page_number: 2
             x: 300
             y: 225
             font: path_to_a_ttf_file
             font_size: 12
-            font_color:
-              - 1
-              - 0
-              - 0
+            font_color: [1, 0, 0]
         ```
     === "Command"
         ```shell
@@ -236,10 +230,7 @@ A line can be drawn by specifying starting and ending coordinates, and optionall
             src_y: 100
             dest_x: 200
             dest_y: 100
-            color:
-              - 0
-              - 0
-              - 1
+            color: [0, 0, 1]
         ```
     === "Command"
         ```shell
@@ -291,14 +282,8 @@ A rectangle can be drawn by specifying its coordinates and dimensions, and optio
             y: 100
             width: 100
             height: 200
-            color:
-              - 0
-              - 0
-              - 1
-            fill_color:
-              - 0
-              - 1
-              - 0
+            color: [0, 0, 1]
+            fill_color: [0, 1, 0]
         ```
     === "Command"
         ```shell
@@ -346,14 +331,8 @@ A circle can be drawn by specifying its center coordinates and radius, and optio
             center_x: 250
             center_y: 100
             radius: 100
-            color:
-              - 1
-              - 0
-              - 0
-            fill_color:
-              - 0
-              - 1
-              - 0
+            color: [1, 0, 0]
+            fill_color: [0, 1, 0]
         ```
     === "Command"
         ```shell
@@ -405,14 +384,8 @@ An ellipse can be drawn by specifying its bounding box coordinates, and optional
             y1: 100
             x2: 500
             y2: 250
-            color:
-              - 1
-              - 0
-              - 0
-            fill_color:
-              - 0
-              - 1
-              - 0
+            color: [1, 0, 0]
+            fill_color: [0, 1, 0]
         ```
     === "Command"
         ```shell

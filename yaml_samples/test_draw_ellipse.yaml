@@ -9,11 +9,5 @@ ellipse:
     y1: 100
     x2: 500
     y2: 250
-    color:
-      - 1
-      - 0
-      - 0
-    fill_color:
-      - 0
-      - 1
-      - 0
+    color: [1, 0, 0]
+    fill_color: [0, 1, 0]
