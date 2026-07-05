@@ -7,7 +7,7 @@ These examples use [sample_template.pdf](pdfs/sample_template.pdf).
 
 PDFs can execute JavaScript during interactions if supported by the viewer. PyPDFForm provides Python APIs and CLI commands to embed scripts into both the PDF document and its form fields.
 
-In CLI examples, field-level scripts are configured in `data.json` and applied with `update field`, unless the section says otherwise.
+In CLI examples, field-level scripts are configured in `data.yaml` and applied with `update field`, unless the section says otherwise.
 
 The examples below embed a script that displays an alert when the pointer hovers over the `test` field:
 
@@ -48,17 +48,14 @@ The examples below embed a script that displays an alert when the pointer hovers
         ```javascript
         app.alert("Hello World!");
         ```
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "on_hovered_over_javascript": "./alert.js"
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          on_hovered_over_javascript: ./alert.js
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ???+ tip
@@ -87,17 +84,14 @@ Set `on_hovered_over_javascript` to run code when the pointer hovers over a fiel
         ```javascript
         this.getField("test").value = "hovered over";
         ```
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "on_hovered_over_javascript": "./script.js"
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          on_hovered_over_javascript: ./script.js
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Execute JavaScript when hover ends
@@ -123,17 +117,14 @@ Set `on_hovered_off_javascript` to run code when the pointer leaves a field:
         ```javascript
         this.getField("test").value = "hovered off";
         ```
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "on_hovered_off_javascript": "./script.js"
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          on_hovered_off_javascript: ./script.js
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Execute JavaScript on mouse press
@@ -159,17 +150,14 @@ Set `on_mouse_pressed_javascript` to run code when a mouse button is pressed ins
         ```javascript
         this.getField("test").value = "mouse pressed";
         ```
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "on_mouse_pressed_javascript": "./script.js"
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          on_mouse_pressed_javascript: ./script.js
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Execute JavaScript on mouse release
@@ -195,17 +183,14 @@ Set `on_mouse_released_javascript` to run code when a mouse button is released i
         ```javascript
         this.getField("test").value = "mouse released";
         ```
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "on_mouse_released_javascript": "./script.js"
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          on_mouse_released_javascript: ./script.js
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Execute JavaScript on focus
@@ -231,17 +216,14 @@ Set `on_focused_javascript` to run code when a field gains focus:
         ```javascript
         this.getField("test").value = "focused";
         ```
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "on_focused_javascript": "./script.js"
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          on_focused_javascript: ./script.js
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Execute JavaScript on blur
@@ -267,17 +249,14 @@ Set `on_blurred_javascript` to run code when a field loses focus:
         ```javascript
         this.getField("test").value = "not focused";
         ```
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "on_blurred_javascript": "./script.js"
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          on_blurred_javascript: ./script.js
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Execute JavaScript on PDF open

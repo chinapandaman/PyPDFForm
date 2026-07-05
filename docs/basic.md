@@ -63,7 +63,7 @@ This section covers the basic entry points for PyPDFForm's Python API and CLI, a
         ```
     === "Command"
         ```shell
-        pypdfform fill sample_template.pdf -f data.yaml -o output.pdf
+        pypdfform fill sample_template.pdf -f data.json -o output.pdf
         ```
 
 ## Handling appearance streams

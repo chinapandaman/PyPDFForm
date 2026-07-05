@@ -72,23 +72,18 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
 === "CLI"
     In the CLI, provide a `.ttf` file path for each text field's `font` value:
 
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "font": "path_to_a_ttf_file"
-            },
-            "test_2": {
-                "font": "path_to_a_ttf_file"
-            },
-            "test_3": {
-                "font": "path_to_a_ttf_file"
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          font: path_to_a_ttf_file
+        test_2:
+          font: path_to_a_ttf_file
+        test_3:
+          font: path_to_a_ttf_file
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Change text field font size
@@ -123,25 +118,20 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Set each text field's `font_size` in JSON:
+    Set each text field's `font_size` in YAML:
 
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "font_size": 30.5
-            },
-            "test_2": {
-                "font_size": 20
-            },
-            "test_3": {
-                "font_size": 20
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          font_size: 30.5
+        test_2:
+          font_size: 20
+        test_3:
+          font_size: 20
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Change text field font color
@@ -176,37 +166,29 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Express each text field's RGB font color as a three-item JSON array:
+    Express each text field's RGB font color as a three-item YAML sequence:
 
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "font_color": [
-                    0.2,
-                    0,
-                    0.5
-                ]
-            },
-            "test_2": {
-                "font_color": [
-                    1,
-                    0,
-                    0
-                ]
-            },
-            "test_3": {
-                "font_color": [
-                    1,
-                    0,
-                    0
-                ]
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          font_color:
+            - 0.2
+            - 0
+            - 0.5
+        test_2:
+          font_color:
+            - 1
+            - 0
+            - 0
+        test_3:
+          font_color:
+            - 1
+            - 0
+            - 0
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Change text field alignment
@@ -241,25 +223,20 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Set each text field's `alignment` value in JSON, using `0` for left, `1` for center, and `2` for right:
+    Set each text field's `alignment` value in YAML, using `0` for left, `1` for center, and `2` for right:
 
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "alignment": 2
-            },
-            "test_2": {
-                "alignment": 1
-            },
-            "test_3": {
-                "alignment": 1
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          alignment: 2
+        test_2:
+          alignment: 1
+        test_3:
+          alignment: 1
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Change text field max length
@@ -294,25 +271,20 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Set each text field's `max_length` in JSON:
+    Set each text field's `max_length` in YAML:
 
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "max_length": 2
-            },
-            "test_2": {
-                "max_length": 4
-            },
-            "test_3": {
-                "max_length": 4
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          max_length: 2
+        test_2:
+          max_length: 4
+        test_3:
+          max_length: 4
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Enable text field character spacing (combs)
@@ -349,28 +321,23 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Set `comb` alongside the required `max_length` values in JSON:
+    Set `comb` alongside the required `max_length` values in YAML:
 
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "max_length": 2,
-                "comb": true
-            },
-            "test_2": {
-                "max_length": 4,
-                "comb": true
-            },
-            "test_3": {
-                "max_length": 4,
-                "comb": true
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          max_length: 2
+          comb: true
+        test_2:
+          max_length: 4
+          comb: true
+        test_3:
+          max_length: 4
+          comb: true
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ???+ warning
@@ -404,17 +371,14 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
 === "CLI"
     Set `multiline` to `true` for fields that should accept paragraph-style input:
 
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "multiline": true
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          multiline: true
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Change checkbox/radio button size
@@ -442,25 +406,20 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Set each checkbox's size, or each radio button group's size, in JSON:
+    Set each checkbox's size, or each radio button group's size, in YAML:
 
-    === "data.json"
-        ```json
-        {
-            "check": {
-                "size": 50
-            },
-            "check_2": {
-                "size": 40
-            },
-            "check_3": {
-                "size": 60
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        check:
+          size: 50
+        check_2:
+          size: 40
+        check_3:
+          size: 60
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Change dropdown field choices
@@ -497,54 +456,36 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
         form.write("output.pdf")
         ```
 === "CLI"
-    Put the replacement dropdown choices in JSON. Use strings for default export values or two-item arrays for custom export values:
+    Put the replacement dropdown choices in YAML. Use strings for default export values or two-item sequences for custom export values:
 
-    === "data.json"
-        ```json
-        {
-            "dropdown_1": {
-                "choices": [
-                    "",
-                    "apple",
-                    "banana",
-                    "cherry",
-                    "dates"
-                ]
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        dropdown_1:
+          choices:
+            - ''
+            - apple
+            - banana
+            - cherry
+            - dates
         ```
-    === "custom_export.json"
-        ```json
-        {
-            "dropdown_1": {
-                "choices": [
-                    [
-                        "",
-                        "blank_export_value"
-                    ],
-                    [
-                        "apple",
-                        "apple_export_value"
-                    ],
-                    [
-                        "banana",
-                        "banana_export_value"
-                    ],
-                    [
-                        "cherry",
-                        "cherry_export_value"
-                    ],
-                    [
-                        "dates",
-                        "dates_export_value"
-                    ]
-                ]
-            }
-        }
+    === "custom_export.yaml"
+        ```yaml
+        dropdown_1:
+          choices:
+            - - ''
+              - blank_export_value
+            - - apple
+              - apple_export_value
+            - - banana
+              - banana_export_value
+            - - cherry
+              - cherry_export_value
+            - - dates
+              - dates_export_value
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template_with_dropdown.pdf -f data.yaml -o output.pdf
         ```
 
 ## Change dropdown field font
@@ -566,17 +507,14 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
 === "CLI"
     In the CLI, provide a `.ttf` file path for the dropdown field's `font` value:
 
-    === "data.json"
-        ```json
-        {
-            "dropdown_1": {
-                "font": "path_to_a_ttf_file"
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        dropdown_1:
+          font: path_to_a_ttf_file
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template_with_dropdown.pdf -f data.yaml -o output.pdf
         ```
 
 ## Change dropdown field font size
@@ -594,19 +532,16 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Set the dropdown field's `font_size` in JSON:
+    Set the dropdown field's `font_size` in YAML:
 
-    === "data.json"
-        ```json
-        {
-            "dropdown_1": {
-                "font_size": 30
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        dropdown_1:
+          font_size: 30
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template_with_dropdown.pdf -f data.yaml -o output.pdf
         ```
 
 ## Change dropdown field font color
@@ -624,23 +559,19 @@ The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
     form.write("output.pdf")
     ```
 === "CLI"
-    Express the dropdown field's RGB font color as a three-item JSON array:
+    Express the dropdown field's RGB font color as a three-item YAML sequence:
 
-    === "data.json"
-        ```json
-        {
-            "dropdown_1": {
-                "font_color": [
-                    1,
-                    0,
-                    0
-                ]
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        dropdown_1:
+          font_color:
+            - 1
+            - 0
+            - 0
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template_with_dropdown.pdf -f data.yaml -o output.pdf
         ```
 
 ## Change field name
@@ -680,40 +611,27 @@ PyPDFForm lets you rename existing fields by updating their keys.
     Provide the old field keys and their `new_key` values to `update rename`:
 
     === "Update Multiple Fields"
-        === "data.json"
-            ```json
-            [
-                {
-                    "test": {
-                        "new_key": "test_text"
-                    }
-                },
-                {
-                    "test_2": {
-                        "new_key": "test_text_2"
-                    }
-                }
-            ]
+        === "data.yaml"
+            ```yaml
+            - test:
+                new_key: test_text
+            - test_2:
+                new_key: test_text_2
             ```
         === "Command"
             ```shell
-            pypdfform update rename sample_template.pdf -f data.json -o output.pdf
+            pypdfform update rename sample_template.pdf -f data.yaml -o output.pdf
             ```
     === "Using Index for Fields with the Same Key"
-        === "data.json"
-            ```json
-            [
-                {
-                    "Description[0]": {
-                        "new_key": "Description[1]",
-                        "index": 1
-                    }
-                }
-            ]
+        === "data.yaml"
+            ```yaml
+            - Description[0]:
+                new_key: Description[1]
+                index: 1
             ```
         === "Command"
             ```shell
-            pypdfform update rename 733.pdf -f data.json -o output.pdf
+            pypdfform update rename 733.pdf -f data.yaml -o output.pdf
             ```
 
 ## Change field editability
@@ -749,40 +667,32 @@ PyPDFForm lets you rename existing fields by updating their keys.
 === "CLI"
     The following example starts with a filled, flattened form and then makes selected fields editable again by setting `readonly` to `false`:
 
-    === "fill.json"
-        ```json
-        {
-            "test_1": "test_1",
-            "test_2": "test_2",
-            "test_3": "test_3",
-            "check_1": true,
-            "check_2": true,
-            "check_3": true,
-            "radio_1": 1,
-            "dropdown_1": 0
-        }
+    === "fill.yaml"
+        ```yaml
+        test_1: test_1
+        test_2: test_2
+        test_3: test_3
+        check_1: true
+        check_2: true
+        check_3: true
+        radio_1: 1
+        dropdown_1: 0
         ```
-    === "editable.json"
-        ```json
-        {
-            "test_2": {
-                "readonly": false
-            },
-            "check_3": {
-                "readonly": false
-            },
-            "radio_1": {
-                "readonly": false
-            },
-            "dropdown_1": {
-                "readonly": false
-            }
-        }
+    === "editable.yaml"
+        ```yaml
+        test_2:
+          readonly: false
+        check_3:
+          readonly: false
+        radio_1:
+          readonly: false
+        dropdown_1:
+          readonly: false
         ```
     === "Command"
         ```shell
-        pypdfform fill sample_template_with_dropdown.pdf -f fill.json -o flattened.pdf --flatten
-        pypdfform update field flattened.pdf -f editable.json -o output.pdf
+        pypdfform fill sample_template_with_dropdown.pdf -f fill.yaml -o flattened.pdf --flatten
+        pypdfform update field flattened.pdf -f editable.yaml -o output.pdf
         ```
 
 ## Change field visibility
@@ -801,17 +711,14 @@ PyPDFForm lets you rename existing fields by updating their keys.
 === "CLI"
     Set `hidden` to `true` or `false` for the fields whose visibility should change:
 
-    === "data.json"
-        ```json
-        {
-            "test": {
-                "hidden": true
-            }
-        }
+    === "data.yaml"
+        ```yaml
+        test:
+          hidden: true
         ```
     === "Command"
         ```shell
-        pypdfform update field sample_template.pdf -f data.json -o output.pdf
+        pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Remove form fields

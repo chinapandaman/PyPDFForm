@@ -13,7 +13,7 @@ runner = CliRunner()
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_index_snippets(pdf_samples, json_samples, tmp_path):
+def test_index_snippets(pdf_samples, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -26,7 +26,7 @@ def test_index_snippets(pdf_samples, json_samples, tmp_path):
             "raw",
             output_path,
             "-f",
-            os.path.join(json_samples, "landing_doc_examples", "labels.json"),
+            os.path.join(yaml_samples, "landing_doc_examples", "labels.yaml"),
         ],
     )
 
@@ -37,7 +37,7 @@ def test_index_snippets(pdf_samples, json_samples, tmp_path):
             "field",
             output_path,
             "-f",
-            os.path.join(json_samples, "landing_doc_examples", "fields.json"),
+            os.path.join(yaml_samples, "landing_doc_examples", "fields.yaml"),
         ],
     )
 
@@ -54,7 +54,7 @@ def test_index_snippets(pdf_samples, json_samples, tmp_path):
             "field",
             output_path,
             "-f",
-            os.path.join(json_samples, "landing_doc_examples", "styles.json"),
+            os.path.join(yaml_samples, "landing_doc_examples", "styles.yaml"),
         ],
     )
 
@@ -64,7 +64,7 @@ def test_index_snippets(pdf_samples, json_samples, tmp_path):
             "fill",
             output_path,
             "-f",
-            os.path.join(json_samples, "landing_doc_examples", "data.json"),
+            os.path.join(yaml_samples, "landing_doc_examples", "data.yaml"),
         ],
     )
 

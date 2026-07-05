@@ -47,42 +47,33 @@ Text can be drawn by specifying its content, coordinates, and optionally its fon
     1.  To use a custom font, see how to register it [here](font.md).
     2.  To use a custom font, see how to register it [here](font.md).
 === "CLI"
-    === "data.json"
-        ```json
-        {
-            "text": [
-                {
-                    "text": "random text",
-                    "page_number": 1,
-                    "x": 300,
-                    "y": 225,
-                    "font": "path_to_a_ttf_file",
-                    "font_size": 12,
-                    "font_color": [
-                        1,
-                        0,
-                        0
-                    ]
-                },
-                {
-                    "text": "random text on page 2",
-                    "page_number": 2,
-                    "x": 300,
-                    "y": 225,
-                    "font": "path_to_a_ttf_file",
-                    "font_size": 12,
-                    "font_color": [
-                        1,
-                        0,
-                        0
-                    ]
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        text:
+          - text: random text
+            page_number: 1
+            x: 300
+            y: 225
+            font: path_to_a_ttf_file
+            font_size: 12
+            font_color:
+              - 1
+              - 0
+              - 0
+          - text: random text on page 2
+            page_number: 2
+            x: 300
+            y: 225
+            font: path_to_a_ttf_file
+            font_size: 12
+            font_color:
+              - 1
+              - 0
+              - 0
         ```
     === "Command"
         ```shell
-        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        pypdfform create raw sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Draw image
@@ -178,34 +169,27 @@ For the `rotation` parameter, positive values rotate images counterclockwise, an
         pdf.write("output.pdf")
         ```
 === "CLI"
-    === "data.json"
-        ```json
-        {
-            "image": [
-                {
-                    "image": "sample_image.jpg",
-                    "page_number": 1,
-                    "x": 100,
-                    "y": 100,
-                    "width": 400,
-                    "height": 225,
-                    "rotation": 0
-                },
-                {
-                    "image": "sample_image.jpg",
-                    "page_number": 2,
-                    "x": 100,
-                    "y": 100,
-                    "width": 400,
-                    "height": 225,
-                    "rotation": 180
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        image:
+          - image: sample_image.jpg
+            page_number: 1
+            x: 100
+            y: 100
+            width: 400
+            height: 225
+            rotation: 0
+          - image: sample_image.jpg
+            page_number: 2
+            x: 100
+            y: 100
+            width: 400
+            height: 225
+            rotation: 180
         ```
     === "Command"
         ```shell
-        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        pypdfform create raw sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Draw line
@@ -239,35 +223,27 @@ A line can be drawn by specifying starting and ending coordinates, and optionall
     pdf.write("output.pdf")
     ```
 === "CLI"
-    === "data.json"
-        ```json
-        {
-            "line": [
-                {
-                    "page_number": 1,
-                    "src_x": 100,
-                    "src_y": 100,
-                    "dest_x": 100,
-                    "dest_y": 200
-                },
-                {
-                    "page_number": 1,
-                    "src_x": 100,
-                    "src_y": 100,
-                    "dest_x": 200,
-                    "dest_y": 100,
-                    "color": [
-                        0,
-                        0,
-                        1
-                    ]
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        line:
+          - page_number: 1
+            src_x: 100
+            src_y: 100
+            dest_x: 100
+            dest_y: 200
+          - page_number: 1
+            src_x: 100
+            src_y: 100
+            dest_x: 200
+            dest_y: 100
+            color:
+              - 0
+              - 0
+              - 1
         ```
     === "Command"
         ```shell
-        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        pypdfform create raw sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Draw rectangle
@@ -302,40 +278,31 @@ A rectangle can be drawn by specifying its coordinates and dimensions, and optio
     pdf.write("output.pdf")
     ```
 === "CLI"
-    === "data.json"
-        ```json
-        {
-            "rectangle": [
-                {
-                    "page_number": 1,
-                    "x": 100,
-                    "y": 100,
-                    "width": 200,
-                    "height": 100
-                },
-                {
-                    "page_number": 1,
-                    "x": 400,
-                    "y": 100,
-                    "width": 100,
-                    "height": 200,
-                    "color": [
-                        0,
-                        0,
-                        1
-                    ],
-                    "fill_color": [
-                        0,
-                        1,
-                        0
-                    ]
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        rectangle:
+          - page_number: 1
+            x: 100
+            y: 100
+            width: 200
+            height: 100
+          - page_number: 1
+            x: 400
+            y: 100
+            width: 100
+            height: 200
+            color:
+              - 0
+              - 0
+              - 1
+            fill_color:
+              - 0
+              - 1
+              - 0
         ```
     === "Command"
         ```shell
-        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        pypdfform create raw sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Draw circle
@@ -368,38 +335,29 @@ A circle can be drawn by specifying its center coordinates and radius, and optio
     pdf.write("output.pdf")
     ```
 === "CLI"
-    === "data.json"
-        ```json
-        {
-            "circle": [
-                {
-                    "page_number": 1,
-                    "center_x": 100,
-                    "center_y": 100,
-                    "radius": 50
-                },
-                {
-                    "page_number": 1,
-                    "center_x": 250,
-                    "center_y": 100,
-                    "radius": 100,
-                    "color": [
-                        1,
-                        0,
-                        0
-                    ],
-                    "fill_color": [
-                        0,
-                        1,
-                        0
-                    ]
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        circle:
+          - page_number: 1
+            center_x: 100
+            center_y: 100
+            radius: 50
+          - page_number: 1
+            center_x: 250
+            center_y: 100
+            radius: 100
+            color:
+              - 1
+              - 0
+              - 0
+            fill_color:
+              - 0
+              - 1
+              - 0
         ```
     === "Command"
         ```shell
-        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        pypdfform create raw sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Draw ellipse
@@ -434,38 +392,29 @@ An ellipse can be drawn by specifying its bounding box coordinates, and optional
     pdf.write("output.pdf")
     ```
 === "CLI"
-    === "data.json"
-        ```json
-        {
-            "ellipse": [
-                {
-                    "page_number": 1,
-                    "x1": 100,
-                    "y1": 100,
-                    "x2": 250,
-                    "y2": 200
-                },
-                {
-                    "page_number": 1,
-                    "x1": 300,
-                    "y1": 100,
-                    "x2": 500,
-                    "y2": 250,
-                    "color": [
-                        1,
-                        0,
-                        0
-                    ],
-                    "fill_color": [
-                        0,
-                        1,
-                        0
-                    ]
-                }
-            ]
-        }
+    === "data.yaml"
+        ```yaml
+        ellipse:
+          - page_number: 1
+            x1: 100
+            y1: 100
+            x2: 250
+            y2: 200
+          - page_number: 1
+            x1: 300
+            y1: 100
+            x2: 500
+            y2: 250
+            color:
+              - 1
+              - 0
+              - 0
+            fill_color:
+              - 0
+              - 1
+              - 0
         ```
     === "Command"
         ```shell
-        pypdfform create raw sample_template.pdf -f data.json -o output.pdf
+        pypdfform create raw sample_template.pdf -f data.yaml -o output.pdf
         ```

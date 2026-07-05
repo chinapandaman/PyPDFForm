@@ -121,7 +121,7 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
     @pytest.mark.cli_test
     def test_fill(pdf_samples, tmp_path):
         expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
-        input_path = os.path.join(tmp_path, "input.json")
+        input_path = os.path.join(tmp_path, "input.yaml")
         output_path = os.path.join(tmp_path, "output.pdf")
         fill_data = {
             "test": "test_1",
@@ -133,7 +133,7 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
         }
 
         with open(input_path, "w") as f:
-            json.dump(fill_data, f)
+            yaml.safe_dump(fill_data, f)
 
         result = runner.invoke(
             cli_app,
@@ -161,6 +161,7 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
 
     ```python
     import pytest
+    import yaml
     from typer.testing import CliRunner
 
     from PyPDFForm.cli.root import cli_app
@@ -168,15 +169,15 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
     runner = CliRunner()
     ```
 
-    The test starts by defining the expected PDF path, the temporary JSON input path, and the output path:
+    The test starts by defining the expected PDF path, the temporary YAML input path, and the output path:
 
     ```python
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
-    input_path = os.path.join(tmp_path, "input.json")
+    input_path = os.path.join(tmp_path, "input.yaml")
     output_path = os.path.join(tmp_path, "output.pdf")
     ```
 
-    The test then writes the fill dictionary to a JSON file in `tmp_path`:
+    The test then writes the fill dictionary to a YAML file in `tmp_path`:
 
     ```python
     fill_data = {
@@ -189,7 +190,7 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
     }
 
     with open(input_path, "w") as f:
-        json.dump(fill_data, f)
+        yaml.safe_dump(fill_data, f)
     ```
 
     Next, the test invokes the `fill` command against `sample_template.pdf` from `pdf_samples`:

@@ -1,6 +1,6 @@
 # Fill PDF forms
 
-PyPDFForm fills PDF forms from a mapping of field names to values. In the library, that mapping is a Python dictionary; in the CLI, it is a JSON object.
+PyPDFForm fills PDF forms from a mapping of field names to values. In the library, that mapping is a Python dictionary; in the CLI, it is a YAML mapping.
 
 Most fields use flat, non-nested values. Image and signature fields can also use nested CLI objects when you need per-field options such as `preserve_aspect_ratio`.
 
@@ -29,20 +29,18 @@ Use string values for text fields and boolean values for checkboxes. The followi
     filled.write("output.pdf")
     ```
 === "CLI"
-    === "data.json"
-        ```json
-        {
-            "test": "test_1",
-            "check": true,
-            "test_2": "test_2",
-            "check_2": false,
-            "test_3": "test_3",
-            "check_3": true
-        }
+    === "data.yaml"
+        ```yaml
+        test: test_1
+        check: true
+        test_2: test_2
+        check_2: false
+        test_3: test_3
+        check_3: true
         ```
     === "Command"
         ```shell
-        pypdfform fill sample_template.pdf -f data.json -o output.pdf
+        pypdfform fill sample_template.pdf -f data.yaml -o output.pdf
         ```
 
 ## Fill radio button group
@@ -67,17 +65,15 @@ Fill each radio button group with the zero-based index of the option to select. 
     filled.write("output.pdf")
     ```
 === "CLI"
-    === "data.json"
-        ```json
-        {
-            "radio_1": 0,
-            "radio_2": 1,
-            "radio_3": 2
-        }
+    === "data.yaml"
+        ```yaml
+        radio_1: 0
+        radio_2: 1
+        radio_3: 2
         ```
     === "Command"
         ```shell
-        pypdfform fill sample_template_with_radio_button.pdf -f data.json -o output.pdf
+        pypdfform fill sample_template_with_radio_button.pdf -f data.yaml -o output.pdf
         ```
 
 ## Fill dropdown field
@@ -114,21 +110,17 @@ A dropdown can be filled with either the zero-based option index or the option t
         filled.write("output.pdf")
         ```
 === "CLI"
-    === "data.json"
-        ```json
-        {
-            "dropdown_1": 1
-        }
+    === "data.yaml"
+        ```yaml
+        dropdown_1: 1
         ```
-    === "string_value.json"
-        ```json
-        {
-            "dropdown_1": "bar"
-        }
+    === "string_value.yaml"
+        ```yaml
+        dropdown_1: bar
         ```
     === "Command"
         ```shell
-        pypdfform fill sample_template_with_dropdown.pdf -f data.json -o output.pdf
+        pypdfform fill sample_template_with_dropdown.pdf -f data.yaml -o output.pdf
         ```
 
 ???+ note
@@ -199,24 +191,19 @@ The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [
         pdf.write("output.pdf")
         ```
 === "CLI"
-    === "data.json"
-        ```json
-        {
-            "signature": "sample_signature.png"
-        }
+    === "data.yaml"
+        ```yaml
+        signature: sample_signature.png
         ```
-    === "aspect_ratio.json"
-        ```json
-        {
-            "signature": {
-                "path": "sample_signature.png",
-                "preserve_aspect_ratio": false
-            }
-        }
+    === "aspect_ratio.yaml"
+        ```yaml
+        signature:
+          path: sample_signature.png
+          preserve_aspect_ratio: false
         ```
     === "Command"
         ```shell
-        pypdfform fill sample_template_with_signature.pdf -f data.json -o output.pdf
+        pypdfform fill sample_template_with_signature.pdf -f data.yaml -o output.pdf
         ```
 
 ## Fill image field
@@ -284,22 +271,17 @@ The examples below use [this PDF](pdfs/sample_template_with_image_field.pdf) and
         pdf.write("output.pdf")
         ```
 === "CLI"
-    === "data.json"
-        ```json
-        {
-            "image_1": "sample_image.jpg"
-        }
+    === "data.yaml"
+        ```yaml
+        image_1: sample_image.jpg
         ```
-    === "aspect_ratio.json"
-        ```json
-        {
-            "image_1": {
-                "path": "sample_image.jpg",
-                "preserve_aspect_ratio": true
-            }
-        }
+    === "aspect_ratio.yaml"
+        ```yaml
+        image_1:
+          path: sample_image.jpg
+          preserve_aspect_ratio: true
         ```
     === "Command"
         ```shell
-        pypdfform fill sample_template_with_image_field.pdf -f data.json -o output.pdf
+        pypdfform fill sample_template_with_image_field.pdf -f data.yaml -o output.pdf
         ```

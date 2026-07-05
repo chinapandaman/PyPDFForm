@@ -5,6 +5,7 @@ import json
 import os
 
 import pytest
+import yaml
 from pypdf import PdfReader
 from typer.testing import CliRunner
 
@@ -37,7 +38,7 @@ def test_change_title(static_pdfs, tmp_path):
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_change_text_font(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_text_font(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -48,7 +49,7 @@ def test_change_text_font(pdf_samples, static_pdfs, json_samples, tmp_path):
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_text_font.json"),
+            os.path.join(yaml_samples, "test_change_text_font.yaml"),
             "-o",
             output_path,
         ],
@@ -61,7 +62,7 @@ def test_change_text_font(pdf_samples, static_pdfs, json_samples, tmp_path):
             "fill",
             output_path,
             "-f",
-            os.path.join(json_samples, "test_fill_text_check.json"),
+            os.path.join(yaml_samples, "test_fill_text_check.yaml"),
         ],
     )
 
@@ -74,7 +75,7 @@ def test_change_text_font(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_change_text_font_size(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_text_font_size(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_size.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -85,7 +86,7 @@ def test_change_text_font_size(pdf_samples, static_pdfs, json_samples, tmp_path)
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_text_font_size.json"),
+            os.path.join(yaml_samples, "test_change_text_font_size.yaml"),
             "-o",
             output_path,
         ],
@@ -98,7 +99,7 @@ def test_change_text_font_size(pdf_samples, static_pdfs, json_samples, tmp_path)
             "fill",
             output_path,
             "-f",
-            os.path.join(json_samples, "test_fill_text_check.json"),
+            os.path.join(yaml_samples, "test_fill_text_check.yaml"),
         ],
     )
 
@@ -111,7 +112,7 @@ def test_change_text_font_size(pdf_samples, static_pdfs, json_samples, tmp_path)
 
 
 @pytest.mark.cli_test
-def test_change_text_font_color(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_text_font_color(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_color.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -122,7 +123,7 @@ def test_change_text_font_color(pdf_samples, static_pdfs, json_samples, tmp_path
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_text_font_color.json"),
+            os.path.join(yaml_samples, "test_change_text_font_color.yaml"),
             "-o",
             output_path,
         ],
@@ -135,7 +136,7 @@ def test_change_text_font_color(pdf_samples, static_pdfs, json_samples, tmp_path
             "fill",
             output_path,
             "-f",
-            os.path.join(json_samples, "test_fill_text_check.json"),
+            os.path.join(yaml_samples, "test_fill_text_check.yaml"),
         ],
     )
 
@@ -148,7 +149,7 @@ def test_change_text_font_color(pdf_samples, static_pdfs, json_samples, tmp_path
 
 
 @pytest.mark.cli_test
-def test_change_text_alignment(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_text_alignment(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_alignment.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -159,7 +160,7 @@ def test_change_text_alignment(pdf_samples, static_pdfs, json_samples, tmp_path)
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_text_alignment.json"),
+            os.path.join(yaml_samples, "test_change_text_alignment.yaml"),
             "-o",
             output_path,
         ],
@@ -172,7 +173,7 @@ def test_change_text_alignment(pdf_samples, static_pdfs, json_samples, tmp_path)
             "fill",
             output_path,
             "-f",
-            os.path.join(json_samples, "test_fill_text_check.json"),
+            os.path.join(yaml_samples, "test_fill_text_check.yaml"),
         ],
     )
 
@@ -185,7 +186,7 @@ def test_change_text_alignment(pdf_samples, static_pdfs, json_samples, tmp_path)
 
 
 @pytest.mark.cli_test
-def test_change_text_max_length(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_text_max_length(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_max_length.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -196,7 +197,7 @@ def test_change_text_max_length(pdf_samples, static_pdfs, json_samples, tmp_path
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_text_max_length.json"),
+            os.path.join(yaml_samples, "test_change_text_max_length.yaml"),
             "-o",
             output_path,
         ],
@@ -209,7 +210,7 @@ def test_change_text_max_length(pdf_samples, static_pdfs, json_samples, tmp_path
             "fill",
             output_path,
             "-f",
-            os.path.join(json_samples, "test_change_text_max_length_comb_data.json"),
+            os.path.join(yaml_samples, "test_change_text_max_length_comb_data.yaml"),
         ],
     )
 
@@ -222,7 +223,7 @@ def test_change_text_max_length(pdf_samples, static_pdfs, json_samples, tmp_path
 
 
 @pytest.mark.cli_test
-def test_change_text_comb(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_text_comb(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_comb.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -233,7 +234,7 @@ def test_change_text_comb(pdf_samples, static_pdfs, json_samples, tmp_path):
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_text_comb.json"),
+            os.path.join(yaml_samples, "test_change_text_comb.yaml"),
             "-o",
             output_path,
         ],
@@ -246,7 +247,7 @@ def test_change_text_comb(pdf_samples, static_pdfs, json_samples, tmp_path):
             "fill",
             output_path,
             "-f",
-            os.path.join(json_samples, "test_change_text_max_length_comb_data.json"),
+            os.path.join(yaml_samples, "test_change_text_max_length_comb_data.yaml"),
         ],
     )
 
@@ -259,12 +260,12 @@ def test_change_text_comb(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_change_text_multiline(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_text_multiline(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_multiline.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
-    data_json = os.path.join(tmp_path, "data.json")
-    with open(data_json, "w", encoding="utf-8") as f:
-        json.dump(
+    data_yaml = os.path.join(tmp_path, "data.yaml")
+    with open(data_yaml, "w", encoding="utf-8") as f:
+        yaml.safe_dump(
             {
                 "test": "test_1\ntest_1",
                 "check": True,
@@ -283,7 +284,7 @@ def test_change_text_multiline(pdf_samples, static_pdfs, json_samples, tmp_path)
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_text_multiline.json"),
+            os.path.join(yaml_samples, "test_change_text_multiline.yaml"),
             "-o",
             output_path,
         ],
@@ -296,7 +297,7 @@ def test_change_text_multiline(pdf_samples, static_pdfs, json_samples, tmp_path)
             "fill",
             output_path,
             "-f",
-            data_json,
+            data_yaml,
         ],
     )
 
@@ -309,12 +310,12 @@ def test_change_text_multiline(pdf_samples, static_pdfs, json_samples, tmp_path)
 
 
 @pytest.mark.cli_test
-def test_change_check_size(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_check_size(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_check_size.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
-    data_json = os.path.join(tmp_path, "data.json")
-    with open(data_json, "w", encoding="utf-8") as f:
-        json.dump(
+    data_yaml = os.path.join(tmp_path, "data.yaml")
+    with open(data_yaml, "w", encoding="utf-8") as f:
+        yaml.safe_dump(
             {
                 "check": True,
                 "check_2": True,
@@ -330,7 +331,7 @@ def test_change_check_size(pdf_samples, static_pdfs, json_samples, tmp_path):
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_check_size.json"),
+            os.path.join(yaml_samples, "test_change_check_size.yaml"),
             "-o",
             output_path,
         ],
@@ -343,7 +344,7 @@ def test_change_check_size(pdf_samples, static_pdfs, json_samples, tmp_path):
             "fill",
             output_path,
             "-f",
-            data_json,
+            data_yaml,
         ],
     )
 
@@ -356,7 +357,7 @@ def test_change_check_size(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_change_dropdown_choices(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_dropdown_choices(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_choices.pdf"
     )
@@ -369,7 +370,7 @@ def test_change_dropdown_choices(pdf_samples, static_pdfs, json_samples, tmp_pat
             "field",
             os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_dropdown_choices.json"),
+            os.path.join(yaml_samples, "test_change_dropdown_choices.yaml"),
             "-o",
             output_path,
         ],
@@ -386,7 +387,7 @@ def test_change_dropdown_choices(pdf_samples, static_pdfs, json_samples, tmp_pat
 
 @pytest.mark.cli_test
 def test_change_dropdown_choices_with_export_values(
-    pdf_samples, static_pdfs, json_samples, tmp_path
+    pdf_samples, static_pdfs, yaml_samples, tmp_path
 ):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_choices_with_export_values.pdf"
@@ -401,7 +402,7 @@ def test_change_dropdown_choices_with_export_values(
             os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
             "-f",
             os.path.join(
-                json_samples, "test_change_dropdown_choices_with_export_values.json"
+                yaml_samples, "test_change_dropdown_choices_with_export_values.yaml"
             ),
             "-o",
             output_path,
@@ -419,7 +420,7 @@ def test_change_dropdown_choices_with_export_values(
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_change_dropdown_font(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_dropdown_font(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_font.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -430,7 +431,7 @@ def test_change_dropdown_font(pdf_samples, static_pdfs, json_samples, tmp_path):
             "field",
             os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_dropdown_font.json"),
+            os.path.join(yaml_samples, "test_change_dropdown_font.yaml"),
             "-o",
             output_path,
         ],
@@ -446,7 +447,7 @@ def test_change_dropdown_font(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_change_dropdown_font_size(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_dropdown_font_size(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_font_size.pdf"
     )
@@ -459,7 +460,7 @@ def test_change_dropdown_font_size(pdf_samples, static_pdfs, json_samples, tmp_p
             "field",
             os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_dropdown_font_size.json"),
+            os.path.join(yaml_samples, "test_change_dropdown_font_size.yaml"),
             "-o",
             output_path,
         ],
@@ -475,7 +476,7 @@ def test_change_dropdown_font_size(pdf_samples, static_pdfs, json_samples, tmp_p
 
 
 @pytest.mark.cli_test
-def test_change_dropdown_font_color(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_dropdown_font_color(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_font_color.pdf"
     )
@@ -488,7 +489,7 @@ def test_change_dropdown_font_color(pdf_samples, static_pdfs, json_samples, tmp_
             "field",
             os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_dropdown_font_color.json"),
+            os.path.join(yaml_samples, "test_change_dropdown_font_color.yaml"),
             "-o",
             output_path,
         ],
@@ -504,7 +505,7 @@ def test_change_dropdown_font_color(pdf_samples, static_pdfs, json_samples, tmp_
 
 
 @pytest.mark.cli_test
-def test_update_key(static_pdfs, json_samples, tmp_path):
+def test_update_key(static_pdfs, yaml_samples, tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -514,7 +515,7 @@ def test_update_key(static_pdfs, json_samples, tmp_path):
             "rename",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_update_key.json"),
+            os.path.join(yaml_samples, "test_update_key.yaml"),
             "-o",
             output_path,
         ],
@@ -533,10 +534,10 @@ def test_update_key(static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_update_key_index(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_update_key_index(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_update_key_index.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
-    sample_data = os.path.join(tmp_path, "sample_data.json")
+    sample_data = os.path.join(tmp_path, "sample_data.yaml")
 
     result = runner.invoke(
         cli_app,
@@ -545,7 +546,7 @@ def test_update_key_index(pdf_samples, static_pdfs, json_samples, tmp_path):
             "rename",
             os.path.join(static_pdfs, "733.pdf"),
             "-f",
-            os.path.join(json_samples, "test_update_key_index.json"),
+            os.path.join(yaml_samples, "test_update_key_index.yaml"),
             "-o",
             output_path,
         ],
@@ -558,7 +559,7 @@ def test_update_key_index(pdf_samples, static_pdfs, json_samples, tmp_path):
     )
 
     with open(sample_data, "w", encoding="utf-8") as f:
-        json.dump(json.loads(result.output), f)
+        yaml.safe_dump(json.loads(result.output), f)
 
     runner.invoke(
         cli_app,
@@ -579,14 +580,14 @@ def test_update_key_index(pdf_samples, static_pdfs, json_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_change_field_editability(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_field_editability(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_editability.pdf"
     )
     output_path = os.path.join(tmp_path, "output.pdf")
-    data_json = os.path.join(tmp_path, "data.json")
-    with open(data_json, "w", encoding="utf-8") as f:
-        json.dump(
+    data_yaml = os.path.join(tmp_path, "data.yaml")
+    with open(data_yaml, "w", encoding="utf-8") as f:
+        yaml.safe_dump(
             {
                 "test_1": "test_1",
                 "test_2": "test_2",
@@ -606,7 +607,7 @@ def test_change_field_editability(pdf_samples, static_pdfs, json_samples, tmp_pa
             "fill",
             os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
             "-f",
-            data_json,
+            data_yaml,
             "-o",
             output_path,
             "--flatten",
@@ -620,7 +621,7 @@ def test_change_field_editability(pdf_samples, static_pdfs, json_samples, tmp_pa
             "field",
             output_path,
             "-f",
-            os.path.join(json_samples, "test_change_field_editability.json"),
+            os.path.join(yaml_samples, "test_change_field_editability.yaml"),
             "-o",
             output_path,
         ],
@@ -636,7 +637,7 @@ def test_change_field_editability(pdf_samples, static_pdfs, json_samples, tmp_pa
 
 
 @pytest.mark.cli_test
-def test_change_field_visibility(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_change_field_visibility(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_visibility.pdf"
     )
@@ -649,7 +650,7 @@ def test_change_field_visibility(pdf_samples, static_pdfs, json_samples, tmp_pat
             "field",
             os.path.join(static_pdfs, "sample_template.pdf"),
             "-f",
-            os.path.join(json_samples, "test_change_field_visibility.json"),
+            os.path.join(yaml_samples, "test_change_field_visibility.yaml"),
             "-o",
             output_path,
         ],
