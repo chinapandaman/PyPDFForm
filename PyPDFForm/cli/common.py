@@ -218,15 +218,17 @@ def handle_font_registration(
         obj (PdfWrapper): The wrapper for the PDF currently being modified.
         params (dict): The element or widget parameters loaded from the input
             file. This dictionary is mutated when it contains a `font` key.
-        registered_font (dict): Mapping of source font paths to generated
-            `PdfWrapper` font names for the current command invocation.
+        registered_font (dict): Mapping of resolved source font paths to
+            generated `PdfWrapper` font names for the current command
+            invocation.
     """
     if "font" in params:
-        if params["font"] not in registered_font:
+        font_path = str(Path(params["font"]).resolve())
+        if font_path not in registered_font:
             font_name = f"new_font_{len(registered_font)}"
-            obj.register_font(font_name, params["font"])
-            registered_font[params["font"]] = font_name
-        params["font"] = registered_font[params["font"]]
+            obj.register_font(font_name, font_path)
+            registered_font[font_path] = font_name
+        params["font"] = registered_font[font_path]
 
 
 def create_elements_from_file(
