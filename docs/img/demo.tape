@@ -5,11 +5,6 @@ Set FontSize 19
 Set Width 1200
 Set Height 450
 
-Hide
-Type "export PS1='$ '" Enter
-Ctrl+L
-Show
-
 Sleep 500ms
 
 Type "ls"
@@ -34,7 +29,7 @@ Sleep 500ms
 
 Enter
 
-Sleep 350ms
+Sleep 500ms
 
 Type "ls"
 
