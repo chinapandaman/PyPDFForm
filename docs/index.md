@@ -117,6 +117,6 @@ The goal is to make PDF form work straightforward, whether you are handling one 
 - :material-file-document-outline: Read the [__User Guide__](install.md) for detailed usage guides.
 - :material-code-braces: Read the [__Developer Guide__](dev_intro.md) if you want to contribute.
 - :fontawesome-solid-bug: Submit [__GitHub Issues__](https://github.com/chinapandaman/PyPDFForm/issues) to report bugs.
-- :fontawesome-regular-star: [__Star__](https://github.com/chinapandaman/PyPDFForm/stargazers) to support this project.
+- :fontawesome-regular-star: [__Star__](https://github.com/chinapandaman/PyPDFForm) to support this project.
 
 </div>
