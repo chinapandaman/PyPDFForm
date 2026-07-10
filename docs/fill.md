@@ -1,14 +1,14 @@
 # Fill PDF forms
 
-PyPDFForm fills PDF forms from a mapping of field names to values. In the library, that mapping is a Python dictionary; in the CLI, it can be a YAML or JSON file or a set of dynamic field options.
+PyPDFForm fills PDF forms from a mapping of field names to values. The library accepts this mapping as a Python dictionary. The CLI `fill` command accepts a YAML or JSON file or a set of field options.
 
 Most fields use flat, non-nested values. Image and signature fields can also use nested CLI objects when you need per-field options such as `preserve_aspect_ratio`.
 
-Filled forms stay editable by default. Pass `flatten=True` to `fill`, or add `--flatten` to the CLI command, to flatten fields after filling so their values can no longer be edited.
+Filled forms stay editable by default. Pass `flatten=True` to the library's `fill` method, or add `--flatten` to the CLI `fill` command, to prevent further edits to the filled fields.
 
-## Fill from a data file or CLI options (CLI only)
+## CLI fill inputs
 
-The CLI accepts form data from a YAML or JSON file passed with `--file` / `-f`:
+The `fill` command can read field values from a YAML or JSON file supplied with `--file` / `-f`:
 
 === "data.yaml"
     ```yaml
@@ -24,7 +24,7 @@ The CLI accepts form data from a YAML or JSON file passed with `--file` / `-f`:
     pypdfform fill sample_template.pdf -f data.yaml -o output.pdf
     ```
 
-You can pass the same mapping directly as dynamic options, using each field name as an option name:
+Alternatively, pass the mapping directly by using each field name as an option:
 
 ```shell
 pypdfform fill sample_template.pdf \
@@ -37,7 +37,7 @@ pypdfform fill sample_template.pdf \
     -o output.pdf
 ```
 
-If `--file` and dynamic options are both present, the file data takes precedence.
+When `--file` and field options are supplied together, `--file` takes precedence.
 
 ## Fill text field and checkbox
 
