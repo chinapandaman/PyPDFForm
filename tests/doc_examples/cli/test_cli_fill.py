@@ -11,6 +11,42 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
+def test_fill_dynamic_options(pdf_samples, static_pdfs, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "fill",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "--test",
+            "test_1",
+            "--check",
+            "true",
+            "--test_2",
+            "test_2",
+            "--check_2",
+            "false",
+            "--test_3",
+            "test_3",
+            "--check_3",
+            "true",
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual
+
+
+@pytest.mark.cli_test
 def test_fill_text_check(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")

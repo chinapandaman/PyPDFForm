@@ -114,6 +114,21 @@ def test_fill_yaml_schema_error(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+def test_fill_malformed_dynamic_options(pdf_samples):
+    for options in (("--check",), ("xxcheck", "true")):
+        result = runner.invoke(
+            cli_app,
+            [
+                "fill",
+                os.path.join(pdf_samples, "sample_template.pdf"),
+                *options,
+            ],
+        )
+
+        assert_cli_error(result, "Invalid value for form field options")
+
+
+@pytest.mark.cli_test
 def test_create_extract_start_after_end(pdf_samples, tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
 
