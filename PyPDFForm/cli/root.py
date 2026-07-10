@@ -8,7 +8,7 @@ commands. The root callback collects global flags in the Typer context so each
 subcommand can initialize `PdfWrapper` with consistent settings.
 
 Commands:
-    - `fill`: Fill an existing PDF form from YAML or JSON data.
+    - `fill`: Fill an existing PDF form from a data file or field options.
     - `create`: Create PDFs, fields, annotations, raw elements, and grid views.
     - `inspect`: Print form metadata and field data as JSON.
     - `update`: Modify PDF metadata, field names, properties, geometry, and scripts.
@@ -152,7 +152,7 @@ def main(
 @cli_app.command(
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Fill a PDF form with a YAML/JSON file or dynamic field options.",
+    help="Fill a PDF form from a YAML or JSON file or field options.",
 )
 def fill(
     ctx: typer.Context,

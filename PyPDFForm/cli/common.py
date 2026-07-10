@@ -226,6 +226,12 @@ def load_data_options(options: list[str], schema: dict) -> Any:
         typer.BadParameter: Raised when the options cannot be parsed or the
             resulting mapping fails validation.
     """
+    if any(not option.startswith("--") for option in options[::2]):
+        cli_bad_parameter(
+            "Use '--name value' pairs with valid values.",
+            param_hint="form field options",
+        )
+
     try:
         input_data = {
             option[2:]: yaml.safe_load(value)

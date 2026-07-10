@@ -114,17 +114,18 @@ def test_fill_yaml_schema_error(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_fill_dynamic_option_without_value(pdf_samples):
-    result = runner.invoke(
-        cli_app,
-        [
-            "fill",
-            os.path.join(pdf_samples, "sample_template.pdf"),
-            "--check",
-        ],
-    )
+def test_fill_malformed_dynamic_options(pdf_samples):
+    for options in (("--check",), ("xxcheck", "true")):
+        result = runner.invoke(
+            cli_app,
+            [
+                "fill",
+                os.path.join(pdf_samples, "sample_template.pdf"),
+                *options,
+            ],
+        )
 
-    assert_cli_error(result, "Use '--name value' pairs with valid", "values.")
+        assert_cli_error(result, "Use '--name value' pairs with valid", "values.")
 
 
 @pytest.mark.cli_test
