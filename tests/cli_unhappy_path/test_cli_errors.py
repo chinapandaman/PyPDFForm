@@ -125,7 +125,7 @@ def test_fill_malformed_dynamic_options(pdf_samples):
             ],
         )
 
-        assert_cli_error(result, "Use '--name value' pairs with valid", "values.")
+        assert_cli_error(result, "Invalid value for form field options")
 
 
 @pytest.mark.cli_test
