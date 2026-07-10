@@ -223,13 +223,20 @@ def load_data_options(options: list[str], schema: dict) -> Any:
         Any: Parsed and validated field data.
 
     Raises:
-        typer.BadParameter: Raised when the resulting mapping fails
-            validation.
+        typer.BadParameter: Raised when the options cannot be parsed or the
+            resulting mapping fails validation.
     """
-    input_data = {
-        option[2:]: yaml.safe_load(value)
-        for option, value in zip(options[::2], options[1::2], strict=False)
-    }
+    try:
+        input_data = {
+            option[2:]: yaml.safe_load(value)
+            for option, value in zip(options[::2], options[1::2], strict=True)
+        }
+    except (ValueError, yaml.YAMLError) as exc:
+        cli_bad_parameter(
+            "Use '--name value' pairs with valid values.",
+            param_hint="form field options",
+            cause=exc,
+        )
 
     return _validate_input_data(input_data, schema, "CLI options", "form field options")
 

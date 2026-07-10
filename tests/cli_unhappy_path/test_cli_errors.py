@@ -114,6 +114,20 @@ def test_fill_yaml_schema_error(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+def test_fill_dynamic_option_without_value(pdf_samples):
+    result = runner.invoke(
+        cli_app,
+        [
+            "fill",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "--check",
+        ],
+    )
+
+    assert_cli_error(result, "Use '--name value' pairs with valid", "values.")
+
+
+@pytest.mark.cli_test
 def test_create_extract_start_after_end(pdf_samples, tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
 
