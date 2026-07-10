@@ -6,7 +6,7 @@ Most fields use flat, non-nested values. Image and signature fields can also use
 
 Filled forms stay editable by default. Pass `flatten=True` to `fill`, or add `--flatten` to the CLI command, to flatten fields after filling so their values can no longer be edited.
 
-## Fill from a data file or CLI options
+## Fill from a data file or CLI options (CLI only)
 
 The CLI accepts form data from a YAML or JSON file passed with `--file` / `-f`:
 
@@ -37,7 +37,7 @@ pypdfform fill sample_template.pdf \
     -o output.pdf
 ```
 
-Dynamic option values are parsed as YAML, so values such as `true`, `false`, and `1` become their corresponding boolean and integer types. If `--file` and dynamic options are both present, the file data takes precedence.
+If `--file` and dynamic options are both present, the file data takes precedence.
 
 ## Fill text field and checkbox
 

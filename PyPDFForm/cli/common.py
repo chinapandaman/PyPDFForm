@@ -211,9 +211,8 @@ def load_data_options(options: list[str], schema: dict) -> Any:
     """
     Loads dynamic form field options and validates them against a schema.
 
-    Dynamic options use either ``--name value`` or ``--name=value`` syntax.
-    Each value is parsed with :func:`yaml.safe_load`, allowing callers to pass
-    YAML scalar and collection types directly on the command line.
+    Dynamic options use ``--name value`` syntax. Each value is parsed with
+    :func:`yaml.safe_load`.
 
     Args:
         options (list[str]): Unrecognized command arguments captured by Typer.
@@ -224,36 +223,13 @@ def load_data_options(options: list[str], schema: dict) -> Any:
         Any: Parsed and validated field data.
 
     Raises:
-        typer.BadParameter: Raised when an option is malformed, its value is
-            invalid YAML, or the resulting mapping fails validation.
+        typer.BadParameter: Raised when the resulting mapping fails
+            validation.
     """
-    input_data = {}
-    option_index = 0
-    while option_index < len(options):
-        option = options[option_index]
-        name, separator, value = option.partition("=")
-        if not name.startswith("--") or name == "--":
-            cli_bad_parameter(
-                "Expected a form field option in the format '--name value'.",
-                param_hint=name,
-            )
-
-        if not separator:
-            option_index += 1
-            if option_index >= len(options):
-                cli_bad_parameter("Option requires a value.", param_hint=name)
-            value = options[option_index]
-
-        try:
-            input_data[name[2:]] = yaml.safe_load(value)
-        except yaml.YAMLError as exc:
-            cli_bad_parameter(
-                f"Invalid YAML value: {exc}",
-                param_hint=name,
-                cause=exc,
-            )
-
-        option_index += 1
+    input_data = {
+        option[2:]: yaml.safe_load(value)
+        for option, value in zip(options[::2], options[1::2], strict=False)
+    }
 
     return _validate_input_data(input_data, schema, "CLI options", "form field options")
 
