@@ -137,6 +137,41 @@ def _input_file_kind(data: Path) -> str:
     return "JSON"
 
 
+def _validate_input_data(
+    input_data: Any,
+    schema: dict,
+    source: str,
+    param_hint: str,
+) -> Any:
+    """
+    Validates parsed CLI input against a JSON schema.
+
+    Args:
+        input_data (Any): Parsed input data to validate.
+        schema (dict): JSON schema to validate against.
+        source (str): User-facing description of the input source.
+        param_hint (str): CLI parameter associated with the input.
+
+    Returns:
+        Any: The validated input data.
+
+    Raises:
+        typer.BadParameter: Raised when validation fails.
+    """
+    try:
+        validate(instance=input_data, schema=schema)
+    except ValidationError as exc:
+        error_path = _validation_error_path(exc)
+        location = f" at {error_path}" if error_path else ""
+        cli_bad_parameter(
+            f"Invalid {source}{location}: {exc.message}",
+            param_hint=param_hint,
+            cause=exc,
+        )
+
+    return input_data
+
+
 def load_data_file(data: Path, schema: dict, param_hint: str) -> Any:
     """
     Loads a YAML or JSON CLI input file and validates it against a schema.
@@ -164,18 +199,63 @@ def load_data_file(data: Path, schema: dict, param_hint: str) -> Any:
             cause=exc,
         )
 
-    try:
-        validate(instance=input_data, schema=schema)
-    except ValidationError as exc:
-        error_path = _validation_error_path(exc)
-        location = f" at {error_path}" if error_path else ""
-        cli_bad_parameter(
-            f"Invalid {input_kind} file{location}: {exc.message}",
-            param_hint=param_hint,
-            cause=exc,
-        )
+    return _validate_input_data(
+        input_data,
+        schema,
+        f"{input_kind} file",
+        param_hint,
+    )
 
-    return input_data
+
+def load_data_options(options: list[str], schema: dict) -> Any:
+    """
+    Loads dynamic form field options and validates them against a schema.
+
+    Dynamic options use either ``--name value`` or ``--name=value`` syntax.
+    Each value is parsed with :func:`yaml.safe_load`, allowing callers to pass
+    YAML scalar and collection types directly on the command line.
+
+    Args:
+        options (list[str]): Unrecognized command arguments captured by Typer.
+        schema (dict): JSON schema to validate the resulting field mapping
+            against.
+
+    Returns:
+        Any: Parsed and validated field data.
+
+    Raises:
+        typer.BadParameter: Raised when an option is malformed, its value is
+            invalid YAML, or the resulting mapping fails validation.
+    """
+    input_data = {}
+    option_index = 0
+    while option_index < len(options):
+        option = options[option_index]
+        name, separator, value = option.partition("=")
+        if not name.startswith("--") or name == "--":
+            cli_bad_parameter(
+                "Expected a form field option in the format '--name value'.",
+                param_hint=name,
+            )
+
+        if not separator:
+            option_index += 1
+            if option_index >= len(options):
+                cli_bad_parameter("Option requires a value.", param_hint=name)
+            value = options[option_index]
+
+        try:
+            input_data[name[2:]] = yaml.safe_load(value)
+        except yaml.YAMLError as exc:
+            cli_bad_parameter(
+                f"Invalid YAML value: {exc}",
+                param_hint=name,
+                cause=exc,
+            )
+
+        option_index += 1
+
+    return _validate_input_data(input_data, schema, "CLI options", "form field options")
 
 
 def get_widget(wrapper: PdfWrapper, field: str, param_hint: str) -> Widget:
