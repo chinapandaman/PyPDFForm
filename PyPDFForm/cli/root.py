@@ -211,7 +211,7 @@ def fill(
     input_data = (
         load_data_file(data, schema, "--file")
         if data is not None
-        else load_data_options(ctx.args, schema)
+        else load_data_options(ctx.args, schema, "form field options")
     )
     for k, each in obj.widgets.items():
         if (

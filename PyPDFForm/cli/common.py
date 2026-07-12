@@ -207,9 +207,7 @@ def load_data_file(data: Path, schema: dict, param_hint: str) -> Any:
     )
 
 
-def load_data_options(
-    options: list[str], schema: dict, param_hint: str = "form field options"
-) -> Any:
+def load_data_options(options: list[str], schema: dict, param_hint: str) -> Any:
     """
     Loads dynamic form field options and validates them against a schema.
 
@@ -220,8 +218,7 @@ def load_data_options(
         options (list[str]): Unrecognized command arguments captured by Typer.
         schema (dict): JSON schema to validate the resulting option mapping
             against.
-        param_hint (str, optional): CLI parameter description used in error
-            messages. Defaults to ``"form field options"``.
+        param_hint (str): CLI parameter description used in error messages.
 
     Returns:
         Any: Parsed and validated field data.
