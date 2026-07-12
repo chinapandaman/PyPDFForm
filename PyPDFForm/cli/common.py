@@ -207,7 +207,9 @@ def load_data_file(data: Path, schema: dict, param_hint: str) -> Any:
     )
 
 
-def load_data_options(options: list[str], schema: dict) -> Any:
+def load_data_options(
+    options: list[str], schema: dict, param_hint: str = "form field options"
+) -> Any:
     """
     Loads dynamic form field options and validates them against a schema.
 
@@ -216,8 +218,10 @@ def load_data_options(options: list[str], schema: dict) -> Any:
 
     Args:
         options (list[str]): Unrecognized command arguments captured by Typer.
-        schema (dict): JSON schema to validate the resulting field mapping
+        schema (dict): JSON schema to validate the resulting option mapping
             against.
+        param_hint (str, optional): CLI parameter description used in error
+            messages. Defaults to ``"form field options"``.
 
     Returns:
         Any: Parsed and validated field data.
@@ -229,7 +233,7 @@ def load_data_options(options: list[str], schema: dict) -> Any:
     if any(not option.startswith("--") for option in options[::2]):
         cli_bad_parameter(
             "Use '--name value' pairs with valid values.",
-            param_hint="form field options",
+            param_hint=param_hint,
         )
 
     try:
@@ -240,11 +244,11 @@ def load_data_options(options: list[str], schema: dict) -> Any:
     except (ValueError, yaml.YAMLError) as exc:
         cli_bad_parameter(
             "Use '--name value' pairs with valid values.",
-            param_hint="form field options",
+            param_hint=param_hint,
             cause=exc,
         )
 
-    return _validate_input_data(input_data, schema, "CLI options", "form field options")
+    return _validate_input_data(input_data, schema, "CLI options", param_hint)
 
 
 def get_widget(wrapper: PdfWrapper, field: str, param_hint: str) -> Widget:
@@ -302,27 +306,28 @@ def handle_font_registration(
 
 def create_elements_from_file(
     pdf: Path,
-    data: Path,
+    data: Path | None,
     element_map: dict,
     schema: dict,
     method_name: str,
     ctx: typer.Context,
     param_hint: str,
     output: Path | None = None,
+    element_type: str | None = None,
 ) -> None:
     """
-    Creates PDF elements from grouped file definitions.
+    Creates PDF elements from grouped file definitions or dynamic CLI options.
 
-    The input data is expected to group element definitions by type, such as
-    `text`, `image`, or `highlight`. Each group key is resolved through
-    `element_map`, each item is constructed after optional font registration,
-    and the resulting objects are passed to `method_name` on `PdfWrapper`.
-    The modified PDF is written to `output` or back to the input path.
+    File input groups element definitions by type, such as `text`, `image`, or
+    `highlight`. Dynamic CLI input creates one element of `element_type` from
+    the unrecognized options stored in ``ctx.args``. File input takes
+    precedence when both forms are supplied. Each item is constructed after
+    optional font registration and passed to `method_name` on `PdfWrapper`.
 
     Args:
         pdf (Path): The path to the input PDF file.
-        data (Path): The path to the input file containing grouped element
-            definitions.
+        data (Path, optional): The path to the input file containing grouped
+            element definitions. Defaults to None.
         element_map (dict): Mapping from input group names to element classes
             or callables used to construct each object.
         schema (dict): JSON schema used to validate the grouped definitions.
@@ -334,8 +339,27 @@ def create_elements_from_file(
         param_hint (str): CLI parameter associated with the input file.
         output (Path, optional): Path where the modified PDF should be saved. If
             omitted, the input PDF is overwritten. Defaults to None.
+        element_type (str, optional): Element type selected for dynamic CLI
+            input. Defaults to None.
     """
-    input_data = load_data_file(data, schema, param_hint)
+    if data is not None:
+        input_data = load_data_file(data, schema, param_hint)
+    else:
+        if element_type not in element_map:
+            choices = ", ".join(element_map)
+            cli_bad_parameter(
+                f"Choose one of: {choices}.",
+                param_hint="--type",
+            )
+        input_data = {
+            element_type: [
+                load_data_options(
+                    ctx.args,
+                    schema["properties"][element_type]["items"],
+                    "element options",
+                )
+            ]
+        }
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     ungrouped_input = []

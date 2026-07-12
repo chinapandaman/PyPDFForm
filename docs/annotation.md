@@ -2,6 +2,41 @@
 
 PyPDFForm supports adding non-form-field annotations to PDFs.
 
+## CLI create inputs
+
+The `create annotation` command can add multiple annotations from a grouped YAML or JSON file:
+
+=== "data.yaml"
+    ```yaml
+    link:
+      - page_number: 1
+        x: 70
+        y: 705
+        width: 95
+        height: 20
+        page: 2
+    ```
+=== "Command"
+    ```shell
+    pypdfform create annotation sample_template.pdf -f data.yaml -o output.pdf
+    ```
+
+To add one annotation, pass its type and properties directly as options:
+
+```shell
+pypdfform create annotation sample_template.pdf \
+    --type link \
+    --page_number 1 \
+    --x 70 \
+    --y 705 \
+    --width 95 \
+    --height 20 \
+    --page 2 \
+    -o output.pdf
+```
+
+Option values are parsed as YAML. When `--file` and dynamic options are supplied together, `--file` takes precedence.
+
 This section uses [this PDF](pdfs/sample_template.pdf) as an example.
 
 Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.

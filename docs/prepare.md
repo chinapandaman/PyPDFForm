@@ -4,6 +4,37 @@ The most common tool for creating PDF form fields is Adobe Acrobat, and a tutori
 
 PyPDFForm also allows creating PDF form fields on existing PDFs programmatically.
 
+## CLI create inputs
+
+The `create field` command can create multiple fields from a grouped YAML or JSON file:
+
+=== "data.yaml"
+    ```yaml
+    text:
+      - name: new_text
+        page_number: 1
+        x: 100
+        y: 100
+    ```
+=== "Command"
+    ```shell
+    pypdfform create field sample_template.pdf -f data.yaml -o output.pdf
+    ```
+
+To create one field, pass its type and properties directly as options:
+
+```shell
+pypdfform create field sample_template.pdf \
+    --type text \
+    --name new_text \
+    --page_number 1 \
+    --x 100 \
+    --y 100 \
+    -o output.pdf
+```
+
+Option values are parsed as YAML. When `--file` and dynamic options are supplied together, `--file` takes precedence.
+
 === "Library"
     Field creation is done with `PdfWrapper.bulk_create_fields`, which accepts a list of field definitions. Use the same method whether you are adding one field or several:
 

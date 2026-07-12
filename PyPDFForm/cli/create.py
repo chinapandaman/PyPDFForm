@@ -188,33 +188,41 @@ def merge(
 
 
 @create_cli.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Add form fields to a PDF.",
+    help="Add form fields from a YAML/JSON file or dynamic options.",
 )
 def field(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, data_file_option("YAML or JSON file with form field definitions.")
-    ],
+        Path | None, data_file_option("YAML or JSON file with form field definitions.")
+    ] = None,
     output: OPTIONAL_OUTPUT_PDF = None,
+    element_type: Annotated[
+        str | None,
+        typer.Option("--type", help="Form field type for dynamic options."),
+    ] = None,
 ) -> None:
     """
-    Add form fields described by grouped YAML or JSON definitions.
+    Add form fields from grouped file definitions or dynamic CLI options.
 
     The command maps input groups such as `text`, `check`, and `signature` to
     PyPDFForm field classes, validates the input file against the CLI field
     schema, creates the corresponding field objects, and calls
-    `PdfWrapper.bulk_create_fields` before writing the modified PDF.
+    `PdfWrapper.bulk_create_fields` before writing the modified PDF. Dynamic
+    options create one field of the selected type; file input takes precedence.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
-        data (Path): YAML or JSON file containing grouped form field
-            definitions.
+        data (Path, optional): YAML or JSON file containing grouped form field
+            definitions. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
+        element_type (str, optional): Form field type for dynamic options.
+            Defaults to None.
     """
     field_map = {
         "text": Fields.TextField,
@@ -233,37 +241,46 @@ def field(
         ctx=ctx,
         param_hint="--file",
         output=output,
+        element_type=element_type,
     )
 
 
 @create_cli.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Draw text, images, and shapes on a PDF.",
+    help="Draw elements from a YAML/JSON file or dynamic options.",
 )
 def raw(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, data_file_option("YAML or JSON file with raw element definitions.")
-    ],
+        Path | None, data_file_option("YAML or JSON file with raw element definitions.")
+    ] = None,
     output: OPTIONAL_OUTPUT_PDF = None,
+    element_type: Annotated[
+        str | None,
+        typer.Option("--type", help="Raw element type for dynamic options."),
+    ] = None,
 ) -> None:
     """
-    Draw raw elements described by grouped YAML or JSON definitions.
+    Draw raw elements from grouped file definitions or dynamic CLI options.
 
     The command maps input groups such as `text`, `image`, and `rectangle` to
     raw element classes, validates the input file against the CLI raw element
     schema, creates the corresponding drawable objects, and calls
-    `PdfWrapper.draw` before writing the modified PDF.
+    `PdfWrapper.draw` before writing the modified PDF. Dynamic options create
+    one element of the selected type; file input takes precedence.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
-        data (Path): YAML or JSON file containing grouped raw element
-            definitions.
+        data (Path, optional): YAML or JSON file containing grouped raw element
+            definitions. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
+        element_type (str, optional): Raw element type for dynamic options.
+            Defaults to None.
     """
     raw_element_map = {
         "text": RawElements.RawText,
@@ -282,37 +299,46 @@ def raw(
         ctx=ctx,
         param_hint="--file",
         output=output,
+        element_type=element_type,
     )
 
 
 @create_cli.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Add annotations to a PDF.",
+    help="Add annotations from a YAML/JSON file or dynamic options.",
 )
 def annotation(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, data_file_option("YAML or JSON file with annotation definitions.")
-    ],
+        Path | None, data_file_option("YAML or JSON file with annotation definitions.")
+    ] = None,
     output: OPTIONAL_OUTPUT_PDF = None,
+    element_type: Annotated[
+        str | None,
+        typer.Option("--type", help="Annotation type for dynamic options."),
+    ] = None,
 ) -> None:
     """
-    Add annotations described by grouped YAML or JSON definitions.
+    Add annotations from grouped file definitions or dynamic CLI options.
 
     The command maps input groups such as `text`, `link`, and `highlight` to
     annotation classes, validates the input file against the CLI annotation
     schema, creates the corresponding annotation objects, and calls
-    `PdfWrapper.annotate` before writing the modified PDF.
+    `PdfWrapper.annotate` before writing the modified PDF. Dynamic options
+    create one annotation of the selected type; file input takes precedence.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
-        data (Path): YAML or JSON file containing grouped annotation
-            definitions.
+        data (Path, optional): YAML or JSON file containing grouped annotation
+            definitions. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
+        element_type (str, optional): Annotation type for dynamic options.
+            Defaults to None.
     """
     annotation_map = {
         "text": Annotations.TextAnnotation,
@@ -332,6 +358,7 @@ def annotation(
         ctx=ctx,
         param_hint="--file",
         output=output,
+        element_type=element_type,
     )
 
 
