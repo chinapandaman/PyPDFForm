@@ -28,7 +28,7 @@ The `create raw` command can draw multiple elements from a grouped YAML or JSON 
     pypdfform create raw sample_template.pdf -f data.yaml -o output.pdf
     ```
 
-To draw one element, pass its type and properties directly as options:
+Alternatively, when you only need to draw one element, you can use dynamic options instead of a file:
 
 ```shell
 pypdfform create raw sample_template.pdf \

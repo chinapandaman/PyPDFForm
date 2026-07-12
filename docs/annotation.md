@@ -27,7 +27,7 @@ The `create annotation` command can add multiple annotations from a grouped YAML
     pypdfform create annotation sample_template.pdf -f data.yaml -o output.pdf
     ```
 
-To add one annotation, pass its type and properties directly as options:
+Alternatively, when you only need to add one annotation, you can use dynamic options instead of a file:
 
 ```shell
 pypdfform create annotation sample_template.pdf \

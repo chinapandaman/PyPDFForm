@@ -92,7 +92,7 @@ The `create field` command can create multiple fields from a grouped YAML or JSO
     pypdfform create field sample_template.pdf -f data.yaml -o output.pdf
     ```
 
-To create one field, pass its type and properties directly as options:
+Alternatively, when you only need to create one field, you can use dynamic options instead of a file:
 
 ```shell
 pypdfform create field sample_template.pdf \
