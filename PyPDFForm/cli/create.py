@@ -239,7 +239,8 @@ def field(
         schema=FIELD_SCHEMA,
         method_name="bulk_create_fields",
         ctx=ctx,
-        param_hint="--file",
+        file_param_hint="--file",
+        options_param_hint="field options",
         output=output,
         element_type=element_type,
     )
@@ -297,7 +298,8 @@ def raw(
         schema=RAW_SCHEMA,
         method_name="draw",
         ctx=ctx,
-        param_hint="--file",
+        file_param_hint="--file",
+        options_param_hint="raw options",
         output=output,
         element_type=element_type,
     )
@@ -356,7 +358,8 @@ def annotation(
         schema=ANNOTATION_SCHEMA,
         method_name="annotate",
         ctx=ctx,
-        param_hint="--file",
+        file_param_hint="--file",
+        options_param_hint="annotation options",
         output=output,
         element_type=element_type,
     )

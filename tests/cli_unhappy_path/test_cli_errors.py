@@ -220,22 +220,42 @@ def test_create_dynamic_options_require_supported_type(pdf_samples):
 
 
 @pytest.mark.cli_test
-def test_create_dynamic_options_schema_error(pdf_samples, tmp_path):
+@pytest.mark.parametrize(
+    ("command", "element_type", "options", "param_hint"),
+    [
+        (
+            "field",
+            "text",
+            ["--name", "new_text", "--page_number", "1", "--x", "100"],
+            "field options",
+        ),
+        (
+            "raw",
+            "rectangle",
+            ["--page_number", "1", "--x", "100", "--y", "100", "--width", "10"],
+            "raw options",
+        ),
+        (
+            "annotation",
+            "text",
+            ["--page_number", "1", "--x", "100"],
+            "annotation options",
+        ),
+    ],
+)
+def test_create_dynamic_options_schema_error(
+    pdf_samples, tmp_path, command, element_type, options, param_hint
+):
     output_path = os.path.join(tmp_path, "output.pdf")
     result = runner.invoke(
         cli_app,
         [
             "create",
-            "field",
+            command,
             os.path.join(pdf_samples, "dummy.pdf"),
             "--type",
-            "text",
-            "--name",
-            "new_text",
-            "--page_number",
-            "1",
-            "--x",
-            "100",
+            element_type,
+            *options,
             "-o",
             output_path,
         ],
@@ -243,6 +263,7 @@ def test_create_dynamic_options_schema_error(pdf_samples, tmp_path):
 
     assert_cli_error(
         result,
+        f"Invalid value for {param_hint}",
         "Invalid CLI options",
         output_path=output_path,
     )

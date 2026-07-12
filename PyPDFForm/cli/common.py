@@ -308,7 +308,8 @@ def create_elements_from_file(
     schema: dict,
     method_name: str,
     ctx: typer.Context,
-    param_hint: str,
+    file_param_hint: str,
+    options_param_hint: str,
     output: Path | None = None,
     element_type: str | None = None,
 ) -> None:
@@ -333,14 +334,16 @@ def create_elements_from_file(
             `annotate`.
         ctx (typer.Context): Typer context containing global wrapper options in
             `ctx.obj`.
-        param_hint (str): CLI parameter associated with the input file.
+        file_param_hint (str): CLI parameter associated with the input file.
+        options_param_hint (str): CLI parameter description associated with
+            dynamic options.
         output (Path, optional): Path where the modified PDF should be saved. If
             omitted, the input PDF is overwritten. Defaults to None.
         element_type (str, optional): Element type selected for dynamic CLI
             input. Defaults to None.
     """
     if data is not None:
-        input_data = load_data_file(data, schema, param_hint)
+        input_data = load_data_file(data, schema, file_param_hint)
     else:
         if element_type not in element_map:
             choices = ", ".join(element_map)
@@ -353,7 +356,7 @@ def create_elements_from_file(
                 load_data_options(
                     ctx.args,
                     schema["properties"][element_type]["items"],
-                    "element options",
+                    options_param_hint,
                 )
             ]
         }
