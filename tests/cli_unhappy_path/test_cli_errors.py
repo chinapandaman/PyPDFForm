@@ -208,6 +208,22 @@ def test_create_field_schema_error(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+def test_create_dynamic_options_require_supported_type(pdf_samples):
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "field",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "--type",
+            "unsupported",
+        ],
+    )
+
+    assert_cli_error(result, "Invalid value for")
+
+
+@pytest.mark.cli_test
 def test_create_raw_schema_error(pdf_samples, tmp_path):
     data_path = write_invalid_json(
         tmp_path,

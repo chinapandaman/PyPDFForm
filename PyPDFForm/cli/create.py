@@ -188,33 +188,43 @@ def merge(
 
 
 @create_cli.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Add form fields to a PDF.",
+    help="Add form fields from a YAML or JSON file or command-line options.",
 )
 def field(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, data_file_option("YAML or JSON file with form field definitions.")
-    ],
+        Path | None, data_file_option("YAML or JSON file with form field definitions.")
+    ] = None,
     output: OPTIONAL_OUTPUT_PDF = None,
+    element_type: Annotated[
+        str | None,
+        typer.Option("--type", help="Type of form field to create without --file."),
+    ] = None,
 ) -> None:
     """
-    Add form fields described by grouped YAML or JSON definitions.
+    Add form fields from a data file or command-line options.
 
     The command maps input groups such as `text`, `check`, and `signature` to
-    PyPDFForm field classes, validates the input file against the CLI field
-    schema, creates the corresponding field objects, and calls
-    `PdfWrapper.bulk_create_fields` before writing the modified PDF.
+    PyPDFForm field classes, validates the input against the CLI field schema,
+    creates the corresponding field objects, and calls
+    `PdfWrapper.bulk_create_fields` before writing the modified PDF. A data file
+    can define multiple fields grouped by type. Without `--file`, `--type` and
+    the field options define one field. The data file takes precedence when
+    both input forms are supplied.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
-        data (Path): YAML or JSON file containing grouped form field
-            definitions.
+        data (Path, optional): YAML or JSON file containing grouped form field
+            definitions. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
+        element_type (str, optional): Form field type used when `data` is
+            omitted. Defaults to None.
     """
     field_map = {
         "text": Fields.TextField,
@@ -231,39 +241,51 @@ def field(
         schema=FIELD_SCHEMA,
         method_name="bulk_create_fields",
         ctx=ctx,
-        param_hint="--file",
+        file_param_hint="--file",
+        options_param_hint="field options",
         output=output,
+        element_type=element_type,
     )
 
 
 @create_cli.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Draw text, images, and shapes on a PDF.",
+    help="Draw elements from a YAML or JSON file or command-line options.",
 )
 def raw(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, data_file_option("YAML or JSON file with raw element definitions.")
-    ],
+        Path | None, data_file_option("YAML or JSON file with raw element definitions.")
+    ] = None,
     output: OPTIONAL_OUTPUT_PDF = None,
+    element_type: Annotated[
+        str | None,
+        typer.Option("--type", help="Type of element to draw without --file."),
+    ] = None,
 ) -> None:
     """
-    Draw raw elements described by grouped YAML or JSON definitions.
+    Draw elements from a data file or command-line options.
 
     The command maps input groups such as `text`, `image`, and `rectangle` to
-    raw element classes, validates the input file against the CLI raw element
-    schema, creates the corresponding drawable objects, and calls
-    `PdfWrapper.draw` before writing the modified PDF.
+    raw element classes, validates the input against the CLI raw element schema,
+    creates the corresponding drawable objects, and calls `PdfWrapper.draw`
+    before writing the modified PDF. A data file can define multiple elements
+    grouped by type. Without `--file`, `--type` and the element options define
+    one element. The data file takes precedence when both input forms are
+    supplied.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
-        data (Path): YAML or JSON file containing grouped raw element
-            definitions.
+        data (Path, optional): YAML or JSON file containing grouped raw element
+            definitions. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
+        element_type (str, optional): Element type used when `data` is omitted.
+            Defaults to None.
     """
     raw_element_map = {
         "text": RawElements.RawText,
@@ -280,39 +302,51 @@ def raw(
         schema=RAW_SCHEMA,
         method_name="draw",
         ctx=ctx,
-        param_hint="--file",
+        file_param_hint="--file",
+        options_param_hint="element options",
         output=output,
+        element_type=element_type,
     )
 
 
 @create_cli.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Add annotations to a PDF.",
+    help="Add annotations from a YAML or JSON file or command-line options.",
 )
 def annotation(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, data_file_option("YAML or JSON file with annotation definitions.")
-    ],
+        Path | None, data_file_option("YAML or JSON file with annotation definitions.")
+    ] = None,
     output: OPTIONAL_OUTPUT_PDF = None,
+    element_type: Annotated[
+        str | None,
+        typer.Option("--type", help="Type of annotation to add without --file."),
+    ] = None,
 ) -> None:
     """
-    Add annotations described by grouped YAML or JSON definitions.
+    Add annotations from a data file or command-line options.
 
     The command maps input groups such as `text`, `link`, and `highlight` to
-    annotation classes, validates the input file against the CLI annotation
-    schema, creates the corresponding annotation objects, and calls
-    `PdfWrapper.annotate` before writing the modified PDF.
+    annotation classes, validates the input against the CLI annotation schema,
+    creates the corresponding annotation objects, and calls
+    `PdfWrapper.annotate` before writing the modified PDF. A data file can
+    define multiple annotations grouped by type. Without `--file`, `--type` and
+    the annotation options define one annotation. The data file takes
+    precedence when both input forms are supplied.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
-        data (Path): YAML or JSON file containing grouped annotation
-            definitions.
+        data (Path, optional): YAML or JSON file containing grouped annotation
+            definitions. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
+        element_type (str, optional): Annotation type used when `data` is
+            omitted. Defaults to None.
     """
     annotation_map = {
         "text": Annotations.TextAnnotation,
@@ -330,8 +364,10 @@ def annotation(
         schema=ANNOTATION_SCHEMA,
         method_name="annotate",
         ctx=ctx,
-        param_hint="--file",
+        file_param_hint="--file",
+        options_param_hint="annotation options",
         output=output,
+        element_type=element_type,
     )
 
 

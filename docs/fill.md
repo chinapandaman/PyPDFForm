@@ -6,7 +6,7 @@ Most fields use flat, non-nested values. Image and signature fields can also use
 
 Filled forms stay editable by default. Pass `flatten=True` to the library's `fill` method, or add `--flatten` to the CLI `fill` command, to prevent further edits to the filled fields.
 
-## CLI fill inputs
+## CLI input methods
 
 The `fill` command can read field values from a YAML or JSON file supplied with `--file` / `-f`:
 

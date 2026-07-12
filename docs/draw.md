@@ -10,6 +10,39 @@ In the library examples, optional parameters are marked with `# optional`.
 
 When drawing multiple elements, collect them in a list and draw them in a single operation for better performance.
 
+## CLI input methods
+
+The `create raw` command can draw one or more elements from a YAML or JSON file. Group the definitions by element type:
+
+=== "data.yaml"
+    ```yaml
+    rectangle:
+      - page_number: 1
+        x: 100
+        y: 100
+        width: 200
+        height: 100
+    ```
+=== "Command"
+    ```shell
+    pypdfform create raw sample_template.pdf -f data.yaml -o output.pdf
+    ```
+
+To draw a single element without creating a data file, specify its type and properties as command-line options:
+
+```shell
+pypdfform create raw sample_template.pdf \
+    --type rectangle \
+    --page_number 1 \
+    --x 100 \
+    --y 100 \
+    --width 200 \
+    --height 100 \
+    -o output.pdf
+```
+
+When `--file` is supplied, it takes precedence over `--type` and the element options.
+
 ## Draw text
 
 Text can be drawn by specifying its content, coordinates, and optionally its font, font size, and font color.

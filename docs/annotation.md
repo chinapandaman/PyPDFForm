@@ -8,6 +8,41 @@ Understanding [the PDF coordinate system](coordinate.md) is necessary for this s
 
 In the library examples, optional parameters are marked with an `# optional` comment.
 
+## CLI input methods
+
+The `create annotation` command can add one or more annotations from a YAML or JSON file. Group the definitions by annotation type:
+
+=== "data.yaml"
+    ```yaml
+    link:
+      - page_number: 1
+        x: 70
+        y: 705
+        width: 95
+        height: 20
+        page: 2
+    ```
+=== "Command"
+    ```shell
+    pypdfform create annotation sample_template.pdf -f data.yaml -o output.pdf
+    ```
+
+To add a single annotation without creating a data file, specify its type and properties as command-line options:
+
+```shell
+pypdfform create annotation sample_template.pdf \
+    --type link \
+    --page_number 1 \
+    --x 70 \
+    --y 705 \
+    --width 95 \
+    --height 20 \
+    --page 2 \
+    -o output.pdf
+```
+
+When `--file` is supplied, it takes precedence over `--type` and the annotation options.
+
 ## Create text annotations
 
 Text annotations appear as sticky notes on a PDF.

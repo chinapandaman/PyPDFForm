@@ -3,6 +3,7 @@
 import os
 
 import pytest
+import yaml
 from typer.testing import CliRunner
 
 from PyPDFForm.cli.root import cli_app
@@ -36,6 +37,50 @@ def test_bulk_create_fields(pdf_samples, yaml_samples, tmp_path):
 
         assert len(expected) == len(actual)
         assert expected == actual
+
+
+@pytest.mark.cli_test
+def test_create_field_input_methods(pdf_samples, tmp_path):
+    data_path = os.path.join(tmp_path, "data.yaml")
+    file_output_path = os.path.join(tmp_path, "file-output.pdf")
+    options_output_path = os.path.join(tmp_path, "options-output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        yaml.safe_dump(
+            {"text": [{"name": "new_text", "page_number": 1, "x": 100, "y": 100}]},
+            f,
+        )
+
+    base_args = ["create", "field", os.path.join(pdf_samples, "dummy.pdf")]
+    file_result = runner.invoke(
+        cli_app, [*base_args, "-f", data_path, "-o", file_output_path]
+    )
+    options_result = runner.invoke(
+        cli_app,
+        [
+            *base_args,
+            "--type",
+            "text",
+            "--name",
+            "new_text",
+            "--page_number",
+            "1",
+            "--x",
+            "100",
+            "--y",
+            "100",
+            "-o",
+            options_output_path,
+        ],
+    )
+
+    assert file_result.exit_code == 0
+    assert options_result.exit_code == 0
+    with open(file_output_path, "rb") as f1, open(options_output_path, "rb") as f2:
+        file_output = f1.read()
+        options_output = f2.read()
+
+        assert len(file_output) == len(options_output)
+        assert file_output == options_output
 
 
 @pytest.mark.requires_zlib_over_zlib_ng
