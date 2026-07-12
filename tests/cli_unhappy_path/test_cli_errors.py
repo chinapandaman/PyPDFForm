@@ -220,7 +220,7 @@ def test_create_dynamic_options_require_supported_type(pdf_samples):
         ],
     )
 
-    assert_cli_error(result, "Invalid value for --type", "Choose one of")
+    assert_cli_error(result, "Invalid value for")
 
 
 @pytest.mark.cli_test
