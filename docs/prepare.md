@@ -75,9 +75,9 @@ Understanding [the PDF coordinate system](coordinate.md) is necessary for this s
 
 In the library examples, optional parameters are marked with `# optional`.
 
-## CLI create inputs
+## CLI input methods
 
-The `create field` command can create multiple fields from a grouped YAML or JSON file:
+The `create field` command can create one or more fields from a YAML or JSON file. Group the definitions by field type:
 
 === "data.yaml"
     ```yaml
@@ -89,13 +89,13 @@ The `create field` command can create multiple fields from a grouped YAML or JSO
     ```
 === "Command"
     ```shell
-    pypdfform create field sample_template.pdf -f data.yaml -o output.pdf
+    pypdfform create field dummy.pdf -f data.yaml -o output.pdf
     ```
 
-Alternatively, when you only need to create one field, you can use dynamic options instead of a file:
+To create a single field without creating a data file, specify its type and properties as command-line options:
 
 ```shell
-pypdfform create field sample_template.pdf \
+pypdfform create field dummy.pdf \
     --type text \
     --name new_text \
     --page_number 1 \
@@ -104,7 +104,7 @@ pypdfform create field sample_template.pdf \
     -o output.pdf
 ```
 
-When `--file` and dynamic options are supplied together, `--file` takes precedence.
+When `--file` is supplied, it takes precedence over `--type` and the field options.
 
 ## Create a text field
 

@@ -8,9 +8,9 @@ Understanding [the PDF coordinate system](coordinate.md) is necessary for this s
 
 In the library examples, optional parameters are marked with an `# optional` comment.
 
-## CLI annotate inputs
+## CLI input methods
 
-The `create annotation` command can add multiple annotations from a grouped YAML or JSON file:
+The `create annotation` command can add one or more annotations from a YAML or JSON file. Group the definitions by annotation type:
 
 === "data.yaml"
     ```yaml
@@ -27,7 +27,7 @@ The `create annotation` command can add multiple annotations from a grouped YAML
     pypdfform create annotation sample_template.pdf -f data.yaml -o output.pdf
     ```
 
-Alternatively, when you only need to add one annotation, you can use dynamic options instead of a file:
+To add a single annotation without creating a data file, specify its type and properties as command-line options:
 
 ```shell
 pypdfform create annotation sample_template.pdf \
@@ -41,7 +41,7 @@ pypdfform create annotation sample_template.pdf \
     -o output.pdf
 ```
 
-When `--file` and dynamic options are supplied together, `--file` takes precedence.
+When `--file` is supplied, it takes precedence over `--type` and the annotation options.
 
 ## Create text annotations
 

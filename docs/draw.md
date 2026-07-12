@@ -10,9 +10,9 @@ In the library examples, optional parameters are marked with `# optional`.
 
 When drawing multiple elements, collect them in a list and draw them in a single operation for better performance.
 
-## CLI draw inputs
+## CLI input methods
 
-The `create raw` command can draw multiple elements from a grouped YAML or JSON file:
+The `create raw` command can draw one or more elements from a YAML or JSON file. Group the definitions by element type:
 
 === "data.yaml"
     ```yaml
@@ -28,7 +28,7 @@ The `create raw` command can draw multiple elements from a grouped YAML or JSON 
     pypdfform create raw sample_template.pdf -f data.yaml -o output.pdf
     ```
 
-Alternatively, when you only need to draw one element, you can use dynamic options instead of a file:
+To draw a single element without creating a data file, specify its type and properties as command-line options:
 
 ```shell
 pypdfform create raw sample_template.pdf \
@@ -41,7 +41,7 @@ pypdfform create raw sample_template.pdf \
     -o output.pdf
 ```
 
-When `--file` and dynamic options are supplied together, `--file` takes precedence.
+When `--file` is supplied, it takes precedence over `--type` and the element options.
 
 ## Draw text
 
