@@ -59,6 +59,7 @@ def test_create_field_dynamic_options(pdf_samples, tmp_path):
     assert file_result.exit_code == 0
     assert options_result.exit_code == 0
     with open(file_output_path, "rb") as f1, open(options_output_path, "rb") as f2:
+        assert len(f1.read()) == len(f2.read())
         assert f1.read() == f2.read()
 
 

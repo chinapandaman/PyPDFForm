@@ -65,6 +65,7 @@ def test_create_raw_dynamic_options(static_pdfs, tmp_path):
     assert file_result.exit_code == 0
     assert options_result.exit_code == 0
     with open(file_output_path, "rb") as f1, open(options_output_path, "rb") as f2:
+        assert len(f1.read()) == len(f2.read())
         assert f1.read() == f2.read()
 
 
