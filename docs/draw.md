@@ -2,7 +2,15 @@
 
 PyPDFForm enables you to draw elements on a PDF, which is useful when a field is missing from your PDF form or when you need to add text, images, lines, or shapes.
 
-## CLI create inputs
+This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
+
+Review [the PDF coordinate system](coordinate.md) before using these examples.
+
+In the library examples, optional parameters are marked with `# optional`.
+
+When drawing multiple elements, collect them in a list and draw them in a single operation for better performance.
+
+## CLI draw inputs
 
 The `create raw` command can draw multiple elements from a grouped YAML or JSON file:
 
@@ -33,15 +41,7 @@ pypdfform create raw sample_template.pdf \
     -o output.pdf
 ```
 
-Option values are parsed as YAML. When `--file` and dynamic options are supplied together, `--file` takes precedence.
-
-This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as an example.
-
-Review [the PDF coordinate system](coordinate.md) before using these examples.
-
-In the library examples, optional parameters are marked with `# optional`.
-
-When drawing multiple elements, collect them in a list and draw them in a single operation for better performance.
+When `--file` and dynamic options are supplied together, `--file` takes precedence.
 
 ## Draw text
 

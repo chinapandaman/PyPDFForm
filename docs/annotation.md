@@ -2,7 +2,13 @@
 
 PyPDFForm supports adding non-form-field annotations to PDFs.
 
-## CLI create inputs
+This section uses [this PDF](pdfs/sample_template.pdf) as an example.
+
+Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
+
+In the library examples, optional parameters are marked with an `# optional` comment.
+
+## CLI annotate inputs
 
 The `create annotation` command can add multiple annotations from a grouped YAML or JSON file:
 
@@ -35,13 +41,7 @@ pypdfform create annotation sample_template.pdf \
     -o output.pdf
 ```
 
-Option values are parsed as YAML. When `--file` and dynamic options are supplied together, `--file` takes precedence.
-
-This section uses [this PDF](pdfs/sample_template.pdf) as an example.
-
-Understanding [the PDF coordinate system](coordinate.md) is necessary for this section.
-
-In the library examples, optional parameters are marked with an `# optional` comment.
+When `--file` and dynamic options are supplied together, `--file` takes precedence.
 
 ## Create text annotations
 
