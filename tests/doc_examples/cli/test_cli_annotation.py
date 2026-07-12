@@ -13,7 +13,7 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_create_annotation_dynamic_options(static_pdfs, tmp_path):
+def test_create_annotation_input_methods(static_pdfs, tmp_path):
     data_path = os.path.join(tmp_path, "data.yaml")
     file_output_path = os.path.join(tmp_path, "file-output.pdf")
     options_output_path = os.path.join(tmp_path, "options-output.pdf")
@@ -68,8 +68,11 @@ def test_create_annotation_dynamic_options(static_pdfs, tmp_path):
     assert file_result.exit_code == 0
     assert options_result.exit_code == 0
     with open(file_output_path, "rb") as f1, open(options_output_path, "rb") as f2:
-        assert len(f1.read()) == len(f2.read())
-        assert f1.read() == f2.read()
+        file_output = f1.read()
+        options_output = f2.read()
+
+        assert len(file_output) == len(options_output)
+        assert file_output == options_output
 
 
 @pytest.mark.cli_test

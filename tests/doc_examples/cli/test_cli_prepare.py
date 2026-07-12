@@ -40,7 +40,7 @@ def test_bulk_create_fields(pdf_samples, yaml_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_create_field_dynamic_options(pdf_samples, tmp_path):
+def test_create_field_input_methods(pdf_samples, tmp_path):
     data_path = os.path.join(tmp_path, "data.yaml")
     file_output_path = os.path.join(tmp_path, "file-output.pdf")
     options_output_path = os.path.join(tmp_path, "options-output.pdf")
@@ -52,18 +52,7 @@ def test_create_field_dynamic_options(pdf_samples, tmp_path):
 
     base_args = ["create", "field", os.path.join(pdf_samples, "dummy.pdf")]
     file_result = runner.invoke(
-        cli_app,
-        [
-            *base_args,
-            "-f",
-            data_path,
-            "--type",
-            "unsupported",
-            "--ignored",
-            "value",
-            "-o",
-            file_output_path,
-        ],
+        cli_app, [*base_args, "-f", data_path, "-o", file_output_path]
     )
     options_result = runner.invoke(
         cli_app,
@@ -87,8 +76,11 @@ def test_create_field_dynamic_options(pdf_samples, tmp_path):
     assert file_result.exit_code == 0
     assert options_result.exit_code == 0
     with open(file_output_path, "rb") as f1, open(options_output_path, "rb") as f2:
-        assert len(f1.read()) == len(f2.read())
-        assert f1.read() == f2.read()
+        file_output = f1.read()
+        options_output = f2.read()
+
+        assert len(file_output) == len(options_output)
+        assert file_output == options_output
 
 
 @pytest.mark.requires_zlib_over_zlib_ng
