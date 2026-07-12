@@ -152,7 +152,7 @@ def main(
 @cli_app.command(
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Fill a PDF form from a YAML or JSON file or field options.",
+    help="Fill a PDF form from a YAML or JSON file or command-line options.",
 )
 def fill(
     ctx: typer.Context,
@@ -167,22 +167,22 @@ def fill(
     ] = None,
 ) -> None:
     """
-    Fill an existing PDF form from a file or dynamic field options.
+    Fill an existing PDF form from a data file or command-line options.
 
     The command loads the input PDF with the global options stored by the root
     callback, expands the generated schema so image and signature widgets can
     accept path objects, validates the input data, normalizes image and
     signature values, and writes the filled PDF to the requested output path or
-    back to the input file. When both a data file and dynamic options are
-    supplied, the data file takes precedence.
+    back to the input file. When both a data file and field options are supplied,
+    the data file takes precedence.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF form path.
         data (Path, optional): YAML or JSON file containing form field values.
-            When omitted, dynamic options from ``ctx.args`` are used. Defaults
-            to None.
+            When omitted, form field values are read from the command-line
+            options in ``ctx.args``. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
         flatten (bool, optional): Whether to flatten form fields after filling.

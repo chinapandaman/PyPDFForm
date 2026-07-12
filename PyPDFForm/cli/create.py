@@ -190,7 +190,7 @@ def merge(
 @create_cli.command(
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Add form fields from a YAML/JSON file or dynamic options.",
+    help="Add form fields from a YAML or JSON file or command-line options.",
 )
 def field(
     ctx: typer.Context,
@@ -201,17 +201,19 @@ def field(
     output: OPTIONAL_OUTPUT_PDF = None,
     element_type: Annotated[
         str | None,
-        typer.Option("--type", help="Form field type for dynamic options."),
+        typer.Option("--type", help="Type of form field to create without --file."),
     ] = None,
 ) -> None:
     """
-    Add form fields from grouped file definitions or dynamic CLI options.
+    Add form fields from a data file or command-line options.
 
     The command maps input groups such as `text`, `check`, and `signature` to
-    PyPDFForm field classes, validates the input file against the CLI field
-    schema, creates the corresponding field objects, and calls
-    `PdfWrapper.bulk_create_fields` before writing the modified PDF. Dynamic
-    options create one field of the selected type; file input takes precedence.
+    PyPDFForm field classes, validates the input against the CLI field schema,
+    creates the corresponding field objects, and calls
+    `PdfWrapper.bulk_create_fields` before writing the modified PDF. A data file
+    can define multiple fields grouped by type. Without `--file`, `--type` and
+    the field options define one field. The data file takes precedence when
+    both input forms are supplied.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
@@ -221,8 +223,8 @@ def field(
             definitions. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
-        element_type (str, optional): Form field type for dynamic options.
-            Defaults to None.
+        element_type (str, optional): Form field type used when `data` is
+            omitted. Defaults to None.
     """
     field_map = {
         "text": Fields.TextField,
@@ -249,7 +251,7 @@ def field(
 @create_cli.command(
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Draw elements from a YAML/JSON file or dynamic options.",
+    help="Draw elements from a YAML or JSON file or command-line options.",
 )
 def raw(
     ctx: typer.Context,
@@ -260,17 +262,19 @@ def raw(
     output: OPTIONAL_OUTPUT_PDF = None,
     element_type: Annotated[
         str | None,
-        typer.Option("--type", help="Raw element type for dynamic options."),
+        typer.Option("--type", help="Type of element to draw without --file."),
     ] = None,
 ) -> None:
     """
-    Draw raw elements from grouped file definitions or dynamic CLI options.
+    Draw elements from a data file or command-line options.
 
     The command maps input groups such as `text`, `image`, and `rectangle` to
-    raw element classes, validates the input file against the CLI raw element
-    schema, creates the corresponding drawable objects, and calls
-    `PdfWrapper.draw` before writing the modified PDF. Dynamic options create
-    one element of the selected type; file input takes precedence.
+    raw element classes, validates the input against the CLI raw element schema,
+    creates the corresponding drawable objects, and calls `PdfWrapper.draw`
+    before writing the modified PDF. A data file can define multiple elements
+    grouped by type. Without `--file`, `--type` and the element options define
+    one element. The data file takes precedence when both input forms are
+    supplied.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
@@ -280,7 +284,7 @@ def raw(
             definitions. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
-        element_type (str, optional): Raw element type for dynamic options.
+        element_type (str, optional): Element type used when `data` is omitted.
             Defaults to None.
     """
     raw_element_map = {
@@ -299,7 +303,7 @@ def raw(
         method_name="draw",
         ctx=ctx,
         file_param_hint="--file",
-        options_param_hint="raw options",
+        options_param_hint="element options",
         output=output,
         element_type=element_type,
     )
@@ -308,7 +312,7 @@ def raw(
 @create_cli.command(
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Add annotations from a YAML/JSON file or dynamic options.",
+    help="Add annotations from a YAML or JSON file or command-line options.",
 )
 def annotation(
     ctx: typer.Context,
@@ -319,17 +323,19 @@ def annotation(
     output: OPTIONAL_OUTPUT_PDF = None,
     element_type: Annotated[
         str | None,
-        typer.Option("--type", help="Annotation type for dynamic options."),
+        typer.Option("--type", help="Type of annotation to add without --file."),
     ] = None,
 ) -> None:
     """
-    Add annotations from grouped file definitions or dynamic CLI options.
+    Add annotations from a data file or command-line options.
 
     The command maps input groups such as `text`, `link`, and `highlight` to
-    annotation classes, validates the input file against the CLI annotation
-    schema, creates the corresponding annotation objects, and calls
-    `PdfWrapper.annotate` before writing the modified PDF. Dynamic options
-    create one annotation of the selected type; file input takes precedence.
+    annotation classes, validates the input against the CLI annotation schema,
+    creates the corresponding annotation objects, and calls
+    `PdfWrapper.annotate` before writing the modified PDF. A data file can
+    define multiple annotations grouped by type. Without `--file`, `--type` and
+    the annotation options define one annotation. The data file takes
+    precedence when both input forms are supplied.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
@@ -339,8 +345,8 @@ def annotation(
             definitions. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
-        element_type (str, optional): Annotation type for dynamic options.
-            Defaults to None.
+        element_type (str, optional): Annotation type used when `data` is
+            omitted. Defaults to None.
     """
     annotation_map = {
         "text": Annotations.TextAnnotation,

@@ -209,9 +209,9 @@ def load_data_file(data: Path, schema: dict, param_hint: str) -> Any:
 
 def load_data_options(options: list[str], schema: dict, param_hint: str) -> Any:
     """
-    Loads dynamic form field options and validates them against a schema.
+    Parses command-line data options and validates them against a schema.
 
-    Dynamic options use ``--name value`` syntax. Each value is parsed with
+    Options use ``--name value`` syntax. Each value is parsed with
     :func:`yaml.safe_load`.
 
     Args:
@@ -221,7 +221,7 @@ def load_data_options(options: list[str], schema: dict, param_hint: str) -> Any:
         param_hint (str): CLI parameter description used in error messages.
 
     Returns:
-        Any: Parsed and validated field data.
+        Any: Parsed and validated option data.
 
     Raises:
         typer.BadParameter: Raised when the options cannot be parsed or the
@@ -279,15 +279,15 @@ def handle_font_registration(
     """
     Registers a custom font referenced by CLI input.
 
-    CLI input files may provide a file path in a `font` parameter. This helper
+    CLI input may provide a file path in a `font` parameter. This helper
     registers each unique font path on the supplied `PdfWrapper` once, assigns
     it a generated internal font name, and mutates `params["font"]` to that
     registered name so downstream field or element constructors can use it.
 
     Args:
         obj (PdfWrapper): The wrapper for the PDF currently being modified.
-        params (dict): The element or widget parameters loaded from the input
-            file. This dictionary is mutated when it contains a `font` key.
+        params (dict): The element or widget parameters loaded from CLI input.
+            This dictionary is mutated when it contains a `font` key.
         registered_font (dict): Mapping of resolved source font paths to
             generated `PdfWrapper` font names for the current command
             invocation.
@@ -314,13 +314,14 @@ def create_elements_from_file(
     element_type: str | None = None,
 ) -> None:
     """
-    Creates PDF elements from grouped file definitions or dynamic CLI options.
+    Creates PDF elements from a data file or command-line options.
 
-    File input groups element definitions by type, such as `text`, `image`, or
-    `highlight`. Dynamic CLI input creates one element of `element_type` from
-    the unrecognized options stored in ``ctx.args``. File input takes
-    precedence when both forms are supplied. Each item is constructed after
-    optional font registration and passed to `method_name` on `PdfWrapper`.
+    A data file groups element definitions by type, such as `text`, `image`, or
+    `highlight`. Without a data file, one element of `element_type` is created
+    from the additional command-line options stored in ``ctx.args``. The data
+    file takes precedence when both input forms are supplied. Each definition
+    is constructed after optional font registration and passed to `method_name`
+    on `PdfWrapper`.
 
     Args:
         pdf (Path): The path to the input PDF file.
@@ -328,7 +329,7 @@ def create_elements_from_file(
             element definitions. Defaults to None.
         element_map (dict): Mapping from input group names to element classes
             or callables used to construct each object.
-        schema (dict): JSON schema used to validate the grouped definitions.
+        schema (dict): JSON schema used to validate file or command-line input.
         method_name (str): Name of the `PdfWrapper` method that accepts the
             constructed elements, such as `bulk_create_fields`, `draw`, or
             `annotate`.
@@ -336,10 +337,10 @@ def create_elements_from_file(
             `ctx.obj`.
         file_param_hint (str): CLI parameter associated with the input file.
         options_param_hint (str): CLI parameter description associated with
-            dynamic options.
+            command-line options.
         output (Path, optional): Path where the modified PDF should be saved. If
             omitted, the input PDF is overwritten. Defaults to None.
-        element_type (str, optional): Element type selected for dynamic CLI
+        element_type (str, optional): Element type selected for command-line
             input. Defaults to None.
     """
     if data is not None:
