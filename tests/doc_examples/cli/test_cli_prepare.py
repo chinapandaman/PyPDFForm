@@ -11,6 +11,34 @@ from PyPDFForm.cli.root import cli_app
 runner = CliRunner()
 
 
+@pytest.mark.requires_zlib_over_zlib_ng
+@pytest.mark.cli_test
+def test_bulk_create_fields(pdf_samples, yaml_samples, tmp_path):
+    expected_path = os.path.join(pdf_samples, "docs", "test_bulk_create_fields.pdf")
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "field",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            "-f",
+            os.path.join(yaml_samples, "test_bulk_create_fields.yaml"),
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+        expected = f1.read()
+        actual = f2.read()
+
+        assert len(expected) == len(actual)
+        assert expected == actual
+
+
 @pytest.mark.cli_test
 def test_create_field_dynamic_options(pdf_samples, tmp_path):
     data_path = os.path.join(tmp_path, "data.yaml")
@@ -61,34 +89,6 @@ def test_create_field_dynamic_options(pdf_samples, tmp_path):
     with open(file_output_path, "rb") as f1, open(options_output_path, "rb") as f2:
         assert len(f1.read()) == len(f2.read())
         assert f1.read() == f2.read()
-
-
-@pytest.mark.requires_zlib_over_zlib_ng
-@pytest.mark.cli_test
-def test_bulk_create_fields(pdf_samples, yaml_samples, tmp_path):
-    expected_path = os.path.join(pdf_samples, "docs", "test_bulk_create_fields.pdf")
-    output_path = os.path.join(tmp_path, "output.pdf")
-
-    result = runner.invoke(
-        cli_app,
-        [
-            "create",
-            "field",
-            os.path.join(pdf_samples, "dummy.pdf"),
-            "-f",
-            os.path.join(yaml_samples, "test_bulk_create_fields.yaml"),
-            "-o",
-            output_path,
-        ],
-    )
-    assert result.exit_code == 0
-
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
-        actual = f2.read()
-
-        assert len(expected) == len(actual)
-        assert expected == actual
 
 
 @pytest.mark.requires_zlib_over_zlib_ng
