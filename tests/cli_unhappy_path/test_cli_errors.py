@@ -351,6 +351,21 @@ def test_update_rename_rejects_full_widget_name_option(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
+@pytest.mark.parametrize("subcommand", ["rename", "field"])
+def test_update_dynamic_options_require_field(pdf_samples, subcommand):
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            subcommand,
+            os.path.join(pdf_samples, "sample_template.pdf"),
+        ],
+    )
+
+    assert_cli_error(result, "Invalid value")
+
+
+@pytest.mark.cli_test
 def test_update_field_schema_error(pdf_samples, tmp_path):
     data_path = write_invalid_json(tmp_path, '{"test": {"alignment": 3}}')
     output_path = os.path.join(tmp_path, "output.pdf")

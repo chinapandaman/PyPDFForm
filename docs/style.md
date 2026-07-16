@@ -4,6 +4,33 @@ PyPDFForm lets you modify PDF-level metadata and form field settings in code. Yo
 
 The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
 
+## CLI input methods
+
+The `update field` command can update one or more fields from a YAML or JSON file supplied with `--file` / `-f`:
+
+=== "data.yaml"
+    ```yaml
+    test:
+      font_size: 20
+      alignment: 1
+    ```
+=== "Command"
+    ```shell
+    pypdfform update field sample_template.pdf -f data.yaml -o output.pdf
+    ```
+
+To update a single field without creating a data file, identify it with `--field` and pass its properties as command-line options:
+
+```shell
+pypdfform update field sample_template.pdf \
+    --field test \
+    --font_size 20 \
+    --alignment 1 \
+    -o output.pdf
+```
+
+When `--file` is supplied, it takes precedence over `--field` and the field property options.
+
 ## Change PDF title
 
 === "Library"
@@ -588,6 +615,15 @@ PyPDFForm lets you rename existing fields by updating their keys.
 === "CLI"
     Provide the old field keys and their `new_key` values to `update rename`:
 
+    === "Command-Line Options"
+        Rename one field without creating a data file by identifying it with `--field`:
+
+        ```shell
+        pypdfform update rename sample_template.pdf \
+            --field test \
+            --new_key test_text \
+            -o output.pdf
+        ```
     === "Update Multiple Fields"
         === "data.yaml"
             ```yaml
