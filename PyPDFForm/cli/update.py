@@ -26,6 +26,7 @@ from .common import (
     get_widget,
     handle_font_registration,
     load_data_file,
+    load_data_options,
 )
 from .schemas.update import FIELD_SCHEMA, RENAME_SCHEMA
 
@@ -185,33 +186,46 @@ def bounds(
 
 
 @update_cli.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Rename form fields from YAML or JSON.",
+    help="Rename form fields from YAML or JSON or command-line options.",
 )
 def rename(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, data_file_option("YAML or JSON file with form field renames.")
-    ],
+        Path | None, data_file_option("YAML or JSON file with form field renames.")
+    ] = None,
     output: OPTIONAL_OUTPUT_PDF = None,
+    widget: Annotated[
+        str | None,
+        typer.Option(
+            "--field",
+            help="Form field name to rename without --file.",
+        ),
+    ] = None,
 ) -> None:
     """
-    Rename form fields using a validated YAML or JSON mapping file.
+    Rename form fields from a data file or command-line options.
 
-    The command rejects full widget name mode, validates the input file against
-    the rename schema, resolves each existing field, queues the requested key
+    The command rejects full widget name mode, validates the input against the
+    rename schema, resolves each existing field, queues the requested key
     updates on the `PdfWrapper`, commits the rename operations, and writes the
-    modified PDF to the requested output path or back to the input file.
+    modified PDF to the requested output path or back to the input file. A data
+    file can rename multiple fields. Without `--file`, `--field` and the rename
+    options update one field. The data file takes precedence when both input
+    forms are supplied.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
-        data (Path): YAML or JSON file containing form field rename
-            definitions.
+        data (Path, optional): YAML or JSON file containing form field rename
+            definitions. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
+        widget (str, optional): Form field name used when `data` is omitted.
+            Defaults to None.
 
     Raises:
         typer.BadParameter: Raised when full widget name mode is enabled, the
@@ -224,59 +238,111 @@ def rename(
             param_hint="--use-full-widget-name",
         )
 
-    input_data = load_data_file(data, RENAME_SCHEMA, "--file")
+    if data is not None:
+        input_data = load_data_file(data, RENAME_SCHEMA, "--file")
+        field_param_hint = "--file"
+    else:
+        if widget is None:
+            cli_bad_parameter(
+                "Specify a form field when --file is omitted.",
+                param_hint="--field",
+            )
+        input_data = [
+            {
+                widget: load_data_options(
+                    ctx.args,
+                    RENAME_SCHEMA["items"]["additionalProperties"],
+                    "rename options",
+                )
+            }
+        ]
+        field_param_hint = "--field"
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     for item in input_data:
         for k, v in item.items():
-            widget = get_widget(obj, k, "--file")
-            obj.update_widget_key(widget.name, v["new_key"], index=v.get("index", 0))
+            field_widget = get_widget(obj, k, field_param_hint)
+            obj.update_widget_key(
+                field_widget.name,
+                v["new_key"],
+                index=v.get("index", 0),
+            )
 
     obj.commit_widget_key_updates().write(output or pdf)
 
 
 @update_cli.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
-    help="Update form field properties from YAML or JSON.",
+    help="Update form field properties from YAML or JSON or command-line options.",
 )
 def field(
     ctx: typer.Context,
     pdf: INPUT_PDF,
     data: Annotated[
-        Path, data_file_option("YAML or JSON file with form field property updates.")
-    ],
+        Path | None,
+        data_file_option("YAML or JSON file with form field property updates."),
+    ] = None,
     output: OPTIONAL_OUTPUT_PDF = None,
+    widget: Annotated[
+        str | None,
+        typer.Option(
+            "--field",
+            help="Form field name to update without --file.",
+        ),
+    ] = None,
 ) -> None:
     """
-    Update form field properties from a validated YAML or JSON file.
+    Update form field properties from a data file or command-line options.
 
-    The command validates the input file against the field update schema, loads
-    the PDF with the global CLI options stored in `ctx.obj`, resolves each
-    field name, registers any referenced fonts once per invocation, assigns the
+    The command validates the input against the field update schema, loads the
+    PDF with the global CLI options stored in `ctx.obj`, resolves each field
+    name, registers any referenced fonts once per invocation, assigns the
     requested widget properties, and writes the modified PDF to the requested
-    output path or back to the input file.
+    output path or back to the input file. A data file can update multiple
+    fields. Without `--file`, `--field` and the property options update one
+    field. The data file takes precedence when both input forms are supplied.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
-        data (Path): YAML or JSON file containing form field property updates.
+        data (Path, optional): YAML or JSON file containing form field property
+            updates. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
+        widget (str, optional): Form field name used when `data` is omitted.
+            Defaults to None.
 
     Raises:
         typer.BadParameter: Raised when the input file is invalid or a requested
             field does not exist.
     """
-    input_data = load_data_file(data, FIELD_SCHEMA, "--file")
+    if data is not None:
+        input_data = load_data_file(data, FIELD_SCHEMA, "--file")
+        field_param_hint = "--file"
+    else:
+        if widget is None:
+            cli_bad_parameter(
+                "Specify a form field when --file is omitted.",
+                param_hint="--field",
+            )
+        input_data = {
+            widget: load_data_options(
+                ctx.args,
+                FIELD_SCHEMA["patternProperties"][".+"],
+                "field update options",
+            )
+        }
+        field_param_hint = "--field"
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
     registered_font = {}
     for k, each in input_data.items():
-        widget = get_widget(obj, k, "--file")
+        field_widget = get_widget(obj, k, field_param_hint)
         handle_font_registration(obj, each, registered_font)
         for param, v in each.items():
-            setattr(widget, param, v)
+            setattr(field_widget, param, v)
 
     obj.write(output or pdf)
 

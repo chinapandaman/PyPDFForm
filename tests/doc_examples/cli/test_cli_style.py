@@ -16,6 +16,47 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
+def test_update_field_input_methods(static_pdfs, tmp_path):
+    data_path = os.path.join(tmp_path, "data.yaml")
+    file_output_path = os.path.join(tmp_path, "file-output.pdf")
+    options_output_path = os.path.join(tmp_path, "options-output.pdf")
+    with open(data_path, "w", encoding="utf-8") as f:
+        yaml.safe_dump({"test": {"font_size": 20, "alignment": 1}}, f)
+
+    base_args = [
+        "update",
+        "field",
+        os.path.join(static_pdfs, "sample_template.pdf"),
+    ]
+    file_result = runner.invoke(
+        cli_app, [*base_args, "-f", data_path, "-o", file_output_path]
+    )
+    options_result = runner.invoke(
+        cli_app,
+        [
+            *base_args,
+            "--field",
+            "test",
+            "--font_size",
+            "20",
+            "--alignment",
+            "1",
+            "-o",
+            options_output_path,
+        ],
+    )
+
+    assert file_result.exit_code == 0
+    assert options_result.exit_code == 0
+    with open(file_output_path, "rb") as f1, open(options_output_path, "rb") as f2:
+        file_output = f1.read()
+        options_output = f2.read()
+
+        assert len(file_output) == len(options_output)
+        assert file_output == options_output
+
+
+@pytest.mark.cli_test
 def test_change_title(static_pdfs, tmp_path):
     output_path = os.path.join(tmp_path, "output.pdf")
     result = runner.invoke(
@@ -502,6 +543,33 @@ def test_change_dropdown_font_color(pdf_samples, static_pdfs, yaml_samples, tmp_
 
         assert len(expected) == len(actual)
         assert expected == actual
+
+
+@pytest.mark.cli_test
+def test_update_key_options(static_pdfs, tmp_path):
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "rename",
+            os.path.join(static_pdfs, "sample_template.pdf"),
+            "--field",
+            "test",
+            "--new_key",
+            "test_text",
+            "-o",
+            output_path,
+        ],
+    )
+    assert result.exit_code == 0
+
+    result = runner.invoke(cli_app, ["inspect", "sample", output_path])
+    sample_data = json.loads(result.output)
+
+    assert "test" not in sample_data
+    assert "test_text" in sample_data
 
 
 @pytest.mark.cli_test
