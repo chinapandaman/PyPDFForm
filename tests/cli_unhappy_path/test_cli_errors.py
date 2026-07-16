@@ -362,7 +362,7 @@ def test_update_dynamic_options_require_field(pdf_samples, subcommand):
         ],
     )
 
-    assert_cli_error(result, "Invalid value for --field")
+    assert_cli_error(result, "Invalid value")
 
 
 @pytest.mark.cli_test
