@@ -22,6 +22,28 @@ inspect_cli = typer.Typer(
 
 @inspect_cli.command(
     no_args_is_help=True,
+    help="Print the PDF title.",
+)
+def title(
+    ctx: typer.Context,
+    pdf: INPUT_PDF,
+) -> None:
+    """
+    Print the document title metadata from an existing PDF.
+
+    The command loads the PDF with the global CLI options stored in `ctx.obj`,
+    reads `PdfWrapper.title`, and writes it to standard output.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+    """
+    typer.echo(PdfWrapper(str(pdf), **ctx.obj).title)
+
+
+@inspect_cli.command(
+    no_args_is_help=True,
     help="Print the form schema as JSON.",
 )
 def schema(
@@ -87,28 +109,6 @@ def sample(
         pdf (Path): Input PDF path.
     """
     typer.echo(json.dumps(PdfWrapper(str(pdf), **ctx.obj).sample_data))
-
-
-@inspect_cli.command(
-    no_args_is_help=True,
-    help="Print the PDF title.",
-)
-def title(
-    ctx: typer.Context,
-    pdf: INPUT_PDF,
-) -> None:
-    """
-    Print the document title metadata from an existing PDF.
-
-    The command loads the PDF with the global CLI options stored in `ctx.obj`,
-    reads `PdfWrapper.title`, and writes it to standard output.
-
-    Args:
-        ctx (typer.Context): Typer context containing global `PdfWrapper`
-            options in `ctx.obj`.
-        pdf (Path): Input PDF path.
-    """
-    typer.echo(PdfWrapper(str(pdf), **ctx.obj).title)
 
 
 @inspect_cli.command(
