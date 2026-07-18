@@ -113,6 +113,7 @@ def main(
         typer.Option(
             "--preserve-metadata",
             help="Preserve input PDF metadata.",
+            hidden=True,
         ),
     ] = False,
     use_full_widget_name: Annotated[

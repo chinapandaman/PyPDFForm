@@ -266,7 +266,7 @@ def test_preserve_metadata():
     )
     writer.write(pdf_stream)
     pdf_stream.seek(0)
-    wrapper = PdfWrapper(pdf_stream, preserve_metadata=True)
+    wrapper = PdfWrapper(pdf_stream)
     wrapper.bulk_create_fields(
         [Fields.TextField(name="Test", page_number=1, x=100, y=400)]
     )
@@ -275,8 +275,6 @@ def test_preserve_metadata():
     metadata = reader.metadata or {}
     assert metadata["/test_key"] == "test_value"
     assert metadata["/other_key"] == "other_value"
-
-    assert PdfWrapper(preserve_metadata=True)
 
 
 @pytest.mark.requires_zlib_over_zlib_ng

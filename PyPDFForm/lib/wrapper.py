@@ -38,6 +38,7 @@ from .adapter import (
     fp_or_f_obj_or_stream_to_stream,
 )
 from .coordinate import generate_coordinate_grid
+from .deprecation import deprecation_notice
 from .egress import (
     appearance_streams_handler,
     preserve_pdf_properties,
@@ -151,9 +152,7 @@ class PdfWrapper:
         self.title: Optional[str] = None
 
         self._version = None
-        self._metadata = (
-            get_metadata(self._read()) if kwargs.get("preserve_metadata") else {}
-        )
+        self._metadata = get_metadata(self._read())
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
@@ -163,6 +162,10 @@ class PdfWrapper:
 
         # sets attrs from kwargs
         for attr, default in self.USER_PARAMS:
+            if attr == "preserve_metadata" and attr in kwargs:
+                deprecation_notice("", "preserve_metadata").emit_notice(
+                    self, "__init__"
+                )
             setattr(self, attr, kwargs.get(attr, default))
 
         if getattr(self, "generate_appearance_streams") is True:
@@ -482,7 +485,6 @@ class PdfWrapper:
         if (
             any(
                 [
-                    getattr(self, "preserve_metadata"),
                     self.title,
                     self.on_open_javascript,
                 ]
@@ -493,7 +495,7 @@ class PdfWrapper:
                 result,
                 self.title,
                 self.on_open_javascript,
-                self._metadata if getattr(self, "preserve_metadata") else None,
+                self._metadata,
             )
 
         if result:
