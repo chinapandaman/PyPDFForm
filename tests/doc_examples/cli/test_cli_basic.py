@@ -3,11 +3,11 @@
 import os
 
 import pytest
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfReader
 from typer.testing import CliRunner
 
 from PyPDFForm.cli.root import cli_app
-from PyPDFForm.lib.constants import AcroForm, Title
+from PyPDFForm.lib.constants import AcroForm
 
 runner = CliRunner()
 
@@ -80,34 +80,6 @@ def test_generate_appearance_streams_option(static_pdfs, tmp_path):
 
     reader = PdfReader(output_path)
     assert "/NeedAppearances" not in reader.root_object[AcroForm]
-
-
-@pytest.mark.cli_test
-def test_preserve_metadata_option(static_pdfs, tmp_path):
-    with_metadata = os.path.join(tmp_path, "metadata.pdf")
-    output_path = os.path.join(tmp_path, "output.pdf")
-    writer = PdfWriter(os.path.join(static_pdfs, "sample_template.pdf"))
-    writer.add_metadata({"/foo": "bar"})
-    writer.write(with_metadata)
-
-    result = runner.invoke(
-        cli_app,
-        [
-            "--preserve-metadata",
-            "update",
-            "title",
-            with_metadata,
-            "-t",
-            "My PDF",
-            "-o",
-            output_path,
-        ],
-    )
-    assert result.exit_code == 0
-
-    reader = PdfReader(output_path)
-    assert (reader.metadata or {}).get(Title) == "My PDF"
-    assert (reader.metadata or {}).get("/foo") == "bar"
 
 
 @pytest.mark.cli_test

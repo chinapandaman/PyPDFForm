@@ -38,6 +38,7 @@ from .adapter import (
     fp_or_f_obj_or_stream_to_stream,
 )
 from .coordinate import generate_coordinate_grid
+from .deprecation import deprecation_notice
 from .egress import (
     appearance_streams_handler,
     preserve_pdf_properties,
@@ -107,7 +108,8 @@ class PdfWrapper:
                 - `use_full_widget_name` (bool): Whether to use the full widget name when filling the form.
                 - `need_appearances` (bool): Whether to set the `NeedAppearances` flag in the PDF's AcroForm dictionary.
                 - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
-                - `preserve_metadata` (bool): Whether to preserve the original metadata of the PDF.
+                - `preserve_metadata` (bool): Deprecated compatibility attribute;
+                  input PDF metadata is captured automatically.
                 - `title` (str): The title of the PDF document.
 
     """
@@ -130,7 +132,8 @@ class PdfWrapper:
 
         Initializes a new `PdfWrapper` object with the given template PDF and optional keyword arguments.
         The template is normalized to bytes, existing widgets are loaded immediately, and
-        original metadata is captured only when `preserve_metadata` is requested.
+        original metadata is captured automatically. The deprecated `preserve_metadata`
+        keyword is accepted for backward compatibility and emits a deprecation warning.
         Enabling `generate_appearance_streams` also enables `need_appearances`.
 
         Args:
@@ -151,9 +154,7 @@ class PdfWrapper:
         self.title: Optional[str] = None
 
         self._version = None
-        self._metadata = (
-            get_metadata(self._read()) if kwargs.get("preserve_metadata") else {}
-        )
+        self._metadata = get_metadata(self._read())
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
@@ -163,6 +164,10 @@ class PdfWrapper:
 
         # sets attrs from kwargs
         for attr, default in self.USER_PARAMS:
+            if attr == "preserve_metadata" and attr in kwargs:
+                deprecation_notice("", "preserve_metadata").emit_notice(
+                    self, "__init__"
+                )
             setattr(self, attr, kwargs.get(attr, default))
 
         if getattr(self, "generate_appearance_streams") is True:
@@ -460,8 +465,8 @@ class PdfWrapper:
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
            generating appearance streams.
-        3. If `preserve_metadata`, title, or on-open JavaScript are set, it preserves
-           or updates the corresponding PDF properties accordingly.
+        3. If a title or on-open JavaScript is set, it restores the captured input
+           metadata while updating the corresponding PDF properties.
         4. Rebuilds the AcroForm `/Fields` array from page annotations for
            widgets known to this wrapper, leaving the stream unchanged when no
            matching widget annotations are found.
@@ -482,7 +487,6 @@ class PdfWrapper:
         if (
             any(
                 [
-                    getattr(self, "preserve_metadata"),
                     self.title,
                     self.on_open_javascript,
                 ]
@@ -493,7 +497,7 @@ class PdfWrapper:
                 result,
                 self.title,
                 self.on_open_javascript,
-                self._metadata if getattr(self, "preserve_metadata") else None,
+                self._metadata,
             )
 
         if result:

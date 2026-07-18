@@ -113,6 +113,7 @@ def main(
         typer.Option(
             "--preserve-metadata",
             help="Preserve input PDF metadata.",
+            hidden=True,
         ),
     ] = False,
     use_full_widget_name: Annotated[
@@ -137,7 +138,8 @@ def main(
             field appearances.
         generate_appearance_streams (bool): Whether to generate form field
             appearance streams while handling PDFs.
-        preserve_metadata (bool): Whether to preserve input PDF metadata.
+        preserve_metadata (bool): Deprecated compatibility option. Input PDF
+            metadata is preserved automatically.
         use_full_widget_name (bool): Whether widget lookups should use full
             form field names.
     """

@@ -89,18 +89,19 @@ def preserve_pdf_properties(
     pdf: bytes, title: str, script: str, metadata: dict
 ) -> bytes:
     """
-    Preserves and updates PDF properties such as metadata, title, and OpenAction scripts.
+    Restores and updates PDF properties such as metadata, title, and OpenAction scripts.
 
-    This function allows setting or updating the PDF's title and metadata, and
-    attaching a JavaScript script that executes when the PDF is opened. Metadata
-    is merged into the reader's current metadata when provided; the title and
-    OpenAction JavaScript are written only when non-empty values are supplied.
+    This function restores captured input metadata, allows setting or updating the
+    PDF's title, and attaches a JavaScript script that executes when the PDF is
+    opened. Captured metadata is merged into the supplied PDF's current metadata;
+    the title and OpenAction JavaScript are written only when non-empty values are
+    supplied.
 
     Args:
         pdf (bytes): The PDF file content as a bytes stream.
         title (str): The title to be set in the PDF metadata.
         script (str): JavaScript code to be executed when the PDF is opened.
-        metadata (dict): The original metadata to preserve.
+        metadata (dict): Captured input metadata to restore.
 
     Returns:
         bytes: The modified PDF content as a bytes stream.
