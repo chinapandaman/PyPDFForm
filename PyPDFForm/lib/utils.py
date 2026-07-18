@@ -46,13 +46,11 @@ def remove_all_widgets(pdf: bytes) -> bytes:
     Returns:
         bytes: The PDF with all widgets removed, as a bytes stream.
     """
-    pdf_file = PdfReader(BytesIO(pdf))
     result_stream = BytesIO()
-    writer = PdfWriter()
-    for page in pdf_file.pages:
+    writer = PdfWriter(BytesIO(pdf))
+    for page in writer.pages:
         if page.annotations:
             page.annotations.clear()
-        writer.add_page(page)
 
     writer.write(result_stream)
     result_stream.seek(0)

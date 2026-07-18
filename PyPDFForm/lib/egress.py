@@ -17,7 +17,7 @@ from io import BytesIO
 from warnings import catch_warnings, filterwarnings
 
 from pikepdf import Pdf
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, NameObject, TextStringObject
 
 from .constants import (
@@ -29,7 +29,6 @@ from .constants import (
     JavaScript,
     OpenAction,
     Parent,
-    Root,
     S,
     Title,
 )
@@ -58,13 +57,12 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     Returns:
         bytes: The modified PDF content as a bytes stream.
     """
-    reader = PdfReader(BytesIO(pdf))
-    writer = PdfWriter()
+    writer = PdfWriter(BytesIO(pdf))
 
-    if AcroForm in reader.trailer[Root] and XFA in reader.trailer[Root][AcroForm]:
-        del reader.trailer[Root][AcroForm][XFA]
+    root_object = writer._root_object  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+    if AcroForm in root_object and XFA in root_object[AcroForm]:
+        del root_object[AcroForm][XFA]
 
-    writer.append(reader)
     writer.set_need_appearances_writer()
 
     with BytesIO() as f:
@@ -107,12 +105,10 @@ def preserve_pdf_properties(
     Returns:
         bytes: The modified PDF content as a bytes stream.
     """
-    reader = PdfReader(BytesIO(pdf))
-    writer = PdfWriter()
-    writer.append(reader)
+    writer = PdfWriter(BytesIO(pdf))
 
     if title or metadata:
-        _metadata = reader.metadata or {}
+        _metadata = writer.metadata or {}
         if metadata:
             _metadata.update(metadata)
         if title:
