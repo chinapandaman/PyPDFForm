@@ -735,6 +735,10 @@ def test_blank_page(pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
+
+        assert not obj.widgets
+        assert len(obj.pages) == 1
+
         request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
 
 
@@ -752,6 +756,10 @@ def test_blank_page_custom_size_multiply(pdf_samples, request):
         expected = f.read()
 
         assert len(obj.read()) == len(expected)
+
+        assert not obj.widgets
+        assert len(obj.pages) == 3
+
         request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
 
 

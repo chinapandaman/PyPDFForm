@@ -52,4 +52,9 @@ def test_index_snippets(pdf_samples, request):
         expected = f.read()
 
         assert len(pdf.read()) == len(expected)
+
+        assert pdf.widgets["my_textfield"].alignment == 1
+        assert pdf.data["my_textfield"] == "this is a text field"
+        assert pdf.data["my_checkbox"]
+
         request.config.results["skip_regenerate"] = len(pdf.read()) == len(expected)
