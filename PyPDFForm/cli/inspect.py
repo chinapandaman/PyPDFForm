@@ -2,10 +2,10 @@
 """
 This module defines CLI commands for inspecting PDF form information.
 
-It exposes the `inspect` command group, which prints JSON for form schemas,
-current form values, generated sample data, and field rectangle metadata.
-Each command wraps read-only `PdfWrapper` properties so users can inspect forms
-from the terminal without writing Python code.
+It exposes the `inspect` command group, which prints PDF titles and JSON for
+form schemas, current form values, generated sample data, and field rectangle
+metadata. Each command wraps read-only `PdfWrapper` properties so users can
+inspect forms from the terminal without writing Python code.
 """
 
 import json
@@ -18,6 +18,28 @@ from .common import FIELD_NAME, INPUT_PDF, get_widget
 inspect_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
 )
+
+
+@inspect_cli.command(
+    no_args_is_help=True,
+    help="Print the PDF title.",
+)
+def title(
+    ctx: typer.Context,
+    pdf: INPUT_PDF,
+) -> None:
+    """
+    Print the document title metadata from an existing PDF.
+
+    The command loads the PDF with the global CLI options stored in `ctx.obj`,
+    reads `PdfWrapper.title`, and writes it to standard output.
+
+    Args:
+        ctx (typer.Context): Typer context containing global `PdfWrapper`
+            options in `ctx.obj`.
+        pdf (Path): Input PDF path.
+    """
+    typer.echo(PdfWrapper(str(pdf), **ctx.obj).title)
 
 
 @inspect_cli.command(
