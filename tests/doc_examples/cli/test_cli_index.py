@@ -6,6 +6,7 @@ import os
 import pytest
 from typer.testing import CliRunner
 
+from PyPDFForm import PdfWrapper
 from PyPDFForm.cli.root import cli_app
 
 runner = CliRunner()
@@ -73,4 +74,10 @@ def test_index_snippets(pdf_samples, yaml_samples, tmp_path, request):
         actual = f2.read()
 
         assert len(expected) == len(actual)
+
+        result = PdfWrapper(actual)
+        assert result.widgets["my_textfield"].alignment == 1
+        assert result.data["my_textfield"] == "this is a text field"
+        assert result.data["my_checkbox"]
+
         request.config.results["skip_regenerate"] = len(expected) == len(actual)

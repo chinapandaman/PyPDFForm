@@ -8,6 +8,7 @@ import pytest
 import yaml
 from typer.testing import CliRunner
 
+from PyPDFForm import PdfWrapper
 from PyPDFForm.cli.root import cli_app
 
 runner = CliRunner()
@@ -111,6 +112,10 @@ def test_change_text_font(pdf_samples, static_pdfs, yaml_samples, tmp_path, requ
         actual = f2.read()
 
         assert len(expected) == len(actual)
+
+        result = PdfWrapper(actual)
+        assert "LiberationSerif-BoldItalic" in result.fonts
+
         request.config.results["skip_regenerate"] = len(expected) == len(actual)
 
 
@@ -150,6 +155,15 @@ def test_change_text_font_size(
         actual = f2.read()
 
         assert len(expected) == len(actual)
+
+        result = PdfWrapper(actual)
+        assert result.data["test"] == "test_1"
+        assert result.data["test_2"] == "test_2"
+        assert result.data["test_3"] == "test_3"
+        assert result.data["check"]
+        assert not result.data["check_2"]
+        assert result.data["check_3"]
+
         request.config.results["skip_regenerate"] = len(expected) == len(actual)
 
 
@@ -189,6 +203,15 @@ def test_change_text_font_color(
         actual = f2.read()
 
         assert len(expected) == len(actual)
+
+        result = PdfWrapper(actual)
+        assert result.data["test"] == "test_1"
+        assert result.data["test_2"] == "test_2"
+        assert result.data["test_3"] == "test_3"
+        assert result.data["check"]
+        assert not result.data["check_2"]
+        assert result.data["check_3"]
+
         request.config.results["skip_regenerate"] = len(expected) == len(actual)
 
 
@@ -228,6 +251,12 @@ def test_change_text_alignment(
         actual = f2.read()
 
         assert len(expected) == len(actual)
+
+        result = PdfWrapper(actual)
+        assert result.widgets["test"].alignment == 2
+        assert result.widgets["test_2"].alignment == 1
+        assert result.widgets["test_3"].alignment == 1
+
         request.config.results["skip_regenerate"] = len(expected) == len(actual)
 
 
@@ -267,6 +296,12 @@ def test_change_text_max_length(
         actual = f2.read()
 
         assert len(expected) == len(actual)
+
+        result = PdfWrapper(actual)
+        assert result.widgets["test"].max_length == 2
+        assert result.widgets["test_2"].max_length == 4
+        assert result.widgets["test_3"].max_length == 4
+
         request.config.results["skip_regenerate"] = len(expected) == len(actual)
 
 
@@ -304,6 +339,12 @@ def test_change_text_comb(pdf_samples, static_pdfs, yaml_samples, tmp_path, requ
         actual = f2.read()
 
         assert len(expected) == len(actual)
+
+        result = PdfWrapper(actual)
+        assert result.widgets["test"].comb
+        assert result.widgets["test_2"].comb
+        assert result.widgets["test_3"].comb
+
         request.config.results["skip_regenerate"] = len(expected) == len(actual)
 
 
@@ -356,6 +397,12 @@ def test_change_text_multiline(
         actual = f2.read()
 
         assert len(expected) == len(actual)
+
+        result = PdfWrapper(actual)
+        assert result.widgets["test"].multiline
+        assert not result.widgets["test_2"].multiline
+        assert not result.widgets["test_3"].multiline
+
         request.config.results["skip_regenerate"] = len(expected) == len(actual)
 
 
@@ -403,6 +450,12 @@ def test_change_check_size(pdf_samples, static_pdfs, yaml_samples, tmp_path, req
         actual = f2.read()
 
         assert len(expected) == len(actual)
+
+        result = PdfWrapper(actual)
+        assert result.data["check"]
+        assert result.data["check_2"]
+        assert result.data["check_3"]
+
         request.config.results["skip_regenerate"] = len(expected) == len(actual)
 
 

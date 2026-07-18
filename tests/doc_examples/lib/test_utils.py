@@ -20,6 +20,10 @@ def test_blank_page(pdf_samples, request):
         expected = f.read()
 
         assert len(blank_pdf.read()) == len(expected)
+
+        assert not blank_pdf.widgets
+        assert len(blank_pdf.pages) == 1
+
         request.config.results["skip_regenerate"] = len(blank_pdf.read()) == len(
             expected
         )
@@ -40,6 +44,10 @@ def test_blank_page_custom_dimensions(pdf_samples, request):
         expected = f.read()
 
         assert len(blank_pdf.read()) == len(expected)
+
+        assert not blank_pdf.widgets
+        assert len(blank_pdf.pages) == 1
+
         request.config.results["skip_regenerate"] = len(blank_pdf.read()) == len(
             expected
         )
@@ -58,6 +66,10 @@ def test_blank_page_multiply(pdf_samples, request):
         expected = f.read()
 
         assert len(blank_pdf.read()) == len(expected)
+
+        assert not blank_pdf.widgets
+        assert len(blank_pdf.pages) == 3
+
         request.config.results["skip_regenerate"] = len(blank_pdf.read()) == len(
             expected
         )
