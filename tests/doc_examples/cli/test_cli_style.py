@@ -6,11 +6,9 @@ import os
 
 import pytest
 import yaml
-from pypdf import PdfReader
 from typer.testing import CliRunner
 
 from PyPDFForm.cli.root import cli_app
-from PyPDFForm.lib.constants import Title
 
 runner = CliRunner()
 
@@ -72,9 +70,6 @@ def test_change_title(static_pdfs, tmp_path):
         ],
     )
     assert result.exit_code == 0
-
-    reader = PdfReader(output_path)
-    assert (reader.metadata or {}).get(Title) == "My PDF"
 
     result = runner.invoke(cli_app, ["inspect", "title", output_path])
     assert result.exit_code == 0
