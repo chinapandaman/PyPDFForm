@@ -40,7 +40,6 @@ from .coordinate import generate_coordinate_grid
 from .deprecation import deprecation_notice
 from .egress import (
     appearance_streams_handler,
-    preserve_pdf_properties,
     rebuild_acroform_fields,
 )
 from .filler import fill
@@ -60,6 +59,7 @@ from .template import (
     get_metadata,
     get_title,
     remove_widgets_by_keys,
+    set_on_open_javascript,
     set_title,
     update_widget_keys,
 )
@@ -468,10 +468,14 @@ class PdfWrapper:
     @property
     def on_open_javascript(self) -> str | None:
         """
-        Returns the JavaScript script that executes when the PDF is opened.
+        Returns the on-open JavaScript most recently assigned to this wrapper.
+
+        This property tracks assignments made through the wrapper; it does not
+        inspect the template PDF for an existing `/OpenAction`.
 
         Returns:
-            str | None: The JavaScript script, or None if no script is set.
+            str | None: The assigned JavaScript, or None if no script has been
+                assigned through this wrapper.
         """
 
         return self._on_open_javascript
@@ -481,13 +485,18 @@ class PdfWrapper:
         """
         Sets the JavaScript script that executes when the PDF is opened.
 
+        Assignment immediately writes a JavaScript `/OpenAction` to the stored
+        PDF stream, replacing any existing document-open action.
+
         Args:
             value (str | TextIO): The JavaScript script, provided as either:
                 - str: The JavaScript code as a string, or a file path to a .js file.
                 - TextIO: An open file-like object containing the JavaScript code.
         """
 
-        self._on_open_javascript = fp_or_f_obj_or_f_content_to_content(value)
+        script = fp_or_f_obj_or_f_content_to_content(value)
+        self._stream = set_on_open_javascript(self._read(), script)
+        self._on_open_javascript = script
 
     def read(self) -> bytes:
         """
@@ -498,12 +507,10 @@ class PdfWrapper:
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
            generating appearance streams.
-        3. If on-open JavaScript is set, it writes the script to the document
-           catalog's `/OpenAction` entry.
-        4. Rebuilds the AcroForm `/Fields` array from page annotations for
+        3. Rebuilds the AcroForm `/Fields` array from page annotations for
            widgets known to this wrapper, leaving the stream unchanged when no
            matching widget annotations are found.
-        5. Restores the wrapper's cached PDF header version after egress
+        4. Restores the wrapper's cached PDF header version after egress
            processing, since PDF writers may emit their own default version.
         The wrapper's stored stream is not replaced by these final egress-only changes.
 
@@ -516,12 +523,6 @@ class PdfWrapper:
             result = appearance_streams_handler(
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
-
-        if self.on_open_javascript and result:
-            result = preserve_pdf_properties(
-                result,
-                self.on_open_javascript,
-            )
 
         if result:
             result = rebuild_acroform_fields(

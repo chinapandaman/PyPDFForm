@@ -5,10 +5,9 @@ A module for egress functions.
 This module provides functionalities that prepare the final PDF for output (egress),
 ensuring that it is properly formatted and ready for the end-user. This includes
 managing appearance streams (so form fields display correctly after being filled),
-handling the /NeedAppearances flag, adding OpenAction JavaScript, and rebuilding the
-AcroForm `/Fields` array from the widget annotations present on each page. These
-functions are typically called right before the final PDF byte stream is returned by
-the wrapper module.
+handling the /NeedAppearances flag, and rebuilding the AcroForm `/Fields` array from
+the widget annotations present on each page. These functions are typically called
+right before the final PDF byte stream is returned by the wrapper module.
 """
 
 from functools import lru_cache
@@ -17,18 +16,14 @@ from warnings import catch_warnings, filterwarnings
 
 from pikepdf import Pdf
 from pypdf import PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject, TextStringObject
+from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
 from .constants import (
-    JS,
     XFA,
     AcroForm,
     Annots,
     Fields,
-    JavaScript,
-    OpenAction,
     Parent,
-    S,
 )
 from .template import get_widget_key
 
@@ -81,35 +76,6 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
                 result = r.read()
 
     return result
-
-
-def preserve_pdf_properties(pdf: bytes, script: str) -> bytes:
-    """
-    Adds an on-open JavaScript action to a PDF.
-
-    The script is stored in the document catalog's `/OpenAction` entry as a
-    JavaScript action. When the script is empty, no action is added.
-
-    Args:
-        pdf (bytes): The PDF file content as a bytes stream.
-        script (str): JavaScript code to be executed when the PDF is opened.
-
-    Returns:
-        bytes: The modified PDF content as a bytes stream.
-    """
-    writer = PdfWriter(BytesIO(pdf))
-
-    if script:
-        open_action = DictionaryObject()
-        open_action[NameObject(S)] = NameObject(JavaScript)
-        open_action[NameObject(JS)] = TextStringObject(script)
-
-        writer._root_object.update({NameObject(OpenAction): open_action})  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
-
-    with BytesIO() as f:
-        writer.write(f)
-        f.seek(0)
-        return f.read()
 
 
 def rebuild_acroform_fields(

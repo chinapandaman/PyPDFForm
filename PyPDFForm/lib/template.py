@@ -2,10 +2,10 @@
 """
 Module for handling PDF form templates.
 
-This module provides functionalities to read and update document metadata and
-to extract, build, and update widgets in PDF form templates. It leverages the
-pypdf library for PDF manipulation and defines specific patterns for identifying
-and constructing different types of widgets.
+This module provides functionalities to read and update document metadata, set
+document-level actions, and extract, build, and update widgets in PDF form
+templates. It leverages the pypdf library for PDF manipulation and defines
+specific patterns for identifying and constructing different types of widgets.
 """
 
 from copy import deepcopy
@@ -14,10 +14,21 @@ from io import BytesIO
 from typing import Dict, List, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject
+from pypdf.generic import ArrayObject, DictionaryObject, NameObject, TextStringObject
 
 from .annotations import AnnotationTypes
-from .constants import COMB, MULTILINE, READ_ONLY, REQUIRED, Annots, Title
+from .constants import (
+    COMB,
+    JS,
+    MULTILINE,
+    READ_ONLY,
+    REQUIRED,
+    Annots,
+    JavaScript,
+    OpenAction,
+    S,
+    Title,
+)
 from .middleware import WIDGET_TYPES
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
@@ -110,6 +121,35 @@ def set_title(pdf: bytes, title: str) -> bytes:
         bytes: The PDF stream containing the updated title.
     """
     return set_metadata(pdf, {Title: title})
+
+
+def set_on_open_javascript(pdf: bytes, script: str) -> bytes:
+    """
+    Sets a PDF's document-open action to execute JavaScript.
+
+    The script is written to the document catalog as a JavaScript
+    `/OpenAction`, replacing any existing document-open action. An action is
+    written even when `script` is empty.
+
+    Args:
+        pdf (bytes): The PDF stream whose document-open action should be set.
+        script (str): JavaScript to execute when the PDF is opened.
+
+    Returns:
+        bytes: The PDF stream containing the JavaScript `/OpenAction`.
+    """
+    writer = PdfWriter(BytesIO(pdf))
+
+    open_action = DictionaryObject()
+    open_action[NameObject(S)] = NameObject(JavaScript)
+    open_action[NameObject(JS)] = TextStringObject(script)
+
+    writer._root_object.update({NameObject(OpenAction): open_action})  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
 
 
 def build_widgets(
