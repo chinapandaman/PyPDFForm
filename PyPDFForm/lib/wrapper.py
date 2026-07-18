@@ -40,7 +40,6 @@ from .coordinate import generate_coordinate_grid
 from .deprecation import deprecation_notice
 from .egress import (
     appearance_streams_handler,
-    preserve_pdf_properties,
     rebuild_acroform_fields,
 )
 from .filler import fill
@@ -60,6 +59,7 @@ from .template import (
     get_metadata,
     get_title,
     remove_widgets_by_keys,
+    set_on_open_javascript,
     set_title,
     update_widget_keys,
 )
@@ -487,7 +487,9 @@ class PdfWrapper:
                 - TextIO: An open file-like object containing the JavaScript code.
         """
 
-        self._on_open_javascript = fp_or_f_obj_or_f_content_to_content(value)
+        script = fp_or_f_obj_or_f_content_to_content(value)
+        self._stream = set_on_open_javascript(self._read(), script)
+        self._on_open_javascript = script
 
     def read(self) -> bytes:
         """
@@ -516,12 +518,6 @@ class PdfWrapper:
             result = appearance_streams_handler(
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
-
-        if self.on_open_javascript and result:
-            result = preserve_pdf_properties(
-                result,
-                self.on_open_javascript,
-            )
 
         if result:
             result = rebuild_acroform_fields(

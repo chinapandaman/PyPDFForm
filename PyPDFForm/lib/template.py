@@ -14,10 +14,21 @@ from io import BytesIO
 from typing import Dict, List, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject
+from pypdf.generic import ArrayObject, DictionaryObject, NameObject, TextStringObject
 
 from .annotations import AnnotationTypes
-from .constants import COMB, MULTILINE, READ_ONLY, REQUIRED, Annots, Title
+from .constants import (
+    COMB,
+    JS,
+    MULTILINE,
+    READ_ONLY,
+    REQUIRED,
+    Annots,
+    JavaScript,
+    OpenAction,
+    S,
+    Title,
+)
 from .middleware import WIDGET_TYPES
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
@@ -110,6 +121,21 @@ def set_title(pdf: bytes, title: str) -> bytes:
         bytes: The PDF stream containing the updated title.
     """
     return set_metadata(pdf, {Title: title})
+
+
+def set_on_open_javascript(pdf: bytes, script: str) -> bytes:
+    writer = PdfWriter(BytesIO(pdf))
+
+    open_action = DictionaryObject()
+    open_action[NameObject(S)] = NameObject(JavaScript)
+    open_action[NameObject(JS)] = TextStringObject(script)
+
+    writer._root_object.update({NameObject(OpenAction): open_action})  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
 
 
 def build_widgets(
