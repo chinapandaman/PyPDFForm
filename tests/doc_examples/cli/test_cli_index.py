@@ -13,7 +13,7 @@ runner = CliRunner()
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_index_snippets(pdf_samples, yaml_samples, tmp_path, request):
+def test_index_snippets(pdf_samples, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -73,4 +73,4 @@ def test_index_snippets(pdf_samples, yaml_samples, tmp_path, request):
         actual = f2.read()
 
         assert len(expected) == len(actual)
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
+        assert expected == actual

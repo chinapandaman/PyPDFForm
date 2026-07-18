@@ -79,7 +79,7 @@ def test_change_title(static_pdfs, tmp_path):
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_change_text_font(pdf_samples, static_pdfs, yaml_samples, tmp_path, request):
+def test_change_text_font(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -112,13 +112,11 @@ def test_change_text_font(pdf_samples, static_pdfs, yaml_samples, tmp_path, requ
         actual = f2.read()
 
         assert len(expected) == len(actual)
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
+        assert expected == actual
 
 
 @pytest.mark.cli_test
-def test_change_text_font_size(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, request
-):
+def test_change_text_font_size(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_size.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -151,13 +149,11 @@ def test_change_text_font_size(
         actual = f2.read()
 
         assert len(expected) == len(actual)
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
+        assert expected == actual
 
 
 @pytest.mark.cli_test
-def test_change_text_font_color(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, request
-):
+def test_change_text_font_color(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_color.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -190,13 +186,11 @@ def test_change_text_font_color(
         actual = f2.read()
 
         assert len(expected) == len(actual)
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
+        assert expected == actual
 
 
 @pytest.mark.cli_test
-def test_change_text_alignment(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, request
-):
+def test_change_text_alignment(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_alignment.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -229,13 +223,11 @@ def test_change_text_alignment(
         actual = f2.read()
 
         assert len(expected) == len(actual)
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
+        assert expected == actual
 
 
 @pytest.mark.cli_test
-def test_change_text_max_length(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, request
-):
+def test_change_text_max_length(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_max_length.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -268,11 +260,11 @@ def test_change_text_max_length(
         actual = f2.read()
 
         assert len(expected) == len(actual)
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
+        assert expected == actual
 
 
 @pytest.mark.cli_test
-def test_change_text_comb(pdf_samples, static_pdfs, yaml_samples, tmp_path, request):
+def test_change_text_comb(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_comb.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -305,13 +297,11 @@ def test_change_text_comb(pdf_samples, static_pdfs, yaml_samples, tmp_path, requ
         actual = f2.read()
 
         assert len(expected) == len(actual)
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
+        assert expected == actual
 
 
 @pytest.mark.cli_test
-def test_change_text_multiline(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, request
-):
+def test_change_text_multiline(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_multiline.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
     data_yaml = os.path.join(tmp_path, "data.yaml")
@@ -357,11 +347,11 @@ def test_change_text_multiline(
         actual = f2.read()
 
         assert len(expected) == len(actual)
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
+        assert expected == actual
 
 
 @pytest.mark.cli_test
-def test_change_check_size(pdf_samples, static_pdfs, yaml_samples, tmp_path, request):
+def test_change_check_size(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_check_size.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
     data_yaml = os.path.join(tmp_path, "data.yaml")
@@ -404,7 +394,7 @@ def test_change_check_size(pdf_samples, static_pdfs, yaml_samples, tmp_path, req
         actual = f2.read()
 
         assert len(expected) == len(actual)
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
+        assert expected == actual
 
 
 @pytest.mark.cli_test
