@@ -57,11 +57,16 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
         print(pdf.title)
         ```
 === "CLI"
-    Set the same title from the command line with `update title`:
+    Set or inspect the title from the command line:
 
-    ```shell
-    pypdfform update title sample_template.pdf -t "My PDF" -o output.pdf
-    ```
+    === "Set Title"
+        ```shell
+        pypdfform update title sample_template.pdf -t "My PDF" -o output.pdf
+        ```
+    === "Get Title"
+        ```shell
+        pypdfform inspect title output.pdf
+        ```
 
 ## Change text field font
 

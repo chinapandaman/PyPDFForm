@@ -76,6 +76,10 @@ def test_change_title(static_pdfs, tmp_path):
     reader = PdfReader(output_path)
     assert (reader.metadata or {}).get(Title) == "My PDF"
 
+    result = runner.invoke(cli_app, ["inspect", "title", output_path])
+    assert result.exit_code == 0
+    assert result.output == "My PDF\n"
+
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
