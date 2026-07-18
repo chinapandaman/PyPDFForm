@@ -255,7 +255,7 @@ def test_sejda_multiline(issue_pdf_directory, request):
         assert obj.read() == expected
 
 
-def test_preserve_metadata():
+def test_not_merge_metadata():
     pdf_stream = BytesIO(PdfWrapper(BlankPage()).read())
     writer = PdfWriter(pdf_stream)
     writer.add_metadata(
