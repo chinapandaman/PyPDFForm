@@ -5,8 +5,7 @@ A module for egress functions.
 This module provides functionalities that prepare the final PDF for output (egress),
 ensuring that it is properly formatted and ready for the end-user. This includes
 managing appearance streams (so form fields display correctly after being filled),
-handling the /NeedAppearances flag, and preserving or updating document-level
-properties like metadata, title, and OpenAction scripts. It can also rebuild the
+handling the /NeedAppearances flag, adding OpenAction JavaScript, and rebuilding the
 AcroForm `/Fields` array from the widget annotations present on each page. These
 functions are typically called right before the final PDF byte stream is returned by
 the wrapper module.
@@ -30,7 +29,6 @@ from .constants import (
     OpenAction,
     Parent,
     S,
-    Title,
 )
 from .template import get_widget_key
 
@@ -85,37 +83,21 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     return result
 
 
-def preserve_pdf_properties(
-    pdf: bytes, title: str, script: str, metadata: dict
-) -> bytes:
+def preserve_pdf_properties(pdf: bytes, script: str) -> bytes:
     """
-    Restores and updates PDF properties such as metadata, title, and OpenAction scripts.
+    Adds an on-open JavaScript action to a PDF.
 
-    This function restores captured input metadata, allows setting or updating the
-    PDF's title, and attaches a JavaScript script that executes when the PDF is
-    opened. Captured metadata is merged into the supplied PDF's current metadata;
-    the title and OpenAction JavaScript are written only when non-empty values are
-    supplied.
+    The script is stored in the document catalog's `/OpenAction` entry as a
+    JavaScript action. When the script is empty, no action is added.
 
     Args:
         pdf (bytes): The PDF file content as a bytes stream.
-        title (str): The title to be set in the PDF metadata.
         script (str): JavaScript code to be executed when the PDF is opened.
-        metadata (dict): Captured input metadata to restore.
 
     Returns:
         bytes: The modified PDF content as a bytes stream.
     """
     writer = PdfWriter(BytesIO(pdf))
-
-    if title or metadata:
-        _metadata = writer.metadata or {}
-        if metadata:
-            _metadata.update(metadata)
-        if title:
-            _metadata[NameObject(Title)] = TextStringObject(title)
-
-        writer.add_metadata(_metadata)
 
     if script:
         open_action = DictionaryObject()

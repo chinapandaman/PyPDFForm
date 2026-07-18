@@ -27,7 +27,6 @@ from typing import (
     BinaryIO,
     Dict,
     List,
-    Optional,
     Sequence,
     TextIO,
     Tuple,
@@ -59,7 +58,9 @@ from .template import (
     build_widgets,
     create_annotations,
     get_metadata,
+    get_title,
     remove_widgets_by_keys,
+    set_title,
     update_widget_keys,
 )
 from .types import PdfArray
@@ -110,7 +111,9 @@ class PdfWrapper:
                 - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
                 - `preserve_metadata` (bool): Deprecated compatibility attribute;
                   input PDF metadata is captured automatically.
-                - `title` (str): The title of the PDF document.
+                - `title` (str | None): The title stored in the PDF's document
+                  metadata. A non-None value replaces the existing title; None
+                  preserves it.
 
     """
 
@@ -131,10 +134,12 @@ class PdfWrapper:
         Constructor method for the `PdfWrapper` class.
 
         Initializes a new `PdfWrapper` object with the given template PDF and optional keyword arguments.
-        The template is normalized to bytes, existing widgets are loaded immediately, and
-        original metadata is captured automatically. The deprecated `preserve_metadata`
-        keyword is accepted for backward compatibility and emits a deprecation warning.
-        Enabling `generate_appearance_streams` also enables `need_appearances`.
+        The template is normalized to bytes, existing widgets are loaded immediately,
+        and the original metadata and title are read. A non-None `title` keyword
+        updates the title in the PDF stream; None preserves the title read from the
+        template. The deprecated `preserve_metadata` keyword is accepted for backward
+        compatibility and emits a deprecation warning. Enabling
+        `generate_appearance_streams` also enables `need_appearances`.
 
         Args:
             template (bytes | str | BinaryIO | BlankPage): The template PDF, provided as either:
@@ -151,10 +156,10 @@ class PdfWrapper:
         super().__init__()
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
-        self.title: Optional[str] = None
 
         self._version = None
         self._metadata = get_metadata(self._read())
+        self._title = get_title(self._read())
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
@@ -323,6 +328,34 @@ class PdfWrapper:
         return self
 
     @property
+    def title(self) -> str | None:
+        """
+        Gets the title stored in the PDF's document metadata.
+
+        Returns:
+            str | None: The current document title, or None when no title exists.
+        """
+
+        return str(self._title) if self._title is not None else None
+
+    @title.setter
+    def title(self, value: str | None) -> None:
+        """
+        Updates the title stored in the PDF's document metadata.
+
+        A non-None value is written to the underlying PDF stream immediately.
+        None is ignored so the current title is preserved.
+
+        Args:
+            value (str | None): The new document title, or None to preserve the
+                current title.
+        """
+
+        if value is not None:
+            self._stream = set_title(self._read(), value)
+            self._title = value
+
+    @property
     def schema(self) -> dict:
         """
         Returns the JSON schema of the PDF form, describing the structure and data types of the form fields.
@@ -465,8 +498,8 @@ class PdfWrapper:
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
            generating appearance streams.
-        3. If a title or on-open JavaScript is set, it restores the captured input
-           metadata while updating the corresponding PDF properties.
+        3. If on-open JavaScript is set, it writes the script to the document
+           catalog's `/OpenAction` entry.
         4. Rebuilds the AcroForm `/Fields` array from page annotations for
            widgets known to this wrapper, leaving the stream unchanged when no
            matching widget annotations are found.
@@ -484,20 +517,10 @@ class PdfWrapper:
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
 
-        if (
-            any(
-                [
-                    self.title,
-                    self.on_open_javascript,
-                ]
-            )
-            and result
-        ):
+        if self.on_open_javascript and result:
             result = preserve_pdf_properties(
                 result,
-                self.title,
                 self.on_open_javascript,
-                self._metadata,
             )
 
         if result:

@@ -2,10 +2,10 @@
 """
 Module for handling PDF form templates.
 
-This module provides functionalities to extract, build, and update widgets
-in PDF form templates. It leverages the pypdf library for PDF manipulation
-and defines specific patterns for identifying and constructing different
-types of widgets.
+This module provides functionalities to read and update document metadata and
+to extract, build, and update widgets in PDF form templates. It leverages the
+pypdf library for PDF manipulation and defines specific patterns for identifying
+and constructing different types of widgets.
 """
 
 from copy import deepcopy
@@ -17,7 +17,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
 from .annotations import AnnotationTypes
-from .constants import COMB, MULTILINE, READ_ONLY, REQUIRED, Annots
+from .constants import COMB, MULTILINE, READ_ONLY, REQUIRED, Annots, Title
 from .middleware import WIDGET_TYPES
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
@@ -58,6 +58,58 @@ def get_metadata(pdf: bytes) -> dict:
 
     reader = PdfReader(BytesIO(pdf))
     return reader.metadata or {}
+
+
+def get_title(pdf: bytes) -> str | None:
+    """
+    Retrieves the title from a PDF's document metadata.
+
+    Args:
+        pdf (bytes): The PDF stream from which to retrieve the title.
+
+    Returns:
+        str | None: The document title, or None when no title is present.
+    """
+    return get_metadata(pdf).get(Title)
+
+
+def set_metadata(pdf: bytes, metadata: dict) -> bytes:
+    """
+    Merges metadata into a PDF's existing document metadata.
+
+    Existing entries are retained unless the supplied mapping contains the
+    same key, in which case the supplied value replaces the existing value.
+
+    Args:
+        pdf (bytes): The PDF stream whose metadata should be updated.
+        metadata (dict): Metadata entries to add or replace.
+
+    Returns:
+        bytes: The PDF stream containing the merged metadata.
+    """
+    writer = PdfWriter(BytesIO(pdf))
+    _metadata = writer.metadata or {}
+    _metadata.update(metadata)
+    writer.add_metadata(_metadata)
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
+
+
+def set_title(pdf: bytes, title: str) -> bytes:
+    """
+    Sets a PDF's document title while preserving its other metadata.
+
+    Args:
+        pdf (bytes): The PDF stream whose title should be set.
+        title (str): The document title to store in the PDF metadata.
+
+    Returns:
+        bytes: The PDF stream containing the updated title.
+    """
+    return set_metadata(pdf, {Title: title})
 
 
 def build_widgets(
