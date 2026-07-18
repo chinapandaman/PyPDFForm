@@ -30,7 +30,6 @@ from .constants import (
     OpenAction,
     Parent,
     S,
-    Title,
 )
 from .template import get_widget_key
 
@@ -85,9 +84,7 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     return result
 
 
-def preserve_pdf_properties(
-    pdf: bytes, title: str, script: str, metadata: dict
-) -> bytes:
+def preserve_pdf_properties(pdf: bytes, script: str) -> bytes:
     """
     Restores and updates PDF properties such as metadata, title, and OpenAction scripts.
 
@@ -99,7 +96,6 @@ def preserve_pdf_properties(
 
     Args:
         pdf (bytes): The PDF file content as a bytes stream.
-        title (str): The title to be set in the PDF metadata.
         script (str): JavaScript code to be executed when the PDF is opened.
         metadata (dict): Captured input metadata to restore.
 
@@ -107,15 +103,6 @@ def preserve_pdf_properties(
         bytes: The modified PDF content as a bytes stream.
     """
     writer = PdfWriter(BytesIO(pdf))
-
-    if title or metadata:
-        _metadata = writer.metadata or {}
-        if metadata:
-            _metadata.update(metadata)
-        if title:
-            _metadata[NameObject(Title)] = TextStringObject(title)
-
-        writer.add_metadata(_metadata)
 
     if script:
         open_action = DictionaryObject()

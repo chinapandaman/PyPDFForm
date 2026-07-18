@@ -27,7 +27,6 @@ from typing import (
     BinaryIO,
     Dict,
     List,
-    Optional,
     Sequence,
     TextIO,
     Tuple,
@@ -59,7 +58,9 @@ from .template import (
     build_widgets,
     create_annotations,
     get_metadata,
+    get_title,
     remove_widgets_by_keys,
+    set_title,
     update_widget_keys,
 )
 from .types import PdfArray
@@ -151,10 +152,10 @@ class PdfWrapper:
         super().__init__()
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
-        self.title: Optional[str] = None
 
         self._version = None
         self._metadata = get_metadata(self._read())
+        self._title = get_title(self._read())
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
@@ -323,6 +324,16 @@ class PdfWrapper:
         return self
 
     @property
+    def title(self) -> str | None:
+        return str(self._title) if self._title is not None else None
+
+    @title.setter
+    def title(self, value: str | None) -> None:
+        if value is not None:
+            self._stream = set_title(self._read(), value)
+            self._title = value
+
+    @property
     def schema(self) -> dict:
         """
         Returns the JSON schema of the PDF form, describing the structure and data types of the form fields.
@@ -484,20 +495,10 @@ class PdfWrapper:
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
 
-        if (
-            any(
-                [
-                    self.title,
-                    self.on_open_javascript,
-                ]
-            )
-            and result
-        ):
+        if self.on_open_javascript and result:
             result = preserve_pdf_properties(
                 result,
-                self.title,
                 self.on_open_javascript,
-                self._metadata,
             )
 
         if result:

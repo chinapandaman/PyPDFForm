@@ -17,7 +17,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
 from .annotations import AnnotationTypes
-from .constants import COMB, MULTILINE, READ_ONLY, REQUIRED, Annots
+from .constants import COMB, MULTILINE, READ_ONLY, REQUIRED, Annots, Title
 from .middleware import WIDGET_TYPES
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
@@ -58,6 +58,26 @@ def get_metadata(pdf: bytes) -> dict:
 
     reader = PdfReader(BytesIO(pdf))
     return reader.metadata or {}
+
+
+def get_title(pdf: bytes) -> str | None:
+    return get_metadata(pdf).get(Title)
+
+
+def set_metadata(pdf: bytes, metadata: dict) -> bytes:
+    writer = PdfWriter(BytesIO(pdf))
+    _metadata = writer.metadata or {}
+    _metadata.update(metadata)
+    writer.add_metadata(_metadata)
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
+
+
+def set_title(pdf: bytes, title: str) -> bytes:
+    return set_metadata(pdf, {Title: title})
 
 
 def build_widgets(

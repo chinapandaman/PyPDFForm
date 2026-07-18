@@ -12,9 +12,11 @@ def test_change_title(static_pdfs):
 
     assert pdf.title == "My PDF"
 
-    pdf.title = "My PDF"
+    pdf.title = "New PDF"
 
-    assert pdf.title == "My PDF"
+    assert pdf.title == "New PDF"
+
+    assert PdfWrapper(pdf.read()).title == "New PDF"
 
 
 @pytest.mark.requires_zlib_over_zlib_ng
