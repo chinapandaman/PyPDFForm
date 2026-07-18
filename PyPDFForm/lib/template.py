@@ -496,9 +496,7 @@ def update_widget_keys(
     Returns:
         bytes: The updated PDF template as a byte stream.
     """
-    pdf = PdfReader(BytesIO(template))
-    out = PdfWriter()
-    out.append(pdf)
+    out = PdfWriter(BytesIO(template))
 
     _apply_widget_key_updates(out, widgets, old_keys, new_keys, indices)
 

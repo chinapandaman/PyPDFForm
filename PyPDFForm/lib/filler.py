@@ -11,7 +11,7 @@ supports flattening the filled form to prevent further modifications.
 from io import BytesIO
 from typing import Dict, cast
 
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
 from pypdf.generic import DictionaryObject
 
 from .constants import Annots
@@ -188,9 +188,7 @@ def fill(
                stream as bytes when an image or signature was drawn. The second
                tuple item is None when no image drawing is needed.
     """
-    pdf = PdfReader(BytesIO(template))
-    out = PdfWriter()
-    out.append(pdf)
+    out = PdfWriter(BytesIO(template))
 
     radio_button_tracker = {}
     images_to_draw = {}

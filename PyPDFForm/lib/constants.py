@@ -122,7 +122,6 @@ FONT_NAME_PREFIX = "/F"
 
 # For Adobe Acrobat
 AcroForm = "/AcroForm"
-Root = "/Root"
 Fields = "/Fields"
 XFA = "/XFA"
 

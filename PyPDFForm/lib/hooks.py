@@ -13,7 +13,7 @@ import sys
 from io import BytesIO
 from typing import TextIO, cast
 
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
 from pypdf.generic import (
     ArrayObject,
     DictionaryObject,
@@ -84,9 +84,7 @@ def trigger_widget_hooks(
     Returns:
         bytes: The modified PDF data as bytes, with the widget hooks applied.
     """
-    pdf_file = PdfReader(BytesIO(pdf))
-    output = PdfWriter()
-    output.append(pdf_file)
+    output = PdfWriter(BytesIO(pdf))
 
     for page in output.pages:
         for annot in page.get(Annots, []):

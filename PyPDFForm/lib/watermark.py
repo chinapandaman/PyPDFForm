@@ -326,9 +326,7 @@ def merge_watermarks_with_pdf(
         bytes: A byte stream representing the merged PDF with watermarks applied.
     """
     result = BytesIO()
-    pdf_file = PdfReader(BytesIO(pdf))
-    output = PdfWriter()
-    output.append(pdf_file)
+    output = PdfWriter(BytesIO(pdf))
 
     for i, page in enumerate(output.pages):
         if watermarks[i]:
@@ -546,8 +544,7 @@ def copy_watermark_widgets(
     Returns:
         bytes: The modified PDF byte stream with copied widgets.
     """
-    pdf_writer = PdfWriter()
-    pdf_writer.append(PdfReader(BytesIO(pdf)))
+    pdf_writer = PdfWriter(BytesIO(pdf))
 
     widgets_to_copy = _collect_widgets_to_copy(pdf_writer, watermarks, keys, page_num)
     _apply_widgets_to_pages(pdf_writer, widgets_to_copy)
