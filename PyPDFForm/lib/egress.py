@@ -5,10 +5,9 @@ A module for egress functions.
 This module provides functionalities that prepare the final PDF for output (egress),
 ensuring that it is properly formatted and ready for the end-user. This includes
 managing appearance streams (so form fields display correctly after being filled),
-handling the /NeedAppearances flag, adding OpenAction JavaScript, and rebuilding the
-AcroForm `/Fields` array from the widget annotations present on each page. These
-functions are typically called right before the final PDF byte stream is returned by
-the wrapper module.
+handling the /NeedAppearances flag, and rebuilding the AcroForm `/Fields` array from
+the widget annotations present on each page. These functions are typically called
+right before the final PDF byte stream is returned by the wrapper module.
 """
 
 from functools import lru_cache

@@ -468,10 +468,14 @@ class PdfWrapper:
     @property
     def on_open_javascript(self) -> str | None:
         """
-        Returns the JavaScript script that executes when the PDF is opened.
+        Returns the on-open JavaScript most recently assigned to this wrapper.
+
+        This property tracks assignments made through the wrapper; it does not
+        inspect the template PDF for an existing `/OpenAction`.
 
         Returns:
-            str | None: The JavaScript script, or None if no script is set.
+            str | None: The assigned JavaScript, or None if no script has been
+                assigned through this wrapper.
         """
 
         return self._on_open_javascript
@@ -480,6 +484,9 @@ class PdfWrapper:
     def on_open_javascript(self, value: str | TextIO) -> None:
         """
         Sets the JavaScript script that executes when the PDF is opened.
+
+        Assignment immediately writes a JavaScript `/OpenAction` to the stored
+        PDF stream, replacing any existing document-open action.
 
         Args:
             value (str | TextIO): The JavaScript script, provided as either:
@@ -500,12 +507,10 @@ class PdfWrapper:
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
            generating appearance streams.
-        3. If on-open JavaScript is set, it writes the script to the document
-           catalog's `/OpenAction` entry.
-        4. Rebuilds the AcroForm `/Fields` array from page annotations for
+        3. Rebuilds the AcroForm `/Fields` array from page annotations for
            widgets known to this wrapper, leaving the stream unchanged when no
            matching widget annotations are found.
-        5. Restores the wrapper's cached PDF header version after egress
+        4. Restores the wrapper's cached PDF header version after egress
            processing, since PDF writers may emit their own default version.
         The wrapper's stored stream is not replaced by these final egress-only changes.
 

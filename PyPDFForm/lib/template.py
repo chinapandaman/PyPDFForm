@@ -2,10 +2,10 @@
 """
 Module for handling PDF form templates.
 
-This module provides functionalities to read and update document metadata and
-to extract, build, and update widgets in PDF form templates. It leverages the
-pypdf library for PDF manipulation and defines specific patterns for identifying
-and constructing different types of widgets.
+This module provides functionalities to read and update document metadata, set
+document-level actions, and extract, build, and update widgets in PDF form
+templates. It leverages the pypdf library for PDF manipulation and defines
+specific patterns for identifying and constructing different types of widgets.
 """
 
 from copy import deepcopy
@@ -124,6 +124,20 @@ def set_title(pdf: bytes, title: str) -> bytes:
 
 
 def set_on_open_javascript(pdf: bytes, script: str) -> bytes:
+    """
+    Sets a PDF's document-open action to execute JavaScript.
+
+    The script is written to the document catalog as a JavaScript
+    `/OpenAction`, replacing any existing document-open action. An action is
+    written even when `script` is empty.
+
+    Args:
+        pdf (bytes): The PDF stream whose document-open action should be set.
+        script (str): JavaScript to execute when the PDF is opened.
+
+    Returns:
+        bytes: The PDF stream containing the JavaScript `/OpenAction`.
+    """
     writer = PdfWriter(BytesIO(pdf))
 
     open_action = DictionaryObject()
