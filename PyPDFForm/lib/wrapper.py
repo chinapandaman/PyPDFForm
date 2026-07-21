@@ -110,7 +110,7 @@ class PdfWrapper:
                 - `need_appearances` (bool): Whether to set the `NeedAppearances` flag in the PDF's AcroForm dictionary.
                 - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
                 - `preserve_metadata` (bool): Deprecated compatibility attribute;
-                  input PDF metadata is captured automatically.
+                  input PDF metadata is preserved automatically.
                 - `title` (str | None): The title stored in the PDF's document
                   metadata. A non-None value replaces the existing title; None
                   preserves it.
@@ -134,11 +134,12 @@ class PdfWrapper:
         Constructor method for the `PdfWrapper` class.
 
         Initializes a new `PdfWrapper` object with the given template PDF and optional keyword arguments.
-        The template is normalized to bytes, existing widgets are loaded immediately,
-        and the original metadata and title are read. A non-None `title` keyword
-        updates the title in the PDF stream; None preserves the title read from the
-        template. The deprecated `preserve_metadata` keyword is accepted for backward
-        compatibility and emits a deprecation warning. Enabling
+        The template is normalized to bytes and existing widgets are loaded immediately.
+        The title and document-open JavaScript remain in the PDF stream and are read
+        lazily when their properties are accessed. A non-None `title` keyword updates
+        the title in the PDF stream; None leaves the template's title unchanged. The
+        deprecated `preserve_metadata` keyword is accepted for backward compatibility
+        and emits a deprecation warning. Enabling
         `generate_appearance_streams` also enables `need_appearances`.
 
         Args:
@@ -329,6 +330,9 @@ class PdfWrapper:
         """
         Gets the title stored in the PDF's document metadata.
 
+        The title is read lazily from the current PDF stream. Metadata extraction
+        is cached for each distinct stream.
+
         Returns:
             str | None: The current document title, or None when no title exists.
         """
@@ -465,14 +469,15 @@ class PdfWrapper:
     @property
     def on_open_javascript(self) -> str | None:
         """
-        Returns the on-open JavaScript most recently assigned to this wrapper.
+        Gets the JavaScript stored in the PDF's document-open action.
 
-        This property tracks assignments made through the wrapper; it does not
-        inspect the template PDF for an existing `/OpenAction`.
+        The script is read lazily from the current PDF stream, including an existing
+        JavaScript `/OpenAction` in the input template. Extraction is cached for each
+        distinct stream.
 
         Returns:
-            str | None: The assigned JavaScript, or None if no script has been
-                assigned through this wrapper.
+            str | None: The current document-open JavaScript, or None when the PDF
+                does not contain a JavaScript document-open action.
         """
 
         return get_on_open_javascript(self._read())

@@ -87,6 +87,19 @@ def get_title(pdf: bytes) -> str | None:
 
 @lru_cache(maxsize=128)
 def get_on_open_javascript(pdf: bytes) -> str | None:
+    """
+    Retrieves the JavaScript configured to run when a PDF is opened.
+
+    Results are cached by PDF stream. Only a document-catalog `/OpenAction`
+    whose action type is JavaScript is returned.
+
+    Args:
+        pdf (bytes): The PDF stream to inspect for a document-open action.
+
+    Returns:
+        str | None: The JavaScript source, or None when the stream is empty or
+            does not contain a JavaScript document-open action.
+    """
     result = None
     if pdf:
         reader = PdfReader(BytesIO(pdf))
