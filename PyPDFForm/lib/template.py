@@ -64,11 +64,12 @@ def get_metadata(pdf: bytes) -> dict:
     Returns:
         dict: A dictionary containing the PDF's metadata.
     """
-    if not pdf:
-        return {}
+    result = {}
+    if pdf:
+        reader = PdfReader(BytesIO(pdf))
+        result = reader.metadata or {}
 
-    reader = PdfReader(BytesIO(pdf))
-    return reader.metadata or {}
+    return result
 
 
 def get_title(pdf: bytes) -> str | None:

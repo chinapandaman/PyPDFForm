@@ -157,7 +157,6 @@ class PdfWrapper:
         self.widgets = {}
 
         self._version = None
-        self._title = get_title(self._read())
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
@@ -334,7 +333,8 @@ class PdfWrapper:
             str | None: The current document title, or None when no title exists.
         """
 
-        return str(self._title) if self._title is not None else None
+        result = get_title(self._read())
+        return str(result) if result is not None else None
 
     @title.setter
     def title(self, value: str | None) -> None:
@@ -351,7 +351,6 @@ class PdfWrapper:
 
         if value is not None:
             self._stream = set_title(self._read(), value)
-            self._title = value
 
     @property
     def schema(self) -> dict:
