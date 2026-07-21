@@ -56,7 +56,6 @@ from .middleware.text import Text
 from .template import (
     build_widgets,
     create_annotations,
-    get_metadata,
     get_title,
     remove_widgets_by_keys,
     set_on_open_javascript,
@@ -158,7 +157,6 @@ class PdfWrapper:
         self.widgets = {}
 
         self._version = None
-        self._metadata = get_metadata(self._read())
         self._title = get_title(self._read())
         self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
