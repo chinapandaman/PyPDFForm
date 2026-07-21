@@ -85,6 +85,17 @@ def get_title(pdf: bytes) -> str | None:
     return get_metadata(pdf).get(Title)
 
 
+def get_on_open_javascript(pdf: bytes) -> str | None:
+    result = None
+    if pdf:
+        reader = PdfReader(BytesIO(pdf))
+        root_object = reader.root_object
+        if OpenAction in root_object and root_object[OpenAction].get(S) == JavaScript:
+            result = root_object[OpenAction].get(JS)
+
+    return result
+
+
 def set_metadata(pdf: bytes, metadata: dict) -> bytes:
     """
     Merges metadata into a PDF's existing document metadata.

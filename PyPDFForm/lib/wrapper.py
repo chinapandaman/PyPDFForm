@@ -56,6 +56,7 @@ from .middleware.text import Text
 from .template import (
     build_widgets,
     create_annotations,
+    get_on_open_javascript,
     get_title,
     remove_widgets_by_keys,
     set_on_open_javascript,
@@ -157,7 +158,6 @@ class PdfWrapper:
         self.widgets = {}
 
         self._version = None
-        self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
         self._font_register_events = []  # for reregister
@@ -475,7 +475,7 @@ class PdfWrapper:
                 assigned through this wrapper.
         """
 
-        return self._on_open_javascript
+        return get_on_open_javascript(self._read())
 
     @on_open_javascript.setter
     def on_open_javascript(self, value: str | TextIO) -> None:
@@ -493,7 +493,6 @@ class PdfWrapper:
 
         script = fp_or_f_obj_or_f_content_to_content(value)
         self._stream = set_on_open_javascript(self._read(), script)
-        self._on_open_javascript = script
 
     def read(self) -> bytes:
         """
