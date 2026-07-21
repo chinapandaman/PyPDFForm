@@ -56,7 +56,7 @@ from .middleware.text import Text
 from .template import (
     build_widgets,
     create_annotations,
-    get_metadata,
+    get_on_open_javascript,
     get_title,
     remove_widgets_by_keys,
     set_on_open_javascript,
@@ -110,7 +110,7 @@ class PdfWrapper:
                 - `need_appearances` (bool): Whether to set the `NeedAppearances` flag in the PDF's AcroForm dictionary.
                 - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
                 - `preserve_metadata` (bool): Deprecated compatibility attribute;
-                  input PDF metadata is captured automatically.
+                  input PDF metadata is preserved automatically.
                 - `title` (str | None): The title stored in the PDF's document
                   metadata. A non-None value replaces the existing title; None
                   preserves it.
@@ -134,11 +134,12 @@ class PdfWrapper:
         Constructor method for the `PdfWrapper` class.
 
         Initializes a new `PdfWrapper` object with the given template PDF and optional keyword arguments.
-        The template is normalized to bytes, existing widgets are loaded immediately,
-        and the original metadata and title are read. A non-None `title` keyword
-        updates the title in the PDF stream; None preserves the title read from the
-        template. The deprecated `preserve_metadata` keyword is accepted for backward
-        compatibility and emits a deprecation warning. Enabling
+        The template is normalized to bytes and existing widgets are loaded immediately.
+        The title and document-open JavaScript remain in the PDF stream and are read
+        lazily when their properties are accessed. A non-None `title` keyword updates
+        the title in the PDF stream; None leaves the template's title unchanged. The
+        deprecated `preserve_metadata` keyword is accepted for backward compatibility
+        and emits a deprecation warning. Enabling
         `generate_appearance_streams` also enables `need_appearances`.
 
         Args:
@@ -158,9 +159,6 @@ class PdfWrapper:
         self.widgets = {}
 
         self._version = None
-        self._metadata = get_metadata(self._read())
-        self._title = get_title(self._read())
-        self._on_open_javascript = None
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
         self._font_register_events = []  # for reregister
@@ -332,11 +330,15 @@ class PdfWrapper:
         """
         Gets the title stored in the PDF's document metadata.
 
+        The title is read lazily from the current PDF stream. Metadata extraction
+        is cached for each distinct stream.
+
         Returns:
             str | None: The current document title, or None when no title exists.
         """
 
-        return str(self._title) if self._title is not None else None
+        result = get_title(self._read())
+        return str(result) if result is not None else None
 
     @title.setter
     def title(self, value: str | None) -> None:
@@ -353,7 +355,6 @@ class PdfWrapper:
 
         if value is not None:
             self._stream = set_title(self._read(), value)
-            self._title = value
 
     @property
     def schema(self) -> dict:
@@ -468,17 +469,18 @@ class PdfWrapper:
     @property
     def on_open_javascript(self) -> str | None:
         """
-        Returns the on-open JavaScript most recently assigned to this wrapper.
+        Gets the JavaScript stored in the PDF's document-open action.
 
-        This property tracks assignments made through the wrapper; it does not
-        inspect the template PDF for an existing `/OpenAction`.
+        The script is read lazily from the current PDF stream, including an existing
+        JavaScript `/OpenAction` in the input template. Extraction is cached for each
+        distinct stream.
 
         Returns:
-            str | None: The assigned JavaScript, or None if no script has been
-                assigned through this wrapper.
+            str | None: The current document-open JavaScript, or None when the PDF
+                does not contain a JavaScript document-open action.
         """
 
-        return self._on_open_javascript
+        return get_on_open_javascript(self._read())
 
     @on_open_javascript.setter
     def on_open_javascript(self, value: str | TextIO) -> None:
@@ -496,7 +498,6 @@ class PdfWrapper:
 
         script = fp_or_f_obj_or_f_content_to_content(value)
         self._stream = set_on_open_javascript(self._read(), script)
-        self._on_open_javascript = script
 
     def read(self) -> bytes:
         """

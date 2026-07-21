@@ -64,11 +64,12 @@ def get_metadata(pdf: bytes) -> dict:
     Returns:
         dict: A dictionary containing the PDF's metadata.
     """
-    if not pdf:
-        return {}
+    result = {}
+    if pdf:
+        reader = PdfReader(BytesIO(pdf))
+        result = reader.metadata or {}
 
-    reader = PdfReader(BytesIO(pdf))
-    return reader.metadata or {}
+    return result
 
 
 def get_title(pdf: bytes) -> str | None:
@@ -82,6 +83,31 @@ def get_title(pdf: bytes) -> str | None:
         str | None: The document title, or None when no title is present.
     """
     return get_metadata(pdf).get(Title)
+
+
+@lru_cache(maxsize=128)
+def get_on_open_javascript(pdf: bytes) -> str | None:
+    """
+    Retrieves the JavaScript configured to run when a PDF is opened.
+
+    Results are cached by PDF stream. Only a document-catalog `/OpenAction`
+    whose action type is JavaScript is returned.
+
+    Args:
+        pdf (bytes): The PDF stream to inspect for a document-open action.
+
+    Returns:
+        str | None: The JavaScript source, or None when the stream is empty or
+            does not contain a JavaScript document-open action.
+    """
+    result = None
+    if pdf:
+        reader = PdfReader(BytesIO(pdf))
+        root_object = reader.root_object
+        if OpenAction in root_object and root_object[OpenAction].get(S) == JavaScript:
+            result = root_object[OpenAction].get(JS)
+
+    return result
 
 
 def set_metadata(pdf: bytes, metadata: dict) -> bytes:
