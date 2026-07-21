@@ -85,6 +85,7 @@ def get_title(pdf: bytes) -> str | None:
     return get_metadata(pdf).get(Title)
 
 
+@lru_cache(maxsize=128)
 def get_on_open_javascript(pdf: bytes) -> str | None:
     result = None
     if pdf:
