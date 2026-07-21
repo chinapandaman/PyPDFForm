@@ -7,8 +7,8 @@ Please consider upgrading your version before reporting any potential vulnerabil
 
 | Version  | Supported          |
 |----------| ------------------ |
-| 5.5.0   | :white_check_mark: |
-| < 5.5.0 | :x:                |
+| 5.5.1   | :white_check_mark: |
+| < 5.5.1 | :x:                |
 
 ## Reporting a Vulnerability
 
