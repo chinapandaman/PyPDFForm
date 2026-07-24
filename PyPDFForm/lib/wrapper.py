@@ -528,11 +528,11 @@ class PdfWrapper:
         if result:
             result = rebuild_acroform_fields(
                 result,
-                set(
+                {
                     key
                     for key, widget in self.widgets.items()
                     if not isinstance(widget, Signature)
-                ),  # TODO: figure out why can't image/sig be rendered by Acrobat
+                },  # TODO: figure out why can't image/sig be rendered by Acrobat
                 getattr(self, "use_full_widget_name"),
             )
             if self.version:

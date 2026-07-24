@@ -119,8 +119,8 @@ def rebuild_acroform_fields(
                     fields.append(field_ref)
                     seen_fields.add(field_key)
 
-    if not seen_fields:
-        return pdf
+    # if not seen_fields:
+    #     return pdf
 
     if AcroForm not in root:
         root[NameObject(AcroForm)] = DictionaryObject({})
