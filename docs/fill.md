@@ -56,7 +56,7 @@ Use string values for text fields and boolean values for checkboxes. The followi
             "test_3": "test_3",
             "check_3": True,
         },
-        flatten=False   # optional, set to True to flatten the filled PDF form
+        flatten=False,  # optional, set to True to flatten the filled PDF form
     )
 
     filled.write("output.pdf")
@@ -92,7 +92,7 @@ Fill each radio button group with the zero-based index of the option to select. 
             "radio_2": 1,
             "radio_3": 2,
         },
-        flatten=False   # optional, set to True to flatten the filled PDF form
+        flatten=False,  # optional, set to True to flatten the filled PDF form
     )
 
     filled.write("output.pdf")
@@ -119,10 +119,8 @@ A dropdown can be filled with either the zero-based option index or the option t
         from PyPDFForm import PdfWrapper
 
         filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
-            {
-                "dropdown_1": 1
-            },
-            flatten=False   # optional, set to True to flatten the filled PDF form
+            {"dropdown_1": 1},
+            flatten=False,  # optional, set to True to flatten the filled PDF form
         )
 
         filled.write("output.pdf")
@@ -134,10 +132,8 @@ A dropdown can be filled with either the zero-based option index or the option t
         from PyPDFForm import PdfWrapper
 
         filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
-            {
-                "dropdown_1": "bar"
-            },
-            flatten=False   # optional, set to True to flatten the filled PDF form
+            {"dropdown_1": "bar"},
+            flatten=False,  # optional, set to True to flatten the filled PDF form
         )
 
         filled.write("output.pdf")
@@ -171,10 +167,8 @@ The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [
         from PyPDFForm import PdfWrapper
 
         signed = PdfWrapper("sample_template_with_signature.pdf").fill(
-            {
-                "signature": "sample_signature.png"
-            },
-            flatten=False   # optional, set to True to flatten the filled PDF form
+            {"signature": "sample_signature.png"},
+            flatten=False,  # optional, set to True to flatten the filled PDF form
         )
 
         signed.write("output.pdf")
@@ -185,10 +179,8 @@ The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [
 
         with open("sample_signature.png", "rb+") as sig:
             signed = PdfWrapper("sample_template_with_signature.pdf").fill(
-                {
-                    "signature": sig
-                },
-                flatten=False   # optional, set to True to flatten the filled PDF form
+                {"signature": sig},
+                flatten=False,  # optional, set to True to flatten the filled PDF form
             )
 
         signed.write("output.pdf")
@@ -199,10 +191,8 @@ The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [
 
         with open("sample_signature.png", "rb+") as sig:
             signed = PdfWrapper("sample_template_with_signature.pdf").fill(
-                {
-                    "signature": sig.read()
-                },
-                flatten=False   # optional, set to True to flatten the filled PDF form
+                {"signature": sig.read()},
+                flatten=False,  # optional, set to True to flatten the filled PDF form
             )
 
         signed.write("output.pdf")
@@ -216,9 +206,7 @@ The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [
         pdf = PdfWrapper("sample_template_with_signature.pdf")
         pdf.widgets["signature"].preserve_aspect_ratio = False
         pdf.fill(
-            {
-                "signature": "sample_signature.png"
-            },
+            {"signature": "sample_signature.png"},
         )
 
         pdf.write("output.pdf")
@@ -251,10 +239,8 @@ The examples below use [this PDF](pdfs/sample_template_with_image_field.pdf) and
         from PyPDFForm import PdfWrapper
 
         filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
-            {
-                "image_1": "sample_image.jpg"
-            },
-            flatten=False   # optional, set to True to flatten the filled PDF form
+            {"image_1": "sample_image.jpg"},
+            flatten=False,  # optional, set to True to flatten the filled PDF form
         )
 
         filled.write("output.pdf")
@@ -265,10 +251,8 @@ The examples below use [this PDF](pdfs/sample_template_with_image_field.pdf) and
 
         with open("sample_image.jpg", "rb+") as img:
             filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
-                {
-                    "image_1": img
-                },
-                flatten=False   # optional, set to True to flatten the filled PDF form
+                {"image_1": img},
+                flatten=False,  # optional, set to True to flatten the filled PDF form
             )
 
         filled.write("output.pdf")
@@ -279,10 +263,8 @@ The examples below use [this PDF](pdfs/sample_template_with_image_field.pdf) and
 
         with open("sample_image.jpg", "rb+") as img:
             filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
-                {
-                    "image_1": img.read()
-                },
-                flatten=False   # optional, set to True to flatten the filled PDF form
+                {"image_1": img.read()},
+                flatten=False,  # optional, set to True to flatten the filled PDF form
             )
 
         filled.write("output.pdf")
@@ -296,9 +278,7 @@ The examples below use [this PDF](pdfs/sample_template_with_image_field.pdf) and
         pdf = PdfWrapper("sample_template_with_image_field.pdf")
         pdf.widgets["image_1"].preserve_aspect_ratio = True
         pdf.fill(
-            {
-                "image_1": "sample_image.jpg"
-            },
+            {"image_1": "sample_image.jpg"},
         )
 
         pdf.write("output.pdf")

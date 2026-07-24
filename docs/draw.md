@@ -172,7 +172,9 @@ For the `rotation` parameter, positive values rotate images counterclockwise, an
 
         images = [
             RawElements.RawImage(
-                image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
+                image=open(
+                    "sample_image.jpg", "rb+"
+                ).read(),  # in practice, use a context manager
                 page_number=1,
                 x=100,
                 y=100,
@@ -181,7 +183,9 @@ For the `rotation` parameter, positive values rotate images counterclockwise, an
                 rotation=0,  # optional
             ),
             RawElements.RawImage(
-                image=open("sample_image.jpg", "rb+").read(),  # in practice, use a context manager
+                image=open(
+                    "sample_image.jpg", "rb+"
+                ).read(),  # in practice, use a context manager
                 page_number=2,
                 x=100,
                 y=100,

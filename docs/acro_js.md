@@ -30,7 +30,9 @@ The examples below embed a script that displays an alert when the pointer hovers
         from PyPDFForm import PdfWrapper
 
         form = PdfWrapper("sample_template.pdf")
-        form.widgets["test"].on_hovered_over_javascript = open("./alert.js")  # in practice, use a context manager
+        form.widgets["test"].on_hovered_over_javascript = open(
+            "./alert.js"
+        )  # in practice, use a context manager
 
         form.write("output.pdf")
         ```
@@ -39,7 +41,9 @@ The examples below embed a script that displays an alert when the pointer hovers
         from PyPDFForm import PdfWrapper
 
         form = PdfWrapper("sample_template.pdf")
-        form.widgets["test"].on_hovered_over_javascript = open("./alert.js").read()  # in practice, use a context manager
+        form.widgets["test"].on_hovered_over_javascript = open(
+            "./alert.js"
+        ).read()  # in practice, use a context manager
 
         form.write("output.pdf")
         ```

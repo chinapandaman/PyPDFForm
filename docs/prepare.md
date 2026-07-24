@@ -114,28 +114,30 @@ When `--file` is supplied, it takes precedence over `--type` and the field optio
     ```python
     from PyPDFForm import Fields, PdfWrapper
 
-    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-        Fields.TextField(
-            name="new_text_field",
-            page_number=1,
-            x=57.5,
-            y=700.9,
-            required=False,  # optional
-            tooltip="this is a text field",  # optional
-            width=120.3,  # optional
-            height=40.7,  # optional
-            max_length=5,  # optional, number of characters
-            comb=True,  # optional, when set to True, max_length must also be set (1)
-            font="your_registered_font",  # optional (2)
-            font_size=15,  # optional
-            font_color=(1, 0, 0),  # optional
-            bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-            border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
-            border_width=5,  # optional
-            alignment=0,  # optional, 0=left, 1=center, 2=right
-            multiline=True,  # optional
-        ),
-    ])
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields(
+        [
+            Fields.TextField(
+                name="new_text_field",
+                page_number=1,
+                x=57.5,
+                y=700.9,
+                required=False,  # optional
+                tooltip="this is a text field",  # optional
+                width=120.3,  # optional
+                height=40.7,  # optional
+                max_length=5,  # optional, number of characters
+                comb=True,  # optional, when set to True, max_length must also be set (1)
+                font="your_registered_font",  # optional (2)
+                font_size=15,  # optional
+                font_color=(1, 0, 0),  # optional
+                bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+                border_color=(1, 0, 0, 1),  # optional, (r, g, b, alpha)
+                border_width=5,  # optional
+                alignment=0,  # optional, 0=left, 1=center, 2=right
+                multiline=True,  # optional
+            ),
+        ]
+    )
 
     new_form.write("output.pdf")
     ```
@@ -180,22 +182,24 @@ When `--file` is supplied, it takes precedence over `--type` and the field optio
     ```python
     from PyPDFForm import Fields, PdfWrapper
 
-    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-        Fields.CheckBoxField(
-            name="new_checkbox",
-            page_number=1,
-            x=57,
-            y=700,
-            required=False,  # optional
-            tooltip="this is a checkbox",  # optional
-            size=30,  # optional
-            button_style="check",  # optional (1)
-            tick_color=(0, 1, 0),  # optional
-            bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-            border_color=(1, 1, 0, 1),  # optional, (r, g, b, alpha)
-            border_width=5,  # optional
-        ),
-    ])
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields(
+        [
+            Fields.CheckBoxField(
+                name="new_checkbox",
+                page_number=1,
+                x=57,
+                y=700,
+                required=False,  # optional
+                tooltip="this is a checkbox",  # optional
+                size=30,  # optional
+                button_style="check",  # optional (1)
+                tick_color=(0, 1, 0),  # optional
+                bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+                border_color=(1, 1, 0, 1),  # optional, (r, g, b, alpha)
+                border_width=5,  # optional
+            ),
+        ]
+    )
 
     new_form.write("output.pdf")
     ```
@@ -238,23 +242,25 @@ When `--file` is supplied, it takes precedence over `--type` and the field optio
     ```python
     from PyPDFForm import Fields, PdfWrapper
 
-    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-        Fields.RadioGroup(
-            name="new_radio_group",
-            page_number=1,
-            x=[50, 100, 150],
-            y=[50, 100, 150],
-            required=False,  # optional
-            tooltip="this is a radio group",  # optional
-            size=30,  # optional
-            button_style="check",  # optional (1)
-            shape="square",  # optional, circle or square
-            tick_color=(0, 1, 0),  # optional
-            bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-            border_color=(1, 0, 1, 1),  # optional, (r, g, b, alpha)
-            border_width=5,  # optional
-        ),
-    ])
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields(
+        [
+            Fields.RadioGroup(
+                name="new_radio_group",
+                page_number=1,
+                x=[50, 100, 150],
+                y=[50, 100, 150],
+                required=False,  # optional
+                tooltip="this is a radio group",  # optional
+                size=30,  # optional
+                button_style="check",  # optional (1)
+                shape="square",  # optional, circle or square
+                tick_color=(0, 1, 0),  # optional
+                bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+                border_color=(1, 0, 1, 1),  # optional, (r, g, b, alpha)
+                border_width=5,  # optional
+            ),
+        ]
+    )
 
     new_form.write("output.pdf")
     ```
@@ -297,29 +303,31 @@ When `--file` is supplied, it takes precedence over `--type` and the field optio
         ```python
         from PyPDFForm import Fields, PdfWrapper
 
-        new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-            Fields.DropdownField(
-                name="new_dropdown",
-                page_number=1,
-                x=57,
-                y=700,
-                options=[
-                    "foo",
-                    "bar",
-                    "foobar",
-                ],
-                required=False,  # optional
-                tooltip="this is a dropdown",  # optional
-                width=120,  # optional
-                height=40,  # optional
-                font="your_registered_font",  # optional (1)
-                font_size=15,  # optional
-                font_color=(1, 0, 0),  # optional
-                bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
-                border_color=(0, 1, 0, 1),  # optional, (r, g, b, alpha)
-                border_width=5,  # optional
-            ),
-        ])
+        new_form = PdfWrapper("dummy.pdf").bulk_create_fields(
+            [
+                Fields.DropdownField(
+                    name="new_dropdown",
+                    page_number=1,
+                    x=57,
+                    y=700,
+                    options=[
+                        "foo",
+                        "bar",
+                        "foobar",
+                    ],
+                    required=False,  # optional
+                    tooltip="this is a dropdown",  # optional
+                    width=120,  # optional
+                    height=40,  # optional
+                    font="your_registered_font",  # optional (1)
+                    font_size=15,  # optional
+                    font_color=(1, 0, 0),  # optional
+                    bg_color=(0, 0, 1, 1),  # optional, (r, g, b, alpha)
+                    border_color=(0, 1, 0, 1),  # optional, (r, g, b, alpha)
+                    border_width=5,  # optional
+                ),
+            ]
+        )
 
         new_form.write("output.pdf")
         ```
@@ -332,19 +340,21 @@ When `--file` is supplied, it takes precedence over `--type` and the field optio
         ```python
         from PyPDFForm import Fields, PdfWrapper
 
-        new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-            Fields.DropdownField(
-                name="new_dropdown",
-                page_number=1,
-                x=57,
-                y=700,
-                options=[
-                    ("option_1", "option_1_export_value"),
-                    ("option_2", "option_2_export_value"),
-                    ("option_3", "option_3_export_value"),
-                ],
-            ),
-        ])
+        new_form = PdfWrapper("dummy.pdf").bulk_create_fields(
+            [
+                Fields.DropdownField(
+                    name="new_dropdown",
+                    page_number=1,
+                    x=57,
+                    y=700,
+                    options=[
+                        ("option_1", "option_1_export_value"),
+                        ("option_2", "option_2_export_value"),
+                        ("option_3", "option_3_export_value"),
+                    ],
+                ),
+            ]
+        )
 
         new_form.write("output.pdf")
         ```
@@ -395,18 +405,20 @@ When `--file` is supplied, it takes precedence over `--type` and the field optio
     ```python
     from PyPDFForm import Fields, PdfWrapper
 
-    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-        Fields.SignatureField(
-            name="new_signature",
-            page_number=1,
-            x=100,
-            y=100,
-            required=False,  # optional
-            tooltip="this is a signature",  # optional
-            width=410,  # optional
-            height=100,  # optional
-        ),
-    ])
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields(
+        [
+            Fields.SignatureField(
+                name="new_signature",
+                page_number=1,
+                x=100,
+                y=100,
+                required=False,  # optional
+                tooltip="this is a signature",  # optional
+                width=410,  # optional
+                height=100,  # optional
+            ),
+        ]
+    )
 
     new_form.write("output.pdf")
     ```
@@ -438,18 +450,20 @@ When `--file` is supplied, it takes precedence over `--type` and the field optio
     ```python
     from PyPDFForm import Fields, PdfWrapper
 
-    new_form = PdfWrapper("dummy.pdf").bulk_create_fields([
-        Fields.ImageField(
-            name="new_image",
-            page_number=1,
-            x=100,
-            y=100,
-            required=False,  # optional
-            tooltip="this is an image",  # optional
-            width=192,  # optional
-            height=108,  # optional
-        ),
-    ])
+    new_form = PdfWrapper("dummy.pdf").bulk_create_fields(
+        [
+            Fields.ImageField(
+                name="new_image",
+                page_number=1,
+                x=100,
+                y=100,
+                required=False,  # optional
+                tooltip="this is an image",  # optional
+                width=192,  # optional
+                height=108,  # optional
+            ),
+        ]
+    )
 
     new_form.write("output.pdf")
     ```

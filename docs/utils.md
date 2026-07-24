@@ -25,7 +25,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
         ```python
         from PyPDFForm import BlankPage, PdfWrapper
 
-        blank_pdf = PdfWrapper(BlankPage(width=595.35, height=841.995)) # A4 size
+        blank_pdf = PdfWrapper(BlankPage(width=595.35, height=841.995))  # A4 size
 
         blank_pdf.write("output.pdf")
         ```
@@ -35,7 +35,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
         ```python
         from PyPDFForm import BlankPage, PdfWrapper
 
-        blank_pdf = PdfWrapper(BlankPage() * 3) # 3 pages of letter size
+        blank_pdf = PdfWrapper(BlankPage() * 3)  # 3 pages of letter size
 
         blank_pdf.write("output.pdf")
         ```

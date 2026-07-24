@@ -15,8 +15,8 @@ To generate a coordinate grid view for [this PDF](pdfs/sample_template.pdf):
     from PyPDFForm import PdfWrapper
 
     grid_view_pdf = PdfWrapper("sample_template.pdf").generate_coordinate_grid(
-        color=(1, 0, 0),    # optional
-        margin=100  # optional
+        color=(1, 0, 0),  # optional
+        margin=100,  # optional
     )
 
     grid_view_pdf.write("output.pdf")

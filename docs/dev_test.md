@@ -46,9 +46,7 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
     def test_fill(pdf_samples, request):
         expected_path = os.path.join(pdf_samples, "sample_filled.pdf")
         with open(expected_path, "rb+") as f:
-            obj = PdfWrapper(
-                os.path.join(pdf_samples, "sample_template.pdf")
-            ).fill(
+            obj = PdfWrapper(os.path.join(pdf_samples, "sample_template.pdf")).fill(
                 {
                     "test": "test_1",
                     "check": True,
@@ -77,9 +75,7 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
     The test then fills `sample_template.pdf` with a data dictionary using `PdfWrapper`:
 
     ```python
-    obj = PdfWrapper(
-        os.path.join(pdf_samples, "sample_template.pdf")
-    ).fill(
+    obj = PdfWrapper(os.path.join(pdf_samples, "sample_template.pdf")).fill(
         {
             "test": "test_1",
             "check": True,
