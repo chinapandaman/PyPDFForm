@@ -31,7 +31,7 @@ from pypdf.generic import (
 )
 from reportlab.pdfgen.canvas import Canvas
 
-from ..constants import AP, DA, FT, Annot, Annots, F, N, Rect, Sig, Subtype, T
+from ..constants import AP, DA, FT, Annot, Annots, F, N, Rect, S, Sig, Subtype, T
 from ..constants import Type as PdfType
 from .base import Field
 
@@ -167,7 +167,7 @@ class SignatureWidget:
         Constructs signature widgets in page-aligned watermark PDFs.
 
         Each widget is represented by a `/Sig` annotation with a transparent
-        normal appearance and an explicitly disabled annotation border. The
+        interior and the same dark-gray, one-point border as an image field. The
         annotation and appearance are created in the destination writer so they
         do not retain references to an external PDF.
         ``build_widget_watermarks`` then packages the annotations by source page.
@@ -184,9 +184,19 @@ class SignatureWidget:
         def build_annotation(out: PdfWriter, widget: SignatureWidget) -> Any:
             width = float(widget.optional_parameters["width"])
             height = float(widget.optional_parameters["height"])
+            border_color = (0.1, 0.1, 0.1)
 
             appearance = StreamObject()
-            appearance.set_data(b"")
+            appearance.set_data(
+                (
+                    f"{border_color[0]:g} "
+                    f"{border_color[1]:g} "
+                    f"{border_color[2]:g} RG\n"
+                    "1 w\n"
+                    f"0.5 0.5 {width - 1:g} {height - 1:g} re\n"
+                    "s\n"
+                ).encode()
+            )
             appearance.update(
                 {
                     NameObject(PdfType): NameObject("/XObject"),
@@ -218,8 +228,18 @@ class SignatureWidget:
                             FloatObject(widget.y + height),
                         ]
                     ),
-                    NameObject("/Border"): ArrayObject(
-                        [FloatObject(0), FloatObject(0), FloatObject(0)]
+                    NameObject("/MK"): DictionaryObject(
+                        {
+                            NameObject("/BC"): ArrayObject(
+                                FloatObject(value) for value in border_color
+                            )
+                        }
+                    ),
+                    NameObject("/BS"): DictionaryObject(
+                        {
+                            NameObject(S): NameObject(S),
+                            NameObject("/W"): NumberObject(1),
+                        }
                     ),
                     NameObject(AP): DictionaryObject({NameObject(N): appearance_ref}),
                     NameObject(DA): TextStringObject("/Helv 0 Tf 0 g"),
