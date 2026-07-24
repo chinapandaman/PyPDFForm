@@ -1352,7 +1352,7 @@
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="s2">&quot;test_3&quot;</span><span class="p">:</span> <span class="s2">&quot;test_3&quot;</span><span class="p">,</span>
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="s2">&quot;check_3&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="p">},</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span>   <span class="c1"># optional, set to True to flatten the filled PDF form</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># optional, set to True to flatten the filled PDF form</span>
 </span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">)</span>
 </span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
 </span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
@@ -1393,7 +1393,7 @@
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>        <span class="s2">&quot;radio_2&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
 </span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>        <span class="s2">&quot;radio_3&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="p">},</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span>   <span class="c1"># optional, set to True to flatten the filled PDF form</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># optional, set to True to flatten the filled PDF form</span>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">)</span>
 </span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
 </span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
@@ -1428,13 +1428,11 @@
 <div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">PyPDFForm</span><span class="w"> </span><span class="kn">import</span> <span class="n">PdfWrapper</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">filled</span> <span class="o">=</span> <span class="n">PdfWrapper</span><span class="p">(</span><span class="s2">&quot;sample_template_with_dropdown.pdf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="p">{</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>        <span class="s2">&quot;dropdown_1&quot;</span><span class="p">:</span> <span class="mi">1</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="p">},</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span>   <span class="c1"># optional, set to True to flatten the filled PDF form</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">)</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="p">{</span><span class="s2">&quot;dropdown_1&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># optional, set to True to flatten the filled PDF form</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">)</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1442,13 +1440,11 @@
 <div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">PyPDFForm</span><span class="w"> </span><span class="kn">import</span> <span class="n">PdfWrapper</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">filled</span> <span class="o">=</span> <span class="n">PdfWrapper</span><span class="p">(</span><span class="s2">&quot;sample_template_with_dropdown.pdf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="p">{</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>        <span class="s2">&quot;dropdown_1&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="p">},</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span>   <span class="c1"># optional, set to True to flatten the filled PDF form</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="p">)</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="p">{</span><span class="s2">&quot;dropdown_1&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">},</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># optional, set to True to flatten the filled PDF form</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="p">)</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 </div>
@@ -1490,13 +1486,11 @@
 <div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">PyPDFForm</span><span class="w"> </span><span class="kn">import</span> <span class="n">PdfWrapper</span>
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">signed</span> <span class="o">=</span> <span class="n">PdfWrapper</span><span class="p">(</span><span class="s2">&quot;sample_template_with_signature.pdf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="p">{</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>        <span class="s2">&quot;signature&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_signature.png&quot;</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="p">},</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span>   <span class="c1"># optional, set to True to flatten the filled PDF form</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="p">)</span>
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>
-</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="n">signed</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="p">{</span><span class="s2">&quot;signature&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_signature.png&quot;</span><span class="p">},</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># optional, set to True to flatten the filled PDF form</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">)</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="n">signed</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1504,13 +1498,11 @@
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;sample_signature.png&quot;</span><span class="p">,</span> <span class="s2">&quot;rb+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sig</span><span class="p">:</span>
 </span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">signed</span> <span class="o">=</span> <span class="n">PdfWrapper</span><span class="p">(</span><span class="s2">&quot;sample_template_with_signature.pdf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>        <span class="p">{</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>            <span class="s2">&quot;signature&quot;</span><span class="p">:</span> <span class="n">sig</span>
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>        <span class="p">},</span>
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>        <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span>   <span class="c1"># optional, set to True to flatten the filled PDF form</span>
-</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>    <span class="p">)</span>
-</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
-</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="n">signed</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>        <span class="p">{</span><span class="s2">&quot;signature&quot;</span><span class="p">:</span> <span class="n">sig</span><span class="p">},</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>        <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># optional, set to True to flatten the filled PDF form</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="p">)</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="n">signed</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1518,13 +1510,11 @@
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
 </span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;sample_signature.png&quot;</span><span class="p">,</span> <span class="s2">&quot;rb+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sig</span><span class="p">:</span>
 </span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    <span class="n">signed</span> <span class="o">=</span> <span class="n">PdfWrapper</span><span class="p">(</span><span class="s2">&quot;sample_template_with_signature.pdf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>        <span class="p">{</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>            <span class="s2">&quot;signature&quot;</span><span class="p">:</span> <span class="n">sig</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>        <span class="p">},</span>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>        <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span>   <span class="c1"># optional, set to True to flatten the filled PDF form</span>
-</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>    <span class="p">)</span>
-</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>
-</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="n">signed</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>        <span class="p">{</span><span class="s2">&quot;signature&quot;</span><span class="p">:</span> <span class="n">sig</span><span class="o">.</span><span class="n">read</span><span class="p">()},</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>        <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># optional, set to True to flatten the filled PDF form</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    <span class="p">)</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="n">signed</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1534,12 +1524,10 @@
 </span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">pdf</span> <span class="o">=</span> <span class="n">PdfWrapper</span><span class="p">(</span><span class="s2">&quot;sample_template_with_signature.pdf&quot;</span><span class="p">)</span>
 </span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">pdf</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="s2">&quot;signature&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">preserve_aspect_ratio</span> <span class="o">=</span> <span class="kc">False</span>
 </span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">pdf</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>    <span class="p">{</span>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>        <span class="s2">&quot;signature&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_signature.png&quot;</span>
-</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>    <span class="p">},</span>
-</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="p">)</span>
-</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>
-</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="n">pdf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>    <span class="p">{</span><span class="s2">&quot;signature&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_signature.png&quot;</span><span class="p">},</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="p">)</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="n">pdf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 </div>
@@ -1579,13 +1567,11 @@
 <div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">PyPDFForm</span><span class="w"> </span><span class="kn">import</span> <span class="n">PdfWrapper</span>
 </span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>
 </span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="n">filled</span> <span class="o">=</span> <span class="n">PdfWrapper</span><span class="p">(</span><span class="s2">&quot;sample_template_with_image_field.pdf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="p">{</span>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>        <span class="s2">&quot;image_1&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_image.jpg&quot;</span>
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>    <span class="p">},</span>
-</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span>   <span class="c1"># optional, set to True to flatten the filled PDF form</span>
-</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="p">)</span>
-</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>
-</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="p">{</span><span class="s2">&quot;image_1&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_image.jpg&quot;</span><span class="p">},</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># optional, set to True to flatten the filled PDF form</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="p">)</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1593,13 +1579,11 @@
 </span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>
 </span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;sample_image.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;rb+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">img</span><span class="p">:</span>
 </span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>    <span class="n">filled</span> <span class="o">=</span> <span class="n">PdfWrapper</span><span class="p">(</span><span class="s2">&quot;sample_template_with_image_field.pdf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
-</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>        <span class="p">{</span>
-</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>            <span class="s2">&quot;image_1&quot;</span><span class="p">:</span> <span class="n">img</span>
-</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>        <span class="p">},</span>
-</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>        <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span>   <span class="c1"># optional, set to True to flatten the filled PDF form</span>
-</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>    <span class="p">)</span>
-</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>
-</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>        <span class="p">{</span><span class="s2">&quot;image_1&quot;</span><span class="p">:</span> <span class="n">img</span><span class="p">},</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>        <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># optional, set to True to flatten the filled PDF form</span>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>    <span class="p">)</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1607,13 +1591,11 @@
 </span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>
 </span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;sample_image.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;rb+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">img</span><span class="p">:</span>
 </span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>    <span class="n">filled</span> <span class="o">=</span> <span class="n">PdfWrapper</span><span class="p">(</span><span class="s2">&quot;sample_template_with_image_field.pdf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>        <span class="p">{</span>
-</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>            <span class="s2">&quot;image_1&quot;</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>        <span class="p">},</span>
-</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>        <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span>   <span class="c1"># optional, set to True to flatten the filled PDF form</span>
-</span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>    <span class="p">)</span>
-</span><span id="__span-23-10"><a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a>
-</span><span id="__span-23-11"><a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>        <span class="p">{</span><span class="s2">&quot;image_1&quot;</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">read</span><span class="p">()},</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>        <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># optional, set to True to flatten the filled PDF form</span>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>    <span class="p">)</span>
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>
+</span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="n">filled</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1623,12 +1605,10 @@
 </span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="n">pdf</span> <span class="o">=</span> <span class="n">PdfWrapper</span><span class="p">(</span><span class="s2">&quot;sample_template_with_image_field.pdf&quot;</span><span class="p">)</span>
 </span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="n">pdf</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="s2">&quot;image_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">preserve_aspect_ratio</span> <span class="o">=</span> <span class="kc">True</span>
 </span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="n">pdf</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
-</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>    <span class="p">{</span>
-</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a>        <span class="s2">&quot;image_1&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_image.jpg&quot;</span>
-</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>    <span class="p">},</span>
-</span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="p">)</span>
-</span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a>
-</span><span id="__span-24-11"><a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="n">pdf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>    <span class="p">{</span><span class="s2">&quot;image_1&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_image.jpg&quot;</span><span class="p">},</span>
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="p">)</span>
+</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>
+</span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="n">pdf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 </div>
