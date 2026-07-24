@@ -528,11 +528,7 @@ class PdfWrapper:
         if result:
             result = rebuild_acroform_fields(
                 result,
-                {
-                    key
-                    for key, widget in self.widgets.items()
-                    if not isinstance(widget, Signature)
-                },  # TODO: figure out why can't image/sig be rendered by Acrobat
+                set(self.widgets.keys()),
                 getattr(self, "use_full_widget_name"),
             )
             if self.version:
@@ -745,10 +741,11 @@ class PdfWrapper:
 
         This method takes a list of field definition objects (`FieldTypes`),
         groups them by creation strategy, and then delegates each group to the
-        internal `_bulk_create_fields` method. Signatures and images are grouped
-        together because both copy bedrock annotations; checkboxes and radio groups
-        are grouped together because they share ReportLab button handling; multiple
-        dropdown fields are routed through the general creation path.
+        internal `_bulk_create_fields` method. Signatures and images are processed
+        separately because each constructs a different PDF annotation; checkboxes
+        and radio groups are grouped together because they share ReportLab button
+        handling; multiple dropdown fields are routed through the general creation
+        path.
 
         Args:
             fields (Sequence[FieldTypes]): A list of field definition objects
@@ -774,9 +771,6 @@ class PdfWrapper:
             else:
                 general_creation.append(each)
 
-        needs_separate_creation_dict[SignatureField] = needs_separate_creation_dict.pop(
-            SignatureField, []
-        ) + needs_separate_creation_dict.pop(ImageField, [])
         needs_separate_creation_dict[CheckBoxField] = needs_separate_creation_dict.pop(
             CheckBoxField, []
         ) + needs_separate_creation_dict.pop(RadioGroup, [])
