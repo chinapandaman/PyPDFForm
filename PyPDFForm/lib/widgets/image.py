@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=R0801
 """
 This module defines the `ImageField` and `ImageWidget` classes, which are used
 to describe and construct image-import form fields.
