@@ -27,22 +27,22 @@ from pypdf.generic import (
 )
 
 from ..constants import (
-    A,
     AP,
-    D,
     DA,
-    F,
     FT,
-    Ff,
+    IMAGE_FIELD_IDENTIFIER,
     JS,
-    N,
-    S,
+    A,
     Action,
     Annot,
     Btn,
-    IMAGE_FIELD_IDENTIFIER,
+    D,
+    F,
+    Ff,
     JavaScript,
+    N,
     Rect,
+    S,
     Subtype,
     T,
 )
@@ -66,8 +66,9 @@ class ImageWidget(SignatureWidget):
         Constructs image widgets in page-aligned watermark PDFs.
 
         Each image field is built as a push-button annotation whose JavaScript
-        action opens the PDF viewer's image-import dialog. Normal, rollover, and
-        pressed appearance streams are created in the destination writer, and
+        action opens the PDF viewer's image-import dialog. Its normal, rollover,
+        and pressed appearances have a transparent interior and use the same
+        dark-gray, one-point border as a default text field.
         ``build_widget_watermarks`` packages the resulting annotations by source
         page.
 
@@ -83,14 +84,18 @@ class ImageWidget(SignatureWidget):
         def build_annotation(out: PdfWriter, widget: SignatureWidget) -> Any:
             width = float(widget.optional_parameters["width"])
             height = float(widget.optional_parameters["height"])
+            border_color = (0.1, 0.1, 0.1)
 
-            def build_appearance(gray: float):
+            def build_appearance():
                 appearance = StreamObject()
                 appearance.set_data(
                     (
-                        f"{gray:g} {gray:g} {gray:g} rg\n"
-                        f"0 0 {width:g} {height:g} re\n"
-                        "f\n"
+                        f"{border_color[0]:g} "
+                        f"{border_color[1]:g} "
+                        f"{border_color[2]:g} RG\n"
+                        "1 w\n"
+                        f"0.5 0.5 {width - 1:g} {height - 1:g} re\n"
+                        "s\n"
                     ).encode()
                 )
                 appearance.update(
@@ -122,9 +127,7 @@ class ImageWidget(SignatureWidget):
                     appearance.flate_encode()
                 )
 
-            normal_appearance = build_appearance(0.501961)
-            rollover_appearance = build_appearance(0.501961)
-            down_appearance = build_appearance(0.498039)
+            appearance = build_appearance()
 
             annotation = DictionaryObject(
                 {
@@ -139,13 +142,15 @@ class ImageWidget(SignatureWidget):
                             NameObject("/IF"): DictionaryObject(
                                 {NameObject(S): NameObject(A)}
                             ),
-                            NameObject("/BG"): ArrayObject(
-                                [
-                                    FloatObject(0.501961),
-                                    FloatObject(0.501961),
-                                    FloatObject(0.501961),
-                                ]
+                            NameObject("/BC"): ArrayObject(
+                                FloatObject(value) for value in border_color
                             ),
+                        }
+                    ),
+                    NameObject("/BS"): DictionaryObject(
+                        {
+                            NameObject(S): NameObject(S),
+                            NameObject("/W"): NumberObject(1),
                         }
                     ),
                     NameObject(A): DictionaryObject(
@@ -166,9 +171,9 @@ class ImageWidget(SignatureWidget):
                     ),
                     NameObject(AP): DictionaryObject(
                         {
-                            NameObject(N): normal_appearance,
-                            NameObject("/R"): rollover_appearance,
-                            NameObject(D): down_appearance,
+                            NameObject(N): appearance,
+                            NameObject("/R"): appearance,
+                            NameObject(D): appearance,
                         }
                     ),
                     NameObject(T): TextStringObject(widget.name),

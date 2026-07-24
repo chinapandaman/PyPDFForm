@@ -31,7 +31,7 @@ from pypdf.generic import (
 )
 from reportlab.pdfgen.canvas import Canvas
 
-from ..constants import AP, DA, F, FT, N, Annot, Annots, Rect, Sig, Subtype, T
+from ..constants import AP, DA, FT, Annot, Annots, F, N, Rect, Sig, Subtype, T
 from ..constants import Type as PdfType
 from .base import Field
 
@@ -166,11 +166,11 @@ class SignatureWidget:
         """
         Constructs signature widgets in page-aligned watermark PDFs.
 
-        Each widget is represented by a `/Sig` annotation with its own bordered
-        normal appearance stream. The annotation and appearance are created in
-        the destination writer so they do not retain references to an external
-        PDF. ``build_widget_watermarks`` then packages the annotations by source
-        page.
+        Each widget is represented by a `/Sig` annotation with a transparent
+        normal appearance and an explicitly disabled annotation border. The
+        annotation and appearance are created in the destination writer so they
+        do not retain references to an external PDF.
+        ``build_widget_watermarks`` then packages the annotations by source page.
 
         Args:
             widgets (List[SignatureWidget]): Signature widgets to construct.
@@ -186,9 +186,7 @@ class SignatureWidget:
             height = float(widget.optional_parameters["height"])
 
             appearance = StreamObject()
-            appearance.set_data(
-                (f"0 G\n1 w\n10 M\n.5 .5 {width - 1:g} {height - 1:g} re\ns\n").encode()
-            )
+            appearance.set_data(b"")
             appearance.update(
                 {
                     NameObject(PdfType): NameObject("/XObject"),
@@ -220,22 +218,14 @@ class SignatureWidget:
                             FloatObject(widget.y + height),
                         ]
                     ),
+                    NameObject("/Border"): ArrayObject(
+                        [FloatObject(0), FloatObject(0), FloatObject(0)]
+                    ),
                     NameObject(AP): DictionaryObject({NameObject(N): appearance_ref}),
                     NameObject(DA): TextStringObject("/Helv 0 Tf 0 g"),
                     NameObject(F): NumberObject(4),
                     NameObject(FT): NameObject(Sig),
                     NameObject("/H"): NameObject(N),
-                    NameObject("/MK"): DictionaryObject(
-                        {
-                            NameObject("/BC"): ArrayObject(
-                                [
-                                    FloatObject(0),
-                                    FloatObject(0),
-                                    FloatObject(0),
-                                ]
-                            )
-                        }
-                    ),
                     NameObject(T): TextStringObject(widget.name),
                     NameObject("/Q"): NumberObject(0),
                 }
