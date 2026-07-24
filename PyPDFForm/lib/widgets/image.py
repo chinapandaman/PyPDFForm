@@ -58,6 +58,124 @@ class ImageWidget(SignatureWidget):
     """
 
     @staticmethod
+    def _build_annotation(out: PdfWriter, widget: SignatureWidget) -> Any:
+        """
+        Constructs an image-import widget annotation owned by a PDF writer.
+
+        This method creates a border-only Form XObject, reuses it for the normal,
+        rollover, and pressed appearances, and builds a push-button `/Btn` widget
+        whose JavaScript action invokes `buttonImportIcon()`. It registers the
+        appearance and annotation with the same writer and implements the
+        annotation-builder callback used by `build_widget_watermarks`.
+
+        Args:
+            out (PdfWriter): The writer that will own the appearance stream and
+                widget annotation.
+            widget (SignatureWidget): The normalized image widget definition to
+                convert into a PDF annotation.
+
+        Returns:
+            Any: The writer-owned indirect reference to the widget annotation.
+        """
+        width = float(widget.optional_parameters["width"])
+        height = float(widget.optional_parameters["height"])
+        border_color = (0.1, 0.1, 0.1)
+
+        appearance_stream = StreamObject()
+        appearance_stream.set_data(
+            (
+                f"{border_color[0]:g} "
+                f"{border_color[1]:g} "
+                f"{border_color[2]:g} RG\n"
+                "1 w\n"
+                f"0.5 0.5 {width - 1:g} {height - 1:g} re\n"
+                "s\n"
+            ).encode()
+        )
+        appearance_stream.update(
+            {
+                NameObject(PdfType): NameObject("/XObject"),
+                NameObject(Subtype): NameObject("/Form"),
+                NameObject("/BBox"): ArrayObject(
+                    [
+                        FloatObject(0),
+                        FloatObject(0),
+                        FloatObject(width),
+                        FloatObject(height),
+                    ]
+                ),
+                NameObject("/Resources"): DictionaryObject(),
+                NameObject("/Matrix"): ArrayObject(
+                    [
+                        FloatObject(1),
+                        FloatObject(0),
+                        FloatObject(0),
+                        FloatObject(1),
+                        FloatObject(0),
+                        FloatObject(0),
+                    ]
+                ),
+            }
+        )
+        appearance = out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
+            appearance_stream.flate_encode()
+        )
+
+        annotation = DictionaryObject(
+            {
+                NameObject(FT): NameObject(Btn),
+                NameObject(Ff): NumberObject(1 << 16),
+                NameObject(PdfType): NameObject(Annot),
+                NameObject(Subtype): NameObject("/Widget"),
+                NameObject(F): NumberObject(4),
+                NameObject("/MK"): DictionaryObject(
+                    {
+                        NameObject("/TP"): NumberObject(1),
+                        NameObject("/IF"): DictionaryObject(
+                            {NameObject(S): NameObject(A)}
+                        ),
+                        NameObject("/BC"): ArrayObject(
+                            FloatObject(value) for value in border_color
+                        ),
+                    }
+                ),
+                NameObject("/BS"): DictionaryObject(
+                    {
+                        NameObject(S): NameObject(S),
+                        NameObject("/W"): NumberObject(1),
+                    }
+                ),
+                NameObject(A): DictionaryObject(
+                    {
+                        NameObject(PdfType): NameObject(Action),
+                        NameObject(S): NameObject(JavaScript),
+                        NameObject(JS): TextStringObject(IMAGE_FIELD_IDENTIFIER),
+                    }
+                ),
+                NameObject(DA): TextStringObject("/Micr 12 Tf 0 0 0 rg"),
+                NameObject(Rect): ArrayObject(
+                    [
+                        FloatObject(widget.x),
+                        FloatObject(widget.y),
+                        FloatObject(widget.x + width),
+                        FloatObject(widget.y + height),
+                    ]
+                ),
+                NameObject(AP): DictionaryObject(
+                    {
+                        NameObject(N): appearance,
+                        NameObject("/R"): appearance,
+                        NameObject(D): appearance,
+                    }
+                ),
+                NameObject(T): TextStringObject(widget.name),
+            }
+        )
+        return out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
+            annotation
+        )
+
+    @staticmethod
     def bulk_watermarks(widgets: List[SignatureWidget], stream: bytes) -> List[bytes]:
         """
         Constructs image widgets in page-aligned carrier PDFs.
@@ -77,107 +195,9 @@ class ImageWidget(SignatureWidget):
             List[bytes]: Page-aligned PDF streams containing the constructed
             image annotations.
         """
-
-        def build_annotation(out: PdfWriter, widget: SignatureWidget) -> Any:
-            width = float(widget.optional_parameters["width"])
-            height = float(widget.optional_parameters["height"])
-            border_color = (0.1, 0.1, 0.1)
-
-            appearance_stream = StreamObject()
-            appearance_stream.set_data(
-                (
-                    f"{border_color[0]:g} "
-                    f"{border_color[1]:g} "
-                    f"{border_color[2]:g} RG\n"
-                    "1 w\n"
-                    f"0.5 0.5 {width - 1:g} {height - 1:g} re\n"
-                    "s\n"
-                ).encode()
-            )
-            appearance_stream.update(
-                {
-                    NameObject(PdfType): NameObject("/XObject"),
-                    NameObject(Subtype): NameObject("/Form"),
-                    NameObject("/BBox"): ArrayObject(
-                        [
-                            FloatObject(0),
-                            FloatObject(0),
-                            FloatObject(width),
-                            FloatObject(height),
-                        ]
-                    ),
-                    NameObject("/Resources"): DictionaryObject(),
-                    NameObject("/Matrix"): ArrayObject(
-                        [
-                            FloatObject(1),
-                            FloatObject(0),
-                            FloatObject(0),
-                            FloatObject(1),
-                            FloatObject(0),
-                            FloatObject(0),
-                        ]
-                    ),
-                }
-            )
-            appearance = out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
-                appearance_stream.flate_encode()
-            )
-
-            annotation = DictionaryObject(
-                {
-                    NameObject(FT): NameObject(Btn),
-                    NameObject(Ff): NumberObject(1 << 16),
-                    NameObject(PdfType): NameObject(Annot),
-                    NameObject(Subtype): NameObject("/Widget"),
-                    NameObject(F): NumberObject(4),
-                    NameObject("/MK"): DictionaryObject(
-                        {
-                            NameObject("/TP"): NumberObject(1),
-                            NameObject("/IF"): DictionaryObject(
-                                {NameObject(S): NameObject(A)}
-                            ),
-                            NameObject("/BC"): ArrayObject(
-                                FloatObject(value) for value in border_color
-                            ),
-                        }
-                    ),
-                    NameObject("/BS"): DictionaryObject(
-                        {
-                            NameObject(S): NameObject(S),
-                            NameObject("/W"): NumberObject(1),
-                        }
-                    ),
-                    NameObject(A): DictionaryObject(
-                        {
-                            NameObject(PdfType): NameObject(Action),
-                            NameObject(S): NameObject(JavaScript),
-                            NameObject(JS): TextStringObject(IMAGE_FIELD_IDENTIFIER),
-                        }
-                    ),
-                    NameObject(DA): TextStringObject("/Micr 12 Tf 0 0 0 rg"),
-                    NameObject(Rect): ArrayObject(
-                        [
-                            FloatObject(widget.x),
-                            FloatObject(widget.y),
-                            FloatObject(widget.x + width),
-                            FloatObject(widget.y + height),
-                        ]
-                    ),
-                    NameObject(AP): DictionaryObject(
-                        {
-                            NameObject(N): appearance,
-                            NameObject("/R"): appearance,
-                            NameObject(D): appearance,
-                        }
-                    ),
-                    NameObject(T): TextStringObject(widget.name),
-                }
-            )
-            return out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
-                annotation
-            )
-
-        return ImageWidget.build_widget_watermarks(widgets, stream, build_annotation)
+        return ImageWidget.build_widget_watermarks(
+            widgets, stream, ImageWidget._build_annotation
+        )
 
 
 @dataclass

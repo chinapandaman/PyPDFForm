@@ -161,6 +161,97 @@ class SignatureWidget:
         return result
 
     @staticmethod
+    def _build_annotation(out: PdfWriter, widget: SignatureWidget) -> Any:
+        """
+        Constructs a signature widget annotation owned by a PDF writer.
+
+        This method creates a border-only Form XObject for the normal appearance,
+        builds a `/Sig` widget from the normalized name, position, and dimensions,
+        and registers both objects with the same writer. It implements the
+        annotation-builder callback used by `build_widget_watermarks`.
+
+        Args:
+            out (PdfWriter): The writer that will own the appearance stream and
+                widget annotation.
+            widget (SignatureWidget): The normalized signature widget definition
+                to convert into a PDF annotation.
+
+        Returns:
+            Any: The writer-owned indirect reference to the widget annotation.
+        """
+        width = float(widget.optional_parameters["width"])
+        height = float(widget.optional_parameters["height"])
+        border_color = (0.1, 0.1, 0.1)
+
+        appearance = StreamObject()
+        appearance.set_data(
+            (
+                f"{border_color[0]:g} "
+                f"{border_color[1]:g} "
+                f"{border_color[2]:g} RG\n"
+                "1 w\n"
+                f"0.5 0.5 {width - 1:g} {height - 1:g} re\n"
+                "s\n"
+            ).encode()
+        )
+        appearance.update(
+            {
+                NameObject(PdfType): NameObject("/XObject"),
+                NameObject(Subtype): NameObject("/Form"),
+                NameObject("/BBox"): ArrayObject(
+                    [
+                        FloatObject(0),
+                        FloatObject(0),
+                        FloatObject(width),
+                        FloatObject(height),
+                    ]
+                ),
+                NameObject("/Resources"): DictionaryObject(),
+            }
+        )
+        appearance_ref = out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
+            appearance.flate_encode()
+        )
+
+        annotation = DictionaryObject(
+            {
+                NameObject(PdfType): NameObject(Annot),
+                NameObject(Subtype): NameObject("/Widget"),
+                NameObject(Rect): ArrayObject(
+                    [
+                        FloatObject(widget.x),
+                        FloatObject(widget.y),
+                        FloatObject(widget.x + width),
+                        FloatObject(widget.y + height),
+                    ]
+                ),
+                NameObject("/MK"): DictionaryObject(
+                    {
+                        NameObject("/BC"): ArrayObject(
+                            FloatObject(value) for value in border_color
+                        )
+                    }
+                ),
+                NameObject("/BS"): DictionaryObject(
+                    {
+                        NameObject(S): NameObject(S),
+                        NameObject("/W"): NumberObject(1),
+                    }
+                ),
+                NameObject(AP): DictionaryObject({NameObject(N): appearance_ref}),
+                NameObject(DA): TextStringObject("/Helv 0 Tf 0 g"),
+                NameObject(F): NumberObject(4),
+                NameObject(FT): NameObject(Sig),
+                NameObject("/H"): NameObject(N),
+                NameObject(T): TextStringObject(widget.name),
+                NameObject("/Q"): NumberObject(0),
+            }
+        )
+        return out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
+            annotation
+        )
+
+    @staticmethod
     def bulk_watermarks(widgets: List[SignatureWidget], stream: bytes) -> List[bytes]:
         """
         Constructs signature widgets in page-aligned carrier PDFs.
@@ -180,82 +271,8 @@ class SignatureWidget:
             List[bytes]: Page-aligned PDF streams containing the constructed
             signature annotations.
         """
-
-        def build_annotation(out: PdfWriter, widget: SignatureWidget) -> Any:
-            width = float(widget.optional_parameters["width"])
-            height = float(widget.optional_parameters["height"])
-            border_color = (0.1, 0.1, 0.1)
-
-            appearance = StreamObject()
-            appearance.set_data(
-                (
-                    f"{border_color[0]:g} "
-                    f"{border_color[1]:g} "
-                    f"{border_color[2]:g} RG\n"
-                    "1 w\n"
-                    f"0.5 0.5 {width - 1:g} {height - 1:g} re\n"
-                    "s\n"
-                ).encode()
-            )
-            appearance.update(
-                {
-                    NameObject(PdfType): NameObject("/XObject"),
-                    NameObject(Subtype): NameObject("/Form"),
-                    NameObject("/BBox"): ArrayObject(
-                        [
-                            FloatObject(0),
-                            FloatObject(0),
-                            FloatObject(width),
-                            FloatObject(height),
-                        ]
-                    ),
-                    NameObject("/Resources"): DictionaryObject(),
-                }
-            )
-            appearance_ref = out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
-                appearance.flate_encode()
-            )
-
-            annotation = DictionaryObject(
-                {
-                    NameObject(PdfType): NameObject(Annot),
-                    NameObject(Subtype): NameObject("/Widget"),
-                    NameObject(Rect): ArrayObject(
-                        [
-                            FloatObject(widget.x),
-                            FloatObject(widget.y),
-                            FloatObject(widget.x + width),
-                            FloatObject(widget.y + height),
-                        ]
-                    ),
-                    NameObject("/MK"): DictionaryObject(
-                        {
-                            NameObject("/BC"): ArrayObject(
-                                FloatObject(value) for value in border_color
-                            )
-                        }
-                    ),
-                    NameObject("/BS"): DictionaryObject(
-                        {
-                            NameObject(S): NameObject(S),
-                            NameObject("/W"): NumberObject(1),
-                        }
-                    ),
-                    NameObject(AP): DictionaryObject({NameObject(N): appearance_ref}),
-                    NameObject(DA): TextStringObject("/Helv 0 Tf 0 g"),
-                    NameObject(F): NumberObject(4),
-                    NameObject(FT): NameObject(Sig),
-                    NameObject("/H"): NameObject(N),
-                    NameObject(T): TextStringObject(widget.name),
-                    NameObject("/Q"): NumberObject(0),
-                }
-            )
-            return out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
-                annotation
-            )
-
         return SignatureWidget.build_widget_watermarks(
-            widgets, stream, build_annotation
+            widgets, stream, SignatureWidget._build_annotation
         )
 
 
