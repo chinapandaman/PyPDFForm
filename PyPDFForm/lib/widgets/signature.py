@@ -32,7 +32,31 @@ from pypdf.generic import (
 )
 from reportlab.pdfgen.canvas import Canvas
 
-from ..constants import AP, DA, FT, Annot, Annots, F, N, Rect, S, Sig, Subtype, T
+from ..constants import (
+    AP,
+    BC,
+    BS,
+    DA,
+    FT,
+    MK,
+    Annot,
+    Annots,
+    BBox,
+    F,
+    Form,
+    H,
+    N,
+    Q,
+    Rect,
+    Resources,
+    S,
+    Sig,
+    Subtype,
+    T,
+    W,
+    Widget,
+    XObject,
+)
 from ..constants import Type as PdfType
 from .base import Field
 
@@ -196,9 +220,9 @@ class SignatureWidget:
         )
         appearance.update(
             {
-                NameObject(PdfType): NameObject("/XObject"),
-                NameObject(Subtype): NameObject("/Form"),
-                NameObject("/BBox"): ArrayObject(
+                NameObject(PdfType): NameObject(XObject),
+                NameObject(Subtype): NameObject(Form),
+                NameObject(BBox): ArrayObject(
                     [
                         FloatObject(0),
                         FloatObject(0),
@@ -206,7 +230,7 @@ class SignatureWidget:
                         FloatObject(height),
                     ]
                 ),
-                NameObject("/Resources"): DictionaryObject(),
+                NameObject(Resources): DictionaryObject(),
             }
         )
         appearance_ref = out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
@@ -216,7 +240,7 @@ class SignatureWidget:
         annotation = DictionaryObject(
             {
                 NameObject(PdfType): NameObject(Annot),
-                NameObject(Subtype): NameObject("/Widget"),
+                NameObject(Subtype): NameObject(Widget),
                 NameObject(Rect): ArrayObject(
                     [
                         FloatObject(widget.x),
@@ -225,26 +249,26 @@ class SignatureWidget:
                         FloatObject(widget.y + height),
                     ]
                 ),
-                NameObject("/MK"): DictionaryObject(
+                NameObject(MK): DictionaryObject(
                     {
-                        NameObject("/BC"): ArrayObject(
+                        NameObject(BC): ArrayObject(
                             FloatObject(value) for value in border_color
                         )
                     }
                 ),
-                NameObject("/BS"): DictionaryObject(
+                NameObject(BS): DictionaryObject(
                     {
                         NameObject(S): NameObject(S),
-                        NameObject("/W"): NumberObject(1),
+                        NameObject(W): NumberObject(1),
                     }
                 ),
                 NameObject(AP): DictionaryObject({NameObject(N): appearance_ref}),
                 NameObject(DA): TextStringObject("/Helv 0 Tf 0 g"),
                 NameObject(F): NumberObject(4),
                 NameObject(FT): NameObject(Sig),
-                NameObject("/H"): NameObject(N),
+                NameObject(H): NameObject(N),
                 NameObject(T): TextStringObject(widget.name),
-                NameObject("/Q"): NumberObject(0),
+                NameObject(Q): NumberObject(0),
             }
         )
         return out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212

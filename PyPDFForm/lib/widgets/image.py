@@ -26,23 +26,36 @@ from pypdf.generic import (
 
 from ..constants import (
     AP,
+    BC,
+    BS,
     DA,
     FT,
+    IF,
     IMAGE_FIELD_IDENTIFIER,
     JS,
+    MK,
+    TP,
     A,
     Action,
     Annot,
+    BBox,
     Btn,
     D,
     F,
     Ff,
+    Form,
     JavaScript,
+    Matrix,
     N,
+    R,
     Rect,
+    Resources,
     S,
     Subtype,
     T,
+    W,
+    Widget,
+    XObject,
 )
 from ..constants import Type as PdfType
 from .signature import SignatureField, SignatureWidget
@@ -94,9 +107,9 @@ class ImageWidget(SignatureWidget):
         )
         appearance_stream.update(
             {
-                NameObject(PdfType): NameObject("/XObject"),
-                NameObject(Subtype): NameObject("/Form"),
-                NameObject("/BBox"): ArrayObject(
+                NameObject(PdfType): NameObject(XObject),
+                NameObject(Subtype): NameObject(Form),
+                NameObject(BBox): ArrayObject(
                     [
                         FloatObject(0),
                         FloatObject(0),
@@ -104,8 +117,8 @@ class ImageWidget(SignatureWidget):
                         FloatObject(height),
                     ]
                 ),
-                NameObject("/Resources"): DictionaryObject(),
-                NameObject("/Matrix"): ArrayObject(
+                NameObject(Resources): DictionaryObject(),
+                NameObject(Matrix): ArrayObject(
                     [
                         FloatObject(1),
                         FloatObject(0),
@@ -126,23 +139,23 @@ class ImageWidget(SignatureWidget):
                 NameObject(FT): NameObject(Btn),
                 NameObject(Ff): NumberObject(1 << 16),
                 NameObject(PdfType): NameObject(Annot),
-                NameObject(Subtype): NameObject("/Widget"),
+                NameObject(Subtype): NameObject(Widget),
                 NameObject(F): NumberObject(4),
-                NameObject("/MK"): DictionaryObject(
+                NameObject(MK): DictionaryObject(
                     {
-                        NameObject("/TP"): NumberObject(1),
-                        NameObject("/IF"): DictionaryObject(
+                        NameObject(TP): NumberObject(1),
+                        NameObject(IF): DictionaryObject(
                             {NameObject(S): NameObject(A)}
                         ),
-                        NameObject("/BC"): ArrayObject(
+                        NameObject(BC): ArrayObject(
                             FloatObject(value) for value in border_color
                         ),
                     }
                 ),
-                NameObject("/BS"): DictionaryObject(
+                NameObject(BS): DictionaryObject(
                     {
                         NameObject(S): NameObject(S),
-                        NameObject("/W"): NumberObject(1),
+                        NameObject(W): NumberObject(1),
                     }
                 ),
                 NameObject(A): DictionaryObject(
@@ -164,7 +177,7 @@ class ImageWidget(SignatureWidget):
                 NameObject(AP): DictionaryObject(
                     {
                         NameObject(N): appearance,
-                        NameObject("/R"): appearance,
+                        NameObject(R): appearance,
                         NameObject(D): appearance,
                     }
                 ),
