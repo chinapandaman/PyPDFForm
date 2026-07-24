@@ -2,14 +2,12 @@
 # pylint: disable=R0801
 """
 This module defines the `ImageField` and `ImageWidget` classes, which are used
-to represent and manipulate image form fields within PDF documents.
+to describe and construct image-import form fields.
 
-The `ImageField` class is a dataclass that encapsulates the properties of an
-image field, inheriting from `SignatureField` for its dimensional attributes.
-
-The `ImageWidget` class extends the base `SignatureWidget` class to provide
-image-field annotation construction while reusing its placement and watermark
-packaging infrastructure.
+`ImageField` inherits the signature field's sizing properties. `ImageWidget`
+reuses the signature widget's placement and carrier-PDF infrastructure while
+constructing a push-button annotation with an Acrobat JavaScript image-import
+action.
 """
 
 from dataclasses import dataclass
@@ -54,30 +52,29 @@ class ImageWidget(SignatureWidget):
     """
     Represents an image widget in a PDF form.
 
-    This class inherits from the SignatureWidget and is specifically designed
-    for creating image fields in PDF forms. It reuses the signature widget's
-    placement parameters while constructing a push-button annotation with an
-    image-import action.
+    The widget inherits signature-field placement, dimensions, and deferred
+    hooks, but constructs a push-button annotation identified by its
+    `buttonImportIcon()` JavaScript action.
     """
 
     @staticmethod
     def bulk_watermarks(widgets: List[SignatureWidget], stream: bytes) -> List[bytes]:
         """
-        Constructs image widgets in page-aligned watermark PDFs.
+        Constructs image widgets in page-aligned carrier PDFs.
 
         Each image field is built as a push-button annotation whose JavaScript
-        action opens the PDF viewer's image-import dialog. Its normal, rollover,
-        and pressed appearances have a transparent interior and use the same
-        dark-gray, one-point border as a default text field.
-        ``build_widget_watermarks`` packages the resulting annotations by source
-        page.
+        action invokes `buttonImportIcon()` in viewers that support Acrobat
+        JavaScript. A single border-only appearance stream is reused for the
+        normal, rollover, and pressed states. It has a transparent interior and
+        the same dark-gray, one-point solid border as the signature widget.
+        ``build_widget_watermarks`` packages the annotations by source page.
 
         Args:
             widgets (List[SignatureWidget]): Image widgets to construct.
-            stream (bytes): Source PDF used to determine page count and dimensions.
+            stream (bytes): Source PDF used to determine page count and page size.
 
         Returns:
-            List[bytes]: Page-aligned watermark streams containing the constructed
+            List[bytes]: Page-aligned PDF streams containing the constructed
             image annotations.
         """
 
@@ -191,9 +188,9 @@ class ImageField(SignatureField):
     """
     Represents an image field in a PDF document.
 
-    This dataclass extends the `SignatureField` base class and defines an image
-    input field. It inherits `width` and `height` from `SignatureField` because
-    image and signature placeholders share the same sizing model.
+    This dataclass extends `SignatureField` and selects `ImageWidget` as its
+    widget implementation. It inherits the optional width and height values;
+    when omitted, the widget resolves them to 160 and 90 points.
 
     Attributes:
         _widget_class (Type[ImageWidget]): The widget class associated with this field type.

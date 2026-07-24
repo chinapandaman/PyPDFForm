@@ -2,14 +2,15 @@
 # pylint: disable=R0801
 """
 This module defines the `SignatureField` and `SignatureWidget` classes, which are
-used to represent and manipulate signature form fields within PDF documents.
+used to describe and construct signature form fields.
 
-The `SignatureField` class is a dataclass that encapsulates the properties of a
-signature field, such as its dimensions.
+`SignatureField` stores the user-facing field definition. `SignatureWidget`
+normalizes that definition's values, constructs a `/Sig` widget annotation,
+and packages annotations in page-aligned PDFs so they can be copied into the
+destination document.
 
-The `SignatureWidget` class provides specific functionality for interacting with
-signature form fields in PDFs, including handling their creation, rendering, and
-integration into the document.
+Signature annotations and their appearance streams are constructed directly;
+they do not depend on ReportLab's AcroForm API or an external template PDF.
 """
 
 from __future__ import annotations
@@ -40,17 +41,14 @@ class SignatureWidget:
     """
     Represents a signature widget in a PDF form.
 
-    This class is responsible for handling the creation and integration of
-    signature fields in a PDF document. Unlike other widget types, it does not
-    inherit from the base Widget class. Instead of using ReportLab's AcroForm
-    API, it constructs signature annotations directly and places them at the
-    specified coordinates.
+    The widget stores placement, dimensions, and deferred hook values for a
+    signature field. Unlike widgets backed by ReportLab's AcroForm API, it
+    constructs its PDF annotation and normal appearance stream directly.
 
     Attributes:
-        OPTIONAL_PARAMS (list): A list of tuples, where each tuple contains the
-            parameter name and its default value.
-        ALLOWED_HOOK_PARAMS (list): A list of parameter names that can be
-            used as hooks to trigger dynamic modifications.
+        OPTIONAL_PARAMS (list): Width and height parameters with their defaults.
+        ALLOWED_HOOK_PARAMS (list): Parameters applied after the annotation has
+            been copied into the destination PDF.
     """
 
     OPTIONAL_PARAMS = [
@@ -68,18 +66,19 @@ class SignatureWidget:
         **kwargs,
     ) -> None:
         """
-        Initializes a SignatureWidget object.
+        Initializes a signature widget description.
 
         The widget records placement information, resolves width and height with
-        defaults, and captures supported hook parameters so they can be applied
-        after the annotation is inserted into the target PDF.
+        defaults of 160 and 90 points, and captures `required` and `tooltip`
+        values for later application.
 
         Args:
             name (str): The name of the signature widget.
-            page_number (int): The page number of the signature widget.
-            x (float): The x coordinate of the signature widget.
-            y (float): The y coordinate of the signature widget.
-            **kwargs: Additional keyword arguments.
+            page_number (int): The 1-based destination page number.
+            x (float): The left edge of the widget in PDF page coordinates.
+            y (float): The bottom edge of the widget in PDF page coordinates.
+            **kwargs: Optional `width`, `height`, `required`, and `tooltip`
+                values.
         """
         super().__init__()
         self.hook_params = []
@@ -102,24 +101,24 @@ class SignatureWidget:
         annotation_builder: Callable[[PdfWriter, SignatureWidget], Any],
     ) -> List[bytes]:
         """
-        Builds page-aligned watermark PDFs from widget annotation objects.
+        Builds page-aligned carrier PDFs from widget annotation objects.
 
         Widgets are grouped by their 1-based page number. For every page that
-        contains widgets, this method creates a blank, single-page PDF with the
-        same dimensions as the source page, asks ``annotation_builder`` to add
-        each widget's objects to that PDF's writer, and stores the returned
-        annotation references in the page's `/Annots` array. Pages without
-        widgets are represented by an empty byte string.
+        contains widgets, this method creates a blank, single-page PDF sized
+        from the source page's media box. It asks ``annotation_builder`` to
+        create each annotation and its dependent objects in that PDF's writer,
+        then stores the returned annotation references in the page's `/Annots`
+        array. Pages without widgets are represented by an empty byte string.
 
         Args:
-            widgets (List[SignatureWidget]): Widgets to package into watermark PDFs.
-            stream (bytes): Source PDF used to determine page count and dimensions.
+            widgets (List[SignatureWidget]): Widgets to package into carrier PDFs.
+            stream (bytes): Source PDF used to determine page count and page size.
             annotation_builder (Callable): Function that receives the destination
-                writer and a widget, adds the annotation's dependent objects to
-                the writer, and returns the annotation object or reference.
+                writer and a widget, creates the annotation and its dependent
+                objects, and returns the annotation object or reference.
 
         Returns:
-            List[bytes]: Page-aligned watermark streams. Each non-empty entry is
+            List[bytes]: Page-aligned PDF streams. Each non-empty entry is
             a single-page PDF containing the annotations for that source page.
         """
         page_to_widgets = defaultdict(list)
@@ -164,20 +163,21 @@ class SignatureWidget:
     @staticmethod
     def bulk_watermarks(widgets: List[SignatureWidget], stream: bytes) -> List[bytes]:
         """
-        Constructs signature widgets in page-aligned watermark PDFs.
+        Constructs signature widgets in page-aligned carrier PDFs.
 
         Each widget is represented by a `/Sig` annotation with a transparent
-        interior and the same dark-gray, one-point border as an image field. The
-        annotation and appearance are created in the destination writer so they
-        do not retain references to an external PDF.
-        ``build_widget_watermarks`` then packages the annotations by source page.
+        interior and a dark-gray, one-point solid border. Its normal appearance
+        stream contains only that border. The annotation and appearance are
+        created in the carrier PDF's writer, so they do not retain references
+        to another PDF. ``build_widget_watermarks`` then packages the
+        annotations by source page.
 
         Args:
             widgets (List[SignatureWidget]): Signature widgets to construct.
-            stream (bytes): Source PDF used to determine page count and dimensions.
+            stream (bytes): Source PDF used to determine page count and page size.
 
         Returns:
-            List[bytes]: Page-aligned watermark streams containing the constructed
+            List[bytes]: Page-aligned PDF streams containing the constructed
             signature annotations.
         """
 
