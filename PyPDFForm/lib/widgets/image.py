@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=R0801
 """
 This module defines the `ImageField` and `ImageWidget` classes, which are used
 to describe and construct image-import form fields.
@@ -82,48 +83,45 @@ class ImageWidget(SignatureWidget):
             height = float(widget.optional_parameters["height"])
             border_color = (0.1, 0.1, 0.1)
 
-            def build_appearance():
-                appearance = StreamObject()
-                appearance.set_data(
-                    (
-                        f"{border_color[0]:g} "
-                        f"{border_color[1]:g} "
-                        f"{border_color[2]:g} RG\n"
-                        "1 w\n"
-                        f"0.5 0.5 {width - 1:g} {height - 1:g} re\n"
-                        "s\n"
-                    ).encode()
-                )
-                appearance.update(
-                    {
-                        NameObject(PdfType): NameObject("/XObject"),
-                        NameObject(Subtype): NameObject("/Form"),
-                        NameObject("/BBox"): ArrayObject(
-                            [
-                                FloatObject(0),
-                                FloatObject(0),
-                                FloatObject(width),
-                                FloatObject(height),
-                            ]
-                        ),
-                        NameObject("/Resources"): DictionaryObject(),
-                        NameObject("/Matrix"): ArrayObject(
-                            [
-                                FloatObject(1),
-                                FloatObject(0),
-                                FloatObject(0),
-                                FloatObject(1),
-                                FloatObject(0),
-                                FloatObject(0),
-                            ]
-                        ),
-                    }
-                )
-                return out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
-                    appearance.flate_encode()
-                )
-
-            appearance = build_appearance()
+            appearance_stream = StreamObject()
+            appearance_stream.set_data(
+                (
+                    f"{border_color[0]:g} "
+                    f"{border_color[1]:g} "
+                    f"{border_color[2]:g} RG\n"
+                    "1 w\n"
+                    f"0.5 0.5 {width - 1:g} {height - 1:g} re\n"
+                    "s\n"
+                ).encode()
+            )
+            appearance_stream.update(
+                {
+                    NameObject(PdfType): NameObject("/XObject"),
+                    NameObject(Subtype): NameObject("/Form"),
+                    NameObject("/BBox"): ArrayObject(
+                        [
+                            FloatObject(0),
+                            FloatObject(0),
+                            FloatObject(width),
+                            FloatObject(height),
+                        ]
+                    ),
+                    NameObject("/Resources"): DictionaryObject(),
+                    NameObject("/Matrix"): ArrayObject(
+                        [
+                            FloatObject(1),
+                            FloatObject(0),
+                            FloatObject(0),
+                            FloatObject(1),
+                            FloatObject(0),
+                            FloatObject(0),
+                        ]
+                    ),
+                }
+            )
+            appearance = out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
+                appearance_stream.flate_encode()
+            )
 
             annotation = DictionaryObject(
                 {
