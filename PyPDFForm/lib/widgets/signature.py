@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=R0801
 """
 This module defines the `SignatureField` and `SignatureWidget` classes, which are
 used to describe and construct signature form fields.
@@ -30,7 +29,6 @@ from pypdf.generic import (
     StreamObject,
     TextStringObject,
 )
-from reportlab.pdfgen.canvas import Canvas
 
 from ..constants import (
     AP,
@@ -59,6 +57,7 @@ from ..constants import (
 )
 from ..constants import Type as PdfType
 from .base import Field
+from .base import Widget as BaseWidget
 
 
 class SignatureWidget:
@@ -158,15 +157,8 @@ class SignatureWidget:
             if not page_widgets:
                 continue
 
-            watermark = BytesIO()
             page = input_pdf.pages[page_num - 1]
-            canvas = Canvas(
-                watermark,
-                pagesize=(
-                    float(page.mediabox[2]),
-                    float(page.mediabox[3]),
-                ),
-            )
+            watermark, canvas = BaseWidget.create_watermark_canvas(page)
             canvas.showPage()
             canvas.save()
             watermark.seek(0)
@@ -185,28 +177,22 @@ class SignatureWidget:
         return result
 
     @staticmethod
-    def _build_annotation(out: PdfWriter, widget: SignatureWidget) -> Any:
+    def _build_border_appearance(
+        width: float,
+        height: float,
+        border_color: tuple[float, float, float],
+    ) -> StreamObject:
         """
-        Constructs a signature widget annotation owned by a PDF writer.
-
-        This method creates a border-only Form XObject for the normal appearance,
-        builds a `/Sig` widget from the normalized name, position, and dimensions,
-        and registers both objects with the same writer. It implements the
-        annotation-builder callback used by `build_widget_watermarks`.
+        Constructs the border-only appearance shared by signature and image widgets.
 
         Args:
-            out (PdfWriter): The writer that will own the appearance stream and
-                widget annotation.
-            widget (SignatureWidget): The normalized signature widget definition
-                to convert into a PDF annotation.
+            width (float): The width of the widget.
+            height (float): The height of the widget.
+            border_color (tuple): The RGB color of the widget border.
 
         Returns:
-            Any: The writer-owned indirect reference to the widget annotation.
+            StreamObject: An unregistered Form XObject containing the widget border.
         """
-        width = float(widget.optional_parameters["width"])
-        height = float(widget.optional_parameters["height"])
-        border_color = (0.1, 0.1, 0.1)
-
         appearance = StreamObject()
         appearance.set_data(
             (
@@ -233,6 +219,58 @@ class SignatureWidget:
                 NameObject(Resources): DictionaryObject(),
             }
         )
+        return appearance
+
+    @staticmethod
+    def _build_rectangle(
+        widget: SignatureWidget, width: float, height: float
+    ) -> ArrayObject:
+        """
+        Constructs the annotation rectangle shared by signature and image widgets.
+
+        Args:
+            widget (SignatureWidget): The widget whose placement defines the rectangle.
+            width (float): The width of the widget.
+            height (float): The height of the widget.
+
+        Returns:
+            ArrayObject: The annotation's lower-left and upper-right coordinates.
+        """
+        return ArrayObject(
+            [
+                FloatObject(widget.x),
+                FloatObject(widget.y),
+                FloatObject(widget.x + width),
+                FloatObject(widget.y + height),
+            ]
+        )
+
+    @staticmethod
+    def _build_annotation(out: PdfWriter, widget: SignatureWidget) -> Any:
+        """
+        Constructs a signature widget annotation owned by a PDF writer.
+
+        This method creates a border-only Form XObject for the normal appearance,
+        builds a `/Sig` widget from the normalized name, position, and dimensions,
+        and registers both objects with the same writer. It implements the
+        annotation-builder callback used by `build_widget_watermarks`.
+
+        Args:
+            out (PdfWriter): The writer that will own the appearance stream and
+                widget annotation.
+            widget (SignatureWidget): The normalized signature widget definition
+                to convert into a PDF annotation.
+
+        Returns:
+            Any: The writer-owned indirect reference to the widget annotation.
+        """
+        width = float(widget.optional_parameters["width"])
+        height = float(widget.optional_parameters["height"])
+        border_color = (0.1, 0.1, 0.1)
+
+        appearance = SignatureWidget._build_border_appearance(
+            width, height, border_color
+        )
         appearance_ref = out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
             appearance.flate_encode()
         )
@@ -241,13 +279,8 @@ class SignatureWidget:
             {
                 NameObject(PdfType): NameObject(Annot),
                 NameObject(Subtype): NameObject(Widget),
-                NameObject(Rect): ArrayObject(
-                    [
-                        FloatObject(widget.x),
-                        FloatObject(widget.y),
-                        FloatObject(widget.x + width),
-                        FloatObject(widget.y + height),
-                    ]
+                NameObject(Rect): SignatureWidget._build_rectangle(
+                    widget, width, height
                 ),
                 NameObject(MK): DictionaryObject(
                     {
