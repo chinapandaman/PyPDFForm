@@ -10,13 +10,14 @@ action.
 """
 
 from dataclasses import dataclass
-from typing import Any, List, Type
+from typing import List, Type
 
 from pypdf import PdfWriter
 from pypdf.generic import (
     ArrayObject,
     DictionaryObject,
     FloatObject,
+    IndirectObject,
     NameObject,
     NumberObject,
     TextStringObject,
@@ -65,7 +66,7 @@ class ImageWidget(SignatureWidget):
     """
 
     @staticmethod
-    def _build_annotation(out: PdfWriter, widget: SignatureWidget) -> Any:
+    def _build_annotation(out: PdfWriter, widget: SignatureWidget) -> IndirectObject:
         """
         Constructs an image-import widget annotation owned by a PDF writer.
 
@@ -82,7 +83,8 @@ class ImageWidget(SignatureWidget):
                 convert into a PDF annotation.
 
         Returns:
-            Any: The writer-owned indirect reference to the widget annotation.
+            IndirectObject: The writer-owned indirect reference to the widget
+                annotation.
         """
         width = float(widget.optional_parameters["width"])
         height = float(widget.optional_parameters["height"])
