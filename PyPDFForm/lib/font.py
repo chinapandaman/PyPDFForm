@@ -66,7 +66,7 @@ from .raw.text import RawText
 from .watermark import create_watermarks_and_draw
 
 
-@lru_cache(maxsize=128)
+@lru_cache(maxsize=8)
 def validate_font(font_name: str, ttf_stream: bytes) -> bool:
     """
     Validates a TrueType font stream.
@@ -212,7 +212,7 @@ def temporary_font_registration(
                 del _fonts[rl_name]
 
 
-@lru_cache(maxsize=128)
+@lru_cache(maxsize=8)
 def _get_watermark_with_font(ttf_stream: bytes) -> bytes:
     """
     Creates a watermark PDF with a single space character using the specified font.
@@ -235,7 +235,7 @@ def _get_watermark_with_font(ttf_stream: bytes) -> bytes:
         )[0]
 
 
-@lru_cache(maxsize=128)
+@lru_cache(maxsize=8)
 def _compress_ttf(ttf_stream: bytes) -> bytes:
     """
     Compresses a TrueType font stream for embedding in a PDF.
@@ -361,7 +361,7 @@ def register_font_acroform(
         return f.read(), new_font_name
 
 
-@lru_cache(maxsize=128)
+@lru_cache(maxsize=8)
 def _get_base_font_name(ttf_stream: bytes) -> str:
     """
     Extracts the base font name from a TrueType font stream.
@@ -402,7 +402,6 @@ def _get_new_font_name(fonts: dict) -> str:
     return f"{FONT_NAME_PREFIX}{n}"
 
 
-@lru_cache(maxsize=128)
 def get_all_available_fonts(pdf: bytes) -> dict:
     """
     Retrieves all available fonts from a PDF document's AcroForm.

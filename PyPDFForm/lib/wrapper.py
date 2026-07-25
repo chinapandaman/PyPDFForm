@@ -280,7 +280,7 @@ class PdfWrapper:
         return self._available_fonts
 
     @staticmethod
-    @lru_cache(maxsize=128)
+    @lru_cache(maxsize=8)
     def _get_page_streams_with_widgets(stream: bytes) -> tuple[bytes, ...]:
         """
         Extracts page streams while preserving the original page widgets.
@@ -330,8 +330,7 @@ class PdfWrapper:
         """
         Gets the title stored in the PDF's document metadata.
 
-        The title is read lazily from the current PDF stream. Metadata extraction
-        is cached for each distinct stream.
+        The title is read lazily from the current PDF stream.
 
         Returns:
             str | None: The current document title, or None when no title exists.
@@ -472,8 +471,7 @@ class PdfWrapper:
         Gets the JavaScript stored in the PDF's document-open action.
 
         The script is read lazily from the current PDF stream, including an existing
-        JavaScript `/OpenAction` in the input template. Extraction is cached for each
-        distinct stream.
+        JavaScript `/OpenAction` in the input template.
 
         Returns:
             str | None: The current document-open JavaScript, or None when the PDF

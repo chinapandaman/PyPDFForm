@@ -22,7 +22,7 @@ from .constants import Annots
 from .patterns import get_widget_key
 
 
-@lru_cache(maxsize=128)
+@lru_cache(maxsize=8)
 def _get_image_reader(image_stream: bytes) -> ImageReader:
     """
     Creates a cached ReportLab image reader for an image byte stream.

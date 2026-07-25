@@ -28,7 +28,7 @@ from .constants import (
 from .template import get_widget_key
 
 
-@lru_cache(maxsize=128)
+@lru_cache(maxsize=8)
 def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) -> bytes:
     """
     Handles appearance streams and the /NeedAppearances flag for a PDF form.

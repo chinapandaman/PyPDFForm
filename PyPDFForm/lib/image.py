@@ -16,7 +16,7 @@ from PIL import Image
 from .constants import Rect
 
 
-@lru_cache(maxsize=128)
+@lru_cache(maxsize=8)
 def rotate_image(image_stream: bytes, rotation: float | int) -> bytes:
     """
     Rotates an image by a specified angle in degrees.
@@ -49,13 +49,12 @@ def rotate_image(image_stream: bytes, rotation: float | int) -> bytes:
     return result
 
 
-@lru_cache(maxsize=128)
 def get_image_dimensions(image_stream: bytes) -> Tuple[float, float]:
     """
     Retrieves the width and height of an image from its byte stream.
 
-    This cached function uses the PIL library to open the image from the provided
-    byte stream and returns its dimensions (width and height) as a tuple of floats.
+    This function uses the PIL library to open the image from the provided byte
+    stream and returns its dimensions (width and height) as a tuple of floats.
 
     Args:
         image_stream (bytes): The image data as bytes.
