@@ -31,7 +31,7 @@ from ..constants import (
     DA,
     FT,
     IF,
-    IMAGE_FIELD_IDENTIFIER,
+    IMAGE_IMPORT_JAVASCRIPT,
     JS,
     MK,
     TP,
@@ -162,7 +162,7 @@ class ImageWidget(SignatureWidget):
                     {
                         NameObject(PdfType): NameObject(Action),
                         NameObject(S): NameObject(JavaScript),
-                        NameObject(JS): TextStringObject(IMAGE_FIELD_IDENTIFIER),
+                        NameObject(JS): TextStringObject(IMAGE_IMPORT_JAVASCRIPT),
                     }
                 ),
                 NameObject(DA): TextStringObject("/Micr 12 Tf 0 0 0 rg"),
