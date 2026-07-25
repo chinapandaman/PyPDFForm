@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=R0801
 """
 This module defines the `ImageField` and `ImageWidget` classes, which are used
 to describe and construct image-import form fields.
@@ -20,7 +19,6 @@ from pypdf.generic import (
     FloatObject,
     NameObject,
     NumberObject,
-    StreamObject,
     TextStringObject,
 )
 
@@ -38,24 +36,20 @@ from ..constants import (
     A,
     Action,
     Annot,
-    BBox,
     Btn,
     D,
     F,
     Ff,
-    Form,
     JavaScript,
     Matrix,
     N,
     R,
     Rect,
-    Resources,
     S,
     Subtype,
     T,
     W,
     Widget,
-    XObject,
 )
 from ..constants import Type as PdfType
 from .signature import SignatureField, SignatureWidget
@@ -94,41 +88,18 @@ class ImageWidget(SignatureWidget):
         height = float(widget.optional_parameters["height"])
         border_color = (0.1, 0.1, 0.1)
 
-        appearance_stream = StreamObject()
-        appearance_stream.set_data(
-            (
-                f"{border_color[0]:g} "
-                f"{border_color[1]:g} "
-                f"{border_color[2]:g} RG\n"
-                "1 w\n"
-                f"0.5 0.5 {width - 1:g} {height - 1:g} re\n"
-                "s\n"
-            ).encode()
+        appearance_stream = ImageWidget._build_border_appearance(
+            width, height, border_color
         )
-        appearance_stream.update(
-            {
-                NameObject(PdfType): NameObject(XObject),
-                NameObject(Subtype): NameObject(Form),
-                NameObject(BBox): ArrayObject(
-                    [
-                        FloatObject(0),
-                        FloatObject(0),
-                        FloatObject(width),
-                        FloatObject(height),
-                    ]
-                ),
-                NameObject(Resources): DictionaryObject(),
-                NameObject(Matrix): ArrayObject(
-                    [
-                        FloatObject(1),
-                        FloatObject(0),
-                        FloatObject(0),
-                        FloatObject(1),
-                        FloatObject(0),
-                        FloatObject(0),
-                    ]
-                ),
-            }
+        appearance_stream[NameObject(Matrix)] = ArrayObject(
+            [
+                FloatObject(1),
+                FloatObject(0),
+                FloatObject(0),
+                FloatObject(1),
+                FloatObject(0),
+                FloatObject(0),
+            ]
         )
         appearance = out._add_object(  # type: ignore # noqa: SLF001 # pylint: disable=W0212
             appearance_stream.flate_encode()
@@ -166,14 +137,7 @@ class ImageWidget(SignatureWidget):
                     }
                 ),
                 NameObject(DA): TextStringObject("/Micr 12 Tf 0 0 0 rg"),
-                NameObject(Rect): ArrayObject(
-                    [
-                        FloatObject(widget.x),
-                        FloatObject(widget.y),
-                        FloatObject(widget.x + width),
-                        FloatObject(widget.y + height),
-                    ]
-                ),
+                NameObject(Rect): ImageWidget._build_rectangle(widget, width, height),
                 NameObject(AP): DictionaryObject(
                     {
                         NameObject(N): appearance,

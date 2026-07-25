@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from inspect import signature
 from io import BytesIO
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pypdf import PdfReader
 from reportlab.lib.colors import Color
@@ -173,6 +173,27 @@ class Widget:
         getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**self.acro_form_params)
 
     @staticmethod
+    def create_watermark_canvas(page: Any) -> tuple[BytesIO, Canvas]:
+        """
+        Creates a PDF canvas sized to a source page.
+
+        Args:
+            page (Any): The source PDF page whose media box defines the canvas size.
+
+        Returns:
+            tuple[BytesIO, Canvas]: The in-memory stream and its PDF canvas.
+        """
+        watermark = BytesIO()
+        canvas = Canvas(
+            watermark,
+            pagesize=(
+                float(page.mediabox[2]),
+                float(page.mediabox[3]),
+            ),
+        )
+        return watermark, canvas
+
+    @staticmethod
     def bulk_watermarks(widgets: List[Widget], stream: bytes) -> List[bytes]:
         """
         Generates watermarks for multiple widgets in bulk.
@@ -209,18 +230,10 @@ class Widget:
             if page_num not in widgets_by_page:
                 continue
 
+            page = pdf.pages[page_num - 1]
             # Use a fresh buffer per page to avoid stale trailing bytes
             # when the current page watermark is smaller than a previous page.
-            watermark = BytesIO()
-            page = pdf.pages[page_num - 1]
-
-            canvas = Canvas(
-                watermark,
-                pagesize=(
-                    float(page.mediabox[2]),
-                    float(page.mediabox[3]),
-                ),
-            )
+            watermark, canvas = Widget.create_watermark_canvas(page)
 
             for widget in widgets_by_page[page_num]:
                 getattr(widget, "_required_handler")(canvas)
