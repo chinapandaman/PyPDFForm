@@ -47,6 +47,10 @@ Annots = "/Annots"
 Annot = "/Annot"
 Contents = "/Contents"
 Widget = "/Widget"
+XObject = "/XObject"
+Form = "/Form"
+BBox = "/BBox"
+Matrix = "/Matrix"
 T = "/T"
 TU = "/TU"
 Rect = "/Rect"
@@ -59,6 +63,7 @@ V = "/V"
 AP = "/AP"
 I = "/I"  # noqa: E741
 N = "/N"
+R = "/R"
 Sig = "/Sig"
 DA = "/DA"
 DR = "/DR"
@@ -71,6 +76,13 @@ Opt = "/Opt"
 AS = "/AS"
 Yes = "/Yes"
 Off = "/Off"
+MK = "/MK"
+BC = "/BC"
+BS = "/BS"
+W = "/W"
+H = "/H"
+TP = "/TP"
+IF = "/IF"
 
 # javascript
 A = "/A"
@@ -144,7 +156,7 @@ DEFAULT_FONT = "Helvetica"
 DEFAULT_FONT_SIZE = 12
 DEFAULT_FONT_COLOR = (0, 0, 0)
 
-IMAGE_FIELD_IDENTIFIER = "event.target.buttonImportIcon();"
+IMAGE_IMPORT_JAVASCRIPT = "event.target.buttonImportIcon();"
 
 COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO = DEFAULT_FONT_SIZE / 100
 UNIQUE_SUFFIX_LENGTH = 20

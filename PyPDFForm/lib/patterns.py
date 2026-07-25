@@ -24,7 +24,7 @@ from .constants import (
     DV,
     FT,
     HIDDEN,
-    IMAGE_FIELD_IDENTIFIER,
+    IMAGE_IMPORT_JAVASCRIPT,
     JS,
     SLASH,
     TU,
@@ -61,7 +61,7 @@ WIDGET_TYPE_PATTERNS = [
     (
         (
             {Subtype: Widget},
-            {A: {JS: IMAGE_FIELD_IDENTIFIER}},
+            {A: {JS: IMAGE_IMPORT_JAVASCRIPT}},
         ),
         Image,
     ),
