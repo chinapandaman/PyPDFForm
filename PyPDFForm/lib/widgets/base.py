@@ -18,9 +18,9 @@ from dataclasses import dataclass
 from functools import lru_cache
 from inspect import signature
 from io import BytesIO
-from typing import Any, List, Optional
+from typing import List, Optional
 
-from pypdf import PdfReader
+from pypdf import PageObject, PdfReader
 from reportlab.lib.colors import Color
 from reportlab.pdfgen.canvas import Canvas
 
@@ -173,12 +173,13 @@ class Widget:
         getattr(canvas.acroForm, self.ACRO_FORM_FUNC)(**self.acro_form_params)
 
     @staticmethod
-    def create_watermark_canvas(page: Any) -> tuple[BytesIO, Canvas]:
+    def create_watermark_canvas(page: PageObject) -> tuple[BytesIO, Canvas]:
         """
         Creates a PDF canvas sized to a source page.
 
         Args:
-            page (Any): The source PDF page whose media box defines the canvas size.
+            page (PageObject): The source PDF page whose media box defines the
+                canvas size.
 
         Returns:
             tuple[BytesIO, Canvas]: The in-memory stream and its PDF canvas.

@@ -17,13 +17,14 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from io import BytesIO
-from typing import Any, Callable, List, Optional, Type
+from typing import Callable, List, Optional, Type
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
     ArrayObject,
     DictionaryObject,
     FloatObject,
+    IndirectObject,
     NameObject,
     NumberObject,
     StreamObject,
@@ -121,7 +122,7 @@ class SignatureWidget:
     def build_widget_watermarks(
         widgets: List[SignatureWidget],
         stream: bytes,
-        annotation_builder: Callable[[PdfWriter, SignatureWidget], Any],
+        annotation_builder: Callable[[PdfWriter, SignatureWidget], IndirectObject],
     ) -> List[bytes]:
         """
         Builds page-aligned carrier PDFs from widget annotation objects.
@@ -246,7 +247,7 @@ class SignatureWidget:
         )
 
     @staticmethod
-    def _build_annotation(out: PdfWriter, widget: SignatureWidget) -> Any:
+    def _build_annotation(out: PdfWriter, widget: SignatureWidget) -> IndirectObject:
         """
         Constructs a signature widget annotation owned by a PDF writer.
 
@@ -262,7 +263,8 @@ class SignatureWidget:
                 to convert into a PDF annotation.
 
         Returns:
-            Any: The writer-owned indirect reference to the widget annotation.
+            IndirectObject: The writer-owned indirect reference to the widget
+                annotation.
         """
         width = float(widget.optional_parameters["width"])
         height = float(widget.optional_parameters["height"])
