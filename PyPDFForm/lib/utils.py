@@ -12,7 +12,6 @@ It includes functions for:
 """
 
 from collections.abc import Callable
-from functools import lru_cache
 from io import BytesIO
 from secrets import choice
 from string import ascii_letters, digits, punctuation
@@ -30,7 +29,6 @@ from .constants import (
 )
 
 
-@lru_cache(maxsize=128)
 def remove_all_widgets(pdf: bytes) -> bytes:
     """
     Removes all widgets (form fields) from a PDF, effectively flattening the form.
