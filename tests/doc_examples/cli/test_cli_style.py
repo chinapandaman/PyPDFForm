@@ -714,7 +714,7 @@ def test_change_field_editability(pdf_samples, static_pdfs, yaml_samples, tmp_pa
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_editability.pdf"
     )
-    output_path = os.path.join(tmp_path, "output.pdf")
+    readonly_path = os.path.join(tmp_path, "readonly.pdf")
     data_yaml = os.path.join(tmp_path, "data.yaml")
     with open(data_yaml, "w", encoding="utf-8") as f:
         yaml.safe_dump(
@@ -739,7 +739,7 @@ def test_change_field_editability(pdf_samples, static_pdfs, yaml_samples, tmp_pa
             "-f",
             data_yaml,
             "-o",
-            output_path,
+            readonly_path,
             "--readonly",
         ],
     )
@@ -749,16 +749,16 @@ def test_change_field_editability(pdf_samples, static_pdfs, yaml_samples, tmp_pa
         [
             "update",
             "field",
-            output_path,
+            readonly_path,
             "-f",
             os.path.join(yaml_samples, "test_change_field_editability.yaml"),
             "-o",
-            output_path,
+            readonly_path,
         ],
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
+    with open(expected_path, "rb") as f1, open(readonly_path, "rb") as f2:
         expected = f1.read()
         actual = f2.read()
 

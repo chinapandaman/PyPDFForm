@@ -6,10 +6,6 @@ Most fields use flat, non-nested values. Image and signature fields can also use
 
 Filled forms stay editable by default. Pass `readonly=True` to the library's `fill` method, or add `--readonly` to the CLI `fill` command, to prevent further edits to the filled fields.
 
-This sets the fields' read-only flag; they remain form fields. To make selected fields editable again, set their `readonly` property to `False` as shown in [Change field editability](style.md#change-field-editability). Passing `readonly=False` to `fill` leaves existing read-only flags unchanged.
-
-The legacy `flatten` argument and `--flatten` CLI option remain supported as deprecated aliases. Using `flatten=True` emits a deprecation warning, and `--flatten` is hidden from CLI help. When both options are supplied, either one being true makes the fields read-only.
-
 ## CLI input methods
 
 The `fill` command can read field values from a YAML or JSON file supplied with `--file` / `-f`:
