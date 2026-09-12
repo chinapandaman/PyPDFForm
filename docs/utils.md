@@ -87,6 +87,11 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
 ## Merge multiple PDFs
 
+???+ note
+    When merging PDF forms with duplicate field names, PyPDFForm automatically renames conflicting fields by appending a unique, randomly generated suffix. This means some field names in the merged PDF will differ from their original names.
+
+    To avoid automatic renaming, give duplicate fields unique names across all input PDFs before merging. See [Change field name](style.md#change-field-name).
+
 === "Library"
     You can merge multiple PDF files by adding their `PdfWrapper` objects together. For example, to merge [this PDF](https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf) and [this PDF](pdfs/sample_template.pdf):
 
