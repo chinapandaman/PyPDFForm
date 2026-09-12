@@ -740,7 +740,7 @@ def test_change_field_editability(pdf_samples, static_pdfs, yaml_samples, tmp_pa
             data_yaml,
             "-o",
             output_path,
-            "--flatten",
+            "--readonly",
         ],
     )
 

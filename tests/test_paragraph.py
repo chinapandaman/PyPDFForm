@@ -25,16 +25,16 @@ def test_fill_sejda_complex(
         assert obj.read() == expected
 
 
-def test_fill_sejda_complex_flatten(
+def test_fill_sejda_complex_readonly(
     sejda_template_complex, sejda_complex_data, pdf_samples, request
 ):
     expected_path = os.path.join(
-        pdf_samples, "paragraph", "test_fill_sejda_complex_flatten.pdf"
+        pdf_samples, "paragraph", "test_fill_sejda_complex_readonly.pdf"
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sejda_template_complex).fill(
             sejda_complex_data,
-            flatten=True,
+            readonly=True,
         )
 
         request.config.results["expected_path"] = expected_path

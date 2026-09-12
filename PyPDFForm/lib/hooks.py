@@ -4,9 +4,10 @@ This module defines widget hooks that allow for dynamic modification of PDF form
 
 It provides functions to trigger these hooks, enabling changes to text field properties
 like font, font size, color, alignment, and multiline settings, as well as the size
-of checkbox and radio button widgets. It also provides functions for flattening
-generic and radio button widgets. These hooks are triggered during the PDF form
-filling process, allowing for customization of the form's appearance and behavior.
+of checkbox and radio button widgets. It also provides functions for changing the
+editability of generic and radio button widgets. These hooks are triggered during
+the PDF form filling process, allowing for customization of the form's appearance
+and behavior.
 """
 
 import sys
@@ -362,10 +363,10 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
     )
 
 
-def flatten_field(annot: DictionaryObject, val: bool) -> None:
+def update_field_readonly(annot: DictionaryObject, val: bool) -> None:
     """
-    Flattens a generic annotation by setting or unsetting the ReadOnly flag,
-    making it non-editable or editable based on the `val` parameter.
+    Sets or unsets the ReadOnly flag on a form field annotation,
+    making it read-only or editable based on the `val` parameter.
 
     This function modifies the Ff (flags) entry in the annotation dictionary to
     set or unset the ReadOnly flag, preventing or allowing the user from
@@ -373,7 +374,7 @@ def flatten_field(annot: DictionaryObject, val: bool) -> None:
 
     Args:
         annot (DictionaryObject): The annotation dictionary.
-        val (bool): True to flatten (make read-only), False to unflatten (make editable).
+        val (bool): True to make the field read-only, False to make it editable.
     """
     _update_field_flag(annot, READ_ONLY, val)
 

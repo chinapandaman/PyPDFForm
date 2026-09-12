@@ -5,7 +5,7 @@ Module containing functions to fill PDF forms.
 This module provides the core functionality for filling PDF forms programmatically.
 It includes functions for handling various form field types, such as text fields,
 checkboxes, radio buttons, dropdowns, images, and signatures. The module also
-supports flattening the filled form to prevent further modifications.
+supports making the filled form read-only to prevent further modifications.
 """
 
 from io import BytesIO
@@ -15,7 +15,7 @@ from pypdf import PdfWriter
 from pypdf.generic import DictionaryObject
 
 from .constants import Annots
-from .hooks import flatten_field
+from .hooks import update_field_readonly
 from .image import get_draw_image_resolutions, get_image_dimensions
 from .middleware import WIDGET_TYPES
 from .middleware.checkbox import Checkbox
@@ -84,12 +84,12 @@ def update_widget(
     radio_button_tracker: Dict[str, int],
     images_to_draw_page: list,
     need_appearances: bool,
-    flatten: bool,
+    readonly: bool,
 ) -> bool:
     """Updates a single widget's value and handles its properties.
 
     This function updates the value of a single PDF form widget based on its type. It sets
-    the read-only flag first when flattening is requested, skips value updates when the
+    the read-only flag first when requested, skips value updates when the
     middleware value is ``None``, tracks radio option indices within each group, and
     prepares images or signatures for later drawing instead of writing image data directly
     into the annotation.
@@ -101,13 +101,13 @@ def update_widget(
         radio_button_tracker (Dict[str, int]): A tracker for radio button groups to manage their indices.
         images_to_draw_page (list): A list to store image data for the current page.
         need_appearances (bool): If True, skips updating appearance streams for certain fields.
-        flatten (bool): Whether to flatten the widget to prevent further editing.
+        readonly (bool): Whether to make the widget read-only to prevent further editing.
 
     Returns:
         bool: True if an image or signature was prepared for drawing, False otherwise.
     """
-    if flatten:
-        flatten_field(annot, True)
+    if readonly:
+        update_field_readonly(annot, True)
     if widget.value is None:
         return False
 
@@ -137,7 +137,7 @@ def handle_image_drawing(
     """Merges prepared images and signatures with the filled PDF.
 
     This function takes the filled PDF and a dictionary of images to draw (from signatures
-    or image fields), flattens that page-indexed structure into watermark drawing
+    or image fields), combines that page-indexed structure into watermark drawing
     instructions, and merges those image watermarks into the PDF.
 
     Args:
@@ -161,7 +161,7 @@ def fill(
     widgets: Dict[str, WIDGET_TYPES],
     need_appearances: bool,
     use_full_widget_name: bool,
-    flatten: bool = False,
+    readonly: bool = False,
 ) -> tuple:
     """Fills a PDF template with the given widgets.
 
@@ -181,7 +181,7 @@ def fill(
             behavior for certain fields.
         use_full_widget_name (bool): Whether to use the full widget name when looking up widgets
                                       in the `widgets` dictionary.
-        flatten (bool): Whether to flatten the filled PDF. Defaults to False.
+        readonly (bool): Whether to make form fields read-only. Defaults to False.
 
     Returns:
         tuple: A tuple containing the filled PDF as bytes and the image-drawn
@@ -211,7 +211,7 @@ def fill(
                 radio_button_tracker,
                 images_to_draw[page_num + 1],
                 need_appearances,
-                flatten,
+                readonly,
             )
 
     with BytesIO() as f:

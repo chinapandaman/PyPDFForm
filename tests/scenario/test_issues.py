@@ -243,7 +243,7 @@ def test_sejda_multiline(issue_pdf_directory, request):
             "Poblacion CERREM rep": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas rhoncus est turpis, vitae hendrerit magna vestibulum in. Nulla maximus consectetur varius. Ut lectus nulla, malesuada at felis dictum, tristique lacinia lacus. Phasellus vehicula dui a orci aliquam, at tempus orci consequat. Maecenas sagittis auctor magna, a scelerisque urna ullamcorper at. Nam pellentesque faucibus condimentum. In hac habitasse platea dictumst.",
             "Poblacion CERREM bnf": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas rhoncus est turpis, vitae hendrerit magna vestibulum in. Nulla maximus consectetur varius. Ut lectus nulla, malesuada at felis dictum, tristique lacinia lacus. Phasellus vehicula dui a orci aliquam, at tempus orci consequat. Maecenas sagittis auctor magna, a scelerisque urna ullamcorper at. Nam pellentesque faucibus condimentum. In hac habitasse platea dictumst.",
         },
-        flatten=True,
+        readonly=True,
     )
 
     expected_path = os.path.join(issue_pdf_directory, "PPF-1349_expected.pdf")

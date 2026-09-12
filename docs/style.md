@@ -656,7 +656,7 @@ PyPDFForm lets you rename existing fields by updating their keys.
 ## Change field editability
 
 === "Library"
-    The `readonly` property of each form field controls its editability. Setting `readonly` to `True` flattens the field, making it uneditable, while setting it to `False` unflattens it, making it editable. The following example makes different form fields editable in [this PDF form](pdfs/sample_template_with_dropdown.pdf) after they have been flattened:
+    The `readonly` property of each form field controls its editability. Setting `readonly` to `True` makes the field read-only, while setting it to `False` makes it editable. The following example makes different form fields editable in [this PDF form](pdfs/sample_template_with_dropdown.pdf) after they have been made read-only:
 
     ```python
     from PyPDFForm import PdfWrapper
@@ -674,7 +674,7 @@ PyPDFForm lets you rename existing fields by updating their keys.
             "radio_1": 1,
             "dropdown_1": 0,
         },
-        flatten=True,
+        readonly=True,
     )
     form.widgets["test_2"].readonly = False  # text
     form.widgets["check_3"].readonly = False  # checkbox
@@ -684,7 +684,7 @@ PyPDFForm lets you rename existing fields by updating their keys.
     form.write("output.pdf")
     ```
 === "CLI"
-    The following example starts with a filled, flattened form and then makes selected fields editable again by setting `readonly` to `false`:
+    The following example starts with a filled, read-only form and then makes selected fields editable again by setting `readonly` to `false`:
 
     === "fill.yaml"
         ```yaml
@@ -710,8 +710,8 @@ PyPDFForm lets you rename existing fields by updating their keys.
         ```
     === "Command"
         ```shell
-        pypdfform fill sample_template_with_dropdown.pdf -f fill.yaml -o flattened.pdf --flatten
-        pypdfform update field flattened.pdf -f editable.yaml -o output.pdf
+        pypdfform fill sample_template_with_dropdown.pdf -f fill.yaml -o readonly.pdf --readonly
+        pypdfform update field readonly.pdf -f editable.yaml -o output.pdf
         ```
 
 ## Change field visibility

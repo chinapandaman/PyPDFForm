@@ -37,9 +37,9 @@ def test_dropdown_not_specified(sample_template_with_dropdown):
     )
 
 
-def test_dropdown_one_flatten(sample_template_with_dropdown, pdf_samples, request):
+def test_dropdown_one_readonly(sample_template_with_dropdown, pdf_samples, request):
     expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_one_flatten.pdf"
+        pdf_samples, "dropdown", "test_dropdown_one_readonly.pdf"
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sample_template_with_dropdown).fill(
@@ -53,7 +53,7 @@ def test_dropdown_one_flatten(sample_template_with_dropdown, pdf_samples, reques
                 "radio_1": 1,
                 "dropdown_1": 0,
             },
-            flatten=True,
+            readonly=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -87,11 +87,11 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
 
 
 @pytest.mark.requires_zlib_over_zlib_ng
-def test_dropdown_alignment_flatten_then_unflatten(
+def test_dropdown_alignment_readonly_then_editable(
     dropdown_alignment, pdf_samples, request
 ):
     expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_alignment_flatten_then_unflatten.pdf"
+        pdf_samples, "dropdown", "test_dropdown_alignment_readonly_then_editable.pdf"
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(dropdown_alignment).fill(
@@ -100,7 +100,7 @@ def test_dropdown_alignment_flatten_then_unflatten(
                 "dropdown_center": 1,
                 "dropdown_right": 2,
             },
-            flatten=True,
+            readonly=True,
         )
         obj.widgets["dropdown_center"].readonly = False
 
@@ -138,11 +138,11 @@ def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples, request
         assert obj.read() == expected
 
 
-def test_dropdown_alignment_sejda_flatten(
+def test_dropdown_alignment_sejda_readonly(
     dropdown_alignment_sejda, pdf_samples, request
 ):
     expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_alignment_sejda_flatten.pdf"
+        pdf_samples, "dropdown", "test_dropdown_alignment_sejda_readonly.pdf"
     )
     with open(
         expected_path,
@@ -154,7 +154,7 @@ def test_dropdown_alignment_sejda_flatten(
                 "dropdown_center": 1,
                 "dropdown_right": 2,
             },
-            flatten=True,
+            readonly=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -166,13 +166,13 @@ def test_dropdown_alignment_sejda_flatten(
         assert obj.read() == expected
 
 
-def test_dropdown_alignment_sejda_flatten_then_unflatten(
+def test_dropdown_alignment_sejda_readonly_then_editable(
     dropdown_alignment_sejda, pdf_samples, request
 ):
     expected_path = os.path.join(
         pdf_samples,
         "dropdown",
-        "test_dropdown_alignment_sejda_flatten_then_unflatten.pdf",
+        "test_dropdown_alignment_sejda_readonly_then_editable.pdf",
     )
     with open(
         expected_path,
@@ -184,7 +184,7 @@ def test_dropdown_alignment_sejda_flatten_then_unflatten(
                 "dropdown_center": 1,
                 "dropdown_right": 2,
             },
-            flatten=True,
+            readonly=True,
         )
         obj.widgets["dropdown_center"].readonly = False
 

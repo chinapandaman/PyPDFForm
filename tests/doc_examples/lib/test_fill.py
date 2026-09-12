@@ -21,7 +21,7 @@ def test_fill_text_check(static_pdfs, pdf_samples, request):
             "test_3": "test_3",
             "check_3": True,
         },
-        flatten=False,  # optional, set to True to flatten the filled PDF form
+        readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
     request.config.results["expected_path"] = expected_path
@@ -45,7 +45,7 @@ def test_fill_radio(static_pdfs, pdf_samples, request):
             "radio_2": 1,
             "radio_3": 2,
         },
-        flatten=False,  # optional, set to True to flatten the filled PDF form
+        readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
     request.config.results["expected_path"] = expected_path
@@ -65,7 +65,7 @@ def test_fill_dropdown(static_pdfs, pdf_samples, request):
         os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
     ).fill(
         {"dropdown_1": 1},
-        flatten=False,  # optional, set to True to flatten the filled PDF form
+        readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
     request.config.results["expected_path"] = expected_path
@@ -85,7 +85,7 @@ def test_fill_dropdown_via_str(static_pdfs, pdf_samples, request):
         os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"),
     ).fill(
         {"dropdown_1": "bar"},
-        flatten=False,  # optional, set to True to flatten the filled PDF form
+        readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
     request.config.results["expected_path"] = expected_path
@@ -106,7 +106,7 @@ def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
         os.path.join(static_pdfs, "sample_template_with_signature.pdf"),
     ).fill(
         {"signature": os.path.join(image_samples, "sample_signature.png")},
-        flatten=False,  # optional, set to True to flatten the filled PDF form
+        readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
     request.config.results["expected_path"] = expected_path
@@ -123,7 +123,7 @@ def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
             os.path.join(static_pdfs, "sample_template_with_signature.pdf"),
         ).fill(
             {"signature": sig},
-            flatten=False,  # optional, set to True to flatten the filled PDF form
+            readonly=False,  # optional, set to True to make the filled PDF form read-only
         )
 
     assert filled2.read() == filled.read()
@@ -133,7 +133,7 @@ def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
             os.path.join(static_pdfs, "sample_template_with_signature.pdf"),
         ).fill(
             {"signature": sig.read()},
-            flatten=False,  # optional, set to True to flatten the filled PDF form
+            readonly=False,  # optional, set to True to make the filled PDF form read-only
         )
 
     assert filled3.read() == filled.read()
@@ -149,7 +149,7 @@ def test_fill_sig_ratio(static_pdfs, pdf_samples, image_samples, request):
     pdf.widgets["signature"].preserve_aspect_ratio = False
     pdf.fill(
         {"signature": os.path.join(image_samples, "sample_signature.png")},
-        flatten=False,  # optional, set to True to flatten the filled PDF form
+        readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
     request.config.results["expected_path"] = expected_path
@@ -169,7 +169,7 @@ def test_fill_image(static_pdfs, pdf_samples, image_samples, request):
         os.path.join(static_pdfs, "sample_template_with_image_field.pdf"),
     ).fill(
         {"image_1": os.path.join(image_samples, "sample_image.jpg")},
-        flatten=False,  # optional, set to True to flatten the filled PDF form
+        readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
     request.config.results["expected_path"] = expected_path
@@ -186,7 +186,7 @@ def test_fill_image(static_pdfs, pdf_samples, image_samples, request):
             os.path.join(static_pdfs, "sample_template_with_image_field.pdf"),
         ).fill(
             {"image_1": img},
-            flatten=False,  # optional, set to True to flatten the filled PDF form
+            readonly=False,  # optional, set to True to make the filled PDF form read-only
         )
 
     assert filled2.read() == filled.read()
@@ -196,7 +196,7 @@ def test_fill_image(static_pdfs, pdf_samples, image_samples, request):
             os.path.join(static_pdfs, "sample_template_with_image_field.pdf"),
         ).fill(
             {"image_1": img.read()},
-            flatten=False,  # optional, set to True to flatten the filled PDF form
+            readonly=False,  # optional, set to True to make the filled PDF form read-only
         )
 
     assert filled3.read() == filled.read()

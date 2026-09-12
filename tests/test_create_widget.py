@@ -311,13 +311,13 @@ def test_create_checkbox_persist_old_widgets_fill(
 
 
 @pytest.mark.requires_zlib_over_zlib_ng
-def test_create_widget_sejda_fill_flatten_before(sejda_template, pdf_samples, request):
+def test_create_widget_sejda_fill_readonly_before(sejda_template, pdf_samples, request):
     expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_widget_sejda_fill_flatten_before.pdf"
+        pdf_samples, "widget", "test_create_widget_sejda_fill_readonly_before.pdf"
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sejda_template)
-        obj.fill(obj.sample_data, flatten=True).bulk_create_fields(
+        obj.fill(obj.sample_data, readonly=True).bulk_create_fields(
             [
                 Fields.TextField(
                     name="new_text_field_widget",
@@ -345,9 +345,9 @@ def test_create_widget_sejda_fill_flatten_before(sejda_template, pdf_samples, re
 
 
 @pytest.mark.requires_zlib_over_zlib_ng
-def test_create_widget_sejda_fill_flatten_after(sejda_template, pdf_samples, request):
+def test_create_widget_sejda_fill_readonly_after(sejda_template, pdf_samples, request):
     expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_widget_sejda_fill_flatten_after.pdf"
+        pdf_samples, "widget", "test_create_widget_sejda_fill_readonly_after.pdf"
     )
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sejda_template)
@@ -366,7 +366,7 @@ def test_create_widget_sejda_fill_flatten_after(sejda_template, pdf_samples, req
                     font_color=(0, 0, 1),
                 )
             ]
-        ).fill(obj.sample_data, flatten=True)
+        ).fill(obj.sample_data, readonly=True)
         assert obj.schema["properties"]["new_text_field_widget"]["type"] == "string"
 
         request.config.results["expected_path"] = expected_path
