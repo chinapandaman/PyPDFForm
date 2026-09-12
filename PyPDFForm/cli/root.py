@@ -165,9 +165,7 @@ def fill(
     output: OPTIONAL_OUTPUT_PDF = None,
     flatten: Annotated[
         bool,
-        typer.Option(
-            "--flatten", help="Deprecated alias for --readonly.", hidden=True
-        ),
+        typer.Option("--flatten", help="Deprecated alias for --readonly.", hidden=True),
     ] = None,
     readonly: Annotated[
         bool,

@@ -102,6 +102,14 @@ def test_deprecation_warning_direct_call_with_replace():
         assert obj.my_method(use_legacy=True) == "result"
 
 
+def test_flatten_deprecating(template_stream):
+    with pytest.warns(
+        DeprecationWarning,
+        match="PdfWrapper.fill.flatten will be deprecated soon. Use PdfWrapper.fill.readonly instead.",
+    ):
+        assert PdfWrapper(template_stream).fill({"test": "test"}, flatten=True)
+
+
 def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
 

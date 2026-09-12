@@ -67,7 +67,8 @@ def test_fill_comb_text_field_all_chars_readonly(
     sample_template_with_comb_text_field, max_length_expected_directory, request
 ):
     expected_path = os.path.join(
-        max_length_expected_directory, "test_fill_comb_text_field_all_chars_readonly.pdf"
+        max_length_expected_directory,
+        "test_fill_comb_text_field_all_chars_readonly.pdf",
     )
     with open(
         expected_path,
