@@ -31,7 +31,7 @@ from .constants import (
 
 def remove_all_widgets(pdf: bytes) -> bytes:
     """
-    Removes all widgets (form fields) from a PDF, effectively flattening the form.
+    Removes all widgets (form fields) from a PDF.
 
     This function takes a PDF as a bytes stream, removes all of its interactive
     form field annotations from each page, and returns the modified PDF as a

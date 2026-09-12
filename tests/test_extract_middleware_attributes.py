@@ -73,7 +73,7 @@ def test_addition_operator_3_times_values(template_stream, data_dict):
 
 
 def test_field_readonly(pdf_samples):
-    obj = PdfWrapper(os.path.join(pdf_samples, "test_fill_flatten_then_unflatten.pdf"))
+    obj = PdfWrapper(os.path.join(pdf_samples, "test_fill_readonly_then_editable.pdf"))
 
     for k, v in obj.widgets.items():
         if k in ["test_2", "check_3"]:
@@ -83,7 +83,7 @@ def test_field_readonly(pdf_samples):
 
 
 def test_field_readonly_sejda(pdf_samples):
-    obj = PdfWrapper(os.path.join(pdf_samples, "test_fill_sejda_flatten.pdf"))
+    obj = PdfWrapper(os.path.join(pdf_samples, "test_fill_sejda_readonly.pdf"))
 
     for v in obj.widgets.values():
         assert v.readonly

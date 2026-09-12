@@ -102,6 +102,14 @@ def test_deprecation_warning_direct_call_with_replace():
         assert obj.my_method(use_legacy=True) == "result"
 
 
+def test_flatten_deprecating(template_stream):
+    with pytest.warns(
+        DeprecationWarning,
+        match="PdfWrapper.fill.flatten will be deprecated soon. Use PdfWrapper.fill.readonly instead.",
+    ):
+        assert PdfWrapper(template_stream).fill({"test": "test"}, flatten=True)
+
+
 def test_base_schema_definition():
     assert Widget("foo").schema_definition == {}
 
@@ -121,10 +129,10 @@ def test_write_io(template_stream):
     assert PdfWrapper(buff.read()).widgets.keys() == obj.widgets.keys()
 
 
-def test_fill_flatten_then_unflatten(template_stream, pdf_samples, data_dict, request):
-    expected_path = os.path.join(pdf_samples, "test_fill_flatten_then_unflatten.pdf")
+def test_fill_readonly_then_editable(template_stream, pdf_samples, data_dict, request):
+    expected_path = os.path.join(pdf_samples, "test_fill_readonly_then_editable.pdf")
     with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).fill(data_dict, flatten=True)
+        obj = PdfWrapper(template_stream).fill(data_dict, readonly=True)
         obj.widgets["test_2"].readonly = False
         obj.widgets["check_3"].readonly = False
 
@@ -178,11 +186,11 @@ def test_fill_with_customized_widgets(
 
 
 @pytest.mark.requires_zlib_over_zlib_ng
-def test_fill_with_customized_widgets_flatten(
+def test_fill_with_customized_widgets_readonly(
     template_stream, pdf_samples, sample_font_stream, data_dict, request
 ):
     expected_path = os.path.join(
-        pdf_samples, "test_fill_with_customized_widgets_flatten.pdf"
+        pdf_samples, "test_fill_with_customized_widgets_readonly.pdf"
     )
     with open(
         expected_path,
@@ -198,7 +206,7 @@ def test_fill_with_customized_widgets_flatten(
         obj.widgets["test_2"].font_color = (0, 1, 0)
         obj.fill(
             data_dict,
-            flatten=True,
+            readonly=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -230,10 +238,10 @@ def test_fill_with_varied_int_values(template_stream, pdf_samples, request):
         assert obj.read() == expected
 
 
-def test_fill_radiobutton_flatten(
+def test_fill_radiobutton_readonly(
     template_with_radiobutton_stream, pdf_samples, request
 ):
-    expected_path = os.path.join(pdf_samples, "test_fill_radiobutton_flatten.pdf")
+    expected_path = os.path.join(pdf_samples, "test_fill_radiobutton_readonly.pdf")
     with open(
         expected_path,
         "rb+",
@@ -244,7 +252,7 @@ def test_fill_radiobutton_flatten(
                 "radio_2": 1,
                 "radio_3": 2,
             },
-            flatten=True,
+            readonly=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -256,11 +264,11 @@ def test_fill_radiobutton_flatten(
         assert obj.read() == expected
 
 
-def test_fill_radiobutton_flatten_then_unflatten(
+def test_fill_radiobutton_readonly_then_editable(
     template_with_radiobutton_stream, pdf_samples, request
 ):
     expected_path = os.path.join(
-        pdf_samples, "test_fill_radiobutton_flatten_then_unflatten.pdf"
+        pdf_samples, "test_fill_radiobutton_readonly_then_editable.pdf"
     )
     with open(
         expected_path,
@@ -272,7 +280,7 @@ def test_fill_radiobutton_flatten_then_unflatten(
                 "radio_2": 1,
                 "radio_3": 2,
             },
-            flatten=True,
+            readonly=True,
         )
         obj.widgets["radio_2"].readonly = False
 
@@ -302,15 +310,15 @@ def test_fill_sejda(sejda_template, pdf_samples, sejda_data, request):
         assert obj.read() == expected
 
 
-def test_fill_sejda_flatten(sejda_template, pdf_samples, sejda_data, request):
-    expected_path = os.path.join(pdf_samples, "test_fill_sejda_flatten.pdf")
+def test_fill_sejda_readonly(sejda_template, pdf_samples, sejda_data, request):
+    expected_path = os.path.join(pdf_samples, "test_fill_sejda_readonly.pdf")
     with open(
         expected_path,
         "rb+",
     ) as f:
         obj = PdfWrapper(sejda_template).fill(
             sejda_data,
-            flatten=True,
+            readonly=True,
         )
 
         request.config.results["expected_path"] = expected_path
@@ -322,11 +330,11 @@ def test_fill_sejda_flatten(sejda_template, pdf_samples, sejda_data, request):
         assert obj.read() == expected
 
 
-def test_fill_sejda_flatten_then_unflatten(
+def test_fill_sejda_readonly_then_editable(
     sejda_template, pdf_samples, sejda_data, request
 ):
     expected_path = os.path.join(
-        pdf_samples, "test_fill_sejda_flatten_then_unflatten.pdf"
+        pdf_samples, "test_fill_sejda_readonly_then_editable.pdf"
     )
     with open(
         expected_path,
@@ -334,7 +342,7 @@ def test_fill_sejda_flatten_then_unflatten(
     ) as f:
         obj = PdfWrapper(sejda_template).fill(
             sejda_data,
-            flatten=True,
+            readonly=True,
         )
         obj.widgets["buyer_name"].readonly = False
         obj.widgets["at_future_date"].readonly = False

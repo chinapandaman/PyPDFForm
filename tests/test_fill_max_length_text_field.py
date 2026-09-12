@@ -63,11 +63,12 @@ def test_fill_comb_text_field_all_chars(
         assert obj.read() == expected
 
 
-def test_fill_comb_text_field_all_chars_flatten(
+def test_fill_comb_text_field_all_chars_readonly(
     sample_template_with_comb_text_field, max_length_expected_directory, request
 ):
     expected_path = os.path.join(
-        max_length_expected_directory, "test_fill_comb_text_field_all_chars_flatten.pdf"
+        max_length_expected_directory,
+        "test_fill_comb_text_field_all_chars_readonly.pdf",
     )
     with open(
         expected_path,
@@ -81,7 +82,7 @@ def test_fill_comb_text_field_all_chars_flatten(
                 "Awesomeness": True,
                 "Gender": 0,
             },
-            flatten=True,
+            readonly=True,
         )
 
         request.config.results["expected_path"] = expected_path

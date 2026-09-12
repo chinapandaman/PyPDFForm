@@ -4,7 +4,7 @@ PyPDFForm fills PDF forms from a mapping of field names to values. The library a
 
 Most fields use flat, non-nested values. Image and signature fields can also use nested CLI objects when you need per-field options such as `preserve_aspect_ratio`.
 
-Filled forms stay editable by default. Pass `flatten=True` to the library's `fill` method, or add `--flatten` to the CLI `fill` command, to prevent further edits to the filled fields.
+Filled forms stay editable by default. Pass `readonly=True` to the library's `fill` method, or add `--readonly` to the CLI `fill` command, to prevent further edits to the filled fields.
 
 ## CLI input methods
 
@@ -56,7 +56,7 @@ Use string values for text fields and boolean values for checkboxes. The followi
             "test_3": "test_3",
             "check_3": True,
         },
-        flatten=False,  # optional, set to True to flatten the filled PDF form
+        readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
     filled.write("output.pdf")
@@ -92,7 +92,7 @@ Fill each radio button group with the zero-based index of the option to select. 
             "radio_2": 1,
             "radio_3": 2,
         },
-        flatten=False,  # optional, set to True to flatten the filled PDF form
+        readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
     filled.write("output.pdf")
@@ -120,7 +120,7 @@ A dropdown can be filled with either the zero-based option index or the option t
 
         filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
             {"dropdown_1": 1},
-            flatten=False,  # optional, set to True to flatten the filled PDF form
+            readonly=False,  # optional, set to True to make the filled PDF form read-only
         )
 
         filled.write("output.pdf")
@@ -133,7 +133,7 @@ A dropdown can be filled with either the zero-based option index or the option t
 
         filled = PdfWrapper("sample_template_with_dropdown.pdf").fill(
             {"dropdown_1": "bar"},
-            flatten=False,  # optional, set to True to flatten the filled PDF form
+            readonly=False,  # optional, set to True to make the filled PDF form read-only
         )
 
         filled.write("output.pdf")
@@ -168,7 +168,7 @@ The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [
 
         signed = PdfWrapper("sample_template_with_signature.pdf").fill(
             {"signature": "sample_signature.png"},
-            flatten=False,  # optional, set to True to flatten the filled PDF form
+            readonly=False,  # optional, set to True to make the filled PDF form read-only
         )
 
         signed.write("output.pdf")
@@ -180,7 +180,7 @@ The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [
         with open("sample_signature.png", "rb+") as sig:
             signed = PdfWrapper("sample_template_with_signature.pdf").fill(
                 {"signature": sig},
-                flatten=False,  # optional, set to True to flatten the filled PDF form
+                readonly=False,  # optional, set to True to make the filled PDF form read-only
             )
 
         signed.write("output.pdf")
@@ -192,7 +192,7 @@ The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [
         with open("sample_signature.png", "rb+") as sig:
             signed = PdfWrapper("sample_template_with_signature.pdf").fill(
                 {"signature": sig.read()},
-                flatten=False,  # optional, set to True to flatten the filled PDF form
+                readonly=False,  # optional, set to True to make the filled PDF form read-only
             )
 
         signed.write("output.pdf")
@@ -240,7 +240,7 @@ The examples below use [this PDF](pdfs/sample_template_with_image_field.pdf) and
 
         filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
             {"image_1": "sample_image.jpg"},
-            flatten=False,  # optional, set to True to flatten the filled PDF form
+            readonly=False,  # optional, set to True to make the filled PDF form read-only
         )
 
         filled.write("output.pdf")
@@ -252,7 +252,7 @@ The examples below use [this PDF](pdfs/sample_template_with_image_field.pdf) and
         with open("sample_image.jpg", "rb+") as img:
             filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
                 {"image_1": img},
-                flatten=False,  # optional, set to True to flatten the filled PDF form
+                readonly=False,  # optional, set to True to make the filled PDF form read-only
             )
 
         filled.write("output.pdf")
@@ -264,7 +264,7 @@ The examples below use [this PDF](pdfs/sample_template_with_image_field.pdf) and
         with open("sample_image.jpg", "rb+") as img:
             filled = PdfWrapper("sample_template_with_image_field.pdf").fill(
                 {"image_1": img.read()},
-                flatten=False,  # optional, set to True to flatten the filled PDF form
+                readonly=False,  # optional, set to True to make the filled PDF form read-only
             )
 
         filled.write("output.pdf")

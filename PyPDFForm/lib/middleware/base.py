@@ -42,7 +42,7 @@ class Widget:
             "y": "update_field_y",
             "width": "update_field_width",
             "height": "update_field_height",
-            "readonly": "flatten_field",
+            "readonly": "update_field_readonly",
             "required": "update_field_required",
             "hidden": "update_field_hidden",
             "tooltip": "update_field_tooltip",

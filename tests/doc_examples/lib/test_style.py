@@ -437,7 +437,7 @@ def test_change_field_editability(static_pdfs, pdf_samples, request):
             "radio_1": 1,
             "dropdown_1": 0,
         },
-        flatten=True,
+        readonly=True,
     )
     form.widgets["test_2"].readonly = False  # text
     form.widgets["check_3"].readonly = False  # checkbox
