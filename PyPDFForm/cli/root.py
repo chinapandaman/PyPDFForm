@@ -152,10 +152,6 @@ def fill(
         Path | None, data_file_option("YAML or JSON file with form field values.")
     ] = None,
     output: OPTIONAL_OUTPUT_PDF = None,
-    flatten: Annotated[
-        bool,
-        typer.Option("--flatten", help="Deprecated alias for --readonly.", hidden=True),
-    ] = None,
     readonly: Annotated[
         bool,
         typer.Option("--readonly", help="Make form fields read-only when filling."),
@@ -180,9 +176,8 @@ def fill(
             options in ``ctx.args``. Defaults to None.
         output (Path, optional): Output PDF path. If omitted, the input PDF is
             overwritten. Defaults to None.
-        flatten (bool, optional): Deprecated alias for `readonly`. Defaults to None.
         readonly (bool): Whether to make form fields read-only when filling.
-            Defaults to False. Either `readonly` or `flatten` enables read-only fields.
+            Defaults to False.
     """
     obj = PdfWrapper(str(pdf), **ctx.obj)
 
@@ -220,4 +215,4 @@ def fill(
             )
             input_data[k] = input_data[k]["path"]
 
-    obj.fill(input_data, readonly=readonly, flatten=flatten).write(output or pdf)
+    obj.fill(input_data, readonly=readonly).write(output or pdf)
