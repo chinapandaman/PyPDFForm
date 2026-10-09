@@ -109,8 +109,6 @@ class PdfWrapper:
                 - `use_full_widget_name` (bool): Whether to use the full widget name when filling the form.
                 - `need_appearances` (bool): Whether to set the `NeedAppearances` flag in the PDF's AcroForm dictionary.
                 - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
-                - `preserve_metadata` (bool): Deprecated compatibility attribute;
-                  input PDF metadata is preserved automatically.
                 - `title` (str | None): The title stored in the PDF's document
                   metadata. A non-None value replaces the existing title; None
                   preserves it.
@@ -121,7 +119,6 @@ class PdfWrapper:
         ("use_full_widget_name", False),
         ("need_appearances", False),
         ("generate_appearance_streams", False),
-        ("preserve_metadata", False),
         ("title", None),
     ]
 
@@ -137,9 +134,7 @@ class PdfWrapper:
         The template is normalized to bytes and existing widgets are loaded immediately.
         The title and document-open JavaScript remain in the PDF stream and are read
         lazily when their properties are accessed. A non-None `title` keyword updates
-        the title in the PDF stream; None leaves the template's title unchanged. The
-        deprecated `preserve_metadata` keyword is accepted for backward compatibility
-        and emits a deprecation warning. Enabling
+        the title in the PDF stream; None leaves the template's title unchanged. Enabling
         `generate_appearance_streams` also enables `need_appearances`.
 
         Args:
@@ -167,10 +162,6 @@ class PdfWrapper:
 
         # sets attrs from kwargs
         for attr, default in self.USER_PARAMS:
-            if attr == "preserve_metadata" and attr in kwargs:
-                deprecation_notice("", "preserve_metadata").emit_notice(
-                    self, "__init__"
-                )
             setattr(self, attr, kwargs.get(attr, default))
 
         if getattr(self, "generate_appearance_streams") is True:

@@ -108,14 +108,6 @@ def main(
             help="Generate form field appearance streams.",
         ),
     ] = False,
-    preserve_metadata: Annotated[
-        bool,
-        typer.Option(
-            "--preserve-metadata",
-            help="Preserve input PDF metadata.",
-            hidden=True,
-        ),
-    ] = False,
     use_full_widget_name: Annotated[
         bool,
         typer.Option(
@@ -138,15 +130,12 @@ def main(
             field appearances.
         generate_appearance_streams (bool): Whether to generate form field
             appearance streams while handling PDFs.
-        preserve_metadata (bool): Deprecated compatibility option. Input PDF
-            metadata is preserved automatically.
         use_full_widget_name (bool): Whether widget lookups should use full
             form field names.
     """
     ctx.obj = {
         "need_appearances": need_appearances,
         "generate_appearance_streams": generate_appearance_streams,
-        "preserve_metadata": preserve_metadata,
         "use_full_widget_name": use_full_widget_name,
     }
 
