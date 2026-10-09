@@ -37,7 +37,6 @@ from .adapter import (
     fp_or_f_obj_or_stream_to_stream,
 )
 from .coordinate import generate_coordinate_grid
-from .deprecation import deprecation_notice
 from .egress import (
     appearance_streams_handler,
     rebuild_acroform_fields,
@@ -668,17 +667,11 @@ class PdfWrapper:
                 Values can be strings, booleans, integers, file-like objects, or bytes.
             **kwargs: Additional keyword arguments:
                 - `readonly` (bool): Whether to make form fields read-only when filling (default: False).
-                - `flatten` (bool): Deprecated alias for `readonly` (default: False).
-                  Emits a deprecation warning when True. Fields become read-only
-                  if either option is True; False does not make existing read-only fields editable.
+                  False does not make existing read-only fields editable.
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
-
-        flatten = kwargs.get("flatten", False)
-        if flatten:
-            deprecation_notice("fill.readonly", "flatten").emit_notice(self, "fill")
 
         for key, value in data.items():
             if key in self.widgets:
@@ -689,7 +682,7 @@ class PdfWrapper:
             self.widgets,
             need_appearances=getattr(self, "need_appearances"),
             use_full_widget_name=getattr(self, "use_full_widget_name"),
-            readonly=kwargs.get("readonly", False) or flatten,
+            readonly=kwargs.get("readonly", False),
         )
 
         if image_drawn_stream is not None:
