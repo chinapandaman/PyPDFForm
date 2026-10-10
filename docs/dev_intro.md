@@ -13,7 +13,7 @@ PyPDFForm is a project built with Python. This part of the documentation is spec
     uv pip install -U -r pyproject.toml --all-extras
     ```
 === "Development Container"
-    PyPDFForm also offers a development container. To build it, run the following command in the project's root directory:
+    PyPDFForm also offers a development container. It uses the median of the five supported Python versions, currently Python 3.13. To build it, run the following command in the project's root directory:
 
     ```shell
     docker build -t pypdfform-dev .
