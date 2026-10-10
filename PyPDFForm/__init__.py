@@ -16,8 +16,6 @@ PyPDFForm aims to make PDF form automation straightforward whether it is used
 from Python code or from the command line.
 """
 
-import logging
-
 __version__ = "5.6.0"
 
 from .lib.annotations import Annotations
@@ -27,13 +25,6 @@ from .lib.raw import RawElements
 from .lib.types import PdfArray
 from .lib.widgets import Fields
 from .lib.wrapper import PdfWrapper
-
-# TODO: figure out why `Annotation sizes differ:`
-for logger in [
-    logging.getLogger(name) for name in getattr(logging.root.manager, "loggerDict")
-]:
-    if "pypdf" in logger.name:
-        logger.setLevel(logging.ERROR)
 
 __all__ = [
     "PdfWrapper",
