@@ -4,7 +4,7 @@ PyPDFForm is available on [PyPI](https://pypi.org/project/PyPDFForm/) and can be
 
 ## Prerequisites
 
-PyPDFForm officially supports Python 3.10 and newer versions that are currently in their active life cycles. This typically includes the minimum supported version and the four major versions above it. For details on Python version life cycles, refer to [this page](https://devguide.python.org/versions/).
+PyPDFForm officially supports Python 3.11 through 3.15, covering the five versions currently in their active life cycles. For details on Python version life cycles, refer to [this page](https://devguide.python.org/versions/).
 
 ## Install instructions
 
