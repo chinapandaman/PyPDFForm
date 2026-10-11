@@ -314,7 +314,28 @@ def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
     annot[NameObject(MaxLen)] = NumberObject(val)
 
 
-def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
+def _normalize_geometry_value(val: int | float) -> float:
+    """
+    Normalizes scalar geometry to a float before modifying an annotation.
+
+    Args:
+        val (int | float): The coordinate or dimension to normalize.
+
+    Returns:
+        float: The normalized geometry value.
+
+    Raises:
+        TypeError: If the value is not an integer or float, or is a boolean.
+    """
+    # bool subclasses int, so the numeric type check alone would accept booleans.
+    if isinstance(val, bool) or not isinstance(val, (int, float)):
+        # TODO: Refactor this raise into a centralized exception raiser when one is introduced.
+        msg = "Geometry values must be integers or floats; booleans are invalid."
+        raise TypeError(msg)
+    return float(val)
+
+
+def update_check_radio_size(annot: DictionaryObject, val: int | float) -> None:
     """
     Updates the size of a check box or radio button annotation.
 
@@ -325,8 +346,12 @@ def update_check_radio_size(annot: DictionaryObject, val: float) -> None:
     Args:
         annot (DictionaryObject): The annotation dictionary for the check box or
             radio button.
-        val (float): The new size (width and height) for the check box or radio button.
+        val (int | float): The new size (width and height) for the check box or radio button.
+
+    Raises:
+        TypeError: If the size is not an integer or float, or is a boolean.
     """
+    val = _normalize_geometry_value(val)
     rect = annot[Rect]
     # scale from bottom left
     new_rect = [
@@ -379,72 +404,88 @@ def update_field_readonly(annot: DictionaryObject, val: bool) -> None:
     _update_field_flag(annot, READ_ONLY, val)
 
 
-def update_field_x(annot: DictionaryObject, val: float) -> None:
+def update_field_x(annot: DictionaryObject, val: int | float) -> None:
     """
     Updates the X-coordinate (horizontal position) of a form field annotation.
 
     This function modifies the 'Rect' entry of the annotation dictionary to change
     the left X-coordinate of the field and adjusts the right X-coordinate by the
-    same delta to maintain the field's width. Non-float values are ignored.
+    same delta to maintain the field's width. Integer and float inputs are
+    normalized to floats before updating the rectangle.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
-        val (float): The new X-coordinate for the left edge of the field.
+        val (int | float): The new X-coordinate for the left edge of the field.
+
+    Raises:
+        TypeError: If the coordinate is not an integer or float, or is a boolean.
     """
-    if isinstance(val, float):
-        diff = val - annot[Rect][0]
-        annot[NameObject(Rect)][0] = FloatObject(val)
-        annot[NameObject(Rect)][2] = FloatObject(annot[NameObject(Rect)][2] + diff)
+    val = _normalize_geometry_value(val)
+    diff = val - annot[Rect][0]
+    annot[NameObject(Rect)][0] = FloatObject(val)
+    annot[NameObject(Rect)][2] = FloatObject(annot[NameObject(Rect)][2] + diff)
 
 
-def update_field_y(annot: DictionaryObject, val: float) -> None:
+def update_field_y(annot: DictionaryObject, val: int | float) -> None:
     """
     Updates the Y-coordinate (vertical position) of a form field annotation.
 
     This function modifies the 'Rect' entry of the annotation dictionary to change
     the bottom Y-coordinate of the field and adjusts the top Y-coordinate by the
-    same delta to maintain the field's height. Non-float values are ignored.
+    same delta to maintain the field's height. Integer and float inputs are
+    normalized to floats before updating the rectangle.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
-        val (float): The new Y-coordinate for the bottom edge of the field.
+        val (int | float): The new Y-coordinate for the bottom edge of the field.
+
+    Raises:
+        TypeError: If the coordinate is not an integer or float, or is a boolean.
     """
-    if isinstance(val, float):
-        diff = val - annot[Rect][1]
-        annot[NameObject(Rect)][1] = FloatObject(val)
-        annot[NameObject(Rect)][3] = FloatObject(annot[NameObject(Rect)][3] + diff)
+    val = _normalize_geometry_value(val)
+    diff = val - annot[Rect][1]
+    annot[NameObject(Rect)][1] = FloatObject(val)
+    annot[NameObject(Rect)][3] = FloatObject(annot[NameObject(Rect)][3] + diff)
 
 
-def update_field_width(annot: DictionaryObject, val: float) -> None:
+def update_field_width(annot: DictionaryObject, val: int | float) -> None:
     """
     Updates the width of a form field annotation.
 
     This function modifies the 'Rect' entry of the annotation dictionary to set
     the new width of the field, adjusting the rightmost coordinate while keeping
-    the leftmost coordinate fixed. Non-float values are ignored.
+    the leftmost coordinate fixed. Integer and float inputs are normalized to
+    floats before updating the rectangle.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
-        val (float): The new width of the field.
+        val (int | float): The new width of the field.
+
+    Raises:
+        TypeError: If the width is not an integer or float, or is a boolean.
     """
-    if isinstance(val, float):
-        annot[NameObject(Rect)][2] = FloatObject(annot[Rect][0] + val)
+    val = _normalize_geometry_value(val)
+    annot[NameObject(Rect)][2] = FloatObject(annot[Rect][0] + val)
 
 
-def update_field_height(annot: DictionaryObject, val: float) -> None:
+def update_field_height(annot: DictionaryObject, val: int | float) -> None:
     """
     Updates the height of a form field annotation.
 
     This function modifies the 'Rect' entry of the annotation dictionary to set
     the new height of the field, adjusting the topmost coordinate while keeping
-    the bottommost coordinate fixed. Non-float values are ignored.
+    the bottommost coordinate fixed. Integer and float inputs are normalized to
+    floats before updating the rectangle.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
-        val (float): The new height of the field.
+        val (int | float): The new height of the field.
+
+    Raises:
+        TypeError: If the height is not an integer or float, or is a boolean.
     """
-    if isinstance(val, float):
-        annot[NameObject(Rect)][3] = FloatObject(annot[Rect][1] + val)
+    val = _normalize_geometry_value(val)
+    annot[NameObject(Rect)][3] = FloatObject(annot[Rect][1] + val)
 
 
 def update_field_tooltip(annot: DictionaryObject, val: str) -> None:

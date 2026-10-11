@@ -1146,3 +1146,49 @@ def test_rebuild_acroform_fields():
 
     assert get_widget_key(reader.root_object[AcroForm][FieldsConst][0], False) == "foo"
     assert get_widget_key(reader.root_object[AcroForm][FieldsConst][1], False) == "bar"
+
+
+def test_scalar_geometry(template_stream, template_with_radiobutton_stream):
+    attributes = {"x": 123, "y": 0, "width": 80, "height": 40}
+    for template, field_name in (
+        (template_stream, "test"),
+        (template_stream, "check"),
+        (template_with_radiobutton_stream, "radio_1"),
+    ):
+        form = PdfWrapper(template)
+        float_form = PdfWrapper(template)
+        expected = {
+            name: getattr(form.widgets[field_name], name) for name in attributes
+        }
+        updates = attributes.copy()
+        if field_name != "test":
+            updates["size"] = 30
+
+        for attribute, value in updates.items():
+            setattr(form.widgets[field_name], attribute, value)
+            setattr(float_form.widgets[field_name], attribute, float(value))
+            for name in ("width", "height") if attribute == "size" else (attribute,):
+                original = expected[name]
+                expected[name] = (
+                    [value] * len(original) if isinstance(original, list) else value
+                )
+
+            stream = form.read()
+            assert stream == float_form.read()
+            reopened = PdfWrapper(stream)
+            for name, expected_value in expected.items():
+                assert getattr(reopened.widgets[field_name], name) == pytest.approx(
+                    expected_value
+                )
+
+
+def test_invalid_scalar_geometry(template_stream):
+    for attribute in ("x", "y", "width", "height", "size"):
+        for value in ("123", True, [123]):
+            form = PdfWrapper(template_stream)
+            setattr(form.widgets["check"], attribute, value)
+
+            with pytest.raises(
+                TypeError, match="Geometry values must be integers or floats"
+            ):
+                form.read()
