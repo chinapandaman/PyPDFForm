@@ -43,9 +43,11 @@ These changes have narrow scope and can usually be reviewed independently. Their
 
 ### E1-02 — Make the documentation example checker fail on tool errors
 
-- [ ] **Work:** In `scripts/doc_examples_type_check.py`, enforce subprocess outcomes and reject malformed or missing Pyright JSON. Keep temporary-file cleanup in failure paths and distinguish diagnostics from an inability to run the checker.
+- [x] **Work:** In `scripts/doc_examples_type_check.py`, enforce subprocess outcomes and reject malformed or missing Pyright JSON. Keep temporary-file cleanup in failure paths and distinguish diagnostics from an inability to run the checker.
 - **Done when:** A missing executable, nonzero tool exit, malformed output, and reported type errors all fail the check with useful messages. Valid, clean output passes.
 - **Basis and dependencies:** R13. Coordinates with E1-01; both the checker and its calling script must propagate failure.
+- **Completed:** October 10, 2026, [PPF-2055](https://github.com/chinapandaman/PyPDFForm/issues/2055). Checker execution and JSON failures now exit nonzero with useful stderr messages. Pyright's type-error exit status preserves documentation source mapping, unmapped diagnostics are reported at their checker locations, and cleanup runs in a `finally` block.
+- **Validation:** Failure injection reconfirmed the original false successes before implementation. All 25 temporary failure-injection cases passed, covering executable failures, unsuccessful exits, missing/malformed JSON and diagnostic fields, mapped/unmapped diagnostics, clean output, and cleanup after extraction failure. Isolated `make linting` failure injection passed seven cases through each of the local and container script branches. After removing the temporary tests, `make test-all` passed all 381 existing tests with 100% configured statement coverage. `make linting` passed using the local `./venv` with standard `zlib`. Container branch injection exercised shell behavior using the local interpreter; a development-container run and the cross-platform CI matrix were not performed locally.
 
 ### E1-03 — Accept integer coordinates wherever numeric geometry is supported
 
