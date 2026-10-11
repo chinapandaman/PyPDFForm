@@ -10,7 +10,7 @@ It performs the following steps:
 4. Executes pyright on these generated files.
 5. Maps any reported diagnostics back to the original documentation files and line numbers.
 6. Cleans up the temporary artifacts.
-7. Exits with a non-zero status if type errors are detected.
+7. Exits with a non-zero status if diagnostics or checker failures are detected.
 """
 
 import json
@@ -106,8 +106,36 @@ def extract_snippets(user_guide_docs, artifact_dir):
     return snippet_map
 
 
+def _get_diagnostics(data):
+    """Validates the Pyright JSON fields needed to report diagnostics."""
+    if not isinstance(data, dict) or not isinstance(
+        data.get("generalDiagnostics"), list
+    ):
+        message = "expected a JSON object with a generalDiagnostics list"
+        raise TypeError(message)
+
+    diagnostics = data["generalDiagnostics"]
+    for diag in diagnostics:
+        location = diag.get("range") if isinstance(diag, dict) else None
+        start = location.get("start") if isinstance(location, dict) else None
+        line = start.get("line") if isinstance(start, dict) else None
+        if (
+            not isinstance(diag, dict)
+            or not isinstance(diag.get("file"), str)
+            or not diag["file"].strip()
+            or not isinstance(diag.get("message"), str)
+            or diag.get("severity") not in ("error", "warning", "information")
+            or type(line) is not int
+            or line < 0
+        ):
+            message = "expected diagnostic file, message, severity, and nonnegative integer start line"
+            raise ValueError(message)
+
+    return diagnostics
+
+
 def run_pyright(artifact_dir):
-    """Runs pyright on generated snippets and returns JSON diagnostics."""
+    """Returns validated diagnostics or raises RuntimeError for checker failures."""
     cmd = [
         "pyright",
         "--outputjson",
@@ -116,13 +144,29 @@ def run_pyright(artifact_dir):
         artifact_dir,
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
     try:
-        data = json.loads(result.stdout)
-        return data.get("generalDiagnostics", [])
-    except json.JSONDecodeError:
-        print("Failed to decode pyright output")
-        return None
+        result = subprocess.run(cmd, capture_output=True, text=True)
+    except OSError as exc:
+        message = f"Unable to run Pyright: {exc}"
+        raise RuntimeError(message) from exc
+
+    details = f"exit status {result.returncode}"
+    if result.stderr.strip():
+        details += f"\n{result.stderr.strip()}"
+
+    try:
+        diagnostics = _get_diagnostics(json.loads(result.stdout))
+    except (TypeError, ValueError) as exc:
+        message = f"Invalid Pyright JSON: {exc} ({details})"
+        raise RuntimeError(message) from exc
+
+    # Pyright uses status 1 for type errors; keep those diagnostics for source mapping.
+    has_type_errors = any(diag["severity"] == "error" for diag in diagnostics)
+    if result.returncode != 0 and not (result.returncode == 1 and has_type_errors):
+        message = f"Pyright failed with {details}"
+        raise RuntimeError(message)
+
+    return diagnostics
 
 
 def map_diagnostics(diagnostics, snippet_map):
@@ -132,19 +176,22 @@ def map_diagnostics(diagnostics, snippet_map):
     for diag in diagnostics:
         file_path = diag.get("file")
         filename = os.path.basename(file_path)
+        error_line_in_snippet = diag["range"]["start"]["line"]
 
         if filename in snippet_map:
             original_doc, start_line = snippet_map[filename]
-            error_line_in_snippet = diag["range"]["start"]["line"]
             original_line = start_line + 1 + error_line_in_snippet
-            msg = diag.get("message", "")
+        else:
+            original_doc = file_path
+            original_line = error_line_in_snippet + 1
+        msg = diag.get("message", "")
 
-            if original_doc not in errors_by_location:
-                errors_by_location[original_doc] = {}
-            if original_line not in errors_by_location[original_doc]:
-                errors_by_location[original_doc][original_line] = []
+        if original_doc not in errors_by_location:
+            errors_by_location[original_doc] = {}
+        if original_line not in errors_by_location[original_doc]:
+            errors_by_location[original_doc][original_line] = []
 
-            errors_by_location[original_doc][original_line].append(msg)
+        errors_by_location[original_doc][original_line].append(msg)
 
     return errors_by_location
 
@@ -169,32 +216,21 @@ def cleanup(artifact_dir):
 
 
 def main():
-    # 1. Create ci_artifacts
+    """Checks documentation snippets, failing on diagnostics or checker errors."""
     artifact_dir = "ci_artifacts"
-    setup_artifact_dir(artifact_dir)
-
-    # 2. Look up docs under User Guide
-    user_guide_docs = get_user_guide_docs("mkdocs.yml")
-
-    # 3. Extract snippets
-    snippet_map = extract_snippets(user_guide_docs, artifact_dir)
-
-    # 4. Run pyright
-    diagnostics = run_pyright(artifact_dir)
-
-    if diagnostics is None:
-        cleanup(artifact_dir)
-        return
-
-    # 5. Report errors
-    errors_by_location = map_diagnostics(diagnostics, snippet_map)
-    has_errors = report_errors(errors_by_location)
-
-    # 6. Delete ci_artifacts
-    cleanup(artifact_dir)
-
-    if has_errors:
+    try:
+        setup_artifact_dir(artifact_dir)
+        user_guide_docs = get_user_guide_docs("mkdocs.yml")
+        snippet_map = extract_snippets(user_guide_docs, artifact_dir)
+        diagnostics = run_pyright(artifact_dir)
+        errors_by_location = map_diagnostics(diagnostics, snippet_map)
+        if report_errors(errors_by_location):
+            sys.exit(1)
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
         sys.exit(1)
+    finally:
+        cleanup(artifact_dir)
 
 
 if __name__ == "__main__":
