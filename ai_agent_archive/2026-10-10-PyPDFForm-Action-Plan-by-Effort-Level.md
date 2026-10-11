@@ -51,9 +51,11 @@ These changes have narrow scope and can usually be reviewed independently. Their
 
 ### E1-03 — Accept integer coordinates wherever numeric geometry is supported
 
-- [ ] **Work:** Correct the geometry hooks in `PyPDFForm/lib/hooks.py` so accepted integer coordinates are normalized and serialized like equivalent floats. Apply the change consistently to relevant coordinate and dimension properties, including supported per-option geometry.
+- [x] **Work:** Correct the geometry hooks in `PyPDFForm/lib/hooks.py` so accepted integer coordinates are normalized and serialized like equivalent floats. Apply the change consistently to relevant coordinate and dimension properties, including supported per-option geometry.
 - **Done when:** Setting `x = 123` changes the reopened field to 123; equivalent integer and float inputs agree. Invalid types fail without silently retaining the old geometry.
 - **Basis and dependencies:** R10. Keep this focused on the documented numeric API; broader geometry validation belongs to E4-01.
+- **Completed:** October 11, 2026, [PPF-2056](https://github.com/chinapandaman/PyPDFForm/issues/2056). Scalar integers and floats share one normalization helper for `x`, `y`, `width`, `height`, and checkbox/radio `size`. Scalar radio updates apply to every option. Invalid types, including booleans, raise `TypeError` inside the hooks before changing the annotation rectangle; a comment identifies the raise for a future centralized exception raiser. `None` still queues no update. Scope remains scalar-only: per-option list updates were unsupported before this change and now raise rather than being silently ignored.
+- **Validation:** Reconfirmed the defect at pre-change commit `928cc13c`: integer `x = 123` reopened as `73.3365`, while float `x = 123.0` persisted. Added a happy path and an unhappy path test in `tests/test_functional.py`, covering reopened text/checkbox/radio geometry, integer/float byte equivalence, zero coordinates, preserved positions or dimensions, checkbox/radio size, and deferred rejection of strings, booleans, and lists. `make test-all` passed all 383 tests with 100% configured statement coverage, and `make linting` passed using the local `./venv` with standard `zlib`. The development container and cross-platform CI matrix were not run locally.
 
 ### E1-04 — Enforce choice-index bounds in schema and runtime validation
 

@@ -751,9 +751,7 @@ from PyPDFForm import PdfWrapper
 buffer = BytesIO()
 canvas = Canvas(buffer)
 canvas.drawString(30, 700, "KEEP_FIRST_PAGE")
-canvas.acroForm.textfield(
-    name="field1", x=30, y=600, width=100, height=20
-)
+canvas.acroForm.textfield(name="field1", x=30, y=600, width=100, height=20)
 canvas.showPage()
 canvas.drawString(30, 700, "EXCLUDED_SECRET_SECOND_PAGE")
 canvas.showPage()
