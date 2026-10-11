@@ -6,11 +6,11 @@
 
 **Evidence baseline:** Commit `0b5cc1dc8604b36693864852d76ed7e60f903451`, package version `6.0.0`, as evaluated in the source report
 
-**Deliverable:** Proposed implementation backlog, ordered by increasing effort. No implementation or new runtime evaluation is included.
+**Deliverable:** Implementation backlog, ordered by increasing effort. Completed items record subsequent implementation and validation below.
 
 The recommended direction is to fix preservation and output safety first, then strengthen the existing architecture incrementally. A wholesale rewrite is an option to evaluate only if narrower changes prove insufficient; the source review does not recommend one.
 
-This plan contains **42 action items in six effort groups**. Each item identifies concrete work, a completion test, and relevant dependencies or decisions. Findings R01–R13 refer to the source report; references to numbered sections cover its additional recommendations. Reported failures and test results remain evidence from that review, not results independently rerun for this document.
+This plan contains **42 action items in six effort groups**. Each item identifies concrete work, a completion test, and relevant dependencies or decisions. Findings R01–R13 refer to the source report; references to numbered sections cover its additional recommendations. Reported failures and test results from that review remain baseline evidence; subsequent validation is recorded under completed items.
 
 ## How to use this plan
 
@@ -27,7 +27,7 @@ Effort reflects implementation breadth, verification burden, compatibility risk,
 
 **Effort order is not release priority.** R01–R07 are P1 findings in the source report. In particular, selected-page isolation (E3-01), safe writes (E2-01), and annotation preservation (E2-02) should lead the maintenance work even though easier items appear earlier below. Do not finish every item in one group before starting urgent work in another.
 
-All items are proposed and unchecked. A dependency marked **requires** is a prerequisite; **coordinates with** identifies overlapping work without requiring a separate refactor first. Policy choices are recommendations for future implementation, not decisions already adopted by maintainers. Drafting them here does not change public behavior.
+Unchecked items remain proposed. A dependency marked **requires** is a prerequisite; **coordinates with** identifies overlapping work without requiring a separate refactor first. Policy choices are recommendations for future implementation, not decisions already adopted by maintainers. Drafting them here does not change public behavior.
 
 ## Group 1 — Lowest-hanging fruit
 
@@ -35,9 +35,11 @@ These changes have narrow scope and can usually be reviewed independently. Their
 
 ### E1-01 — Propagate every local lint failure
 
-- [ ] **Work:** Update `scripts/linting.sh` so a failure in Pylint, Pyright, Ruff, or the documentation checker makes `make linting` fail. Choose fail-fast execution or explicit status aggregation; do not return only the last command's status.
+- [x] **Work:** Update `scripts/linting.sh` so a failure in Pylint, Pyright, Ruff, or the documentation checker makes `make linting` fail. Choose fail-fast execution or explicit status aggregation; do not return only the last command's status.
 - **Done when:** Injecting a nonzero status into each command, with all other commands succeeding, always yields a nonzero script status. An all-success run still succeeds and identifies the checks performed.
 - **Basis and dependencies:** R13. Independent of PDF implementation changes; useful early because later contributors rely on this gate.
+- **Completed:** October 10, 2026, [PPF-2054](https://github.com/chinapandaman/PyPDFForm/issues/2054). Explicit status aggregation runs all four checks, identifies each command, reports failures with their exit statuses, and exits nonzero if any check fails.
+- **Validation:** Temporary failure-injection checks passed for each individual failure, combined failures, and all-success execution through both the script and `make linting`, covering local and container environment branches. `make test-all` passed with 100% statement coverage, and `make linting` passed using the local `./venv` with standard `zlib`.
 
 ### E1-02 — Make the documentation example checker fail on tool errors
 
