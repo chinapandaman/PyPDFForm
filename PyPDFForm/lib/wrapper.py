@@ -686,20 +686,16 @@ class PdfWrapper:
             ValueError: If an integer dropdown or radio index is out of range.
         """
 
-        values = dict(data)
-        values.update(
-            (key, widget.value)
-            for key, widget in self.widgets.items()
-            if key not in data
-        )
         pending = [
-            (key, self.widgets[key].prepare_value(value))
-            for key, value in values.items()
+            (self.widgets[key], self.widgets[key].prepare_value(value))
+            for key, value in data.items()
             if key in self.widgets
         ]
-        for key, update in pending:
-            if key in data:
-                self.widgets[key].apply_value(update)
+        for key, widget in self.widgets.items():
+            if key not in data:
+                widget.prepare_value(widget.value)
+        for widget, update in pending:
+            widget.apply_value(update)
 
         filled_stream, image_drawn_stream = fill(
             self._read(),
