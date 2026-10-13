@@ -6,10 +6,10 @@ This module defines the Dropdown class, which is a subclass of the
 Widget class. It represents a dropdown form field in a PDF document.
 """
 
-from typing import Optional
+from typing import Any, Optional
 
 from .base import Widget
-from .common import choice_index_schema, validate_choice_index
+from .common import PreparedValue, choice_index_schema, validate_choice_index
 
 
 class Dropdown(Widget):
@@ -92,15 +92,49 @@ class Dropdown(Widget):
         Raises:
             ValueError: If an integer index is outside the current choices.
         """
+        self.apply_value(self.prepare_value(value))
+
+    def prepare_value(self, value: Any) -> PreparedValue:
+        """
+        Prepares a dropdown selection without changing its value or choices.
+
+        Integer indices are checked against the current choices. Strings are
+        normalized to an existing index or staged as a new last option. New
+        choices do not trigger hooks until the prepared selection is applied.
+
+        Args:
+            value (Any): The proposed option text or index.
+
+        Returns:
+            PreparedValue: The selected index and any replacement choices.
+
+        Raises:
+            ValueError: If an integer index is outside the current choices.
+        """
         validate_choice_index(value, len(self.choices or []))
         if isinstance(value, str):
             index = self._get_option_index(value)
             if index is None:
-                self.choices = list(self.choices) + [value]
-                index = len(self.choices) - 1
+                choices = list(self.choices) + [value]
+                return PreparedValue(len(choices) - 1, choices)
             value = index
 
-        self._value = value
+        return super().prepare_value(value)
+
+    def apply_value(self, update: PreparedValue) -> None:
+        """
+        Applies a previously prepared dropdown selection.
+
+        Replacement choices are stored through the existing attribute setter
+        so their PDF update hook is queued before the selected index is stored.
+        Validation and option lookup are not repeated during application.
+
+        Args:
+            update (PreparedValue): The prepared selection and optional choices.
+        """
+        if update.choices is not None:
+            self.choices = update.choices
+        super().apply_value(update)
 
     def _get_option_index(self, value: str) -> int | None:
         """

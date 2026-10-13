@@ -660,6 +660,9 @@ class PdfWrapper:
         drawing those values as watermarks and copying the remaining widgets back onto
         the output. The wrapper's widget cache is intentionally left in place so
         subsequent style updates can still refer to the same middleware objects.
+        All supplied values are prepared before any are applied, so a rejected
+        choice index leaves widget values, pending hooks, and PDF state unchanged.
+        Errors during later PDF processing are not rolled back by this preparation.
 
         Args:
             data (Dict[str, str | bool | int | BinaryIO | bytes]): A dictionary where keys
@@ -671,11 +674,18 @@ class PdfWrapper:
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
+
+        Raises:
+            ValueError: If an integer dropdown or radio index is out of range.
         """
 
-        for key, value in data.items():
-            if key in self.widgets:
-                self.widgets[key].value = value
+        pending = [
+            (self.widgets[key], self.widgets[key].prepare_value(value))
+            for key, value in data.items()
+            if key in self.widgets
+        ]
+        for widget, update in pending:
+            widget.apply_value(update)
 
         filled_stream, image_drawn_stream = fill(
             self._read(),

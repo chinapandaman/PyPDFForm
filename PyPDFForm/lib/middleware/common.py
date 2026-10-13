@@ -6,6 +6,28 @@ This module provides common schema and validation logic used by middleware
 classes. Choice widgets use these helpers to enforce integer-index bounds.
 """
 
+from dataclasses import dataclass
+from typing import Any
+
+
+@dataclass(frozen=True)
+class PreparedValue:
+    """
+    Represents a widget value prepared for assignment.
+
+    Preparation validates and normalizes the value without changing the widget.
+    Dropdown updates can also include replacement choices, which are stored and
+    queued for PDF updates only when the prepared value is applied.
+
+    Attributes:
+        value (Any): The value to store in the widget.
+        choices (list | None): Replacement dropdown choices, or None when the
+            choices should remain unchanged.
+    """
+
+    value: Any
+    choices: list | None = None
+
 
 def choice_index_schema(number_of_options: int) -> dict:
     """

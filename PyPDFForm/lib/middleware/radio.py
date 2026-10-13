@@ -7,8 +7,10 @@ Checkbox class. It represents a radio button form field in a PDF
 document, allowing users to select one option from a group of choices.
 """
 
+from typing import Any
+
 from .checkbox import Checkbox
-from .common import choice_index_schema, validate_choice_index
+from .common import PreparedValue, choice_index_schema, validate_choice_index
 
 
 class Radio(Checkbox):
@@ -39,32 +41,24 @@ class Radio(Checkbox):
 
         self.number_of_options: int = 0
 
-    @property
-    def value(self) -> int:
+    def prepare_value(self, value: Any) -> PreparedValue:
         """
-        Gets the current value of the radio button group.
+        Prepares a radio selection without changing the current value.
 
-        Returns:
-            int: The index of the selected option.
-        """
-        return super().value
-
-    @value.setter
-    def value(self, value: int) -> None:
-        """
-        Sets the value of the radio button group.
-
-        Integer indices are checked against the current option count before
-        being stored, preserving the previous value when validation fails.
+        Integer indices are checked against the current option count. The
+        inherited value setter and PDF filling use this same preparation step.
 
         Args:
-            value (int): The index of the option to select.
+            value (Any): The proposed index of the option to select.
+
+        Returns:
+            PreparedValue: The selection to apply after validation succeeds.
 
         Raises:
             ValueError: If an integer index is outside the current options.
         """
         validate_choice_index(value, self.number_of_options)
-        self._value = value
+        return super().prepare_value(value)
 
     @property
     def schema_definition(self) -> dict:

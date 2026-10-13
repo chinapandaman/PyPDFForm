@@ -3,6 +3,7 @@
 import os
 from copy import deepcopy
 from io import BytesIO
+from unittest.mock import patch
 
 import pytest
 from jsonschema import ValidationError, validate
@@ -21,6 +22,7 @@ from PyPDFForm.lib.constants import (
 )
 from PyPDFForm.lib.deprecation import deprecation_notice
 from PyPDFForm.lib.middleware.base import Widget
+from PyPDFForm.lib.middleware.common import validate_choice_index
 from PyPDFForm.lib.template import get_widget_key, get_widgets_by_page
 from PyPDFForm.lib.utils import get_version, set_version
 
@@ -1199,10 +1201,20 @@ def test_choice_indices(sample_template_with_dropdown):
     for field_name, count in (("dropdown_1", 4), ("radio_1", 3)):
         for index in (0, count - 1):
             form = PdfWrapper(sample_template_with_dropdown)
+            widget = form.widgets[field_name]
             validate({field_name: index}, form.schema)
-            form.fill({field_name: index})
+            with patch(
+                f"PyPDFForm.lib.middleware.{field_name.split('_')[0]}.validate_choice_index",
+                wraps=validate_choice_index,
+            ) as validation:
+                form.fill({field_name: index})
+                assert validation.call_count == 1
+                validation.reset_mock()
+                widget.value = index
+                assert validation.call_count == 1
 
-            assert form.widgets[field_name].value == index
+            assert form.widgets[field_name] is widget
+            assert widget.value == index
             annotations = [
                 reference.get_object()
                 for page in PdfReader(BytesIO(form.read())).pages
@@ -1251,14 +1263,25 @@ def test_invalid_choice_indices(sample_template_with_dropdown):
                     widget.number_of_options = 0
                 widget.value = None
             stream = form.read()
-            original_state = deepcopy(widget.__dict__)
+            original_state = deepcopy(
+                {key: value.__dict__ for key, value in form.widgets.items()}
+            )
             for index in (-999, -1, option_count, option_count + 999):
                 with pytest.raises(ValidationError):
                     validate({field_name: index}, form.schema)
                 with pytest.raises(ValueError, match="Choice index"):
                     widget.value = index
                 with pytest.raises(ValueError, match="Choice index"):
-                    form.fill({field_name: index}, readonly=True)
+                    form.fill(
+                        {
+                            "test_1": "must not change",
+                            "dropdown_1": "must not append",
+                            field_name: index,
+                        },
+                        readonly=True,
+                    )
 
-                assert widget.__dict__ == original_state
+                assert {
+                    key: value.__dict__ for key, value in form.widgets.items()
+                } == original_state
                 assert form.read() == stream

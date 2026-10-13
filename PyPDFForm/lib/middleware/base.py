@@ -10,6 +10,8 @@ and schema definition.
 
 from typing import Any, List, Optional, TextIO
 
+from .common import PreparedValue
+
 
 class Widget:
     """
@@ -136,7 +138,34 @@ class Widget:
         Args:
             value (Any): The value to set.
         """
-        self._value = value
+        self.apply_value(self.prepare_value(value))
+
+    def prepare_value(self, value: Any) -> PreparedValue:
+        """
+        Prepares a value for assignment without changing the widget.
+
+        The base implementation retains the supplied value. Subclasses can
+        validate or normalize it and stage related attribute changes here.
+
+        Args:
+            value (Any): The proposed value of the widget.
+
+        Returns:
+            PreparedValue: The value to apply after preparation succeeds.
+        """
+        return PreparedValue(value)
+
+    def apply_value(self, update: PreparedValue) -> None:
+        """
+        Applies a previously prepared value to the widget.
+
+        This method stores the value without repeating validation. Subclasses
+        can apply related attribute changes through their existing hooks.
+
+        Args:
+            update (PreparedValue): The prepared widget value to store.
+        """
+        self._value = update.value
 
     @property
     def schema_definition(self) -> dict:
