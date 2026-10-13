@@ -46,7 +46,7 @@ def test_dropdown_values(pdf_samples):
 def test_dropdown_default_values(pdf_samples):
     obj = PdfWrapper(os.path.join(pdf_samples, "dropdown", "test_dropdown_one.pdf"))
 
-    assert obj.widgets["dropdown_1"].value is None
+    assert obj.widgets["dropdown_1"].value == 0
 
 
 def test_sejda_dropdown_values(pdf_samples):
@@ -54,7 +54,7 @@ def test_sejda_dropdown_values(pdf_samples):
         os.path.join(pdf_samples, "dropdown", "test_dropdown_alignment_sejda.pdf")
     )
 
-    assert obj.widgets["dropdown_left"].value is None
+    assert obj.widgets["dropdown_left"].value == 0
     assert obj.widgets["dropdown_center"].value == 1
     assert obj.widgets["dropdown_right"].value == 2
 
