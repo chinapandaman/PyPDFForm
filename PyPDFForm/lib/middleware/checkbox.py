@@ -76,7 +76,7 @@ class Checkbox(Widget):
         return {"type": "boolean", **super().schema_definition}
 
     @property
-    def sample_value(self) -> bool | int:
+    def sample_value(self) -> bool | int | None:
         """
         Returns a sample value for the checkbox.
 
@@ -84,6 +84,6 @@ class Checkbox(Widget):
         checkbox field.
 
         Returns:
-            bool | int: A sample value for the checkbox.
+            bool | int | None: A sample value for the checkbox or its subclasses.
         """
         return True

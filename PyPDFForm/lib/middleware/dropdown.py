@@ -207,14 +207,15 @@ class Dropdown(Widget):
         }
 
     @property
-    def sample_value(self) -> int:
+    def sample_value(self) -> int | None:
         """
         Returns a sample value for the dropdown.
 
         The sample value is used to generate example data for the
-        dropdown field. It selects the last available option.
+        dropdown field. It selects the last available option, or returns None
+        when no choices are available so sample data can omit the field.
 
         Returns:
-            int: A sample value for the dropdown.
+            int | None: The last option index, or None when there are no choices.
         """
-        return len(self.choices) - 1
+        return len(self.choices) - 1 if self.choices else None

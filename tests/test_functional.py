@@ -453,7 +453,7 @@ def test_schema(sample_template_with_comb_text_field):
         pass
 
 
-def test_sample_data(sejda_template_complex):
+def test_sample_data(sejda_template_complex, sample_template_with_dropdown):
     obj = PdfWrapper(sejda_template_complex)
     try:
         validate(instance=obj.sample_data, schema=obj.schema)
@@ -466,6 +466,33 @@ def test_sample_data(sejda_template_complex):
         raise AssertionError
     except NotImplementedError:
         pass
+
+    for field_name in ("dropdown_1", "radio_1"):
+        for option_count in (0, 1):
+            form = PdfWrapper(sample_template_with_dropdown)
+            widget = form.widgets[field_name]
+            if field_name == "dropdown_1":
+                choices = widget.choices
+                assert choices is not None
+                widget.choices = choices[:option_count]
+            else:
+                widget.number_of_options = option_count
+            widget.value = None
+
+            sample = form.sample_data
+            if option_count:
+                assert widget.sample_value == 0
+                assert sample[field_name] == 0
+            else:
+                assert widget.sample_value is None
+                assert field_name not in sample
+            validate(sample, form.schema)
+            form.fill(sample)
+            assert widget.value == (0 if option_count else None)
+            if field_name == "dropdown_1":
+                reopened = PdfWrapper(form.read())
+                assert reopened.widgets[field_name].choices == tuple(widget.choices)
+                assert (field_name in reopened.sample_data) == bool(option_count)
 
 
 def test_sample_data_max_boundary(sample_template_with_comb_text_field):
@@ -1285,3 +1312,32 @@ def test_invalid_choice_indices(sample_template_with_dropdown):
                     key: value.__dict__ for key, value in form.widgets.items()
                 } == original_state
                 assert form.read() == stream
+
+        for option_count in (1, 0):
+            form = PdfWrapper(sample_template_with_dropdown).fill(
+                {field_name: count - 1, "test_1": "original"}
+            )
+            widget = form.widgets[field_name]
+            if field_name == "dropdown_1":
+                choices = widget.choices
+                assert choices is not None
+                widget.choices = choices[:option_count]
+            else:
+                widget.number_of_options = option_count
+            form.widgets["test_1"].x = 123
+            stream = getattr(form, "_stream")
+            original_state = deepcopy(
+                {key: value.__dict__ for key, value in form.widgets.items()}
+            )
+
+            with pytest.raises(ValidationError):
+                validate({field_name: widget.value}, form.schema)
+            with pytest.raises(ValueError, match="Choice index"):
+                form.fill({"test_1": "must not change"}, readonly=True)
+
+            assert {
+                key: value.__dict__ for key, value in form.widgets.items()
+            } == original_state
+            assert getattr(form, "_stream") == stream
+            form.fill({field_name: 0 if option_count else None})
+            assert widget.value == (0 if option_count else None)

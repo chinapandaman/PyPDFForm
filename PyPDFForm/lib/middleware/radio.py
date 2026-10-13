@@ -114,15 +114,16 @@ class Radio(Checkbox):
         }
 
     @property
-    def sample_value(self) -> int:
+    def sample_value(self) -> int | None:
         """
         Returns a sample value for the radio button.
 
         The sample value is used to generate example data for the
         radio button field. It returns the index of the last option
-        in the group.
+        in the group, or None when no options are available so sample data can
+        omit the field.
 
         Returns:
-            int: A sample value for the radio button.
+            int | None: The last option index, or None when there are no options.
         """
-        return self.number_of_options - 1
+        return self.number_of_options - 1 if self.number_of_options > 0 else None
