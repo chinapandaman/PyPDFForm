@@ -6,9 +6,9 @@ This module defines the Dropdown class, which is a subclass of the
 Widget class. It represents a dropdown form field in a PDF document.
 """
 
-from typing import Optional
+from typing import Any, Optional
 
-from .base import Widget
+from .base import PreparedValue, Widget
 
 
 class Dropdown(Widget):
@@ -18,7 +18,7 @@ class Dropdown(Widget):
     Inherits from the Widget class and provides specific functionality
     for handling dropdown form fields. The stored value is an option index; string
     assignments are normalized to an existing option index or appended as a new
-    choice.
+    choice. Integer indices must identify an existing option.
 
     Key attributes:
         font (str): The font of the dropdown field.
@@ -81,21 +81,92 @@ class Dropdown(Widget):
 
         If the value is a string, it attempts to find the corresponding
         index in the choices list. If not found, the string value is
-        added to the choices, and its new index is used. Integer values are stored
-        directly as indices.
+        added to the choices, and its new index is used. Integer values are checked
+        against the current choices before being stored.
 
         Args:
             value (str | int): The value to set. Can be a string
                                       (option text) or an integer (index).
+
+        Raises:
+            ValueError: If an integer index is outside the current choices.
         """
+        self.apply_value(self.prepare_value(value))
+
+    def prepare_value(self, value: Any) -> PreparedValue:
+        """
+        Prepares a dropdown selection without changing its value or choices.
+
+        Integer indices are checked against the current choices. Strings are
+        normalized to an existing index or staged as a new last option. New
+        choices do not trigger hooks until the prepared selection is applied.
+
+        Args:
+            value (Any): The proposed option text or index.
+
+        Returns:
+            PreparedValue: The selected index and any replacement choices.
+
+        Raises:
+            ValueError: If an integer index is outside the current choices.
+        """
+        self.validate_choice_index(value)
         if isinstance(value, str):
             index = self._get_option_index(value)
             if index is None:
-                self.choices = list(self.choices) + [value]
-                index = len(self.choices) - 1
+                choices = list(self.choices) + [value]
+                return PreparedValue(len(choices) - 1, choices)
             value = index
 
-        self._value = value
+        return super().prepare_value(value)
+
+    def apply_value(self, update: PreparedValue) -> None:
+        """
+        Applies a previously prepared dropdown selection.
+
+        Replacement choices are stored through the existing attribute setter
+        so their PDF update hook is queued before the selected index is stored.
+        Validation and option lookup are not repeated during application.
+
+        Args:
+            update (PreparedValue): The prepared selection and optional choices.
+        """
+        if update.choices is not None:
+            self.choices = update.choices
+        super().apply_value(update)
+
+    def choice_index_schema(self) -> dict:
+        """
+        Returns the schema definition for indices into the current choices.
+
+        Valid indices range from zero to the number of choices minus one. An
+        empty dropdown explicitly rejects every integer selection.
+
+        Returns:
+            dict: A dictionary representing the schema definition for indices.
+        """
+        number_of_options = len(self.choices or [])
+        if not number_of_options:
+            return {"type": "integer", "not": {}}
+        return {"type": "integer", "minimum": 0, "maximum": number_of_options - 1}
+
+    def validate_choice_index(self, value: object) -> None:
+        """
+        Validates an integer selection against the current dropdown choices.
+
+        Non-integer values retain their existing handling, including strings
+        normalized during preparation and None for an unset selection.
+
+        Args:
+            value (object): The proposed value of the dropdown.
+
+        Raises:
+            ValueError: If an integer index is outside the current choices.
+        """
+        number_of_options = len(self.choices or [])
+        if isinstance(value, int) and not 0 <= value < number_of_options:
+            msg = f"Choice index {value} must satisfy 0 <= index < {number_of_options}."
+            raise ValueError(msg)
 
     def _get_option_index(self, value: str) -> int | None:
         """
@@ -128,8 +199,7 @@ class Dropdown(Widget):
         return {
             "anyOf": [
                 {
-                    "type": "integer",
-                    "maximum": len(self.choices) - 1,
+                    **self.choice_index_schema(),
                     **super().schema_definition,
                 },
                 {"type": "string"},
@@ -137,14 +207,15 @@ class Dropdown(Widget):
         }
 
     @property
-    def sample_value(self) -> int:
+    def sample_value(self) -> int | None:
         """
         Returns a sample value for the dropdown.
 
         The sample value is used to generate example data for the
-        dropdown field. It selects the last available option.
+        dropdown field. It selects the last available option, or returns None
+        when no choices are available so sample data can omit the field.
 
         Returns:
-            int: A sample value for the dropdown.
+            int | None: The last option index, or None when there are no choices.
         """
-        return len(self.choices) - 1
+        return len(self.choices) - 1 if self.choices else None

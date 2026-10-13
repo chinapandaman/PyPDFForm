@@ -8,7 +8,27 @@ common attributes and methods for all form widgets, such as name, value,
 and schema definition.
 """
 
+from dataclasses import dataclass
 from typing import Any, List, Optional, TextIO
+
+
+@dataclass(frozen=True)
+class PreparedValue:
+    """
+    Represents a widget value prepared for assignment.
+
+    Preparation validates and normalizes the value without changing the widget.
+    Dropdown updates can also include replacement choices, which are stored and
+    queued for PDF updates only when the prepared value is applied.
+
+    Attributes:
+        value (Any): The value to store in the widget.
+        choices (list | None): Replacement dropdown choices, or None when the
+            choices should remain unchanged.
+    """
+
+    value: Any
+    choices: list | None = None
 
 
 class Widget:
@@ -136,7 +156,34 @@ class Widget:
         Args:
             value (Any): The value to set.
         """
-        self._value = value
+        self.apply_value(self.prepare_value(value))
+
+    def prepare_value(self, value: Any) -> PreparedValue:
+        """
+        Prepares a value for assignment without changing the widget.
+
+        The base implementation retains the supplied value. Subclasses can
+        validate or normalize it and stage related attribute changes here.
+
+        Args:
+            value (Any): The proposed value of the widget.
+
+        Returns:
+            PreparedValue: The value to apply after preparation succeeds.
+        """
+        return PreparedValue(value)
+
+    def apply_value(self, update: PreparedValue) -> None:
+        """
+        Applies a previously prepared value to the widget.
+
+        This method stores the value without repeating validation. Subclasses
+        can apply related attribute changes through their existing hooks.
+
+        Args:
+            update (PreparedValue): The prepared widget value to store.
+        """
+        self._value = update.value
 
     @property
     def schema_definition(self) -> dict:

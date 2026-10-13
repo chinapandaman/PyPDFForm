@@ -428,29 +428,34 @@ def get_text_field_alignment(widget: dict) -> int | None:
     return int(widget[Q]) if Q in widget else None
 
 
-def get_dropdown_choices(widget: dict) -> Tuple[str, ...] | None:
+def get_dropdown_choices(widget: dict) -> Tuple[str, ...]:
     """
     Extracts the choices from a dropdown widget dictionary.
 
     This function extracts the choices from a dropdown widget dictionary. Direct
     string options are returned as-is. Two-item PDF option arrays return the
-    display value stored at index 1.
+    display value stored at index 1. Empty or missing options produce an empty
+    tuple. An explicitly empty widget option array is preserved even when its
+    parent has options.
 
     Args:
         widget (dict): The widget dictionary to extract the choices from.
 
     Returns:
-        Tuple[str, ...] | None: A tuple of strings representing the choices in the dropdown, or None if the choices are not specified.
+        Tuple[str, ...]: The dropdown choices, or an empty tuple when none exist.
     """
+    choices = (
+        widget[Opt]
+        if Opt in widget
+        else extract_widget_property(widget, DROPDOWN_CHOICE_PATTERNS, (), None)
+    )
     return tuple(
         (
             each.get_object()
             if isinstance(each.get_object(), str)
             else str(each.get_object()[1])
         )
-        for each in extract_widget_property(
-            widget, DROPDOWN_CHOICE_PATTERNS, None, None
-        )
+        for each in choices
     )
 
 

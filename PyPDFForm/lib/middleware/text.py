@@ -89,7 +89,7 @@ class Text(Widget):
         Args:
             value (str): The value to set.
         """
-        self._value = value
+        self.apply_value(self.prepare_value(value))
 
     @property
     def schema_definition(self) -> dict:

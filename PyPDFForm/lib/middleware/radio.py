@@ -7,6 +7,9 @@ Checkbox class. It represents a radio button form field in a PDF
 document, allowing users to select one option from a group of choices.
 """
 
+from typing import Any
+
+from .base import PreparedValue
 from .checkbox import Checkbox
 
 
@@ -38,6 +41,60 @@ class Radio(Checkbox):
 
         self.number_of_options: int = 0
 
+    def prepare_value(self, value: Any) -> PreparedValue:
+        """
+        Prepares a radio selection without changing the current value.
+
+        Integer indices are checked against the current option count. The
+        inherited value setter and PDF filling use this same preparation step.
+
+        Args:
+            value (Any): The proposed index of the option to select.
+
+        Returns:
+            PreparedValue: The selection to apply after validation succeeds.
+
+        Raises:
+            ValueError: If an integer index is outside the current options.
+        """
+        self.validate_choice_index(value)
+        return super().prepare_value(value)
+
+    def choice_index_schema(self) -> dict:
+        """
+        Returns the schema definition for indices into the current radio group.
+
+        Valid indices range from zero to the option count minus one. A group
+        with no options explicitly rejects every integer selection.
+
+        Returns:
+            dict: A dictionary representing the schema definition for indices.
+        """
+        if self.number_of_options <= 0:
+            return {"type": "integer", "not": {}}
+        return {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": self.number_of_options - 1,
+        }
+
+    def validate_choice_index(self, value: object) -> None:
+        """
+        Validates an integer selection against the current radio option count.
+
+        Non-integer values retain their existing handling, including None for
+        an unset selection. Broader value-type validation is left to callers.
+
+        Args:
+            value (object): The proposed value of the radio button group.
+
+        Raises:
+            ValueError: If an integer index is outside the current options.
+        """
+        if isinstance(value, int) and not 0 <= value < self.number_of_options:
+            msg = f"Choice index {value} must satisfy 0 <= index < {self.number_of_options}."
+            raise ValueError(msg)
+
     @property
     def schema_definition(self) -> dict:
         """
@@ -52,21 +109,21 @@ class Radio(Checkbox):
             dict: A dictionary representing the schema definition.
         """
         return {
-            "maximum": self.number_of_options - 1,
             **super().schema_definition,
-            "type": "integer",
+            **self.choice_index_schema(),
         }
 
     @property
-    def sample_value(self) -> int:
+    def sample_value(self) -> int | None:
         """
         Returns a sample value for the radio button.
 
         The sample value is used to generate example data for the
         radio button field. It returns the index of the last option
-        in the group.
+        in the group, or None when no options are available so sample data can
+        omit the field.
 
         Returns:
-            int: A sample value for the radio button.
+            int | None: The last option index, or None when there are no options.
         """
-        return self.number_of_options - 1
+        return self.number_of_options - 1 if self.number_of_options > 0 else None
