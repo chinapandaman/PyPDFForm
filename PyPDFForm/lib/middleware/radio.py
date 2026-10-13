@@ -9,8 +9,8 @@ document, allowing users to select one option from a group of choices.
 
 from typing import Any
 
+from .base import PreparedValue
 from .checkbox import Checkbox
-from .common import PreparedValue, choice_index_schema, validate_choice_index
 
 
 class Radio(Checkbox):
@@ -57,8 +57,43 @@ class Radio(Checkbox):
         Raises:
             ValueError: If an integer index is outside the current options.
         """
-        validate_choice_index(value, self.number_of_options)
+        self.validate_choice_index(value)
         return super().prepare_value(value)
+
+    def choice_index_schema(self) -> dict:
+        """
+        Returns the schema definition for indices into the current radio group.
+
+        Valid indices range from zero to the option count minus one. A group
+        with no options explicitly rejects every integer selection.
+
+        Returns:
+            dict: A dictionary representing the schema definition for indices.
+        """
+        if self.number_of_options <= 0:
+            return {"type": "integer", "not": {}}
+        return {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": self.number_of_options - 1,
+        }
+
+    def validate_choice_index(self, value: object) -> None:
+        """
+        Validates an integer selection against the current radio option count.
+
+        Non-integer values retain their existing handling, including None for
+        an unset selection. Broader value-type validation is left to callers.
+
+        Args:
+            value (object): The proposed value of the radio button group.
+
+        Raises:
+            ValueError: If an integer index is outside the current options.
+        """
+        if isinstance(value, int) and not 0 <= value < self.number_of_options:
+            msg = f"Choice index {value} must satisfy 0 <= index < {self.number_of_options}."
+            raise ValueError(msg)
 
     @property
     def schema_definition(self) -> dict:
@@ -75,7 +110,7 @@ class Radio(Checkbox):
         """
         return {
             **super().schema_definition,
-            **choice_index_schema(self.number_of_options),
+            **self.choice_index_schema(),
         }
 
     @property

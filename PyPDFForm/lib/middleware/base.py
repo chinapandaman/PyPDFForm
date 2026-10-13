@@ -8,9 +8,27 @@ common attributes and methods for all form widgets, such as name, value,
 and schema definition.
 """
 
+from dataclasses import dataclass
 from typing import Any, List, Optional, TextIO
 
-from .common import PreparedValue
+
+@dataclass(frozen=True)
+class PreparedValue:
+    """
+    Represents a widget value prepared for assignment.
+
+    Preparation validates and normalizes the value without changing the widget.
+    Dropdown updates can also include replacement choices, which are stored and
+    queued for PDF updates only when the prepared value is applied.
+
+    Attributes:
+        value (Any): The value to store in the widget.
+        choices (list | None): Replacement dropdown choices, or None when the
+            choices should remain unchanged.
+    """
+
+    value: Any
+    choices: list | None = None
 
 
 class Widget:

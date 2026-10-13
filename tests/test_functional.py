@@ -22,7 +22,6 @@ from PyPDFForm.lib.constants import (
 )
 from PyPDFForm.lib.deprecation import deprecation_notice
 from PyPDFForm.lib.middleware.base import Widget
-from PyPDFForm.lib.middleware.common import validate_choice_index
 from PyPDFForm.lib.template import get_widget_key, get_widgets_by_page
 from PyPDFForm.lib.utils import get_version, set_version
 
@@ -1203,9 +1202,10 @@ def test_choice_indices(sample_template_with_dropdown):
             form = PdfWrapper(sample_template_with_dropdown)
             widget = form.widgets[field_name]
             validate({field_name: index}, form.schema)
-            with patch(
-                f"PyPDFForm.lib.middleware.{field_name.split('_')[0]}.validate_choice_index",
-                wraps=validate_choice_index,
+            with patch.object(
+                widget,
+                "validate_choice_index",
+                wraps=widget.validate_choice_index,
             ) as validation:
                 form.fill({field_name: index})
                 assert validation.call_count == 1

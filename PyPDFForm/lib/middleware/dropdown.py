@@ -8,8 +8,7 @@ Widget class. It represents a dropdown form field in a PDF document.
 
 from typing import Any, Optional
 
-from .base import Widget
-from .common import PreparedValue, choice_index_schema, validate_choice_index
+from .base import PreparedValue, Widget
 
 
 class Dropdown(Widget):
@@ -111,7 +110,7 @@ class Dropdown(Widget):
         Raises:
             ValueError: If an integer index is outside the current choices.
         """
-        validate_choice_index(value, len(self.choices or []))
+        self.validate_choice_index(value)
         if isinstance(value, str):
             index = self._get_option_index(value)
             if index is None:
@@ -135,6 +134,39 @@ class Dropdown(Widget):
         if update.choices is not None:
             self.choices = update.choices
         super().apply_value(update)
+
+    def choice_index_schema(self) -> dict:
+        """
+        Returns the schema definition for indices into the current choices.
+
+        Valid indices range from zero to the number of choices minus one. An
+        empty dropdown explicitly rejects every integer selection.
+
+        Returns:
+            dict: A dictionary representing the schema definition for indices.
+        """
+        number_of_options = len(self.choices or [])
+        if not number_of_options:
+            return {"type": "integer", "not": {}}
+        return {"type": "integer", "minimum": 0, "maximum": number_of_options - 1}
+
+    def validate_choice_index(self, value: object) -> None:
+        """
+        Validates an integer selection against the current dropdown choices.
+
+        Non-integer values retain their existing handling, including strings
+        normalized during preparation and None for an unset selection.
+
+        Args:
+            value (object): The proposed value of the dropdown.
+
+        Raises:
+            ValueError: If an integer index is outside the current choices.
+        """
+        number_of_options = len(self.choices or [])
+        if isinstance(value, int) and not 0 <= value < number_of_options:
+            msg = f"Choice index {value} must satisfy 0 <= index < {number_of_options}."
+            raise ValueError(msg)
 
     def _get_option_index(self, value: str) -> int | None:
         """
@@ -167,7 +199,7 @@ class Dropdown(Widget):
         return {
             "anyOf": [
                 {
-                    **choice_index_schema(len(self.choices or [])),
+                    **self.choice_index_schema(),
                     **super().schema_definition,
                 },
                 {"type": "string"},
