@@ -9,6 +9,7 @@ Widget class. It represents a dropdown form field in a PDF document.
 from typing import Optional
 
 from .base import Widget
+from .common import choice_index_schema, validate_choice_index
 
 
 class Dropdown(Widget):
@@ -18,7 +19,7 @@ class Dropdown(Widget):
     Inherits from the Widget class and provides specific functionality
     for handling dropdown form fields. The stored value is an option index; string
     assignments are normalized to an existing option index or appended as a new
-    choice.
+    choice. Integer indices must identify an existing option.
 
     Key attributes:
         font (str): The font of the dropdown field.
@@ -81,13 +82,17 @@ class Dropdown(Widget):
 
         If the value is a string, it attempts to find the corresponding
         index in the choices list. If not found, the string value is
-        added to the choices, and its new index is used. Integer values are stored
-        directly as indices.
+        added to the choices, and its new index is used. Integer values are checked
+        against the current choices before being stored.
 
         Args:
             value (str | int): The value to set. Can be a string
                                       (option text) or an integer (index).
+
+        Raises:
+            ValueError: If an integer index is outside the current choices.
         """
+        validate_choice_index(value, len(self.choices or []))
         if isinstance(value, str):
             index = self._get_option_index(value)
             if index is None:
@@ -128,8 +133,7 @@ class Dropdown(Widget):
         return {
             "anyOf": [
                 {
-                    "type": "integer",
-                    "maximum": len(self.choices) - 1,
+                    **choice_index_schema(len(self.choices or [])),
                     **super().schema_definition,
                 },
                 {"type": "string"},

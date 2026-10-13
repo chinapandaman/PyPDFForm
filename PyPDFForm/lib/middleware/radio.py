@@ -8,6 +8,7 @@ document, allowing users to select one option from a group of choices.
 """
 
 from .checkbox import Checkbox
+from .common import choice_index_schema, validate_choice_index
 
 
 class Radio(Checkbox):
@@ -39,6 +40,33 @@ class Radio(Checkbox):
         self.number_of_options: int = 0
 
     @property
+    def value(self) -> int:
+        """
+        Gets the current value of the radio button group.
+
+        Returns:
+            int: The index of the selected option.
+        """
+        return super().value
+
+    @value.setter
+    def value(self, value: int) -> None:
+        """
+        Sets the value of the radio button group.
+
+        Integer indices are checked against the current option count before
+        being stored, preserving the previous value when validation fails.
+
+        Args:
+            value (int): The index of the option to select.
+
+        Raises:
+            ValueError: If an integer index is outside the current options.
+        """
+        validate_choice_index(value, self.number_of_options)
+        self._value = value
+
+    @property
     def schema_definition(self) -> dict:
         """
         Returns the schema definition for the radio button.
@@ -52,9 +80,8 @@ class Radio(Checkbox):
             dict: A dictionary representing the schema definition.
         """
         return {
-            "maximum": self.number_of_options - 1,
             **super().schema_definition,
-            "type": "integer",
+            **choice_index_schema(self.number_of_options),
         }
 
     @property
