@@ -172,11 +172,12 @@ class PdfWrapper:
         """
         Merges PDF wrappers together, creating a new `PdfWrapper` containing the combined content.
 
-        This method allows you to combine PDF forms into a single form. It handles potential
-        naming conflicts between form fields by adding a unique suffix to the field names in the
-        form being merged, commits those queued renames before merging, and returns a new wrapper
-        configured with the left-hand wrapper's user parameters. Registered custom fonts from the
-        left-hand wrapper are carried into the result.
+        Field-name conflicts are resolved by adding a unique suffix to names in the right-hand
+        wrapper. Renames are committed only when queued, modifying that wrapper. The result uses
+        the left-hand wrapper's user parameters and inherits its registered custom fonts.
+
+        Collision-free merges work in full-name mode. A collision requiring a rename of a
+        full-name field still raises `NotImplementedError`.
 
         Args:
             other (PdfWrapper | Sequence[PdfWrapper]): The other `PdfWrapper` object or
@@ -203,7 +204,8 @@ class PdfWrapper:
             if k in other.widgets:
                 other.update_widget_key(k, f"{k}-{unique_suffix}")
 
-        other.commit_widget_key_updates()
+        if other._keys_to_update:
+            other.commit_widget_key_updates()
 
         # user params are based on the first object
         result = self.__class__(
