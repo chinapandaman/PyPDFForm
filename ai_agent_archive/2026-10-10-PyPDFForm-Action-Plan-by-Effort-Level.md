@@ -78,9 +78,12 @@ These changes have narrow scope and can usually be reviewed independently. Their
 
 ### E1-06 — Skip an empty rename commit during full-name merges
 
-- [ ] **Work:** In `wrapper.py`, avoid the unsupported full-name rename path when no rename is queued. Preserve the explicit limitation for an actual unsupported rename rather than suppressing all errors.
+- [x] **Work:** In `wrapper.py`, avoid the unsupported full-name rename path when no rename is queued. Preserve the explicit limitation for an actual unsupported rename rather than suppressing all errors.
 - **Done when:** Full-name wrappers containing distinct `left` and `right` fields merge successfully; true collisions still follow an explicit existing or documented limitation. Exercise page slices that rely on merging as well.
 - **Basis and dependencies:** R09. Does not require choosing a new collision policy; E4-02 addresses broader identity and operand behavior.
+- **Baseline:** Reconfirmed at pre-change commit `a4dd54cb`: merging distinct full-name `left`/`right` fields, merging matching partial names under distinct parents, and multi-page slices raised `NotImplementedError`.
+- **Scope:** Addition now commits renames only when the right-hand wrapper has queued updates. Full-name collisions, direct rename methods, and pending renames after switching to full-name mode retain `NotImplementedError`. Ordinary queued renames still commit and modify the right-hand wrapper; broader collision and operand policies remain E4-02. The merge docstring describes these boundaries.
+- **Validation:** The retained three regression tests cover distinct full-name merges, the existing collision error, and multi-page slices, checking reopened values, page order, and preserved source streams. All 10 focused tests and all 388 full-suite tests passed with 100% configured statement coverage for the full suite. `make linting`, `make format-code`, and `git diff --check` passed using local `./venv` with standard `zlib` and a temporary Pylint cache. The development container, cross-platform CI matrix, and viewer rendering were not run locally; the repair changes merge control flow rather than appearance generation.
 
 ### E1-07 — Allocate font resource names without assuming every name is numeric
 
