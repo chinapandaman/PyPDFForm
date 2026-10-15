@@ -55,6 +55,8 @@ In this example, `sample_template.pdf` contains three text fields (`test`, `test
 
 You can use the PyPDFForm-generated JSON schema to validate the data used for filling a PDF form.
 
+For dropdowns and radio groups, the schema restricts integer selections to `0 <= index < option_count`. Fields with no options reject every integer index; dropdowns still accept strings to add an option. See [choice-index validation](fill.md#choice-index-validation) for runtime rejection behavior.
+
 ## Inspect PDF form data
 
 To inspect the current values in a filled PDF form, use the `.data` attribute. For example, the following snippet inspects the values in [this PDF](pdfs/sample_template_filled.pdf):
@@ -86,7 +88,9 @@ To inspect the current values in a filled PDF form, use the `.data` attribute. F
 
 ## Generate sample data
 
-PyPDFForm can also generate sample fill data for a PDF form:
+PyPDFForm can also generate sample fill data for a PDF form. Dropdowns and radio groups use the last valid option index. Fields without a usable sample value, including dropdowns and radio groups with no options, are omitted so the generated data remains valid against the form's schema.
+
+For example:
 
 === "Library"
     ```python
