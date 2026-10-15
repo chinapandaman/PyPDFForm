@@ -80,7 +80,7 @@ Use string values for text fields and boolean values for checkboxes. The followi
 
 A radio button group is a collection of radio buttons sharing the same name on a PDF form.
 
-Fill each radio button group with the zero-based index of the option to select. For example, to fill [this PDF](pdfs/sample_template_with_radio_button.pdf):
+Fill each radio button group with the zero-based index of the option to select. The index must satisfy the [choice-index bounds](#choice-index-validation). For example, to fill [this PDF](pdfs/sample_template_with_radio_button.pdf):
 
 === "Library"
     ```python
@@ -154,6 +154,14 @@ A dropdown can be filled with either the zero-based option index or the option t
 
 ???+ note
     If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
+
+### Choice-index validation
+
+Dropdown and radio indices must satisfy `0 <= index < option_count`: zero selects the first option, and `option_count - 1` selects the last. Negative indices and indices equal to or greater than the option count are rejected. A field with no options rejects every integer index. An empty dropdown can still accept a string, which adds and selects a new option.
+
+The [generated JSON schema](inspect.md#generate-a-json-schema-that-describes-a-pdf-form) enforces these integer bounds, and the CLI validates fill data against that schema. In the Python API, an out-of-range integer passed to `fill()` or assigned to `pdf.widgets[name].value` raises `ValueError`.
+
+`fill()` checks both supplied and retained selections before applying values or pending field updates. If an index is invalid, existing widget values, queued updates, and PDF data remain unchanged. If you shorten a dropdown's choices, supply a valid replacement for any selection that is now out of range. This guarantee covers index validation; failures during later hook execution, image processing, or serialization are not rolled back.
 
 ## Fill signature field
 
