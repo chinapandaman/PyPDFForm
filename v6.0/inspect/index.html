@@ -1077,6 +1077,8 @@
       
         
       
+        
+      
     
     
     
@@ -1116,6 +1118,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../news/2026-10-14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2026-10-14: Migrating from 5.6 to 6.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -1321,6 +1351,7 @@
 </div>
 <p>In this example, <code>sample_template.pdf</code> contains three text fields (<code>test</code>, <code>test_2</code>, and <code>test_3</code>) of type <code>string</code> and three checkboxes (<code>check</code>, <code>check_2</code>, and <code>check_3</code>) of type <code>boolean</code>.</p>
 <p>You can use the PyPDFForm-generated JSON schema to validate the data used for filling a PDF form.</p>
+<p>For dropdowns and radio groups, the schema restricts integer selections to <code>0 &lt;= index &lt; option_count</code>. Fields with no options reject every integer index; dropdowns still accept strings to add an option. See <a href="../fill/#choice-index-validation">choice-index validation</a> for runtime rejection behavior.</p>
 <h2 id="inspect-pdf-form-data">Inspect PDF form data<a class="headerlink" href="#inspect-pdf-form-data" title="Permanent link">⚓︎</a></h2>
 <p>To inspect the current values in a filled PDF form, use the <code>.data</code> attribute. For example, the following snippet inspects the values in <a href="../pdfs/sample_template_filled.pdf">this PDF</a>:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Library</label><label for="__tabbed_2_2">CLI</label><label for="__tabbed_2_3">Output</label></div>
@@ -1352,7 +1383,8 @@
 </div>
 </div>
 <h2 id="generate-sample-data">Generate sample data<a class="headerlink" href="#generate-sample-data" title="Permanent link">⚓︎</a></h2>
-<p>PyPDFForm can also generate sample fill data for a PDF form:</p>
+<p>PyPDFForm can also generate sample fill data for a PDF form. Dropdowns and radio groups use the last valid option index. Fields without a usable sample value, including dropdowns and radio groups with no options, are omitted so the generated data remains valid against the form's schema.</p>
+<p>For example:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="3:3"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Library</label><label for="__tabbed_3_2">CLI</label><label for="__tabbed_3_3">Output</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">

@@ -707,6 +707,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Fill dropdown field">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#choice-index-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choice-index validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1110,6 +1127,8 @@
       
         
       
+        
+      
     
     
     
@@ -1149,6 +1168,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../news/2026-10-14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2026-10-14: Migrating from 5.6 to 6.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -1381,7 +1428,7 @@
 </div>
 <h2 id="fill-radio-button-group">Fill radio button group<a class="headerlink" href="#fill-radio-button-group" title="Permanent link">⚓︎</a></h2>
 <p>A radio button group is a collection of radio buttons sharing the same name on a PDF form.</p>
-<p>Fill each radio button group with the zero-based index of the option to select. For example, to fill <a href="../pdfs/sample_template_with_radio_button.pdf">this PDF</a>:</p>
+<p>Fill each radio button group with the zero-based index of the option to select. The index must satisfy the <a href="#choice-index-validation">choice-index bounds</a>. For example, to fill <a href="../pdfs/sample_template_with_radio_button.pdf">this PDF</a>:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Library</label><label for="__tabbed_4_2">CLI</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -1474,6 +1521,10 @@
 <summary>Note</summary>
 <p>If you fill a dropdown field with a <code>string</code> value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.</p>
 </details>
+<h3 id="choice-index-validation">Choice-index validation<a class="headerlink" href="#choice-index-validation" title="Permanent link">⚓︎</a></h3>
+<p>Dropdown and radio indices must satisfy <code>0 &lt;= index &lt; option_count</code>: zero selects the first option, and <code>option_count - 1</code> selects the last. Negative indices and indices equal to or greater than the option count are rejected. A field with no options rejects every integer index. An empty dropdown can still accept a string, which adds and selects a new option.</p>
+<p>The <a href="../inspect/#generate-a-json-schema-that-describes-a-pdf-form">generated JSON schema</a> enforces these integer bounds, and the CLI validates fill data against that schema. In the Python API, an out-of-range integer passed to <code>fill()</code> or assigned to <code>pdf.widgets[name].value</code> raises <code>ValueError</code>.</p>
+<p><code>fill()</code> checks both supplied and retained selections before applying values or pending field updates. If an index is invalid, existing widget values, queued updates, and PDF data remain unchanged. If you shorten a dropdown's choices, supply a valid replacement for any selection that is now out of range. This guarantee covers index validation; failures during later hook execution, image processing, or serialization are not rolled back.</p>
 <h2 id="fill-signature-field">Fill signature field<a class="headerlink" href="#fill-signature-field" title="Permanent link">⚓︎</a></h2>
 <p>A signature field can be filled with a handwritten signature image.</p>
 <p>The examples below use <a href="../pdfs/sample_template_with_signature.pdf">this PDF</a> and <a href="https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png">this signature image</a>:</p>
