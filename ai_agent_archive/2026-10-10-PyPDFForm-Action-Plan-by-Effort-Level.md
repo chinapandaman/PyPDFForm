@@ -94,11 +94,14 @@ These changes have narrow scope and can usually be reviewed independently. Their
 - **Completed:** October 14, 2026, [PPF-2060](https://github.com/chinapandaman/PyPDFForm/issues/2060). The allocator parses only `/F[0-9]+` names, preserves other resource keys, and retains the lowest unused numeric suffix, including existing leading-zero handling. Updated the allocator docstring and consolidated font tests in `tests/test_font_related.py`.
 - **Validation:** All 402 full-suite tests passed with 100% configured statement coverage. After the final filename-only change, full collection, 27 focused tests, and Ruff linting/formatting checks passed; the full suite was not repeated. The 14 new regression cases verify allocation, preserved font resources, embedded TrueType bytes, and font use after reopening through generated text appearances. `make linting`, `make format-code`, and `git diff --check` passed using local `./venv` with standard `zlib`. Container, cross-platform CI, and viewer checks were not run locally; appearance generation is unchanged.
 
-### E1-08 — Publish migration and capability guidance
+### E1-08 — Publish migration guidance
 
-- [ ] **Work:** Draft the 5.6-to-6.0 migration guide and link it from appropriate documentation. Cover the Python minimum/support window at the reviewed snapshot, removed Python arguments and CLI options, and available replacements or lack of equivalents. Add a compact table distinguishing signature images, signature fields, cryptographic signing, read-only fields, and flattening.
-- **Done when:** Users can identify affected calls and supported alternatives without assuming `readonly` provides flattening or integrity protection. Explain the reviewed silent-keyword behavior and update the guide when E2-05 changes it. State the supported release/security policy and where viewer limitations are documented.
+- [x] **Work:** Draft the 5.6-to-6.0 migration guide and link it from appropriate documentation. Cover the Python minimum/support window, removed Python arguments and CLI options, available replacements or lack of equivalents, and the supported release/security policy.
+- **Done when:** Users can identify affected calls and supported alternatives, including the former `flatten` alias's read-only behavior. Explain the silent-keyword behavior in 6.0.0 and update the guide when E2-05 changes it.
 - **Basis and dependencies:** R10; report §§5.6, 7.1–7.2. Verify statements against the release being documented; do not advertise planned fixes as delivered.
+- **Completed:** October 14, 2026, [PPF-2061](https://github.com/chinapandaman/PyPDFForm/issues/2061). Added the [5.6-to-6.0 migration guide](../docs/news/2026-10-14.md) and linked it in the MkDocs News navigation. It covers the Python 3.11 minimum and 3.11–3.15 support/test window, removed Python/CLI options, before-and-after examples, automatic metadata preservation, silently ignored Python keywords, and latest-version-only security support.
+- **Scope decision:** At the maintainer's request, the guide focuses on migration changes. The proposed signature/read-only/flattening capability table and viewer/appearance limitations section were omitted because those capabilities are unchanged between 5.6.0 and 6.0.0. The revised completion criteria above reflect this scope; broader capability documentation was not completed by this item. E2-05 remains pending and must revisit the silent-keyword guidance when argument validation changes.
+- **Validation:** Compared the `v5.6.0` and `v6.0.0` tags and checked the current implementation. Temporary assertion-based checks verified ignored removed Python arguments without deprecation warnings, preserved metadata, reopened field values and read-only flags, flag reversibility, removed CLI parameters, and the migrated CLI example. `make linting`, a strict MkDocs build, and whitespace checks passed using local `./venv` with standard `zlib`; the MkDocs build and whitespace checks were repeated after removing the capability sections. Full tests, the development container, cross-platform CI, and viewer rendering were not run for this documentation-only change.
 
 ## Group 2 — Bounded repairs
 
@@ -367,7 +370,7 @@ This map makes the primary repair for every numbered finding explicit. Later arc
 | R12 — Font naming/registration problems | E1-07, E2-04 | E4-04, E5-04 |
 | R13 — Quality/release safeguards | E1-01/E1-02, E2-08/E2-09, E3-08 | E3-07, E3-09 |
 
-Additional recommendations are covered by E1-08 (migration/support/capability guidance), E3-09 (dependency reproducibility), E3-10 (backlog maintenance), E4-03 (interoperability and processing boundaries), E4-04 through E4-06 (performance/cache lifecycle), E4-07 (typing), and E5-01 through E5-04 (architecture and contributor knowledge).
+Additional recommendations are covered by E1-08 (migration/support guidance), E3-09 (dependency reproducibility), E3-10 (backlog maintenance), E4-03 (interoperability and processing boundaries), E4-04 through E4-06 (performance/cache lifecycle), E4-07 (typing), and E5-01 through E5-04 (architecture and contributor knowledge).
 
 ## Completion and validation rules for future implementation
 
