@@ -87,9 +87,12 @@ These changes have narrow scope and can usually be reviewed independently. Their
 
 ### E1-07 — Allocate font resource names without assuming every name is numeric
 
-- [ ] **Work:** Restrict numeric suffix parsing in `font.py` to the exact resource-name pattern it owns, and allocate an unused name without changing existing arbitrary resource keys.
+- [x] **Work:** Restrict numeric suffix parsing in `font.py` to the exact resource-name pattern it owns, and allocate an unused name without changing existing arbitrary resource keys.
 - **Done when:** `/FontA`, `/FCustom`, sparse `/F1` and `/F9` entries, and unrelated names all survive registration; the new resource does not collide and remains usable after reopening.
 - **Basis and dependencies:** R12. Independent of registry cleanup in E2-04 and later resource ownership in E5-04.
+- **Baseline:** At pre-change commit `0800f8de`, `/FontA` caused custom-font registration to raise `ValueError`. Regression cases also reproduced failures for non-numeric suffixes and non-ASCII digits in both `need_appearances` modes.
+- **Completed:** October 14, 2026, [PPF-2060](https://github.com/chinapandaman/PyPDFForm/issues/2060). The allocator parses only `/F[0-9]+` names, preserves other resource keys, and retains the lowest unused numeric suffix, including existing leading-zero handling. Updated the allocator docstring and consolidated font tests in `tests/test_font_related.py`.
+- **Validation:** All 402 full-suite tests passed with 100% configured statement coverage. After the final filename-only change, full collection, 27 focused tests, and Ruff linting/formatting checks passed; the full suite was not repeated. The 14 new regression cases verify allocation, preserved font resources, embedded TrueType bytes, and font use after reopening through generated text appearances. `make linting`, `make format-code`, and `git diff --check` passed using local `./venv` with standard `zlib`. Container, cross-platform CI, and viewer checks were not run locally; appearance generation is unchanged.
 
 ### E1-08 — Publish migration and capability guidance
 

@@ -10,6 +10,7 @@ for extracting font information from TTF streams and managing font names within 
 from contextlib import contextmanager
 from functools import lru_cache
 from io import BytesIO
+from re import fullmatch
 from typing import Generator
 from uuid import uuid4
 from zlib import compress
@@ -382,8 +383,10 @@ def _get_new_font_name(fonts: dict) -> str:
     """
     Generates a new unique font name to avoid conflicts with existing fonts in the PDF.
 
-    This function inspects existing AcroForm resource keys that look like `/F#`
-    and returns the lowest unused numbered key with the same prefix.
+    This function inspects existing AcroForm resource keys that exactly match `/F`
+    followed by one or more ASCII decimal digits and returns the lowest unused
+    numbered key with the same prefix. Other resource names are left unchanged
+    and do not reserve a number.
 
     Args:
         fonts (dict): A dictionary of existing fonts in the PDF.
@@ -393,8 +396,8 @@ def _get_new_font_name(fonts: dict) -> str:
     """
     existing = set()
     for key in fonts:
-        if isinstance(key, str) and key.startswith(FONT_NAME_PREFIX):
-            existing.add(int(key[2:]))
+        if isinstance(key, str) and fullmatch(rf"{FONT_NAME_PREFIX}[0-9]+", key):
+            existing.add(int(key[len(FONT_NAME_PREFIX) :]))
 
     n = 1
     while n in existing:

@@ -10,7 +10,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from fontTools.ttLib import TTLibError
-from pypdf import PdfWriter
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import NameObject
 
 from PyPDFForm import PdfWrapper
 from PyPDFForm.lib.constants import (
@@ -121,3 +122,87 @@ def test_pdf_widths_use_missing_width_for_unmapped_glyphs(pdf_font_widths_and_mi
     # Assume that rounding floats to 3 decimal is accurate for most cases
     assert round(missing_width, 3) == round(pdf_widths_array[128], 3)
     assert round(missing_width, 3) == round(pdf_widths_array[129], 3)
+
+
+@pytest.mark.parametrize("need_appearances", [False, True])
+@pytest.mark.parametrize(
+    ("resource_names", "expected_name"),
+    [
+        pytest.param([], "/F1", id="no-numbered-resources"),
+        pytest.param(["/F1", "/F2"], "/F3", id="consecutive-resources"),
+        pytest.param(["/F9"], "/F1", id="unused-first-number"),
+        pytest.param(
+            ["/FontA", "/FCustom", "/F1", "/F9", "/Other"],
+            "/F2",
+            id="arbitrary-and-sparse-resources",
+        ),
+        pytest.param(["/F01", "/F9"], "/F2", id="leading-zero-resource"),
+        pytest.param(
+            ["/F", "/F+1", "/F-1", "/F 1", "/F1.5", "/F1tail", "/F1\n"],
+            "/F1",
+            id="non-numeric-suffixes",
+        ),
+        pytest.param(["/F\u0661", "/F\u00b2"], "/F1", id="non-ascii-digits"),
+    ],
+)
+def test_register_font_preserves_resource_names(
+    template_stream, sample_font_stream, need_appearances, resource_names, expected_name
+):
+    writer = PdfWriter(BytesIO(template_stream))
+    fonts = writer.root_object["/AcroForm"]["/DR"]["/Font"]
+    original_font = next(iter(fonts.values()))
+    for name in resource_names:
+        fonts[NameObject(name)] = original_font
+    original_fonts = {
+        name: (font["/Type"], font["/Subtype"], font["/BaseFont"])
+        for name, font in fonts.items()
+    }
+    with BytesIO() as stream:
+        writer.write(stream)
+        form = PdfWrapper(stream.getvalue(), need_appearances=need_appearances)
+
+    form.register_font("new_font", sample_font_stream)
+    registered_stream = form.read()
+    registered = PdfReader(BytesIO(registered_stream))
+    registered_fonts = registered.root_object["/AcroForm"]["/DR"]["/Font"]
+    assert set(registered_fonts) == set(original_fonts) | {expected_name}
+    assert expected_name not in original_fonts
+    for name, definition in original_fonts.items():
+        font = registered_fonts[name]
+        assert (font["/Type"], font["/Subtype"], font["/BaseFont"]) == definition
+
+    new_font = registered_fonts[expected_name]
+    assert new_font["/Type"] == "/Font"
+    assert new_font["/Subtype"] == "/TrueType"
+    assert new_font["/FontDescriptor"]["/FontFile2"].get_data() == sample_font_stream
+
+    reopened = PdfWrapper(registered_stream, generate_appearance_streams=True)
+    font_name = new_font["/BaseFont"][1:]
+    assert font_name in reopened.fonts
+    reopened.widgets["test"].font = font_name
+    reopened.fill({"test": "Font regression"})
+    filled_stream = reopened.read()
+    assert PdfWrapper(filled_stream).widgets["test"].value == "Font regression"
+
+    filled = PdfReader(BytesIO(filled_stream))
+    filled_fonts = filled.root_object["/AcroForm"]["/DR"]["/Font"]
+    assert set(filled_fonts) == set(registered_fonts)
+    for name, definition in original_fonts.items():
+        font = filled_fonts[name]
+        assert (font["/Type"], font["/Subtype"], font["/BaseFont"]) == definition
+
+    annotation = next(
+        annot.get_object()
+        for annot in filled.pages[0]["/Annots"]
+        if annot.get_object().get("/T") == "test"
+    )
+    assert annotation["/DA"].split()[0] == expected_name
+    appearance = annotation["/AP"]["/N"]
+    assert f"{expected_name} ".encode() in appearance.get_data()
+    assert b"(Font regression) Tj" in appearance.get_data()
+    appearance_font = appearance["/Resources"]["/Font"][expected_name]
+    assert appearance_font["/BaseFont"] == new_font["/BaseFont"]
+    assert (
+        appearance_font["/FontDescriptor"]["/FontFile2"].get_data()
+        == sample_font_stream
+    )
