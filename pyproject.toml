@@ -32,7 +32,7 @@ dependencies = [
     "cryptography>=50.0.0,<51.0.0",
     "fonttools>=4.63.0,<5.0.0",
     "pikepdf>=10.7.2,<11.0.0",
-    "pillow>=12.2.0,<13.0.0",
+    "pillow>=12.2.0,<14.0.0",
     "pypdf>=6.12.2,<7.0.0",
     "reportlab>=4.5.1,<6.0.0",
 ]
