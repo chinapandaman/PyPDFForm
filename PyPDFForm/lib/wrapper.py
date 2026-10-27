@@ -40,6 +40,7 @@ from .coordinate import generate_coordinate_grid
 from .egress import (
     appearance_streams_handler,
     rebuild_acroform_fields,
+    write_path,
 )
 from .filler import fill
 from .font import (
@@ -574,26 +575,26 @@ class PdfWrapper:
 
         return self._stream
 
-    def write(self, dest: str | BinaryIO) -> PdfWrapper:
+    def write(self, dest: str | bytes | PathLike | BinaryIO) -> PdfWrapper:
         """
-        Writes the PDF to a file.
+        Serialize the PDF, then write it to a path or an open binary stream.
 
-        String, bytes, and PathLike destinations are opened in binary write mode.
-        Other objects are treated as already-open writable binary streams.
+        Paths use atomic replacement after a sibling temporary file closes; failures preserve existing bytes.
+        Symlinks are followed and permission bits preserved; new files are private (0600 on POSIX).
+        Other metadata and hard links are not preserved. Stream write failures can leave partial output.
 
         Args:
-            dest (str | BinaryIO): The destination to write the PDF to.
-                Can be a file path (str) or a file-like object (BinaryIO).
+            dest (str | bytes | PathLike | BinaryIO): A regular file path or writable binary stream.
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
+        content = self.read()
         if isinstance(dest, (str, bytes, PathLike)):
-            with open(dest, "wb+") as f:
-                f.write(self.read())
+            write_path(dest, content)
         else:
-            dest.write(self.read())
+            dest.write(content)
 
         return self
 
