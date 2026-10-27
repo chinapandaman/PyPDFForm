@@ -1,15 +1,21 @@
 # -*- coding: utf-8 -*-
 
 import os
+import stat
+from contextlib import contextmanager
 from copy import deepcopy
 from io import BytesIO
 from unittest.mock import patch
 
 import pytest
 from jsonschema import ValidationError, validate
+from pikepdf import Pdf
 from pypdf import PdfReader
+from typer.testing import CliRunner
 
 from PyPDFForm import Annotations, BlankPage, Fields, PdfArray, PdfWrapper
+from PyPDFForm.cli.root import cli_app
+from PyPDFForm.lib import egress
 from PyPDFForm.lib.constants import (
     DA,
     UNIQUE_SUFFIX_LENGTH,
@@ -109,9 +115,135 @@ def test_base_schema_definition():
 
 
 def test_write(template_stream, tmp_path):
-    assert PdfWrapper(template_stream).write(
-        os.path.join(tmp_path, "sample_template.pdf")
-    )
+    destination = tmp_path / "sample_template.pdf"
+    obj = PdfWrapper(template_stream).fill({"test": "transactional"})
+    assert obj.write(str(destination)) is obj
+    assert PdfWrapper(str(destination)).data["test"] == "transactional"
+    fields = PdfReader(str(destination)).get_fields()
+    assert fields is not None
+    assert fields["test"][V] == "transactional"
+    with Pdf.open(destination) as reopened:
+        assert not reopened.check_pdf_syntax()
+    if os.name != "nt":
+        assert stat.S_IMODE(destination.stat().st_mode) == 0o600
+        destination.chmod(0o640)
+
+    expected = obj.read()
+    assert obj.write(os.fsencode(destination)) is obj
+    assert destination.read_bytes() == expected
+    if os.name != "nt":
+        assert stat.S_IMODE(destination.stat().st_mode) == 0o640
+    with pytest.raises(OSError, match="regular file"):
+        obj.write(tmp_path)
+    assert set(tmp_path.iterdir()) == {destination}
+
+
+@pytest.mark.parametrize("failure", ["hook", "appearance", "write", "close", "replace"])
+@pytest.mark.parametrize(
+    "operation",
+    [
+        "library",
+        pytest.param("cli_in_place", marks=pytest.mark.cli_test),
+        pytest.param("cli_output", marks=pytest.mark.cli_test),
+    ],
+)
+def test_write_failure_preserves_destination(
+    template_stream, tmp_path, monkeypatch, failure, operation
+):
+    source = tmp_path / "input.pdf"
+    source.write_bytes(template_stream)
+    destination = source if operation == "cli_in_place" else tmp_path / "output.pdf"
+    if destination != source:
+        destination.write_bytes(b"existing output")
+    original = destination.read_bytes()
+    original_entries = set(tmp_path.iterdir())
+    error = OSError(f"injected {failure} failure")
+
+    def fail(*_args):
+        raise error
+
+    if failure == "hook":
+        monkeypatch.setattr("PyPDFForm.lib.hooks.update_text_field_font_size", fail)
+    elif failure == "appearance":
+        egress.appearance_streams_handler.cache_clear()
+        monkeypatch.setattr(Pdf, "generate_appearance_streams", fail)
+    elif failure in ("write", "close"):
+        temporary_file = egress.NamedTemporaryFile
+
+        @contextmanager
+        def failing_temporary_file(**kwargs):
+            with temporary_file(**kwargs) as temporary:
+                if failure == "write":
+                    real_write = temporary.write
+                    monkeypatch.setattr(
+                        temporary, "write", lambda content: real_write(content[:10])
+                    )
+                else:
+                    monkeypatch.setattr(temporary.file, "flush", fail)
+                yield temporary
+
+        monkeypatch.setattr(egress, "NamedTemporaryFile", failing_temporary_file)
+    else:
+        monkeypatch.setattr(egress.os, "replace", fail)
+        real_unlink = os.unlink
+
+        def readonly_unlink(path):
+            # Exercise cleanup when Windows treats the temporary file as read-only.
+            monkeypatch.setattr(egress.os, "unlink", real_unlink)
+            raise PermissionError(path)
+
+        monkeypatch.setattr(egress.os, "unlink", readonly_unlink)
+
+    if operation == "library":
+        obj = PdfWrapper(template_stream, generate_appearance_streams=True)
+        obj.widgets["test"].font_size = 14
+        with pytest.raises(OSError, match="injected|incomplete"):
+            obj.write(destination)
+    else:
+        args = [
+            "--generate-appearance-streams",
+            "update",
+            "field",
+            str(source),
+            "--field",
+            "test",
+            "--font_size",
+            "14",
+        ]
+        if operation == "cli_output":
+            args.extend(["-o", str(destination)])
+        result = CliRunner().invoke(cli_app, args)
+        assert result.exit_code == 1
+        assert isinstance(result.exception, OSError)
+
+    assert destination.read_bytes() == original
+    assert source.read_bytes() == template_stream
+    assert set(tmp_path.iterdir()) == original_entries
+
+
+def test_write_follows_symlink(template_stream, tmp_path):
+    directory = tmp_path / "targets"
+    directory.mkdir()
+    target = directory / "output.pdf"
+    symlink = tmp_path / "link.pdf"
+    try:
+        symlink.symlink_to("targets/output.pdf")
+    except OSError:
+        pytest.skip("Creating symlinks requires platform support and permissions")
+
+    obj = PdfWrapper(template_stream).fill({"test": "first output"})
+    obj.write(symlink)
+    original = target.read_bytes()
+    other_link = directory / "other.pdf"
+    os.link(target, other_link)
+    obj.fill({"test": "second output"}).write(symlink)
+
+    assert symlink.is_symlink()
+    assert os.readlink(symlink) == "targets/output.pdf"
+    assert PdfWrapper(str(target)).data["test"] == "second output"
+    assert other_link.read_bytes() == original
+    assert not os.path.samefile(target, other_link)
+    assert set(directory.iterdir()) == {target, other_link}
 
 
 def test_write_io(template_stream):
