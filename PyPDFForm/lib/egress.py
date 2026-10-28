@@ -29,6 +29,8 @@ from .constants import (
     Annots,
     Fields,
     Parent,
+    Subtype,
+    Widget,
 )
 from .template import get_widget_key
 
@@ -135,8 +137,8 @@ def rebuild_acroform_fields(
     Rebuilds the AcroForm `/Fields` array from matching page annotations.
 
     The existing `/Fields` array is replaced, creating an AcroForm dictionary
-    when necessary. Each page annotation is resolved to a widget key, and only
-    annotations whose keys are present in `widget_keys` contribute their
+    when necessary. Only widget annotations are resolved to a widget key, and
+    those whose keys are present in `widget_keys` contribute their
     top-level field object to the new array. Page annotation arrays are left
     unchanged. When no matching page annotations are found, the original PDF
     stream is returned unchanged to avoid an unnecessary rewrite.
@@ -161,6 +163,8 @@ def rebuild_acroform_fields(
     seen_fields = set()
     for page in writer.pages:
         for annot in page.get(Annots, []):
+            if annot.get_object().get(Subtype) != Widget:
+                continue
             key = get_widget_key(annot.get_object(), use_full_widget_name)
             if key in widget_keys:
                 field_ref = _get_root_field_reference(writer, annot)

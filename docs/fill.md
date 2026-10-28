@@ -167,6 +167,8 @@ The [generated JSON schema](inspect.md#generate-a-json-schema-that-describes-a-p
 
 A signature field can be filled with a handwritten signature image.
 
+Filling draws the signature image on top of the page content and removes the field.
+
 The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [this signature image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png):
 
 === "Library"
@@ -238,6 +240,8 @@ The examples below use [this PDF](pdfs/sample_template_with_signature.pdf) and [
 ## Fill image field
 
 An image field accepts the same input types as a signature field: a file path, an open file object, or a bytes stream.
+
+Just like a signature field, an image field is filled by drawing the image on top of the page content and removing the field.
 
 The examples below use [this PDF](pdfs/sample_template_with_image_field.pdf) and [this image](https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_image.jpg):
 
