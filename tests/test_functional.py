@@ -1309,6 +1309,24 @@ def test_rebuild_acroform_fields():
     assert get_widget_key(reader.root_object[AcroForm][FieldsConst][1], False) == "bar"
 
 
+def test_rebuild_acroform_fields_ignores_note_title():
+    form = PdfWrapper(BlankPage()).annotate(
+        [
+            Annotations.TextAnnotation(
+                1, 100, 100, title="signature", contents="keep note"
+            )
+        ]
+    )
+    stream = form.read()
+
+    result = egress.rebuild_acroform_fields(stream, {"signature"}, False)
+
+    assert result == stream
+    reader = PdfReader(BytesIO(result))
+    assert not reader.get_fields()
+    assert reader.pages[0]["/Annots"][0].get_object()["/Contents"] == "keep note"
+
+
 def test_scalar_geometry(template_stream, template_with_radiobutton_stream):
     attributes = {"x": 123, "y": 0, "width": 80, "height": 40}
     for template, field_name in (
