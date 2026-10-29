@@ -585,7 +585,7 @@ def test_schema(sample_template_with_comb_text_field):
         pass
 
 
-def test_sample_data(sejda_template_complex, sample_template_with_dropdown):
+def test_sample_data(sejda_template_complex):
     obj = PdfWrapper(sejda_template_complex)
     try:
         validate(instance=obj.sample_data, schema=obj.schema)
@@ -599,32 +599,36 @@ def test_sample_data(sejda_template_complex, sample_template_with_dropdown):
     except NotImplementedError:
         pass
 
-    for field_name in ("dropdown_1", "radio_1"):
-        for option_count in (0, 1):
-            form = PdfWrapper(sample_template_with_dropdown)
-            widget = form.widgets[field_name]
-            if field_name == "dropdown_1":
-                choices = widget.choices
-                assert choices is not None
-                widget.choices = choices[:option_count]
-            else:
-                widget.number_of_options = option_count
-            widget.value = None
 
-            sample = form.sample_data
-            if option_count:
-                assert widget.sample_value == 0
-                assert sample[field_name] == 0
-            else:
-                assert widget.sample_value is None
-                assert field_name not in sample
-            validate(sample, form.schema)
-            form.fill(sample)
-            assert widget.value == (0 if option_count else None)
-            if field_name == "dropdown_1":
-                reopened = PdfWrapper(form.read())
-                assert reopened.widgets[field_name].choices == tuple(widget.choices)
-                assert (field_name in reopened.sample_data) == bool(option_count)
+@pytest.mark.parametrize("field_name", ["dropdown_1", "radio_1"])
+@pytest.mark.parametrize("option_count", [0, 1])
+def test_sample_data_choice_boundaries(
+    sample_template_with_dropdown, field_name, option_count
+):
+    form = PdfWrapper(sample_template_with_dropdown)
+    widget = form.widgets[field_name]
+    if field_name == "dropdown_1":
+        choices = widget.choices
+        assert choices is not None
+        widget.choices = choices[:option_count]
+    else:
+        widget.number_of_options = option_count
+    widget.value = None
+
+    sample = form.sample_data
+    if option_count:
+        assert widget.sample_value == 0
+        assert sample[field_name] == 0
+    else:
+        assert widget.sample_value is None
+        assert field_name not in sample
+    validate(sample, form.schema)
+    form.fill(sample)
+    assert widget.value == (0 if option_count else None)
+    if field_name == "dropdown_1":
+        reopened = PdfWrapper(form.read())
+        assert reopened.widgets[field_name].choices == tuple(widget.choices)
+        assert (field_name in reopened.sample_data) == bool(option_count)
 
 
 def test_sample_data_max_boundary(sample_template_with_comb_text_field):
@@ -1327,38 +1331,35 @@ def test_rebuild_acroform_fields_ignores_note_title():
     assert reader.pages[0]["/Annots"][0].get_object()["/Contents"] == "keep note"
 
 
-def test_scalar_geometry(template_stream, template_with_radiobutton_stream):
+@pytest.mark.parametrize("field_name", ["test", "check", "radio_1"])
+def test_scalar_geometry(template_stream, template_with_radiobutton_stream, field_name):
+    template = (
+        template_with_radiobutton_stream if field_name == "radio_1" else template_stream
+    )
     attributes = {"x": 123, "y": 0, "width": 80, "height": 40}
-    for template, field_name in (
-        (template_stream, "test"),
-        (template_stream, "check"),
-        (template_with_radiobutton_stream, "radio_1"),
-    ):
-        form = PdfWrapper(template)
-        float_form = PdfWrapper(template)
-        expected = {
-            name: getattr(form.widgets[field_name], name) for name in attributes
-        }
-        updates = attributes.copy()
-        if field_name != "test":
-            updates["size"] = 30
+    form = PdfWrapper(template)
+    float_form = PdfWrapper(template)
+    expected = {name: getattr(form.widgets[field_name], name) for name in attributes}
+    updates = attributes.copy()
+    if field_name != "test":
+        updates["size"] = 30
 
-        for attribute, value in updates.items():
-            setattr(form.widgets[field_name], attribute, value)
-            setattr(float_form.widgets[field_name], attribute, float(value))
-            for name in ("width", "height") if attribute == "size" else (attribute,):
-                original = expected[name]
-                expected[name] = (
-                    [value] * len(original) if isinstance(original, list) else value
-                )
+    for attribute, value in updates.items():
+        setattr(form.widgets[field_name], attribute, value)
+        setattr(float_form.widgets[field_name], attribute, float(value))
+        for name in ("width", "height") if attribute == "size" else (attribute,):
+            original = expected[name]
+            expected[name] = (
+                [value] * len(original) if isinstance(original, list) else value
+            )
 
-            stream = form.read()
-            assert stream == float_form.read()
-            reopened = PdfWrapper(stream)
-            for name, expected_value in expected.items():
-                assert getattr(reopened.widgets[field_name], name) == pytest.approx(
-                    expected_value
-                )
+        stream = form.read()
+        assert stream == float_form.read()
+        reopened = PdfWrapper(stream)
+        for name, expected_value in expected.items():
+            assert getattr(reopened.widgets[field_name], name) == pytest.approx(
+                expected_value
+            )
 
 
 def test_invalid_scalar_geometry(template_stream):
@@ -1479,68 +1480,74 @@ def test_choice_indices(sample_template_with_dropdown):
     assert widget.value == 0
 
 
-def test_invalid_choice_indices(sample_template_with_dropdown):
-    for field_name, count in (("dropdown_1", 4), ("radio_1", 3)):
-        for option_count in (count, 0):
-            form = PdfWrapper(sample_template_with_dropdown).fill(
-                {field_name: count - 1}
-            )
-            widget = form.widgets[field_name]
-            if not option_count:
-                if field_name == "dropdown_1":
-                    widget.choices = []
-                else:
-                    widget.number_of_options = 0
-                widget.value = None
-            stream = form.read()
-            original_state = deepcopy(
-                {key: value.__dict__ for key, value in form.widgets.items()}
-            )
-            for index in (-999, -1, option_count, option_count + 999):
-                with pytest.raises(ValidationError):
-                    validate({field_name: index}, form.schema)
-                with pytest.raises(ValueError, match="Choice index"):
-                    widget.value = index
-                with pytest.raises(ValueError, match="Choice index"):
-                    form.fill(
-                        {
-                            "test_1": "must not change",
-                            "dropdown_1": "must not append",
-                            field_name: index,
-                        },
-                        readonly=True,
-                    )
-
-                assert {
-                    key: value.__dict__ for key, value in form.widgets.items()
-                } == original_state
-                assert form.read() == stream
-
-        for option_count in (1, 0):
-            form = PdfWrapper(sample_template_with_dropdown).fill(
-                {field_name: count - 1, "test_1": "original"}
-            )
-            widget = form.widgets[field_name]
-            if field_name == "dropdown_1":
-                choices = widget.choices
-                assert choices is not None
-                widget.choices = choices[:option_count]
-            else:
-                widget.number_of_options = option_count
-            form.widgets["test_1"].x = 123
-            stream = getattr(form, "_stream")
-            original_state = deepcopy(
-                {key: value.__dict__ for key, value in form.widgets.items()}
+@pytest.mark.parametrize(("field_name", "count"), [("dropdown_1", 4), ("radio_1", 3)])
+@pytest.mark.parametrize("empty", [False, True])
+def test_invalid_choice_indices(
+    sample_template_with_dropdown, field_name, count, empty
+):
+    option_count = 0 if empty else count
+    form = PdfWrapper(sample_template_with_dropdown).fill({field_name: count - 1})
+    widget = form.widgets[field_name]
+    if empty:
+        if field_name == "dropdown_1":
+            widget.choices = []
+        else:
+            widget.number_of_options = 0
+        widget.value = None
+    stream = form.read()
+    original_state = deepcopy(
+        {key: value.__dict__ for key, value in form.widgets.items()}
+    )
+    for index in (-999, -1, option_count, option_count + 999):
+        with pytest.raises(ValidationError):
+            validate({field_name: index}, form.schema)
+        with pytest.raises(ValueError, match="Choice index"):
+            widget.value = index
+        with pytest.raises(ValueError, match="Choice index"):
+            form.fill(
+                {
+                    "test_1": "must not change",
+                    "dropdown_1": "must not append",
+                    field_name: index,
+                },
+                readonly=True,
             )
 
-            with pytest.raises(ValidationError):
-                validate({field_name: widget.value}, form.schema)
-            with pytest.raises(ValueError, match="Choice index"):
-                form.fill({"test_1": "must not change"}, readonly=True)
+        assert {
+            key: value.__dict__ for key, value in form.widgets.items()
+        } == original_state
+        assert form.read() == stream
 
-            assert {
-                key: value.__dict__ for key, value in form.widgets.items()
-            } == original_state
-            assert getattr(form, "_stream") == stream
-            form.fill({field_name: 0 if option_count else None})
-            assert widget.value == (0 if option_count else None)
+
+@pytest.mark.parametrize(("field_name", "count"), [("dropdown_1", 4), ("radio_1", 3)])
+@pytest.mark.parametrize("option_count", [1, 0])
+def test_stale_choice_indices(
+    sample_template_with_dropdown, field_name, count, option_count
+):
+    form = PdfWrapper(sample_template_with_dropdown).fill(
+        {field_name: count - 1, "test_1": "original"}
+    )
+    widget = form.widgets[field_name]
+    if field_name == "dropdown_1":
+        choices = widget.choices
+        assert choices is not None
+        widget.choices = choices[:option_count]
+    else:
+        widget.number_of_options = option_count
+    form.widgets["test_1"].x = 123
+    stream = getattr(form, "_stream")
+    original_state = deepcopy(
+        {key: value.__dict__ for key, value in form.widgets.items()}
+    )
+
+    with pytest.raises(ValidationError):
+        validate({field_name: widget.value}, form.schema)
+    with pytest.raises(ValueError, match="Choice index"):
+        form.fill({"test_1": "must not change"}, readonly=True)
+
+    assert {
+        key: value.__dict__ for key, value in form.widgets.items()
+    } == original_state
+    assert getattr(form, "_stream") == stream
+    form.fill({field_name: 0 if option_count else None})
+    assert widget.value == (0 if option_count else None)

@@ -231,7 +231,8 @@ def fill(
         annotations = page.annotations
         if annotations is None:
             continue
-        for reference in list(annotations):
+        # Keep a snapshot because consumed widgets are removed during iteration.
+        for reference in annotations.copy():
             annot = cast(DictionaryObject, reference.get_object())
             if annot.get(Subtype) != Widget:
                 continue

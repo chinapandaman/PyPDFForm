@@ -163,15 +163,17 @@ def rebuild_acroform_fields(
     seen_fields = set()
     for page in writer.pages:
         for annot in page.get(Annots, []):
-            if annot.get_object().get(Subtype) != Widget:
+            annotation = annot.get_object()
+            if (
+                annotation.get(Subtype) != Widget
+                or get_widget_key(annotation, use_full_widget_name) not in widget_keys
+            ):
                 continue
-            key = get_widget_key(annot.get_object(), use_full_widget_name)
-            if key in widget_keys:
-                field_ref = _get_root_field_reference(writer, annot)
-                field_key = _field_reference_key(field_ref)
-                if field_key not in seen_fields:
-                    fields.append(field_ref)
-                    seen_fields.add(field_key)
+            field_ref = _get_root_field_reference(writer, annot)
+            field_key = _field_reference_key(field_ref)
+            if field_key not in seen_fields:
+                fields.append(field_ref)
+                seen_fields.add(field_key)
 
     if not seen_fields:
         return pdf
