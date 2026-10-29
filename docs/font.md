@@ -36,6 +36,10 @@ For example, to use a font from the [Liberation Serif](https://fonts.adobe.com/f
 
 In this example, `LiberationSerif-BoldItalic.ttf` is registered as `new_font_name`. You can now reference this font in other PyPDFForm APIs using the name `new_font_name`.
 
+???+ info "Thread safety"
+    If your application uses multiple threads, run PyPDFForm and ReportLab
+    operations one at a time when working with custom fonts.
+
 ## Get registered fonts
 
 To see which fonts have been registered, access the `fonts` attribute of the `PdfWrapper` object:

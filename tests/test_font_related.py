@@ -12,8 +12,10 @@ import pytest
 from fontTools.ttLib import TTLibError
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject
+from reportlab.pdfbase.pdfmetrics import _fonts
+from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
-from PyPDFForm import PdfWrapper
+from PyPDFForm import PdfWrapper, RawElements
 from PyPDFForm.lib.constants import (
     DEFAULT_ASSUMED_GLYPH_WIDTH,
     DR,
@@ -24,7 +26,100 @@ from PyPDFForm.lib.constants import (
     MissingWidth,
     Widths,
 )
-from PyPDFForm.lib.font import compute_font_glyph_widths
+from PyPDFForm.lib.font import compute_font_glyph_widths, temporary_font_registration
+
+
+@pytest.fixture
+def font_registry():
+    original = dict(_fonts)
+    yield _fonts
+    # Restore shared state even when a regression assertion fails.
+    _fonts.clear()
+    _fonts.update(original)
+
+
+def test_temporary_font_registration_cleans_up_setup_failure(
+    sample_font_stream, font_registry
+):
+    original = dict(font_registry)
+    fonts = [("same", sample_font_stream)] * 2 + [("bad", b"invalid font")]
+    with pytest.raises(TTFError), temporary_font_registration(fonts):
+        pytest.fail("Invalid font setup must fail before entering the context")
+
+    assert font_registry == original
+
+
+def test_temporary_font_registration_preserves_other_registrations_on_failure(
+    sample_font_stream, font_registry
+):
+    original = dict(font_registry)
+    error = RuntimeError("drawing failed")
+    external = TTFont("external", BytesIO(sample_font_stream))
+
+    def fail_drawing():
+        font_registry["external"] = external
+        raise error
+
+    with temporary_font_registration([("same", sample_font_stream)]):
+        outer_state = dict(font_registry)
+        with (
+            pytest.raises(RuntimeError, match="drawing failed") as caught,
+            temporary_font_registration([("same", sample_font_stream)] * 2),
+        ):
+            fail_drawing()
+
+        assert caught.value is error
+        assert font_registry == {**outer_state, "external": external}
+
+    assert font_registry == {**original, "external": external}
+
+
+def test_temporary_font_registration_only_removes_owned_entries(
+    sample_font_stream, font_registry
+):
+    existing = TTFont("existing", BytesIO(sample_font_stream))
+    font_registry["existing"] = existing
+    original = dict(font_registry)
+    with patch("PyPDFForm.lib.font.uuid4") as uuid:
+        uuid.side_effect = [MagicMock(hex="existing"), MagicMock(hex="temporary")]
+        with temporary_font_registration([("same", sample_font_stream)]) as mapping:
+            assert mapping == {"same": "temporary"}
+            assert font_registry["existing"] is existing
+            font_registry[mapping["same"]] = existing
+
+    assert font_registry == {**original, "temporary": existing}
+
+
+@pytest.mark.parametrize("need_appearances", [False, True])
+def test_repeated_draws_with_duplicate_font_aliases(
+    template_stream, sample_font_stream, font_samples, font_registry, need_appearances
+):
+    # Initialize ReportLab's lazily loaded built-in fonts before taking a snapshot.
+    PdfWrapper(template_stream).draw([RawElements.RawText("Warm up", 1, 100, 100)])
+    form = PdfWrapper(template_stream, need_appearances=need_appearances)
+    form.register_font("same", os.path.join(font_samples, "LiberationSerif-Italic.ttf"))
+    form.register_font("same", sample_font_stream)
+    original = dict(font_registry)
+    original_fields = set(form.widgets)
+
+    for index in range(3):
+        text = f"Font lifecycle {index}"
+        form.draw([RawElements.RawText(text, 1, 100, 100 + index * 25, font="same")])
+        stream = form.read()
+        assert font_registry == original
+
+        reopened = PdfWrapper(stream)
+        assert set(reopened.widgets) == original_fields
+        assert "LiberationSerif-BoldItalic" in reopened.fonts
+        page = PdfReader(BytesIO(stream)).pages[0]
+        assert text in page.extract_text()
+        assert any(
+            font["/BaseFont"].endswith("LiberationSerif-BoldItalic")
+            and font["/FontDescriptor"]["/FontFile2"].get_data()
+            for font in (
+                ref.get_object() for ref in page["/Resources"]["/Font"].values()
+            )
+        )
 
 
 @pytest.fixture
