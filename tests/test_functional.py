@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 from jsonschema import ValidationError, validate
-from pikepdf import Pdf
+from pikepdf import Name, Pdf
 from pypdf import PdfReader
 from typer.testing import CliRunner
 
@@ -1371,6 +1371,59 @@ def test_invalid_scalar_geometry(template_stream):
                 TypeError, match="Geometry values must be integers or floats"
             ):
                 form.read()
+
+
+@pytest.mark.parametrize(
+    ("filename", "name", "spanning_pages"),
+    [
+        ("sample_template_with_radio_button.pdf", "radio_1", True),
+        ("sample_template_sejda.pdf", "purchase_option", False),
+    ],
+)
+def test_radio_group_selection(pdf_samples, filename, name, spanning_pages):
+    with Pdf.open(os.path.join(pdf_samples, filename)) as pdf:
+        group = next(field for field in pdf.Root.AcroForm.Fields if name == field.T)
+        children = list(group.Kids)
+        if spanning_pages:
+            # Reverse page traversal order without changing /Kids or /Opt order.
+            moved = children.pop(0)
+            pdf.pages[0].Annots = [
+                annot for annot in pdf.pages[0].Annots if annot.objgen != moved.objgen
+            ]
+            pdf.pages[1].Annots.append(moved)
+            moved.P = pdf.pages[1].obj
+            children.append(moved)
+        states = [
+            next(key for key in child.AP.N if key != "/Off") for child in children
+        ]
+        exports = [str(value) for value in group.get("/Opt", [])]
+        # Start with an existing selection, independently of PdfWrapper.fill.
+        group.V = Name(states[0])
+        for index, child in enumerate(children):
+            child.AS = Name(states[0] if index == 0 else "/Off")
+        stream = BytesIO()
+        pdf.save(stream)
+
+    form = PdfWrapper(stream.getvalue())
+    assert form.widgets[name].value == 0
+    for reopen in (False, True):
+        for index in (1, 0):
+            form.fill({name: index})
+            result = form.read()
+            with Pdf.open(BytesIO(result)) as pdf:
+                group = next(
+                    field for field in pdf.Root.AcroForm.Fields if name == field.T
+                )
+                assert states[index] == group.V
+                assert [str(child.AS) for child in group.Kids] == [
+                    states[index] if states[index] in child.AP.N else "/Off"
+                    for child in group.Kids
+                ]
+                assert [str(value) for value in group.get("/Opt", [])] == exports
+            reopened = PdfWrapper(result)
+            assert reopened.widgets[name].value == index
+            if reopen:
+                form = reopened
 
 
 def test_choice_indices(sample_template_with_dropdown):

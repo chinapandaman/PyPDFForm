@@ -90,7 +90,8 @@ def update_widget(
 
     This function updates the value of a single PDF form widget based on its type. It sets
     the read-only flag first when requested, skips value updates when the
-    middleware value is ``None``, tracks radio option indices within each group, and
+    middleware value is ``None``, tracks radio option indices within each group,
+    updates the entire radio group when its selected option is reached, and
     prepares images or signatures for later drawing instead of writing image data directly
     into the annotation.
 
