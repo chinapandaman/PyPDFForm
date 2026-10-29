@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -29,10 +29,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -1527,6 +1527,7 @@
 <p><code>fill()</code> checks both supplied and retained selections before applying values or pending field updates. If an index is invalid, existing widget values, queued updates, and PDF data remain unchanged. If you shorten a dropdown's choices, supply a valid replacement for any selection that is now out of range. This guarantee covers index validation; failures during later hook execution, image processing, or serialization are not rolled back.</p>
 <h2 id="fill-signature-field">Fill signature field<a class="headerlink" href="#fill-signature-field" title="Permanent link">⚓︎</a></h2>
 <p>A signature field can be filled with a handwritten signature image.</p>
+<p>Filling draws the signature image on top of the page content and removes the field.</p>
 <p>The examples below use <a href="../pdfs/sample_template_with_signature.pdf">this PDF</a> and <a href="https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_signature.png">this signature image</a>:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="9:2"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">Library</label><label for="__tabbed_9_2">CLI</label></div>
 <div class="tabbed-content">
@@ -1608,6 +1609,7 @@
 </div>
 <h2 id="fill-image-field">Fill image field<a class="headerlink" href="#fill-image-field" title="Permanent link">⚓︎</a></h2>
 <p>An image field accepts the same input types as a signature field: a file path, an open file object, or a bytes stream.</p>
+<p>Just like a signature field, an image field is filled by drawing the image on top of the page content and removing the field.</p>
 <p>The examples below use <a href="../pdfs/sample_template_with_image_field.pdf">this PDF</a> and <a href="https://github.com/chinapandaman/PyPDFForm/raw/master/image_samples/sample_image.jpg">this image</a>:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="12:2"><input checked="checked" id="__tabbed_12_1" name="__tabbed_12" type="radio" /><input id="__tabbed_12_2" name="__tabbed_12" type="radio" /><div class="tabbed-labels"><label for="__tabbed_12_1">Library</label><label for="__tabbed_12_2">CLI</label></div>
 <div class="tabbed-content">
@@ -1826,10 +1828,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "content.code.select", "content.code.annotate", "content.action.edit", "content.action.view", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.top", "toc.follow", "toc.integrate", "search.suggest", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "content.code.select", "content.code.annotate", "content.action.edit", "content.action.view", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.top", "toc.follow", "toc.integrate", "search.suggest", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>
