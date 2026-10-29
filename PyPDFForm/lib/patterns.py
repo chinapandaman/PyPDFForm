@@ -34,6 +34,7 @@ from .constants import (
     F,
     Ff,
     I,
+    Kids,
     MaxLen,
     N,
     Off,
@@ -260,22 +261,22 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
 
 def update_radio_value(annot: DictionaryObject) -> None:
     """
-    Updates the value of a radio button annotation, selecting it.
+    Selects a radio button and clears every other widget in its group.
 
-    This function modifies the appearance state (AS) and value (V) of the radio button's
-    parent dictionary to reflect the selected state. It also removes the parent's
-    Opt entry when present so the selected appearance state is used directly.
+    The selected widget's non-Off normal appearance supplies the parent value
+    (V) and selected appearance state (AS). All other children, including those
+    on other pages, receive /Off. The parent's Opt export mapping is preserved.
 
     Args:
         annot (DictionaryObject): The radio button annotation dictionary.
     """
-    if Opt in annot[Parent]:
-        del annot[Parent][Opt]
-
     for each in annot[AP][N]:
         if str(each) != Off:
-            annot[NameObject(AS)] = NameObject(each)
-            annot[NameObject(Parent)][NameObject(V)] = NameObject(each)
+            parent = annot[Parent]
+            parent[NameObject(V)] = NameObject(each)
+            for reference in parent[Kids]:
+                child = reference.get_object()
+                child[NameObject(AS)] = NameObject(each if child is annot else Off)
             break
 
 
