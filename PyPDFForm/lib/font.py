@@ -191,7 +191,14 @@ def temporary_font_registration(
     from the original font names to the unique names.
 
     The fonts are inserted into ReportLab's global font registry for the duration
-    of the context manager and removed again on exit.
+    of the context manager. Every inserted entry is tracked independently of the
+    alias mapping and removed on exit, including setup and drawing failures.
+    Repeated aliases resolve to the last registration. Cleanup only removes
+    entries still referencing the font objects inserted by this context.
+
+    Sequential and nested contexts are supported. Callers must serialize threaded
+    PyPDFForm and direct ReportLab operations in the same process for the entire
+    operation; this context manager does not synchronize the global registry.
 
     Args:
         fonts (list[tuple[str, bytes]]): A list of tuples, each containing a font name and its TTF stream.
@@ -200,16 +207,21 @@ def temporary_font_registration(
         dict: A mapping of the original font names to the temporary unique names used by ReportLab.
     """
     font_mapping = {}
-    for font_name, ttf_stream in fonts:
-        rl_name = uuid4().hex
-        font_mapping[font_name] = rl_name
-        _fonts[rl_name] = TTFont(rl_name, BytesIO(ttf_stream))
-
+    registered_fonts = {}
     try:
+        for font_name, ttf_stream in fonts:
+            rl_name = uuid4().hex
+            while rl_name in _fonts:
+                rl_name = uuid4().hex
+            font = TTFont(rl_name, BytesIO(ttf_stream))
+            registered_fonts[rl_name] = font
+            _fonts[rl_name] = font
+            font_mapping[font_name] = rl_name
+
         yield font_mapping
     finally:
-        for rl_name in font_mapping.values():
-            if rl_name in _fonts:
+        for rl_name, font in registered_fonts.items():
+            if _fonts.get(rl_name) is font:
                 del _fonts[rl_name]
 
 
