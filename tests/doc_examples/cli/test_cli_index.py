@@ -14,7 +14,9 @@ runner = CliRunner()
 
 @pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_index_snippets(pdf_samples, yaml_samples, tmp_path, request):
+def test_index_snippets(pdf_samples, yaml_samples, tmp_path, request, monkeypatch):
+    # Stable ReportLab timestamps prevent variable-length document IDs.
+    monkeypatch.setenv("SOURCE_DATE_EPOCH", "946684800")
     expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 

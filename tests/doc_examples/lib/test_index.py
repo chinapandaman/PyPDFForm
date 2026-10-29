@@ -8,7 +8,9 @@ from PyPDFForm import BlankPage, Fields, PdfWrapper, RawElements
 
 
 @pytest.mark.requires_zlib_over_zlib_ng
-def test_index_snippets(pdf_samples, request):
+def test_index_snippets(pdf_samples, request, monkeypatch):
+    # Stable ReportLab timestamps prevent variable-length document IDs.
+    monkeypatch.setenv("SOURCE_DATE_EPOCH", "946684800")
     expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
 
     # Create a blank PDF
