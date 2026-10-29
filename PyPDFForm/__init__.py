@@ -16,7 +16,7 @@ PyPDFForm aims to make PDF form automation straightforward whether it is used
 from Python code or from the command line.
 """
 
-__version__ = "6.0.1"
+__version__ = "6.0.2"
 
 from .lib.annotations import Annotations
 from .lib.assets.blank import BlankPage
