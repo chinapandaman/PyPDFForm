@@ -141,6 +141,18 @@ def annotated_form(request):
     return PdfWrapper(stream.getvalue(), use_full_widget_name=request.param)
 
 
+def _collect_field_references(fields):
+    leaves = []
+    for reference in fields:
+        field = reference.get_object()
+        if "/Kids" in field:
+            assert field["/Kids"]
+            leaves.extend(_collect_field_references(field["/Kids"]))
+        else:
+            leaves.append(reference)
+    return leaves
+
+
 def assert_annotation_graph(stream, expected_keys, use_full_widget_name):
     reader = PdfReader(BytesIO(stream))
     widgets = {}
@@ -178,18 +190,7 @@ def assert_annotation_graph(stream, expected_keys, use_full_widget_name):
         == notes["keep note"]
     )
     # The field tree must reference the same surviving widgets as the pages.
-    leaves = []
-
-    def collect_fields(fields):
-        for reference in fields:
-            field = reference.get_object()
-            if "/Kids" in field:
-                assert field["/Kids"]
-                collect_fields(field["/Kids"])
-            else:
-                leaves.append(reference)
-
-    collect_fields(reader.root_object["/AcroForm"]["/Fields"])
+    leaves = _collect_field_references(reader.root_object["/AcroForm"]["/Fields"])
     assert set(leaves) == set(widgets.values())
     assert len(leaves) == len(widgets)
     assert expected_keys <= (reader.get_fields() or {}).keys()
