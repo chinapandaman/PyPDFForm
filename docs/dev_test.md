@@ -12,6 +12,12 @@ for measuring test coverage. To run the tests, execute:
     test
     ```
 
+## Adding tests
+
+Add only the tests needed to cover the changed behavior and maintain 100% coverage. Extend existing test files. If a new test file is absolutely necessary, consult the maintainer before creating it.
+
+Leave expected PDF sample regeneration and visual regression comparison to the maintainer unless they explicitly delegate these tasks.
+
 ## Generate coverage report
 
 To generate a test coverage report, run:

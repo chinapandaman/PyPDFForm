@@ -1,6 +1,6 @@
 # Hosting Docs Locally
 
-When making changes to the Python API, CLI, or other significant parts of the code, it's important to also update the relevant documentation.
+For guidance on when to update the User Guide and how to word changes, see the [pull request requirements](dev_changes.md#code-changes).
 
 PyPDFForm uses [MkDocs](https://www.mkdocs.org/) to build its documentation. You can either host it locally in a virtual environment or run it in the development container.
 
