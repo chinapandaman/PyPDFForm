@@ -1179,6 +1179,18 @@ def test_merge_empty_and_one_item(template_stream, sample_font_stream, data_dict
     assert "test_2" in source.widgets
 
 
+@pytest.mark.parametrize("version", ["1.7", "2.0"])
+@pytest.mark.parametrize("padded", [False, True])
+def test_merge_copy_preserves_version(template_stream, version, padded):
+    source = PdfWrapper(template_stream).change_version(version)
+    source.widgets["test"].font_size = 18
+    result = PdfArray([source, PdfWrapper()] if padded else [source]).merge()
+
+    assert result.version == source.version == version
+    assert result.read().startswith(f"%PDF-{version}".encode())
+    assert result.read() == source.read()
+
+
 def test_merge_copy_preserves_widget_settings(pdf_samples, image_samples, tmp_path):
     template = os.path.join(
         pdf_samples, "signature", "sample_template_with_signature_overlap.pdf"

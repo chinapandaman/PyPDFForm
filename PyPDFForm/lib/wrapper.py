@@ -239,9 +239,10 @@ class PdfWrapper:
 
         The copy starts from the current PDF stream, which already contains the title
         and registered font resources, so fonts are not embedded again; their mappings
-        and registration events are copied instead. Widgets and pending key updates
-        are copied so either wrapper can change without affecting the other. Readable
-        stream values on widgets are shared because they cannot be duplicated.
+        and registration events are copied instead. The cached PDF version is copied
+        so the copy restores the same header when serialized. Widgets and pending key
+        updates are copied so either wrapper can change without affecting the other.
+        Readable stream values on widgets are shared because they cannot be duplicated.
 
         Returns:
             PdfWrapper: The copied `PdfWrapper` object.
@@ -265,6 +266,7 @@ class PdfWrapper:
                 if readable(value)
             },
         )
+        result._version = self._version
         result._available_fonts = dict(self._available_fonts)
         result._available_fonts_loaded = self._available_fonts_loaded
         result._font_register_events = list(self._font_register_events)
