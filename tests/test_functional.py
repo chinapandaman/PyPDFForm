@@ -1162,13 +1162,47 @@ def test_merge_empty_and_one_item(template_stream, sample_font_stream, data_dict
         result = PdfArray(pdfs).merge()
         assert result is not source
         assert getattr(result, "need_appearances")
-        assert "new_font" in result.fonts
-        assert result.data == PdfWrapper(source.read()).data
+        assert result.fonts == source.fonts
+        assert result.read() == source.read()
+        assert PdfArray([result]).merge().read() == source.read()
+        assert result.data == source.data
         assert PdfWrapper(result.read()).data == PdfWrapper(source.read()).data
         assert len(result.pages) == len(source.pages)
 
         result.fill({"test": "changed"})
         assert source.data["test"] == data_dict["test"]
+
+    source.update_widget_key("test_2", "renamed")
+    result = PdfArray([source]).merge()
+    result.commit_widget_key_updates()
+    assert "renamed" in result.widgets
+    assert "test_2" in source.widgets
+
+
+def test_merge_copy_preserves_widget_settings(pdf_samples, image_samples, tmp_path):
+    template = os.path.join(
+        pdf_samples, "signature", "sample_template_with_signature_overlap.pdf"
+    )
+    image = os.path.join(image_samples, "small_icon.png")
+    expected = PdfWrapper(template)
+    expected.widgets["signature"].preserve_aspect_ratio = False
+    expected = expected.fill({"signature": image}).read()
+
+    source = PdfWrapper(template)
+    source.widgets["signature"].preserve_aspect_ratio = False
+    for pdfs in ([source], [source, PdfWrapper()]):
+        result = PdfArray(pdfs).merge()
+        assert result.widgets["signature"] is not source.widgets["signature"]
+        assert result.widgets["signature"].preserve_aspect_ratio is False
+        assert result.fill({"signature": image}).read() == expected
+    assert "signature" in source.widgets
+
+    script = tmp_path / "script.js"
+    script.write_text('app.alert("hello");')
+    with open(script) as f:
+        source.widgets["signature"].on_hovered_over_javascript = f
+        result = PdfArray([source]).merge()
+    assert result.widgets["signature"].on_hovered_over_javascript is f
 
 
 def test_annotate(template_stream, pdf_samples, request):

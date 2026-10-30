@@ -20,6 +20,7 @@ that merges them when sliced or merged.
 from __future__ import annotations
 
 from collections import defaultdict
+from copy import deepcopy
 from dataclasses import asdict
 from functools import lru_cache
 from os import PathLike
@@ -37,6 +38,7 @@ from typing import (
 from .adapter import (
     fp_or_f_obj_or_f_content_to_content,
     fp_or_f_obj_or_stream_to_stream,
+    readable,
 )
 from .coordinate import generate_coordinate_grid
 from .deprecation import reject_unsupported_kwargs
@@ -219,31 +221,54 @@ class PdfWrapper:
         if other._keys_to_update:
             other.commit_widget_key_updates()
 
-        # user params and fonts are based on the first object
-        return self._derive(merge_pdfs([self._read(), other._read()]))
-
-    def _derive(self, stream: bytes) -> PdfWrapper:
-        """
-        Creates a new `PdfWrapper` for a stream, inheriting this wrapper's settings.
-
-        The new wrapper uses this wrapper's user parameters, and its custom font
-        registration events are replayed so the same font names remain available.
-        Passing this wrapper's own stream creates an independent copy.
-
-        Args:
-            stream (bytes): The PDF stream for the new wrapper.
-
-        Returns:
-            PdfWrapper: The new `PdfWrapper` object.
-        """
-
+        # user params are based on the first object
         result = self.__class__(
-            stream,
+            merge_pdfs([self._read(), other._read()]),
             **{each[0]: getattr(self, each[0], each[1]) for each in self.USER_PARAMS},
         )
 
+        # inherit fonts
         for event in self._font_register_events:
             result.register_font(event[0], event[1])
+
+        return result
+
+    def _copy(self) -> PdfWrapper:
+        """
+        Creates an independent copy of this wrapper.
+
+        The copy starts from the current PDF stream, which already contains the title
+        and registered font resources, so fonts are not embedded again; their mappings
+        and registration events are copied instead. Widgets and pending key updates
+        are copied so either wrapper can change without affecting the other. Readable
+        stream values on widgets are shared because they cannot be duplicated.
+
+        Returns:
+            PdfWrapper: The copied `PdfWrapper` object.
+        """
+
+        # pylint: disable=W0212
+        result: PdfWrapper = self.__class__(
+            self._read(),
+            **{
+                each[0]: getattr(self, each[0], each[1])
+                for each in self.USER_PARAMS
+                if each[0] != "title"
+            },
+        )
+        result.widgets = deepcopy(
+            self.widgets,
+            {
+                id(value): value
+                for widget in self.widgets.values()
+                for value in vars(widget).values()
+                if readable(value)
+            },
+        )
+        result._available_fonts = dict(self._available_fonts)
+        result._available_fonts_loaded = self._available_fonts_loaded
+        result._font_register_events = list(self._font_register_events)
+        result._keys_to_update = list(self._keys_to_update)
 
         return result
 
@@ -1068,8 +1093,8 @@ class PdfArray(list):
         objects contained in the list into one. An empty array returns a new empty
         PdfWrapper. The result is never one of the contained wrappers: when merging
         would return an input unchanged, such as for a one-item array or when the
-        other wrappers are empty, an independent copy that inherits that wrapper's
-        user parameters and custom fonts is returned instead.
+        other wrappers are empty, an independent copy of that wrapper is returned
+        instead, including its user parameters, widget settings, and custom fonts.
 
         Returns:
             Any: A single new merged PdfWrapper object.
@@ -1082,6 +1107,6 @@ class PdfArray(list):
             generic_merge(list(self), lambda x, y: x + y) if len(self) > 1 else self[0]
         )
         if any(result is each for each in self):
-            result = result._derive(result._read())  # noqa: SLF001 # pylint: disable=W0212
+            result = result._copy()  # noqa: SLF001 # pylint: disable=W0212
 
         return result
