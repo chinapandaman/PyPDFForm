@@ -33,7 +33,7 @@ See [testing PyPDFForm with pytest](dev_test.md).
 
 When creating a GitHub issue, follow these guidelines:
 
-* The issue title should have the format `PPF-<issue number>: <title of the issue>`.
+* Create the issue with a descriptive title, then update it to `PPF-<issue number>: <title of the issue>` using the number assigned by GitHub. The issue number is only available after creation.
 * The issue description should be as descriptive as possible, preferably with the following:
     * A code snippet related to the issue.
     * A PDF form template used by the code snippet.
@@ -43,6 +43,6 @@ When creating a GitHub issue, follow these guidelines:
 
 Before opening a pull request, create an issue. When opening the pull request, follow these guidelines:
 
-* The PR title should be the same as its respective issue, so `PPF-<issue number>: <title of the issue>`.
+* The PR title should match its respective issue: `PPF-<issue number>: <title of the issue>`. The prefix uses the linked issue's number, so it can be set when opening the PR.
 * The PR description should contain a brief explanation of the changes.
 * Once opened, the PR should be linked to its respective issue.
