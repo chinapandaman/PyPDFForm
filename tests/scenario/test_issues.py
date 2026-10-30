@@ -282,8 +282,6 @@ def test_dropdown_tutorial(issue_pdf_directory, request):
     obj = PdfWrapper(BlankPage(width=612, height=792) * 3)
     obj.generate_coordinate_grid(margin=100, color=(0, 0, 1))
 
-    obj.register_font("my_font", "./LiberationSerif-BoldItalic.ttf")
-
     obj.bulk_create_fields(
         [
             Fields.TextField(

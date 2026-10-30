@@ -22,9 +22,8 @@ from .lib.annotations import Annotations
 from .lib.assets.blank import BlankPage
 from .lib.middleware import Widgets
 from .lib.raw import RawElements
-from .lib.types import PdfArray
 from .lib.widgets import Fields
-from .lib.wrapper import PdfWrapper
+from .lib.wrapper import PdfArray, PdfWrapper
 
 __all__ = [
     "PdfWrapper",
