@@ -13,17 +13,20 @@ This module simplifies common tasks such as:
 The core class, `PdfWrapper`, encapsulates a PDF document and provides
 methods for interacting with its form fields and content. It leverages
 lower-level modules within the `PyPDFForm` library to handle the
-underlying PDF manipulation.
+underlying PDF manipulation. `PdfArray` is a list of `PdfWrapper` objects
+that merges them when sliced or merged.
 """
 
 from __future__ import annotations
 
 from collections import defaultdict
+from copy import deepcopy
 from dataclasses import asdict
 from functools import lru_cache
 from os import PathLike
 from typing import (
     TYPE_CHECKING,
+    Any,
     BinaryIO,
     Dict,
     List,
@@ -35,8 +38,10 @@ from typing import (
 from .adapter import (
     fp_or_f_obj_or_f_content_to_content,
     fp_or_f_obj_or_stream_to_stream,
+    readable,
 )
 from .coordinate import generate_coordinate_grid
+from .deprecation import reject_unsupported_kwargs
 from .egress import (
     appearance_streams_handler,
     rebuild_acroform_fields,
@@ -62,9 +67,9 @@ from .template import (
     set_title,
     update_widget_keys,
 )
-from .types import PdfArray
 from .utils import (
     generate_unique_suffix,
+    generic_merge,
     get_page_streams,
     get_version,
     merge_pdfs,
@@ -123,7 +128,7 @@ class PdfWrapper:
 
     def __init__(
         self,
-        template: bytes | str | BinaryIO | BlankPage = b"",
+        template: bytes | str | PathLike | BinaryIO | BlankPage = b"",
         **kwargs,
     ) -> None:
         """
@@ -131,24 +136,33 @@ class PdfWrapper:
 
         Initializes a new `PdfWrapper` object with the given template PDF and optional keyword arguments.
         The template is normalized to bytes and existing widgets are loaded immediately.
+        Omitting the template, or passing empty bytes or an empty stream, creates an empty
+        wrapper; a missing path raises instead.
         The title and document-open JavaScript remain in the PDF stream and are read
         lazily when their properties are accessed. A non-None `title` keyword updates
         the title in the PDF stream; None leaves the template's title unchanged. Enabling
         `generate_appearance_streams` also enables `need_appearances`.
 
         Args:
-            template (bytes | str | BinaryIO | BlankPage): The template PDF, provided as either:
+            template (bytes | str | PathLike | BinaryIO | BlankPage): The template PDF, provided as either:
                 - bytes: The raw PDF data as a byte string.
-                - str: The file path to the PDF.
+                - str | PathLike: The file path to the PDF.
                 - BinaryIO: An open file-like object containing the PDF data.
                 - BlankPage: A blank page object.
                 Defaults to an empty byte string (b"").
             **kwargs: Additional keyword arguments to configure the `PdfWrapper`.
                 These arguments are used to set the user-configurable parameters defined in `USER_PARAMS`.
                 For example: `use_full_widget_name=True` or `need_appearances=False`.
+
+        Raises:
+            TypeError: If a keyword argument is not in `USER_PARAMS` or the template type is unsupported.
+            OSError: If the template path cannot be opened, such as `FileNotFoundError`.
         """
 
         super().__init__()
+        reject_unsupported_kwargs(
+            self, "__init__", kwargs, [each[0] for each in self.USER_PARAMS]
+        )
         self._stream = fp_or_f_obj_or_stream_to_stream(template)
         self.widgets = {}
 
@@ -216,6 +230,47 @@ class PdfWrapper:
         # inherit fonts
         for event in self._font_register_events:
             result.register_font(event[0], event[1])
+
+        return result
+
+    def _copy(self) -> PdfWrapper:
+        """
+        Creates an independent copy of this wrapper.
+
+        The copy starts from the current PDF stream, which already contains the title
+        and registered font resources, so fonts are not embedded again; their mappings
+        and registration events are copied instead. The cached PDF version is copied
+        so the copy restores the same header when serialized. Widgets and pending key
+        updates are copied so either wrapper can change without affecting the other.
+        Readable stream values on widgets are shared because they cannot be duplicated.
+
+        Returns:
+            PdfWrapper: The copied `PdfWrapper` object.
+        """
+
+        # pylint: disable=W0212
+        result: PdfWrapper = self.__class__(
+            self._read(),
+            **{
+                each[0]: getattr(self, each[0], each[1])
+                for each in self.USER_PARAMS
+                if each[0] != "title"
+            },
+        )
+        result.widgets = deepcopy(
+            self.widgets,
+            {
+                id(value): value
+                for widget in self.widgets.values()
+                for value in vars(widget).values()
+                if readable(value)
+            },
+        )
+        result._version = self._version
+        result._available_fonts = dict(self._available_fonts)
+        result._available_fonts_loaded = self._available_fonts_loaded
+        result._font_register_events = list(self._font_register_events)
+        result._keys_to_update = list(self._keys_to_update)
 
         return result
 
@@ -686,9 +741,11 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
 
         Raises:
+            TypeError: If a keyword argument other than `readonly` is passed. Nothing is changed.
             ValueError: If an integer dropdown or radio index is out of range.
         """
 
+        reject_unsupported_kwargs(self, "fill", kwargs, ["readonly"])
         pending = [
             (self.widgets[key], self.widgets[key].prepare_value(value))
             for key, value in data.items()
@@ -954,7 +1011,7 @@ class PdfWrapper:
     def register_font(
         self,
         font_name: str,
-        ttf_file: bytes | str | BinaryIO,
+        ttf_file: bytes | str | PathLike | BinaryIO,
     ) -> PdfWrapper:
         """
         Registers a custom font for use in the PDF.
@@ -962,17 +1019,21 @@ class PdfWrapper:
         Valid TrueType font data is embedded into the PDF's AcroForm resources and
         recorded under the user-provided `font_name`. The original registration input
         is kept so font resources can be replayed after operations that rewrite the
-        PDF stream. Invalid font streams are ignored.
+        PDF stream. Invalid font streams are ignored, but a missing font path raises.
 
         Args:
             font_name (str): The name of the font. This name will be used to reference the font when drawing text.
-            ttf_file (bytes | str | BinaryIO): The TTF file data, provided as either:
+            ttf_file (bytes | str | PathLike | BinaryIO): The TTF file data, provided as either:
                 - bytes: The raw TTF file data as a byte string.
-                - str: The file path to the TTF file.
+                - str | PathLike: The file path to the TTF file.
                 - BinaryIO: An open file-like object containing the TTF file data.
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
+
+        Raises:
+            OSError: If the font path cannot be opened, such as `FileNotFoundError`.
+            TypeError: If the font input type is unsupported.
         """
 
         ttf_file = fp_or_f_obj_or_stream_to_stream(ttf_file)
@@ -986,3 +1047,68 @@ class PdfWrapper:
             self._font_register_events.append((font_name, ttf_file))
 
         return self
+
+
+class PdfArray(list):
+    """
+    A specialized list subclass designed to hold PdfWrapper objects.
+
+    When sliced, this list automatically merges the contained PdfWrapper
+    objects using the PdfWrapper.__add__ method, returning a single
+    merged PdfWrapper object. If the slice is empty, it returns None.
+    For non-slice indexing, it behaves like a standard list.
+    """
+
+    def __getitem__(self, key: Any) -> list | Any:
+        """
+        Retrieves an item or a slice of items from the list.
+
+        If the key is a slice, it merges the PdfWrapper objects in the slice
+        and returns a single merged PdfWrapper.
+        If the key is an index, it returns the PdfWrapper at that index.
+
+        Args:
+            key (int | slice): The index or slice to retrieve.
+
+        Returns:
+            PdfWrapper | list | Any: A single merged PdfWrapper if sliced,
+                                          or the item at the index if indexed.
+        """
+
+        if isinstance(key, slice):
+            result = None
+            wrappers = super().__getitem__(key)
+            for each in wrappers:
+                if not result:
+                    result = each
+                else:
+                    result += each
+
+            return result
+        return super().__getitem__(key)
+
+    def merge(self) -> Any:
+        """
+        Merges all PdfWrapper objects in the list into a single new PdfWrapper.
+
+        This method uses a pairwise merging strategy to combine all PdfWrapper
+        objects contained in the list into one. An empty array returns a new empty
+        PdfWrapper. The result is never one of the contained wrappers: when merging
+        would return an input unchanged, such as for a one-item array or when the
+        other wrappers are empty, an independent copy of that wrapper is returned
+        instead, including its user parameters, widget settings, and custom fonts.
+
+        Returns:
+            Any: A single new merged PdfWrapper object.
+        """
+
+        if not self:
+            return PdfWrapper()
+
+        result = (
+            generic_merge(list(self), lambda x, y: x + y) if len(self) > 1 else self[0]
+        )
+        if any(result is each for each in self):
+            result = result._copy()  # noqa: SLF001 # pylint: disable=W0212
+
+        return result

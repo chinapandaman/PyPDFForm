@@ -41,6 +41,24 @@ VERSION_IDENTIFIERS = [
 
 DEPRECATION_NOTICE = "{} will be deprecated soon."
 DEPRECATION_REPLACE_NOTICE = "Use {} instead."
+UNEXPECTED_KWARG_NOTICE = "{}() got an unexpected keyword argument '{}'."
+REMOVED_KWARG_NOTICE = "It was removed in PyPDFForm {}. {}"
+SUPPORTED_KWARGS_NOTICE = "Supported keyword arguments: {}."
+# method name -> removed keyword -> (version removed, migration guidance)
+REMOVED_KWARGS = {
+    "__init__": {
+        "preserve_metadata": (
+            "6.0.0",
+            "Remove it; input PDF metadata is preserved automatically.",
+        ),
+    },
+    "fill": {
+        "flatten": (
+            "6.0.0",
+            "Use readonly=True to make fields read-only; there is no form-flattening replacement.",
+        ),
+    },
+}
 
 Title = "/Title"
 Annots = "/Annots"

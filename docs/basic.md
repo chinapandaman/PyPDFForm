@@ -29,7 +29,9 @@ This section covers the basic entry points for PyPDFForm's Python API and CLI, a
         ```
 
     ???+ tip
-        PyPDFForm provides an adapter for different file interaction methods in Python, which allows you to pass your PDF form to `PdfWrapper` as a file path, an open file object, or a `bytes` file stream. This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
+        PyPDFForm provides an adapter for different file interaction methods in Python, which allows you to pass your PDF form to `PdfWrapper` as a file path, an open file object, or a `bytes` file stream. File paths can be strings or path objects such as `pathlib.Path`. This file adaptation applies to all PyPDFForm APIs. You can replace file path parameters with file objects or streams throughout the documentation.
+
+        A path that does not exist raises `FileNotFoundError`. To start without a template, use `PdfWrapper()`.
 === "CLI"
     To see CLI help, run:
 

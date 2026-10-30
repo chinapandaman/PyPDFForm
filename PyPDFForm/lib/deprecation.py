@@ -4,13 +4,22 @@ A module for handling deprecation notices within the PyPDFForm library.
 
 This module provides utility functions to issue standard DeprecationWarning
 messages, ensuring consistency across the library when notifying users of
-deprecated features.
+deprecated features. It also rejects keyword arguments that are unsupported
+or were removed after deprecation.
 """
 
 from functools import wraps
+from typing import Any, Sequence
 from warnings import warn
 
-from .constants import DEPRECATION_NOTICE, DEPRECATION_REPLACE_NOTICE
+from .constants import (
+    DEPRECATION_NOTICE,
+    DEPRECATION_REPLACE_NOTICE,
+    REMOVED_KWARG_NOTICE,
+    REMOVED_KWARGS,
+    SUPPORTED_KWARGS_NOTICE,
+    UNEXPECTED_KWARG_NOTICE,
+)
 
 
 def deprecation_notice(to_replace: str, param: str = "") -> callable:
@@ -72,3 +81,39 @@ def deprecation_notice(to_replace: str, param: str = "") -> callable:
 
     decorator.emit_notice = emit_notice
     return decorator
+
+
+def reject_unsupported_kwargs(
+    obj: Any, method_name: str, kwargs: dict, supported: Sequence[str]
+) -> None:
+    """
+    Raises a TypeError for the first keyword argument a method does not support.
+
+    The message names the keyword like Python's own unexpected-keyword error.
+    Keywords listed for the method in `REMOVED_KWARGS` add the version that
+    removed them and their migration guidance; other keywords list the
+    supported ones.
+
+    Args:
+        obj (Any): The object whose method received the keyword arguments.
+        method_name (str): The method name, such as "__init__" or "fill".
+        kwargs (dict): The keyword arguments passed to the method.
+        supported (Sequence[str]): The keyword arguments the method supports.
+
+    Raises:
+        TypeError: If any keyword argument is not supported.
+    """
+
+    name = obj.__class__.__name__
+    if method_name != "__init__":
+        name = f"{name}.{method_name}"
+    removed = REMOVED_KWARGS.get(method_name, {})
+
+    for key in kwargs:
+        if key not in supported:
+            msg = UNEXPECTED_KWARG_NOTICE.format(name, key)
+            if key in removed:
+                msg = f"{msg} {REMOVED_KWARG_NOTICE.format(*removed[key])}"
+            else:
+                msg = f"{msg} {SUPPORTED_KWARGS_NOTICE.format(', '.join(supported))}"
+            raise TypeError(msg)

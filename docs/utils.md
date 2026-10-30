@@ -116,7 +116,7 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
         merged.write("output.pdf")
         ```
     === "Bulk Merge"
-        When merging a large number of PDF files, use the `PdfArray.merge` method for better performance:
+        When merging a large number of PDF files, use the `PdfArray.merge` method for better performance. It always returns a new `PdfWrapper`, which is empty when the array is empty:
 
         ```python
         from PyPDFForm import PdfArray, PdfWrapper

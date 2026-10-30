@@ -5,6 +5,7 @@ Contains the RawImage class, which represents an image that can be drawn
 directly onto a PDF page at a specified position and size.
 """
 
+from os import PathLike
 from typing import BinaryIO
 
 from ..adapter import fp_or_f_obj_or_stream_to_stream
@@ -22,7 +23,7 @@ class RawImage:
 
     def __init__(
         self,
-        image: bytes | str | BinaryIO,
+        image: bytes | str | PathLike | BinaryIO,
         page_number: int,
         x: float,
         y: float,
@@ -34,8 +35,8 @@ class RawImage:
         Initializes a raw image object for drawing.
 
         Args:
-            image: The image source, which can be a path (str), raw bytes (bytes),
-                   or a file stream (BinaryIO).
+            image: The image source, which can be a path (str or PathLike), raw bytes (bytes),
+                   or a file stream (BinaryIO). A missing path raises when the image is drawn.
             page_number: The 1-based index of the page where the image should be drawn.
             x: The x-coordinate (horizontal position) of the bottom-left corner of the image.
             y: The y-coordinate (vertical position) of the bottom-left corner of the image.

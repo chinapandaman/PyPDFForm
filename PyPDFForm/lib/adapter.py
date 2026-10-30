@@ -10,6 +10,7 @@ forms. The module ensures that the input is properly converted into a byte
 stream before further processing.
 """
 
+from os import PathLike
 from os.path import isfile
 from typing import Any, BinaryIO
 
@@ -32,7 +33,7 @@ def readable(obj: Any) -> bool:
 
 
 def fp_or_f_obj_or_stream_to_stream(
-    fp_or_f_obj_or_stream: bytes | str | BinaryIO,
+    fp_or_f_obj_or_stream: bytes | str | PathLike | BinaryIO,
 ) -> bytes:
     """
     Adapt a file path, file object, or stream to a byte stream.
@@ -40,30 +41,37 @@ def fp_or_f_obj_or_stream_to_stream(
     This function takes a file path, a file object, or a byte stream and adapts it to a consistent byte stream.
     It handles different input types, including:
         - byte streams (bytes)
-        - file paths (str)
+        - file paths (str or PathLike)
         - file-like objects with a read() method (BinaryIO)
-    Unsupported inputs and string paths that do not point to files are treated
-    as empty input and return ``b""``.
+    Paths are opened directly, so a missing path raises ``FileNotFoundError``.
+    Empty bytes and empty readable objects are returned as ``b""``.
 
     Args:
-        fp_or_f_obj_or_stream (bytes | str | BinaryIO): The input to adapt.
-            It can be a byte stream, a file path (string), or a file object.
+        fp_or_f_obj_or_stream (bytes | str | PathLike | BinaryIO): The input to adapt.
+            It can be a byte stream, a file path, or a file object.
 
     Returns:
         bytes: The byte stream representation of the input.
-               Returns an empty byte string if the file path does not exist.
+
+    Raises:
+        OSError: If a file path cannot be opened, such as ``FileNotFoundError``
+            for a missing path.
+        TypeError: If the input is not bytes, a file path, or a readable object.
     """
     # not cached to handle writing to the same disk file
-    result = b""
     if isinstance(fp_or_f_obj_or_stream, bytes):
         result = fp_or_f_obj_or_stream
 
     elif readable(fp_or_f_obj_or_stream):
         result = fp_or_f_obj_or_stream.read()
 
-    elif isinstance(fp_or_f_obj_or_stream, str) and isfile(fp_or_f_obj_or_stream):
+    elif isinstance(fp_or_f_obj_or_stream, (str, PathLike)):
         with open(fp_or_f_obj_or_stream, "rb") as _file:
             result = _file.read()
+
+    else:
+        msg = f"Expected bytes, a file path, or a readable binary stream, got {type(fp_or_f_obj_or_stream).__name__}."
+        raise TypeError(msg)
     return result
 
 

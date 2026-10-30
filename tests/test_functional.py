@@ -5,6 +5,7 @@ import stat
 from contextlib import contextmanager
 from copy import deepcopy
 from io import BytesIO
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -273,9 +274,78 @@ def test_fill_readonly_then_editable(template_stream, pdf_samples, data_dict, re
         assert obj.read() == expected
 
 
-def test_register_bad_fonts():
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [
+        (
+            {"flatten": True},
+            r"'flatten'\. It was removed in PyPDFForm 6\.0\.0\. Use readonly=True",
+        ),
+        ({"flatten": False}, r"'flatten'\. It was removed in PyPDFForm 6\.0\.0\."),
+        ({"read_only": True}, r"'read_only'\. Supported keyword arguments: readonly\."),
+    ],
+)
+def test_fill_rejects_unsupported_kwargs(template_stream, data_dict, kwargs, match):
+    obj = PdfWrapper(template_stream)
+    original = obj.read()
+    original_data = obj.data
+
+    with pytest.raises(TypeError, match=r"^PdfWrapper\.fill\(\) got .*" + match):
+        obj.fill(data_dict, **kwargs)
+
+    assert obj.read() == original
+    assert obj.data == original_data
+    assert not any(
+        widget.readonly for widget in PdfWrapper(obj.read()).widgets.values()
+    )
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [
+        (
+            {"preserve_metadata": True},
+            r"'preserve_metadata'\. It was removed in PyPDFForm 6\.0\.0\. Remove it",
+        ),
+        (
+            {"use_full_widget_names": True},
+            (
+                r"'use_full_widget_names'\. Supported keyword arguments: "
+                r"use_full_widget_name, need_appearances, generate_appearance_streams, title\."
+            ),
+        ),
+    ],
+)
+def test_init_rejects_unsupported_kwargs(template_stream, kwargs, match):
+    with pytest.raises(TypeError, match=r"^PdfWrapper\(\) got .*" + match):
+        PdfWrapper(template_stream, **kwargs)
+
+
+def test_template_inputs(template_stream, pdf_samples, tmp_path):
+    expected = PdfWrapper(template_stream).read()
+    obj = PdfWrapper(Path(pdf_samples) / "sample_template.pdf")
+    assert obj.read() == expected
+    assert obj.widgets.keys() == PdfWrapper(template_stream).widgets.keys()
+
+    for obj in (PdfWrapper(), PdfWrapper(b""), PdfWrapper(BytesIO())):
+        assert obj.read() == b""
+        assert obj.widgets == {}
+
+    for missing in (str(tmp_path / "missing.pdf"), tmp_path / "missing.pdf"):
+        with pytest.raises(FileNotFoundError):
+            PdfWrapper(missing)
+    # Windows reports opening a directory as PermissionError
+    with pytest.raises((IsADirectoryError, PermissionError)):
+        PdfWrapper(str(tmp_path))
+    for unsupported in (None, 123):
+        with pytest.raises(TypeError, match="readable binary stream, got"):
+            PdfWrapper(unsupported)
+
+
+def test_register_bad_fonts(tmp_path):
     assert not PdfWrapper().register_font("foo", b"foo").read()
-    assert not PdfWrapper().register_font("foo", "foo").read()
+    with pytest.raises(FileNotFoundError):
+        PdfWrapper().register_font("foo", str(tmp_path / "missing.ttf"))
 
     obj = PdfWrapper().register_font("foo", b"foo")
     assert "foo" not in obj.fonts
@@ -1071,6 +1141,80 @@ def test_merge(template_stream):
                 assert field[V] == f"test_2_{int(page / 3)}"
             elif key.startswith("test_3-"):
                 assert field[V] == f"test_3_{int(page / 3 - 0.5)}"
+
+
+def test_merge_empty_and_one_item(template_stream, sample_font_stream, data_dict):
+    result = PdfArray().merge()
+    assert isinstance(result, PdfWrapper)
+    assert result.read() == b""
+
+    empty = PdfWrapper()
+    result = PdfArray([empty]).merge()
+    assert result is not empty
+    assert result.read() == b""
+
+    source = (
+        PdfWrapper(template_stream, need_appearances=True)
+        .register_font("new_font", sample_font_stream)
+        .fill(data_dict)
+    )
+    for pdfs in ([source], [PdfWrapper(), source, PdfWrapper()]):
+        result = PdfArray(pdfs).merge()
+        assert result is not source
+        assert getattr(result, "need_appearances")
+        assert result.fonts == source.fonts
+        assert result.read() == source.read()
+        assert PdfArray([result]).merge().read() == source.read()
+        assert result.data == source.data
+        assert PdfWrapper(result.read()).data == PdfWrapper(source.read()).data
+        assert len(result.pages) == len(source.pages)
+
+        result.fill({"test": "changed"})
+        assert source.data["test"] == data_dict["test"]
+
+    source.update_widget_key("test_2", "renamed")
+    result = PdfArray([source]).merge()
+    result.commit_widget_key_updates()
+    assert "renamed" in result.widgets
+    assert "test_2" in source.widgets
+
+
+@pytest.mark.parametrize("version", ["1.7", "2.0"])
+@pytest.mark.parametrize("padded", [False, True])
+def test_merge_copy_preserves_version(template_stream, version, padded):
+    source = PdfWrapper(template_stream).change_version(version)
+    source.widgets["test"].font_size = 18
+    result = PdfArray([source, PdfWrapper()] if padded else [source]).merge()
+
+    assert result.version == source.version == version
+    assert result.read().startswith(f"%PDF-{version}".encode())
+    assert result.read() == source.read()
+
+
+def test_merge_copy_preserves_widget_settings(pdf_samples, image_samples, tmp_path):
+    template = os.path.join(
+        pdf_samples, "signature", "sample_template_with_signature_overlap.pdf"
+    )
+    image = os.path.join(image_samples, "small_icon.png")
+    expected = PdfWrapper(template)
+    expected.widgets["signature"].preserve_aspect_ratio = False
+    expected = expected.fill({"signature": image}).read()
+
+    source = PdfWrapper(template)
+    source.widgets["signature"].preserve_aspect_ratio = False
+    for pdfs in ([source], [source, PdfWrapper()]):
+        result = PdfArray(pdfs).merge()
+        assert result.widgets["signature"] is not source.widgets["signature"]
+        assert result.widgets["signature"].preserve_aspect_ratio is False
+        assert result.fill({"signature": image}).read() == expected
+    assert "signature" in source.widgets
+
+    script = tmp_path / "script.js"
+    script.write_text('app.alert("hello");')
+    with open(script) as f:
+        source.widgets["signature"].on_hovered_over_javascript = f
+        result = PdfArray([source]).merge()
+    assert result.widgets["signature"].on_hovered_over_javascript is f
 
 
 def test_annotate(template_stream, pdf_samples, request):

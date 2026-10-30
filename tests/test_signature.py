@@ -254,16 +254,27 @@ def test_fill_preserves_unrelated_annotations(annotated_form, image_samples):
 
 
 @pytest.mark.parametrize("annotated_form", [True], indirect=True, ids=["full-names"])
-def test_failed_image_fill_preserves_annotations(annotated_form, image_samples):
+@pytest.mark.parametrize(
+    ("image", "error"),
+    [
+        (b"invalid image", UnidentifiedImageError),
+        ("missing_image.png", FileNotFoundError),
+    ],
+)
+def test_failed_image_fill_preserves_annotations(
+    annotated_form, image_samples, image, error
+):
     form = annotated_form
     original = form.read()
     original_widgets = form.widgets.copy()
 
-    with pytest.raises(UnidentifiedImageError):
+    with pytest.raises(error):
         form.fill(
             {
                 "group.first": os.path.join(image_samples, "sample_signature.png"),
-                "group.image": b"invalid image",
+                "group.image": image
+                if isinstance(image, bytes)
+                else os.path.join(image_samples, image),
             }
         )
 
