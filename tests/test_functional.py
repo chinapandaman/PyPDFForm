@@ -1464,7 +1464,9 @@ def get_link_targets(stream):
                     result.append((i + 1, str(annot.A.URI), []))
                 else:
                     target = page_numbers.get(getattr(dest[0], "objgen", None))
-                    result.append((i + 1, target, [str(each) for each in dest[1:]]))
+                    result.append(
+                        (i + 1, target, [str(each) for each in list(dest)[1:]])
+                    )
     return result
 
 
