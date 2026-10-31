@@ -14,12 +14,13 @@ from io import BytesIO
 from typing import Any, Dict, List, Optional
 
 from pypdf import PageObject, PdfReader, PdfWriter
-from pypdf.generic import ArrayObject, NameObject
+from pypdf.generic import ArrayObject, IndirectObject, NameObject
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 
 from .constants import Annots
 from .patterns import get_widget_key
+from .utils import clone_annotation, map_page_references
 
 
 @lru_cache(maxsize=8)
@@ -343,17 +344,22 @@ def _clone_page_widgets(
     writer: PdfWriter,
     page: PageObject,
     keys: Optional[set[str]],
+    page_references: Dict[int, IndirectObject],
 ) -> List[Any]:
     """
     Clones matching widgets from a single PDF page.
 
     When `keys` is None, every widget annotation on the page is cloned. When it
     is a set, only annotations whose short widget key is present are cloned.
+    Links to internal pages are remapped to the output pages in
+    `page_references`, and links to other pages are dropped.
 
     Args:
         writer (PdfWriter): The PdfWriter for cloning.
         page (PageObject): The source PDF page object.
         keys (Optional[set[str]]): Keys of widgets to clone.
+        page_references (Dict[int, IndirectObject]): Output page references
+            keyed by the object numbers of their source pages.
 
     Returns:
         List[Any]: A list of cloned widget objects.
@@ -362,7 +368,9 @@ def _clone_page_widgets(
     for annot in page.get(Annots, []):
         key = get_widget_key(annot.get_object(), False)
         if keys is None or key in keys:
-            cloned_widgets.append(annot.clone(writer))
+            cloned = clone_annotation(annot, writer, page_references)
+            if cloned is not None:
+                cloned_widgets.append(cloned)
     return cloned_widgets
 
 
@@ -390,8 +398,9 @@ def _collect_from_single_watermark_specific_page(
     widgets_to_copy = defaultdict(list)
     watermark_reader = PdfReader(BytesIO(watermark))
     if page_num < len(watermark_reader.pages):
+        page = watermark_reader.pages[page_num]
         widgets_to_copy[0] = _clone_page_widgets(
-            writer, watermark_reader.pages[page_num], keys
+            writer, page, keys, map_page_references([page], writer.pages)
         )
     return widgets_to_copy
 
@@ -417,8 +426,9 @@ def _collect_from_single_watermark_1_to_1(
     """
     widgets_to_copy = defaultdict(list)
     watermark_reader = PdfReader(BytesIO(watermark))
+    page_references = map_page_references(watermark_reader.pages, writer.pages)
     for i, page in enumerate(watermark_reader.pages):
-        widgets_to_copy[i] = _clone_page_widgets(writer, page, keys)
+        widgets_to_copy[i] = _clone_page_widgets(writer, page, keys, page_references)
     return widgets_to_copy
 
 
@@ -451,7 +461,10 @@ def _collect_from_multiple_watermarks(
         watermark_reader = PdfReader(BytesIO(watermark_stream))
         for j, page in enumerate(watermark_reader.pages):
             if page_num is None or j == page_num:
-                widgets_to_copy[i].extend(_clone_page_widgets(writer, page, keys))
+                page_references = map_page_references([page], writer.pages[i : i + 1])
+                widgets_to_copy[i].extend(
+                    _clone_page_widgets(writer, page, keys, page_references)
+                )
     return widgets_to_copy
 
 

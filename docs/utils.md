@@ -59,6 +59,9 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
 ## Extract pages
 
+???+ warning
+    Extracted pages keep links within the same page. Links to other pages are removed, even when those pages are extracted together.
+
 === "Library"
     The `PdfWrapper` object has a `.pages` attribute, which is a `PdfArray` containing one `PdfWrapper` object per page:
 

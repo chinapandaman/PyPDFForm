@@ -6,26 +6,34 @@ It includes functions for:
 - Removing all widgets (form fields) from a PDF.
 - Splitting PDFs into single-page streams.
 - Merging PDF byte streams while preserving page annotations.
+- Cloning annotations with links remapped to the destination pages.
 - Finding and traversing patterns within PDF widgets.
 - Extracting widget properties based on defined patterns.
 - Generating unique suffixes for internal use.
 """
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from io import BytesIO
 from secrets import choice
 from string import ascii_letters, digits, punctuation
-from typing import Any, List
+from typing import Any, Dict, List, cast
 
-from pypdf import PdfReader, PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject
+from pypdf import PageObject, PdfReader, PdfWriter
+from pypdf.generic import ArrayObject, DictionaryObject, IndirectObject, NameObject
 
 from .constants import (
     SLASH,
     UNIQUE_SUFFIX_LENGTH,
     VERSION_IDENTIFIER_PREFIX,
     VERSION_IDENTIFIERS,
+    A,
     Annots,
+    D,
+    Dest,
+    GoTo,
+    Link,
+    S,
+    Subtype,
 )
 
 
@@ -53,6 +61,103 @@ def remove_all_widgets(pdf: bytes) -> bytes:
     writer.write(result_stream)
     result_stream.seek(0)
     return result_stream.read()
+
+
+def map_page_references(
+    source_pages: Sequence[PageObject],
+    writer_pages: Sequence[PageObject],
+) -> Dict[int, IndirectObject]:
+    """
+    Maps source pages to the writer pages that take their place.
+
+    Pages are paired in order. Source pages without a matching writer page are
+    left unmapped.
+
+    Args:
+        source_pages (Sequence[PageObject]): The pages of a source PDF.
+        writer_pages (Sequence[PageObject]): The writer pages, in the same order
+            as their source pages.
+
+    Returns:
+        Dict[int, IndirectObject]: Writer page references keyed by the object
+            numbers of their source pages.
+    """
+    return {
+        cast(IndirectObject, source.indirect_reference).idnum: cast(
+            IndirectObject, target.indirect_reference
+        )
+        for source, target in zip(source_pages, writer_pages, strict=False)
+    }
+
+
+def _get_link_destination(annot: DictionaryObject) -> tuple:
+    """
+    Gets the destination of a link annotation and the key that holds it.
+
+    Args:
+        annot (DictionaryObject): The annotation dictionary.
+
+    Returns:
+        tuple: `/Dest` or `/A` and the destination, or `(None, None)` for other
+            annotations and actions.
+    """
+    if annot.get(Subtype) != Link:
+        return None, None
+    if Dest in annot:
+        return Dest, annot[Dest]
+
+    action = annot.get(A, DictionaryObject()).get_object()
+    if isinstance(action, DictionaryObject) and action.get(S) == GoTo and D in action:
+        return A, action[D]
+    return None, None
+
+
+def clone_annotation(
+    annotation: Any,
+    writer: PdfWriter,
+    page_references: Dict[int, IndirectObject],
+) -> Any:
+    """
+    Clones an annotation into a writer, remapping links to internal pages.
+
+    A link whose `/Dest` or GoTo action `/D` is an explicit destination refers
+    to a page object of its source PDF. Cloning that reference as is would copy
+    the source page into the writer outside its page tree. Instead, the
+    destination is pointed at the writer page mapped from the source page, and
+    a link to an unmapped page is dropped. Other annotations, including links
+    with named destinations, are cloned unchanged.
+
+    Args:
+        annotation (Any): The source annotation or a reference to it.
+        writer (PdfWriter): The writer to clone the annotation into.
+        page_references (Dict[int, IndirectObject]): Writer page references
+            keyed by the object numbers of their source pages.
+
+    Returns:
+        Any: The cloned annotation, or None if it links to an unmapped page.
+    """
+    annot = annotation.get_object()
+    key, destination = _get_link_destination(annot)
+    if not (
+        isinstance(destination, ArrayObject)
+        and destination
+        and isinstance(destination[0], IndirectObject)
+    ):
+        return annotation.clone(writer)
+
+    target = page_references.get(destination[0].idnum)
+    if target is None:
+        return None
+
+    remapped = ArrayObject([target, *destination[1:]])
+    if key == A:
+        action = DictionaryObject(annot[A])
+        action[NameObject(D)] = remapped
+        remapped = action
+
+    result = annotation.clone(writer, ignore_fields=(1, key))
+    result.get_object()[NameObject(key)] = remapped.clone(writer)
+    return result
 
 
 def get_page_streams(pdf: bytes) -> List[bytes]:
@@ -167,15 +272,14 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     output.append(merged_no_widgets)
 
     widgets_to_copy = {}
-    for i, page in enumerate(pdf_file.pages):
-        widgets_to_copy[i] = []
-        for annot in page.get(Annots, []):
-            widgets_to_copy[i].append(annot.clone(output))
-
-    for i, page in enumerate(other_file.pages):
-        widgets_to_copy[i + len(pdf_file.pages)] = []
-        for annot in page.get(Annots, []):
-            widgets_to_copy[i + len(pdf_file.pages)].append(annot.clone(output))
+    for offset, source in ((0, pdf_file), (len(pdf_file.pages), other_file)):
+        page_references = map_page_references(source.pages, output.pages[offset:])
+        for i, page in enumerate(source.pages):
+            widgets_to_copy[i + offset] = []
+            for annot in page.get(Annots, []):
+                cloned = clone_annotation(annot, output, page_references)
+                if cloned is not None:
+                    widgets_to_copy[i + offset].append(cloned)
 
     for i, page in enumerate(output.pages):
         page[NameObject(Annots)] = (

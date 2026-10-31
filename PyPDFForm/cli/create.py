@@ -126,7 +126,8 @@ def extract(
     The command validates that the requested end page does not precede the
     start page, converts the 1-based CLI page numbers into the slice expected
     by `PdfWrapper.pages`, and writes the extracted pages to the required
-    output path.
+    output path. Each page is extracted separately, so links to other pages
+    are removed.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
@@ -332,7 +333,8 @@ def annotation(
     The command maps input groups such as `text`, `link`, and `highlight` to
     annotation classes, validates the input against the CLI annotation schema,
     creates the corresponding annotation objects, and calls
-    `PdfWrapper.annotate` before writing the modified PDF. A data file can
+    `PdfWrapper.annotate` before writing the modified PDF. A link to a page
+    outside the PDF is reported as a parameter error. A data file can
     define multiple annotations grouped by type. Without `--file`, `--type` and
     the annotation options define one annotation. The data file takes
     precedence when both input forms are supplied.
@@ -368,6 +370,7 @@ def annotation(
         options_param_hint="annotation options",
         output=output,
         element_type=element_type,
+        input_errors=(ValueError,),
     )
 
 
