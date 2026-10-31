@@ -7,7 +7,7 @@ The PyPDFForm release process involves these initial steps:
 
 These steps trigger the deployment CI.
 
-The [Create Release](https://github.com/chinapandaman/PyPDFForm/actions/workflows/create-release.yml) workflow releases the exact commit it runs on, which must be on `master`. The version at that commit must be the next patch, minor, or major version after the latest tag. Rerunning it after the release exists creates nothing and succeeds.
+The [Create Release](https://github.com/chinapandaman/PyPDFForm/actions/workflows/create-release.yml) workflow releases the exact commit it runs on, which must be on `master`. The version at that commit must be the next patch, minor, or major version after the latest tag. The workflow creates the version's tag at that commit before the release, and stops if the tag already points at another commit. Rerunning it after the release exists creates nothing and succeeds.
 
 ## Versioning
 

@@ -3,13 +3,15 @@
 Creates a new GitHub release for the version at a target commit.
 
 This script reads the version from PyPDFForm/__init__.py at the target commit,
-which must be a full commit SHA reachable from origin/master. The version must
-be the next patch, minor, or major version after the highest vX.Y.Z tag. The
-release is created at exactly that commit and tagged with the new version
-number, and release notes are generated automatically by GitHub.
+which must be a full commit SHA reachable from origin/master. If that version
+is already released with its tag on GitHub pointing at the target commit,
+nothing is created and the script succeeds, so reruns are safe. A tag that
+points at any other commit is rejected.
 
-If the version's tag already points at the target commit, nothing is created
-and the script succeeds, so reruns are safe. Any other failure, including an
+Otherwise, the version must be the next patch, minor, or major version after
+the highest other vX.Y.Z tag. The script creates the tag at the target commit
+on GitHub if it does not exist yet, then creates the release for that tag with
+release notes generated automatically by GitHub. Any failure, including an
 unexpected API response, a request error, or a timeout, exits with status 1.
 
 Requires the GITHUB_TOKEN environment variable for authentication.
@@ -25,10 +27,11 @@ import sys
 
 import requests
 
-RELEASES_URL = "https://api.github.com/repos/chinapandaman/PyPDFForm/releases"
+API_URL = "https://api.github.com/repos/chinapandaman/PyPDFForm"
 RELEASES_PAGE = "https://github.com/chinapandaman/PyPDFForm/releases"
 DEFAULT_BRANCH = "origin/master"
 REQUEST_TIMEOUT = 30
+MAX_TAG_DEPTH = 5
 SHA_PATTERN = re.compile(r"[0-9a-f]{40}")
 VERSION_PATTERN = re.compile(r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)")
 
@@ -41,6 +44,45 @@ def git(*args):
         message = f"Unable to run git: {exc}"
         raise RuntimeError(message) from exc
     return result.returncode, result.stdout.strip()
+
+
+def github(token, method, path, payload=None):
+    """Sends a GitHub API request, raising RuntimeError if it cannot complete."""
+    try:
+        return requests.request(
+            method=method,
+            url=f"{API_URL}/{path}",
+            headers={
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {token}",
+            },
+            json=payload,
+            timeout=REQUEST_TIMEOUT,
+        )
+    except requests.RequestException as exc:
+        message = f"{method} {path} failed: {exc}."
+        if method != "GET":
+            message += (
+                f" It may still have taken effect; check {RELEASES_PAGE}, then rerun."
+            )
+        raise RuntimeError(message) from exc
+
+
+def json_object(response):
+    """Returns the JSON object in a response, or an empty dict otherwise."""
+    try:
+        data = response.json()
+    except ValueError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def unexpected(response, action):
+    """Returns a RuntimeError describing an unexpected API response."""
+    message = (
+        f"Failed to {action}. Status code: {response.status_code}. {response.text}"
+    )
+    return RuntimeError(message)
 
 
 def parse_version(text):
@@ -89,8 +131,8 @@ def read_version(sha):
     return version
 
 
-def latest_tag():
-    """Returns the highest vX.Y.Z tag and its parsed version."""
+def latest_tag(exclude):
+    """Returns the highest vX.Y.Z tag other than exclude and its parsed version."""
     status, output = git("tag", "--list", "v*")
     if status != 0:
         message = "Unable to list tags."
@@ -99,7 +141,7 @@ def latest_tag():
     tags = {}
     for each in output.splitlines():
         version = parse_version(each[1:])
-        if version is not None:
+        if version is not None and each != exclude:
             tags[version] = each
     if not tags:
         message = "No vX.Y.Z tags found to compare against."
@@ -107,15 +149,6 @@ def latest_tag():
 
     version = max(tags)
     return tags[version], version
-
-
-def tag_commit(tag):
-    """Returns the commit SHA that tag points at."""
-    status, sha = git("rev-parse", f"{tag}^{{commit}}")
-    if status != 0:
-        message = f"Unable to resolve the commit for {tag}."
-        raise RuntimeError(message)
-    return sha
 
 
 def next_versions(version):
@@ -128,77 +161,102 @@ def next_versions(version):
     ]
 
 
-def create_release(tag, sha):
-    """Creates the release at sha, raising RuntimeError unless GitHub confirms it."""
-    token = os.environ.get("GITHUB_TOKEN")
-    if not token:
-        message = "GITHUB_TOKEN is not set."
-        raise RuntimeError(message)
+def remote_tag_commit(token, tag):
+    """Returns the commit SHA that tag points at on GitHub, or None if it is absent."""
+    response = github(token, "GET", f"git/ref/tags/{tag}")
+    if response.status_code == 404:
+        return None
+    if response.status_code != 200:
+        raise unexpected(response, f"look up tag {tag}")
 
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "Authorization": f"Bearer {token}",
-    }
+    target = json_object(response).get("object")
+    for _ in range(MAX_TAG_DEPTH):
+        if not isinstance(target, dict):
+            break
+        sha = target.get("sha")
+        if not isinstance(sha, str) or not SHA_PATTERN.fullmatch(sha):
+            break
+        if target.get("type") == "commit":
+            return sha
+        if target.get("type") != "tag":
+            break
+
+        # Annotated tags point at a tag object; follow it to the commit.
+        response = github(token, "GET", f"git/tags/{sha}")
+        if response.status_code != 200:
+            raise unexpected(response, f"look up tag {tag}")
+        target = json_object(response).get("object")
+
+    message = f"Tag {tag} on GitHub does not resolve to a commit."
+    raise RuntimeError(message)
+
+
+def release_exists(token, tag):
+    """Returns whether GitHub has a release for tag."""
+    response = github(token, "GET", f"releases/tags/{tag}")
+    if response.status_code == 404:
+        return False
+    if response.status_code != 200:
+        raise unexpected(response, f"look up the release for {tag}")
+    return True
+
+
+def create_tag(token, tag, sha):
+    """Creates tag at sha on GitHub, failing if the tag already exists."""
+    response = github(
+        token, "POST", "git/refs", {"ref": f"refs/tags/{tag}", "sha": sha}
+    )
+    if response.status_code != 201:
+        raise unexpected(response, f"create tag {tag} at {sha}")
+
+
+def create_release(token, tag, sha):
+    """Creates the release for tag, which must already point at sha on GitHub."""
+    # GitHub ignores target_commitish while the tag exists; it only applies
+    # if the tag was deleted after it was checked.
     body = {
         "tag_name": tag,
         "target_commitish": sha,
         "name": tag,
         "generate_release_notes": True,
     }
-
-    try:
-        response = requests.post(
-            url=RELEASES_URL,
-            headers=headers,
-            json=body,
-            timeout=REQUEST_TIMEOUT,
-        )
-    except requests.RequestException as exc:
-        message = (
-            f"Request to create {tag} failed: {exc}. The release may still have "
-            f"been created; check {RELEASES_PAGE}, then rerun."
-        )
-        raise RuntimeError(message) from exc
-
+    response = github(token, "POST", "releases", body)
     if response.status_code != 201:
-        message = (
-            f"Failed creating {tag}. Status code: {response.status_code}. "
-            f"{response.text}"
-        )
+        error = unexpected(response, f"create release {tag}")
+        message = f"{error} Tag {tag} points at {sha}; rerun to create the release."
         raise RuntimeError(message)
 
-    try:
-        data = response.json()
-    except ValueError:
-        data = None
-    if (
-        not isinstance(data, dict)
-        or data.get("tag_name") != tag
-        or data.get("target_commitish") != sha
-    ):
+    if json_object(response).get("tag_name") != tag:
         message = (
-            f"GitHub reported a new release, but not {tag} at {sha}; "
-            f"check {RELEASES_PAGE}."
+            f"GitHub reported a new release, but not for {tag}; check {RELEASES_PAGE}."
         )
         raise RuntimeError(message)
 
 
 def release(sha):
-    """Releases the version at sha unless its tag already points at sha."""
+    """Releases the version at sha unless it is already released there."""
     check_target(sha)
     version = read_version(sha)
-    latest, latest_version = latest_tag()
     tag = format_tag(version)
-    print(f"Latest tag: {latest}. Target: {tag} at {sha}.")
+    print(f"Target: {tag} at {sha}.")
 
-    if version == latest_version:
-        tagged = tag_commit(latest)
-        if tagged == sha:
-            print(f"{tag} is already released at {sha}; nothing created.")
-            return
-        message = f"{tag} is already released at {tagged}; bump the version first."
+    token = os.environ.get("GITHUB_TOKEN")
+    if not token:
+        message = "GITHUB_TOKEN is not set."
         raise RuntimeError(message)
 
+    tagged = remote_tag_commit(token, tag)
+    if tagged is not None and tagged != sha:
+        message = (
+            f"{tag} already points at {tagged}, not {sha}; bump the version first."
+        )
+        raise RuntimeError(message)
+    if tagged == sha and release_exists(token, tag):
+        print(f"{tag} is already released at {sha}; nothing created.")
+        return
+
+    latest, latest_version = latest_tag(tag)
+    print(f"Latest other tag: {latest}.")
     allowed = next_versions(latest_version)
     if version not in allowed:
         message = (
@@ -207,7 +265,10 @@ def release(sha):
         )
         raise RuntimeError(message)
 
-    create_release(tag, sha)
+    if tagged is None:
+        create_tag(token, tag, sha)
+        print(f"Created tag {tag} at {sha}.")
+    create_release(token, tag, sha)
     print(f"Successfully created {tag} at {sha}.")
 
 
