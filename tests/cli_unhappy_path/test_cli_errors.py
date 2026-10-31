@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import json
 import os
+import shutil
 
 import pytest
 from typer.testing import CliRunner
 
+from PyPDFForm import PdfWrapper
 from PyPDFForm.cli.root import cli_app
 
 runner = CliRunner()
@@ -386,6 +389,71 @@ def test_update_field_schema_error(pdf_samples, tmp_path):
     assert_cli_error(
         result, "Invalid JSON file at test.alignment", output_path=output_path
     )
+
+
+@pytest.mark.cli_test
+def test_update_field_unsupported_property_option(pdf_samples, tmp_path):
+    output_path = os.path.join(tmp_path, "output.pdf")
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "update",
+            "field",
+            os.path.join(pdf_samples, "sample_template.pdf"),
+            "--field",
+            "check",
+            "--max_length",
+            "5",
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert_cli_error(
+        result,
+        "Checkbox field 'check' does not support property",
+        "'max_length'",
+        output_path=output_path,
+    )
+
+
+@pytest.mark.cli_test
+def test_update_field_unsupported_property_file(pdf_samples, font_samples, tmp_path):
+    pdf_path = os.path.join(tmp_path, "sample_template.pdf")
+    shutil.copyfile(os.path.join(pdf_samples, "sample_template.pdf"), pdf_path)
+    with open(pdf_path, "rb") as f:
+        expected = f.read()
+
+    data = {
+        "test": {
+            "font": os.path.join(font_samples, "LiberationSerif-Regular.ttf"),
+            "max_length": 2,
+        },
+        "check": {"size": 20, "max_length": 5},
+    }
+    data_path = tmp_path / "data.json"
+    data_path.write_text(json.dumps(data), encoding="utf-8")
+
+    result = runner.invoke(cli_app, ["update", "field", pdf_path, "-f", str(data_path)])
+
+    assert_cli_error(
+        result,
+        "Checkbox field 'check' does not support property",
+        "'max_length'",
+    )
+    with open(pdf_path, "rb") as f:
+        assert f.read() == expected
+
+    del data["check"]["max_length"]
+    data_path.write_text(json.dumps(data), encoding="utf-8")
+
+    result = runner.invoke(cli_app, ["update", "field", pdf_path, "-f", str(data_path)])
+
+    assert result.exit_code == 0
+    widgets = PdfWrapper(pdf_path).widgets
+    assert widgets["test"].max_length == 2
+    assert widgets["check"].width == widgets["check"].height == 20
 
 
 @pytest.mark.cli_test

@@ -30,6 +30,8 @@ class Dropdown(Widget):
         sample_value: Returns a sample value for the dropdown.
     """
 
+    TYPE_SPECIFIC_PROPERTIES = frozenset({"font", "font_size", "font_color", "choices"})
+
     def __init__(
         self,
         name: str,

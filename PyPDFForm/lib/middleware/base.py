@@ -39,7 +39,27 @@ class Widget:
     built from existing PDF form fields. It stores extracted field state,
     queues hook calls when mutable attributes are changed, and exposes schema
     and sample-data helpers used by `PdfWrapper`.
+
+    Attributes:
+        TYPE_SPECIFIC_PROPERTIES (frozenset): Properties supported only by this
+            widget type and its subclasses. Subclasses declare their own.
     """
+
+    TYPE_SPECIFIC_PROPERTIES = frozenset()
+    _ALL_TYPE_SPECIFIC_PROPERTIES = set()
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        """
+        Registers the type-specific properties declared by a subclass.
+
+        The registry holds the properties declared by every widget type, so a
+        widget can reject properties that only other widget types support.
+
+        Args:
+            **kwargs: Keyword arguments passed to the parent hook.
+        """
+        super().__init_subclass__(**kwargs)
+        Widget._ALL_TYPE_SPECIFIC_PROPERTIES.update(cls.TYPE_SPECIFIC_PROPERTIES)
 
     def __init__(
         self,
@@ -106,12 +126,19 @@ class Widget:
         This method overrides the default __setattr__ method to
         trigger hooks when certain attributes are set to non-None values. It also
         tracks existing attributes that were explicitly set so those values can be
-        preserved across widget-cache rebuilds.
+        preserved across widget-cache rebuilds. Type-specific properties that the
+        widget does not support are rejected before any change.
 
         Args:
             name (str): The name of the attribute.
             value (Any): The value of the attribute.
+
+        Raises:
+            AttributeError: Raised when the widget type does not support the
+                property.
         """
+        self.check_property_supported(name)
+
         if (
             hasattr(self, "SET_ATTR_TRIGGER_HOOK_MAP")
             and name in self.SET_ATTR_TRIGGER_HOOK_MAP
@@ -127,6 +154,31 @@ class Widget:
             self.attr_set_tracker[name] = value
 
         super().__setattr__(name, value)
+
+    def check_property_supported(self, name: str) -> None:
+        """
+        Checks whether the widget type supports a property.
+
+        Type-specific properties, such as `max_length` or `size`, are supported
+        only by widget types that declare them in `TYPE_SPECIFIC_PROPERTIES`.
+        Other attribute names are not checked.
+
+        Args:
+            name (str): The name of the property.
+
+        Raises:
+            AttributeError: Raised when the widget type does not support the
+                property.
+        """
+        if (
+            name in Widget._ALL_TYPE_SPECIFIC_PROPERTIES
+            and name not in self.TYPE_SPECIFIC_PROPERTIES
+        ):
+            msg = (
+                f"{type(self).__name__} field '{self.name}' does not support "
+                f"property '{name}'."
+            )
+            raise AttributeError(msg)
 
     @property
     def name(self) -> str:

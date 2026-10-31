@@ -297,9 +297,10 @@ def field(
 
     The command validates the input against the field update schema, loads the
     PDF with the global CLI options stored in `ctx.obj`, resolves each field
-    name, registers any referenced fonts once per invocation, assigns the
-    requested widget properties, and writes the modified PDF to the requested
-    output path or back to the input file. A data file can update multiple
+    name, checks that each field type supports its requested properties,
+    registers any referenced fonts once per invocation, assigns the requested
+    widget properties, and writes the modified PDF to the requested output path
+    or back to the input file. A data file can update multiple
     fields. Without `--file`, `--field` and the property options update one
     field. The data file takes precedence when both input forms are supplied.
 
@@ -315,8 +316,9 @@ def field(
             Defaults to None.
 
     Raises:
-        typer.BadParameter: Raised when the input file is invalid or a requested
-            field does not exist.
+        typer.BadParameter: Raised when the input file is invalid, a requested
+            field does not exist, or a field type does not support a requested
+            property.
     """
     if data is not None:
         input_data = load_data_file(data, FIELD_SCHEMA, "--file")
@@ -337,12 +339,21 @@ def field(
         field_param_hint = "--field"
 
     obj = PdfWrapper(str(pdf), **ctx.obj)
-    registered_font = {}
+    field_widgets = {}
     for k, each in input_data.items():
         field_widget = get_widget(obj, k, field_param_hint)
+        for param in each:
+            try:
+                field_widget.check_property_supported(param)
+            except AttributeError as exc:
+                cli_bad_parameter(str(exc), param_hint=field_param_hint, cause=exc)
+        field_widgets[k] = field_widget
+
+    registered_font = {}
+    for k, each in input_data.items():
         handle_font_registration(obj, each, registered_font)
         for param, v in each.items():
-            setattr(field_widget, param, v)
+            setattr(field_widgets[k], param, v)
 
     obj.write(output or pdf)
 

@@ -20,6 +20,8 @@ class Checkbox(Widget):
     implements the schema_definition and sample_value properties.
     """
 
+    TYPE_SPECIFIC_PROPERTIES = frozenset({"size"})
+
     def __init__(
         self,
         name: str,

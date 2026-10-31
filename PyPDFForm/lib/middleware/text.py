@@ -24,6 +24,18 @@ class Text(Widget):
     font_size, font_color, comb, alignment, and multiline.
     """
 
+    TYPE_SPECIFIC_PROPERTIES = frozenset(
+        {
+            "font",
+            "font_size",
+            "font_color",
+            "comb",
+            "alignment",
+            "multiline",
+            "max_length",
+        }
+    )
+
     def __init__(
         self,
         name: str,
