@@ -293,3 +293,64 @@ def test_set_text_field_required_sejda(pdf_samples, sejda_template, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+@pytest.mark.parametrize(
+    ("template", "key", "supported"),
+    [
+        (
+            "sample_template_with_radio_button.pdf",
+            "test",
+            [
+                "font",
+                "font_size",
+                "font_color",
+                "comb",
+                "alignment",
+                "multiline",
+                "max_length",
+            ],
+        ),
+        ("sample_template_with_radio_button.pdf", "check", ["size"]),
+        ("sample_template_with_radio_button.pdf", "radio_1", ["size"]),
+        (
+            os.path.join("dropdown", "sample_template_with_dropdown.pdf"),
+            "dropdown_1",
+            ["font", "font_size", "font_color", "choices"],
+        ),
+        ("sample_template_with_full_key.pdf", "Signature17", []),
+        ("sample_template_with_image_field.pdf", "image_1", []),
+    ],
+)
+def test_set_unsupported_widget_property(pdf_samples, template, key, supported):
+    type_specific_properties = [
+        "font",
+        "font_size",
+        "font_color",
+        "comb",
+        "alignment",
+        "multiline",
+        "max_length",
+        "choices",
+        "size",
+    ]
+    unsupported = [each for each in type_specific_properties if each not in supported]
+    obj = PdfWrapper(os.path.join(pdf_samples, template))
+    expected = obj.read()
+    widget = obj.widgets[key]
+    attr_set_tracker = dict(widget.attr_set_tracker)
+
+    for name in unsupported:
+        for value in (1, None):
+            with pytest.raises(
+                AttributeError,
+                match=rf"^{type(widget).__name__} field '{key}' does not support "
+                rf"property '{name}'\.$",
+            ):
+                setattr(widget, name, value)
+
+        assert not hasattr(widget, name)
+
+    assert not widget.hooks_to_trigger
+    assert widget.attr_set_tracker == attr_set_tracker
+    assert obj.read() == expected
