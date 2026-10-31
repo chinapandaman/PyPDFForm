@@ -36,3 +36,4 @@ serve-files:
 
 clean-temp:
 	rm -f ./temp/*.pdf ./temp/*.png
+	rm -rf ./temp/pdf_diffs

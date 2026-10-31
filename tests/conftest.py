@@ -11,6 +11,7 @@ def pytest_configure(config):
 
 def pytest_addoption(parser):
     parser.addoption("--regenerate", action="store", default="0")
+    parser.addoption("--regenerate-dir", action="store", default="")
 
 
 @pytest.fixture(autouse=True)
@@ -22,7 +23,20 @@ def _generate_new_pdf_samples(request):
         and request.config.results
         and not request.config.results.get("skip_regenerate")
     ):
-        with open(request.config.results["expected_path"], "wb+") as f:
+        output_path = request.config.results["expected_path"]
+        regenerate_dir = request.config.getoption("--regenerate-dir")
+        if regenerate_dir:
+            # write to the same relative path under regenerate_dir instead of
+            # overwriting the expected PDF
+            output_path = os.path.join(
+                regenerate_dir,
+                os.path.relpath(
+                    output_path, os.path.join(os.path.dirname(__file__), "..")
+                ),
+            )
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+        with open(output_path, "wb+") as f:
             f.write(request.config.results["stream"])
 
 

@@ -2,14 +2,16 @@
 """
 Generates and opens a visual diff of two PDF files.
 
-This script takes a "before" PDF file path. It assumes a corresponding
-"after" PDF exists in the 'temp' directory (created by create_pdf_diff.py).
-It converts both PDFs to PNG images, creates a visual diff image, and
-prints the pixel difference count.
+This script takes a "before" PDF file path, an "after" PDF file path, and an
+output directory. It converts both PDFs to PNG images in the output
+directory, creates a visual diff image, and prints the pixel difference count.
 
 Finally, it attempts to open the before, after, and diff images in a
 web browser or the default image viewer, and prints their accessible URLs
 for web-based environments.
+
+Usage:
+    python scripts/open_pdf_diff.py <before_pdf> <after_pdf> <output_dir>
 """
 
 import os
@@ -18,26 +20,28 @@ import sys
 import webbrowser
 
 if __name__ == "__main__":
-    project_root = "PyPDFForm"
-    if os.environ.get("PYPDFFORM_ENV") == "container":
-        project_root = project_root.lower()
-    before_path = sys.argv[1]
-    file_name = "_".join(before_path.split("/"))
-    after_path = os.path.join(os.path.dirname(__file__), "..", "temp", file_name)
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    before_path = os.path.abspath(sys.argv[1])
+    after_path = os.path.abspath(sys.argv[2])
+    output_dir = os.path.abspath(sys.argv[3])
 
-    before = os.path.join(os.path.dirname(__file__), "..", "temp", "before.png")
-    after = os.path.join(os.path.dirname(__file__), "..", "temp", "after.png")
-    pdf_diff = os.path.join(os.path.dirname(__file__), "..", "temp", "pdf_diff.png")
+    before = os.path.join(output_dir, "before.png")
+    after = os.path.join(output_dir, "after.png")
+    pdf_diff = os.path.join(output_dir, "pdf_diff.png")
 
-    subprocess.run(["pdftoppm", "-png", before_path, "temp/before"])
-    subprocess.run(["pdftoppm", "-png", after_path, "temp/after"])
+    subprocess.run(
+        ["pdftoppm", "-png", before_path, os.path.join(output_dir, "before")]
+    )
+    subprocess.run(["pdftoppm", "-png", after_path, os.path.join(output_dir, "after")])
 
     magick = ["convert"]
     if sys.platform == "darwin":
         magick = ["magick"]
 
-    subprocess.run(magick + ["temp/before-*.png", "-append", before])
-    subprocess.run(magick + ["temp/after-*.png", "-append", after])
+    subprocess.run(
+        magick + [os.path.join(output_dir, "before-*.png"), "-append", before]
+    )
+    subprocess.run(magick + [os.path.join(output_dir, "after-*.png"), "-append", after])
 
     pdf_diff_count = subprocess.run(
         ["compare", "-metric", "AE", before, after, pdf_diff], capture_output=True
@@ -70,7 +74,7 @@ if __name__ == "__main__":
             webbrowser.get(chrome).open(after_path)
             webbrowser.get(chrome).open(pdf_diff)
 
-    print("Before:", base_url + before_path.split(f"{project_root}/")[1])
-    print("After:", base_url + after_path.split(f"{project_root}/./scripts/../")[1])
-    print("Diff:", base_url + pdf_diff.split(f"{project_root}/./scripts/../")[1])
+    print("Before:", base_url + os.path.relpath(before_path, project_root))
+    print("After:", base_url + os.path.relpath(after_path, project_root))
+    print("Diff:", base_url + os.path.relpath(pdf_diff, project_root))
     print("Diff Count:", pdf_diff_count.stderr or 0)
