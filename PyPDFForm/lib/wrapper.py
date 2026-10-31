@@ -188,7 +188,8 @@ class PdfWrapper:
 
         Field-name conflicts are resolved by adding a unique suffix to names in the right-hand
         wrapper. Renames are committed only when queued, modifying that wrapper. The result uses
-        the left-hand wrapper's user parameters and inherits its registered custom fonts.
+        the left-hand wrapper's user parameters and inherits its registered custom fonts. Links
+        to internal pages keep pointing to the same pages in the merged PDF.
 
         Collision-free merges work in full-name mode. A collision requiring a rename of a
         full-name field still raises `NotImplementedError`.
@@ -495,8 +496,8 @@ class PdfWrapper:
 
         This allows you to work with individual pages of the PDF. Each page wrapper
         preserves the page's original widgets and inherits the current wrapper's user
-        parameters. Custom font registration events are replayed onto the page wrappers
-        when needed.
+        parameters. Links to other pages are removed. Custom font registration events
+        are replayed onto the page wrappers when needed.
 
         Returns:
             Sequence[PdfWrapper]: A list of `PdfWrapper` objects, one for each page in the PDF.

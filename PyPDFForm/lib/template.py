@@ -14,9 +14,15 @@ from io import BytesIO
 from typing import Dict, List, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject, TextStringObject
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    IndirectObject,
+    NameObject,
+    TextStringObject,
+)
 
-from .annotations import AnnotationTypes
+from .annotations import AnnotationTypes, LinkAnnotation
 from .constants import (
     COMB,
     JS,
@@ -24,6 +30,7 @@ from .constants import (
     READ_ONLY,
     REQUIRED,
     Annots,
+    Dest,
     JavaScript,
     OpenAction,
     S,
@@ -497,6 +504,32 @@ def _group_annotations_by_page(
     return result
 
 
+def _get_annotation_properties(
+    annotation: AnnotationTypes,
+    page_references: List[IndirectObject],
+) -> dict:
+    """
+    Builds the PDF dictionary of an annotation for a target PDF.
+
+    A link to an internal page gets a destination that refers to the target
+    page in `page_references`.
+
+    Args:
+        annotation (AnnotationTypes): The annotation object to build.
+        page_references (List[IndirectObject]): References to the pages of the
+            target PDF, in page order.
+
+    Returns:
+        dict: The PDF dictionary of the annotation.
+    """
+    result = annotation.get_specific_properties()
+    if isinstance(annotation, LinkAnnotation):
+        destination = annotation.get_destination(page_references)
+        if destination is not None:
+            result[NameObject(Dest)] = destination
+    return result
+
+
 def create_annotations(
     template: bytes,
     annotations: List[AnnotationTypes],
@@ -507,7 +540,8 @@ def create_annotations(
     This function takes a PDF template and a list of annotation objects, builds
     their PDF dictionaries, and appends them to the `/Annots` array for each
     target page. Existing annotations are preserved, and annotation page numbers
-    are 1-based.
+    are 1-based. Links to internal pages refer to the target page objects, and
+    every annotation is built before any page changes.
 
     Args:
         template (bytes): The PDF template to add annotations to.
@@ -516,19 +550,28 @@ def create_annotations(
 
     Returns:
         bytes: The updated PDF stream with the added annotations.
+
+    Raises:
+        ValueError: If a link points to a page outside the PDF.
     """
     writer = PdfWriter(BytesIO(template))
-    annotations_by_page = _group_annotations_by_page(annotations)
+    page_references = [page.indirect_reference for page in writer.pages]
+    annotations_by_page = {
+        page_num: [
+            _get_annotation_properties(annotation, page_references)
+            for annotation in page_annotations
+        ]
+        for page_num, page_annotations in _group_annotations_by_page(
+            annotations
+        ).items()
+    }
 
     for i, page in enumerate(writer.pages):
         page_num = i + 1
         if page_num not in annotations_by_page:
             continue
 
-        page_annotations = ArrayObject([])
-        for annotation in annotations_by_page[page_num]:
-            page_annotations.append(annotation.get_specific_properties())
-
+        page_annotations = ArrayObject(annotations_by_page[page_num])
         if Annots in page:
             page[NameObject(Annots)] += page_annotations
         else:

@@ -312,6 +312,7 @@ def create_elements_from_file(
     options_param_hint: str,
     output: Path | None = None,
     element_type: str | None = None,
+    input_errors: tuple[type[Exception], ...] = (),
 ) -> None:
     """
     Creates PDF elements from a data file or command-line options.
@@ -321,7 +322,8 @@ def create_elements_from_file(
     from the additional command-line options stored in ``ctx.args``. The data
     file takes precedence when both input forms are supplied. Each definition
     is constructed after optional font registration and passed to `method_name`
-    on `PdfWrapper`.
+    on `PdfWrapper`. Errors of the `input_errors` types raised by that method
+    are reported against the input form that was used, without writing output.
 
     Args:
         pdf (Path): The path to the input PDF file.
@@ -342,6 +344,9 @@ def create_elements_from_file(
             omitted, the input PDF is overwritten. Defaults to None.
         element_type (str, optional): Element type selected for command-line
             input. Defaults to None.
+        input_errors (tuple[type[Exception], ...], optional): Exception types
+            raised by `method_name` for invalid element definitions. Defaults to
+            an empty tuple.
     """
     if data is not None:
         input_data = load_data_file(data, schema, file_param_hint)
@@ -370,4 +375,13 @@ def create_elements_from_file(
             handle_font_registration(obj, each, registered_font)
             ungrouped_input.append(element_map[k](**each))
 
-    getattr(obj, method_name)(ungrouped_input).write(output or pdf)
+    try:
+        result = getattr(obj, method_name)(ungrouped_input)
+    except input_errors as exc:
+        cli_bad_parameter(
+            str(exc),
+            param_hint=file_param_hint if data is not None else options_param_hint,
+            cause=exc,
+        )
+
+    result.write(output or pdf)

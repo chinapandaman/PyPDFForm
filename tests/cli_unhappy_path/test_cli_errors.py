@@ -282,6 +282,41 @@ def test_create_annotation_rejects_multiple_link_destinations(pdf_samples, tmp_p
 
 
 @pytest.mark.cli_test
+@pytest.mark.parametrize("use_file", [False, True])
+def test_create_annotation_link_page_out_of_range(pdf_samples, tmp_path, use_file):
+    output_path = os.path.join(tmp_path, "output.pdf")
+    link = {"page_number": 1, "x": 1, "y": 1, "width": 10, "height": 10, "page": 2}
+    if use_file:
+        data_path = tmp_path / "data.json"
+        data_path.write_text(json.dumps({"link": [link]}), encoding="utf-8")
+        args, param_hint = ["-f", str(data_path)], "--file"
+    else:
+        args = ["--type", "link"]
+        for k, v in link.items():
+            args += [f"--{k}", str(v)]
+        param_hint = "annotation options"
+
+    result = runner.invoke(
+        cli_app,
+        [
+            "create",
+            "annotation",
+            os.path.join(pdf_samples, "dummy.pdf"),
+            *args,
+            "-o",
+            output_path,
+        ],
+    )
+
+    assert_cli_error(
+        result,
+        f"Invalid value for {param_hint}",
+        "Link page 2 must satisfy",
+        output_path=output_path,
+    )
+
+
+@pytest.mark.cli_test
 def test_create_grid_invalid_range(pdf_samples):
     result = runner.invoke(
         cli_app,
