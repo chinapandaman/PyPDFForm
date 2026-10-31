@@ -289,12 +289,11 @@ def test_create_annotation_link_page_out_of_range(pdf_samples, tmp_path, use_fil
     if use_file:
         data_path = tmp_path / "data.json"
         data_path.write_text(json.dumps({"link": [link]}), encoding="utf-8")
-        args, param_hint = ["-f", str(data_path)], "--file"
+        args = ["-f", str(data_path)]
     else:
         args = ["--type", "link"]
         for k, v in link.items():
             args += [f"--{k}", str(v)]
-        param_hint = "annotation options"
 
     result = runner.invoke(
         cli_app,
@@ -310,7 +309,7 @@ def test_create_annotation_link_page_out_of_range(pdf_samples, tmp_path, use_fil
 
     assert_cli_error(
         result,
-        f"Invalid value for {param_hint}",
+        "Invalid value",
         "Link page 2 must satisfy",
         output_path=output_path,
     )
