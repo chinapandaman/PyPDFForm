@@ -4,11 +4,12 @@ Closes issues that have been waiting for their reporter for too long.
 
 A maintainer adds the "awaiting response" label to an issue when they need
 more information from the reporter. This script closes an open issue only if
-that label was last added at least 30 days ago and nobody other than a
-maintainer (the repository owner, members, and collaborators) has commented
-since. Issues without the label and pull requests are never closed. Each
-closed issue gets a comment saying that it was not resolved and is closed as
-"not planned", so inactivity is never recorded as a resolution.
+its timeline shows that the label was last added at least 30 days ago and not
+removed since, and nobody other than a maintainer (the repository owner,
+members, and collaborators) has commented since. Issues without the label and
+pull requests are never closed. Each closed issue gets a comment saying that
+it was not resolved and is closed as "not planned", so inactivity is never
+recorded as a resolution.
 
 By default, the script only prints what it would do. Pass --apply to comment
 on and close the issues, which requires the GITHUB_TOKEN environment
@@ -163,16 +164,23 @@ def review(session, issue, now):
         f"list the timeline of issue #{number}",
     )
 
-    labeled_at = None
+    # The latest addition or removal of the label decides. A removal wins a
+    # tie, so an issue is never closed if the label might have been removed.
+    latest = None
     for event in events:
-        if text(event, "event", f"an event of issue #{number}") != "labeled":
+        kind = text(event, "event", f"an event of issue #{number}")
+        if kind not in {"labeled", "unlabeled"}:
             continue
-        what = f"a labeled event of issue #{number}"
+        what = f"issue #{number}'s {kind} event"
         if is_label(text(event.get("label"), "name", what)):
-            created = timestamp(event, what)
-            labeled_at = created if labeled_at is None else max(labeled_at, created)
-    if labeled_at is None:
+            change = (timestamp(event, what), kind == "unlabeled")
+            latest = change if latest is None else max(latest, change)
+    if latest is None:
         return False, f"no record of when {LABEL!r} was added", False
+    changed_at, removed = latest
+    if removed:
+        return False, f"{LABEL!r} removed on {changed_at.date()}", False
+    labeled_at = changed_at
 
     reply = None
     commented = False
