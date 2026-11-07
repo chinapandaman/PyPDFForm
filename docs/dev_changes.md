@@ -20,6 +20,6 @@ Your PR will be reviewed before merging into the master branch. If your changes 
 Additionally, your PR must pass these CI checks:
 
 * [Linting](https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-linting.yml) on the source code.
-* [Tests](https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml) will be run on three mainstream operating systems: `ubuntu`, `windows`, and `macos`, and across all Python versions PyPDFForm supports on each OS.
+* [Tests](https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml) will be run on three mainstream operating systems: `ubuntu`, `windows`, and `macos`, and across all Python versions PyPDFForm supports on each OS. The same workflow builds the sdist and wheel and checks them as described in [releasing](dev_release.md#deploy-process).
 
 Once the CI is green and your code looks good, the PR will be merged into the master branch. They will be deployed on the next release.

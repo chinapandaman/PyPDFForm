@@ -1,13 +1,22 @@
 name: Create Release
 permissions:
-  contents: write
+  contents: read
 
 on:
   workflow_dispatch:
     
 jobs:
+  tests:
+    uses: ./.github/workflows/python-package.yml
+
+  linting:
+    uses: ./.github/workflows/python-linting.yml
+
   build:
+    needs: [tests, linting]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v7
         with:
