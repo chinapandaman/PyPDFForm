@@ -39,6 +39,24 @@ When creating a GitHub issue, follow these guidelines:
     * A PDF form template used by the code snippet.
     * Screenshots that can help visualize the issue.
 
+## Issue triage
+
+Maintainers, meaning the repository owner and collaborators, triage issues. They decide:
+
+* Whether a report is a confirmed defect, a feature or roadmap request, or needs more information.
+* Whether a change to documented Python API or CLI behavior is acceptable, and which [version](dev_release.md#versioning) releases it.
+* When an issue is closed. Confirmed defects and roadmap decisions stay open until they are fixed or a maintainer closes them with a reason.
+
+Report vulnerabilities through a security advisory as described in the [security policy](https://github.com/chinapandaman/PyPDFForm/blob/master/SECURITY.md), not in an issue.
+
+When a maintainer needs more information, they ask for it in a comment and add the `awaiting response` label. A nightly job closes a labeled issue once 30 days have passed since the label was added or a maintainer last commented, whichever is later. A comment from anyone else pauses this until a maintainer comments again, and the maintainer removes the label once the issue no longer needs a response. The job closes issues as not planned, with a comment saying the issue was not resolved. Comment with the requested information and a maintainer will reopen it. The job never closes pull requests or issues without the label.
+
+To preview what the job would do without changing anything, run:
+
+```shell
+python scripts/close_staled_issues.py
+```
+
 ## Opening pull requests
 
 Before opening a pull request, create an issue. When opening the pull request, follow these guidelines:

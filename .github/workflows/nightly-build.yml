@@ -27,7 +27,7 @@ jobs:
       - name: Close Staled Issues
         env:
           GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
-        run: python scripts/close_staled_issues.py
+        run: python scripts/close_staled_issues.py --apply
 
   backup-on-codeberg:
     runs-on: ubuntu-latest
