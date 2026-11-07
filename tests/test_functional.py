@@ -10,8 +10,9 @@ from unittest.mock import patch
 
 import pytest
 from jsonschema import ValidationError, validate
-from pikepdf import Dictionary, Name, Pdf
+from pikepdf import Array, Dictionary, Name, Pdf, Stream
 from pypdf import PdfReader
+from reportlab.pdfgen.canvas import Canvas
 from typer.testing import CliRunner
 
 from PyPDFForm import (
@@ -1557,6 +1558,318 @@ def test_invalid_link_page(template_stream):
             )
 
         assert form.read() == stream
+
+
+def build_cross_page_form(page_action=True):
+    pdf = Pdf.new()
+    for _ in range(3):
+        pdf.add_blank_page()
+    page_1, page_2, page_3 = (page.obj for page in pdf.pages)
+
+    def stream(data, **kwargs):
+        return pdf.make_stream(data, **kwargs)
+
+    def appearance(text):
+        return stream(
+            b"BT /Helv 10 Tf 2 2 Td (" + text + b") Tj ET",
+            Type=Name.XObject,
+            Subtype=Name.Form,
+            BBox=[0, 0, 100, 20],
+        )
+
+    def annotate(page, rect, **kwargs):
+        annot = pdf.make_indirect(
+            Dictionary(Type=Name.Annot, Rect=rect, P=page, **kwargs)
+        )
+        if "/Annots" not in page:
+            page.Annots = pdf.make_indirect([])
+        page.Annots.append(annot)
+        return annot
+
+    def goto(page):
+        return Dictionary(S=Name.GoTo, D=[page, Name.Fit])
+
+    page_1.Contents = stream(b"BT /F1 12 Tf 30 700 Td (KEEP_PAGE_1) Tj ET")
+    if page_action:
+        page_1.AA = Dictionary(O=goto(page_2))
+    page_2.Contents = stream(b"BT /F1 12 Tf 30 700 Td (SECRET_PAGE_2) Tj ET /Im0 Do")
+    page_2.Resources = Dictionary(
+        XObject=Dictionary(
+            Im0=stream(
+                b"SECRET_IMAGE",
+                Type=Name.XObject,
+                Subtype=Name.Image,
+                Width=12,
+                Height=1,
+                ColorSpace=Name.DeviceGray,
+                BitsPerComponent=8,
+            )
+        )
+    )
+
+    # A text field with widgets on pages 1 and 2.
+    shared = pdf.make_indirect(Dictionary(FT=Name.Tx, T="shared", V="shared_value"))
+    shared.Kids = [
+        annotate(
+            page,
+            [10, 10, 110, 30],
+            Subtype=Name.Widget,
+            Parent=shared,
+            AP=Dictionary(N=appearance(text)),
+        )
+        for page, text in ((page_1, b"shared_value"), (page_2, b"SECRET_SHARED_AP"))
+    ]
+    # A parent field whose children are on pages 1 and 2.
+    person = pdf.make_indirect(Dictionary(T="person"))
+    person.Kids = [
+        annotate(
+            page,
+            [10, 50, 110, 70],
+            Subtype=Name.Widget,
+            FT=Name.Tx,
+            T=name,
+            V=value,
+            Parent=person,
+        )
+        for page, name, value in (
+            (page_1, "name", "KEEP_NAME"),
+            (page_2, "address", "SECRET_ADDRESS"),
+        )
+    ]
+    # A parent field whose only child is on page 2.
+    contact = pdf.make_indirect(Dictionary(T="contact"))
+    contact.Kids = [
+        annotate(
+            page_2,
+            [10, 90, 110, 110],
+            Subtype=Name.Widget,
+            FT=Name.Tx,
+            T="solo",
+            V="SECRET_SOLO",
+            Parent=contact,
+        )
+    ]
+    # A radio group with buttons on pages 1 and 3.
+    radio = pdf.make_indirect(
+        Dictionary(FT=Name.Btn, Ff=49152, T="radio", V=Name("/b"))
+    )
+    radio.Kids = [
+        annotate(
+            page,
+            [10, 130, 20, 140],
+            Subtype=Name.Widget,
+            Parent=radio,
+            AS=state if selected else Name.Off,
+            AP=Dictionary(N=Dictionary({state: appearance(text)})),
+        )
+        for page, state, text, selected in (
+            (page_1, "/a", b"radio_a", False),
+            (page_3, "/b", b"SECRET_RADIO_AP", True),
+        )
+    ]
+    note = annotate(page_1, [200, 200, 220, 220], Subtype=Name.Text, Contents="note")
+    note.Popup = annotate(page_1, [220, 200, 320, 260], Subtype=Name.Popup, Parent=note)
+    buttons = [
+        annotate(
+            page_1,
+            [300, y, 350, y + 20],
+            Subtype=Name.Widget,
+            FT=Name.Btn,
+            Ff=65536,
+            T=name,
+            **actions,
+        )
+        for y, name, actions in (
+            (
+                10,
+                "next",
+                {"A": Dictionary(S=Name.GoTo, D=pdf.make_indirect([page_2, Name.Fit]))},
+            ),
+            (50, "last", {"AA": Dictionary(U=goto(page_3), D=goto(page_1))}),
+            (90, "top", {"A": goto(page_1)}),
+        )
+    ]
+    annotate(page_1, [400, 10, 450, 30], Subtype=Name.Link, Dest=[page_2, Name.Fit])
+    pdf.Root.AcroForm = pdf.make_indirect(
+        Dictionary(Fields=[shared, person, contact, radio, *buttons])
+    )
+
+    result = BytesIO()
+    pdf.save(result)
+    return result.getvalue()
+
+
+def get_retained_content(stream, markers):
+    found = set()
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for obj in pdf.objects:
+            if isinstance(obj, Stream):
+                data = obj.read_bytes() + obj.stream_dict.unparse(resolved=True)
+            elif isinstance(obj, (Dictionary, Array)):
+                data = obj.unparse(resolved=True)
+            else:
+                continue
+            found.update(marker for marker in markers if marker.encode() in data)
+    return found
+
+
+def check_page_ownership(stream):
+    with Pdf.open(BytesIO(stream)) as pdf:
+        pages = {page.obj.objgen for page in pdf.pages}
+        assert not [
+            obj.objgen
+            for obj in pdf.objects
+            if isinstance(obj, Dictionary)
+            and obj.get("/Type") == Name.Page
+            and obj.objgen not in pages
+        ]
+        annots = {}
+        for page in pdf.pages:
+            for annot in page.get("/Annots", []):
+                annots[annot.objgen] = annot
+                if "/P" in annot:
+                    assert annot.P.objgen == page.obj.objgen
+        for annot in annots.values():
+            parent = annot.get("/Parent") if annot.Subtype == Name.Widget else None
+            while parent is not None:
+                assert all(
+                    kid.objgen in annots or "/Kids" in kid for kid in parent.Kids
+                )
+                parent = parent.get("/Parent")
+
+
+def test_pages_exclude_other_page_content():
+    buffer = BytesIO()
+    canvas = Canvas(buffer)
+    canvas.drawString(30, 700, "KEEP_FIRST_PAGE")
+    canvas.acroForm.textfield(name="field1", x=30, y=600, width=100, height=20)
+    canvas.showPage()
+    canvas.drawString(30, 700, "EXCLUDED_SECRET_SECOND_PAGE")
+    canvas.showPage()
+    canvas.save()
+
+    output = PdfWrapper(buffer.getvalue()).pages[0].read()
+
+    assert get_retained_content(
+        output, ["KEEP_FIRST_PAGE", "EXCLUDED_SECRET_SECOND_PAGE"]
+    ) == {"KEEP_FIRST_PAGE"}
+    check_page_ownership(output)
+    with Pdf.open(BytesIO(output)) as pdf:
+        assert len(pdf.pages) == 1
+        widget = pdf.pages[0].Annots[0]
+        assert widget.P.objgen == pdf.pages[0].obj.objgen
+        assert widget.P.Parent.Count == 1
+    assert PdfWrapper(output).widgets.keys() == {"field1"}
+
+
+def test_pages_keep_only_own_part_of_cross_page_fields():
+    pages = PdfWrapper(build_cross_page_form()).pages
+    page_1_markers = ["KEEP_PAGE_1", "KEEP_NAME", "radio_a"]
+    page_2_markers = [
+        "SECRET_PAGE_2",
+        "SECRET_IMAGE",
+        "SECRET_SHARED_AP",
+        "SECRET_ADDRESS",
+        "SECRET_SOLO",
+    ]
+    page_3_markers = ["SECRET_RADIO_AP"]
+    markers = page_1_markers + page_2_markers + page_3_markers
+    first = pages[0].read()
+    second = pages[1].read()
+
+    for selection, expected in (
+        (pages[0], page_1_markers),
+        (pages[1], page_2_markers),
+        (pages[2], page_3_markers),
+        (pages[0:2], page_1_markers + page_2_markers),
+        (PdfArray([pages[0], pages[2]]).merge(), page_1_markers + page_3_markers),
+    ):
+        stream = selection.read()
+        assert get_retained_content(stream, markers) == set(expected)
+        check_page_ownership(stream)
+        check_page_ownership(PdfWrapper(stream).fill({}).read())
+
+    assert PdfWrapper(first).data == {
+        "shared": "shared_value",
+        "name": "KEEP_NAME",
+        "radio": None,
+    }
+    assert PdfWrapper(second).data == {
+        "shared": "shared_value",
+        "address": "SECRET_ADDRESS",
+        "solo": "SECRET_SOLO",
+    }
+    with Pdf.open(BytesIO(first)) as pdf:
+        page = pdf.pages[0].obj
+        assert "/O" not in page.AA
+        assert [str(annot.Subtype) for annot in page.Annots] == [
+            "/Widget",
+            "/Widget",
+            "/Widget",
+            "/Text",
+            "/Popup",
+            "/Widget",
+            "/Widget",
+            "/Widget",
+        ]
+        shared, name, radio, note, popup, goto_next, goto_last, goto_top = page.Annots
+        for kid in (shared, name, radio):
+            assert [each.objgen for each in kid.Parent.Kids] == [kid.objgen]
+        assert "/A" not in goto_next
+        assert list(goto_last.AA.keys()) == ["/D"]
+        assert goto_last.AA.D.D[0].objgen == page.objgen
+        assert goto_top.A.D[0].objgen == page.objgen
+        assert note.Popup.objgen == popup.objgen
+        assert popup.Parent.objgen == note.objgen
+
+
+@pytest.mark.parametrize(
+    ("key", "get_value"),
+    [
+        (
+            "/A",
+            lambda pdf: Dictionary(
+                S=Name.ResetForm, Fields=[pdf.Root.AcroForm.Fields[2]]
+            ),
+        ),
+        ("/A", lambda pdf: Dictionary(S=Name.Hide, T=pdf.pages[1].Annots[0])),
+        ("/IRT", lambda pdf: pdf.pages[2].Annots[0]),
+    ],
+)
+def test_pages_reject_other_cross_page_references(key, get_value):
+    with Pdf.open(BytesIO(build_cross_page_form())) as pdf:
+        pdf.pages[0].Annots[7][key] = get_value(pdf)
+        stream = BytesIO()
+        pdf.save(stream)
+
+    form = PdfWrapper(stream.getvalue())
+    with pytest.raises(
+        ValueError,
+        match=rf"Cannot copy page 1: /Annots\[7\]{key}\S* refers to content that "
+        "is not being copied",
+    ):
+        form.pages  # noqa: B018 # pylint: disable=W0104
+
+    check_page_ownership(form.draw([RawElements.RawText("drawn", 1, 100, 100)]).read())
+
+
+def test_clone_paths_keep_page_ownership():
+    template = build_cross_page_form(page_action=False)
+    for result in (
+        PdfWrapper(template).draw([RawElements.RawText("drawn", 1, 100, 100)]),
+        PdfWrapper(template).generate_coordinate_grid(),
+        PdfWrapper(template) + PdfWrapper(template),
+        PdfWrapper(template).bulk_create_fields([Fields.TextField("new", 3, 10, 10)]),
+    ):
+        stream = result.read()
+        check_page_ownership(stream)
+        with Pdf.open(BytesIO(stream)) as pdf:
+            page_1, page_2, page_3 = (page.obj for page in pdf.pages[:3])
+            shared, name, radio, _, _, goto_next, goto_last, _, _ = page_1.Annots
+            for kid in (shared, name, radio):
+                assert len(kid.Parent.Kids) == 2
+            assert goto_next.A.D[0].objgen == page_2.objgen
+            assert goto_last.AA.U.D[0].objgen == page_3.objgen
 
 
 def test_rebuild_acroform_fields():

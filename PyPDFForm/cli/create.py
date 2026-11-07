@@ -126,8 +126,11 @@ def extract(
     The command validates that the requested end page does not precede the
     start page, converts the 1-based CLI page numbers into the slice expected
     by `PdfWrapper.pages`, and writes the extracted pages to the required
-    output path. Each page is extracted separately, so links to other pages
-    are removed.
+    output path. Each page is extracted separately, so links and other GoTo
+    actions to other pages are removed, and fields shared with other pages keep
+    only their widgets on each page. A `ValueError` from `PdfWrapper.pages`
+    for other references to another page's content is not converted, so the
+    command exits with an error before writing the output.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`

@@ -61,8 +61,11 @@ REMOVED_KWARGS = {
 }
 
 Title = "/Title"
+Root = "/Root"
 Annots = "/Annots"
 Annot = "/Annot"
+P = "/P"
+B = "/B"
 Link = "/Link"
 Dest = "/Dest"
 Contents = "/Contents"
