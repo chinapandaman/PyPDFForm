@@ -16,7 +16,6 @@ jobs:
 
   deploy:
     needs: [tests, linting]
-    if: github.event_name == 'release'
 
     runs-on: ubuntu-latest
     permissions:
@@ -43,8 +42,10 @@ jobs:
     - name: Install uv
       uses: astral-sh/setup-uv@v7
     - name: Deploy to PyPI
+      if: github.event_name == 'release'
       run: uv publish dist/*
     - name: Record the published commit and files
+      if: github.event_name == 'release'
       env:
         CHECKSUMS: ${{ needs.tests.outputs.dist-sha256 }}
       run: |

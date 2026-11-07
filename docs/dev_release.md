@@ -30,7 +30,7 @@ Deploy runs the Tests and Linting workflows again on the release commit. Besides
 
 Deploy uploads those same files only if every Tests and Linting job passes and their SHA-256 checksums match the checked ones. The run summary records the commit and checksums. If anything fails, nothing is uploaded, but the GitHub release, its tag, and the docs already exist. Rerun the failed jobs if the failure was temporary. Otherwise, fix the problem on `master` and release the next version.
 
-To rehearse a deployment, run the Deploy workflow manually on any branch. It runs every check and skips the upload.
+To rehearse a deployment, run the Deploy workflow manually on any branch. It runs every check, including downloading the checked files and comparing their checksums, and skips only the upload.
 
 To check a distribution locally, commit your changes, since files are compared with `HEAD`, then run:
 
