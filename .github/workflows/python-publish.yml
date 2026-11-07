@@ -1,11 +1,21 @@
 name: Deploy
+permissions:
+  contents: read
 
 on:
   release:
     types: [created]
+  workflow_dispatch:
 
 jobs:
+  tests:
+    uses: ./.github/workflows/python-package.yml
+
+  linting:
+    uses: ./.github/workflows/python-linting.yml
+
   deploy:
+    needs: [tests, linting]
 
     runs-on: ubuntu-latest
     permissions:
@@ -13,14 +23,36 @@ jobs:
       id-token: write
 
     steps:
-    - uses: actions/checkout@v7
+    - name: Download the checked distribution
+      uses: actions/download-artifact@v8
+      with:
+        name: dist
+        path: dist
+    - name: Verify the files are the checked distribution
+      env:
+        EXPECTED: ${{ needs.tests.outputs.dist-sha256 }}
+      run: |
+        cd dist
+        if [ -z "$EXPECTED" ]; then
+          echo "No checksums were recorded for the checked distribution." >&2
+          exit 1
+        fi
+        diff <(echo "$EXPECTED" | sort) <(sha256sum -- * | sort)
+        echo "$EXPECTED"
     - name: Install uv
       uses: astral-sh/setup-uv@v7
-    - name: Set up Python
-      uses: actions/setup-python@v7
-      with:
-        python-version: '3.x'
-    - name: Build and deploy to PyPI
+    - name: Deploy to PyPI
+      if: github.event_name == 'release'
+      run: uv publish dist/*
+    - name: Record the published commit and files
+      if: github.event_name == 'release'
+      env:
+        CHECKSUMS: ${{ needs.tests.outputs.dist-sha256 }}
       run: |
-        uv build
-        uv publish
+        {
+          echo "### Published ${GITHUB_REF_NAME} from \`${GITHUB_SHA}\`"
+          echo
+          echo '```'
+          echo "$CHECKSUMS"
+          echo '```'
+        } >> "$GITHUB_STEP_SUMMARY"
