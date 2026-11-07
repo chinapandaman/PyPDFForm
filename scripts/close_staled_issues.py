@@ -4,12 +4,13 @@ Closes issues that have been waiting for their reporter for too long.
 
 A maintainer adds the "awaiting response" label to an issue when they need
 more information from the reporter. This script closes an open issue only if
-its timeline shows that the label was last added at least 30 days ago and not
-removed since, and nobody other than a maintainer (the repository owner,
-members, and collaborators) has commented since. Issues without the label and
-pull requests are never closed. Each closed issue gets a comment saying that
-it was not resolved and is closed as "not planned", so inactivity is never
-recorded as a resolution.
+its timeline shows that the label was last added and not removed since, and
+30 days have passed since the later of that addition and the latest comment
+by a maintainer (the repository owner, members, and collaborators). A comment
+from anyone else after the label was added pauses closing until a maintainer
+comments again. Issues without the label and pull requests are never closed.
+Each closed issue gets a comment saying that it was not resolved and is
+closed as "not planned", so inactivity is never recorded as a resolution.
 
 By default, the script only prints what it would do. Pass --apply to comment
 on and close the issues, which requires the GITHUB_TOKEN environment
@@ -38,10 +39,10 @@ MAX_PAGES = 100
 MAINTAINERS = frozenset({"OWNER", "MEMBER", "COLLABORATOR"})
 MARKER = "<!-- close_staled_issues -->"
 CLOSING_COMMENT = (
-    f"Closing because this issue has been labeled `{LABEL}` for "
-    f"{WAITING_PERIOD.days} days without a reply. This does not mean it has "
-    "been resolved. If you can provide the requested information, comment "
-    f"here and a maintainer will reopen it.\n\n{MARKER}"
+    f"Closing because this issue is labeled `{LABEL}` and has had no reply "
+    f"for {WAITING_PERIOD.days} days. This does not mean it has been "
+    "resolved. If you can provide the requested information, comment here "
+    f"and a maintainer will reopen it.\n\n{MARKER}"
 )
 
 
@@ -182,8 +183,12 @@ def review(session, issue, now):
         return False, f"{LABEL!r} removed on {changed_at.date()}", False
     labeled_at = changed_at
 
-    reply = None
-    commented = False
+    # The latest comment since the label was added decides: a reply from
+    # anyone other than a maintainer pauses closing, and a maintainer comment
+    # restarts the waiting period. A reply wins a tie. The closing comment
+    # posted by this script does neither.
+    last = None
+    marked_at = None
     for event in events:
         if event["event"] != "commented":
             continue
@@ -191,24 +196,27 @@ def review(session, issue, now):
         created = timestamp(event, what)
         if created < labeled_at:
             continue
-        if text(event, "author_association", what) not in MAINTAINERS:
+        reply = text(event, "author_association", what) not in MAINTAINERS
+        if not reply and MARKER in (event.get("body") or ""):
+            marked_at = created if marked_at is None else max(marked_at, created)
+            continue
+        if last is None or (created, reply) > last[:2]:
             user = event.get("user")
             login = user.get("login") if isinstance(user, dict) else None
-            if reply is None or created > reply[0]:
-                reply = (created, login or "unknown user")
-        elif MARKER in (event.get("body") or ""):
-            commented = True
+            last = (created, reply, login or "unknown user")
 
-    if reply is not None:
-        return False, f"@{reply[1]} replied on {reply[0].date()}", False
-    due = labeled_at + WAITING_PERIOD
+    if last is not None and last[1]:
+        return False, f"@{last[2]} replied on {last[0].date()}", False
+    since = f"labeled {labeled_at.date()}"
+    start = labeled_at
+    if last is not None:
+        start = last[0]
+        since += f", maintainer commented {start.date()}"
+    due = start + WAITING_PERIOD
     if due > now:
-        return False, f"labeled {labeled_at.date()}, can close from {due.date()}", False
-    return (
-        True,
-        f"labeled {labeled_at.date()}, no non-maintainer reply since",
-        commented,
-    )
+        return False, f"{since}, can close from {due.date()}", False
+    commented = marked_at is not None and marked_at >= start
+    return True, f"{since}, no reply since", commented
 
 
 def close(session, number, commented):
