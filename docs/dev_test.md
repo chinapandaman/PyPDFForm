@@ -18,6 +18,35 @@ Add only the tests needed to cover the changed behavior and maintain 100% covera
 
 Leave expected PDF sample regeneration and visual regression comparison to the maintainer unless they explicitly delegate these tasks.
 
+## Expected PDF environment
+
+Most tests compare the PDF they generate with an expected PDF in `pdf_samples`, byte for byte. These bytes can depend on:
+
+* The zlib library Python uses. Expected PDFs are generated with standard zlib. Python builds that use zlib-ng, such as Python 3.14 and later on Windows, produce different bytes for tests marked `requires_zlib_over_zlib_ng`, so those tests are skipped there.
+* The installed versions of pikepdf and its qpdf library, pypdf, reportlab, Pillow, fonttools, and cryptography.
+
+PyPDFForm doesn't pin its dependencies. Any version in its dependency ranges is supported, and with standard zlib the expected PDFs are the same for every supported Python version and for both the newest and lowest dependency versions.
+
+`pdf_samples/fixture_environment.json` records the environment the expected PDFs were last regenerated in. Regenerating them in place, for example with `make generate-new-pdf-samples` or `update` in the development container, rewrites this file, so commit it with the regenerated PDFs. Regenerating stops with an error when Python uses zlib-ng.
+
+Each test run prints the current environment and any differences from the record at the top of its output, for example:
+
+```
+differs from pdf_samples/fixture_environment.json: pypdf 6.22.0 (recorded 6.21.4)
+```
+
+If byte comparisons fail without a code change, check these differences first. A newer dependency version that changes the bytes needs regenerated expected PDFs. To reproduce the recorded bytes, install the recorded versions into a separate virtual environment, for example `uv pip install pypdf==6.21.4`.
+
+### Lowest dependency versions
+
+The nightly build also runs every test, including byte comparisons, with the lowest version of each direct dependency on the oldest and newest supported Python versions. Expected PDFs must stay the same on these versions. If a newer version of a dependency changes the bytes, raise that dependency's minimum version to one that produces the regenerated expected PDFs.
+
+To run the tests with the lowest versions locally, install them into a separate virtual environment:
+
+```shell
+uv pip install --resolution=lowest-direct -r pyproject.toml --all-extras
+```
+
 ## Generate coverage report
 
 To generate a test coverage report, run:

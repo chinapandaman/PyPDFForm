@@ -25,7 +25,7 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v7
       with:
@@ -42,11 +42,11 @@ jobs:
         zlib_backend="$(python -c "import json, sys; print(json.load(sys.stdin)['zlib_backend'])" <<< "$zlib_info")"
         echo "backend=$zlib_backend" >> "$GITHUB_OUTPUT"
     - name: Test with pytest
-      if: steps.zlib.outputs.backend == 'zlib' && matrix.os != 'windows-latest'
+      if: steps.zlib.outputs.backend == 'zlib'
       run: |
         coverage run -m pytest && coverage report --fail-under=100
     - name: Test with pytest without zlib-only expected streams
-      if: steps.zlib.outputs.backend != 'zlib' || matrix.os == 'windows-latest'
+      if: steps.zlib.outputs.backend != 'zlib'
       run: |
         python -m pytest -v -m "not requires_zlib_over_zlib_ng"
 
@@ -59,7 +59,7 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
     - name: Set up the oldest and newest supported Python versions
       uses: actions/setup-python@v7
       with:

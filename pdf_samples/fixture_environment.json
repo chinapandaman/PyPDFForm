@@ -1,0 +1,16 @@
+{
+  "python": "3.14.10",
+  "python_implementation": "CPython",
+  "platform": "Darwin-arm64",
+  "zlib_backend": "zlib",
+  "zlib_compile_time_version": "1.2.12",
+  "zlib_runtime_version": "1.2.12",
+  "pillow_zlib_version": "1.3.1.zlib-ng",
+  "qpdf": "12.4.2",
+  "cryptography": "50.0.2",
+  "fonttools": "4.68.0",
+  "pikepdf": "10.18.0",
+  "pillow": "13.0.0",
+  "pypdf": "6.21.4",
+  "reportlab": "5.1.0"
+}

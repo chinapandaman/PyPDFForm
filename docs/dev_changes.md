@@ -11,6 +11,7 @@ That said, your PR should follow these conventions:
 * Try to submit small, incremental changes. For large changes, request a feature branch in your issue and open your PR against that branch, as they will likely need revision before merging into master.
 * Ensure your changes pass all linters. PyPDFForm uses rules from [pylint](https://www.pylint.org/), [ruff](https://docs.astral.sh/ruff/), and [pyright](https://microsoft.github.io/pyright/#/). Run `linting` inside the development container to check.
 * Your changes must pass all tests and have 100% coverage. You can read more about testing [here](dev_test.md).
+* Pin third-party GitHub Actions to a full commit SHA with a version comment, as the existing workflows do. Dependabot keeps these pins updated. GitHub's own `actions/*` use major version tags.
 * Update the User Guide when a change affects how users use the Python API or CLI. Keep wording simple and avoid explaining intuitive behavior or internal implementation details. Update affected docstrings in the same style as the rest of the codebase.
 
 ## Merge process

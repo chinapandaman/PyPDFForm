@@ -1,17 +1,106 @@
 # -*- coding: utf-8 -*-
 
+import json
 import os
+import platform
+import runpy
+from importlib import metadata
 
+import pikepdf
 import pytest
+from PIL import features
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FIXTURE_ENVIRONMENT_PATH = os.path.join(ROOT, "pdf_samples", "fixture_environment.json")
+# packages whose versions can change the bytes of expected PDFs
+FIXTURE_PACKAGES = (
+    "cryptography",
+    "fonttools",
+    "pikepdf",
+    "pillow",
+    "pypdf",
+    "reportlab",
+)
+regenerated_in_place = pytest.StashKey[bool]()
+
+
+def _zlib_info():
+    # the same zlib detection that `make check-zlib` and CI use
+    return runpy.run_path(os.path.join(ROOT, "scripts", "check_zlib.py"))["zlib_info"]()
+
+
+def fixture_environment():
+    zlib_info = _zlib_info()
+    environment = {
+        "python": platform.python_version(),
+        "python_implementation": platform.python_implementation(),
+        "platform": f"{platform.system()}-{platform.machine()}",
+        "zlib_backend": zlib_info["zlib_backend"],
+        "zlib_compile_time_version": zlib_info["zlib_compile_time_version"],
+        "zlib_runtime_version": zlib_info["zlib_runtime_version"],
+        "pillow_zlib_version": features.version("zlib"),
+        "qpdf": pikepdf.__libqpdf_version__,
+    }
+    for package in FIXTURE_PACKAGES:
+        environment[package] = metadata.version(package)
+
+    return environment
+
+
+def _regenerating_in_place(config):
+    return config.getoption("--regenerate") == "1" and not config.getoption(
+        "--regenerate-dir"
+    )
 
 
 def pytest_configure(config):
     config.results = {}
+    if _regenerating_in_place(config) and _zlib_info()["zlib_backend"] != "zlib":
+        msg = (
+            "Expected PDFs must be regenerated with standard zlib, but this "
+            "Python uses zlib-ng. Regenerate them in the development container."
+        )
+        raise pytest.UsageError(msg)
 
 
 def pytest_addoption(parser):
     parser.addoption("--regenerate", action="store", default="0")
     parser.addoption("--regenerate-dir", action="store", default="")
+
+
+def pytest_report_header(config):
+    current = fixture_environment()
+    lines = [
+        "expected PDF environment: "
+        + ", ".join(f"{key} {value}" for key, value in current.items())
+    ]
+    record = os.path.relpath(FIXTURE_ENVIRONMENT_PATH, ROOT)
+    try:
+        with open(FIXTURE_ENVIRONMENT_PATH, encoding="utf-8") as f:
+            recorded = json.load(f)
+    except (OSError, ValueError) as e:
+        lines.append(f"{record} could not be read: {e}")
+        return lines
+
+    differences = [
+        f"{key} {current.get(key)} (recorded {recorded.get(key)})"
+        for key in {**current, **recorded}
+        if current.get(key) != recorded.get(key)
+    ]
+    if differences:
+        lines.append(f"differs from {record}: " + ", ".join(differences))
+    else:
+        lines.append(f"matches {record}")
+
+    return lines
+
+
+def pytest_sessionfinish(session):
+    # record the environment of the latest in-place regeneration
+    if session.config.stash.get(regenerated_in_place, False):
+        with open(FIXTURE_ENVIRONMENT_PATH, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(fixture_environment(), f, indent=2)
+            f.write("\n")
 
 
 @pytest.fixture(autouse=True)
@@ -35,6 +124,8 @@ def _generate_new_pdf_samples(request):
                 ),
             )
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        else:
+            request.config.stash[regenerated_in_place] = True
 
         with open(output_path, "wb+") as f:
             f.write(request.config.results["stream"])
