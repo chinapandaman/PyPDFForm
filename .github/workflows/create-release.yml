@@ -22,11 +22,11 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: '3.x'
+          python-version: '3.13'
       - name: Install dependencies
         run: uv pip install -U -r pyproject.toml --all-extras --system
       - name: Create release for the dispatched commit
