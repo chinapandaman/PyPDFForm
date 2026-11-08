@@ -12,7 +12,13 @@ from collections.abc import Callable
 from typing import Any, Dict, Iterable, List, NoReturn, Optional, cast
 
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, IndirectObject, NameObject
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    IndirectObject,
+    NameObject,
+    StreamObject,
+)
 
 from .constants import (
     AP,
@@ -430,8 +436,12 @@ class ClonePlan:
         With `/Opt`, a kid's on-state may be its position in `/Kids`, such as
         `/0` or `/1`. Those names are renumbered to the new positions in each
         remaining kid's `/AS` and normal, rollover, and down appearance
-        dictionaries, renaming each distinct dictionary once even when kids or
-        appearance types share it. The field's `/V` and `/DV`, inherited or
+        dictionaries. Each remaining kid gets its own `/AP` dictionary with
+        renamed copies of those state dictionaries, so dictionaries shared with
+        other fields are not changed. Appearance streams stay shared, and kids
+        or appearance types of this field that shared a state dictionary share
+        its copy (see `_rename_appearances`). The copies hold the same values as
+        the originals, which the guard walks. The field's `/V` and `/DV`, inherited or
         not, are renumbered on the field itself. One naming the position of a
         removed kid is deleted from the field, or set to `/Off` when an
         ancestor would otherwise still supply a value. Other state names are
@@ -457,27 +467,66 @@ class ClonePlan:
             if field.get_inherited(key) is not None:
                 field[NameObject(key)] = NameObject(Off)
 
-        renamed: Dict[int, DictionaryObject] = {}
+        copies: Dict[int, tuple[DictionaryObject, DictionaryObject]] = {}
         for kid in kids:
             if AS in kid and kid[AS] in states:
                 kid[NameObject(AS)] = states[kid[AS]]
-            appearances = kid.get(AP, DictionaryObject()).get_object()
-            for key in (N, R, D):
-                appearance = appearances.get(key, DictionaryObject()).get_object()
-                if not isinstance(appearance, DictionaryObject) or (
-                    id(appearance) in renamed
-                ):
-                    continue
-                renamed[id(appearance)] = appearance
-                moved = [
-                    (name, appearance.raw_get(name))
-                    for name in list(appearance)
-                    if name in states
-                ]
-                for name, _ in moved:
-                    del appearance[name]
-                for name, value in moved:
-                    appearance[states[name]] = value
+            if AP in kid:
+                kid[NameObject(AP)] = ClonePlan._rename_appearances(
+                    cast(DictionaryObject, kid[AP]), states, copies
+                )
+
+    @staticmethod
+    def _rename_appearances(
+        appearances: DictionaryObject,
+        states: Dict[NameObject, NameObject],
+        copies: Dict[int, tuple[DictionaryObject, DictionaryObject]],
+    ) -> DictionaryObject:
+        """
+        Copies a kid's appearance dictionary with renamed state dictionaries.
+
+        The normal, rollover, and down entries that are state dictionaries are
+        replaced with copies whose keys are renamed by `states`. A state
+        dictionary already copied for another kid or entry of the same field
+        reuses that copy. Appearance streams, including entries that are a
+        single stream, are kept as they are.
+
+        Args:
+            appearances (DictionaryObject): The kid's `/AP` dictionary.
+            states (Dict[NameObject, NameObject]): The renamed states.
+            copies (Dict[int, tuple[DictionaryObject, DictionaryObject]]): The
+                state dictionaries copied so far for the field, with their
+                originals kept alive, keyed by the originals' `id`.
+
+        Returns:
+            DictionaryObject: The new `/AP` dictionary.
+        """
+        result = DictionaryObject(
+            {key: appearances.raw_get(key) for key in appearances}
+        )
+        for key in (N, R, D):
+            if key not in result:
+                continue
+            state = result[key]
+            if not isinstance(state, DictionaryObject) or isinstance(
+                state, StreamObject
+            ):
+                continue
+            if id(state) not in copies:
+                entries = [(name, state.raw_get(name)) for name in state]
+                copies[id(state)] = (
+                    state,
+                    DictionaryObject(
+                        {name: value for name, value in entries if name not in states}
+                        | {
+                            states[name]: value
+                            for name, value in entries
+                            if name in states
+                        }
+                    ),
+                )
+            result[NameObject(key)] = copies[id(state)][1]
+        return result
 
     def _check(self, value: Any, path: str, page_number: int) -> Any:
         """

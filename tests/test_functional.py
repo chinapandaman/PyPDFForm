@@ -1909,7 +1909,9 @@ def test_pages_renumber_positional_radio_states():
         for index, kid in enumerate(radio.Kids):
             state = f"/{index}"
             on = next(iter(kid.AP.N.values()))
-            kid.AP = Dictionary(N=Dictionary({state: on}), D=Dictionary({state: on}))
+            kid.AP = Dictionary(
+                N=Dictionary({state: on}), D=Dictionary({state: on}), R=on
+            )
             kid.AS = Name(state) if index else Name.Off
         # A choice field whose options happen to match its two widgets.
         choice = pdf.make_indirect(
@@ -1954,6 +1956,7 @@ def test_pages_renumber_positional_radio_states():
             assert len(radio.Kids) == 1
             assert str(kid.AS) == state
             assert list(kid.AP.N.keys()) == list(kid.AP.D.keys()) == ["/0"]
+            assert isinstance(kid.AP.R, Stream)
             assert get_values(radio) == (value, default)
     assert PdfWrapper(pages[0].read()).data["radio"] is None
     assert PdfWrapper(pages[2].read()).data["radio"] == 0
@@ -2064,9 +2067,80 @@ def test_pages_renumber_shared_and_inherited_radio_states():
             if index == 0:
                 first, second = widgets
                 assert list(first.AP.R.keys()) == ["/0"]
-                assert second.AP.N.objgen == second.AP.D.objgen
+                assert sorted(second.AP.N.keys()) == sorted(second.AP.D.keys())
                 assert sorted(second.AP.N.keys()) == ["/1", "/Off"]
+                assert second.AP.N["/1"].objgen == second.AP.D["/1"].objgen
         assert PdfWrapper(output).data["radio"] == (1 if index == 0 else None)
+
+
+def test_pages_renumber_without_changing_other_fields():
+    pdf = Pdf.new()
+    for _ in range(2):
+        pdf.add_blank_page()
+    page_1, page_2 = (page.obj for page in pdf.pages)
+
+    def appearance(text):
+        return pdf.make_stream(
+            text, Type=Name.XObject, Subtype=Name.Form, BBox=[0, 0, 10, 10]
+        )
+
+    off = appearance(b"off")
+    # Both groups' selected buttons use one normal state dictionary.
+    shared = pdf.make_indirect(Dictionary({"/1": appearance(b"on_1"), "/Off": off}))
+    fields = []
+    for y, name, pages in (
+        (10, "split", (page_1, page_2)),
+        (50, "kept", (page_2,) * 2),
+    ):
+        field = pdf.make_indirect(
+            Dictionary(FT=Name.Btn, Ff=49152, T=name, Opt=["a", "b"], V=Name("/1"))
+        )
+        field.Kids = []
+        for index, page in enumerate(pages):
+            kid = pdf.make_indirect(
+                Dictionary(
+                    Type=Name.Annot,
+                    Subtype=Name.Widget,
+                    Rect=[10 + 20 * index, y, 20 + 20 * index, y + 10],
+                    P=page,
+                    Parent=field,
+                    AP=Dictionary(
+                        N=shared
+                        if index
+                        else Dictionary({"/0": appearance(b"on_0"), "/Off": off})
+                    ),
+                    AS=Name("/1") if index else Name.Off,
+                )
+            )
+            if "/Annots" not in page:
+                page.Annots = pdf.make_indirect([])
+            page.Annots.append(kid)
+            field.Kids.append(kid)
+        fields.append(field)
+    pdf.Root.AcroForm = Dictionary(Fields=fields)
+    stream = BytesIO()
+    pdf.save(stream)
+
+    form = PdfWrapper(stream.getvalue())
+    assert form.data == {"split": 1, "kept": 1}
+    output = form.pages[1].read()
+    assert PdfWrapper(output).data == {"split": 0, "kept": 1}
+    with Pdf.open(BytesIO(output)) as pdf:
+        split, kept = (
+            [annot for annot in pdf.pages[0].Annots if str(annot.Parent.T) == name]
+            for name in ("split", "kept")
+        )
+        assert [str(each) for each in split[0].Parent.Opt] == ["b"]
+        assert (str(split[0].AS), sorted(split[0].AP.N.keys())) == (
+            "/0",
+            ["/0", "/Off"],
+        )
+        assert [str(each) for each in kept[0].Parent.Opt] == ["a", "b"]
+        assert (str(kept[1].AS), sorted(kept[1].AP.N.keys())) == (
+            "/1",
+            ["/1", "/Off"],
+        )
+        assert split[0].AP.N["/0"].objgen == kept[1].AP.N["/1"].objgen
 
 
 def test_clone_paths_keep_page_ownership():
