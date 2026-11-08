@@ -9,25 +9,39 @@ widgets, and references to excluded content are removed or rejected.
 """
 
 from collections.abc import Callable
-from typing import Any, Dict, Iterable, List, Optional, cast
+from typing import Any, Dict, Iterable, List, NoReturn, Optional, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, IndirectObject, NameObject
 
 from .constants import (
+    AP,
+    AS,
+    DV,
+    FT,
     A,
     AcroForm,
     Annots,
+    Btn,
     D,
     Dest,
+    Fields,
     GoTo,
+    Hide,
     Kids,
     Link,
+    N,
+    Off,
+    Opt,
     P,
     Parent,
+    ResetForm,
     Root,
     S,
+    SubmitForm,
     Subtype,
+    T,
+    V,
     Widget,
 )
 
@@ -47,15 +61,19 @@ class ClonePlan:
       annotation's own `/P` is first pointed at the page that lists it.
     * `/Kids` arrays drop annotations that are not cloned and fields whose
       widgets are all not cloned, so a field shared with other pages keeps only
-      the cloned part of its hierarchy.
+      the cloned part of its hierarchy. A button field's `/Opt` and positional
+      on-states are updated to match its remaining kids.
     * GoTo actions whose explicit destination is an excluded page are removed,
       together with any actions chained after them.
     * Any other reference to an excluded page, the page tree, the AcroForm
       dictionary, an annotation that is not cloned, or a field whose widgets are
       all not cloned raises `ValueError` instead of copying excluded content.
+      This includes fields that ResetForm, SubmitForm, and Hide actions name by
+      fully qualified name.
     """
 
     _REMOVE = object()
+    _NAMED_TARGETS = {ResetForm: Fields, SubmitForm: Fields, Hide: T}
 
     def __init__(
         self,
@@ -128,6 +146,8 @@ class ClonePlan:
 
         self._dropped = dropped - kept
         self._excluded_fields: Dict[int, bool] = {}
+        self._field_names: Optional[Dict[str, IndirectObject]] = None
+        self._original_kids: Dict[int, List[Any]] = {}
         self._forbidden = (forbidden | self._dropped) - set(self._references)
 
     @staticmethod
@@ -251,7 +271,190 @@ class ClonePlan:
             self._excluded_fields[reference.idnum] = result
         return self._excluded_fields[reference.idnum]
 
-    def _check(self, value: Any, path: str, page_number: int, prune: bool) -> Any:
+    def _is_excluded(self, value: Any) -> bool:
+        """
+        Checks whether a value refers to content that is not cloned.
+
+        Args:
+            value (Any): A raw value from a source object, or None.
+
+        Returns:
+            bool: True if the value is a source reference to an excluded page,
+                the page tree, the AcroForm dictionary, an annotation that is
+                not cloned, or a field whose widgets are all not cloned.
+        """
+        return (
+            isinstance(value, IndirectObject)
+            and value.pdf is self._reader
+            and value.idnum not in self._references
+            and (value.idnum in self._forbidden or self._is_excluded_field(value))
+        )
+
+    @staticmethod
+    def _reject(path: str, page_number: int) -> NoReturn:
+        """
+        Raises the error for a reference to content that is not cloned.
+
+        Args:
+            path (str): The location of the reference.
+            page_number (int): The 1-based source page being guarded.
+
+        Raises:
+            ValueError: Always.
+        """
+        msg = (
+            f"Cannot copy page {page_number}: {path} refers to content that is "
+            "not being copied, such as another page or a field or annotation on "
+            "one."
+        )
+        raise ValueError(msg)
+
+    def _find_field(self, name: str) -> IndirectObject | None:
+        """
+        Finds a source field by its fully qualified name.
+
+        The field hierarchy under the AcroForm `/Fields` array is indexed on
+        first use, including kids that were already pruned.
+
+        Args:
+            name (str): The fully qualified field name.
+
+        Returns:
+            IndirectObject | None: A reference to the field with that name, or
+                None if there is none.
+        """
+        if self._field_names is None:
+            self._field_names = {}
+            acroform = (
+                self._reader.trailer[Root]
+                .get(AcroForm, DictionaryObject())
+                .get_object()
+            )
+            stack = [
+                (field, "")
+                for field in acroform.get(Fields, ArrayObject()).get_object()
+                if isinstance(field, IndirectObject)
+            ]
+            seen = {field.idnum for field, _ in stack}
+            while stack:
+                reference, prefix = stack.pop()
+                node = cast(DictionaryObject, reference.get_object())
+                if T in node:
+                    prefix = f"{prefix}.{node[T]}" if prefix else str(node[T])
+                    self._field_names.setdefault(prefix, reference)
+                kids = [
+                    kid
+                    for kid in self._original_kids.get(
+                        id(node),
+                        cast(ArrayObject, node.get(Kids, ArrayObject()).get_object()),
+                    )
+                    if isinstance(kid, IndirectObject) and kid.idnum not in seen
+                ]
+                seen.update(kid.idnum for kid in kids)
+                stack.extend((kid, prefix) for kid in kids)
+        return self._field_names.get(name)
+
+    def _check_named_targets(
+        self, action: DictionaryObject, path: str, page_number: int
+    ) -> None:
+        """
+        Rejects an action that names a field that is not cloned.
+
+        ResetForm and SubmitForm actions can name fields in `/Fields`, and Hide
+        actions in `/T`, by fully qualified name instead of by reference. Names
+        are resolved against the source field hierarchy and follow the same
+        rule as references. Names of unknown fields are kept.
+
+        Args:
+            action (DictionaryObject): A source dictionary, possibly an action.
+            path (str): The dictionary's location, for error messages.
+            page_number (int): The 1-based source page being guarded.
+
+        Raises:
+            ValueError: If the action names a field that is not cloned.
+        """
+        key = self._NAMED_TARGETS.get(action.get(S))
+        if key is None or key not in action:
+            return
+
+        targets = action[key]
+        entries = (
+            [(f"{path}{key}[{index}]", target) for index, target in enumerate(targets)]
+            if isinstance(targets, ArrayObject)
+            else [(f"{path}{key}", targets)]
+        )
+        for entry_path, target in entries:
+            if isinstance(target, str) and self._is_excluded(self._find_field(target)):
+                self._reject(entry_path, page_number)
+
+    def _prune_kids(self, field: DictionaryObject) -> None:
+        """
+        Removes kids that are not cloned from a field's `/Kids`.
+
+        For a button field whose `/Opt` has one entry per kid, `/Opt` keeps
+        only the entries of the remaining kids, and their positional states are
+        renumbered with `_renumber_states`.
+
+        Args:
+            field (DictionaryObject): A source dictionary with `/Kids`.
+        """
+        kids = field[Kids]
+        keep = [index for index, kid in enumerate(kids) if not self._is_excluded(kid)]
+        if len(keep) == len(kids):
+            return
+
+        options = field.get(Opt, ArrayObject()).get_object()
+        if field.get_inherited(FT) == Btn and len(options) == len(kids):
+            self._renumber_states(
+                field, [kids[index].get_object() for index in keep], keep
+            )
+            field[NameObject(Opt)] = ArrayObject(options[index] for index in keep)
+        self._original_kids[id(field)] = list(kids)
+        kids[:] = [kids[index] for index in keep]
+
+    @staticmethod
+    def _renumber_states(
+        field: DictionaryObject, kids: List[DictionaryObject], keep: List[int]
+    ) -> None:
+        """
+        Renumbers positional states after a button field's `/Kids` are pruned.
+
+        With `/Opt`, a kid's on-state may be its position in `/Kids`, such as
+        `/0` or `/1`. Those names are renumbered to the new positions in each
+        remaining kid's `/AS` and normal and down appearance dictionaries, and
+        in the field's `/V` and `/DV`. A `/V` or `/DV` naming the position of a
+        removed kid becomes `/Off`. Other state names are kept.
+
+        Args:
+            field (DictionaryObject): The button field.
+            kids (List[DictionaryObject]): The remaining kids, in order.
+            keep (List[int]): The original positions of the remaining kids.
+        """
+        states = {
+            NameObject(f"/{old}"): NameObject(f"/{new}") for new, old in enumerate(keep)
+        }
+        for key in (V, DV):
+            value = field.get(key)
+            if isinstance(value, NameObject) and value[1:].isdigit():
+                field[NameObject(key)] = states.get(value, NameObject(Off))
+
+        for kid in kids:
+            if kid.get(AS) in states:
+                kid[NameObject(AS)] = states[kid[AS]]
+            appearances = kid.get(AP, DictionaryObject()).get_object()
+            for key in (N, D):
+                appearance = appearances.get(key, DictionaryObject()).get_object()
+                moved = [
+                    (name, appearance.raw_get(name))
+                    for name in list(appearance)
+                    if name in states
+                ]
+                for name, _ in moved:
+                    del appearance[name]
+                for name, value in moved:
+                    appearance[states[name]] = value
+
+    def _check(self, value: Any, path: str, page_number: int) -> Any:
         """
         Decides what happens to one entry of an object being guarded.
 
@@ -259,7 +462,6 @@ class ClonePlan:
             value (Any): The raw entry value.
             path (str): The entry's location, for error messages.
             page_number (int): The 1-based source page being guarded.
-            prune (bool): Whether the entry is an item of a `/Kids` array.
 
         Returns:
             Any: `_REMOVE` to remove the entry, a replacement reference, or None
@@ -268,18 +470,14 @@ class ClonePlan:
         Raises:
             ValueError: If the entry refers to excluded content.
         """
-        if isinstance(value, IndirectObject) and value.pdf is self._reader:
-            if value.idnum in self._references:
-                return self._references[value.idnum]
-            if value.idnum in self._forbidden or self._is_excluded_field(value):
-                if prune:
-                    return self._REMOVE
-                msg = (
-                    f"Cannot copy page {page_number}: {path} refers to content "
-                    "that is not being copied, such as another page or a field "
-                    "or annotation on one."
-                )
-                raise ValueError(msg)
+        if (
+            isinstance(value, IndirectObject)
+            and value.pdf is self._reader
+            and value.idnum in self._references
+        ):
+            return self._references[value.idnum]
+        if self._is_excluded(value):
+            self._reject(path, page_number)
 
         action = value.get_object()
         if (
@@ -309,14 +507,18 @@ class ClonePlan:
         Raises:
             ValueError: If a reachable object refers to excluded content.
         """
-        stack: List[tuple[Any, str, bool]] = [(root, path, False)]
+        stack: List[tuple[Any, str]] = [(root, path)]
         while stack:
-            obj, path, prune = stack.pop()
+            obj, path = stack.pop()
             if id(obj) in self._visited:
                 continue
             self._visited[id(obj)] = obj
 
             is_dict = isinstance(obj, DictionaryObject)
+            if is_dict:
+                if Kids in obj:
+                    self._prune_kids(obj)
+                self._check_named_targets(obj, path, page_number)
             entries = (
                 [(key, obj.raw_get(key)) for key in list(obj)]
                 if is_dict
@@ -327,7 +529,7 @@ class ClonePlan:
                 if is_dict and obj is root and key in skip:
                     continue
                 entry_path = f"{path}{key}" if is_dict else f"{path}[{key}]"
-                result = self._check(value, entry_path, page_number, prune)
+                result = self._check(value, entry_path, page_number)
                 if result is self._REMOVE:
                     if is_dict:
                         del obj[key]
@@ -339,7 +541,7 @@ class ClonePlan:
                 elif isinstance(
                     target := value.get_object(), (DictionaryObject, ArrayObject)
                 ):
-                    stack.append((target, entry_path, is_dict and key == Kids))
+                    stack.append((target, entry_path))
                 kept.append(value)
 
             if not is_dict:

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 import stat
 from contextlib import contextmanager
 from copy import deepcopy
@@ -1824,19 +1825,36 @@ def test_pages_keep_only_own_part_of_cross_page_fields():
 
 
 @pytest.mark.parametrize(
-    ("key", "get_value"),
+    ("key", "get_value", "path"),
     [
         (
             "/A",
             lambda pdf: Dictionary(
                 S=Name.ResetForm, Fields=[pdf.Root.AcroForm.Fields[2]]
             ),
+            "/A/Fields[0]",
         ),
-        ("/A", lambda pdf: Dictionary(S=Name.Hide, T=pdf.pages[1].Annots[0])),
-        ("/IRT", lambda pdf: pdf.pages[2].Annots[0]),
+        ("/A", lambda pdf: Dictionary(S=Name.Hide, T=pdf.pages[1].Annots[0]), "/A/T"),
+        ("/IRT", lambda pdf: pdf.pages[2].Annots[0], "/IRT"),
+        (
+            "/A",
+            lambda _: Dictionary(
+                S=Name.ResetForm, Fields=["person.name", "person.address"]
+            ),
+            "/A/Fields[1]",
+        ),
+        (
+            "/A",
+            lambda _: Dictionary(
+                S=Name.SubmitForm, F="https://example.com", Fields=["contact"]
+            ),
+            "/A/Fields[0]",
+        ),
+        ("/A", lambda _: Dictionary(S=Name.Hide, T="person.address"), "/A/T"),
+        ("/A", lambda _: Dictionary(S=Name.Hide, T=["contact.solo"]), "/A/T[0]"),
     ],
 )
-def test_pages_reject_other_cross_page_references(key, get_value):
+def test_pages_reject_other_cross_page_references(key, get_value, path):
     with Pdf.open(BytesIO(build_cross_page_form())) as pdf:
         pdf.pages[0].Annots[7][key] = get_value(pdf)
         stream = BytesIO()
@@ -1845,12 +1863,97 @@ def test_pages_reject_other_cross_page_references(key, get_value):
     form = PdfWrapper(stream.getvalue())
     with pytest.raises(
         ValueError,
-        match=rf"Cannot copy page 1: /Annots\[7\]{key}\S* refers to content that "
-        "is not being copied",
+        match=rf"Cannot copy page 1: /Annots\[7\]{re.escape(path)} refers to content "
+        "that is not being copied",
     ):
         form.pages  # noqa: B018 # pylint: disable=W0104
 
     check_page_ownership(form.draw([RawElements.RawText("drawn", 1, 100, 100)]).read())
+
+
+def test_pages_keep_actions_naming_copied_fields():
+    names = ["person", "person.name", "shared", "unknown"]
+    with Pdf.open(BytesIO(build_cross_page_form())) as pdf:
+        pdf.pages[0].Annots[7].A = Dictionary(S=Name.ResetForm, Fields=names)
+        stream = BytesIO()
+        pdf.save(stream)
+
+    with Pdf.open(BytesIO(PdfWrapper(stream.getvalue()).pages[0].read())) as pdf:
+        assert [str(name) for name in pdf.pages[0].Annots[7].A.Fields] == names
+
+
+def test_pages_renumber_positional_radio_states():
+    with Pdf.open(BytesIO(build_cross_page_form())) as pdf:
+        radio = pdf.Root.AcroForm.Fields[3]
+        radio.Opt = ["FIRST_EXPORT", "THIRD_EXPORT"]
+        radio.V = Name("/1")
+        radio.DV = Name("/0")
+        for index, kid in enumerate(radio.Kids):
+            state = f"/{index}"
+            on = next(iter(kid.AP.N.values()))
+            kid.AP = Dictionary(N=Dictionary({state: on}), D=Dictionary({state: on}))
+            kid.AS = Name(state) if index else Name.Off
+        # A choice field whose options happen to match its two widgets.
+        choice = pdf.make_indirect(
+            Dictionary(FT=Name.Ch, Ff=131072, T="choice", Opt=["x", "y"], V="y")
+        )
+        choice.Kids = [
+            pdf.make_indirect(
+                Dictionary(
+                    Type=Name.Annot,
+                    Subtype=Name.Widget,
+                    Rect=[10, 170, 110, 190],
+                    P=page.obj,
+                    Parent=choice,
+                )
+            )
+            for page in pdf.pages[:2]
+        ]
+        for page, kid in zip(pdf.pages[:2], choice.Kids, strict=True):
+            page.Annots.append(kid)
+        pdf.Root.AcroForm.Fields.append(choice)
+        stream = BytesIO()
+        pdf.save(stream)
+    template = stream.getvalue()
+
+    def get_radio(output):
+        pdf = Pdf.open(BytesIO(output))
+        kid = next(
+            annot
+            for annot in pdf.pages[0].Annots
+            if annot.get("/Parent", {}).get("/T") == "radio"
+        )
+        return pdf, kid.Parent, kid
+
+    pages = PdfWrapper(template).pages
+    for index, export, state, value, default in (
+        (0, "FIRST_EXPORT", "/Off", "/Off", "/0"),
+        (2, "THIRD_EXPORT", "/0", "/0", "/Off"),
+    ):
+        pdf, radio, kid = get_radio(pages[index].read())
+        with pdf:
+            assert [str(each) for each in radio.Opt] == [export]
+            assert len(radio.Kids) == 1
+            assert str(kid.AS) == state
+            assert list(kid.AP.N.keys()) == list(kid.AP.D.keys()) == ["/0"]
+            assert (str(radio.V), str(radio.DV)) == (value, default)
+    assert PdfWrapper(pages[0].read()).data["radio"] is None
+    assert PdfWrapper(pages[2].read()).data["radio"] == 0
+
+    with Pdf.open(BytesIO(pages[0].read())) as pdf:
+        choice = next(
+            annot.Parent
+            for annot in pdf.pages[0].Annots
+            if annot.get("/Parent", {}).get("/T") == "choice"
+        )
+        assert len(choice.Kids) == 1
+        assert [str(each) for each in choice.Opt] == ["x", "y"]
+
+    pdf, radio, kid = get_radio(PdfWrapper(template).draw([]).read())
+    with pdf:
+        assert [str(each) for each in radio.Opt] == ["FIRST_EXPORT", "THIRD_EXPORT"]
+        assert [str(each.AS) for each in radio.Kids] == ["/Off", "/1"]
+        assert (str(radio.V), str(radio.DV)) == ("/1", "/0")
 
 
 def test_clone_paths_keep_page_ownership():
