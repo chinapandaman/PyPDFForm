@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -933,6 +933,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#issue-triage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue triage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#opening-pull-requests" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1344,6 +1355,18 @@
 </ul>
 </li>
 </ul>
+<h2 id="issue-triage">Issue triage<a class="headerlink" href="#issue-triage" title="Permanent link">⚓︎</a></h2>
+<p>Maintainers, meaning the repository owner and collaborators, triage issues. They decide:</p>
+<ul>
+<li>Whether a report is a confirmed defect, a feature or roadmap request, or needs more information.</li>
+<li>Whether a change to documented Python API or CLI behavior is acceptable, and which <a href="../dev_release/#versioning">version</a> releases it.</li>
+<li>When an issue is closed. Confirmed defects and roadmap decisions stay open until they are fixed or a maintainer closes them with a reason.</li>
+</ul>
+<p>Report vulnerabilities through a security advisory as described in the <a href="https://github.com/chinapandaman/PyPDFForm/blob/master/SECURITY.md">security policy</a>, not in an issue.</p>
+<p>When a maintainer needs more information, they ask for it in a comment and add the <code>awaiting response</code> label. A nightly job closes a labeled issue once 30 days have passed since the label was added or a maintainer last commented, whichever is later. A comment from anyone else pauses this until a maintainer comments again, and the maintainer removes the label once the issue no longer needs a response. The job closes issues as not planned, with a comment saying the issue was not resolved. Comment with the requested information and a maintainer will reopen it. The job never closes pull requests or issues without the label.</p>
+<p>To preview what the job would do without changing anything, run:</p>
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>scripts/close_staled_issues.py
+</span></code></pre></div>
 <h2 id="opening-pull-requests">Opening pull requests<a class="headerlink" href="#opening-pull-requests" title="Permanent link">⚓︎</a></h2>
 <p>Before opening a pull request, create an issue. When opening the pull request, follow these guidelines:</p>
 <ul>
@@ -1493,7 +1516,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "content.code.select", "content.code.annotate", "content.action.edit", "content.action.view", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.top", "toc.follow", "toc.integrate", "search.suggest", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

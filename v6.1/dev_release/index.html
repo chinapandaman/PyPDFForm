@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -1306,16 +1306,29 @@
 <li>A new <a href="https://github.com/chinapandaman/PyPDFForm/releases">GitHub release</a> with auto-generated changelogs.</li>
 </ol>
 <p>These steps trigger the deployment CI.</p>
-<p>The <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/create-release.yml">Create Release</a> workflow releases the exact commit it runs on, which must be on <code>master</code>. The version at that commit must be the next patch, minor, or major version after the latest tag. The workflow creates the version's tag at that commit before the release, and stops if the tag already points at another commit. Rerunning it after the release exists creates nothing and succeeds.</p>
+<p>The <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/create-release.yml">Create Release</a> workflow releases the exact commit it runs on, which must be on <code>master</code>. It first runs the <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-package.yml">Tests</a> and <a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-linting.yml">Linting</a> workflows on that commit, and creates nothing if any of their jobs fail. The version bump commit skips CI when it is pushed, so this is where it is first checked. The version at that commit must be the next patch, minor, or major version after the latest tag. The workflow creates the version's tag at that commit before the release, and stops if the tag already points at another commit. Rerunning it after the release exists creates nothing and succeeds.</p>
 <h2 id="versioning">Versioning<a class="headerlink" href="#versioning" title="Permanent link">⚓︎</a></h2>
 <p>PyPDFForm follows <a href="https://semver.org/">Semantic Versioning</a>.</p>
 <p>Documentation versioning follows a slightly different strategy, tracking only major and minor versions. For example, a release of <code>v1.2.3</code> updates the documentation for <code>v1.2</code>, whereas a release of <code>v1.3.0</code> creates documentation for <code>v1.3</code>.</p>
 <h2 id="deploy-process">Deploy process<a class="headerlink" href="#deploy-process" title="Permanent link">⚓︎</a></h2>
 <p>A GitHub release triggers two CIs:</p>
 <ul>
-<li><a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-publish.yml">Deploy</a>, which creates the distribution and uploads it to <a href="https://pypi.org/project/PyPDFForm/">PyPI</a>.</li>
+<li><a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/python-publish.yml">Deploy</a>, which checks the release commit and uploads its distribution to <a href="https://pypi.org/project/PyPDFForm/">PyPI</a>.</li>
 <li><a href="https://github.com/chinapandaman/PyPDFForm/actions/workflows/deploy-docs.yml">Deploy Docs</a>, which updates the <a href="https://chinapandaman.github.io/PyPDFForm/">doc site</a> or creates a new version for minor/major releases.</li>
 </ul>
+<p>Deploy runs the Tests and Linting workflows again on the release commit. Besides the test matrix, Tests builds the sdist and wheel once and checks them with <code>scripts/check_dist.py</code>:</p>
+<ul>
+<li>The file names, package metadata, installed <code>__version__</code>, and release tag name the same version.</li>
+<li>Both files contain exactly the expected files from the release commit, byte for byte. Apart from package files and metadata, the sdist only contains <code>README.md</code>, <code>LICENSE</code>, <code>pyproject.toml</code>, and top-level <code>tests/test*.py</code> files.</li>
+<li>On the oldest and newest supported Python versions, the wheel is installed into new environments outside the checkout, once without extras and once with the <code>cli</code> extra. PyPDFForm must import from the installed wheel rather than the checkout, and a form is created, filled, and reopened. The <code>pypdfform</code> command must show installation guidance without the <code>cli</code> extra, and create, fill, and inspect a form with it.</li>
+</ul>
+<p>Deploy uploads those same files only if every Tests and Linting job passes and their SHA-256 checksums match the checked ones. The run summary records the commit and checksums. If anything fails, nothing is uploaded, but the GitHub release, its tag, and the docs already exist. Rerun the failed jobs if the failure was temporary. Otherwise, fix the problem on <code>master</code> and release the next version.</p>
+<p>To rehearse a deployment, run the Deploy workflow manually on any branch. It runs every check, including downloading the checked files and comparing their checksums, and skips only the upload.</p>
+<p>To check a distribution locally, commit your changes, since files are compared with <code>HEAD</code>, then run:</p>
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>dist<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>uv<span class="w"> </span>build
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>scripts/check_dist.py<span class="w"> </span>dist
+</span></code></pre></div>
+<p>The check uses the Python running the script. Pass <code>--python</code> once per version to check others, for example <code>--python 3.11 --python 3.15</code>.</p>
 <h2 id="when-are-releases-done">When are releases done?<a class="headerlink" href="#when-are-releases-done" title="Permanent link">⚓︎</a></h2>
 <p>Release timing depends on changes pending deployment on the master branch. Generally:</p>
 <ul>
@@ -1465,7 +1478,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "content.code.select", "content.code.annotate", "content.action.edit", "content.action.view", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.top", "toc.follow", "toc.integrate", "search.suggest", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>
