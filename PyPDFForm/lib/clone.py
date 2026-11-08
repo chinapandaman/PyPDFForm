@@ -66,10 +66,10 @@ class ClonePlan:
     * References to selected pages become their mapped references, and
       references to the document catalog become the writer's catalog. An
       annotation's own `/P` is first pointed at the page that lists it.
-    * `/Kids` arrays drop annotations that are not cloned and fields whose
-      widgets are all not cloned, so a field shared with other pages keeps only
-      the cloned part of its hierarchy. A button field's `/Opt` and positional
-      on-states are updated to match its remaining kids.
+    * Fields get new `/Kids` arrays without annotations that are not cloned
+      and fields whose widgets are all not cloned, so a field shared with other
+      pages keeps only the cloned part of its hierarchy. A button field's
+      `/Opt` and positional on-states are updated to match its remaining kids.
     * GoTo actions whose explicit destination is an excluded page are removed,
       together with any actions chained after them.
     * Any other reference to an excluded page, the page tree, the AcroForm

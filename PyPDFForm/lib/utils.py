@@ -126,8 +126,8 @@ def get_page_streams(pdf: bytes) -> List[bytes]:
     Splits a PDF into single-page PDF streams that keep their annotations.
 
     Each page is copied from its own reader without its `/Parent` or article
-    beads (`/B`), and its annotations are cloned with `clone_page_annotations`.
-    The page itself is checked by the same rules, so an excluded page reached
+    beads (`/B`), and its annotations are cloned by a `ClonePlan` for that
+    page. The page itself is checked by the same rules, so an excluded page reached
     from it, for example through a page action, is not copied either. The
     stream does not contain the source catalog, so document-level structures
     such as the AcroForm dictionary are not copied.
