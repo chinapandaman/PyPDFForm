@@ -26,6 +26,7 @@ from .constants import (
     HIDDEN,
     IMAGE_IMPORT_JAVASCRIPT,
     JS,
+    RADIO,
     SLASH,
     TU,
     A,
@@ -125,6 +126,16 @@ WIDGET_TYPE_PATTERNS = [
             {Parent: {FT: Tx}},
         ),
         Text,
+    ),
+    (
+        # a radio group's /DV can be /Yes or /Off too, so check it before the /DV rule
+        (
+            {Subtype: Widget},
+            {Parent: {FT: Btn}},
+            {AS: (Yes, Off)},
+            {Parent: {Ff: lambda flags: int(flags) & RADIO}},
+        ),
+        Radio,
     ),
     (
         (
@@ -286,8 +297,8 @@ def get_radio_value(annot: DictionaryObject) -> bool:
 
     This function iterates through the appearance states (AP) of the radio button
     annotation. If the value (V) of the parent dictionary matches any of these
-    appearance states, it means the radio button is selected, and True is returned.
-    Otherwise, False is returned.
+    appearance states other than `/Off`, it means the radio button is selected, and
+    True is returned. Otherwise, False is returned.
 
     Args:
         annot (DictionaryObject): The radio button annotation dictionary.
@@ -296,7 +307,7 @@ def get_radio_value(annot: DictionaryObject) -> bool:
         bool: True if the radio button is selected, False otherwise.
     """
     for each in annot.get(AP, {}).get(N, []):
-        if annot.get(Parent, {}).get(V) == each:
+        if each != Off and annot.get(Parent, {}).get(V) == each:
             return True
 
     return False

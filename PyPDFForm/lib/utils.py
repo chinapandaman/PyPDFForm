@@ -278,7 +278,8 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
 
     Nested dictionaries delegate to `find_pattern_match`. Tuple pattern values
     support matching any listed value, and a tuple containing ``"/"`` also
-    matches PDF names with arbitrary slash-prefixed values.
+    matches PDF names with arbitrary slash-prefixed values. Callable pattern
+    values are predicates called with the widget value.
 
     Args:
         pattern_value (Any): The value from the pattern.
@@ -291,6 +292,9 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
         widget_value, (dict, DictionaryObject)
     ):
         return find_pattern_match(pattern_value, widget_value)
+
+    if callable(pattern_value):
+        return bool(pattern_value(widget_value))
 
     if isinstance(pattern_value, tuple):
         if widget_value in pattern_value:
