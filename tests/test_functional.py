@@ -2103,7 +2103,7 @@ def test_pages_renumber_shared_and_inherited_radio_states():
         assert PdfWrapper(output).data["radio"] == (1 if index == 0 else None)
 
 
-def build_button_group(field_flags, default, on_index):
+def build_button_group(field_flags, default, on_index, value=None):
     pdf = Pdf.new()
     pdf.add_blank_page()
     page = pdf.pages[0].obj
@@ -2113,6 +2113,8 @@ def build_button_group(field_flags, default, on_index):
     field = pdf.make_indirect(
         Dictionary(FT=Name.Btn, Ff=field_flags, T="group", DV=default)
     )
+    if value is not None:
+        field.V = value
     kids = [
         pdf.make_indirect(
             Dictionary(
@@ -2146,6 +2148,16 @@ def test_radio_group_with_off_or_yes_default_is_radio(default, on_index):
     assert isinstance(form.pages[0].widgets["group"], Radio)
 
     assert PdfWrapper(form.fill({"group": 1}).read()).data["group"] == 1
+
+
+def test_radio_group_with_off_value_stays_unselected():
+    form = PdfWrapper(build_button_group(49152, Name.Off, None, Name.Off))
+    assert form.data["group"] is None
+
+    with Pdf.open(BytesIO(form.fill({}).read())) as pdf:
+        field = pdf.Root.AcroForm.Fields[0]
+        assert str(field.V) == "/Off"
+        assert [str(kid.AS) for kid in field.Kids] == ["/Off", "/Off"]
 
 
 def test_button_without_radio_flag_and_off_default_is_checkbox():
