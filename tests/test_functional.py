@@ -1886,6 +1886,34 @@ def test_pages_reject_other_cross_page_references(key, get_value, path):
     check_page_ownership(form.draw([RawElements.RawText("drawn", 1, 100, 100)]).read())
 
 
+@pytest.mark.parametrize("targets", ["shared", "copied", None])
+def test_pages_check_targets_sharing_pruned_kids(targets):
+    with Pdf.open(BytesIO(build_cross_page_form())) as pdf:
+        person = pdf.Root.AcroForm.Fields[1]
+        person.Kids = pdf.make_indirect(Array(person.Kids))
+        if targets:
+            pdf.pages[0].Annots[7].A = Dictionary(
+                S=Name.ResetForm,
+                Fields=person.Kids if targets == "shared" else Array(person.Kids),
+            )
+        stream = BytesIO()
+        pdf.save(stream)
+
+    form = PdfWrapper(stream.getvalue())
+    if targets:
+        with pytest.raises(
+            ValueError,
+            match=r"Cannot copy page 1: /Annots\[7\]/A/Fields\[1\] refers to "
+            "content that is not being copied",
+        ):
+            form.pages  # noqa: B018 # pylint: disable=W0104
+        return
+
+    with Pdf.open(BytesIO(form.pages[0].read())) as pdf:
+        name = next(a for a in pdf.pages[0].Annots if a.get("/T") == "name")
+        assert [str(kid.T) for kid in name.Parent.Kids] == ["name"]
+
+
 def test_pages_keep_actions_naming_copied_fields():
     names = ["person", "person.name", "shared", "unknown"]
     with Pdf.open(BytesIO(build_cross_page_form())) as pdf:

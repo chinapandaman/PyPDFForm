@@ -154,7 +154,7 @@ class ClonePlan:
         self._dropped = dropped - kept
         self._excluded_fields: Dict[int, bool] = {}
         self._field_names: Optional[Dict[str, IndirectObject]] = None
-        self._original_kids: Dict[int, List[Any]] = {}
+        self._original_kids: Dict[int, ArrayObject] = {}
         self._forbidden = (forbidden | self._dropped) - set(self._references)
 
     @staticmethod
@@ -400,7 +400,9 @@ class ClonePlan:
         """
         Removes kids that are not cloned from a field's `/Kids`.
 
-        For a button field whose kids are widgets and whose `/Opt`, inherited
+        The field gets a new `/Kids` array, so the original array stays intact
+        for anything else that refers to it, such as an action's `/Fields`,
+        and is still checked there. For a button field whose kids are widgets and whose `/Opt`, inherited
         or not, has one entry per kid, the field gets its own `/Opt` with the
         entries of the remaining kids, and their positional states are
         renumbered with `_renumber_states`.
@@ -423,8 +425,8 @@ class ClonePlan:
                 field, [kids[index].get_object() for index in keep], keep
             )
             field[NameObject(Opt)] = ArrayObject(options[index] for index in keep)
-        self._original_kids[id(field)] = list(kids)
-        kids[:] = [kids[index] for index in keep]
+        self._original_kids[id(field)] = kids
+        field[NameObject(Kids)] = ArrayObject(kids[index] for index in keep)
 
     @staticmethod
     def _renumber_states(
