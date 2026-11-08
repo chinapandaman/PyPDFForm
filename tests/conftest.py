@@ -83,6 +83,12 @@ def pytest_report_header(config):
     except (OSError, ValueError) as e:
         lines.append(f"{record} could not be read: {e}")
         return lines
+    if not isinstance(recorded, dict):
+        lines.append(
+            f"{record} could not be read: expected a JSON object, "
+            f"got {type(recorded).__name__}"
+        )
+        return lines
 
     differences = [
         f"{key} {current.get(key)} (recorded {recorded.get(key)})"
