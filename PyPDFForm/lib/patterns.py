@@ -26,6 +26,7 @@ from .constants import (
     HIDDEN,
     IMAGE_IMPORT_JAVASCRIPT,
     JS,
+    RADIO,
     SLASH,
     TU,
     A,
@@ -125,6 +126,16 @@ WIDGET_TYPE_PATTERNS = [
             {Parent: {FT: Tx}},
         ),
         Text,
+    ),
+    (
+        # a radio group's /DV can be /Yes or /Off too, so check it before the /DV rule
+        (
+            {Subtype: Widget},
+            {Parent: {FT: Btn}},
+            {AS: (Yes, Off)},
+            {Parent: {Ff: lambda flags: int(flags) & RADIO}},
+        ),
+        Radio,
     ),
     (
         (
