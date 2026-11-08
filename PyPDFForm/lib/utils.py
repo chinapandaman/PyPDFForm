@@ -4,9 +4,9 @@ This module provides a collection of utility functions used throughout the PyPDF
 
 It includes functions for:
 - Removing all widgets (form fields) from a PDF.
-- Splitting PDFs into single-page streams.
+- Splitting PDFs into single-page streams without content from other pages.
 - Merging PDF byte streams while preserving page annotations.
-- Cloning annotations with links remapped to the destination pages.
+- Cloning page annotations with `ClonePlan`, so page references point at the destination pages.
 - Finding and traversing patterns within PDF widgets.
 - Extracting widget properties based on defined patterns.
 - Generating unique suffixes for internal use.
@@ -16,24 +16,20 @@ from collections.abc import Callable, Sequence
 from io import BytesIO
 from secrets import choice
 from string import ascii_letters, digits, punctuation
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Optional, cast
 
 from pypdf import PageObject, PdfReader, PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, IndirectObject, NameObject
 
+from .clone import ClonePlan
 from .constants import (
     SLASH,
     UNIQUE_SUFFIX_LENGTH,
     VERSION_IDENTIFIER_PREFIX,
     VERSION_IDENTIFIERS,
-    A,
     Annots,
-    D,
-    Dest,
-    GoTo,
-    Link,
-    S,
-    Subtype,
+    B,
+    Parent,
 )
 
 
@@ -90,100 +86,83 @@ def map_page_references(
     }
 
 
-def _get_link_destination(annot: DictionaryObject) -> tuple:
-    """
-    Gets the destination of a link annotation and the key that holds it.
-
-    Args:
-        annot (DictionaryObject): The annotation dictionary.
-
-    Returns:
-        tuple: `/Dest` or `/A` and the destination, or `(None, None)` for other
-            annotations and actions.
-    """
-    if annot.get(Subtype) != Link:
-        return None, None
-    if Dest in annot:
-        return Dest, annot[Dest]
-
-    action = annot.get(A, DictionaryObject()).get_object()
-    if isinstance(action, DictionaryObject) and action.get(S) == GoTo and D in action:
-        return A, action[D]
-    return None, None
-
-
-def clone_annotation(
-    annotation: Any,
+def clone_page_annotations(
+    reader: PdfReader,
     writer: PdfWriter,
     page_references: Dict[int, IndirectObject],
-) -> Any:
+    select: Optional[Callable[[DictionaryObject], bool]] = None,
+) -> List[List[Any]]:
     """
-    Clones an annotation into a writer, remapping links to internal pages.
+    Clones the annotations of selected source pages into a writer.
 
-    A link whose `/Dest` or GoTo action `/D` is an explicit destination refers
-    to a page object of its source PDF. Cloning that reference as is would copy
-    the source page into the writer outside its page tree. Instead, the
-    destination is pointed at the writer page mapped from the source page, and
-    a link to an unmapped page is dropped. Other annotations, including links
-    with named destinations, are cloned unchanged.
+    Only content of the selected pages is cloned. References to a selected page,
+    including each annotation's `/P`, are pointed at its writer page. Fields
+    shared with excluded pages keep only their cloned widgets. Links whose
+    explicit destination is an excluded page are not cloned, and GoTo actions
+    with such a destination are removed. Other references to excluded content
+    raise `ValueError`. The reader's objects are edited in memory, so the reader
+    must not be used for anything else afterwards.
 
     Args:
-        annotation (Any): The source annotation or a reference to it.
-        writer (PdfWriter): The writer to clone the annotation into.
+        reader (PdfReader): The source reader, used only for this call.
+        writer (PdfWriter): The writer to clone the annotations into.
         page_references (Dict[int, IndirectObject]): Writer page references
-            keyed by the object numbers of their source pages.
+            keyed by the object numbers of their source pages. Annotations of
+            other pages are not cloned.
+        select (Optional[Callable[[DictionaryObject], bool]]): Decides which
+            annotations of selected pages are cloned. Defaults to all.
 
     Returns:
-        Any: The cloned annotation, or None if it links to an unmapped page.
+        List[List[Any]]: The cloned annotations, one list per source page.
+
+    Raises:
+        ValueError: If a cloned annotation refers to excluded content.
     """
-    annot = annotation.get_object()
-    key, destination = _get_link_destination(annot)
-    if not (
-        isinstance(destination, ArrayObject)
-        and destination
-        and isinstance(destination[0], IndirectObject)
-    ):
-        return annotation.clone(writer)
-
-    target = page_references.get(destination[0].idnum)
-    if target is None:
-        return None
-
-    remapped = ArrayObject([target, *destination[1:]])
-    if key == A:
-        action = DictionaryObject(annot[A])
-        action[NameObject(D)] = remapped
-        remapped = action
-
-    result = annotation.clone(writer, ignore_fields=(1, key))
-    result.get_object()[NameObject(key)] = remapped.clone(writer)
-    return result
+    return ClonePlan(reader, writer, page_references, select).clone_annotations()
 
 
 def get_page_streams(pdf: bytes) -> List[bytes]:
     """
-    Extracts the content stream of each page in a PDF as a list of byte streams.
+    Splits a PDF into single-page PDF streams that keep their annotations.
 
-    This function takes a PDF as a bytes stream and returns a list of single-page
-    PDF byte streams. Each element contains a complete one-page PDF produced by a
-    writer, not just the page's raw `/Contents` stream.
+    Each page is copied from its own reader without its `/Parent` or article
+    beads (`/B`), and its annotations are cloned by a `ClonePlan` for that
+    page. The page itself is checked by the same rules, so an excluded page reached
+    from it, for example through a page action, is not copied either. The
+    stream does not contain the source catalog, so document-level structures
+    such as the AcroForm dictionary are not copied.
 
     Args:
         pdf (bytes): The PDF as a bytes stream.
 
     Returns:
-        List[bytes]: A list of bytes streams, one for each page.
-    """
-    pdf_file = PdfReader(BytesIO(pdf))
-    result = []
+        List[bytes]: A list of single-page PDF byte streams, one for each page.
 
-    for page in pdf_file.pages:
+    Raises:
+        ValueError: If a page or one of its annotations refers to content of
+            another page in a way that cannot be removed.
+    """
+    result = []
+    page_count = len(PdfReader(BytesIO(pdf)).pages)
+    for index in range(page_count):
+        reader = PdfReader(BytesIO(pdf))
         writer = PdfWriter()
-        writer.add_page(page)
+        page = reader.pages[index]
+        reference = cast(IndirectObject, page.indirect_reference)
+        plan = ClonePlan(reader, writer, {reference.idnum: reference})
+        plan.guard(page, "", index + 1, (Parent, Annots, B))
+        for key in (Annots, B):
+            if key in page:
+                del page[key]
+
+        output_page = writer.add_page(page)
+        annotations = plan.clone_annotations()[index]
+        if annotations:
+            output_page[NameObject(Annots)] = ArrayObject(annotations)
+
         with BytesIO() as f:
             writer.write(f)
-            f.seek(0)
-            result.append(f.read())
+            result.append(f.getvalue())
 
     return result
 
@@ -245,7 +224,8 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
 
     This function takes two PDF files as byte streams, merges them, and returns the result as a single PDF byte stream.
     It handles the merging of pages from both PDFs and also attempts to preserve form field widgets from both input PDFs
-    in the final merged PDF. The form fields are cloned and added to the output pages.
+    in the final merged PDF. The annotations are cloned with `clone_page_annotations`, so their page
+    references point at the merged pages, and added to the output pages.
 
     Args:
         pdf (bytes): The first PDF file as a byte stream.
@@ -274,12 +254,10 @@ def merge_two_pdfs(pdf: bytes, other: bytes) -> bytes:
     widgets_to_copy = {}
     for offset, source in ((0, pdf_file), (len(pdf_file.pages), other_file)):
         page_references = map_page_references(source.pages, output.pages[offset:])
-        for i, page in enumerate(source.pages):
-            widgets_to_copy[i + offset] = []
-            for annot in page.get(Annots, []):
-                cloned = clone_annotation(annot, output, page_references)
-                if cloned is not None:
-                    widgets_to_copy[i + offset].append(cloned)
+        for i, annotations in enumerate(
+            clone_page_annotations(source, output, page_references)
+        ):
+            widgets_to_copy[i + offset] = annotations
 
     for i, page in enumerate(output.pages):
         page[NameObject(Annots)] = (

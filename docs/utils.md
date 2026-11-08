@@ -60,7 +60,11 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 ## Extract pages
 
 ???+ warning
-    Extracted pages keep links within the same page. Links to other pages are removed, even when those pages are extracted together.
+    Each page is extracted on its own, without content from other pages. Links and other actions that go to another page, such as a navigation button's, are removed, even when that page is extracted too. A field shared with other pages keeps only its widgets on the extracted page.
+
+    Extraction raises a `ValueError` if a page refers to another page's content in any other way, such as a button that resets a field on another page.
+
+    Extraction is not redaction. Content the extracted page uses itself, including resources it shares with other pages, is kept.
 
 === "Library"
     The `PdfWrapper` object has a `.pages` attribute, which is a `PdfArray` containing one `PdfWrapper` object per page:

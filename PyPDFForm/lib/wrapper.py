@@ -333,24 +333,21 @@ class PdfWrapper:
         """
         Extracts page streams while preserving the original page widgets.
 
-        Widgets are removed before splitting the PDF into pages, then cloned back
-        from the original stream onto the matching single-page PDF. This avoids
-        page extraction losing form field annotations.
+        Each single-page PDF keeps the page's annotations and only the parts of
+        their fields on that page, without copying content of other pages.
 
         Args:
             stream (bytes): The PDF stream to split into pages.
 
         Returns:
             tuple[bytes, ...]: Single-page PDF streams with widgets preserved.
+
+        Raises:
+            ValueError: If a page refers to content of another page in a way
+                that cannot be removed.
         """
 
-        return tuple(
-            # Case: Single watermark PDF, extracting a specific page to the first output page.
-            copy_watermark_widgets(page_stream, stream, None, i)
-            for i, page_stream in enumerate(
-                get_page_streams(remove_all_widgets(stream))
-            )
-        )
+        return tuple(get_page_streams(stream))
 
     def _reregister_font(self) -> PdfWrapper:
         """
@@ -496,11 +493,17 @@ class PdfWrapper:
 
         This allows you to work with individual pages of the PDF. Each page wrapper
         preserves the page's original widgets and inherits the current wrapper's user
-        parameters. Links to other pages are removed. Custom font registration events
-        are replayed onto the page wrappers when needed.
+        parameters. Content of other pages is not copied: links and GoTo actions to
+        other pages are removed, and a field shared with other pages keeps only its
+        widgets on the page. Custom font registration events are replayed onto the
+        page wrappers when needed.
 
         Returns:
             Sequence[PdfWrapper]: A list of `PdfWrapper` objects, one for each page in the PDF.
+
+        Raises:
+            ValueError: If a page refers to content of another page in another way,
+                such as an action that resets a field on another page.
         """
 
         result = [
@@ -511,7 +514,7 @@ class PdfWrapper:
             for each in self._get_page_streams_with_widgets(self._read())
         ]
 
-        # because copy_watermark_widgets and remove_all_widgets
+        # because page streams do not copy the AcroForm fonts
         if self._font_register_events:
             for event in self._font_register_events:
                 for page in result:
@@ -704,7 +707,6 @@ class PdfWrapper:
             ),
             stream_with_widgets,
             None,
-            None,
         )
         # because copy_watermark_widgets and remove_all_widgets
         self._reregister_font()
@@ -889,7 +891,6 @@ class PdfWrapper:
             self._read(),
             watermarks,
             [widget.name for widget in widgets],
-            None,
         )
 
         self._init_helper()
@@ -1002,7 +1003,7 @@ class PdfWrapper:
         self._stream = merge_watermarks_with_pdf(self._read(), watermarks)
         # Case: Single watermark PDF, mapping pages 1:1 to output pages.
         self._stream = copy_watermark_widgets(
-            remove_all_widgets(self._read()), stream_with_widgets, None, None
+            remove_all_widgets(self._read()), stream_with_widgets, None
         )
         # because copy_watermark_widgets and remove_all_widgets
         self._reregister_font()
