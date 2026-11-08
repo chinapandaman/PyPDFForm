@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 import pytest
 from jsonschema import ValidationError, validate
-from pikepdf import Array, Dictionary, Name, Pdf, Stream
+from pikepdf import Array, Dictionary, Name, Pdf, Stream, String
 from pypdf import PdfReader
 from reportlab.pdfgen.canvas import Canvas
 from typer.testing import CliRunner
@@ -1852,6 +1852,21 @@ def test_pages_keep_only_own_part_of_cross_page_fields():
         ),
         ("/A", lambda _: Dictionary(S=Name.Hide, T="person.address"), "/A/T"),
         ("/A", lambda _: Dictionary(S=Name.Hide, T=["contact.solo"]), "/A/T[0]"),
+        (
+            "/A",
+            lambda pdf: Dictionary(
+                S=Name.ResetForm,
+                Fields=[pdf.make_indirect(String("person.address"))],
+            ),
+            "/A/Fields[0]",
+        ),
+        (
+            "/A",
+            lambda pdf: Dictionary(
+                S=Name.Hide, T=[pdf.make_indirect(String("contact"))]
+            ),
+            "/A/T[0]",
+        ),
     ],
 )
 def test_pages_reject_other_cross_page_references(key, get_value, path):
@@ -1882,12 +1897,15 @@ def test_pages_keep_actions_naming_copied_fields():
         assert [str(name) for name in pdf.pages[0].Annots[7].A.Fields] == names
 
 
+def get_values(field):
+    return tuple(str(field[key]) if key in field else None for key in ("/V", "/DV"))
+
+
 def test_pages_renumber_positional_radio_states():
     with Pdf.open(BytesIO(build_cross_page_form())) as pdf:
         radio = pdf.Root.AcroForm.Fields[3]
         radio.Opt = ["FIRST_EXPORT", "THIRD_EXPORT"]
         radio.V = Name("/1")
-        radio.DV = Name("/0")
         for index, kid in enumerate(radio.Kids):
             state = f"/{index}"
             on = next(iter(kid.AP.N.values()))
@@ -1927,8 +1945,8 @@ def test_pages_renumber_positional_radio_states():
 
     pages = PdfWrapper(template).pages
     for index, export, state, value, default in (
-        (0, "FIRST_EXPORT", "/Off", "/Off", "/0"),
-        (2, "THIRD_EXPORT", "/0", "/0", "/Off"),
+        (0, "FIRST_EXPORT", "/Off", None, None),
+        (2, "THIRD_EXPORT", "/0", "/0", None),
     ):
         pdf, radio, kid = get_radio(pages[index].read())
         with pdf:
@@ -1936,7 +1954,7 @@ def test_pages_renumber_positional_radio_states():
             assert len(radio.Kids) == 1
             assert str(kid.AS) == state
             assert list(kid.AP.N.keys()) == list(kid.AP.D.keys()) == ["/0"]
-            assert (str(radio.V), str(radio.DV)) == (value, default)
+            assert get_values(radio) == (value, default)
     assert PdfWrapper(pages[0].read()).data["radio"] is None
     assert PdfWrapper(pages[2].read()).data["radio"] == 0
 
@@ -1953,7 +1971,102 @@ def test_pages_renumber_positional_radio_states():
     with pdf:
         assert [str(each) for each in radio.Opt] == ["FIRST_EXPORT", "THIRD_EXPORT"]
         assert [str(each.AS) for each in radio.Kids] == ["/Off", "/1"]
-        assert (str(radio.V), str(radio.DV)) == ("/1", "/0")
+        assert get_values(radio) == ("/1", None)
+
+
+def test_pages_renumber_shared_and_inherited_radio_states():
+    with Pdf.open(BytesIO(build_cross_page_form())) as pdf:
+        page_1, _, page_3 = pdf.pages
+        radio = pdf.Root.AcroForm.Fields[3]
+        on = next(iter(radio.Kids[0].AP.N.values()))
+        for page in (page_1, page_3):
+            page.obj.Annots = [
+                annot
+                for annot in page.Annots
+                if annot.get("/Parent", {}).get("/T") != "radio"
+            ]
+
+        def widget(page, x, parent, appearances, state=Name.Off):
+            kid = pdf.make_indirect(
+                Dictionary(
+                    Type=Name.Annot,
+                    Subtype=Name.Widget,
+                    Rect=[x, 130, x + 10, 140],
+                    P=page.obj,
+                    Parent=parent,
+                    AP=appearances,
+                    AS=state,
+                )
+            )
+            page.Annots.append(kid)
+            return kid
+
+        shared = pdf.make_indirect(Dictionary({"/2": on, "/Off": on}))
+        radio.Kids = [
+            widget(page_3, 10, radio, Dictionary(N=Dictionary({"/0": on}))),
+            widget(
+                page_1,
+                10,
+                radio,
+                Dictionary(N=Dictionary({"/1": on}), R=Dictionary({"/1": on})),
+            ),
+            widget(page_1, 40, radio, Dictionary(N=shared, D=shared), Name("/2")),
+        ]
+        radio.DV = Name("/0")
+        del radio.V
+        # /Opt and /V are inherited from a parent whose kids are radio groups.
+        others = [
+            pdf.make_indirect(Dictionary(FT=Name.Btn, Ff=49152, T=name))
+            for name in ("other", "other_2")
+        ]
+        for x, other in zip((60, 90), others, strict=True):
+            other.Kids = [
+                widget(page_3, x, other, Dictionary(N=Dictionary({"/0": on})))
+            ]
+        group = pdf.make_indirect(
+            Dictionary(
+                T="group",
+                FT=Name.Btn,
+                Opt=["A", "B", "C"],
+                V=Name("/2"),
+                Kids=[radio, *others],
+            )
+        )
+        for kid in group.Kids:
+            kid.Parent = group
+        pdf.Root.AcroForm.Fields[3] = group
+        pdf.Root.AcroForm.Fields.extend(others)
+        stream = BytesIO()
+        pdf.save(stream)
+
+    pages = PdfWrapper(stream.getvalue()).pages
+    for index, options, value, default, kids in (
+        (0, ["B", "C"], "/1", None, [("/Off", "/0"), ("/1", "/1")]),
+        (2, ["A"], "/Off", "/0", [("/Off", "/0")]),
+    ):
+        output = pages[index].read()
+        with Pdf.open(BytesIO(output)) as pdf:
+            widgets = [
+                annot
+                for annot in pdf.pages[0].Annots
+                if annot.get("/Parent", {}).get("/T") == "radio"
+            ]
+            radio = widgets[0].Parent
+            assert [str(each) for each in radio.Opt] == options
+            assert get_values(radio) == (value, default)
+            assert [str(each) for each in radio.Parent.Opt] == ["A", "B", "C"]
+            assert get_values(radio.Parent) == ("/2", None)
+            assert len(radio.Parent.Kids) == (1 if index == 0 else 3)
+            assert [
+                (str(kid.AS), sorted(set(kid.AP.N.keys()) - {"/Off"})[0])
+                for kid in widgets
+            ] == kids
+            if index == 0:
+                first, second = widgets
+                assert list(first.AP.R.keys()) == ["/0"]
+                assert second.AP.N.objgen == second.AP.D.objgen
+                assert sorted(second.AP.N.keys()) == ["/1", "/Off"]
+        assert PdfWrapper(output).data["radio"] == (1 if index == 0 else None)
 
 
 def test_clone_paths_keep_page_ownership():

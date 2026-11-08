@@ -35,6 +35,7 @@ from .constants import (
     Opt,
     P,
     Parent,
+    R,
     ResetForm,
     Root,
     S,
@@ -362,8 +363,9 @@ class ClonePlan:
 
         ResetForm and SubmitForm actions can name fields in `/Fields`, and Hide
         actions in `/T`, by fully qualified name instead of by reference. Names
-        are resolved against the source field hierarchy and follow the same
-        rule as references. Names of unknown fields are kept.
+        are resolved against the source field hierarchy, including names
+        stored as indirect strings, and follow the same rule as references.
+        Names of unknown fields are kept.
 
         Args:
             action (DictionaryObject): A source dictionary, possibly an action.
@@ -384,15 +386,17 @@ class ClonePlan:
             else [(f"{path}{key}", targets)]
         )
         for entry_path, target in entries:
-            if isinstance(target, str) and self._is_excluded(self._find_field(target)):
+            name = target.get_object()
+            if isinstance(name, str) and self._is_excluded(self._find_field(name)):
                 self._reject(entry_path, page_number)
 
     def _prune_kids(self, field: DictionaryObject) -> None:
         """
         Removes kids that are not cloned from a field's `/Kids`.
 
-        For a button field whose `/Opt` has one entry per kid, `/Opt` keeps
-        only the entries of the remaining kids, and their positional states are
+        For a button field whose kids are widgets and whose `/Opt`, inherited
+        or not, has one entry per kid, the field gets its own `/Opt` with the
+        entries of the remaining kids, and their positional states are
         renumbered with `_renumber_states`.
 
         Args:
@@ -403,8 +407,12 @@ class ClonePlan:
         if len(keep) == len(kids):
             return
 
-        options = field.get(Opt, ArrayObject()).get_object()
-        if field.get_inherited(FT) == Btn and len(options) == len(kids):
+        options = field.get_inherited(Opt, ArrayObject())
+        if (
+            field.get_inherited(FT) == Btn
+            and len(options) == len(kids)
+            and all(kid.get_object().get(Subtype) == Widget for kid in kids)
+        ):
             self._renumber_states(
                 field, [kids[index].get_object() for index in keep], keep
             )
@@ -421,9 +429,13 @@ class ClonePlan:
 
         With `/Opt`, a kid's on-state may be its position in `/Kids`, such as
         `/0` or `/1`. Those names are renumbered to the new positions in each
-        remaining kid's `/AS` and normal and down appearance dictionaries, and
-        in the field's `/V` and `/DV`. A `/V` or `/DV` naming the position of a
-        removed kid becomes `/Off`. Other state names are kept.
+        remaining kid's `/AS` and normal, rollover, and down appearance
+        dictionaries, renaming each distinct dictionary once even when kids or
+        appearance types share it. The field's `/V` and `/DV`, inherited or
+        not, are renumbered on the field itself. One naming the position of a
+        removed kid is deleted from the field, or set to `/Off` when an
+        ancestor would otherwise still supply a value. Other state names are
+        kept.
 
         Args:
             field (DictionaryObject): The button field.
@@ -434,16 +446,29 @@ class ClonePlan:
             NameObject(f"/{old}"): NameObject(f"/{new}") for new, old in enumerate(keep)
         }
         for key in (V, DV):
-            value = field.get(key)
-            if isinstance(value, NameObject) and value[1:].isdigit():
-                field[NameObject(key)] = states.get(value, NameObject(Off))
+            value = field.get_inherited(key)
+            if not (isinstance(value, NameObject) and value[1:].isdigit()):
+                continue
+            if value in states:
+                field[NameObject(key)] = states[value]
+                continue
+            if key in field:
+                del field[key]
+            if field.get_inherited(key) is not None:
+                field[NameObject(key)] = NameObject(Off)
 
+        renamed: Dict[int, DictionaryObject] = {}
         for kid in kids:
-            if kid.get(AS) in states:
+            if AS in kid and kid[AS] in states:
                 kid[NameObject(AS)] = states[kid[AS]]
             appearances = kid.get(AP, DictionaryObject()).get_object()
-            for key in (N, D):
+            for key in (N, R, D):
                 appearance = appearances.get(key, DictionaryObject()).get_object()
+                if not isinstance(appearance, DictionaryObject) or (
+                    id(appearance) in renamed
+                ):
+                    continue
+                renamed[id(appearance)] = appearance
                 moved = [
                     (name, appearance.raw_get(name))
                     for name in list(appearance)
