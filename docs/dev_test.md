@@ -23,7 +23,7 @@ Leave expected PDF sample regeneration and visual regression comparison to the m
 Most tests compare the PDF they generate with an expected PDF in `pdf_samples`, byte for byte. These bytes can depend on:
 
 * The zlib library Python uses. Expected PDFs are generated with standard zlib. Python builds that use zlib-ng, such as Python 3.14 and later on Windows, produce different bytes for tests marked `requires_zlib_over_zlib_ng`, so those tests are skipped there.
-* The installed versions of pikepdf and its qpdf library, pypdf, reportlab, Pillow, fonttools, and cryptography.
+* The installed versions of PyPDFForm's dependencies, and of the qpdf library pikepdf uses.
 
 PyPDFForm doesn't pin its dependencies. Any version in its dependency ranges is supported, and with standard zlib the expected PDFs are the same on Linux, macOS, and Windows, for every supported Python version, and for both the newest and lowest dependency versions.
 

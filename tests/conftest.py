@@ -4,29 +4,31 @@ import json
 import os
 import platform
 import runpy
+import tomllib
 from importlib import metadata
 
 import pikepdf
 import pytest
+from packaging.requirements import Requirement
+from packaging.utils import canonicalize_name
 from PIL import features
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURE_ENVIRONMENT_PATH = os.path.join(ROOT, "pdf_samples", "fixture_environment.json")
-# packages whose versions can change the bytes of expected PDFs
-FIXTURE_PACKAGES = (
-    "cryptography",
-    "fonttools",
-    "pikepdf",
-    "pillow",
-    "pypdf",
-    "reportlab",
-)
 regenerated_in_place = pytest.StashKey[bool]()
 
 
 def _zlib_info():
     # the same zlib detection that `make check-zlib` and CI use
     return runpy.run_path(os.path.join(ROOT, "scripts", "check_zlib.py"))["zlib_info"]()
+
+
+def _runtime_dependencies():
+    # the runtime dependencies, whose versions can change the bytes of expected PDFs
+    with open(os.path.join(ROOT, "pyproject.toml"), "rb") as f:
+        dependencies = tomllib.load(f)["project"]["dependencies"]
+
+    return [canonicalize_name(Requirement(each).name) for each in dependencies]
 
 
 def fixture_environment():
@@ -41,7 +43,7 @@ def fixture_environment():
         "pillow_zlib_version": features.version("zlib"),
         "qpdf": pikepdf.__libqpdf_version__,
     }
-    for package in FIXTURE_PACKAGES:
+    for package in _runtime_dependencies():
         environment[package] = metadata.version(package)
 
     return environment
