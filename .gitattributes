@@ -1,1 +1,4 @@
 *.sh text eol=lf
+# Some PDFs have no NUL bytes, so git would treat them as text and convert
+# their line endings on checkout, such as on Windows with core.autocrlf.
+*.pdf -text
