@@ -12,7 +12,8 @@ from unittest.mock import patch
 import pytest
 from jsonschema import ValidationError, validate
 from pikepdf import Array, Dictionary, Name, Pdf, Stream, String
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import ArrayObject, NameObject, NumberObject
 from reportlab.pdfgen.canvas import Canvas
 from typer.testing import CliRunner
 
@@ -2548,3 +2549,15 @@ def test_dropdown_display_and_export_values():
     assert [list(each) for each in field["/Opt"]] == opt + [["Cherry", "Cherry"]]
     assert field["/V"] == "Cherry"
     assert PdfWrapper(output).data == {"choice": 3}
+
+    # an indirect index in /I chooses among options sharing an export value
+    widget.choices = [("Apple", "X"), ("X", "X")]
+    writer = PdfWriter(clone_from=PdfReader(BytesIO(form.fill({"choice": 1}).read())))
+    writer.pages[0]["/Annots"][0].get_object()[NameObject("/I")] = ArrayObject(
+        [writer._add_object(NumberObject(1))]  # type: ignore # noqa: SLF001
+    )
+    stream = BytesIO()
+    writer.write(stream)
+    reopened = PdfWrapper(stream.getvalue())
+    assert reopened.data == {"choice": 1}
+    assert get_field(reopened.fill({}).read())["/I"] == [1]

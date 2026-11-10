@@ -309,8 +309,8 @@ class Dropdown(Widget):
         Export values are matched first, because a field's `/V` holds the export
         value. Displayed text is matched only when no export value matches, so
         fields filled with displayed text are still read. Among matching options,
-        the first index in `/I` is used when it is one of them; otherwise the
-        first match is used.
+        the first index in `/I`, which can be an indirect object, is used when it
+        is one of them; otherwise the first match is used.
 
         Args:
             value (Any): The field's `/V` entry.
@@ -321,7 +321,10 @@ class Dropdown(Widget):
                 matches.
         """
         options = self.options
-        hint = indices[0] if isinstance(indices, list) and indices else None
+        # array elements are not resolved by subscripting
+        hint = (
+            indices[0].get_object() if isinstance(indices, list) and indices else None
+        )
         for matches in (
             [i for i, each in enumerate(options) if each.export == value],
             [i for i, each in enumerate(options) if each.display == value],
