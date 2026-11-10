@@ -728,8 +728,9 @@ class PdfWrapper:
         is refreshed to remove consumed fields while retaining the middleware objects
         for surviving fields so subsequent style updates can still use them.
         Supplied and retained values are prepared before any assignments or PDF
-        hooks are applied, so an invalid choice index leaves widget values,
-        pending hooks, and PDF state unchanged. Only supplied values are assigned.
+        hooks are applied, so an invalid choice index or ambiguous dropdown string
+        leaves widget values, pending hooks, and PDF state unchanged. Only supplied
+        values are assigned.
         Errors during later PDF processing are not rolled back by this preparation.
 
         Args:
@@ -745,7 +746,8 @@ class PdfWrapper:
 
         Raises:
             TypeError: If a keyword argument other than `readonly` is passed. Nothing is changed.
-            ValueError: If an integer dropdown or radio index is out of range.
+            ValueError: If an integer dropdown or radio index is out of range, or a
+                dropdown string matches options that differ. Nothing is changed.
         """
 
         reject_unsupported_kwargs(self, "fill", kwargs, ["readonly"])

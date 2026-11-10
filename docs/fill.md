@@ -126,7 +126,7 @@ A dropdown can be filled with either the zero-based option index or the option t
         filled.write("output.pdf")
         ```
     === "Using String Value"
-        You can also specify a dropdown option by its `string` value:
+        You can also specify a dropdown option by its `string` value, which can be either its displayed text or its [export value](prepare.md#create-a-dropdown-field):
 
         ```python
         from PyPDFForm import PdfWrapper
@@ -154,6 +154,8 @@ A dropdown can be filled with either the zero-based option index or the option t
 
 ???+ note
     If you fill a dropdown field with a `string` value that is not one of its existing options, the new value is added as the last option in the dropdown and automatically selected.
+
+If a `string` value matches more than one different option, for example two options with the same displayed text but different export values, it is rejected with a `ValueError` and nothing is changed. Use the option index instead. The [generated JSON schema](inspect.md#generate-a-json-schema-that-describes-a-pdf-form) rejects these values too.
 
 ### Choice-index validation
 

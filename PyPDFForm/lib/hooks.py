@@ -56,6 +56,7 @@ from .constants import (
     U,
     X,
 )
+from .middleware.dropdown import DropdownOption
 from .patterns import get_widget_key
 
 
@@ -377,14 +378,7 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
         val (list): A list of strings or tuples representing the new choices for the dropdown.
     """
     annot[NameObject(Opt)] = ArrayObject(
-        [
-            (
-                ArrayObject([TextStringObject(each[1]), TextStringObject(each[0])])
-                if isinstance(each, (tuple, list))
-                else ArrayObject([TextStringObject(each), TextStringObject(each)])
-            )
-            for each in val
-        ]
+        [DropdownOption.from_choice(each).to_pdf() for each in val]
     )
 
 

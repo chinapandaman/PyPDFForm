@@ -478,6 +478,8 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 
         form.write("output.pdf")
         ```
+
+        Reading `.choices` returns the same format: a string for each option whose displayed text and export value are equal, and a tuple for each option where they differ.
 === "CLI"
     Put the replacement dropdown choices in YAML. Use strings for default export values or two-item sequences for custom export values:
 
