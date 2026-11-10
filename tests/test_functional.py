@@ -13,7 +13,7 @@ import pytest
 from jsonschema import ValidationError, validate
 from pikepdf import Array, Dictionary, Name, Pdf, Stream, String
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import ArrayObject, NameObject, NumberObject
+from pypdf.generic import ArrayObject, NameObject, NumberObject, TextStringObject
 from reportlab.pdfgen.canvas import Canvas
 from typer.testing import CliRunner
 
@@ -2550,12 +2550,13 @@ def test_dropdown_display_and_export_values():
     assert field["/V"] == "Cherry"
     assert PdfWrapper(output).data == {"choice": 3}
 
-    # an indirect index in /I chooses among options sharing an export value
+    # indirect /V, /I, and /I element choose among options sharing an export value
     widget.choices = [("Apple", "X"), ("X", "X")]
     writer = PdfWriter(clone_from=PdfReader(BytesIO(form.fill({"choice": 1}).read())))
-    writer.pages[0]["/Annots"][0].get_object()[NameObject("/I")] = ArrayObject(
-        [writer._add_object(NumberObject(1))]  # type: ignore # noqa: SLF001
-    )
+    add_object = writer._add_object  # type: ignore # noqa: SLF001
+    field = writer.pages[0]["/Annots"][0].get_object()
+    field[NameObject("/V")] = add_object(TextStringObject("X"))
+    field[NameObject("/I")] = add_object(ArrayObject([add_object(NumberObject(1))]))
     stream = BytesIO()
     writer.write(stream)
     reopened = PdfWrapper(stream.getvalue())

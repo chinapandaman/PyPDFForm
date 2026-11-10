@@ -355,9 +355,9 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         widget (Dropdown): The Dropdown widget object to update with the retrieved value.
     """
     field = annot[NameObject(Parent)] if Parent in annot and T not in annot else annot
-    # subscripting resolves indirect entries, unlike get()
-    value = field[NameObject(V)] if V in field else None
-    indices = field[NameObject(I)] if I in field else None
+    # discovered annotations are plain dictionaries, so entries can be references
+    value = field[NameObject(V)].get_object() if V in field else None
+    indices = field[NameObject(I)].get_object() if I in field else None
     index = widget.get_selected_index(value, indices)
     if index is not None:
         widget.value = index
