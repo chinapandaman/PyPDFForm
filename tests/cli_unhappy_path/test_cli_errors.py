@@ -322,7 +322,8 @@ def test_create_grid_invalid_range(pdf_samples):
         ["create", "grid", os.path.join(pdf_samples, "dummy.pdf"), "--red", "2"],
     )
 
-    assert_cli_error(result, "is not in the range")
+    # the range message itself depends on the installed Typer version
+    assert_cli_error(result, "Invalid value for")
 
 
 @pytest.mark.cli_test
