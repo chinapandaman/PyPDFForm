@@ -12,7 +12,8 @@ from unittest.mock import patch
 import pytest
 from jsonschema import ValidationError, validate
 from pikepdf import Array, Dictionary, Name, Pdf, Stream, String
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import ArrayObject, NameObject, NumberObject, TextStringObject
 from reportlab.pdfgen.canvas import Canvas
 from typer.testing import CliRunner
 
@@ -2505,3 +2506,59 @@ def test_stale_choice_indices(
     assert getattr(form, "_stream") == stream
     form.fill({field_name: 0 if option_count else None})
     assert widget.value == (0 if option_count else None)
+
+
+def test_dropdown_display_and_export_values():
+    def get_field(output):
+        return PdfReader(BytesIO(output)).pages[0]["/Annots"][0].get_object()
+
+    form = PdfWrapper(BlankPage()).bulk_create_fields(
+        [Fields.DropdownField("choice", 1, 20, 20, options=["Apple", "Banana"])]
+    )
+    widget = form.widgets["choice"]
+    widget.choices = [("Pear", "P"), ("Grape", "G"), ("Grape", "R")]
+    opt = [["P", "Pear"], ["G", "Grape"], ["R", "Grape"]]
+
+    # by index, displayed text, and export value
+    for selection, index in ((1, 1), ("Pear", 0), ("G", 1), ("R", 2)):
+        output = form.fill({"choice": selection}).read()
+        field = get_field(output)
+        assert [list(each) for each in field["/Opt"]] == opt
+        assert field["/V"] == opt[index][0]
+        assert field["/I"] == [index]
+        reopened = PdfWrapper(output)
+        assert reopened.data == {"choice": index}
+        assert reopened.widgets["choice"].choices == (
+            ("Pear", "P"),
+            ("Grape", "G"),
+            ("Grape", "R"),
+        )
+
+    # displayed text shared by options with different export values
+    stream = form.read()
+    with pytest.raises(ValidationError):
+        validate({"choice": "Grape"}, form.schema)
+    with pytest.raises(ValueError, match="use an option index"):
+        form.fill({"choice": "Grape"})
+    assert widget.value == 2
+    assert form.read() == stream
+
+    # a new value is appended without dropping export values
+    output = PdfWrapper(stream).fill({"choice": "Cherry"}).read()
+    field = get_field(output)
+    assert [list(each) for each in field["/Opt"]] == opt + [["Cherry", "Cherry"]]
+    assert field["/V"] == "Cherry"
+    assert PdfWrapper(output).data == {"choice": 3}
+
+    # indirect /V, /I, and /I element choose among options sharing an export value
+    widget.choices = [("Apple", "X"), ("X", "X")]
+    writer = PdfWriter(clone_from=PdfReader(BytesIO(form.fill({"choice": 1}).read())))
+    add_object = writer._add_object  # type: ignore # noqa: SLF001
+    field = writer.pages[0]["/Annots"][0].get_object()
+    field[NameObject("/V")] = add_object(TextStringObject("X"))
+    field[NameObject("/I")] = add_object(ArrayObject([add_object(NumberObject(1))]))
+    stream = BytesIO()
+    writer.write(stream)
+    reopened = PdfWrapper(stream.getvalue())
+    assert reopened.data == {"choice": 1}
+    assert get_field(reopened.fill({}).read())["/I"] == [1]

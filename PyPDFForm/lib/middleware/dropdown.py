@@ -4,11 +4,96 @@ Module representing a dropdown widget.
 
 This module defines the Dropdown class, which is a subclass of the
 Widget class. It represents a dropdown form field in a PDF document.
+It also defines DropdownOption, the single representation used to convert
+dropdown options between public choices and PDF option arrays.
 """
 
-from typing import Any, Optional
+from __future__ import annotations
+
+from collections import defaultdict
+from dataclasses import dataclass
+from typing import Any, Optional, Sequence
+
+from pypdf.generic import ArrayObject, TextStringObject
 
 from .base import PreparedValue, Widget
+
+
+@dataclass(frozen=True)
+class DropdownOption:
+    """
+    Represents one dropdown option with its displayed text and export value.
+
+    Public choices use a string when both values are equal, or a
+    `(display, export)` sequence when they differ. PDF option arrays store the
+    same pair in the opposite order, `[export, display]`, and a field's `/V`
+    holds the export value of the selected option.
+
+    Attributes:
+        display (str): The text shown for the option.
+        export (str): The value stored in the PDF when the option is selected.
+    """
+
+    display: str
+    export: str
+
+    @classmethod
+    def from_choice(cls, choice: str | Sequence[str]) -> DropdownOption:
+        """
+        Creates an option from a public choice.
+
+        Args:
+            choice (str | Sequence[str]): A string used as both the displayed
+                text and export value, or a `(display, export)` sequence.
+
+        Returns:
+            DropdownOption: The option described by the choice.
+        """
+        if isinstance(choice, str):
+            return cls(choice, choice)
+        display, export = choice
+        return cls(display, export)
+
+    @classmethod
+    def from_pdf(cls, entry: Any) -> DropdownOption:
+        """
+        Creates an option from an entry of a PDF `/Opt` array.
+
+        Args:
+            entry (Any): A text string used as both values, or an
+                `[export, display]` array.
+
+        Returns:
+            DropdownOption: The option described by the entry.
+        """
+        entry = entry.get_object()
+        if isinstance(entry, str):
+            return cls(str(entry), str(entry))
+        return cls(str(entry[1]), str(entry[0]))
+
+    @property
+    def choice(self) -> str | tuple[str, str]:
+        """
+        Returns the option in the public choices format.
+
+        Returns:
+            str | tuple[str, str]: The displayed text when it equals the export
+                value, otherwise a `(display, export)` tuple.
+        """
+        if self.display == self.export:
+            return self.display
+        return self.display, self.export
+
+    def to_pdf(self) -> ArrayObject:
+        """
+        Returns the option as an entry of a PDF `/Opt` array.
+
+        Returns:
+            ArrayObject: The `[export, display]` array for the option.
+        """
+        return ArrayObject(
+            [TextStringObject(self.export), TextStringObject(self.display)]
+        )
 
 
 class Dropdown(Widget):
@@ -17,12 +102,15 @@ class Dropdown(Widget):
 
     Inherits from the Widget class and provides specific functionality
     for handling dropdown form fields. The stored value is an option index; string
-    assignments are normalized to an existing option index or appended as a new
-    choice. Integer indices must identify an existing option.
+    assignments select the option whose displayed text or export value matches,
+    or are appended as a new choice when none does. Strings matching options that
+    differ are rejected. Integer indices must identify an existing option.
 
     Key attributes:
         font (str): The font of the dropdown field.
-        choices (List[str]): The list of available options in the dropdown.
+        choices (List[str | Tuple[str, str]]): The available options. Each is a
+            string when its displayed text and export value are equal, or a
+            `(display, export)` tuple when they differ.
         value (int): The index of the selected choice in the choices list.
 
     Methods:
@@ -49,7 +137,8 @@ class Dropdown(Widget):
 
         Attributes:
             font (str): The font of the dropdown field.
-            choices (List[str]): The list of choices for the dropdown.
+            choices (List[str | Tuple[str, str]]): The list of choices for the
+                dropdown, as strings or `(display, export)` tuples.
         """
         super().__init__(name, value)
         self.SET_ATTR_TRIGGER_HOOK_MAP.update(
@@ -81,42 +170,56 @@ class Dropdown(Widget):
         """
         Sets the value of the dropdown.
 
-        If the value is a string, it attempts to find the corresponding
-        index in the choices list. If not found, the string value is
+        If the value is a string, it selects the option whose displayed text
+        or export value matches it. If none matches, the string value is
         added to the choices, and its new index is used. Integer values are checked
         against the current choices before being stored.
 
         Args:
             value (str | int): The value to set. Can be a string
-                                      (option text) or an integer (index).
+                (displayed text or export value) or an integer (index).
 
         Raises:
-            ValueError: If an integer index is outside the current choices.
+            ValueError: If an integer index is outside the current choices, or
+                a string matches options that differ.
         """
         self.apply_value(self.prepare_value(value))
+
+    @property
+    def options(self) -> tuple[DropdownOption, ...]:
+        """
+        Returns the current choices as options with explicit export values.
+
+        Returns:
+            tuple[DropdownOption, ...]: The options, in choice order.
+        """
+        return tuple(DropdownOption.from_choice(each) for each in self.choices or ())
 
     def prepare_value(self, value: Any) -> PreparedValue:
         """
         Prepares a dropdown selection without changing its value or choices.
 
         Integer indices are checked against the current choices. Strings are
-        normalized to an existing index or staged as a new last option. New
-        choices do not trigger hooks until the prepared selection is applied.
+        normalized to the index of the option whose displayed text or export
+        value matches, or staged as a new last option, keeping the existing
+        choices and their export values. New choices do not trigger hooks until
+        the prepared selection is applied.
 
         Args:
-            value (Any): The proposed option text or index.
+            value (Any): The proposed displayed text, export value, or index.
 
         Returns:
             PreparedValue: The selected index and any replacement choices.
 
         Raises:
-            ValueError: If an integer index is outside the current choices.
+            ValueError: If an integer index is outside the current choices, or
+                a string matches options that differ.
         """
         self.validate_choice_index(value)
         if isinstance(value, str):
             index = self._get_option_index(value)
             if index is None:
-                choices = list(self.choices) + [value]
+                choices = list(self.choices or ()) + [value]
                 return PreparedValue(len(choices) - 1, choices)
             value = index
 
@@ -172,19 +275,79 @@ class Dropdown(Widget):
 
     def _get_option_index(self, value: str) -> int | None:
         """
-        Gets the index of a given option value in the dropdown's choices.
+        Gets the index of the option whose displayed text or export value matches.
+
+        Identical options, with the same displayed text and export value, are
+        interchangeable, so the first is used.
 
         Args:
-            value (str): The option value to search for.
+            value (str): The displayed text or export value to search for.
 
         Returns:
             int | None: The index of the option if found, otherwise None.
+
+        Raises:
+            ValueError: If the value matches options that differ.
         """
-        for i, each in enumerate(self.choices):
-            if value == each:
-                return i
+        options = self.options
+        matches = [
+            i for i, each in enumerate(options) if value in (each.display, each.export)
+        ]
+        if len({options[i] for i in matches}) > 1:
+            msg = (
+                f"Dropdown value {value!r} matches the options at indices {matches}; "
+                "use an option index instead."
+            )
+            raise ValueError(msg)
+
+        return matches[0] if matches else None
+
+    def get_selected_index(self, value: Any, indices: Any) -> int | None:
+        """
+        Gets the index of the option selected by a PDF field value.
+
+        Export values are matched first, because a field's `/V` holds the export
+        value. Displayed text is matched only when no export value matches, so
+        fields filled with displayed text are still read. Among matching options,
+        the first index in `/I`, which can be an indirect object, is used when it
+        is one of them; otherwise the first match is used.
+
+        Args:
+            value (Any): The field's `/V` entry.
+            indices (Any): The field's `/I` entry.
+
+        Returns:
+            int | None: The index of the selected option, or None when no option
+                matches.
+        """
+        options = self.options
+        # array elements are not resolved by subscripting
+        hint = (
+            indices[0].get_object() if isinstance(indices, list) and indices else None
+        )
+        for matches in (
+            [i for i, each in enumerate(options) if each.export == value],
+            [i for i, each in enumerate(options) if each.display == value],
+        ):
+            if matches:
+                return hint if hint in matches else matches[0]
 
         return None
+
+    def ambiguous_values(self) -> list[str]:
+        """
+        Returns the strings that match options that differ.
+
+        Returns:
+            list[str]: The sorted displayed texts and export values that a string
+                selection rejects.
+        """
+        matches = defaultdict(set)
+        for each in self.options:
+            matches[each.display].add(each)
+            matches[each.export].add(each)
+
+        return sorted(value for value, options in matches.items() if len(options) > 1)
 
     @property
     def schema_definition(self) -> dict:
@@ -193,18 +356,23 @@ class Dropdown(Widget):
 
         The schema definition accepts either an integer option index bounded by
         the current choices or a string value that can be normalized by the value
-        setter.
+        setter. Strings that match options that differ are excluded.
 
         Returns:
             dict: A dictionary representing the schema definition.
         """
+        string_schema: dict = {"type": "string"}
+        ambiguous = self.ambiguous_values()
+        if ambiguous:
+            string_schema["not"] = {"enum": ambiguous}
+
         return {
             "anyOf": [
                 {
                     **self.choice_index_schema(),
                     **super().schema_definition,
                 },
-                {"type": "string"},
+                string_schema,
             ]
         }
 

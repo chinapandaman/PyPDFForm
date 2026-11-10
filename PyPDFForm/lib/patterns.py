@@ -52,7 +52,7 @@ from .constants import (
     Yes,
 )
 from .middleware.checkbox import Checkbox
-from .middleware.dropdown import Dropdown
+from .middleware.dropdown import Dropdown, DropdownOption
 from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
@@ -319,11 +319,11 @@ def update_dropdown_value(
     """
     Updates the value of a dropdown annotation, selecting an option from the list.
 
-    This function modifies the value (V) and appearance (AP) of the dropdown
-    annotation to reflect the selected option. Top-level dropdowns also receive
-    the selected index (I). Child annotations write the value to their parent
-    field dictionary. Appearance updates are skipped when `need_appearances` is
-    enabled.
+    This function sets the field's value (V) to the selected option's export
+    value and its selected index (I), and sets the annotation's appearance (AP)
+    to the option's displayed text. Child annotations write V and I to their
+    parent field dictionary. Appearance updates are skipped when
+    `need_appearances` is enabled.
 
     Args:
         annot (DictionaryObject): The dropdown annotation dictionary.
@@ -331,42 +331,36 @@ def update_dropdown_value(
         need_appearances (bool): If True, skips updating the appearance stream (AP) to
             maintain compatibility with Adobe Reader's behavior for certain fields.
     """
-    choices = widget.choices or []
-    if Parent in annot and T not in annot:
-        annot[NameObject(Parent)][NameObject(V)] = TextStringObject(
-            choices[widget.value]
-        )
-        if not need_appearances:
-            annot[NameObject(AP)] = TextStringObject(choices[widget.value])
-    else:
-        annot[NameObject(V)] = TextStringObject(choices[widget.value])
-        annot[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
-        if not need_appearances:
-            annot[NameObject(AP)] = TextStringObject(choices[widget.value])
+    option = widget.options[widget.value]
+    field = annot[NameObject(Parent)] if Parent in annot and T not in annot else annot
+    field[NameObject(V)] = TextStringObject(option.export)
+    field[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
+    if not need_appearances:
+        annot[NameObject(AP)] = TextStringObject(option.display)
 
 
 def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
     """
     Retrieves the selected value of a dropdown annotation and updates the widget.
 
-    This function determines the current value of the dropdown, considering
-    whether it's a child annotation or a top-level one. A matching choice sets
-    the widget's value to its index, including zero for the first choice. If no
-    choice matches, the widget's value is left unchanged; an initially unselected
-    widget remains None.
+    This function reads the field's value (V) and selected indices (I), from the
+    parent field dictionary for child annotations. V is matched against export
+    values, then displayed text, and I chooses among options with the same
+    value. A matching option sets the widget's value to its index, including
+    zero for the first option. If no option matches, the widget's value is left
+    unchanged; an initially unselected widget remains None.
 
     Args:
         annot (DictionaryObject): The dropdown annotation dictionary.
         widget (Dropdown): The Dropdown widget object to update with the retrieved value.
     """
-    if Parent in annot and T not in annot:
-        to_compare = annot.get(Parent, {}).get(V)
-    else:
-        to_compare = annot.get(V)
-
-    for i, each in enumerate(widget.choices):
-        if each == to_compare:
-            widget.value = i
+    field = annot[NameObject(Parent)] if Parent in annot and T not in annot else annot
+    # discovered annotations are plain dictionaries, so entries can be references
+    value = field[NameObject(V)].get_object() if V in field else None
+    indices = field[NameObject(I)].get_object() if I in field else None
+    index = widget.get_selected_index(value, indices)
+    if index is not None:
+        widget.value = index
 
 
 def update_text_value(
@@ -440,35 +434,29 @@ def get_text_field_alignment(widget: dict) -> int | None:
     return int(widget[Q]) if Q in widget else None
 
 
-def get_dropdown_choices(widget: dict) -> Tuple[str, ...]:
+def get_dropdown_choices(widget: dict) -> Tuple[str | Tuple[str, str], ...]:
     """
     Extracts the choices from a dropdown widget dictionary.
 
-    This function extracts the choices from a dropdown widget dictionary. Direct
-    string options are returned as-is. Two-item PDF option arrays return the
-    display value stored at index 1. Empty or missing options produce an empty
-    tuple. An explicitly empty widget option array is preserved even when its
-    parent has options.
+    This function extracts the choices from a dropdown widget dictionary. Each
+    option is returned as a string when its displayed text and export value are
+    equal, or as a `(display, export)` tuple when they differ. Empty or missing
+    options produce an empty tuple. An explicitly empty widget option array is
+    preserved even when its parent has options.
 
     Args:
         widget (dict): The widget dictionary to extract the choices from.
 
     Returns:
-        Tuple[str, ...]: The dropdown choices, or an empty tuple when none exist.
+        Tuple[str | Tuple[str, str], ...]: The dropdown choices, or an empty
+            tuple when none exist.
     """
     choices = (
         widget[Opt]
         if Opt in widget
         else extract_widget_property(widget, DROPDOWN_CHOICE_PATTERNS, (), None)
     )
-    return tuple(
-        (
-            each.get_object()
-            if isinstance(each.get_object(), str)
-            else str(each.get_object()[1])
-        )
-        for each in choices
-    )
+    return tuple(DropdownOption.from_pdf(each).choice for each in choices)
 
 
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:

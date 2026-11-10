@@ -55,7 +55,7 @@ In this example, `sample_template.pdf` contains three text fields (`test`, `test
 
 You can use the PyPDFForm-generated JSON schema to validate the data used for filling a PDF form.
 
-For dropdowns and radio groups, the schema restricts integer selections to `0 <= index < option_count`. Fields with no options reject every integer index; dropdowns still accept strings to add an option. See [choice-index validation](fill.md#choice-index-validation) for runtime rejection behavior.
+For dropdowns and radio groups, the schema restricts integer selections to `0 <= index < option_count`. Fields with no options reject every integer index; dropdowns still accept strings to add an option. Dropdowns reject strings that match more than one different option. See [choice-index validation](fill.md#choice-index-validation) for runtime rejection behavior.
 
 ## Inspect PDF form data
 

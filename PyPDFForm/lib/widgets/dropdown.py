@@ -13,6 +13,7 @@ specific functionality for interacting with dropdown form fields in PDFs.
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Type
 
+from ..middleware.dropdown import DropdownOption
 from .base import Field, Widget
 from .text import TextWidget
 
@@ -22,9 +23,8 @@ class DropdownWidget(TextWidget):
     Represents a dropdown widget in a PDF form.
 
     Inherits from the base TextWidget class and replaces text-field creation with
-    ReportLab's choice-field path. The first option is used as the initial value,
-    with a single space substituted for an empty first option to work around
-    ReportLab behavior.
+    ReportLab's choice-field path. The first option's export value is used as the
+    initial value.
 
     Attributes:
         NONE_DEFAULTS (list): A list of parameters that default to None.
@@ -62,9 +62,11 @@ class DropdownWidget(TextWidget):
         ]
         super().__init__(name, page_number, x, y, **kwargs)
         self.acro_form_params["wkind"] = "choice"
-        self.acro_form_params["value"] = (
-            self.acro_form_params["options"][0] or " "  # reportlab bug
-        )
+        # ReportLab fails on an empty string value; a one-item list selects the
+        # option by its export value, including an empty one.
+        self.acro_form_params["value"] = [
+            DropdownOption.from_choice(self.acro_form_params["options"][0]).export
+        ]
 
 
 @dataclass
