@@ -258,11 +258,17 @@ def test_fill_preserves_unrelated_annotations(
     ],
 )
 def test_failed_image_fill_preserves_annotations(
-    annotated_form, image_samples, image, error, assert_catalog_fields
+    annotated_form,
+    image_samples,
+    image,
+    error,
+    assert_catalog_fields,
+    assert_widgets_match_output,
 ):
     form = annotated_form
     original = form.read()
     original_widgets = form.widgets.copy()
+    original_data = form.data
 
     with pytest.raises(error):
         form.fill(
@@ -275,7 +281,10 @@ def test_failed_image_fill_preserves_annotations(
         )
 
     assert form.widgets == original_widgets
+    # the valid signature filled before the failure is not kept either
+    assert form.data == original_data
     assert form.read() == original
+    assert_widgets_match_output(form)
     assert_annotation_graph(
         form.read(),
         set(original_widgets),

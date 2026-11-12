@@ -20,6 +20,7 @@ that merges them when sliced or merged.
 from __future__ import annotations
 
 from collections import defaultdict
+from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import asdict
 from functools import lru_cache
@@ -29,6 +30,7 @@ from typing import (
     Any,
     BinaryIO,
     Dict,
+    Iterator,
     List,
     Sequence,
     TextIO,
@@ -170,7 +172,7 @@ class PdfWrapper:
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
         self._font_register_events = []  # for reregister
-        self._key_update_tracker = {}  # for update key preserve old key attrs
+        self._key_update_tracker = {}  # new key to old key, for renamed widgets
         self._keys_to_update = []  # for bulk update keys
 
         # sets attrs from kwargs
@@ -282,6 +284,11 @@ class PdfWrapper:
         This method is called during initialization and after certain operations
         that modify the PDF content (e.g., filling, creating widgets, updating keys).
         It rebuilds the widget dictionary and invalidates the lazily loaded font cache.
+        Fields no longer in the PDF are dropped. Existing widget objects are kept
+        for fields that remain, since queued hooks were already applied to the PDF
+        and their properties match it. A renamed widget is built from the PDF and
+        takes only the properties not read back from the PDF, such as fonts, from
+        the widget it replaces, without queuing hooks.
         """
 
         self._available_fonts_loaded = False
@@ -294,20 +301,57 @@ class PdfWrapper:
             if stream
             else {}
         )
-        # ensure old widgets don't get overwritten
-        for k, v in self.widgets.items():
-            if k in new_widgets:
-                new_widgets[k] = v
-
-        # update key preserve old key attrs
         for k, v in new_widgets.items():
-            if k in self._key_update_tracker:
-                old_widget = self.widgets[self._key_update_tracker[k]]
-                for name in old_widget.attr_set_tracker:
-                    setattr(v, name, getattr(old_widget, name, None))
+            if k in self.widgets:
+                new_widgets[k] = self.widgets[k]
+            elif self._key_update_tracker.get(k) in self.widgets:
+                v.copy_widget_only_properties(self.widgets[self._key_update_tracker[k]])
         self._key_update_tracker = {}
 
         self.widgets = new_widgets
+
+    @contextmanager
+    def _restore_on_failure(self) -> Iterator[None]:
+        """
+        Restores the wrapper's state if the enclosed operation raises.
+
+        The PDF stream, widgets, their attributes and queued hooks, fonts, and
+        queued key updates are recorded on entry. If the operation raises, they
+        are restored before the exception propagates, so the wrapper and its PDF
+        output are both unchanged. Widget objects keep their identity.
+
+        Yields:
+            None: Control returns to the enclosed operation.
+        """
+
+        widgets = dict(self.widgets)
+        widget_states = [(widget, widget.save_state()) for widget in widgets.values()]
+        state = (
+            self._stream,
+            self._version,
+            dict(self._available_fonts),
+            self._available_fonts_loaded,
+            list(self._font_register_events),
+            dict(self._key_update_tracker),
+            list(self._keys_to_update),
+        )
+
+        try:
+            yield
+        except Exception:
+            (
+                self._stream,
+                self._version,
+                self._available_fonts,
+                self._available_fonts_loaded,
+                self._font_register_events,
+                self._key_update_tracker,
+                self._keys_to_update,
+            ) = state
+            for widget, widget_state in widget_states:
+                widget.restore_state(widget_state)
+            self.widgets = widgets
+            raise
 
     def _ensure_available_fonts_loaded(self) -> dict:
         """
@@ -559,7 +603,9 @@ class PdfWrapper:
         Reads the PDF document and returns its content as bytes.
 
         This method retrieves the PDF stream and performs several processing steps:
-        1. Triggers widget hooks and updates font mappings (via `_read`).
+        1. Triggers widget hooks and updates font mappings (via `_read`). If a
+           hook raises, all queued widget updates are reverted before the error
+           propagates.
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
            generating appearance streams.
@@ -597,10 +643,17 @@ class PdfWrapper:
         This internal method executes queued widget hooks. When a pending font hook
         exists, user-facing registered font names are mapped to their internal PDF
         resource names before hooks are applied. Applying hooks updates the wrapper's
-        stored stream and clears each widget's hook queue.
+        stored stream and clears each widget's hook queue. If a hook raises, every
+        widget's queued hooks are discarded and their properties are restored to
+        their committed values, so the stream and widgets are unchanged and later
+        reads do not retry the failed updates.
 
         Returns:
             bytes: The raw PDF stream.
+
+        Raises:
+            Exception: Any error raised while applying a hook is re-raised after
+                the queued updates are reverted.
         """
 
         widgets_with_hooks = [
@@ -625,11 +678,19 @@ class PdfWrapper:
                         # from `new_font` to `/F1`
                         widget.font = available_fonts.get(widget.font)
 
-            self._stream = trigger_widget_hooks(
-                self._stream,
-                self.widgets,
-                getattr(self, "use_full_widget_name"),
-            )
+            try:
+                self._stream = trigger_widget_hooks(
+                    self._stream,
+                    self.widgets,
+                    getattr(self, "use_full_widget_name"),
+                )
+            except Exception:
+                for widget in self.widgets.values():
+                    widget.revert_property_updates()
+                raise
+
+            for widget in self.widgets.values():
+                widget.clear_property_updates()
 
         return self._stream
 
@@ -726,12 +787,13 @@ class PdfWrapper:
         and removes only the consumed widgets. Other annotations and unfilled
         signature/image fields are preserved. After image drawing, the widget cache
         is refreshed to remove consumed fields while retaining the middleware objects
-        for surviving fields so subsequent style updates can still use them.
+        for surviving fields so subsequent style updates can still use them. With
+        `readonly=True`, every remaining widget reports `readonly` as True.
         Supplied and retained values are prepared before any assignments or PDF
         hooks are applied, so an invalid choice index or ambiguous dropdown string
         leaves widget values, pending hooks, and PDF state unchanged. Only supplied
-        values are assigned.
-        Errors during later PDF processing are not rolled back by this preparation.
+        values are assigned. If later processing raises, such as for an invalid
+        image, widget values and the PDF are restored before the error propagates.
 
         Args:
             data (Dict[str, str | bool | int | BinaryIO | bytes]): A dictionary where keys
@@ -751,6 +813,7 @@ class PdfWrapper:
         """
 
         reject_unsupported_kwargs(self, "fill", kwargs, ["readonly"])
+        readonly = kwargs.get("readonly", False)
         pending = [
             (self.widgets[key], self.widgets[key].prepare_value(value))
             for key, value in data.items()
@@ -759,22 +822,30 @@ class PdfWrapper:
         for key, widget in self.widgets.items():
             if key not in data:
                 widget.prepare_value(widget.value)
-        for widget, update in pending:
-            widget.apply_value(update)
 
-        filled_stream, image_drawn_stream = fill(
-            self._read(),
-            self.widgets,
-            need_appearances=getattr(self, "need_appearances"),
-            use_full_widget_name=getattr(self, "use_full_widget_name"),
-            readonly=kwargs.get("readonly", False),
-        )
+        self._read()
+        with self._restore_on_failure():
+            for widget, update in pending:
+                widget.apply_value(update)
 
-        self._stream = (
-            image_drawn_stream if image_drawn_stream is not None else filled_stream
-        )
-        if image_drawn_stream is not None:
-            self._init_helper()
+            filled_stream, image_drawn_stream = fill(
+                self._read(),
+                self.widgets,
+                need_appearances=getattr(self, "need_appearances"),
+                use_full_widget_name=getattr(self, "use_full_widget_name"),
+                readonly=readonly,
+            )
+
+            self._stream = (
+                image_drawn_stream if image_drawn_stream is not None else filled_stream
+            )
+            if image_drawn_stream is not None:
+                self._init_helper()
+
+        if readonly:
+            for widget in self.widgets.values():
+                # the PDF already has the flag, so no hook is queued
+                widget.__dict__["readonly"] = True
 
         return self
 
@@ -808,7 +879,8 @@ class PdfWrapper:
         separately because each constructs a different PDF annotation; checkboxes
         and radio groups are grouped together because they share ReportLab button
         handling; multiple dropdown fields are routed through the general creation
-        path.
+        path. If creating any group raises, the PDF and widgets are restored, so
+        no field is created.
 
         Args:
             fields (Sequence[FieldTypes]): A list of field definition objects
@@ -844,9 +916,13 @@ class PdfWrapper:
         ):
             general_creation += needs_separate_creation_dict.pop(DropdownField, [])
 
-        for each in list(needs_separate_creation_dict.values()) + [general_creation]:
-            if each:
-                self._bulk_create_fields(each)
+        self._read()
+        with self._restore_on_failure():
+            for each in list(needs_separate_creation_dict.values()) + [
+                general_creation
+            ]:
+                if each:
+                    self._bulk_create_fields(each)
 
         return self
 
@@ -909,6 +985,7 @@ class PdfWrapper:
 
         This method removes any fields whose keys are included in `keys` and
         refreshes the wrapper's widget metadata after the PDF stream is updated.
+        If removal raises, the PDF and widgets are restored.
 
         Args:
             keys (List[str]): A list of form field keys to remove.
@@ -917,10 +994,12 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        self._stream = remove_widgets_by_keys(
-            self._read(), keys, getattr(self, "use_full_widget_name")
-        )
-        self._init_helper()
+        self._read()
+        with self._restore_on_failure():
+            self._stream = remove_widgets_by_keys(
+                self._read(), keys, getattr(self, "use_full_widget_name")
+            )
+            self._init_helper()
 
         return self
 
@@ -955,8 +1034,10 @@ class PdfWrapper:
         Commits deferred widget key updates, applying all queued key renames to the PDF.
 
         This method applies all widget key updates queued by the `update_widget_key` method. It updates
-        the underlying PDF stream with the new key names, rebuilds the widget cache, preserves attributes
-        that were set on the old widget objects, and clears the queue.
+        the underlying PDF stream with the new key names, rebuilds the widget cache, and clears the queue.
+        Renamed widgets are read from the PDF and keep the old widgets' properties that the PDF does not
+        store, such as fonts, without queuing their hooks again. If committing raises, the PDF, widgets,
+        and queue are restored.
 
         Returns:
             PdfWrapper: The PdfWrapper object.
@@ -969,14 +1050,16 @@ class PdfWrapper:
         new_keys = [each[1] for each in self._keys_to_update]
         indices = [each[2] for each in self._keys_to_update]
 
-        self._stream = update_widget_keys(
-            self._read(), self.widgets, old_keys, new_keys, indices
-        )
+        self._read()
+        with self._restore_on_failure():
+            self._stream = update_widget_keys(
+                self._read(), self.widgets, old_keys, new_keys, indices
+            )
 
-        for each in self._keys_to_update:
-            self._key_update_tracker[each[1]] = each[0]
-        self._init_helper()
-        self._keys_to_update = []
+            for each in self._keys_to_update:
+                self._key_update_tracker[each[1]] = each[0]
+            self._init_helper()
+            self._keys_to_update = []
 
         return self
 

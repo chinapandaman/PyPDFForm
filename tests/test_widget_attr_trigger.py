@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import os
+from io import BytesIO
 
 import pytest
+from pypdf import PdfReader
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
 
@@ -336,7 +338,7 @@ def test_set_unsupported_widget_property(pdf_samples, template, key, supported):
     obj = PdfWrapper(os.path.join(pdf_samples, template))
     expected = obj.read()
     widget = obj.widgets[key]
-    attr_set_tracker = dict(widget.attr_set_tracker)
+    state = dict(vars(widget))
 
     for name in unsupported:
         for value in (1, None):
@@ -350,5 +352,105 @@ def test_set_unsupported_widget_property(pdf_samples, template, key, supported):
         assert not hasattr(widget, name)
 
     assert not widget.hooks_to_trigger
-    assert widget.attr_set_tracker == attr_set_tracker
+    assert vars(widget) == state
     assert obj.read() == expected
+
+
+def test_clear_text_field_properties(template_stream, assert_widgets_match_output):
+    obj = PdfWrapper(template_stream)
+    widget = obj.widgets["test"]
+    widget.multiline = True
+    widget.comb = True
+    widget.tooltip = "tooltip"
+    widget.max_length = 4
+    widget.alignment = 2
+    assert_widgets_match_output(obj)
+
+    widget.multiline = False
+    widget.comb = False
+    widget.tooltip = ""
+    widget.max_length = None
+    widget.alignment = None
+    assert widget.tooltip is None
+    assert_widgets_match_output(obj)
+
+    reopened = PdfWrapper(obj.read()).widgets["test"]
+    assert reopened.multiline is False
+    assert reopened.comb is False
+    assert reopened.tooltip is None
+    assert reopened.max_length is None
+    assert reopened.alignment is None
+
+
+def _text_field_entries(stream):
+    entries = ("/Ff", "/TU", "/MaxLen", "/Q")
+    reader = PdfReader(BytesIO(stream))
+    for each in reader.pages[0]["/Annots"]:
+        each = each.get_object()
+        if each.get("/T") == "test":
+            return {entry: each.get(entry) for entry in entries}
+
+    return None
+
+
+def test_clear_absent_text_field_properties(template_stream):
+    obj = PdfWrapper(template_stream)
+    expected = _text_field_entries(obj.read())
+    widget = obj.widgets["test"]
+    widget.multiline = False
+    widget.comb = False
+    widget.tooltip = None
+    widget.max_length = None
+    widget.alignment = None
+
+    # clearing entries the field doesn't have leaves the field unchanged
+    assert _text_field_entries(obj.read()) == expected
+
+
+@pytest.mark.parametrize(
+    ("template", "key", "name", "value", "error"),
+    [
+        ("sample_template.pdf", "test", "readonly", None, TypeError),
+        ("sample_template.pdf", "test", "required", None, TypeError),
+        ("sample_template.pdf", "test", "hidden", None, TypeError),
+        ("sample_template.pdf", "test", "multiline", None, TypeError),
+        ("sample_template.pdf", "test", "comb", None, TypeError),
+        ("sample_template.pdf", "test", "max_length", 0, ValueError),
+        ("sample_template.pdf", "test", "max_length", -1, ValueError),
+        ("sample_template.pdf", "check", "size", None, TypeError),
+        ("sample_template_with_radio_button.pdf", "radio_1", "x", None, TypeError),
+        ("sample_template_with_radio_button.pdf", "radio_1", "x", [1, 2], TypeError),
+        (
+            os.path.join("dropdown", "sample_template_with_dropdown.pdf"),
+            "dropdown_1",
+            "choices",
+            None,
+            TypeError,
+        ),
+    ],
+)
+def test_reject_property_value_not_stored_in_pdf(
+    pdf_samples, template, key, name, value, error, assert_widgets_match_output
+):
+    obj = PdfWrapper(os.path.join(pdf_samples, template))
+    expected = obj.read()
+    widget = obj.widgets[key]
+    state = dict(vars(widget))
+
+    with pytest.raises(error, match=rf"'{key}'|Geometry values"):
+        setattr(widget, name, value)
+
+    assert vars(widget) == state
+    assert not widget.hooks_to_trigger
+    assert obj.read() == expected
+    assert_widgets_match_output(obj)
+
+
+def test_clear_parent_tooltip(pdf_samples, assert_widgets_match_output):
+    obj = PdfWrapper(os.path.join(pdf_samples, "sample_template_with_full_key.pdf"))
+    assert obj.widgets["cout HT"].tooltip == "coût euro HT"
+
+    # the tooltip is on the parent field, so it is removed there too
+    obj.widgets["cout HT"].tooltip = None
+    assert_widgets_match_output(obj)
+    assert PdfWrapper(obj.read()).widgets["cout HT"].tooltip is None

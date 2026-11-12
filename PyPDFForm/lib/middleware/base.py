@@ -38,14 +38,27 @@ class Widget:
     The Widget class provides a base implementation for middleware objects
     built from existing PDF form fields. It stores extracted field state,
     queues hook calls when mutable attributes are changed, and exposes schema
-    and sample-data helpers used by `PdfWrapper`.
+    and sample-data helpers used by `PdfWrapper`. Each queued property keeps
+    its committed value so a failed update can be reverted.
 
     Attributes:
         TYPE_SPECIFIC_PROPERTIES (frozenset): Properties supported only by this
             widget type and its subclasses. Subclasses declare their own.
+        READ_PROPERTIES (frozenset): Hooked properties read back from the PDF
+            when a wrapper is opened. Other hooked properties, such as fonts and
+            JavaScript, exist only on the widget.
+        CLEARABLE_PROPERTIES (frozenset): Read properties that are absent from
+            the PDF when None. Assigning None removes them from the PDF.
+        GEOMETRY_PROPERTIES (frozenset): Coordinates and dimensions, which must
+            be integers or floats. Subclasses add their own, such as `size`.
     """
 
     TYPE_SPECIFIC_PROPERTIES = frozenset()
+    READ_PROPERTIES = frozenset(
+        {"x", "y", "width", "height", "readonly", "required", "hidden", "tooltip"}
+    )
+    CLEARABLE_PROPERTIES = frozenset({"tooltip"})
+    GEOMETRY_PROPERTIES = frozenset({"x", "y", "width", "height"})
     _ALL_TYPE_SPECIFIC_PROPERTIES = set()
 
     def __init_subclass__(cls, **kwargs) -> None:
@@ -93,7 +106,7 @@ class Widget:
             "on_focused_javascript": "update_field_on_focused_javascript",
             "on_blurred_javascript": "update_field_on_blurred_javascript",
         }
-        self.attr_set_tracker = {}
+        self._committed_values = {}
 
         self._name = name
         self._value = value
@@ -123,11 +136,13 @@ class Widget:
         """
         Set an attribute on the widget.
 
-        This method overrides the default __setattr__ method to
-        trigger hooks when certain attributes are set to non-None values. It also
-        tracks existing attributes that were explicitly set so those values can be
-        preserved across widget-cache rebuilds. Type-specific properties that the
-        widget does not support are rejected before any change.
+        This method overrides the default __setattr__ method. After the widget
+        is constructed, assigning a hooked property validates the value with
+        `prepare_property` and queues a hook that applies it to the PDF on the
+        next read. The property's committed value is kept until the hook is
+        applied or reverted. None queues a hook only for clearable properties.
+        Type-specific properties that the widget does not support are rejected
+        before any change.
 
         Args:
             name (str): The name of the attribute.
@@ -136,24 +151,135 @@ class Widget:
         Raises:
             AttributeError: Raised when the widget type does not support the
                 property.
+            TypeError: Raised when a property read back from the PDF is set to
+                None, or geometry is not a number.
+            ValueError: Raised when a value is outside its valid range.
         """
         self.check_property_supported(name)
 
-        if (
-            hasattr(self, "SET_ATTR_TRIGGER_HOOK_MAP")
-            and name in self.SET_ATTR_TRIGGER_HOOK_MAP
-            and value is not None
-        ):
-            self.hooks_to_trigger.append((self.SET_ATTR_TRIGGER_HOOK_MAP[name], value))
-
-        if (
-            hasattr(self, "attr_set_tracker")
-            and name in self.__dict__
-            and value is not None
-        ):
-            self.attr_set_tracker[name] = value
+        hook = self.__dict__.get("SET_ATTR_TRIGGER_HOOK_MAP", {}).get(name)
+        if hook is not None and name in self.__dict__:
+            value, hook_value = self.prepare_property(name, value)
+            if hook_value is not None or name in self.CLEARABLE_PROPERTIES:
+                self._committed_values.setdefault(name, self.__dict__[name])
+                self.hooks_to_trigger.append((hook, hook_value))
 
         super().__setattr__(name, value)
+
+    def prepare_property(self, name: str, value: Any) -> tuple[Any, Any]:
+        """
+        Validates a hooked property value before the widget changes.
+
+        Properties read back from the PDF must be values the PDF can store, so
+        reopening the PDF reports the same value. None is accepted only for
+        clearable properties, and an empty tooltip clears the tooltip. Geometry
+        must be an integer or float. Subclasses can validate their own
+        properties and change how a value is stored.
+
+        Args:
+            name (str): The name of the property.
+            value (Any): The proposed value of the property.
+
+        Returns:
+            tuple[Any, Any]: The value to store on the widget and the value to
+                pass to the property's hook.
+
+        Raises:
+            TypeError: Raised when a property read back from the PDF is set to
+                None, or geometry is not a number.
+        """
+        if value is None:
+            if (
+                name in self.READ_PROPERTIES or name in self.GEOMETRY_PROPERTIES
+            ) and name not in self.CLEARABLE_PROPERTIES:
+                msg = (
+                    f"{type(self).__name__} field '{self.name}' property "
+                    f"'{name}' cannot be None."
+                )
+                raise TypeError(msg)
+        elif name in self.GEOMETRY_PROPERTIES:
+            self.validate_geometry_value(value)
+        elif name == "tooltip" and value == "":
+            value = None
+
+        return value, value
+
+    @staticmethod
+    def validate_geometry_value(value: Any) -> int | float:
+        """
+        Validates a scalar coordinate or dimension.
+
+        Args:
+            value (Any): The coordinate or dimension to validate.
+
+        Returns:
+            int | float: The unchanged value.
+
+        Raises:
+            TypeError: If the value is not an integer or float, or is a boolean.
+        """
+        # bool subclasses int, so the numeric type check alone would accept booleans.
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            # TODO: Refactor this raise into a centralized exception raiser when one is introduced.
+            msg = "Geometry values must be integers or floats; booleans are invalid."
+            raise TypeError(msg)
+        return value
+
+    def save_state(self) -> dict:
+        """
+        Returns a copy of the widget's attributes, queued hooks, and committed values.
+
+        Returns:
+            dict: The state to pass to `restore_state`.
+        """
+        return {
+            **self.__dict__,
+            "hooks_to_trigger": list(self.hooks_to_trigger),
+            "_committed_values": dict(self._committed_values),
+        }
+
+    def restore_state(self, state: dict) -> None:
+        """
+        Restores attributes saved by `save_state` without queuing hooks.
+
+        Args:
+            state (dict): The state returned by `save_state`.
+        """
+        self.__dict__.clear()
+        self.__dict__.update(state)
+
+    def clear_property_updates(self) -> None:
+        """
+        Clears queued hooks and committed values after hooks are applied.
+        """
+        self.hooks_to_trigger = []
+        self._committed_values = {}
+
+    def revert_property_updates(self) -> None:
+        """
+        Discards queued hooks and restores their properties' committed values.
+
+        Values are restored without queuing hooks, so the widget again matches
+        the PDF the hooks were not applied to.
+        """
+        for name, value in self._committed_values.items():
+            self.__dict__[name] = value
+        self.clear_property_updates()
+
+    def copy_widget_only_properties(self, other: "Widget") -> None:
+        """
+        Copies hooked properties that are not read back from the PDF.
+
+        Fonts, sizes, and JavaScript exist only on the widget, so a widget
+        rebuilt from the PDF, such as after renaming, takes them from the widget
+        it replaces. The values are copied without queuing hooks.
+
+        Args:
+            other (Widget): The widget to copy the properties from.
+        """
+        for name in self.SET_ATTR_TRIGGER_HOOK_MAP:
+            if name not in self.READ_PROPERTIES and name in other.__dict__:
+                self.__dict__[name] = other.__dict__[name]
 
     def check_property_supported(self, name: str) -> None:
         """

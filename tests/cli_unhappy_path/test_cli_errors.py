@@ -404,8 +404,15 @@ def test_update_dynamic_options_require_field(pdf_samples, subcommand):
 
 
 @pytest.mark.cli_test
-def test_update_field_schema_error(pdf_samples, tmp_path):
-    data_path = write_invalid_json(tmp_path, '{"test": {"alignment": 3}}')
+@pytest.mark.parametrize(
+    ("data", "path"),
+    [
+        ('{"test": {"alignment": 3}}', "test.alignment"),
+        ('{"test": {"max_length": 0}}', "test.max_length"),
+    ],
+)
+def test_update_field_schema_error(pdf_samples, tmp_path, data, path):
+    data_path = write_invalid_json(tmp_path, data)
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -421,9 +428,7 @@ def test_update_field_schema_error(pdf_samples, tmp_path):
         ],
     )
 
-    assert_cli_error(
-        result, "Invalid JSON file at test.alignment", output_path=output_path
-    )
+    assert_cli_error(result, f"Invalid JSON file at {path}", output_path=output_path)
 
 
 @pytest.mark.cli_test

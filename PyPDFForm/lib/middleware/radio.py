@@ -9,7 +9,7 @@ document, allowing users to select one option from a group of choices.
 
 from typing import Any
 
-from .base import PreparedValue
+from .base import PreparedValue, Widget
 from .checkbox import Checkbox
 
 
@@ -40,6 +40,32 @@ class Radio(Checkbox):
         super().__init__(name, value)
 
         self.number_of_options: int = 0
+
+    def prepare_property(self, name: str, value: Any) -> tuple[Any, Any]:
+        """
+        Validates a hooked property value before the radio group changes.
+
+        A coordinate or dimension applies to every option, so it is stored as
+        one value per option, as reopening the PDF reports it. `size` stays a
+        single value because it is not read back from the PDF.
+
+        Args:
+            name (str): The name of the property.
+            value (Any): The proposed value of the property.
+
+        Returns:
+            tuple[Any, Any]: The value to store on the widget and the value to
+                pass to the property's hook.
+
+        Raises:
+            TypeError: Raised when a property read back from the PDF is set to
+                None, or geometry is not a number.
+        """
+        value, hook_value = super().prepare_property(name, value)
+        if name in Widget.GEOMETRY_PROPERTIES:
+            value = [value] * self.number_of_options
+
+        return value, hook_value
 
     def prepare_value(self, value: Any) -> PreparedValue:
         """
