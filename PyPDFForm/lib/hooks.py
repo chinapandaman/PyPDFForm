@@ -142,36 +142,45 @@ def _update_field_flag(annot: DictionaryObject, flag: int, should_set: bool) -> 
         )
 
 
-def _remove_inherited_entry(annot: DictionaryObject, key: str) -> None:
+def _remove_field_entry(
+    annot: DictionaryObject, key: str, inherited: bool = True
+) -> None:
     """
-    Removes an inheritable field entry from a widget and its own field.
+    Removes a field entry from a widget and its own field.
 
     The widget's own field is the first dictionary in its `/Parent` chain,
     starting with the widget itself, that has a name (`T`). The entry is removed
     from every dictionary up to and including that field, so the field no longer
-    has it, even when it was stored on the parent of a widget.
+    has it, even when it was stored on the parent of a widget. Fields above the
+    widget's own field are shared with other fields, so they are never changed.
+    An inheritable entry set by any of them still applies to the field. Other
+    entries are read only from the widget and its parent, so only a shared
+    parent of the widget itself still applies.
 
     Args:
         annot (DictionaryObject): The widget annotation dictionary.
-        key (str): The inheritable entry to remove, such as `/MaxLen` or `/Q`.
+        key (str): The entry to remove, such as `/MaxLen`, `/Q`, or `/TU`.
+        inherited (bool): Whether the entry is inheritable. Defaults to True.
 
     Raises:
-        ValueError: If a field above the widget's own field sets the entry.
-            Those fields are shared with other fields, so they are not changed.
+        ValueError: If a shared field above the widget's own field sets an
+            entry that would still apply to the field.
     """
     own = [annot]
     while T not in own[-1] and Parent in own[-1]:
         own.append(cast(DictionaryObject, own[-1][Parent].get_object()))
 
+    shared = []
     ancestor = own[-1]
     while Parent in ancestor:
         ancestor = cast(DictionaryObject, ancestor[Parent].get_object())
-        if key in ancestor:
-            msg = (
-                f"Cannot remove {key}: it is inherited from a parent field "
-                "shared with other fields."
-            )
-            raise ValueError(msg)
+        shared.append(ancestor)
+    if not inherited:
+        shared = shared[: max(0, 2 - len(own))]
+
+    if any(key in each for each in shared):
+        msg = f"Cannot remove {key}: a parent field shared with other fields sets it."
+        raise ValueError(msg)
 
     for each in own:
         each.pop(NameObject(key), None)
@@ -307,7 +316,7 @@ def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
             parent field shared with other fields.
     """
     if val is None:
-        _remove_inherited_entry(annot, Q)
+        _remove_field_entry(annot, Q)
     else:
         annot[NameObject(Q)] = NumberObject(val)
 
@@ -364,7 +373,7 @@ def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
             parent field shared with other fields.
     """
     if val is None:
-        _remove_inherited_entry(annot, MaxLen)
+        _remove_field_entry(annot, MaxLen)
     else:
         annot[NameObject(MaxLen)] = NumberObject(val)
 
@@ -537,19 +546,23 @@ def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
 
     This function sets the 'TU' entry in the annotation dictionary, which
     provides a text string that can be used as a tooltip for the field. None or
-    an empty string removes the tooltip from the annotation and its parent field.
+    an empty string removes the tooltip from the annotation and its own field.
+    A tooltip is read from the widget or its parent, so a parent shared with
+    other fields keeps its tooltip.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
         val (str | None): The new tooltip string for the field, or None to
             remove it.
+
+    Raises:
+        ValueError: If None is given and the widget's parent is shared with
+            other fields and sets a tooltip.
     """
     if val:
         annot[NameObject(TU)] = TextStringObject(val)
     else:
-        annot.pop(NameObject(TU), None)
-        if Parent in annot:
-            cast(DictionaryObject, annot[Parent].get_object()).pop(NameObject(TU), None)
+        _remove_field_entry(annot, TU, inherited=False)
 
 
 def update_field_required(annot: DictionaryObject, val: bool) -> None:

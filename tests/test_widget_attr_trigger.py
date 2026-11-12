@@ -542,3 +542,35 @@ def test_clear_property_inherited_from_shared_parent(
     assert obj.read() == expected
     assert _inherited_entry(expected, "test_2", entry) == 1
     assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_clear_tooltip_shared_by_parent(
+    template_stream, use_full_widget_name, assert_widgets_match_output
+):
+    stream = _group_fields(
+        template_stream, ("test", "test_2"), "/TU", String("shared tooltip")
+    )
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    prefix = "group." if use_full_widget_name else ""
+    widget, sibling = obj.widgets[f"{prefix}test"], obj.widgets[f"{prefix}test_2"]
+    assert widget.tooltip == sibling.tooltip == "shared tooltip"
+    expected = obj.read()
+
+    widget.tooltip = None
+    # removing it from the parent would clear the tooltip of test_2 too
+    with pytest.raises(ValueError, match="Cannot remove /TU"):
+        obj.read()
+
+    assert widget.tooltip == "shared tooltip"
+    assert obj.read() == expected
+    reopened = PdfWrapper(expected, use_full_widget_name=use_full_widget_name)
+    assert reopened.widgets[f"{prefix}test_2"].tooltip == "shared tooltip"
+    assert_widgets_match_output(obj)
+
+    # a tooltip of its own is set on the widget, leaving the parent's
+    widget.tooltip = "own tooltip"
+    assert_widgets_match_output(obj)
+    reopened = PdfWrapper(obj.read(), use_full_widget_name=use_full_widget_name)
+    assert reopened.widgets[f"{prefix}test"].tooltip == "own tooltip"
+    assert reopened.widgets[f"{prefix}test_2"].tooltip == "shared tooltip"
