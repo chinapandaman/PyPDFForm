@@ -8,14 +8,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  tests:
+  distribution:
     uses: ./.github/workflows/python-package.yml
-
-  linting:
-    uses: ./.github/workflows/python-linting.yml
+    with:
+      distribution-only: true
 
   deploy:
-    needs: [tests, linting]
+    needs: distribution
 
     runs-on: ubuntu-latest
     permissions:
@@ -30,7 +29,7 @@ jobs:
         path: dist
     - name: Verify the files are the checked distribution
       env:
-        EXPECTED: ${{ needs.tests.outputs.dist-sha256 }}
+        EXPECTED: ${{ needs.distribution.outputs.dist-sha256 }}
       run: |
         cd dist
         if [ -z "$EXPECTED" ]; then
@@ -47,7 +46,7 @@ jobs:
     - name: Record the published commit and files
       if: github.event_name == 'release'
       env:
-        CHECKSUMS: ${{ needs.tests.outputs.dist-sha256 }}
+        CHECKSUMS: ${{ needs.distribution.outputs.dist-sha256 }}
       run: |
         {
           echo "### Published ${GITHUB_REF_NAME} from \`${GITHUB_SHA}\`"
@@ -56,3 +55,10 @@ jobs:
           echo "$CHECKSUMS"
           echo '```'
         } >> "$GITHUB_STEP_SUMMARY"
+
+  docs:
+    needs: deploy
+    if: github.event_name == 'release'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/deploy-docs.yml
