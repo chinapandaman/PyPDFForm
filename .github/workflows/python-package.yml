@@ -8,6 +8,11 @@ on:
   pull_request:
     branches: [ master ]
   workflow_call:
+    inputs:
+      distribution-only:
+        description: Skip the test matrix and only build and check the distribution
+        type: boolean
+        default: false
     outputs:
       dist-sha256:
         description: SHA-256 checksums of the files in the checked dist artifact
@@ -15,6 +20,7 @@ on:
 
 jobs:
   build:
+    if: ${{ !inputs.distribution-only }}
 
     runs-on: ${{ matrix.os }}
     strategy:
