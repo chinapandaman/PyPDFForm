@@ -52,6 +52,7 @@ from .constants import (
     Q,
     Rect,
     S,
+    T,
     Type,
     U,
     X,
@@ -139,6 +140,41 @@ def _update_field_flag(annot: DictionaryObject, flag: int, should_set: bool) -> 
                 else int(annot.get(NameObject(Ff), 0)) & ~flag
             )
         )
+
+
+def _remove_inherited_entry(annot: DictionaryObject, key: str) -> None:
+    """
+    Removes an inheritable field entry from a widget and its own field.
+
+    The widget's own field is the first dictionary in its `/Parent` chain,
+    starting with the widget itself, that has a name (`T`). The entry is removed
+    from every dictionary up to and including that field, so the field no longer
+    has it, even when it was stored on the parent of a widget.
+
+    Args:
+        annot (DictionaryObject): The widget annotation dictionary.
+        key (str): The inheritable entry to remove, such as `/MaxLen` or `/Q`.
+
+    Raises:
+        ValueError: If a field above the widget's own field sets the entry.
+            Those fields are shared with other fields, so they are not changed.
+    """
+    own = [annot]
+    while T not in own[-1] and Parent in own[-1]:
+        own.append(cast(DictionaryObject, own[-1][Parent].get_object()))
+
+    ancestor = own[-1]
+    while Parent in ancestor:
+        ancestor = cast(DictionaryObject, ancestor[Parent].get_object())
+        if key in ancestor:
+            msg = (
+                f"Cannot remove {key}: it is inherited from a parent field "
+                "shared with other fields."
+            )
+            raise ValueError(msg)
+
+    for each in own:
+        each.pop(NameObject(key), None)
 
 
 def update_text_field_font(annot: DictionaryObject, val: str) -> None:
@@ -258,15 +294,20 @@ def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
     Updates the text alignment of a text field annotation.
 
     This function modifies the Q entry in the annotation dictionary to change
-    the text alignment of the text field. None removes the entry.
+    the text alignment of the text field. None removes the entry from the
+    annotation and its own field, since the field's alignment is inherited.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
         val (int | None): The new alignment value (0=Left, 1=Center, 2=Right),
             or None to remove it.
+
+    Raises:
+        ValueError: If None is given and the alignment is inherited from a
+            parent field shared with other fields.
     """
     if val is None:
-        annot.pop(NameObject(Q), None)
+        _remove_inherited_entry(annot, Q)
     else:
         annot[NameObject(Q)] = NumberObject(val)
 
@@ -310,15 +351,20 @@ def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
 
     This function sets the 'MaxLen' entry in the annotation dictionary, which
     specifies the maximum number of characters that can be entered into the text field.
-    None removes the entry.
+    None removes the entry from the annotation and its own field, since the
+    field's maximum length is inherited.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
         val (int | None): The maximum number of characters allowed in the text
             field, or None to remove the limit.
+
+    Raises:
+        ValueError: If None is given and the maximum length is inherited from a
+            parent field shared with other fields.
     """
     if val is None:
-        annot.pop(NameObject(MaxLen), None)
+        _remove_inherited_entry(annot, MaxLen)
     else:
         annot[NameObject(MaxLen)] = NumberObject(val)
 

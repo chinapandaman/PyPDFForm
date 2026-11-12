@@ -1194,6 +1194,23 @@ def test_commit_widget_key_updates_does_not_replay_hooks(
     assert_widgets_match_output(obj)
 
 
+def test_commit_widget_key_updates_keeps_pending_value(template_stream):
+    obj = PdfWrapper(template_stream)
+    obj.widgets["test"].tooltip = "tooltip"
+    obj.read()
+    # assigned without filling, so only the wrapper has it
+    obj.widgets["test"].value = "pending text"
+
+    obj.update_widget_key("test", "renamed").commit_widget_key_updates()
+
+    renamed = obj.widgets["renamed"]
+    assert renamed.value == "pending text"
+    assert not renamed.hooks_to_trigger
+
+    obj.fill({})
+    assert PdfWrapper(obj.read()).widgets["renamed"].value == "pending text"
+
+
 def _without_default_appearance(stream, key):
     writer = PdfWriter(BytesIO(stream))
     for annot in writer.pages[0]["/Annots"]:

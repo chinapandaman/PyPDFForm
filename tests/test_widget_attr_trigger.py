@@ -4,9 +4,11 @@ import os
 from io import BytesIO
 
 import pytest
+from pikepdf import Array, Dictionary, Pdf, String
 from pypdf import PdfReader
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
+from PyPDFForm.lib.patterns import get_widget_key
 
 
 def test_register_font_no_form_fields(
@@ -454,3 +456,89 @@ def test_clear_parent_tooltip(pdf_samples, assert_widgets_match_output):
     obj.widgets["cout HT"].tooltip = None
     assert_widgets_match_output(obj)
     assert PdfWrapper(obj.read()).widgets["cout HT"].tooltip is None
+
+
+def _inherited_entry(stream, name, entry):
+    # the entry a viewer uses for the widget, which can be stored on its parents
+    for page in PdfReader(BytesIO(stream)).pages:
+        for annot in page.get("/Annots", []):
+            annot = annot.get_object()
+            if get_widget_key(annot, False) == name:
+                return annot.get_inherited(entry, None)
+
+    return None
+
+
+def _set_parent_entry(stream, name, entry, value):
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for page in pdf.pages:
+            for annot in page.get("/Annots", []):
+                if "/Parent" in annot and str(annot.Parent.get("/T")) == name:
+                    annot.Parent[entry] = value
+
+        with BytesIO() as f:
+            pdf.save(f)
+            return f.getvalue()
+
+
+@pytest.mark.parametrize(
+    ("name", "entry", "value"), [("max_length", "/MaxLen", 10), ("alignment", "/Q", 2)]
+)
+def test_clear_inherited_text_field_property(
+    pdf_samples, name, entry, value, assert_widgets_match_output
+):
+    with open(
+        os.path.join(pdf_samples, "sample_template_with_full_key.pdf"), "rb"
+    ) as f:
+        # the widget of "Date mois" inherits the entry from its field
+        stream = _set_parent_entry(f.read(), "Date mois", entry, 1)
+    assert _inherited_entry(stream, "Date mois", entry) == 1
+
+    obj = PdfWrapper(stream)
+    setattr(obj.widgets["Date mois"], name, value)
+    assert _inherited_entry(obj.read(), "Date mois", entry) == value
+
+    setattr(obj.widgets["Date mois"], name, None)
+    assert _inherited_entry(obj.read(), "Date mois", entry) is None
+    assert_widgets_match_output(obj)
+
+
+def _group_fields(stream, names, entry, value):
+    # make the fields kids of a parent field that sets the entry
+    with Pdf.open(BytesIO(stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        kids = [field for field in fields if str(field.get("/T")) in names]
+        parent = pdf.make_indirect(
+            Dictionary({"/T": String("group"), "/Kids": Array(kids), entry: value})
+        )
+        for kid in kids:
+            kid.Parent = parent
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in fields if str(field.get("/T")) not in names] + [parent]
+        )
+
+        with BytesIO() as f:
+            pdf.save(f)
+            return f.getvalue()
+
+
+@pytest.mark.parametrize(
+    ("name", "entry", "value"), [("max_length", "/MaxLen", 5), ("alignment", "/Q", 2)]
+)
+def test_clear_property_inherited_from_shared_parent(
+    template_stream, name, entry, value, assert_widgets_match_output
+):
+    obj = PdfWrapper(_group_fields(template_stream, ("test", "test_2"), entry, 1))
+    setattr(obj.widgets["test"], name, value)
+    expected = obj.read()
+
+    setattr(obj.widgets["test"], name, None)
+    # removing it from the parent would change "test_2" too
+    with pytest.raises(ValueError, match=f"Cannot remove {entry}"):
+        obj.read()
+
+    assert getattr(obj.widgets["test"], name) == value
+    assert not obj.widgets["test"].hooks_to_trigger
+    assert obj.read() == expected
+    assert _inherited_entry(expected, "test_2", entry) == 1
+    assert_widgets_match_output(obj)

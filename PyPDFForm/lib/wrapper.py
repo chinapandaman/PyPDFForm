@@ -287,8 +287,9 @@ class PdfWrapper:
         Fields no longer in the PDF are dropped. Existing widget objects are kept
         for fields that remain, since queued hooks were already applied to the PDF
         and their properties match it. A renamed widget is built from the PDF and
-        takes only the properties not read back from the PDF, such as fonts, from
-        the widget it replaces, without queuing hooks.
+        takes from the widget it replaces only its value, which may not be filled
+        yet, and the properties not read back from the PDF, such as fonts,
+        without queuing hooks.
         """
 
         self._available_fonts_loaded = False
@@ -305,7 +306,7 @@ class PdfWrapper:
             if k in self.widgets:
                 new_widgets[k] = self.widgets[k]
             elif self._key_update_tracker.get(k) in self.widgets:
-                v.copy_widget_only_properties(self.widgets[self._key_update_tracker[k]])
+                v.copy_unread_state(self.widgets[self._key_update_tracker[k]])
         self._key_update_tracker = {}
 
         self.widgets = new_widgets
@@ -1035,8 +1036,8 @@ class PdfWrapper:
 
         This method applies all widget key updates queued by the `update_widget_key` method. It updates
         the underlying PDF stream with the new key names, rebuilds the widget cache, and clears the queue.
-        Renamed widgets are read from the PDF and keep the old widgets' properties that the PDF does not
-        store, such as fonts, without queuing their hooks again. If committing raises, the PDF, widgets,
+        Renamed widgets are read from the PDF and keep the old widgets' values, including values not filled
+        yet, and properties that the PDF does not store, such as fonts, without queuing their hooks again. If committing raises, the PDF, widgets,
         and queue are restored.
 
         Returns:

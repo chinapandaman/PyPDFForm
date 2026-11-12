@@ -266,17 +266,23 @@ class Widget:
             self.__dict__[name] = value
         self.clear_property_updates()
 
-    def copy_widget_only_properties(self, other: "Widget") -> None:
+    def copy_unread_state(self, other: "Widget") -> None:
         """
-        Copies hooked properties that are not read back from the PDF.
+        Copies the state that rebuilding a widget from the PDF would lose.
 
-        Fonts, sizes, and JavaScript exist only on the widget, so a widget
-        rebuilt from the PDF, such as after renaming, takes them from the widget
-        it replaces. The values are copied without queuing hooks.
+        A widget rebuilt from the PDF, such as after renaming, takes the value
+        of the widget it replaces, since a value assigned without filling is not
+        in the PDF yet. It also takes the hooked properties that are not read
+        back from the PDF, such as fonts, sizes, and JavaScript. A value of None
+        keeps the value read from the PDF. Nothing is copied through hooks, so
+        no update is queued again.
 
         Args:
-            other (Widget): The widget to copy the properties from.
+            other (Widget): The widget to copy the state from.
         """
+        if other.__dict__.get("_value") is not None:
+            self.__dict__["_value"] = other.__dict__["_value"]
+
         for name in self.SET_ATTR_TRIGGER_HOOK_MAP:
             if name not in self.READ_PROPERTIES and name in other.__dict__:
                 self.__dict__[name] = other.__dict__[name]
