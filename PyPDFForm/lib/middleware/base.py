@@ -51,6 +51,9 @@ class Widget:
             the PDF when None. Assigning None removes them from the PDF.
         GEOMETRY_PROPERTIES (frozenset): Coordinates and dimensions, which must
             be integers or floats. Subclasses add their own, such as `size`.
+        LOCAL_SETTINGS (frozenset): Settings without hooks that exist only on
+            the widget, such as `preserve_aspect_ratio`. They are kept when the
+            widget is rebuilt from the PDF.
     """
 
     TYPE_SPECIFIC_PROPERTIES = frozenset()
@@ -59,6 +62,7 @@ class Widget:
     )
     CLEARABLE_PROPERTIES = frozenset({"tooltip"})
     GEOMETRY_PROPERTIES = frozenset({"x", "y", "width", "height"})
+    LOCAL_SETTINGS = frozenset()
     _ALL_TYPE_SPECIFIC_PROPERTIES = set()
 
     def __init_subclass__(cls, **kwargs) -> None:
@@ -273,7 +277,8 @@ class Widget:
         A widget rebuilt from the PDF, such as after renaming, takes the value
         of the widget it replaces, since a value assigned without filling is not
         in the PDF yet. It also takes the hooked properties that are not read
-        back from the PDF, such as fonts, sizes, and JavaScript. A value of None
+        back from the PDF, such as fonts, sizes, and JavaScript, and the settings
+        in `LOCAL_SETTINGS` that were assigned on the widget. A value of None
         keeps the value read from the PDF. Nothing is copied through hooks, so
         no update is queued again.
 
@@ -283,7 +288,7 @@ class Widget:
         if other.__dict__.get("_value") is not None:
             self.__dict__["_value"] = other.__dict__["_value"]
 
-        for name in self.SET_ATTR_TRIGGER_HOOK_MAP:
+        for name in (*self.SET_ATTR_TRIGGER_HOOK_MAP, *self.LOCAL_SETTINGS):
             if name not in self.READ_PROPERTIES and name in other.__dict__:
                 self.__dict__[name] = other.__dict__[name]
 

@@ -459,3 +459,47 @@ def test_fill_vertical_image_not_preserve_aspect_ratio(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def _page_contents(pdf):
+    return [
+        contents.get_data()
+        for page in PdfReader(BytesIO(pdf.read())).pages
+        if (contents := page.get_contents()) is not None
+    ]
+
+
+@pytest.mark.parametrize(
+    ("template", "key", "preserve"),
+    [
+        (
+            os.path.join("signature", "sample_template_with_signature_overlap.pdf"),
+            "signature",
+            False,
+        ),
+        ("sample_template_with_image_field.pdf", "image_1", True),
+    ],
+)
+def test_rename_keeps_preserve_aspect_ratio(
+    pdf_samples, image_samples, template, key, preserve
+):
+    path = os.path.join(pdf_samples, template)
+    image = os.path.join(image_samples, "sample_image.jpg")
+    forms = {}
+    for each in (preserve, not preserve, "renamed"):
+        forms[each] = PdfWrapper(path)
+        # preserve differs from the field's default
+        forms[each].widgets[key].preserve_aspect_ratio = (
+            preserve if each == "renamed" else each
+        )
+
+    renamed = forms.pop("renamed")
+    renamed.update_widget_key(key, "renamed").commit_widget_key_updates()
+    assert renamed.widgets["renamed"].preserve_aspect_ratio is preserve
+    assert not renamed.widgets["renamed"].hooks_to_trigger
+
+    renamed.fill({"renamed": image})
+    for each, form in forms.items():
+        form.fill({key: image})
+        # the image is drawn as without renaming, and the setting changes it
+        assert (_page_contents(renamed) == _page_contents(form)) is (each is preserve)
