@@ -11,9 +11,8 @@ from PyPDFForm.cli.root import cli_app
 runner = CliRunner()
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_bulk_create_fields(pdf_samples, yaml_samples, tmp_path):
+def test_bulk_create_fields(pdf_samples, yaml_samples, tmp_path, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_bulk_create_fields.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -35,8 +34,7 @@ def test_bulk_create_fields(pdf_samples, yaml_samples, tmp_path):
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        assert_same_pdf(actual, expected)
 
 
 @pytest.mark.cli_test
@@ -83,9 +81,8 @@ def test_create_field_input_methods(pdf_samples, tmp_path):
         assert file_output == options_output
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_create_text(pdf_samples, yaml_samples, tmp_path):
+def test_create_text(pdf_samples, yaml_samples, tmp_path, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_text.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -107,13 +104,11 @@ def test_create_text(pdf_samples, yaml_samples, tmp_path):
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        assert_same_pdf(actual, expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_create_check(pdf_samples, yaml_samples, tmp_path):
+def test_create_check(pdf_samples, yaml_samples, tmp_path, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_check.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -135,13 +130,11 @@ def test_create_check(pdf_samples, yaml_samples, tmp_path):
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        assert_same_pdf(actual, expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_create_radio(pdf_samples, yaml_samples, tmp_path):
+def test_create_radio(pdf_samples, yaml_samples, tmp_path, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_radio.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -163,13 +156,11 @@ def test_create_radio(pdf_samples, yaml_samples, tmp_path):
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        assert_same_pdf(actual, expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_create_dropdown(pdf_samples, yaml_samples, tmp_path):
+def test_create_dropdown(pdf_samples, yaml_samples, tmp_path, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_dropdown.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -191,13 +182,13 @@ def test_create_dropdown(pdf_samples, yaml_samples, tmp_path):
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        assert_same_pdf(actual, expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_create_dropdown_with_export_values(pdf_samples, yaml_samples, tmp_path):
+def test_create_dropdown_with_export_values(
+    pdf_samples, yaml_samples, tmp_path, assert_same_pdf
+):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_create_dropdown_with_export_values.pdf"
     )
@@ -221,8 +212,7 @@ def test_create_dropdown_with_export_values(pdf_samples, yaml_samples, tmp_path)
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        assert_same_pdf(actual, expected)
 
 
 @pytest.mark.cli_test

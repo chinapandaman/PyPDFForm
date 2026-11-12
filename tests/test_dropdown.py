@@ -2,8 +2,6 @@
 
 import os
 
-import pytest
-
 from PyPDFForm import PdfWrapper
 
 
@@ -65,8 +63,7 @@ def test_dropdown_one_readonly(sample_template_with_dropdown, pdf_samples, reque
         assert obj.read() == expected
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
+def test_dropdown_alignment(dropdown_alignment, pdf_samples, request, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_alignment.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(dropdown_alignment).fill(
@@ -82,13 +79,11 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 def test_dropdown_alignment_readonly_then_editable(
-    dropdown_alignment, pdf_samples, request
+    dropdown_alignment, pdf_samples, request, assert_same_pdf
 ):
     expected_path = os.path.join(
         pdf_samples, "dropdown", "test_dropdown_alignment_readonly_then_editable.pdf"
@@ -109,8 +104,7 @@ def test_dropdown_alignment_readonly_then_editable(
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
 def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples, request):

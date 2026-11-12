@@ -2,13 +2,10 @@
 
 import os
 
-import pytest
-
 from PyPDFForm import BlankPage, PdfArray, PdfWrapper
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_blank_page(pdf_samples, request):
+def test_blank_page(pdf_samples, request, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_blank_page.pdf")
 
     blank_pdf = PdfWrapper(BlankPage())
@@ -19,7 +16,7 @@ def test_blank_page(pdf_samples, request):
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(blank_pdf.read()) == len(expected)
+        assert_same_pdf(blank_pdf.read(), expected, timestamped=True)
 
         assert not blank_pdf.widgets
         assert len(blank_pdf.pages) == 1
@@ -29,8 +26,7 @@ def test_blank_page(pdf_samples, request):
         )
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_blank_page_custom_dimensions(pdf_samples, request):
+def test_blank_page_custom_dimensions(pdf_samples, request, assert_same_pdf):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_blank_page_custom_dimensions.pdf"
     )
@@ -43,7 +39,7 @@ def test_blank_page_custom_dimensions(pdf_samples, request):
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(blank_pdf.read()) == len(expected)
+        assert_same_pdf(blank_pdf.read(), expected, timestamped=True)
 
         assert not blank_pdf.widgets
         assert len(blank_pdf.pages) == 1
@@ -53,8 +49,7 @@ def test_blank_page_custom_dimensions(pdf_samples, request):
         )
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_blank_page_multiply(pdf_samples, request):
+def test_blank_page_multiply(pdf_samples, request, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_blank_page_multiply.pdf")
 
     blank_pdf = PdfWrapper(BlankPage() * 3)  # 3 pages of letter size
@@ -65,7 +60,7 @@ def test_blank_page_multiply(pdf_samples, request):
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(blank_pdf.read()) == len(expected)
+        assert_same_pdf(blank_pdf.read(), expected, timestamped=True)
 
         assert not blank_pdf.widgets
         assert len(blank_pdf.pages) == 3

@@ -2,8 +2,6 @@
 
 import os
 
-import pytest
-
 from PyPDFForm import PdfWrapper
 
 
@@ -92,8 +90,9 @@ def test_filling_soda_pdf_form(tool_pdf_directory, request):
         assert result.read() == expected
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_filling_pdfgear_sig(tool_pdf_directory, image_samples, request):
+def test_filling_pdfgear_sig(
+    tool_pdf_directory, image_samples, request, assert_same_pdf
+):
     expected_path = os.path.join(tool_pdf_directory, "test_filling_pdfgear_sig.pdf")
     with open(expected_path, "rb+") as f:
         expected = f.read()
@@ -103,5 +102,4 @@ def test_filling_pdfgear_sig(tool_pdf_directory, image_samples, request):
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = result.read()
 
-        assert len(result.read()) == len(expected)
-        assert result.read() == expected
+        assert_same_pdf(result.read(), expected)

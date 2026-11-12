@@ -2,13 +2,13 @@
 
 import os
 
-import pytest
-
 from PyPDFForm import PdfWrapper
 from tests.test_need_appearances import run_sample_template_library_test
 
 
-def test_fill(template_stream, pdf_samples, data_dict, request):
+def test_fill(
+    template_stream, pdf_samples, data_dict, request, assert_valid_appearances
+):
     expected_path = os.path.join(
         pdf_samples, "generate_appearance_streams", "sample_filled.pdf"
     )
@@ -24,10 +24,15 @@ def test_fill(template_stream, pdf_samples, data_dict, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+        assert_valid_appearances(obj.read())
 
 
 def test_fill_sejda_complex(
-    sejda_template_complex, sejda_complex_data, pdf_samples, request
+    sejda_template_complex,
+    sejda_complex_data,
+    pdf_samples,
+    request,
+    assert_valid_appearances,
 ):
     expected_path = os.path.join(
         pdf_samples,
@@ -47,9 +52,12 @@ def test_fill_sejda_complex(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+        assert_valid_appearances(obj.read())
 
 
-def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
+def test_dropdown_two(
+    sample_template_with_dropdown, pdf_samples, request, assert_valid_appearances
+):
     expected_path = os.path.join(
         pdf_samples, "generate_appearance_streams", "dropdown", "dropdown_two.pdf"
     )
@@ -76,9 +84,10 @@ def test_dropdown_two(sample_template_with_dropdown, pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+        assert_valid_appearances(obj.read())
 
 
-def test_issue_613(pdf_samples, request):
+def test_issue_613(pdf_samples, request, assert_valid_appearances):
     expected_path = os.path.join(
         pdf_samples, "generate_appearance_streams", "issues", "613_expected.pdf"
     )
@@ -100,16 +109,17 @@ def test_issue_613(pdf_samples, request):
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+        assert_valid_appearances(obj.read())
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 def test_sample_template_library(
-    pdf_samples, image_samples, sample_font_stream, request
+    pdf_samples, image_samples, sample_font_stream, request, assert_same_pdf
 ):
     run_sample_template_library_test(
         pdf_samples,
         image_samples,
         sample_font_stream,
         request,
+        assert_same_pdf,
         generate_appearance_streams=True,
     )

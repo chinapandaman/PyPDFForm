@@ -141,19 +141,9 @@ def annotated_form(request):
     return PdfWrapper(stream.getvalue(), use_full_widget_name=request.param)
 
 
-def _collect_field_references(fields):
-    leaves = []
-    for reference in fields:
-        field = reference.get_object()
-        if "/Kids" in field:
-            assert field["/Kids"]
-            leaves.extend(_collect_field_references(field["/Kids"]))
-        else:
-            leaves.append(reference)
-    return leaves
-
-
-def assert_annotation_graph(stream, expected_keys, use_full_widget_name):
+def assert_annotation_graph(
+    stream, expected_keys, use_full_widget_name, assert_catalog_fields
+):
     reader = PdfReader(BytesIO(stream))
     widgets = {}
     notes = {}
@@ -190,10 +180,7 @@ def assert_annotation_graph(stream, expected_keys, use_full_widget_name):
         == notes["keep note"]
     )
     # The field tree must reference the same surviving widgets as the pages.
-    leaves = _collect_field_references(reader.root_object["/AcroForm"]["/Fields"])
-    assert set(leaves) == set(widgets.values())
-    assert len(leaves) == len(widgets)
-    assert expected_keys <= (reader.get_fields() or {}).keys()
+    assert_catalog_fields(stream, expected_keys)
     assert (
         set(PdfWrapper(stream, use_full_widget_name=use_full_widget_name).widgets)
         == expected_keys
@@ -202,7 +189,9 @@ def assert_annotation_graph(stream, expected_keys, use_full_widget_name):
         assert pdf.check_pdf_syntax() == []
 
 
-def test_fill_preserves_unrelated_annotations(annotated_form, image_samples):
+def test_fill_preserves_unrelated_annotations(
+    annotated_form, image_samples, assert_catalog_fields, assert_annotations_preserved
+):
     form = annotated_form
     full_names = form.use_full_widget_name
     key = "group.first" if full_names else "first"
@@ -210,6 +199,7 @@ def test_fill_preserves_unrelated_annotations(annotated_form, image_samples):
     original_widgets = form.widgets.copy()
     expected_keys = set(original_widgets) - {key}
     image = os.path.join(image_samples, "sample_signature.png")
+    original = form.read()
 
     assert form.fill({key: image}) is form
 
@@ -223,7 +213,9 @@ def test_fill_preserves_unrelated_annotations(annotated_form, image_samples):
     assert all(form.widgets[name] is original_widgets[name] for name in expected_keys)
     assert form.widgets[text_key].value == "retained value"
     stream = form.read()
-    assert_annotation_graph(stream, expected_keys, full_names)
+    assert_annotation_graph(stream, expected_keys, full_names, assert_catalog_fields)
+    # Filling also rewrites the text field that keeps its value.
+    assert_annotations_preserved(original, stream, changed={key, text_key})
     reader = PdfReader(BytesIO(stream))
     assert len(reader.pages[0].images) == 1
     assert not reader.pages[1].images
@@ -241,13 +233,17 @@ def test_fill_preserves_unrelated_annotations(annotated_form, image_samples):
     contents = PdfReader(BytesIO(form.read())).pages[0].get_contents()
     assert contents is not None
     assert contents.get_data() == content
-    assert_annotation_graph(form.read(), expected_keys, full_names)
+    stream = form.read()
+    assert_annotation_graph(stream, expected_keys, full_names, assert_catalog_fields)
 
     image_key = "group.image" if full_names else "image"
     form.fill({image_key: image})
     expected_keys.remove(image_key)
     assert set(form.widgets) == expected_keys
-    assert_annotation_graph(form.read(), expected_keys, full_names)
+    assert_annotation_graph(
+        form.read(), expected_keys, full_names, assert_catalog_fields
+    )
+    assert_annotations_preserved(stream, form.read(), changed={image_key})
     contents = PdfReader(BytesIO(form.read())).pages[0].get_contents()
     assert contents is not None
     assert contents.get_data().count(b" Do") == 2
@@ -262,7 +258,7 @@ def test_fill_preserves_unrelated_annotations(annotated_form, image_samples):
     ],
 )
 def test_failed_image_fill_preserves_annotations(
-    annotated_form, image_samples, image, error
+    annotated_form, image_samples, image, error, assert_catalog_fields
 ):
     form = annotated_form
     original = form.read()
@@ -281,11 +277,14 @@ def test_failed_image_fill_preserves_annotations(
     assert form.widgets == original_widgets
     assert form.read() == original
     assert_annotation_graph(
-        form.read(), set(original_widgets), form.use_full_widget_name
+        form.read(),
+        set(original_widgets),
+        form.use_full_widget_name,
+        assert_catalog_fields,
     )
 
 
-def test_fill_removes_empty_signature_field_tree(image_samples):
+def test_fill_removes_empty_signature_field_tree(image_samples, assert_catalog_fields):
     writer = PdfWriter()
     writer.add_blank_page(612, 792)
     annotation = writer.add_annotation(
@@ -323,8 +322,7 @@ def test_fill_removes_empty_signature_field_tree(image_samples):
     assert form.widgets == {}
     reader = PdfReader(BytesIO(form.read()))
     assert not reader.pages[0]["/Annots"]
-    assert reader.root_object["/AcroForm"]["/Fields"] == []
-    assert not reader.get_fields()
+    assert_catalog_fields(form.read(), [])
     assert PdfWrapper(form.read()).widgets == {}
     assert len(reader.pages[0].images) == 1
 
@@ -347,8 +345,7 @@ def test_signature_sample_value(pdf_samples):
     )
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_fill_signature_overlap(pdf_samples, image_samples, request):
+def test_fill_signature_overlap(pdf_samples, image_samples, request, assert_same_pdf):
     expected_path = os.path.join(
         pdf_samples, "signature", "test_fill_signature_overlap.pdf"
     )
@@ -364,12 +361,10 @@ def test_fill_signature_overlap(pdf_samples, image_samples, request):
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_fill_small_icon(pdf_samples, image_samples, request):
+def test_fill_small_icon(pdf_samples, image_samples, request, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "signature", "test_fill_small_icon.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(
@@ -384,12 +379,12 @@ def test_fill_small_icon(pdf_samples, image_samples, request):
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_fill_small_icon_not_preserve_aspect_ratio(pdf_samples, image_samples, request):
+def test_fill_small_icon_not_preserve_aspect_ratio(
+    pdf_samples, image_samples, request, assert_same_pdf
+):
     expected_path = os.path.join(
         pdf_samples, "signature", "test_fill_small_icon_not_preserve_aspect_ratio.pdf"
     )
@@ -407,8 +402,7 @@ def test_fill_small_icon_not_preserve_aspect_ratio(pdf_samples, image_samples, r
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
 def test_fill_vertical_image(pdf_samples, image_samples, request):

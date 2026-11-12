@@ -241,7 +241,12 @@ def test_pdf_widths_use_missing_width_for_unmapped_glyphs(pdf_font_widths_and_mi
     ],
 )
 def test_register_font_preserves_resource_names(
-    template_stream, sample_font_stream, need_appearances, resource_names, expected_name
+    template_stream,
+    sample_font_stream,
+    need_appearances,
+    resource_names,
+    expected_name,
+    assert_valid_appearances,
 ):
     writer = PdfWriter(BytesIO(template_stream))
     fonts = writer.root_object["/AcroForm"]["/DR"]["/Font"]
@@ -292,6 +297,7 @@ def test_register_font_preserves_resource_names(
         if annot.get_object().get("/T") == "test"
     )
     assert annotation["/DA"].split()[0] == expected_name
+    assert_valid_appearances(filled_stream)
     appearance = annotation["/AP"]["/N"]
     assert f"{expected_name} ".encode() in appearance.get_data()
     assert b"(Font regression) Tj" in appearance.get_data()

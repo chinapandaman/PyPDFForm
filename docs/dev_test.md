@@ -18,11 +18,26 @@ Add only the tests needed to cover the changed behavior and maintain 100% covera
 
 Leave expected PDF sample regeneration and visual regression comparison to the maintainer unless they explicitly delegate these tasks.
 
+### Shared assertions
+
+An expected PDF only shows that the output hasn't changed, not that it is correct. `tests/conftest.py` has fixtures that check what a PDF contains instead. They don't depend on an expected PDF, except for `assert_same_pdf`, and behave the same on every platform:
+
+| Fixture | Checks |
+| --- | --- |
+| `assert_same_pdf(actual, expected)` | The PDF has the same objects as its expected PDF. See [zlib-specific expected PDFs](#zlib-specific-expected-pdfs). |
+| `assert_page_ownership(stream)` | Every page is in the page tree, every annotation belongs to the page that lists it, and every widget of a listed field is on a page. |
+| `assert_catalog_fields(stream, names)` | The AcroForm lists exactly the fields with these fully qualified names, and their widgets are exactly the widgets on the pages. |
+| `assert_round_trip(pdf, data)` | The wrapper and its reopened output both read these values. |
+| `assert_valid_appearances(stream)` | Every `/AP` is a dictionary of appearance streams, and a widget with appearance states selects one of them or `/Off`. |
+| `assert_annotations_preserved(before, after, changed)` | Every annotation has the same content on the same page in the same order, except the widgets of the `changed` fields. |
+
+Use them when a change affects one of these properties. Not every PDF passes all of them. For example, filling a text field by default writes an `/AP` that isn't a dictionary.
+
 ## Expected PDF environment
 
 Most tests compare the PDF they generate with an expected PDF in `pdf_samples`, byte for byte. These bytes can depend on:
 
-* The zlib library Python uses. Expected PDFs are generated with standard zlib. Python builds that use zlib-ng, such as Python 3.14 and later on Windows, produce different bytes for tests marked `requires_zlib_over_zlib_ng`, so those tests are skipped there.
+* The zlib library Python uses. Expected PDFs are generated with standard zlib. Python builds that use zlib-ng, such as Python 3.14 and later on Windows, compress some streams to different bytes. See [zlib-specific expected PDFs](#zlib-specific-expected-pdfs).
 * The installed versions of PyPDFForm's dependencies, and of the qpdf library pikepdf uses.
 
 PyPDFForm doesn't pin its dependencies. Any version in its dependency ranges is supported, and with standard zlib the expected PDFs are the same on Linux, macOS, and Windows, for every supported Python version, and for both the newest and lowest dependency versions.
@@ -36,6 +51,27 @@ differs from pdf_samples/fixture_environment.json: pypdf 6.22.0 (recorded 6.21.4
 ```
 
 If byte comparisons fail without a code change, check these differences first. A newer dependency version that changes the bytes needs regenerated expected PDFs. To reproduce the recorded bytes, install the recorded versions into a separate virtual environment, for example `uv pip install pypdf==6.21.4`.
+
+### zlib-specific expected PDFs
+
+Python's zlib compresses some of the streams PyPDFForm writes, such as embedded fonts, drawn text and images, and created fields. A test whose expected PDF has such streams uses the `assert_same_pdf` fixture instead of comparing bytes itself:
+
+```python
+def test_fill_font_color(
+    sample_template_with_font_colors, pdf_samples, request, assert_same_pdf
+):
+    ...
+
+    expected = f.read()
+
+    assert_same_pdf(obj.read(), expected)
+```
+
+On every platform, the fixture checks that both PDFs have the same version, trailer, and objects, comparing each stream after decompressing it. It ignores each stream's `/Length` and the trailer's `/ID`. With standard zlib, it also compares the bytes.
+
+Use it for a new test that passes with standard zlib but fails its byte comparison with zlib-ng.
+
+A PDF created from a blank page holds the time it was created. Pass `timestamped=True` for such a PDF. Its `/CreationDate` and `/ModDate` are then ignored, and with standard zlib only the length of the bytes is compared.
 
 ### Lowest dependency versions
 

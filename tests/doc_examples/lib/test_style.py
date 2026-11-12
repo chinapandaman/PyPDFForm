@@ -2,8 +2,6 @@
 
 import os
 
-import pytest
-
 from PyPDFForm import PdfWrapper, Widgets
 
 
@@ -19,8 +17,9 @@ def test_change_title(static_pdfs):
     assert PdfWrapper(pdf.read()).title == "New PDF"
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_change_text_font(static_pdfs, sample_font_stream, pdf_samples, request):
+def test_change_text_font(
+    static_pdfs, sample_font_stream, pdf_samples, request, assert_same_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
@@ -51,8 +50,7 @@ def test_change_text_font(static_pdfs, sample_font_stream, pdf_samples, request)
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+        assert_same_pdf(form.read(), expected)
 
 
 def test_change_text_font_size(static_pdfs, pdf_samples, request):
@@ -326,8 +324,9 @@ def test_change_dropdown_choices_with_export_values(static_pdfs, pdf_samples, re
         assert form.read() == expected
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_change_dropdown_font(static_pdfs, pdf_samples, sample_font_stream, request):
+def test_change_dropdown_font(
+    static_pdfs, pdf_samples, sample_font_stream, request, assert_same_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_font.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
@@ -342,8 +341,7 @@ def test_change_dropdown_font(static_pdfs, pdf_samples, sample_font_stream, requ
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+        assert_same_pdf(form.read(), expected)
 
 
 def test_change_dropdown_font_size(static_pdfs, pdf_samples, request):

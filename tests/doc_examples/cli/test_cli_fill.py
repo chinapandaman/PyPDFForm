@@ -150,9 +150,8 @@ def test_fill_dropdown_via_str(pdf_samples, static_pdfs, yaml_samples, tmp_path)
         assert expected == actual
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_fill_sig(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_fill_sig(pdf_samples, static_pdfs, yaml_samples, tmp_path, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -173,13 +172,13 @@ def test_fill_sig(pdf_samples, static_pdfs, yaml_samples, tmp_path):
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        assert_same_pdf(actual, expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_fill_sig_ratio(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_fill_sig_ratio(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, assert_same_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig_ratio.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -200,8 +199,7 @@ def test_fill_sig_ratio(pdf_samples, static_pdfs, yaml_samples, tmp_path):
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        assert_same_pdf(actual, expected)
 
 
 @pytest.mark.cli_test

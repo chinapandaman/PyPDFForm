@@ -12,9 +12,10 @@ from PyPDFForm.cli.root import cli_app
 runner = CliRunner()
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_index_snippets(pdf_samples, yaml_samples, tmp_path, request, monkeypatch):
+def test_index_snippets(
+    pdf_samples, yaml_samples, tmp_path, request, monkeypatch, assert_same_pdf
+):
     # Stable ReportLab timestamps prevent variable-length document IDs.
     monkeypatch.setenv("SOURCE_DATE_EPOCH", "946684800")
     expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
@@ -75,7 +76,7 @@ def test_index_snippets(pdf_samples, yaml_samples, tmp_path, request, monkeypatc
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
+        assert_same_pdf(actual, expected, timestamped=True)
 
         result = PdfWrapper(actual)
         assert result.widgets["my_textfield"].alignment == 1
