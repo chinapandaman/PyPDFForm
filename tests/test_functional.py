@@ -1194,7 +1194,9 @@ def test_commit_widget_key_updates_does_not_replay_hooks(
     assert_widgets_match_output(obj)
 
 
-def test_commit_widget_key_updates_keeps_pending_value(template_stream):
+def test_commit_widget_key_updates_keeps_pending_value(
+    template_stream, assert_round_trip
+):
     obj = PdfWrapper(template_stream)
     obj.widgets["test"].tooltip = "tooltip"
     obj.read()
@@ -1202,13 +1204,10 @@ def test_commit_widget_key_updates_keeps_pending_value(template_stream):
     obj.widgets["test"].value = "pending text"
 
     obj.update_widget_key("test", "renamed").commit_widget_key_updates()
-
-    renamed = obj.widgets["renamed"]
-    assert renamed.value == "pending text"
-    assert not renamed.hooks_to_trigger
+    assert not obj.widgets["renamed"].hooks_to_trigger
 
     obj.fill({})
-    assert PdfWrapper(obj.read()).widgets["renamed"].value == "pending text"
+    assert_round_trip(obj, {"renamed": "pending text"})
 
 
 def _without_default_appearance(stream, key):
@@ -1248,43 +1247,34 @@ def test_failed_hook_reverts_queued_updates(
     assert PdfWrapper(obj.read()).widgets["test_2"].x == 300
 
 
-def test_failed_remove_fields_restores_wrapper(
-    template_stream, assert_widgets_match_output
+@pytest.mark.parametrize(
+    "operation",
+    [
+        lambda obj: obj.remove_fields(["test_2"]),
+        lambda obj: obj.commit_widget_key_updates(),
+    ],
+    ids=["remove_fields", "commit_widget_key_updates"],
+)
+def test_failed_operation_restores_wrapper(
+    template_stream, operation, assert_widgets_match_output
 ):
     obj = PdfWrapper(template_stream)
     obj.widgets["test"].x = 200
-    original = obj.read()
-    widgets = dict(obj.widgets)
-
-    with (
-        patch("PyPDFForm.lib.wrapper.build_widgets", side_effect=RuntimeError),
-        pytest.raises(RuntimeError),
-    ):
-        obj.remove_fields(["test_2"])
-
-    assert obj.widgets == widgets
-    assert obj.read() == original
-    assert_widgets_match_output(obj)
-
-
-def test_failed_commit_widget_key_updates_restores_wrapper(
-    template_stream, assert_widgets_match_output
-):
-    obj = PdfWrapper(template_stream)
-    original = obj.read()
-    widgets = dict(obj.widgets)
     obj.update_widget_key("test", "renamed")
+    original = obj.read()
+    widgets = dict(obj.widgets)
 
     with (
         patch("PyPDFForm.lib.wrapper.build_widgets", side_effect=RuntimeError),
         pytest.raises(RuntimeError),
     ):
-        obj.commit_widget_key_updates()
+        operation(obj)
 
     assert obj.widgets == widgets
     assert obj.read() == original
     assert_widgets_match_output(obj)
 
+    # the queued rename is kept, so it can still be committed
     obj.commit_widget_key_updates()
     assert "renamed" in obj.widgets
     assert "test" not in obj.widgets

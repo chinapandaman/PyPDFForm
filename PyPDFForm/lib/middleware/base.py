@@ -44,24 +44,29 @@ class Widget:
     Attributes:
         TYPE_SPECIFIC_PROPERTIES (frozenset): Properties supported only by this
             widget type and its subclasses. Subclasses declare their own.
+        GEOMETRY_PROPERTIES (frozenset): Coordinates and dimensions, which must
+            be integers or floats and can't be None. Subclasses add their own,
+            such as `size`.
         READ_PROPERTIES (frozenset): Hooked properties read back from the PDF
-            when a wrapper is opened. Other hooked properties, such as fonts and
+            when a wrapper is opened, by the `_populate_*` functions in
+            `template.py`. Other hooked properties, such as fonts and
             JavaScript, exist only on the widget.
         CLEARABLE_PROPERTIES (frozenset): Read properties that are absent from
             the PDF when None. Assigning None removes them from the PDF.
-        GEOMETRY_PROPERTIES (frozenset): Coordinates and dimensions, which must
-            be integers or floats. Subclasses add their own, such as `size`.
         LOCAL_SETTINGS (frozenset): Settings without hooks that exist only on
             the widget, such as `preserve_aspect_ratio`. They are kept when the
             widget is rebuilt from the PDF.
     """
 
     TYPE_SPECIFIC_PROPERTIES = frozenset()
-    READ_PROPERTIES = frozenset(
-        {"x", "y", "width", "height", "readonly", "required", "hidden", "tooltip"}
-    )
-    CLEARABLE_PROPERTIES = frozenset({"tooltip"})
     GEOMETRY_PROPERTIES = frozenset({"x", "y", "width", "height"})
+    READ_PROPERTIES = GEOMETRY_PROPERTIES | {
+        "readonly",
+        "required",
+        "hidden",
+        "tooltip",
+    }
+    CLEARABLE_PROPERTIES = frozenset({"tooltip"})
     LOCAL_SETTINGS = frozenset()
     _ALL_TYPE_SPECIFIC_PROPERTIES = set()
 
@@ -161,8 +166,11 @@ class Widget:
         """
         self.check_property_supported(name)
 
-        hook = self.__dict__.get("SET_ATTR_TRIGGER_HOOK_MAP", {}).get(name)
-        if hook is not None and name in self.__dict__:
+        # attributes are first assigned during construction, without hooks
+        hook = (
+            self.SET_ATTR_TRIGGER_HOOK_MAP.get(name) if name in self.__dict__ else None
+        )
+        if hook is not None:
             value, hook_value = self.prepare_property(name, value)
             if hook_value is not None or name in self.CLEARABLE_PROPERTIES:
                 self._committed_values.setdefault(name, self.__dict__[name])
@@ -194,8 +202,9 @@ class Widget:
         """
         if value is None:
             if (
-                name in self.READ_PROPERTIES or name in self.GEOMETRY_PROPERTIES
-            ) and name not in self.CLEARABLE_PROPERTIES:
+                name in self.READ_PROPERTIES | self.GEOMETRY_PROPERTIES
+                and name not in self.CLEARABLE_PROPERTIES
+            ):
                 msg = (
                     f"{type(self).__name__} field '{self.name}' property "
                     f"'{name}' cannot be None."
@@ -209,15 +218,12 @@ class Widget:
         return value, value
 
     @staticmethod
-    def validate_geometry_value(value: Any) -> int | float:
+    def validate_geometry_value(value: Any) -> None:
         """
         Validates a scalar coordinate or dimension.
 
         Args:
             value (Any): The coordinate or dimension to validate.
-
-        Returns:
-            int | float: The unchanged value.
 
         Raises:
             TypeError: If the value is not an integer or float, or is a boolean.
@@ -227,7 +233,6 @@ class Widget:
             # TODO: Refactor this raise into a centralized exception raiser when one is introduced.
             msg = "Geometry values must be integers or floats; booleans are invalid."
             raise TypeError(msg)
-        return value
 
     def save_state(self) -> dict:
         """

@@ -9,7 +9,7 @@ document, allowing users to select one option from a group of choices.
 
 from typing import Any
 
-from .base import PreparedValue, Widget
+from .base import PreparedValue
 from .checkbox import Checkbox
 
 
@@ -62,7 +62,7 @@ class Radio(Checkbox):
                 None, or geometry is not a number.
         """
         value, hook_value = super().prepare_property(name, value)
-        if name in Widget.GEOMETRY_PROPERTIES:
+        if name in self.GEOMETRY_PROPERTIES & self.READ_PROPERTIES:
             value = [value] * self.number_of_options
 
         return value, hook_value

@@ -57,9 +57,9 @@ from .constants import (
     U,
     X,
 )
-from .middleware.base import Widget
 from .middleware.dropdown import DropdownOption
-from .patterns import check_field_flag, get_widget_key
+from .patterns import WIDGET_DESCRIPTION_PATTERNS, check_field_flag, get_widget_key
+from .utils import extract_widget_property
 
 
 def trigger_widget_hooks(
@@ -143,7 +143,7 @@ def _update_field_flag(annot: DictionaryObject, flag: int, should_set: bool) -> 
 
 
 def _remove_field_entry(
-    annot: DictionaryObject, key: str, inherited: bool = True
+    annot: DictionaryObject, key: str, patterns: list | None = None
 ) -> None:
     """
     Removes a field entry from a widget and its own field.
@@ -153,37 +153,35 @@ def _remove_field_entry(
     from every dictionary up to and including that field, so the field no longer
     has it, even when it was stored on the parent of a widget. Fields above the
     widget's own field are shared with other fields, so they are never changed.
-    An inheritable entry set by any of them still applies to the field. Other
-    entries are read only from the widget and its parent, so only a shared
-    parent of the widget itself still applies.
+    If the field still has the entry afterwards, one of them supplies it, and an
+    error is raised. Hooks change a PDF writer that is written only when every
+    hook succeeds, so raising discards the removal.
 
     Args:
         annot (DictionaryObject): The widget annotation dictionary.
         key (str): The entry to remove, such as `/MaxLen`, `/Q`, or `/TU`.
-        inherited (bool): Whether the entry is inheritable. Defaults to True.
+        patterns (list | None): The patterns used to read a non-inheritable
+            entry, such as `WIDGET_DESCRIPTION_PATTERNS`. None for an
+            inheritable entry, which the field takes from any ancestor.
 
     Raises:
-        ValueError: If a shared field above the widget's own field sets an
-            entry that would still apply to the field.
+        ValueError: If a shared field above the widget's own field supplies
+            the entry.
     """
-    own = [annot]
-    while T not in own[-1] and Parent in own[-1]:
-        own.append(cast(DictionaryObject, own[-1][Parent].get_object()))
+    field = annot
+    field.pop(NameObject(key), None)
+    while T not in field and Parent in field:
+        field = cast(DictionaryObject, field[Parent].get_object())
+        field.pop(NameObject(key), None)
 
-    shared = []
-    ancestor = own[-1]
-    while Parent in ancestor:
-        ancestor = cast(DictionaryObject, ancestor[Parent].get_object())
-        shared.append(ancestor)
-    if not inherited:
-        shared = shared[: max(0, 2 - len(own))]
-
-    if any(key in each for each in shared):
+    value = (
+        annot.get_inherited(key, None)
+        if patterns is None
+        else extract_widget_property(annot, patterns, None, None)
+    )
+    if value is not None:
         msg = f"Cannot remove {key}: a parent field shared with other fields sets it."
         raise ValueError(msg)
-
-    for each in own:
-        each.pop(NameObject(key), None)
 
 
 def update_text_field_font(annot: DictionaryObject, val: str) -> None:
@@ -304,7 +302,7 @@ def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
 
     This function modifies the Q entry in the annotation dictionary to change
     the text alignment of the text field. None removes the entry from the
-    annotation and its own field, since the field's alignment is inherited.
+    annotation and its own field, since the field's alignment is inheritable.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
@@ -312,8 +310,8 @@ def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
             or None to remove it.
 
     Raises:
-        ValueError: If None is given and the alignment is inherited from a
-            parent field shared with other fields.
+        ValueError: If None is given and a parent field shared with other
+            fields sets the alignment.
     """
     if val is None:
         _remove_field_entry(annot, Q)
@@ -361,7 +359,7 @@ def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
     This function sets the 'MaxLen' entry in the annotation dictionary, which
     specifies the maximum number of characters that can be entered into the text field.
     None removes the entry from the annotation and its own field, since the
-    field's maximum length is inherited.
+    field's maximum length is inheritable.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
@@ -369,8 +367,8 @@ def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
             field, or None to remove the limit.
 
     Raises:
-        ValueError: If None is given and the maximum length is inherited from a
-            parent field shared with other fields.
+        ValueError: If None is given and a parent field shared with other
+            fields sets the maximum length.
     """
     if val is None:
         _remove_field_entry(annot, MaxLen)
@@ -382,16 +380,16 @@ def _normalize_geometry_value(val: int | float) -> float:
     """
     Normalizes scalar geometry to a float before modifying an annotation.
 
+    Values are validated when they are assigned to the widget, by
+    `Widget.validate_geometry_value`.
+
     Args:
         val (int | float): The coordinate or dimension to normalize.
 
     Returns:
         float: The normalized geometry value.
-
-    Raises:
-        TypeError: If the value is not an integer or float, or is a boolean.
     """
-    return float(Widget.validate_geometry_value(val))
+    return float(val)
 
 
 def update_check_radio_size(annot: DictionaryObject, val: int | float) -> None:
@@ -406,9 +404,6 @@ def update_check_radio_size(annot: DictionaryObject, val: int | float) -> None:
         annot (DictionaryObject): The annotation dictionary for the check box or
             radio button.
         val (int | float): The new size (width and height) for the check box or radio button.
-
-    Raises:
-        TypeError: If the size is not an integer or float, or is a boolean.
     """
     val = _normalize_geometry_value(val)
     rect = annot[Rect]
@@ -468,9 +463,6 @@ def update_field_x(annot: DictionaryObject, val: int | float) -> None:
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
         val (int | float): The new X-coordinate for the left edge of the field.
-
-    Raises:
-        TypeError: If the coordinate is not an integer or float, or is a boolean.
     """
     val = _normalize_geometry_value(val)
     diff = val - annot[Rect][0]
@@ -490,9 +482,6 @@ def update_field_y(annot: DictionaryObject, val: int | float) -> None:
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
         val (int | float): The new Y-coordinate for the bottom edge of the field.
-
-    Raises:
-        TypeError: If the coordinate is not an integer or float, or is a boolean.
     """
     val = _normalize_geometry_value(val)
     diff = val - annot[Rect][1]
@@ -512,9 +501,6 @@ def update_field_width(annot: DictionaryObject, val: int | float) -> None:
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
         val (int | float): The new width of the field.
-
-    Raises:
-        TypeError: If the width is not an integer or float, or is a boolean.
     """
     val = _normalize_geometry_value(val)
     annot[NameObject(Rect)][2] = FloatObject(annot[Rect][0] + val)
@@ -532,9 +518,6 @@ def update_field_height(annot: DictionaryObject, val: int | float) -> None:
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
         val (int | float): The new height of the field.
-
-    Raises:
-        TypeError: If the height is not an integer or float, or is a boolean.
     """
     val = _normalize_geometry_value(val)
     annot[NameObject(Rect)][3] = FloatObject(annot[Rect][1] + val)
@@ -562,7 +545,7 @@ def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
     if val:
         annot[NameObject(TU)] = TextStringObject(val)
     else:
-        _remove_field_entry(annot, TU, inherited=False)
+        _remove_field_entry(annot, TU, WIDGET_DESCRIPTION_PATTERNS)
 
 
 def update_field_required(annot: DictionaryObject, val: bool) -> None:

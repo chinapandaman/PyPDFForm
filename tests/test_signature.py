@@ -485,21 +485,22 @@ def test_rename_keeps_preserve_aspect_ratio(
 ):
     path = os.path.join(pdf_samples, template)
     image = os.path.join(image_samples, "sample_image.jpg")
-    forms = {}
-    for each in (preserve, not preserve, "renamed"):
-        forms[each] = PdfWrapper(path)
-        # preserve differs from the field's default
-        forms[each].widgets[key].preserve_aspect_ratio = (
-            preserve if each == "renamed" else each
-        )
+    renamed, same, different = (PdfWrapper(path) for _ in range(3))
+    # preserve differs from the field's default
+    for form, setting in (
+        (renamed, preserve),
+        (same, preserve),
+        (different, not preserve),
+    ):
+        form.widgets[key].preserve_aspect_ratio = setting
 
-    renamed = forms.pop("renamed")
     renamed.update_widget_key(key, "renamed").commit_widget_key_updates()
     assert renamed.widgets["renamed"].preserve_aspect_ratio is preserve
     assert not renamed.widgets["renamed"].hooks_to_trigger
 
     renamed.fill({"renamed": image})
-    for each, form in forms.items():
-        form.fill({key: image})
-        # the image is drawn as without renaming, and the setting changes it
-        assert (_page_contents(renamed) == _page_contents(form)) is (each is preserve)
+    same.fill({key: image})
+    different.fill({key: image})
+    # the image is drawn as without renaming, and the setting changes it
+    assert _page_contents(renamed) == _page_contents(same)
+    assert _page_contents(renamed) != _page_contents(different)

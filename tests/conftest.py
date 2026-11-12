@@ -310,8 +310,9 @@ def _same_property(actual, expected):
     return actual == expected
 
 
-# the widget properties that opening a PDF reads from it
-READ_PROPERTIES = (
+# the widget properties that opening a PDF reads from it, independently of
+# the widget classes' own READ_PROPERTIES
+COMPARED_PROPERTIES = (
     "value",
     "page_number",
     "x",
@@ -342,7 +343,7 @@ def assert_widgets_match_output():
         for name, widget in pdf.widgets.items():
             other = reopened.widgets[name]
             assert type(widget) is type(other)
-            for prop in READ_PROPERTIES:
+            for prop in COMPARED_PROPERTIES:
                 actual, expected = (
                     getattr(widget, prop, None),
                     getattr(other, prop, None),

@@ -51,11 +51,10 @@ class Checkbox(Widget):
         """
         Custom attribute setter for the Checkbox class.
 
-        If the attribute being set is 'size' after construction, it validates the
-        size, then sets both 'width' and 'height' attributes of the widget to the
-        given value before setting `size`, ensuring the checkbox remains square and
-        all relevant hooks are queued. For all other attributes, it defers to the
-        parent class's setter.
+        The parent class's setter validates the attribute and queues its hook.
+        When 'size' is set after construction, both 'width' and 'height' are then
+        set to the same value, ensuring the checkbox remains square and all
+        relevant hooks are queued.
 
         Args:
             name (str): The name of the attribute to set.
@@ -64,11 +63,11 @@ class Checkbox(Widget):
         Raises:
             TypeError: Raised when the size is None or not a number.
         """
-        if name == "size" and name in self.__dict__:
-            self.prepare_property(name, value)
+        constructed = name in self.__dict__
+        super().__setattr__(name, value)
+        if name == "size" and constructed:
             super().__setattr__("width", value)
             super().__setattr__("height", value)
-        super().__setattr__(name, value)
 
     @property
     def schema_definition(self) -> dict:

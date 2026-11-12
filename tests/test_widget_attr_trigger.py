@@ -384,20 +384,22 @@ def test_clear_text_field_properties(template_stream, assert_widgets_match_outpu
     assert reopened.alignment is None
 
 
-def _text_field_entries(stream):
-    entries = ("/Ff", "/TU", "/MaxLen", "/Q")
-    reader = PdfReader(BytesIO(stream))
-    for each in reader.pages[0]["/Annots"]:
-        each = each.get_object()
-        if each.get("/T") == "test":
-            return {entry: each.get(entry) for entry in entries}
+def _find_widget(stream, name):
+    # the widget annotation of a field, by its short name
+    for page in PdfReader(BytesIO(stream)).pages:
+        for annot in page.get("/Annots", []):
+            annot = annot.get_object()
+            if get_widget_key(annot, False) == name:
+                return annot
 
-    return None
+    pytest.fail(f"No widget named {name}.")
 
 
 def test_clear_absent_text_field_properties(template_stream):
     obj = PdfWrapper(template_stream)
-    expected = _text_field_entries(obj.read())
+    entries = ("/Ff", "/TU", "/MaxLen", "/Q")
+    annot = _find_widget(obj.read(), "test")
+    expected = {entry: annot.get(entry) for entry in entries}
     widget = obj.widgets["test"]
     widget.multiline = False
     widget.comb = False
@@ -406,7 +408,8 @@ def test_clear_absent_text_field_properties(template_stream):
     widget.alignment = None
 
     # clearing entries the field doesn't have leaves the field unchanged
-    assert _text_field_entries(obj.read()) == expected
+    annot = _find_widget(obj.read(), "test")
+    assert {entry: annot.get(entry) for entry in entries} == expected
 
 
 @pytest.mark.parametrize(
@@ -419,7 +422,6 @@ def test_clear_absent_text_field_properties(template_stream):
         ("sample_template.pdf", "test", "comb", None, TypeError),
         ("sample_template.pdf", "test", "max_length", 0, ValueError),
         ("sample_template.pdf", "test", "max_length", -1, ValueError),
-        ("sample_template.pdf", "check", "size", None, TypeError),
         ("sample_template_with_radio_button.pdf", "radio_1", "x", None, TypeError),
         ("sample_template_with_radio_button.pdf", "radio_1", "x", [1, 2], TypeError),
         (
@@ -448,33 +450,17 @@ def test_reject_property_value_not_stored_in_pdf(
     assert_widgets_match_output(obj)
 
 
-def test_clear_parent_tooltip(pdf_samples, assert_widgets_match_output):
-    obj = PdfWrapper(os.path.join(pdf_samples, "sample_template_with_full_key.pdf"))
-    assert obj.widgets["cout HT"].tooltip == "coût euro HT"
-
-    # the tooltip is on the parent field, so it is removed there too
-    obj.widgets["cout HT"].tooltip = None
-    assert_widgets_match_output(obj)
-    assert PdfWrapper(obj.read()).widgets["cout HT"].tooltip is None
-
-
-def _inherited_entry(stream, name, entry):
-    # the entry a viewer uses for the widget, which can be stored on its parents
-    for page in PdfReader(BytesIO(stream)).pages:
-        for annot in page.get("/Annots", []):
-            annot = annot.get_object()
-            if get_widget_key(annot, False) == name:
-                return annot.get_inherited(entry, None)
-
-    return None
+def _pdf_value(value):
+    return String(value) if isinstance(value, str) else value
 
 
 def _set_parent_entry(stream, name, entry, value):
+    # sets the entry on the parent field of a widget without a name
     with Pdf.open(BytesIO(stream)) as pdf:
         for page in pdf.pages:
             for annot in page.get("/Annots", []):
                 if "/Parent" in annot and str(annot.Parent.get("/T")) == name:
-                    annot.Parent[entry] = value
+                    annot.Parent[entry] = _pdf_value(value)
 
         with BytesIO() as f:
             pdf.save(f)
@@ -482,24 +468,33 @@ def _set_parent_entry(stream, name, entry, value):
 
 
 @pytest.mark.parametrize(
-    ("name", "entry", "value"), [("max_length", "/MaxLen", 10), ("alignment", "/Q", 2)]
+    ("name", "entry", "parent", "value"),
+    [
+        ("max_length", "/MaxLen", 1, 10),
+        ("alignment", "/Q", 1, 2),
+        ("tooltip", "/TU", "field tooltip", "own tooltip"),
+    ],
 )
-def test_clear_inherited_text_field_property(
-    pdf_samples, name, entry, value, assert_widgets_match_output
+def test_clear_property_of_parent_field(
+    sample_template_with_full_key,
+    name,
+    entry,
+    parent,
+    value,
+    assert_widgets_match_output,
 ):
-    with open(
-        os.path.join(pdf_samples, "sample_template_with_full_key.pdf"), "rb"
-    ) as f:
-        # the widget of "Date mois" inherits the entry from its field
-        stream = _set_parent_entry(f.read(), "Date mois", entry, 1)
-    assert _inherited_entry(stream, "Date mois", entry) == 1
+    # the widget of "Date mois" has no name, so its parent is the field
+    stream = _set_parent_entry(
+        sample_template_with_full_key, "Date mois", entry, parent
+    )
+    assert _find_widget(stream, "Date mois").get_inherited(entry) == parent
 
     obj = PdfWrapper(stream)
     setattr(obj.widgets["Date mois"], name, value)
-    assert _inherited_entry(obj.read(), "Date mois", entry) == value
+    assert _find_widget(obj.read(), "Date mois").get_inherited(entry) == value
 
     setattr(obj.widgets["Date mois"], name, None)
-    assert _inherited_entry(obj.read(), "Date mois", entry) is None
+    assert _find_widget(obj.read(), "Date mois").get_inherited(entry) is None
     assert_widgets_match_output(obj)
 
 
@@ -509,7 +504,13 @@ def _group_fields(stream, names, entry, value):
         fields = pdf.Root.AcroForm.Fields
         kids = [field for field in fields if str(field.get("/T")) in names]
         parent = pdf.make_indirect(
-            Dictionary({"/T": String("group"), "/Kids": Array(kids), entry: value})
+            Dictionary(
+                {
+                    "/T": String("group"),
+                    "/Kids": Array(kids),
+                    entry: _pdf_value(value),
+                }
+            )
         )
         for kid in kids:
             kid.Parent = parent
@@ -522,55 +523,39 @@ def _group_fields(stream, names, entry, value):
             return f.getvalue()
 
 
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
 @pytest.mark.parametrize(
-    ("name", "entry", "value"), [("max_length", "/MaxLen", 5), ("alignment", "/Q", 2)]
+    ("name", "entry", "parent", "value"),
+    [
+        ("max_length", "/MaxLen", 1, 5),
+        ("alignment", "/Q", 1, 2),
+        ("tooltip", "/TU", "shared tooltip", "own tooltip"),
+    ],
 )
-def test_clear_property_inherited_from_shared_parent(
-    template_stream, name, entry, value, assert_widgets_match_output
+def test_clear_property_set_by_shared_parent(
+    template_stream,
+    name,
+    entry,
+    parent,
+    value,
+    use_full_widget_name,
+    assert_widgets_match_output,
 ):
-    obj = PdfWrapper(_group_fields(template_stream, ("test", "test_2"), entry, 1))
-    setattr(obj.widgets["test"], name, value)
+    stream = _group_fields(template_stream, ("test", "test_2"), entry, parent)
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    widget = obj.widgets["group.test" if use_full_widget_name else "test"]
+    # a value of its own is set on the widget, leaving the parent's
+    setattr(widget, name, value)
     expected = obj.read()
+    assert _find_widget(expected, "test").get_inherited(entry) == value
 
-    setattr(obj.widgets["test"], name, None)
+    setattr(widget, name, None)
     # removing it from the parent would change "test_2" too
     with pytest.raises(ValueError, match=f"Cannot remove {entry}"):
         obj.read()
 
-    assert getattr(obj.widgets["test"], name) == value
-    assert not obj.widgets["test"].hooks_to_trigger
+    assert getattr(widget, name) == value
+    assert not widget.hooks_to_trigger
     assert obj.read() == expected
-    assert _inherited_entry(expected, "test_2", entry) == 1
+    assert _find_widget(expected, "test_2").get_inherited(entry) == parent
     assert_widgets_match_output(obj)
-
-
-@pytest.mark.parametrize("use_full_widget_name", [False, True])
-def test_clear_tooltip_shared_by_parent(
-    template_stream, use_full_widget_name, assert_widgets_match_output
-):
-    stream = _group_fields(
-        template_stream, ("test", "test_2"), "/TU", String("shared tooltip")
-    )
-    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
-    prefix = "group." if use_full_widget_name else ""
-    widget, sibling = obj.widgets[f"{prefix}test"], obj.widgets[f"{prefix}test_2"]
-    assert widget.tooltip == sibling.tooltip == "shared tooltip"
-    expected = obj.read()
-
-    widget.tooltip = None
-    # removing it from the parent would clear the tooltip of test_2 too
-    with pytest.raises(ValueError, match="Cannot remove /TU"):
-        obj.read()
-
-    assert widget.tooltip == "shared tooltip"
-    assert obj.read() == expected
-    reopened = PdfWrapper(expected, use_full_widget_name=use_full_widget_name)
-    assert reopened.widgets[f"{prefix}test_2"].tooltip == "shared tooltip"
-    assert_widgets_match_output(obj)
-
-    # a tooltip of its own is set on the widget, leaving the parent's
-    widget.tooltip = "own tooltip"
-    assert_widgets_match_output(obj)
-    reopened = PdfWrapper(obj.read(), use_full_widget_name=use_full_widget_name)
-    assert reopened.widgets[f"{prefix}test"].tooltip == "own tooltip"
-    assert reopened.widgets[f"{prefix}test_2"].tooltip == "shared tooltip"
