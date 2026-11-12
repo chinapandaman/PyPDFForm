@@ -2,8 +2,6 @@
 
 import os
 
-import pytest
-
 from PyPDFForm import PdfWrapper
 
 
@@ -98,8 +96,7 @@ def test_fill_dropdown_via_str(static_pdfs, pdf_samples, request):
         assert filled.read() == expected
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
+def test_fill_sig(static_pdfs, pdf_samples, image_samples, request, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig.pdf")
 
     filled = PdfWrapper(
@@ -115,8 +112,7 @@ def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(filled.read()) == len(expected)
-        assert filled.read() == expected
+        assert_same_pdf(filled.read(), expected)
 
     with open(os.path.join(image_samples, "sample_signature.png"), "rb+") as sig:
         filled2 = PdfWrapper(
@@ -139,8 +135,9 @@ def test_fill_sig(static_pdfs, pdf_samples, image_samples, request):
     assert filled3.read() == filled.read()
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_fill_sig_ratio(static_pdfs, pdf_samples, image_samples, request):
+def test_fill_sig_ratio(
+    static_pdfs, pdf_samples, image_samples, request, assert_same_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig_ratio.pdf")
 
     pdf = PdfWrapper(
@@ -158,8 +155,7 @@ def test_fill_sig_ratio(static_pdfs, pdf_samples, image_samples, request):
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+        assert_same_pdf(pdf.read(), expected)
 
 
 def test_fill_image(static_pdfs, pdf_samples, image_samples, request):

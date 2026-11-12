@@ -2,13 +2,10 @@
 
 import os
 
-import pytest
-
 from PyPDFForm import BlankPage, Fields, PdfWrapper, RawElements
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_index_snippets(pdf_samples, request, monkeypatch):
+def test_index_snippets(pdf_samples, request, monkeypatch, assert_same_pdf):
     # Stable ReportLab timestamps prevent variable-length document IDs.
     monkeypatch.setenv("SOURCE_DATE_EPOCH", "946684800")
     expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
@@ -53,7 +50,7 @@ def test_index_snippets(pdf_samples, request, monkeypatch):
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(pdf.read()) == len(expected)
+        assert_same_pdf(pdf.read(), expected, timestamped=True)
 
         assert pdf.widgets["my_textfield"].alignment == 1
         assert pdf.data["my_textfield"] == "this is a text field"

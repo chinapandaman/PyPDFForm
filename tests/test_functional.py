@@ -363,9 +363,13 @@ def test_register_bad_fonts(tmp_path):
     assert "foo" not in obj.fonts
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 def test_fill_with_customized_widgets(
-    template_stream, pdf_samples, sample_font_stream, data_dict, request
+    template_stream,
+    pdf_samples,
+    sample_font_stream,
+    data_dict,
+    request,
+    assert_same_pdf,
 ):
     expected_path = os.path.join(pdf_samples, "test_fill_with_customized_widgets.pdf")
     with open(
@@ -389,13 +393,16 @@ def test_fill_with_customized_widgets(
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 def test_fill_with_customized_widgets_readonly(
-    template_stream, pdf_samples, sample_font_stream, data_dict, request
+    template_stream,
+    pdf_samples,
+    sample_font_stream,
+    data_dict,
+    request,
+    assert_same_pdf,
 ):
     expected_path = os.path.join(
         pdf_samples, "test_fill_with_customized_widgets_readonly.pdf"
@@ -422,8 +429,7 @@ def test_fill_with_customized_widgets_readonly(
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
 def test_fill_with_varied_int_values(template_stream, pdf_samples, request):
@@ -766,8 +772,9 @@ def test_version(pdf_samples):
     assert obj.read().startswith(b"%PDF-2.0")
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request):
+def test_fill_font_color(
+    sample_template_with_font_colors, pdf_samples, request, assert_same_pdf
+):
     expected_path = os.path.join(pdf_samples, "test_fill_font_color.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sample_template_with_font_colors).fill(
@@ -784,12 +791,12 @@ def test_fill_font_color(sample_template_with_font_colors, pdf_samples, request)
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, request):
+def test_fill_complex_fonts(
+    sample_template_with_complex_fonts, pdf_samples, request, assert_same_pdf
+):
     expected_path = os.path.join(pdf_samples, "test_fill_complex_fonts.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(sample_template_with_complex_fonts).fill(
@@ -814,12 +821,12 @@ def test_fill_complex_fonts(sample_template_with_complex_fonts, pdf_samples, req
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_pages_preserve_font(template_stream, pdf_samples, sample_font_stream, request):
+def test_pages_preserve_font(
+    template_stream, pdf_samples, sample_font_stream, request, assert_same_pdf
+):
     expected_path = os.path.join(pdf_samples, "pages", "test_pages_preserve_font.pdf")
     obj = PdfWrapper(template_stream)
     obj.register_font("new_font", sample_font_stream)
@@ -828,7 +835,7 @@ def test_pages_preserve_font(template_stream, pdf_samples, sample_font_stream, r
     with open(expected_path, "rb+") as f:
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.pages[1].read()
-        assert obj.pages[1].read() == f.read()
+        assert_same_pdf(obj.pages[1].read(), f.read())
 
 
 def test_sejda_pages_1(sejda_template, pdf_samples, request):
@@ -970,8 +977,7 @@ def test_uncheck_checkbox(pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_blank_page(pdf_samples, request):
+def test_blank_page(pdf_samples, request, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "test_blank_page.pdf")
     with open(expected_path, "rb+") as f:
         obj = PdfWrapper(BlankPage() * 1)
@@ -981,7 +987,7 @@ def test_blank_page(pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
+        assert_same_pdf(obj.read(), expected, timestamped=True)
 
         assert not obj.widgets
         assert len(obj.pages) == 1
@@ -989,8 +995,7 @@ def test_blank_page(pdf_samples, request):
         request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_blank_page_custom_size_multiply(pdf_samples, request):
+def test_blank_page_custom_size_multiply(pdf_samples, request, assert_same_pdf):
     expected_path = os.path.join(
         pdf_samples, "test_blank_page_custom_size_multiply.pdf"
     )
@@ -1002,7 +1007,7 @@ def test_blank_page_custom_size_multiply(pdf_samples, request):
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
+        assert_same_pdf(obj.read(), expected, timestamped=True)
 
         assert not obj.widgets
         assert len(obj.pages) == 3
@@ -1717,32 +1722,7 @@ def get_retained_content(stream, markers):
     return found
 
 
-def check_page_ownership(stream):
-    with Pdf.open(BytesIO(stream)) as pdf:
-        pages = {page.obj.objgen for page in pdf.pages}
-        assert not [
-            obj.objgen
-            for obj in pdf.objects
-            if isinstance(obj, Dictionary)
-            and obj.get("/Type") == Name.Page
-            and obj.objgen not in pages
-        ]
-        annots = {}
-        for page in pdf.pages:
-            for annot in page.get("/Annots", []):
-                annots[annot.objgen] = annot
-                if "/P" in annot:
-                    assert annot.P.objgen == page.obj.objgen
-        for annot in annots.values():
-            parent = annot.get("/Parent") if annot.Subtype == Name.Widget else None
-            while parent is not None:
-                assert all(
-                    kid.objgen in annots or "/Kids" in kid for kid in parent.Kids
-                )
-                parent = parent.get("/Parent")
-
-
-def test_pages_exclude_other_page_content():
+def test_pages_exclude_other_page_content(assert_page_ownership):
     buffer = BytesIO()
     canvas = Canvas(buffer)
     canvas.drawString(30, 700, "KEEP_FIRST_PAGE")
@@ -1757,7 +1737,7 @@ def test_pages_exclude_other_page_content():
     assert get_retained_content(
         output, ["KEEP_FIRST_PAGE", "EXCLUDED_SECRET_SECOND_PAGE"]
     ) == {"KEEP_FIRST_PAGE"}
-    check_page_ownership(output)
+    assert_page_ownership(output)
     with Pdf.open(BytesIO(output)) as pdf:
         assert len(pdf.pages) == 1
         widget = pdf.pages[0].Annots[0]
@@ -1766,7 +1746,7 @@ def test_pages_exclude_other_page_content():
     assert PdfWrapper(output).widgets.keys() == {"field1"}
 
 
-def test_pages_keep_only_own_part_of_cross_page_fields():
+def test_pages_keep_only_own_part_of_cross_page_fields(assert_page_ownership):
     pages = PdfWrapper(build_cross_page_form()).pages
     page_1_markers = ["KEEP_PAGE_1", "KEEP_NAME", "radio_a"]
     page_2_markers = [
@@ -1790,8 +1770,8 @@ def test_pages_keep_only_own_part_of_cross_page_fields():
     ):
         stream = selection.read()
         assert get_retained_content(stream, markers) == set(expected)
-        check_page_ownership(stream)
-        check_page_ownership(PdfWrapper(stream).fill({}).read())
+        assert_page_ownership(stream)
+        assert_page_ownership(PdfWrapper(stream).fill({}).read())
 
     assert PdfWrapper(first).data == {
         "shared": "shared_value",
@@ -1872,7 +1852,9 @@ def test_pages_keep_only_own_part_of_cross_page_fields():
         ),
     ],
 )
-def test_pages_reject_other_cross_page_references(key, get_value, path):
+def test_pages_reject_other_cross_page_references(
+    key, get_value, path, assert_page_ownership
+):
     with Pdf.open(BytesIO(build_cross_page_form())) as pdf:
         pdf.pages[0].Annots[7][key] = get_value(pdf)
         stream = BytesIO()
@@ -1886,7 +1868,7 @@ def test_pages_reject_other_cross_page_references(key, get_value, path):
     ):
         form.pages  # noqa: B018 # pylint: disable=W0104
 
-    check_page_ownership(form.draw([RawElements.RawText("drawn", 1, 100, 100)]).read())
+    assert_page_ownership(form.draw([RawElements.RawText("drawn", 1, 100, 100)]).read())
 
 
 @pytest.mark.parametrize("targets", ["shared", "copied", None])
@@ -2236,16 +2218,21 @@ def test_pages_renumber_without_changing_other_fields():
         assert split[0].AP.N["/0"].objgen == kept[1].AP.N["/1"].objgen
 
 
-def test_clone_paths_keep_page_ownership():
+def test_clone_paths_keep_page_ownership(
+    assert_page_ownership, assert_annotations_preserved
+):
     template = build_cross_page_form(page_action=False)
+    merged = PdfWrapper(template) + PdfWrapper(template)
     for result in (
         PdfWrapper(template).draw([RawElements.RawText("drawn", 1, 100, 100)]),
         PdfWrapper(template).generate_coordinate_grid(),
-        PdfWrapper(template) + PdfWrapper(template),
+        merged,
         PdfWrapper(template).bulk_create_fields([Fields.TextField("new", 3, 10, 10)]),
     ):
         stream = result.read()
-        check_page_ownership(stream)
+        assert_page_ownership(stream)
+        if result is not merged:
+            assert_annotations_preserved(template, stream, changed={"new"})
         with Pdf.open(BytesIO(stream)) as pdf:
             page_1, page_2, page_3 = (page.obj for page in pdf.pages[:3])
             shared, name, radio, _, _, goto_next, goto_last, _, _ = page_1.Annots
@@ -2255,20 +2242,21 @@ def test_clone_paths_keep_page_ownership():
             assert goto_last.AA.U.D[0].objgen == page_3.objgen
 
 
-def test_rebuild_acroform_fields():
+def test_rebuild_acroform_fields(assert_catalog_fields):
     pdf = PdfWrapper(BlankPage() * 2)
 
     pdf.bulk_create_fields(
         [Fields.TextField("foo", 1, 100, 100), Fields.TextField("bar", 2, 100, 200)]
     )
 
+    assert_catalog_fields(pdf.read(), ["foo", "bar"])
     reader = PdfReader(BytesIO(pdf.read()))
 
     assert get_widget_key(reader.root_object[AcroForm][FieldsConst][0], False) == "foo"
     assert get_widget_key(reader.root_object[AcroForm][FieldsConst][1], False) == "bar"
 
 
-def test_rebuild_acroform_fields_ignores_note_title():
+def test_rebuild_acroform_fields_ignores_note_title(assert_catalog_fields):
     form = PdfWrapper(BlankPage()).annotate(
         [
             Annotations.TextAnnotation(
@@ -2281,8 +2269,8 @@ def test_rebuild_acroform_fields_ignores_note_title():
     result = egress.rebuild_acroform_fields(stream, {"signature"}, False)
 
     assert result == stream
+    assert_catalog_fields(result, [])
     reader = PdfReader(BytesIO(result))
-    assert not reader.get_fields()
     assert reader.pages[0]["/Annots"][0].get_object()["/Contents"] == "keep note"
 
 
@@ -2336,7 +2324,9 @@ def test_invalid_scalar_geometry(template_stream):
         ("sample_template_sejda.pdf", "purchase_option", False),
     ],
 )
-def test_radio_group_selection(pdf_samples, filename, name, spanning_pages):
+def test_radio_group_selection(
+    pdf_samples, filename, name, spanning_pages, assert_round_trip
+):
     with Pdf.open(os.path.join(pdf_samples, filename)) as pdf:
         group = next(field for field in pdf.Root.AcroForm.Fields if name == field.T)
         children = list(group.Kids)
@@ -2376,13 +2366,12 @@ def test_radio_group_selection(pdf_samples, filename, name, spanning_pages):
                     for child in group.Kids
                 ]
                 assert [str(value) for value in group.get("/Opt", [])] == exports
-            reopened = PdfWrapper(result)
-            assert reopened.widgets[name].value == index
+            assert_round_trip(form, {name: index})
             if reopen:
-                form = reopened
+                form = PdfWrapper(result)
 
 
-def test_choice_indices(sample_template_with_dropdown):
+def test_choice_indices(sample_template_with_dropdown, assert_round_trip):
     for field_name, count in (("dropdown_1", 4), ("radio_1", 3)):
         for index in (0, count - 1):
             form = PdfWrapper(sample_template_with_dropdown)
@@ -2400,7 +2389,7 @@ def test_choice_indices(sample_template_with_dropdown):
                 assert validation.call_count == 1
 
             assert form.widgets[field_name] is widget
-            assert widget.value == index
+            assert_round_trip(form, {field_name: index})
             annotations = [
                 reference.get_object()
                 for page in PdfReader(BytesIO(form.read())).pages
@@ -2423,7 +2412,6 @@ def test_choice_indices(sample_template_with_dropdown):
                     for i, annotation in enumerate(annotations)
                     if i != index
                 )
-                assert PdfWrapper(form.read()).widgets[field_name].value == index
 
     form = PdfWrapper(sample_template_with_dropdown)
     widget = form.widgets["dropdown_1"]
@@ -2508,7 +2496,7 @@ def test_stale_choice_indices(
     assert widget.value == (0 if option_count else None)
 
 
-def test_dropdown_display_and_export_values():
+def test_dropdown_display_and_export_values(assert_round_trip):
     def get_field(output):
         return PdfReader(BytesIO(output)).pages[0]["/Annots"][0].get_object()
 
@@ -2526,9 +2514,8 @@ def test_dropdown_display_and_export_values():
         assert [list(each) for each in field["/Opt"]] == opt
         assert field["/V"] == opt[index][0]
         assert field["/I"] == [index]
-        reopened = PdfWrapper(output)
-        assert reopened.data == {"choice": index}
-        assert reopened.widgets["choice"].choices == (
+        assert_round_trip(form, {"choice": index})
+        assert PdfWrapper(output).widgets["choice"].choices == (
             ("Pear", "P"),
             ("Grape", "G"),
             ("Grape", "R"),

@@ -145,6 +145,5 @@ include = ["PyPDFForm*"]
 
 [tool.pytest.ini_options]
 markers = [
-    "requires_zlib_over_zlib_ng", # expected PDF streams differ when Python uses zlib-ng
     "cli_test",
 ]

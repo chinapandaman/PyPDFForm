@@ -2,8 +2,6 @@
 
 import os
 
-import pytest
-
 from PyPDFForm import PdfWrapper, RawElements
 
 
@@ -142,9 +140,8 @@ def test_draw_image_on_sejda_template(
         assert obj.read() == expected
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 def test_draw_png_image_on_one_page(
-    template_stream, image_samples, pdf_samples, request
+    template_stream, image_samples, pdf_samples, request, assert_same_pdf
 ):
     expected_path = os.path.join(pdf_samples, "test_draw_png_image_on_one_page.pdf")
     with open(expected_path, "rb+") as f:
@@ -165,13 +162,11 @@ def test_draw_png_image_on_one_page(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 def test_draw_transparent_png_image_on_one_page(
-    template_stream, image_samples, pdf_samples, request
+    template_stream, image_samples, pdf_samples, request, assert_same_pdf
 ):
     expected_path = os.path.join(
         pdf_samples, "test_draw_transparent_png_image_on_one_page.pdf"
@@ -194,8 +189,7 @@ def test_draw_transparent_png_image_on_one_page(
 
         request.config.results["expected_path"] = expected_path
         request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
 def test_draw_text_and_image(template_stream, image_samples, pdf_samples, request):

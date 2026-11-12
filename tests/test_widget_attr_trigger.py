@@ -7,8 +7,9 @@ import pytest
 from PyPDFForm import Fields, PdfWrapper, RawElements
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_register_font_no_form_fields(pdf_samples, sample_font_stream, request):
+def test_register_font_no_form_fields(
+    pdf_samples, sample_font_stream, request, assert_same_pdf
+):
     expected_path = os.path.join(
         pdf_samples, "test_widget_attr_trigger", "test_register_font_no_form_fields.pdf"
     )
@@ -24,12 +25,12 @@ def test_register_font_no_form_fields(pdf_samples, sample_font_stream, request):
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_set_text_field_font_sejda(pdf_samples, font_samples, sejda_template, request):
+def test_set_text_field_font_sejda(
+    pdf_samples, font_samples, sejda_template, request, assert_same_pdf
+):
     expected_path = os.path.join(
         pdf_samples,
         "test_widget_attr_trigger",
@@ -49,8 +50,7 @@ def test_set_text_field_font_sejda(pdf_samples, font_samples, sejda_template, re
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
 def test_set_text_field_font_size_sejda(pdf_samples, sejda_template, request):
@@ -219,9 +219,8 @@ def test_set_radio_size_sejda(pdf_samples, sejda_template, request):
         assert obj.read() == expected
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 def test_set_dropdown_font_sejda(
-    pdf_samples, dropdown_alignment_sejda, sample_font_stream, request
+    pdf_samples, dropdown_alignment_sejda, sample_font_stream, request, assert_same_pdf
 ):
     expected_path = os.path.join(
         pdf_samples, "test_widget_attr_trigger", "test_set_dropdown_font_sejda.pdf"
@@ -236,8 +235,7 @@ def test_set_dropdown_font_sejda(
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
 def test_set_dropdown_font_size_sejda(pdf_samples, dropdown_alignment_sejda, request):

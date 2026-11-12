@@ -3,7 +3,6 @@
 import os
 from io import BytesIO
 
-import pytest
 from pypdf import PdfReader, PdfWriter
 
 from PyPDFForm import BlankPage, Fields, PdfWrapper
@@ -277,8 +276,7 @@ def test_not_merge_metadata():
     assert metadata["/other_key"] == "other_value"
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_dropdown_tutorial(issue_pdf_directory, request):
+def test_dropdown_tutorial(issue_pdf_directory, request, assert_same_pdf):
     obj = PdfWrapper(BlankPage(width=612, height=792) * 3)
     obj.generate_coordinate_grid(margin=100, color=(0, 0, 1))
 
@@ -343,5 +341,4 @@ def test_dropdown_tutorial(issue_pdf_directory, request):
     request.config.results["stream"] = obj.read()
     with open(expected_path, "rb+") as f:
         expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)

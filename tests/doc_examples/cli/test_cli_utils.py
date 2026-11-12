@@ -11,9 +11,8 @@ from PyPDFForm.cli.root import cli_app
 runner = CliRunner()
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_blank_page(pdf_samples, tmp_path):
+def test_blank_page(pdf_samples, tmp_path, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_blank_page.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -32,12 +31,11 @@ def test_blank_page(pdf_samples, tmp_path):
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
+        assert_same_pdf(actual, expected, timestamped=True)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_blank_page_custom_dimensions(pdf_samples, tmp_path):
+def test_blank_page_custom_dimensions(pdf_samples, tmp_path, assert_same_pdf):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_blank_page_custom_dimensions.pdf"
     )
@@ -62,12 +60,11 @@ def test_blank_page_custom_dimensions(pdf_samples, tmp_path):
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
+        assert_same_pdf(actual, expected, timestamped=True)
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 @pytest.mark.cli_test
-def test_blank_page_multiply(pdf_samples, tmp_path):
+def test_blank_page_multiply(pdf_samples, tmp_path, assert_same_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_blank_page_multiply.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -81,7 +78,7 @@ def test_blank_page_multiply(pdf_samples, tmp_path):
         expected = f1.read()
         actual = f2.read()
 
-        assert len(expected) == len(actual)
+        assert_same_pdf(actual, expected, timestamped=True)
 
 
 @pytest.mark.cli_test

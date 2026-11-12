@@ -3,13 +3,12 @@
 
 import os
 
-import pytest
-
 from PyPDFForm import PdfWrapper, RawElements
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
-def test_draw_text(static_pdfs, pdf_samples, sample_font_stream, request):
+def test_draw_text(
+    static_pdfs, pdf_samples, sample_font_stream, request, assert_same_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_text.pdf")
 
     texts = [
@@ -45,8 +44,7 @@ def test_draw_text(static_pdfs, pdf_samples, sample_font_stream, request):
     with open(expected_path, "rb+") as f:
         expected = f.read()
 
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+        assert_same_pdf(pdf.read(), expected)
 
 
 def test_draw_image(static_pdfs, image_samples, pdf_samples, request):

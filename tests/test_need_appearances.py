@@ -2,8 +2,6 @@
 
 import os
 
-import pytest
-
 from PyPDFForm import Fields, PdfWrapper
 
 
@@ -12,6 +10,7 @@ def run_sample_template_library_test(
     image_samples,
     sample_font_stream,
     request,
+    assert_same_pdf,
     generate_appearance_streams=False,
     need_appearances=False,
 ):
@@ -107,8 +106,7 @@ def run_sample_template_library_test(
 
         expected = f.read()
 
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+        assert_same_pdf(obj.read(), expected)
 
 
 def test_fill(template_stream, pdf_samples, data_dict, request):
@@ -198,14 +196,14 @@ def test_issue_613(pdf_samples, request):
         assert obj.read() == expected
 
 
-@pytest.mark.requires_zlib_over_zlib_ng
 def test_sample_template_library(
-    pdf_samples, image_samples, sample_font_stream, request
+    pdf_samples, image_samples, sample_font_stream, request, assert_same_pdf
 ):
     run_sample_template_library_test(
         pdf_samples,
         image_samples,
         sample_font_stream,
         request,
+        assert_same_pdf,
         need_appearances=True,
     )
