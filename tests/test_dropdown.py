@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import os
+from unittest.mock import patch
+
+import pytest
 
 from PyPDFForm import PdfWrapper
 
@@ -189,3 +192,24 @@ def test_dropdown_alignment_sejda_readonly_then_editable(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_failed_fill_restores_dropdown(
+    sample_template_with_dropdown, assert_widgets_match_output
+):
+    obj = PdfWrapper(sample_template_with_dropdown)
+    original = obj.read()
+    data = obj.data
+    choices = obj.widgets["dropdown_1"].choices
+
+    with (
+        patch("PyPDFForm.lib.wrapper.fill", side_effect=RuntimeError),
+        pytest.raises(RuntimeError),
+    ):
+        obj.fill({"test_1": "test_1", "dropdown_1": "new choice"})
+
+    assert obj.data == data
+    assert obj.widgets["dropdown_1"].choices == choices
+    assert not any(widget.hooks_to_trigger for widget in obj.widgets.values())
+    assert obj.read() == original
+    assert_widgets_match_output(obj)

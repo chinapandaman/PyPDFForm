@@ -119,6 +119,7 @@ class Dropdown(Widget):
     """
 
     TYPE_SPECIFIC_PROPERTIES = frozenset({"font", "font_size", "font_color", "choices"})
+    READ_PROPERTIES = Widget.READ_PROPERTIES | {"choices"}
 
     def __init__(
         self,

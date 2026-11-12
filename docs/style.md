@@ -2,6 +2,8 @@
 
 PyPDFForm lets you modify PDF-level metadata and form field settings in code. You can update document titles, field appearances, and field behavior without altering the PDF form template.
 
+Changes to a field's properties are written to the PDF the next time it is read, for example by `read()` or `write()`. A value the PDF can't store, such as `None` for `readonly` or a coordinate that isn't a number, raises an error right away and leaves the field unchanged. If writing the changes fails, all pending changes are discarded before the error is raised, so the fields still match the PDF.
+
 The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
 
 ## CLI input methods
@@ -217,7 +219,7 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 ## Change text field alignment
 
 === "Library"
-    You can change the alignment of the text filled into a text field by setting its `alignment` property to an integer value: `0` for left, `1` for center, and `2` for right.
+    You can change the alignment of the text filled into a text field by setting its `alignment` property to an integer value: `0` for left, `1` for center, and `2` for right. Set it to `None` to use the default alignment.
 
     ```python
     from PyPDFForm import PdfWrapper, Widgets
@@ -265,7 +267,7 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 ## Change text field max length
 
 === "Library"
-    You can change the maximum number of characters allowed in a text field:
+    You can change the maximum number of characters allowed in a text field. The maximum must be at least `1`. Set it to `None` to remove the limit:
 
     ```python
     from PyPDFForm import PdfWrapper, Widgets
@@ -313,7 +315,7 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 ## Enable text field character spacing (combs)
 
 === "Library"
-    To enable character spacing in a text field, set its `.comb` property to `True`. This spaces out the filled text evenly across the field.
+    To enable character spacing in a text field, set its `.comb` property to `True`. This spaces out the filled text evenly across the field. Set it to `False` to disable it.
 
     ```python
     from PyPDFForm import PdfWrapper, Widgets
@@ -369,7 +371,7 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 ## Enable multiline text field
 
 === "Library"
-    To enable multiline input for a text field, set its `.multiline` property to `True`. This lets it accept paragraph-style input:
+    To enable multiline input for a text field, set its `.multiline` property to `True`. This lets it accept paragraph-style input. Set it to `False` to disable it:
 
     ```python
     from PyPDFForm import PdfWrapper

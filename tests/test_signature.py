@@ -258,11 +258,17 @@ def test_fill_preserves_unrelated_annotations(
     ],
 )
 def test_failed_image_fill_preserves_annotations(
-    annotated_form, image_samples, image, error, assert_catalog_fields
+    annotated_form,
+    image_samples,
+    image,
+    error,
+    assert_catalog_fields,
+    assert_widgets_match_output,
 ):
     form = annotated_form
     original = form.read()
     original_widgets = form.widgets.copy()
+    original_data = form.data
 
     with pytest.raises(error):
         form.fill(
@@ -275,7 +281,10 @@ def test_failed_image_fill_preserves_annotations(
         )
 
     assert form.widgets == original_widgets
+    # the valid signature filled before the failure is not kept either
+    assert form.data == original_data
     assert form.read() == original
+    assert_widgets_match_output(form)
     assert_annotation_graph(
         form.read(),
         set(original_widgets),
@@ -450,3 +459,48 @@ def test_fill_vertical_image_not_preserve_aspect_ratio(
 
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def _page_contents(pdf):
+    return [
+        contents.get_data()
+        for page in PdfReader(BytesIO(pdf.read())).pages
+        if (contents := page.get_contents()) is not None
+    ]
+
+
+@pytest.mark.parametrize(
+    ("template", "key", "preserve"),
+    [
+        (
+            os.path.join("signature", "sample_template_with_signature_overlap.pdf"),
+            "signature",
+            False,
+        ),
+        ("sample_template_with_image_field.pdf", "image_1", True),
+    ],
+)
+def test_rename_keeps_preserve_aspect_ratio(
+    pdf_samples, image_samples, template, key, preserve
+):
+    path = os.path.join(pdf_samples, template)
+    image = os.path.join(image_samples, "sample_image.jpg")
+    renamed, same, different = (PdfWrapper(path) for _ in range(3))
+    # preserve differs from the field's default
+    for form, setting in (
+        (renamed, preserve),
+        (same, preserve),
+        (different, not preserve),
+    ):
+        form.widgets[key].preserve_aspect_ratio = setting
+
+    renamed.update_widget_key(key, "renamed").commit_widget_key_updates()
+    assert renamed.widgets["renamed"].preserve_aspect_ratio is preserve
+    assert not renamed.widgets["renamed"].hooks_to_trigger
+
+    renamed.fill({"renamed": image})
+    same.fill({key: image})
+    different.fill({key: image})
+    # the image is drawn as without renaming, and the setting changes it
+    assert _page_contents(renamed) == _page_contents(same)
+    assert _page_contents(renamed) != _page_contents(different)

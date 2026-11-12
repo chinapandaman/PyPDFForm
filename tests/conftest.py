@@ -15,6 +15,7 @@ from packaging.utils import canonicalize_name
 from PIL import features
 
 from PyPDFForm import PdfWrapper
+from PyPDFForm.lib.middleware.checkbox import Checkbox
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURE_ENVIRONMENT_PATH = os.path.join(ROOT, "pdf_samples", "fixture_environment.json")
@@ -290,6 +291,67 @@ def assert_round_trip():
                 # True == 1 and False == 0, but a checkbox value isn't an index
                 assert isinstance(actual, bool) == isinstance(value, bool)
                 assert actual == value
+
+    return check
+
+
+def _same_property(actual, expected):
+    # numbers are compared approximately, since the PDF stores them as reals,
+    # and a list or tuple of choices or per-option geometry element by element
+    if isinstance(actual, (list, tuple)) and isinstance(expected, (list, tuple)):
+        return len(actual) == len(expected) and all(
+            _same_property(a, b) for a, b in zip(actual, expected, strict=True)
+        )
+    if isinstance(actual, bool) or isinstance(expected, bool):
+        return actual is expected
+    if isinstance(actual, (int, float)) and isinstance(expected, (int, float)):
+        return actual == pytest.approx(expected)
+
+    return actual == expected
+
+
+# the widget properties that opening a PDF reads from it, independently of
+# the widget classes' own READ_PROPERTIES
+COMPARED_PROPERTIES = (
+    "value",
+    "page_number",
+    "x",
+    "y",
+    "width",
+    "height",
+    "readonly",
+    "required",
+    "hidden",
+    "tooltip",
+    "comb",
+    "alignment",
+    "multiline",
+    "max_length",
+    "choices",
+    "number_of_options",
+)
+
+
+@pytest.fixture
+def assert_widgets_match_output():
+    # the wrapper's fields, values, and properties read from the PDF are the
+    # same as those of its reopened output
+    def check(pdf):
+        stream = pdf.read()
+        reopened = PdfWrapper(stream, use_full_widget_name=pdf.use_full_widget_name)
+        assert list(pdf.widgets) == list(reopened.widgets)
+        for name, widget in pdf.widgets.items():
+            other = reopened.widgets[name]
+            assert type(widget) is type(other)
+            for prop in COMPARED_PROPERTIES:
+                actual, expected = (
+                    getattr(widget, prop, None),
+                    getattr(other, prop, None),
+                )
+                if prop == "value" and type(widget) is Checkbox:
+                    # an unchecked checkbox reads None, filled with False or not
+                    actual, expected = actual or None, expected or None
+                assert _same_property(actual, expected), (name, prop, actual, expected)
 
     return check
 

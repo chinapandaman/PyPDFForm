@@ -20,9 +20,11 @@ class Signature(Widget):
     The Signature class provides a concrete implementation for
     signature form fields. It inherits from the Widget class, preserves image
     aspect ratio by default, and adapts the field value into an image byte stream
-    when the PDF is filled.
+    when the PDF is filled. The `preserve_aspect_ratio` setting exists only on
+    the widget and is kept when the widget is rebuilt, such as after renaming.
     """
 
+    LOCAL_SETTINGS = frozenset({"preserve_aspect_ratio"})
     preserve_aspect_ratio: bool = True
 
     @property

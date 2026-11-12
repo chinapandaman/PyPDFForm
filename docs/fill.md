@@ -163,7 +163,7 @@ Dropdown and radio indices must satisfy `0 <= index < option_count`: zero select
 
 The [generated JSON schema](inspect.md#generate-a-json-schema-that-describes-a-pdf-form) enforces these integer bounds, and the CLI validates fill data against that schema. In the Python API, an out-of-range integer passed to `fill()` or assigned to `pdf.widgets[name].value` raises `ValueError`.
 
-`fill()` checks both supplied and retained selections before applying values or pending field updates. If an index is invalid, existing widget values, queued updates, and PDF data remain unchanged. If you shorten a dropdown's choices, supply a valid replacement for any selection that is now out of range. This guarantee covers index validation; failures during later hook execution, image processing, or serialization are not rolled back.
+`fill()` checks both supplied and retained selections before applying values or pending field updates. If an index is invalid, existing widget values, queued updates, and PDF data remain unchanged. If you shorten a dropdown's choices, supply a valid replacement for any selection that is now out of range. If filling fails later, for example because an image can't be read, the widget values and PDF data are restored before the error is raised.
 
 ## Fill signature field
 

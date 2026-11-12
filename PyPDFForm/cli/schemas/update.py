@@ -49,7 +49,7 @@ FIELD_SCHEMA = {
                 "comb": {"type": "boolean"},
                 "alignment": {"type": "integer", "minimum": 0, "maximum": 2},
                 "multiline": {"type": "boolean"},
-                "max_length": {"type": "integer", "minimum": 0},
+                "max_length": {"type": "integer", "minimum": 1},
                 "choices": {
                     "type": "array",
                     "items": {

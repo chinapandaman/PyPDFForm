@@ -7,7 +7,7 @@ Widget class. It represents a text field form field in a PDF document,
 allowing users to enter text.
 """
 
-from typing import Optional
+from typing import Any, Optional
 
 from .base import Widget
 
@@ -35,6 +35,13 @@ class Text(Widget):
             "max_length",
         }
     )
+    READ_PROPERTIES = Widget.READ_PROPERTIES | {
+        "comb",
+        "alignment",
+        "multiline",
+        "max_length",
+    }
+    CLEARABLE_PROPERTIES = Widget.CLEARABLE_PROPERTIES | {"alignment", "max_length"}
 
     def __init__(
         self,
@@ -77,6 +84,32 @@ class Text(Widget):
         self.alignment: Optional[int] = None
         self.multiline: Optional[bool] = None
         self.max_length: Optional[int] = None
+
+    def prepare_property(self, name: str, value: Any) -> tuple[Any, Any]:
+        """
+        Validates a hooked property value before the text field changes.
+
+        An integer maximum length must be at least one, since reopening the PDF
+        reports a smaller maximum length as None.
+
+        Args:
+            name (str): The name of the property.
+            value (Any): The proposed value of the property.
+
+        Returns:
+            tuple[Any, Any]: The value to store on the widget and the value to
+                pass to the property's hook.
+
+        Raises:
+            TypeError: Raised when a property read back from the PDF is set to
+                None, or geometry is not a number.
+            ValueError: Raised when an integer maximum length is less than one.
+        """
+        if name == "max_length" and isinstance(value, int) and value < 1:
+            msg = f"Text field '{self.name}' max_length must be at least 1."
+            raise ValueError(msg)
+
+        return super().prepare_property(name, value)
 
     @property
     def value(self) -> str:

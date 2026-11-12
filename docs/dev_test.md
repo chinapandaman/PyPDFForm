@@ -28,6 +28,7 @@ An expected PDF only shows that the output hasn't changed, not that it is correc
 | `assert_page_ownership(stream)` | Every page is in the page tree, every annotation belongs to the page that lists it, and every widget of a listed field is on a page. |
 | `assert_catalog_fields(stream, names)` | The AcroForm lists exactly the fields with these fully qualified names, and their widgets are exactly the widgets on the pages, each listed once. |
 | `assert_round_trip(pdf, data)` | The wrapper and its reopened output both read these values. |
+| `assert_widgets_match_output(pdf)` | The wrapper has the same fields as its reopened output, with the same values and the same properties read from the PDF, such as geometry, flags, and tooltips. An unchecked checkbox matches whether it reads `False` or `None`. |
 | `assert_valid_appearances(stream)` | Every `/AP` is a dictionary of appearance streams, and a widget with appearance states selects one of them or `/Off`. |
 | `assert_annotations_preserved(before, after, changed)` | Every annotation has the same content on the same page in the same order, except the widgets of the `changed` fields. |
 
