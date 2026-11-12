@@ -249,19 +249,19 @@ def assert_page_ownership():
 @pytest.fixture
 def assert_catalog_fields():
     # the catalog lists exactly the fields with these fully qualified names, and
-    # their widgets are exactly the widgets on the pages
+    # their widgets are exactly the widgets on the pages, each of them once
     def check(stream, names):
         with pikepdf.Pdf.open(BytesIO(stream)) as pdf:
-            on_pages = {
+            on_pages = [
                 annot.objgen
                 for page in pdf.pages
                 for annot in page.get("/Annots", [])
                 if annot.get("/Subtype") == pikepdf.Name.Widget
-            }
+            ]
             acroform = pdf.Root.get("/AcroForm", pikepdf.Dictionary())
             pending = [(field, "") for field in acroform.get("/Fields", [])]
             found = []
-            listed = set()
+            listed = []
             while pending:
                 field, prefix = pending.pop()
                 name = prefix + str(field.get("/T", ""))
@@ -271,10 +271,11 @@ def assert_catalog_fields():
                 widgets = [kid for kid in kids if "/T" not in kid]
                 if widgets or not kids:
                     found.append(name)
-                    listed.update(each.objgen for each in widgets or [field])
+                    listed.extend(each.objgen for each in widgets or [field])
 
             assert sorted(found) == sorted(names)
-            assert listed == on_pages
+            assert len(set(listed)) == len(listed)
+            assert sorted(listed) == sorted(on_pages)
 
     return check
 
@@ -285,8 +286,10 @@ def assert_round_trip():
     def check(pdf, data):
         reopened = PdfWrapper(pdf.read(), use_full_widget_name=pdf.use_full_widget_name)
         for name, value in data.items():
-            assert pdf.data[name] == value
-            assert reopened.data[name] == value
+            for actual in (pdf.data[name], reopened.data[name]):
+                # True == 1 and False == 0, but a checkbox value isn't an index
+                assert isinstance(actual, bool) == isinstance(value, bool)
+                assert actual == value
 
     return check
 
@@ -313,7 +316,10 @@ def assert_valid_appearances():
                             for each in appearance.values()
                         )
                     if not isinstance(annot.AP.N, pikepdf.Stream):
-                        assert str(annot.get("/AS")) in ("/Off", *annot.AP.N.keys())
+                        state = annot.get("/AS")
+                        # a string with the same characters selects no state
+                        assert isinstance(state, pikepdf.Name)
+                        assert str(state) in ("/Off", *annot.AP.N.keys())
 
     return check
 
