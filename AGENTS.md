@@ -106,9 +106,11 @@ host is set, without printing its value. For `github.com`, a subdomain of
 `ghe.com`, or `github.localhost`, these are `GH_TOKEN` and `GITHUB_TOKEN`. For
 any other host, they are `GH_ENTERPRISE_TOKEN` and `GITHUB_ENTERPRISE_TOKEN`.
 
-If none is set, run `gh auth status` to confirm the stored login. If any is
-set, stop and ask the user to approve the token, identifying it only by the
-name of each variable that is set. After approval, run `gh auth status`, tell
+Run status checks only as `gh auth status --hostname <target-host> --active`,
+so they stay within the active account on the host checked locally. If no
+token variable is set, run a status check to confirm the stored login. If any
+is set, stop and ask the user to approve the token, identifying it only by the
+name of each variable that is set. After approval, run a status check, tell
 the user the account it reports and which variable it came from, and wait for
 the user to confirm before any other GitHub request.
 
