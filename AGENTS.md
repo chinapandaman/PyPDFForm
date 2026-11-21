@@ -83,11 +83,46 @@ or temporary PDF/image files unless the task is specifically about those files.
 Before finishing, summarize what changed and which checks were run. If a useful
 check was not run, explain why.
 
-## Human-Only Actions
+## GitHub Access
 
 Agents may make local changes in the working tree and create GitHub issues or
 pull requests. Follow the issue and pull request guidelines in
 [`docs/dev_intro.md`](docs/dev_intro.md).
+
+Use only the GitHub CLI (`gh`) to interact with GitHub issues and pull
+requests, including reading them. Do not log in, switch accounts, refresh
+scopes, set or supply tokens, or reach GitHub through other means such as a
+browser, web fetches, MCP servers, or API requests made outside `gh`.
+
+Use only the credential already configured for `gh` in the local environment.
+A login stored by `gh` is authorized. A token inherited through an environment
+variable takes precedence over the stored login and is authorized only when
+the user approves it for the current task. Do not unset or override these
+variables to fall back to the stored login.
+
+Before any GitHub request in a task, including `gh auth status` and
+`git push`, check locally whether a token variable that applies to the target
+host is set, without printing its value. For `github.com`, a subdomain of
+`ghe.com`, or `github.localhost`, these are `GH_TOKEN` and `GITHUB_TOKEN`. For
+any other host, they are `GH_ENTERPRISE_TOKEN` and `GITHUB_ENTERPRISE_TOKEN`.
+
+Run status checks only as `gh auth status --hostname <target-host> --active`,
+so they stay within the active account on the host checked locally. If no
+token variable is set, run a status check to confirm the stored login. If any
+is set, stop and ask the user to approve the token, identifying it only by the
+name of each variable that is set. After approval, run a status check, tell
+the user the account it reports and which variable it came from, and wait for
+the user to confirm before any other GitHub request.
+
+Push pull request branches with `git` using the existing local Git
+configuration. Do not add, change, or switch Git credentials.
+
+If `gh` is not installed, or its credential is missing, rejected, or lacks the
+needed permission, stop before any further GitHub step and tell the user what
+failed. Do not work around the failure. Local changes already made stay in
+place.
+
+## Human-Only Actions
 
 Do not publish releases, push release tags, upload packages, or alter release
 metadata unless explicitly asked by a maintainer. Follow the release process in
