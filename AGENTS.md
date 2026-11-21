@@ -89,6 +89,20 @@ Agents may make local changes in the working tree and create GitHub issues or
 pull requests. Follow the issue and pull request guidelines in
 [`docs/dev_intro.md`](docs/dev_intro.md).
 
+Use only the GitHub CLI (`gh`) to interact with GitHub issues and pull
+requests, including reading them, and only with the credential already
+configured for `gh` in the local environment. Do not log in, switch accounts,
+refresh scopes, set or supply tokens, or reach GitHub through other means such
+as a browser, web fetches, MCP servers, or API requests made outside `gh`.
+
+Push pull request branches with `git` using the existing local Git
+configuration. Do not add, change, or switch Git credentials.
+
+If `gh` is not installed, or its credential is missing, rejected, or lacks the
+needed permission, stop before any further GitHub step and tell the user what
+failed. Do not work around the failure. Local changes already made stay in
+place.
+
 Do not publish releases, push release tags, upload packages, or alter release
 metadata unless explicitly asked by a maintainer. Follow the release process in
 the Developer Guide.
