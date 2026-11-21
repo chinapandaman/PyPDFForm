@@ -83,7 +83,7 @@ or temporary PDF/image files unless the task is specifically about those files.
 Before finishing, summarize what changed and which checks were run. If a useful
 check was not run, explain why.
 
-## Human-Only Actions
+## GitHub Access
 
 Agents may make local changes in the working tree and create GitHub issues or
 pull requests. Follow the issue and pull request guidelines in
@@ -111,6 +111,8 @@ If `gh` is not installed, or its credential is missing, rejected, or lacks the
 needed permission, stop before any further GitHub step and tell the user what
 failed. Do not work around the failure. Local changes already made stay in
 place.
+
+## Human-Only Actions
 
 Do not publish releases, push release tags, upload packages, or alter release
 metadata unless explicitly asked by a maintainer. Follow the release process in
