@@ -49,6 +49,7 @@ from .egress import (
     sync_acroform_fields,
     write_path,
 )
+from .field_tree import remove_widgets_by_keys, share_inline_fields
 from .filler import fill
 from .font import (
     get_all_available_fonts,
@@ -64,10 +65,8 @@ from .template import (
     create_annotations,
     get_on_open_javascript,
     get_title,
-    remove_widgets_by_keys,
     set_on_open_javascript,
     set_title,
-    share_inline_fields,
     update_widget_keys,
 )
 from .utils import (

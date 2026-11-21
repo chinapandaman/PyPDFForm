@@ -32,7 +32,7 @@ from .constants import (
     Subtype,
     Widget,
 )
-from .template import share_inline_objects
+from .field_tree import share_inline_objects
 from .utils import get_array, get_dictionary
 
 

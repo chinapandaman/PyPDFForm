@@ -11,7 +11,7 @@ either the requested output path or the original file.
 import typer
 
 from .. import PdfWrapper
-from ..lib.template import get_field_keys
+from ..lib.field_tree import get_field_keys
 from .common import FIELD_NAMES, INPUT_PDF, OPTIONAL_OUTPUT_PDF, get_widget
 
 remove_cli = typer.Typer(

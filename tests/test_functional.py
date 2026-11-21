@@ -2564,9 +2564,9 @@ def _with_catalog_extras(stream):
 
 
 def _describe_catalog(stream):
-    # the fully qualified names and values of the catalog's fields, the
-    # calculation order, the other AcroForm entries, and whether the widgets
-    # in the field tree are exactly the widgets on the pages
+    # the values of the catalog's fields, by the fully qualified names
+    # assert_catalog_fields lists, the calculation order, and the other
+    # AcroForm entries
     def get_name(field):
         parts = []
         while field is not None:
@@ -2578,46 +2578,37 @@ def _describe_catalog(stream):
     with Pdf.open(BytesIO(stream)) as pdf:
         acroform = pdf.Root.get("/AcroForm", Dictionary())
         values = {}
-        widgets = []
         pending = list(acroform.get("/Fields", []))
         while pending:
             field = pending.pop()
-            pending.extend(field.get("/Kids", []))
-            if "/T" in field:
+            kids = list(field.get("/Kids", []))
+            pending.extend(kid for kid in kids if "/T" in kid)
+            if not kids or any("/T" not in kid for kid in kids):
                 values[get_name(field)] = str(field.get("/V", ""))
-            if field.get("/Subtype") == Name.Widget:
-                widgets.append(field.objgen)
-        on_pages = [
-            annot.objgen
-            for page in pdf.pages
-            for annot in page.get("/Annots", [])
-            if annot.get("/Subtype") == Name.Widget
-        ]
 
         return {
             "fields": values,
             "calculation_order": [get_name(field) for field in acroform.get("/CO", [])],
             "entries": sorted(key for key in acroform if key != "/Fields"),
-            "widgets_on_pages": sorted(widgets) == sorted(on_pages),
         }
 
 
-def test_read_preserves_catalog(template_stream):
+def test_read_preserves_catalog(template_stream, assert_catalog_fields):
     stream = _with_catalog_extras(template_stream)
     expected = _describe_catalog(stream)
 
     assert expected["fields"]["hidden_business_id"] == "12345"
-    assert {"submit_button", "group", "group.test_2", "group.test_3"} <= set(
-        expected["fields"]
-    )
+    assert {"submit_button", "group.test_2", "group.test_3"} <= set(expected["fields"])
     assert expected["calculation_order"] == [
         "test",
         "group.test_2",
         "hidden_business_id",
     ]
     assert expected["entries"] == ["/CO", "/DA", "/DR"]
-    assert expected["widgets_on_pages"]
-    assert _describe_catalog(PdfWrapper(stream).read()) == expected
+    assert_catalog_fields(stream, list(expected["fields"]))
+    result = PdfWrapper(stream).read()
+    assert _describe_catalog(result) == expected
+    assert_catalog_fields(result, list(expected["fields"]))
 
 
 def test_read_preserves_fields_without_widgets_on_pages(sejda_template):
@@ -2660,13 +2651,16 @@ def test_read_preserves_fields_without_widgets_on_pages(sejda_template):
     ],
     ids=["fill", "style", "create", "draw", "grid", "rename", "annotate"],
 )
-def test_unrelated_edits_preserve_catalog(template_stream, operation, changed):
+def test_unrelated_edits_preserve_catalog(
+    template_stream, assert_catalog_fields, operation, changed
+):
     stream = _with_catalog_extras(template_stream)
     expected = _describe_catalog(stream)
     obj = PdfWrapper(stream)
 
     operation(obj)
-    result = _describe_catalog(obj.read())
+    output = obj.read()
+    result = _describe_catalog(output)
 
     assert {
         name: value for name, value in result["fields"].items() if name not in changed
@@ -2675,7 +2669,7 @@ def test_unrelated_edits_preserve_catalog(template_stream, operation, changed):
     }
     assert result["calculation_order"] == expected["calculation_order"]
     assert result["entries"] == expected["entries"]
-    assert result["widgets_on_pages"]
+    assert_catalog_fields(output, list(result["fields"]))
 
 
 @pytest.mark.parametrize(
@@ -2687,7 +2681,7 @@ def test_unrelated_edits_preserve_catalog(template_stream, operation, changed):
         (
             ["test_2", "test_3"],
             False,
-            {"group", "group.test_2", "group.test_3"},
+            {"group.test_2", "group.test_3"},
             ["test", "hidden_business_id"],
         ),
         (
@@ -2729,7 +2723,12 @@ def test_unrelated_edits_preserve_catalog(template_stream, operation, changed):
     ],
 )
 def test_remove_fields_updates_catalog(
-    template_stream, keys, use_full_widget_name, removed, calculation_order
+    template_stream,
+    assert_catalog_fields,
+    keys,
+    use_full_widget_name,
+    removed,
+    calculation_order,
 ):
     stream = _with_catalog_extras(template_stream)
     expected = _describe_catalog(stream)
@@ -2737,14 +2736,17 @@ def test_remove_fields_updates_catalog(
     obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
 
     obj.remove_fields(keys)
-    result = _describe_catalog(obj.read())
+    output = obj.read()
+    result = _describe_catalog(output)
 
-    assert result["fields"] == {
+    remaining = {
         name: value for name, value in expected["fields"].items() if name not in removed
     }
+    assert result["fields"] == remaining
+    # an emptied parent would be listed as a field without widgets
+    assert_catalog_fields(output, list(remaining))
     assert result["calculation_order"] == calculation_order
     assert ("/CO" in result["entries"]) == bool(calculation_order)
-    assert result["widgets_on_pages"]
 
 
 def test_remove_fields_radio_group(

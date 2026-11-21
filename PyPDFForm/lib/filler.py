@@ -15,6 +15,7 @@ from pypdf import PdfWriter
 from pypdf.generic import DictionaryObject
 
 from .constants import Subtype, Widget
+from .field_tree import detach_field
 from .hooks import update_field_readonly
 from .image import get_draw_image_resolutions, get_image_dimensions
 from .middleware import WIDGET_TYPES
@@ -31,7 +32,6 @@ from .patterns import (
     update_radio_value,
     update_text_value,
 )
-from .template import detach_field
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 

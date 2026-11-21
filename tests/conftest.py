@@ -250,7 +250,9 @@ def assert_page_ownership():
 @pytest.fixture
 def assert_catalog_fields():
     # the catalog lists exactly the fields with these fully qualified names, and
-    # their widgets are exactly the widgets on the pages, each of them once
+    # their widgets are exactly the widgets on the pages, each of them once; a
+    # field without kids is its own widget unless it isn't a widget annotation,
+    # such as a hidden field
     def check(stream, names):
         with pikepdf.Pdf.open(BytesIO(stream)) as pdf:
             on_pages = [
@@ -270,9 +272,11 @@ def assert_catalog_fields():
                 # kids with a name are fields, the others are the field's widgets
                 pending.extend((kid, f"{name}.") for kid in kids if "/T" in kid)
                 widgets = [kid for kid in kids if "/T" not in kid]
+                if not kids and field.get("/Subtype") == pikepdf.Name.Widget:
+                    widgets = [field]
                 if widgets or not kids:
                     found.append(name)
-                    listed.extend(each.objgen for each in widgets or [field])
+                    listed.extend(each.objgen for each in widgets)
 
             assert sorted(found) == sorted(names)
             assert len(set(listed)) == len(listed)
