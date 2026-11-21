@@ -746,6 +746,8 @@ PyPDFForm lets you rename existing fields by updating their keys.
 
 ## Remove form fields
 
+You can also remove fields that aren't on any page, such as hidden fields. Removing a field doesn't guarantee that its data is erased from the PDF file, so don't use it to redact information.
+
 === "Library"
     Use `PdfWrapper.remove_fields()` to remove form fields by their keys:
 

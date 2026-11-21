@@ -12,9 +12,10 @@ from io import BytesIO
 from typing import Dict, cast
 
 from pypdf import PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject
+from pypdf.generic import DictionaryObject
 
-from .constants import AcroForm, Fields, Kids, Parent, Subtype, Widget
+from .constants import Subtype, Widget
+from .field_tree import detach_field
 from .hooks import update_field_readonly
 from .image import get_draw_image_resolutions, get_image_dimensions
 from .middleware import WIDGET_TYPES
@@ -157,36 +158,6 @@ def handle_image_drawing(
     return merge_watermarks_with_pdf(result, create_watermarks_and_draw(result, images))
 
 
-def _detach_consumed_widget(writer: PdfWriter, annot: DictionaryObject) -> None:
-    """
-    Detaches a consumed widget and empty ancestor fields from the AcroForm tree.
-
-    This function removes the widget from its parent's child array or the
-    AcroForm's root field array. It removes ancestors that become empty, stopping
-    at the first parent with remaining children. Resolved objects are compared
-    by identity so unrelated fields with the same name retain their references.
-    The caller is responsible for removing the widget from page annotations.
-
-    Args:
-        writer (PdfWriter): The PDF writer that owns the widget and field tree.
-        annot (DictionaryObject): The consumed image or signature widget to detach.
-    """
-    field = annot
-    while Parent in field:
-        parent = cast(DictionaryObject, field[Parent])
-        children = cast(ArrayObject, parent.get(Kids, ArrayObject()).get_object())
-        children[:] = [child for child in children if child.get_object() is not field]
-        if children:
-            return
-        field = parent
-
-    acroform = writer.root_object.get(AcroForm, DictionaryObject()).get_object()
-    fields = cast(ArrayObject, acroform.get(Fields, ArrayObject()).get_object())
-    fields[:] = [
-        reference for reference in fields if reference.get_object() is not field
-    ]
-
-
 def fill(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
@@ -256,7 +227,7 @@ def fill(
                 annotations[:] = [
                     item for item in annotations if item.get_object() is not annot
                 ]
-                _detach_consumed_widget(out, annot)
+                detach_field(out, annot)
 
     with BytesIO() as f:
         out.write(f)

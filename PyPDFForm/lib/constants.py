@@ -163,6 +163,7 @@ FONT_NAME_PREFIX = "/F"
 # For Adobe Acrobat
 AcroForm = "/AcroForm"
 Fields = "/Fields"
+CO = "/CO"
 XFA = "/XFA"
 
 # Field flag bits

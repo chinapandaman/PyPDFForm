@@ -13,7 +13,14 @@ import pytest
 from jsonschema import ValidationError, validate
 from pikepdf import Array, Dictionary, Name, Pdf, Stream, String
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import ArrayObject, NameObject, NumberObject, TextStringObject
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    NameObject,
+    NullObject,
+    NumberObject,
+    TextStringObject,
+)
 from reportlab.pdfgen.canvas import Canvas
 from typer.testing import CliRunner
 
@@ -2393,7 +2400,7 @@ def test_clone_paths_keep_page_ownership(
             assert goto_last.AA.U.D[0].objgen == page_3.objgen
 
 
-def test_rebuild_acroform_fields(assert_catalog_fields):
+def test_sync_acroform_fields(assert_catalog_fields):
     pdf = PdfWrapper(BlankPage() * 2)
 
     pdf.bulk_create_fields(
@@ -2407,7 +2414,7 @@ def test_rebuild_acroform_fields(assert_catalog_fields):
     assert get_widget_key(reader.root_object[AcroForm][FieldsConst][1], False) == "bar"
 
 
-def test_rebuild_acroform_fields_ignores_note_title(assert_catalog_fields):
+def test_sync_acroform_fields_ignores_note_title(assert_catalog_fields):
     form = PdfWrapper(BlankPage()).annotate(
         [
             Annotations.TextAnnotation(
@@ -2417,12 +2424,436 @@ def test_rebuild_acroform_fields_ignores_note_title(assert_catalog_fields):
     )
     stream = form.read()
 
-    result = egress.rebuild_acroform_fields(stream, {"signature"}, False)
+    result = egress.sync_acroform_fields(stream)
 
     assert result == stream
     assert_catalog_fields(result, [])
     reader = PdfReader(BytesIO(result))
     assert reader.pages[0]["/Annots"][0].get_object()["/Contents"] == "keep note"
+
+
+def test_sync_acroform_fields_inline_widget(assert_catalog_fields):
+    # widget annotations should be indirect objects; an inline one is made one,
+    # shared by the page and the catalog
+    writer = PdfWriter()
+    page = writer.add_blank_page(200, 200)
+    page[NameObject("/Annots")] = ArrayObject(
+        [
+            DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/Annot"),
+                    NameObject("/Subtype"): NameObject("/Widget"),
+                    NameObject("/FT"): NameObject("/Tx"),
+                    NameObject(T): TextStringObject("inline"),
+                    NameObject("/Rect"): ArrayObject(
+                        NumberObject(each) for each in (10, 10, 100, 30)
+                    ),
+                }
+            )
+        ]
+    )
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    result = egress.sync_acroform_fields(stream)
+
+    assert_catalog_fields(result, ["inline"])
+    assert list(PdfReader(BytesIO(result)).get_fields()) == ["inline"]
+    assert list(PdfWrapper(result).widgets) == ["inline"]
+
+
+def test_sync_acroform_fields_inline_parent(assert_catalog_fields):
+    # a parent field should be an indirect object; an inline one is made one,
+    # shared by its widget and the catalog
+    writer = PdfWriter()
+    writer.add_blank_page(200, 200)
+    widget = writer.add_annotation(
+        0,
+        {
+            NameObject("/Type"): NameObject("/Annot"),
+            NameObject("/Subtype"): NameObject("/Widget"),
+            NameObject("/Rect"): ArrayObject(
+                NumberObject(each) for each in (10, 10, 100, 30)
+            ),
+        },
+    )
+    widget[NameObject("/Parent")] = DictionaryObject(
+        {
+            NameObject("/FT"): NameObject("/Tx"),
+            NameObject(T): TextStringObject("parent"),
+            NameObject("/Kids"): ArrayObject([widget.indirect_reference]),
+        }
+    )
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    result = egress.sync_acroform_fields(stream)
+
+    assert_catalog_fields(result, ["parent"])
+    with Pdf.open(BytesIO(result)) as pdf:
+        parent = pdf.pages[0].Annots[0].Parent
+        assert parent.is_indirect
+        assert parent.objgen == pdf.Root.AcroForm.Fields[0].objgen
+
+
+@pytest.mark.parametrize("key", ["/CO", "/Fields"])
+def test_null_acroform_entries(template_stream, key):
+    # ISO 32000-1 treats a null dictionary value as an absent entry
+    writer = PdfWriter(BytesIO(template_stream))
+    writer.root_object["/AcroForm"][NameObject(key)] = NullObject()
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    result = PdfWrapper(stream).remove_fields(["test"]).read()
+
+    assert sorted(PdfReader(BytesIO(result)).get_fields()) == [
+        "check",
+        "check_2",
+        "check_3",
+        "test_2",
+        "test_3",
+    ]
+
+
+def _with_catalog_extras(stream):
+    # adds fields PyPDFForm doesn't list in `widgets`: a field without a widget,
+    # an unsupported push button on page 1, a parent of test_2 and test_3, and a
+    # calculation order
+    with Pdf.open(BytesIO(stream)) as pdf:
+        acroform = pdf.Root.AcroForm
+        page = pdf.pages[0].obj
+        fields = {str(field.T): field for field in acroform.Fields}
+        group = pdf.make_indirect(
+            Dictionary(
+                T=String("group"), Kids=Array([fields["test_2"], fields["test_3"]])
+            )
+        )
+        for name in ("test_2", "test_3"):
+            fields[name].Parent = group
+        button = pdf.make_indirect(
+            Dictionary(
+                Type=Name.Annot,
+                Subtype=Name.Widget,
+                FT=Name.Btn,
+                Ff=1 << 16,
+                T=String("submit_button"),
+                Rect=Array([0, 0, 20, 20]),
+                P=page,
+            )
+        )
+        page.Annots.append(button)
+        hidden = pdf.make_indirect(
+            Dictionary(FT=Name.Tx, T=String("hidden_business_id"), V=String("12345"))
+        )
+        acroform.Fields = Array(
+            [
+                field
+                for name, field in fields.items()
+                if name not in ("test_2", "test_3")
+            ]
+            + [group, button, hidden]
+        )
+        acroform.CO = Array([fields["test"], fields["test_2"], hidden])
+
+        with BytesIO() as f:
+            pdf.save(f)
+            return f.getvalue()
+
+
+def _describe_catalog(stream):
+    # the values of the catalog's fields, by the fully qualified names
+    # assert_catalog_fields lists, the calculation order, and the other
+    # AcroForm entries
+    def get_name(field):
+        parts = []
+        while field is not None:
+            if "/T" in field:
+                parts.append(str(field.T))
+            field = field.get("/Parent")
+        return ".".join(reversed(parts))
+
+    with Pdf.open(BytesIO(stream)) as pdf:
+        acroform = pdf.Root.get("/AcroForm", Dictionary())
+        values = {}
+        pending = list(acroform.get("/Fields", []))
+        while pending:
+            field = pending.pop()
+            kids = list(field.get("/Kids", []))
+            pending.extend(kid for kid in kids if "/T" in kid)
+            if not kids or any("/T" not in kid for kid in kids):
+                values[get_name(field)] = str(field.get("/V", ""))
+
+        return {
+            "fields": values,
+            "calculation_order": [get_name(field) for field in acroform.get("/CO", [])],
+            "entries": sorted(key for key in acroform if key != "/Fields"),
+        }
+
+
+def test_read_preserves_catalog(template_stream, assert_catalog_fields):
+    stream = _with_catalog_extras(template_stream)
+    expected = _describe_catalog(stream)
+
+    assert expected["fields"]["hidden_business_id"] == "12345"
+    assert {"submit_button", "group.test_2", "group.test_3"} <= set(expected["fields"])
+    assert expected["calculation_order"] == [
+        "test",
+        "group.test_2",
+        "hidden_business_id",
+    ]
+    assert expected["entries"] == ["/CO", "/DA", "/DR"]
+    assert_catalog_fields(stream, list(expected["fields"]))
+    result = PdfWrapper(stream).read()
+    assert _describe_catalog(result) == expected
+    assert_catalog_fields(result, list(expected["fields"]))
+
+
+def test_read_preserves_fields_without_widgets_on_pages(sejda_template):
+    # the sejda template lists fields whose widgets are on no page
+    def get_names(stream):
+        with Pdf.open(BytesIO(stream)) as pdf:
+            return sorted(
+                str(field.get("/T", "")) for field in pdf.Root.AcroForm.Fields
+            )
+
+    names = get_names(sejda_template)
+
+    assert "Buyers Name" in names
+    assert get_names(PdfWrapper(sejda_template).read()) == names
+
+
+@pytest.mark.parametrize(
+    ("operation", "changed"),
+    [
+        (lambda obj: obj.fill({"test": "filled", "check": True}), {"test", "check"}),
+        (lambda obj: setattr(obj.widgets["test"], "font_size", 20), set()),
+        (
+            lambda obj: obj.bulk_create_fields([Fields.TextField("new", 1, 300, 300)]),
+            {"new"},
+        ),
+        (lambda obj: obj.draw([RawElements.RawText("drawn", 1, 300, 300)]), set()),
+        (lambda obj: obj.generate_coordinate_grid(), set()),
+        (
+            lambda obj: obj.update_widget_key(
+                "check", "renamed"
+            ).commit_widget_key_updates(),
+            {"check", "renamed"},
+        ),
+        (
+            lambda obj: obj.annotate(
+                [Annotations.TextAnnotation(1, 300, 300, contents="note")]
+            ),
+            set(),
+        ),
+    ],
+    ids=["fill", "style", "create", "draw", "grid", "rename", "annotate"],
+)
+def test_unrelated_edits_preserve_catalog(
+    template_stream, assert_catalog_fields, operation, changed
+):
+    stream = _with_catalog_extras(template_stream)
+    expected = _describe_catalog(stream)
+    obj = PdfWrapper(stream)
+
+    operation(obj)
+    output = obj.read()
+    result = _describe_catalog(output)
+
+    assert {
+        name: value for name, value in result["fields"].items() if name not in changed
+    } == {
+        name: value for name, value in expected["fields"].items() if name not in changed
+    }
+    assert result["calculation_order"] == expected["calculation_order"]
+    assert result["entries"] == expected["entries"]
+    assert_catalog_fields(output, list(result["fields"]))
+
+
+@pytest.mark.parametrize(
+    ("keys", "use_full_widget_name", "removed", "calculation_order"),
+    [
+        (["test"], False, {"test"}, ["group.test_2", "hidden_business_id"]),
+        (["test_2"], False, {"group.test_2"}, ["test", "hidden_business_id"]),
+        (["group.test_2"], True, {"group.test_2"}, ["test", "hidden_business_id"]),
+        (
+            ["test_2", "test_3"],
+            False,
+            {"group.test_2", "group.test_3"},
+            ["test", "hidden_business_id"],
+        ),
+        (
+            ["hidden_business_id"],
+            False,
+            {"hidden_business_id"},
+            ["test", "group.test_2"],
+        ),
+        (
+            ["submit_button"],
+            False,
+            {"submit_button"},
+            ["test", "group.test_2", "hidden_business_id"],
+        ),
+        (
+            [
+                "test",
+                "check",
+                "test_2",
+                "check_2",
+                "test_3",
+                "check_3",
+                "submit_button",
+                "hidden_business_id",
+            ],
+            False,
+            None,
+            [],
+        ),
+    ],
+    ids=[
+        "field",
+        "child",
+        "child_full_name",
+        "all_children",
+        "without_widget",
+        "unsupported",
+        "all",
+    ],
+)
+def test_remove_fields_updates_catalog(
+    template_stream,
+    assert_catalog_fields,
+    keys,
+    use_full_widget_name,
+    removed,
+    calculation_order,
+):
+    stream = _with_catalog_extras(template_stream)
+    expected = _describe_catalog(stream)
+    removed = set(expected["fields"]) if removed is None else removed
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+
+    obj.remove_fields(keys)
+    output = obj.read()
+    result = _describe_catalog(output)
+
+    remaining = {
+        name: value for name, value in expected["fields"].items() if name not in removed
+    }
+    assert result["fields"] == remaining
+    # an emptied parent would be listed as a field without widgets
+    assert_catalog_fields(output, list(remaining))
+    assert result["calculation_order"] == calculation_order
+    assert ("/CO" in result["entries"]) == bool(calculation_order)
+
+
+def test_remove_fields_radio_group(
+    template_with_radiobutton_stream, assert_catalog_fields
+):
+    obj = PdfWrapper(template_with_radiobutton_stream)
+    expected = [key for key in obj.widgets if key != "radio_1"]
+
+    obj.remove_fields(["radio_1"])
+
+    assert list(obj.widgets) == expected
+    assert_catalog_fields(obj.read(), expected)
+
+
+def test_remove_fields_keeps_widget_references(template_stream, assert_catalog_fields):
+    # widgets that stay on a page are the same objects as in the field tree
+    obj = PdfWrapper(template_stream).remove_fields(["test"])
+
+    assert_catalog_fields(
+        obj.read(), ["check", "test_2", "check_2", "test_3", "check_3"]
+    )
+
+
+def test_remove_all_fields_removes_values(template_stream, assert_catalog_fields):
+    obj = PdfWrapper(template_stream).fill({"test": "REVIEW_SENTINEL"})
+
+    obj.remove_fields(list(obj.widgets))
+    stream = obj.read()
+
+    assert not obj.widgets
+    assert_catalog_fields(stream, [])
+    assert not PdfReader(BytesIO(stream)).get_fields()
+    assert not PdfWrapper(stream).widgets
+
+
+@pytest.mark.cli_test
+def test_remove_fields_cli_without_widgets_on_pages(template_stream, tmp_path):
+    source = tmp_path / "input.pdf"
+    source.write_bytes(_with_catalog_extras(template_stream))
+    output = tmp_path / "output.pdf"
+
+    result = CliRunner().invoke(
+        cli_app,
+        [
+            "remove",
+            "field",
+            str(source),
+            "--field",
+            "hidden_business_id",
+            "-o",
+            str(output),
+        ],
+    )
+
+    assert result.exit_code == 0
+    fields = _describe_catalog(output.read_bytes())["fields"]
+    assert "hidden_business_id" not in fields
+    assert "test" in fields
+
+    result = CliRunner().invoke(
+        cli_app,
+        ["remove", "field", str(source), "--field", "missing_name", "-o", str(output)],
+    )
+
+    assert result.exit_code == 2
+    assert "Form field 'missing_name' does not exist" in result.output
+
+
+@pytest.mark.cli_test
+def test_remove_fields_cli_widget_not_in_catalog(template_stream, tmp_path):
+    # an unsupported widget on a page whose field isn't listed in /Fields
+    with Pdf.open(BytesIO(_with_catalog_extras(template_stream))) as pdf:
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in pdf.Root.AcroForm.Fields if field.T != "submit_button"]
+        )
+        source = tmp_path / "input.pdf"
+        pdf.save(source)
+    output = tmp_path / "output.pdf"
+
+    result = CliRunner().invoke(
+        cli_app,
+        ["remove", "field", str(source), "--field", "submit_button", "-o", str(output)],
+    )
+
+    assert result.exit_code == 0
+    with Pdf.open(output) as pdf:
+        assert all(
+            annot.get("/T") != "submit_button"
+            for page in pdf.pages
+            for annot in page.get("/Annots", [])
+        )
+
+
+def test_remove_fields_without_widgets_on_pages(sejda_template):
+    obj = PdfWrapper(sejda_template)
+    widgets = list(obj.widgets)
+
+    obj.remove_fields(["Date", "Buyers Name"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        names = [str(field.get("/T", "")) for field in pdf.Root.AcroForm.Fields]
+    assert "Date" not in names
+    assert "Buyers Name" not in names
+    # other fields without widgets on pages are kept
+    assert "Make" in names
+    assert "date" in names
+    assert list(obj.widgets) == widgets
 
 
 @pytest.mark.parametrize("field_name", ["test", "check", "radio_1"])

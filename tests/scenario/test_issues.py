@@ -3,7 +3,17 @@
 import os
 from io import BytesIO
 
+import pytest
 from pypdf import PdfReader, PdfWriter
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    IndirectObject,
+    NameObject,
+    NullObject,
+    NumberObject,
+    TextStringObject,
+)
 
 from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.constants import TU, Parent, V
@@ -54,6 +64,224 @@ def test_ppf_627_fill_1(issue_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_ppf_2100_refill_inline_widget(issue_pdf_directory, assert_catalog_fields):
+    # saved by PyPDFForm before PPF-2100 after checking check_2 and removing
+    # test_2: check_2's widget is inline in /Annots, with a copy in /Fields
+    path = os.path.join(issue_pdf_directory, "PPF-2100.pdf")
+    reader = PdfReader(path)
+    assert not isinstance(reader.pages[1]["/Annots"][0], IndirectObject)
+    assert (reader.get_fields() or {})["check_2"]["/V"] == "/Yes"
+    names = ["test", "check", "check_2", "test_3", "check_3"]
+
+    stream = PdfWrapper(path).fill({"check_2": False}).read()
+
+    assert_catalog_fields(stream, names)
+    assert (PdfReader(BytesIO(stream)).get_fields() or {})["check_2"]["/V"] == "/Off"
+    # an unchecked checkbox reads False or None
+    assert not PdfWrapper(stream).data["check_2"]
+
+    # saving it again keeps one entry per field
+    assert_catalog_fields(PdfWrapper(stream).read(), names)
+
+
+def test_ppf_2100_inline_parent(issue_pdf_directory, assert_catalog_fields):
+    # saved by PyPDFForm before PPF-2100: the widget's /Parent is inline with
+    # /V old, and /Fields has a copy of it
+    path = os.path.join(issue_pdf_directory, "PPF-2100-inline-parent.pdf")
+    widget = PdfReader(path).pages[0]["/Annots"][0].get_object()
+    assert not isinstance(widget.raw_get(Parent), IndirectObject)
+
+    stream = PdfWrapper(path).fill({"name": "new"}).read()
+
+    assert_catalog_fields(stream, ["name"])
+    reader = PdfReader(BytesIO(stream))
+    assert (reader.get_fields() or {})["name"]["/V"] == "new"
+    widget = reader.pages[0]["/Annots"][0].get_object()
+    assert widget.raw_get(Parent) == reader.root_object["/AcroForm"]["/Fields"][0]
+
+
+def _javascript(script):
+    return DictionaryObject(
+        {
+            NameObject("/S"): NameObject("/JavaScript"),
+            NameObject("/JS"): TextStringObject(script),
+        }
+    )
+
+
+@pytest.mark.parametrize(
+    ("inline_actions", "expected_format"),
+    [
+        (None, "format_copy();"),
+        (
+            lambda: DictionaryObject(
+                {NameObject("/F"): _javascript("format_inline();")}
+            ),
+            "format_inline();",
+        ),
+        (NullObject, "format_copy();"),
+        (
+            lambda: DictionaryObject(
+                {NameObject("/C"): NullObject(), NameObject("/TU"): NullObject()}
+            ),
+            "format_copy();",
+        ),
+    ],
+    ids=["copy", "both", "null", "null_entries"],
+)
+def test_ppf_2100_inline_parent_keeps_catalog_entries(
+    issue_pdf_directory, inline_actions, expected_format
+):
+    # the copy in /Fields has calculation and format actions and a tooltip,
+    # and is in the calculation order; the inline parent has no /AA, or a
+    # null /TU with its own format action, a null /AA, or null triggers, and
+    # null entries count as absent
+    writer = PdfWriter(
+        clone_from=os.path.join(issue_pdf_directory, "PPF-2100-inline-parent.pdf")
+    )
+    acroform = writer.root_object["/AcroForm"]
+    copy = acroform["/Fields"][0]
+    copy.get_object()[NameObject("/AA")] = DictionaryObject(
+        {
+            NameObject("/C"): _javascript("calculate();"),
+            NameObject("/F"): _javascript("format_copy();"),
+        }
+    )
+    copy.get_object()[NameObject(TU)] = TextStringObject("tooltip")
+    acroform[NameObject("/CO")] = ArrayObject([copy])
+    inline = writer.pages[0]["/Annots"][0].get_object()[Parent]
+    if inline_actions is not None:
+        inline[NameObject("/AA")] = inline_actions()
+        inline[NameObject(TU)] = NullObject()
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    reader = PdfReader(BytesIO(PdfWrapper(stream).read()))
+
+    acroform = reader.root_object["/AcroForm"]
+    field = acroform["/Fields"][0]
+    assert reader.pages[0]["/Annots"][0].get_object().raw_get(Parent) == field
+    assert acroform["/CO"][0] == field
+    actions = field.get_object()["/AA"]
+    assert actions["/C"]["/JS"] == "calculate();"
+    # the inline parent's action wins for a trigger both have
+    assert actions["/F"]["/JS"] == expected_format
+    assert field.get_object()[TU] == "tooltip"
+    assert field.get_object()[V] == "old"
+
+
+def test_ppf_2100_stale_page_reference(
+    issue_pdf_directory, assert_catalog_fields, assert_page_ownership
+):
+    # page 1's widget has a /P naming page 2; the page listing it decides which
+    # copy it reuses, and the copy keeps its /P
+    writer = PdfWriter(
+        clone_from=os.path.join(issue_pdf_directory, "PPF-2100-hide-target.pdf")
+    )
+    page_1, page_2 = writer.pages
+    page_1["/Annots"][0].get_object()[NameObject("/P")] = page_2.indirect_reference
+    with BytesIO() as f:
+        writer.write(f)
+        stream = PdfWrapper(f.getvalue()).read()
+
+    assert_catalog_fields(stream, ["shared"])
+    assert_page_ownership(stream)
+    reader = PdfReader(BytesIO(stream))
+    target = reader.root_object["/OpenAction"].raw_get("/T")
+    assert list(reader.pages[1]["/Annots"]) == [target]
+
+
+def test_ppf_2100_inline_fields_keep_version(issue_pdf_directory):
+    with open(
+        os.path.join(issue_pdf_directory, "PPF-2100-inline-parent.pdf"), "rb"
+    ) as f:
+        stream = f.read().replace(b"%PDF-1.3", b"%PDF-1.7", 1)
+
+    assert PdfWrapper(stream).version == "1.7"
+
+
+def _hide_target_form(issue_pdf_directory, edit=None):
+    # saved by PyPDFForm before PPF-2100: the widgets of "shared", one per page
+    # at the same rect, are inline, /Kids lists their copies in reverse page
+    # order, and a Hide action targets the page 2 copy
+    path = os.path.join(issue_pdf_directory, "PPF-2100-hide-target.pdf")
+    if edit is None:
+        return path
+
+    writer = PdfWriter(clone_from=path)
+    for page in writer.pages:
+        edit(page["/Annots"][0].get_object())
+    with BytesIO() as f:
+        writer.write(f)
+        return f.getvalue()
+
+
+def _set_flags(widget):
+    widget[NameObject("/F")] = NumberObject(4)
+
+
+def _drop_page(widget):
+    widget.pop("/P", None)
+
+
+def _drop_page_from_copies(widget):
+    # the page widgets and both copies are then equal
+    _drop_page(widget)
+    for kid in widget["/Parent"]["/Kids"]:
+        _drop_page(kid.get_object())
+
+
+@pytest.mark.parametrize(
+    "edit", [None, _set_flags, _drop_page], ids=["saved", "edited", "widgets"]
+)
+def test_ppf_2100_hide_target(issue_pdf_directory, assert_catalog_fields, edit):
+    # each page widget reuses the copy whose /P is its page, even if the widget
+    # was changed or lost its own /P
+    stream = PdfWrapper(_hide_target_form(issue_pdf_directory, edit)).read()
+
+    assert_catalog_fields(stream, ["shared"])
+    reader = PdfReader(BytesIO(stream))
+    target = reader.root_object["/OpenAction"].raw_get("/T")
+    assert list(reader.pages[1]["/Annots"]) == [target]
+    assert target.get_object().raw_get("/P") == reader.pages[1].indirect_reference
+    if edit is _set_flags:
+        assert target.get_object()["/F"] == 4
+
+
+def test_ppf_2100_ambiguous_inline_widgets(issue_pdf_directory):
+    # without /P on the page widgets and their copies, each page widget matches
+    # both copies, so neither copy is reused and the Hide action keeps its
+    # target
+    stream = PdfWrapper(
+        _hide_target_form(issue_pdf_directory, _drop_page_from_copies)
+    ).read()
+
+    reader = PdfReader(BytesIO(stream))
+    target = reader.root_object["/OpenAction"].raw_get("/T")
+    widgets = [page["/Annots"][0] for page in reader.pages]
+    assert target not in widgets
+    assert all(widget in widget.get_object()["/Parent"]["/Kids"] for widget in widgets)
+
+
+def test_ppf_2100_fill_inline_signature(
+    issue_pdf_directory, image_samples, assert_catalog_fields
+):
+    # saved by PyPDFForm before PPF-2100 after removing a text field from page
+    # 2: the signature widget is inline, and /Fields has a copy of it
+    path = os.path.join(issue_pdf_directory, "PPF-2100-inline-signature.pdf")
+    assert not isinstance(PdfReader(path).pages[1]["/Annots"][0], IndirectObject)
+
+    stream = (
+        PdfWrapper(path)
+        .fill({"signature": os.path.join(image_samples, "sample_image.jpg")})
+        .read()
+    )
+
+    assert_catalog_fields(stream, ["text_1"])
+    assert list(PdfReader(BytesIO(stream)).get_fields() or {}) == ["text_1"]
 
 
 def test_get_desc_in_schema(issue_pdf_directory):

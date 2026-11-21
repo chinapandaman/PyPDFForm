@@ -3,6 +3,7 @@
 This module provides a collection of utility functions used throughout the PyPDFForm library.
 
 It includes functions for:
+- Reading array and dictionary entries, treating null entries as absent.
 - Removing all widgets (form fields) from a PDF.
 - Splitting PDFs into single-page streams without content from other pages.
 - Merging PDF byte streams while preserving page annotations.
@@ -31,6 +32,43 @@ from .constants import (
     B,
     Parent,
 )
+
+
+def get_array(obj: DictionaryObject, key: str) -> ArrayObject:
+    """
+    Gets an array entry of a dictionary, resolving indirect references.
+
+    A missing entry reads as an empty array, and so does a null, which ISO
+    32000-1 treats as an absent entry, or any other value that is not an array.
+    Such an empty array is not stored in `obj`, so changing it has no effect.
+
+    Args:
+        obj (DictionaryObject): The dictionary to read.
+        key (str): The entry's key.
+
+    Returns:
+        ArrayObject: The resolved array, or a new empty array.
+    """
+    value = obj.get(key)
+    value = value.get_object() if value is not None else None
+    return value if isinstance(value, ArrayObject) else ArrayObject()
+
+
+def get_dictionary(obj: DictionaryObject, key: str) -> Optional[DictionaryObject]:
+    """
+    Gets a dictionary entry of a dictionary, resolving indirect references.
+
+    Args:
+        obj (DictionaryObject): The dictionary to read.
+        key (str): The entry's key.
+
+    Returns:
+        Optional[DictionaryObject]: The resolved dictionary, or None when the
+            entry is missing, null, or not a dictionary.
+    """
+    value = obj.get(key)
+    value = value.get_object() if value is not None else None
+    return value if isinstance(value, DictionaryObject) else None
 
 
 def remove_all_widgets(pdf: bytes) -> bytes:

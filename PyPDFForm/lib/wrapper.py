@@ -46,9 +46,10 @@ from .coordinate import generate_coordinate_grid
 from .deprecation import reject_unsupported_kwargs
 from .egress import (
     appearance_streams_handler,
-    rebuild_acroform_fields,
+    sync_acroform_fields,
     write_path,
 )
+from .field_tree import remove_widgets_by_keys, share_inline_fields
 from .filler import fill
 from .font import (
     get_all_available_fonts,
@@ -64,7 +65,6 @@ from .template import (
     create_annotations,
     get_on_open_javascript,
     get_title,
-    remove_widgets_by_keys,
     set_on_open_javascript,
     set_title,
     update_widget_keys,
@@ -75,7 +75,6 @@ from .utils import (
     get_page_streams,
     get_version,
     merge_pdfs,
-    remove_all_widgets,
     set_version,
 )
 from .watermark import (
@@ -138,6 +137,9 @@ class PdfWrapper:
 
         Initializes a new `PdfWrapper` object with the given template PDF and optional keyword arguments.
         The template is normalized to bytes and existing widgets are loaded immediately.
+        Widgets and their parent fields stored inline, as earlier versions of PyPDFForm
+        could save them, are first shared with the form's field tree, so that later
+        operations change one object.
         Omitting the template, or passing empty bytes or an empty stream, creates an empty
         wrapper; a missing path raises instead.
         The title and document-open JavaScript remain in the PDF stream and are read
@@ -165,7 +167,7 @@ class PdfWrapper:
         reject_unsupported_kwargs(
             self, "__init__", kwargs, [each[0] for each in self.USER_PARAMS]
         )
-        self._stream = fp_or_f_obj_or_stream_to_stream(template)
+        self._stream = share_inline_fields(fp_or_f_obj_or_stream_to_stream(template))
         self.widgets = {}
 
         self._version = None
@@ -600,9 +602,10 @@ class PdfWrapper:
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
            generating appearance streams.
-        3. Rebuilds the AcroForm `/Fields` array from page annotations for
-           widgets known to this wrapper, leaving the stream unchanged when no
-           matching widget annotations are found.
+        3. Adds the fields of page widget annotations to the AcroForm `/Fields`
+           array, keeping every field already listed, including fields without
+           a widget on a page. The stream is left unchanged when no page has a
+           widget annotation.
         4. Restores the wrapper's cached PDF header version after egress
            processing, since PDF writers may emit their own default version.
         The wrapper's stored stream is not replaced by these final egress-only changes.
@@ -618,11 +621,7 @@ class PdfWrapper:
             )  # cached
 
         if result:
-            result = rebuild_acroform_fields(
-                result,
-                set(self.widgets.keys()),
-                getattr(self, "use_full_widget_name"),
-            )
+            result = sync_acroform_fields(result)
             if self.version:
                 result = set_version(result, get_version(result), self.version)
         return result
@@ -737,9 +736,10 @@ class PdfWrapper:
         """
         Generates a coordinate grid on the PDF, useful for debugging layout issues.
 
-        Existing widgets are temporarily removed while the grid is drawn as page
-        watermarks, then copied back onto the resulting stream. Registered fonts are
-        restored afterward because the remove/copy cycle rewrites the PDF.
+        The grid is drawn as page watermarks merged into the page content.
+        Annotations, including widgets, keep their objects, so references to
+        them, such as the AcroForm field tree, are unchanged. Registered fonts
+        are registered again afterward.
 
         Args:
             color (Tuple[float, float, float]): The color of the grid lines, specified as an RGB tuple (default: red).
@@ -749,18 +749,7 @@ class PdfWrapper:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
         """
 
-        stream_with_widgets = self._read()
-        # Case: Single watermark PDF, mapping pages 1:1 to output pages.
-        self._stream = copy_watermark_widgets(
-            generate_coordinate_grid(
-                remove_all_widgets(self._read()),
-                color,
-                margin,
-            ),
-            stream_with_widgets,
-            None,
-        )
-        # because copy_watermark_widgets and remove_all_widgets
+        self._stream = generate_coordinate_grid(self._read(), color, margin)
         self._reregister_font()
 
         return self
@@ -974,7 +963,10 @@ class PdfWrapper:
 
         This method removes any fields whose keys are included in `keys` and
         refreshes the wrapper's widget metadata after the PDF stream is updated.
-        If removal raises, the PDF and widgets are restored.
+        Keys use the same names as `widgets` and also match fields without a
+        widget on any page. Removed fields are taken off their pages and out of
+        the PDF's form fields and calculation order. Keys that match no field
+        are ignored. If removal raises, the PDF and widgets are restored.
 
         Args:
             keys (List[str]): A list of form field keys to remove.
@@ -1056,8 +1048,10 @@ class PdfWrapper:
 
         This method is the primary mechanism for drawing non-form field content.
         It takes a list of raw element objects, temporarily registers custom fonts
-        for ReportLab drawing, renders the elements onto page watermarks, merges those
-        watermarks into the PDF, and copies the original widgets back onto the output.
+        for ReportLab drawing, renders the elements onto page watermarks, and merges
+        those watermarks into the page content. Annotations, including widgets, keep
+        their objects, so references to them, such as the AcroForm field tree, are
+        unchanged. Registered fonts are registered again afterward.
 
         Args:
             elements (Sequence[RawTypes]): A list of raw elements to draw (e.g., [RawText(...), RawImage(...)]).
@@ -1071,13 +1065,7 @@ class PdfWrapper:
                 self._read(), [each.to_draw for each in elements], font_mapping
             )
 
-        stream_with_widgets = self._read()
         self._stream = merge_watermarks_with_pdf(self._read(), watermarks)
-        # Case: Single watermark PDF, mapping pages 1:1 to output pages.
-        self._stream = copy_watermark_widgets(
-            remove_all_widgets(self._read()), stream_with_widgets, None
-        )
-        # because copy_watermark_widgets and remove_all_widgets
         self._reregister_font()
 
         return self
