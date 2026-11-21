@@ -11,7 +11,8 @@ specific patterns for identifying and constructing different types of widgets.
 from copy import deepcopy
 from functools import lru_cache
 from io import BytesIO
-from typing import Dict, List, cast
+from collections.abc import Callable
+from typing import Dict, List, Optional, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
@@ -37,7 +38,9 @@ from .constants import (
     JavaScript,
     Kids,
     OpenAction,
+    P,
     Parent,
+    Rect,
     S,
     Subtype,
     T,
@@ -70,6 +73,8 @@ from .utils import (
     find_pattern_match,
     get_array,
     get_dictionary,
+    get_version,
+    set_version,
 )
 
 
@@ -828,6 +833,283 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
     ]
 
     return result
+
+
+@lru_cache(maxsize=8)
+def share_inline_fields(pdf: bytes) -> bytes:
+    """
+    Shares inline widget annotations and parent fields with the field tree.
+
+    Widget annotations and fields should be indirect objects, so that a page
+    and the field tree share one object. PDFs saved by earlier versions of
+    PyPDFForm can list a widget inline in a page's `/Annots`, or a field inline
+    in its child's `/Parent`, with a separate copy in the field tree. Such PDFs
+    are rewritten with `share_inline_objects`, keeping their header version.
+    Other PDFs, including empty streams, are returned unchanged. The result is
+    cached using lru_cache for performance.
+
+    Args:
+        pdf (bytes): The PDF stream to read.
+
+    Returns:
+        bytes: The PDF stream whose page widgets and their parents are indirect
+            objects shared with the field tree.
+    """
+    if not pdf or not _has_inline_fields(PdfReader(BytesIO(pdf))):
+        return pdf
+
+    writer = PdfWriter(BytesIO(pdf))
+    share_inline_objects(writer)
+    with BytesIO() as f:
+        writer.write(f)
+        result = f.getvalue()
+
+    return set_version(result, get_version(result), get_version(pdf))
+
+
+def _has_inline_fields(reader: PdfReader) -> bool:
+    """
+    Checks whether a page lists an inline widget or one with an inline parent.
+
+    Args:
+        reader (PdfReader): The PDF reader.
+
+    Returns:
+        bool: True if a widget annotation in a page's `/Annots`, or a field on
+            its `/Parent` chain, is stored inline.
+    """
+    for page in reader.pages:
+        for annot in get_array(page, Annots):
+            widget = annot.get_object()
+            if _is_widget_annotation(widget) and (
+                not isinstance(annot, IndirectObject) or _has_inline_parent(widget)
+            ):
+                return True
+
+    return False
+
+
+def _has_inline_parent(obj: DictionaryObject) -> bool:
+    """
+    Checks whether a field on the `/Parent` chain of an object is stored inline.
+
+    Args:
+        obj (DictionaryObject): A widget annotation or field.
+
+    Returns:
+        bool: True if a `/Parent` along the chain is not an indirect reference.
+    """
+    seen = set()
+    while get_dictionary(obj, Parent) is not None and id(obj) not in seen:
+        seen.add(id(obj))
+        if not isinstance(obj.raw_get(Parent), IndirectObject):
+            return True
+        obj = cast(DictionaryObject, get_dictionary(obj, Parent))
+
+    return False
+
+
+def share_inline_objects(writer: PdfWriter) -> None:
+    """
+    Makes inline page widgets and their inline parents shared indirect objects.
+
+    Each widget stored inline in a page's `/Annots` is replaced with a
+    reference. Its copy in the field tree is reused when the widget's parent
+    `/Kids`, or the AcroForm `/Fields` array for a widget without a parent,
+    has an indirect entry that is on no page and has the widget's `/T` and
+    `/Rect`, and its `/P` when the widget has one. Each field stored inline in
+    the `/Parent` of a page widget or of such a field is replaced the same
+    way, reusing an entry of its own container that has its `/T` and lists the
+    child in `/Kids`. A reused entry takes the inline object's entries, except
+    a parent keeps its own `/Kids`, so references to the entry, such as `/CO`
+    entries or actions, now refer to the object on the page. When several
+    entries match, only an exact copy is reused. Otherwise the inline object
+    becomes a new indirect object, added to its container.
+
+    Args:
+        writer (PdfWriter): The PDF writer to update in place.
+    """
+    acroform = get_dictionary(writer.root_object, AcroForm)
+    root_fields = get_array(acroform, Fields) if acroform is not None else ArrayObject()
+    on_pages = {
+        id(annot.get_object())
+        for page in writer.pages
+        for annot in get_array(page, Annots)
+    }
+    claimed = set()
+
+    for page in writer.pages:
+        annots = get_array(page, Annots)
+        for index, annot in enumerate(annots):
+            widget = annot.get_object()
+            if not _is_widget_annotation(widget):
+                continue
+            if not isinstance(annot, IndirectObject):
+                annot = _share_inline_widget(
+                    writer, widget, root_fields, on_pages, claimed
+                )
+                annots[index] = annot
+            _share_inline_parents(writer, annot, root_fields)
+
+
+def _share_inline_widget(
+    writer: PdfWriter,
+    widget: DictionaryObject,
+    root_fields: ArrayObject,
+    on_pages: set,
+    claimed: set,
+) -> IndirectObject:
+    """
+    Returns the reference that replaces an inline page widget.
+
+    Args:
+        writer (PdfWriter): The PDF writer that owns the page and field tree.
+        widget (DictionaryObject): The inline widget annotation.
+        root_fields (ArrayObject): The AcroForm `/Fields` array.
+        on_pages (set): The `id` of every annotation listed by a page.
+        claimed (set): Object numbers of entries already used for a page
+            widget, updated in place.
+
+    Returns:
+        IndirectObject: The reused copy, or a new indirect object.
+    """
+    parent = get_dictionary(widget, Parent)
+    container = get_array(parent, Kids) if parent is not None else root_fields
+    keys = (T, P) if P in widget else (T,)
+    reference = _find_copy(
+        container,
+        widget,
+        lambda copy: (
+            _is_widget_annotation(copy)
+            and id(copy) not in on_pages
+            and all(copy.get(key) == widget.get(key) for key in keys)
+            and _get_rect(copy) == _get_rect(widget)
+        ),
+        claimed,
+    )
+    if reference is None:
+        reference = writer._add_object(widget)  # type: ignore[attr-defined] # noqa: SLF001 # pylint: disable=W0212
+        container.append(reference)
+    else:
+        copy = cast(DictionaryObject, reference.get_object())
+        copy.clear()
+        copy.update({key: widget.raw_get(key) for key in widget})
+
+    claimed.add(reference.idnum)
+    return reference
+
+
+def _share_inline_parents(
+    writer: PdfWriter, child: IndirectObject, root_fields: ArrayObject
+) -> None:
+    """
+    Replaces inline fields along the `/Parent` chain of an indirect object.
+
+    Args:
+        writer (PdfWriter): The PDF writer that owns the field tree.
+        child (IndirectObject): A page widget, referenced indirectly.
+        root_fields (ArrayObject): The AcroForm `/Fields` array.
+    """
+    obj = cast(DictionaryObject, child.get_object())
+    seen = set()
+    while (parent := get_dictionary(obj, Parent)) is not None and id(obj) not in seen:
+        seen.add(id(obj))
+        reference = obj.raw_get(Parent)
+        if not isinstance(reference, IndirectObject):
+            reference = _share_inline_parent(writer, parent, child, root_fields)
+            obj[NameObject(Parent)] = reference
+        child = reference
+        obj = cast(DictionaryObject, reference.get_object())
+
+
+def _share_inline_parent(
+    writer: PdfWriter,
+    parent: DictionaryObject,
+    child: IndirectObject,
+    root_fields: ArrayObject,
+) -> IndirectObject:
+    """
+    Returns the reference that replaces an inline parent field.
+
+    Args:
+        writer (PdfWriter): The PDF writer that owns the field tree.
+        parent (DictionaryObject): The inline parent field.
+        child (IndirectObject): The child whose `/Parent` it is.
+        root_fields (ArrayObject): The AcroForm `/Fields` array.
+
+    Returns:
+        IndirectObject: The reused copy, or a new indirect object.
+    """
+    grandparent = get_dictionary(parent, Parent)
+    container = get_array(grandparent, Kids) if grandparent is not None else root_fields
+    reference = _find_copy(
+        container,
+        parent,
+        lambda copy: (
+            isinstance(copy, DictionaryObject)
+            and copy.get(T) == parent.get(T)
+            and child in get_array(copy, Kids)
+        ),
+        set(),
+    )
+    if reference is None:
+        reference = writer._add_object(parent)  # type: ignore[attr-defined] # noqa: SLF001 # pylint: disable=W0212
+        container.append(reference)
+    else:
+        copy = cast(DictionaryObject, reference.get_object())
+        kids = copy.raw_get(Kids)
+        copy.clear()
+        copy.update({key: parent.raw_get(key) for key in parent})
+        copy[NameObject(Kids)] = kids
+
+    return reference
+
+
+def _find_copy(
+    container: ArrayObject,
+    obj: DictionaryObject,
+    matches: Callable[[object], bool],
+    claimed: set,
+) -> Optional[IndirectObject]:
+    """
+    Finds the entry of a container that is the copy of an inline object.
+
+    Args:
+        container (ArrayObject): The `/Kids` or `/Fields` array to search.
+        obj (DictionaryObject): The inline object.
+        matches (Callable[[object], bool]): Decides which resolved entries
+            match the inline object.
+        claimed (set): Object numbers of entries that cannot be used.
+
+    Returns:
+        Optional[IndirectObject]: The only matching indirect entry, or the
+            first one equal to `obj` when several match, or None.
+    """
+    found = [
+        entry
+        for entry in container
+        if isinstance(entry, IndirectObject)
+        and entry.idnum not in claimed
+        and matches(entry.get_object())
+    ]
+    exact = [entry for entry in found if entry.get_object() == obj]
+    if exact:
+        return exact[0]
+
+    return found[0] if len(found) == 1 else None
+
+
+def _get_rect(annot: DictionaryObject) -> list:
+    """
+    Gets the `/Rect` of an annotation as numbers.
+
+    Args:
+        annot (DictionaryObject): The annotation.
+
+    Returns:
+        list: The rectangle's coordinates, or an empty list without one.
+    """
+    return [float(each.get_object()) for each in get_array(annot, Rect)]
 
 
 def update_widget_keys(

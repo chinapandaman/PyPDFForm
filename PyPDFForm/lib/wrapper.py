@@ -67,6 +67,7 @@ from .template import (
     remove_widgets_by_keys,
     set_on_open_javascript,
     set_title,
+    share_inline_fields,
     update_widget_keys,
 )
 from .utils import (
@@ -137,6 +138,9 @@ class PdfWrapper:
 
         Initializes a new `PdfWrapper` object with the given template PDF and optional keyword arguments.
         The template is normalized to bytes and existing widgets are loaded immediately.
+        Widgets and their parent fields stored inline, as earlier versions of PyPDFForm
+        could save them, are first shared with the form's field tree, so that later
+        operations change one object.
         Omitting the template, or passing empty bytes or an empty stream, creates an empty
         wrapper; a missing path raises instead.
         The title and document-open JavaScript remain in the PDF stream and are read
@@ -164,7 +168,7 @@ class PdfWrapper:
         reject_unsupported_kwargs(
             self, "__init__", kwargs, [each[0] for each in self.USER_PARAMS]
         )
-        self._stream = fp_or_f_obj_or_stream_to_stream(template)
+        self._stream = share_inline_fields(fp_or_f_obj_or_stream_to_stream(template))
         self.widgets = {}
 
         self._version = None

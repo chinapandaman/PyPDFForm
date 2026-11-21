@@ -3,8 +3,9 @@
 import os
 from io import BytesIO
 
+import pytest
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import IndirectObject
+from pypdf.generic import IndirectObject, NameObject, NumberObject
 
 from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.constants import TU, Parent, V
@@ -75,6 +76,96 @@ def test_ppf_2100_refill_inline_widget(issue_pdf_directory, assert_catalog_field
 
     # saving it again keeps one entry per field
     assert_catalog_fields(PdfWrapper(stream).read(), names)
+
+
+def test_ppf_2100_inline_parent(issue_pdf_directory, assert_catalog_fields):
+    # saved by PyPDFForm before PPF-2100: the widget's /Parent is inline with
+    # /V old, and /Fields has a copy of it
+    path = os.path.join(issue_pdf_directory, "PPF-2100-inline-parent.pdf")
+    widget = PdfReader(path).pages[0]["/Annots"][0].get_object()
+    assert not isinstance(widget.raw_get(Parent), IndirectObject)
+
+    stream = PdfWrapper(path).fill({"name": "new"}).read()
+
+    assert_catalog_fields(stream, ["name"])
+    reader = PdfReader(BytesIO(stream))
+    assert (reader.get_fields() or {})["name"]["/V"] == "new"
+    widget = reader.pages[0]["/Annots"][0].get_object()
+    assert widget.raw_get(Parent) == reader.root_object["/AcroForm"]["/Fields"][0]
+
+
+def test_ppf_2100_inline_fields_keep_version(issue_pdf_directory):
+    with open(
+        os.path.join(issue_pdf_directory, "PPF-2100-inline-parent.pdf"), "rb"
+    ) as f:
+        stream = f.read().replace(b"%PDF-1.3", b"%PDF-1.7", 1)
+
+    assert PdfWrapper(stream).version == "1.7"
+
+
+def _hide_target_form(issue_pdf_directory, edit=None):
+    # saved by PyPDFForm before PPF-2100: the widgets of "shared", one per page
+    # at the same rect, are inline, /Kids lists their copies in reverse page
+    # order, and a Hide action targets the page 2 copy
+    path = os.path.join(issue_pdf_directory, "PPF-2100-hide-target.pdf")
+    if edit is None:
+        return path
+
+    writer = PdfWriter(clone_from=path)
+    for page in writer.pages:
+        edit(page["/Annots"][0].get_object())
+    with BytesIO() as f:
+        writer.write(f)
+        return f.getvalue()
+
+
+def _set_flags(widget):
+    widget[NameObject("/F")] = NumberObject(4)
+
+
+@pytest.mark.parametrize("edit", [None, _set_flags], ids=["saved", "edited"])
+def test_ppf_2100_hide_target(issue_pdf_directory, assert_catalog_fields, edit):
+    # each page widget reuses the copy on its own page, even if it was changed
+    stream = PdfWrapper(_hide_target_form(issue_pdf_directory, edit)).read()
+
+    assert_catalog_fields(stream, ["shared"])
+    reader = PdfReader(BytesIO(stream))
+    target = reader.root_object["/OpenAction"].raw_get("/T")
+    assert list(reader.pages[1]["/Annots"]) == [target]
+    if edit is not None:
+        assert target.get_object()["/F"] == 4
+
+
+def test_ppf_2100_ambiguous_inline_widgets(issue_pdf_directory):
+    # without /P, each page widget matches both copies, so neither copy is
+    # reused and the Hide action keeps its target
+    stream = PdfWrapper(
+        _hide_target_form(issue_pdf_directory, lambda widget: widget.pop("/P"))
+    ).read()
+
+    reader = PdfReader(BytesIO(stream))
+    target = reader.root_object["/OpenAction"].raw_get("/T")
+    widgets = [page["/Annots"][0] for page in reader.pages]
+    assert target not in widgets
+    assert all(widget in widget.get_object()["/Parent"]["/Kids"] for widget in widgets)
+
+
+def test_ppf_2100_fill_inline_signature(
+    issue_pdf_directory, image_samples, assert_catalog_fields
+):
+    # saved by PyPDFForm before PPF-2100 after removing a text field from page
+    # 2: the signature widget is inline, and /Fields has a copy of it
+    path = os.path.join(issue_pdf_directory, "PPF-2100-inline-signature.pdf")
+    assert not isinstance(PdfReader(path).pages[1]["/Annots"][0], IndirectObject)
+
+    stream = (
+        PdfWrapper(path)
+        .fill({"signature": os.path.join(image_samples, "sample_image.jpg")})
+        .read()
+    )
+
+    assert_catalog_fields(stream, ["text_1"])
+    assert list(PdfReader(BytesIO(stream)).get_fields() or {}) == ["text_1"]
 
 
 def test_get_desc_in_schema(issue_pdf_directory):
