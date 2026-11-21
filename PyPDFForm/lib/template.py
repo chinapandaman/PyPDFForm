@@ -920,11 +920,13 @@ def share_inline_objects(writer: PdfWriter) -> None:
     `/Rect`, and its `/P` when the widget has one. Each field stored inline in
     the `/Parent` of a page widget or of such a field is replaced the same
     way, reusing an entry of its own container that has its `/T` and lists the
-    child in `/Kids`. A reused entry takes the inline object's entries, except
-    a parent keeps its own `/Kids`, so references to the entry, such as `/CO`
-    entries or actions, now refer to the object on the page. When several
-    entries match, only an exact copy is reused. Otherwise the inline object
-    becomes a new indirect object, added to its container.
+    child in `/Kids`. A reused entry takes the inline object's entries and
+    keeps the ones the inline object lacks, such as actions added to the
+    field, and a parent keeps its own `/Kids`, so references to the entry,
+    such as `/CO` entries or actions, now refer to the object on the page. An
+    entry is reused only when it is the one exact copy among the matching
+    entries, or the only matching entry. Otherwise the inline object becomes
+    a new indirect object, added to its container.
 
     Args:
         writer (PdfWriter): The PDF writer to update in place.
@@ -991,9 +993,9 @@ def _share_inline_widget(
         reference = writer._add_object(widget)  # type: ignore[attr-defined] # noqa: SLF001 # pylint: disable=W0212
         container.append(reference)
     else:
-        copy = cast(DictionaryObject, reference.get_object())
-        copy.clear()
-        copy.update({key: widget.raw_get(key) for key in widget})
+        cast(DictionaryObject, reference.get_object()).update(
+            {key: widget.raw_get(key) for key in widget}
+        )
 
     claimed.add(reference.idnum)
     return reference
@@ -1056,11 +1058,9 @@ def _share_inline_parent(
         reference = writer._add_object(parent)  # type: ignore[attr-defined] # noqa: SLF001 # pylint: disable=W0212
         container.append(reference)
     else:
-        copy = cast(DictionaryObject, reference.get_object())
-        kids = copy.raw_get(Kids)
-        copy.clear()
-        copy.update({key: parent.raw_get(key) for key in parent})
-        copy[NameObject(Kids)] = kids
+        cast(DictionaryObject, reference.get_object()).update(
+            {key: parent.raw_get(key) for key in parent if key != Kids}
+        )
 
     return reference
 
@@ -1082,8 +1082,9 @@ def _find_copy(
         claimed (set): Object numbers of entries that cannot be used.
 
     Returns:
-        Optional[IndirectObject]: The only matching indirect entry, or the
-            first one equal to `obj` when several match, or None.
+        Optional[IndirectObject]: The only matching entry equal to `obj`, or
+            the only matching entry when none is equal to it, or None when
+            the match is not unique.
     """
     found = [
         entry
@@ -1093,10 +1094,9 @@ def _find_copy(
         and matches(entry.get_object())
     ]
     exact = [entry for entry in found if entry.get_object() == obj]
-    if exact:
-        return exact[0]
+    candidates = exact or found
 
-    return found[0] if len(found) == 1 else None
+    return candidates[0] if len(candidates) == 1 else None
 
 
 def _get_rect(annot: DictionaryObject) -> list:

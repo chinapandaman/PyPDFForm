@@ -5,7 +5,14 @@ from io import BytesIO
 
 import pytest
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import IndirectObject, NameObject, NumberObject
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    IndirectObject,
+    NameObject,
+    NumberObject,
+    TextStringObject,
+)
 
 from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.constants import TU, Parent, V
@@ -94,6 +101,38 @@ def test_ppf_2100_inline_parent(issue_pdf_directory, assert_catalog_fields):
     assert widget.raw_get(Parent) == reader.root_object["/AcroForm"]["/Fields"][0]
 
 
+def test_ppf_2100_inline_parent_keeps_catalog_entries(issue_pdf_directory):
+    # the copy in /Fields has a calculation action and a tooltip that the
+    # inline parent lacks, and is in the calculation order
+    writer = PdfWriter(
+        clone_from=os.path.join(issue_pdf_directory, "PPF-2100-inline-parent.pdf")
+    )
+    acroform = writer.root_object["/AcroForm"]
+    copy = acroform["/Fields"][0]
+    action = DictionaryObject(
+        {
+            NameObject("/S"): NameObject("/JavaScript"),
+            NameObject("/JS"): TextStringObject("event.value = 1;"),
+        }
+    )
+    copy.get_object()[NameObject("/AA")] = DictionaryObject({NameObject("/C"): action})
+    copy.get_object()[NameObject(TU)] = TextStringObject("tooltip")
+    acroform[NameObject("/CO")] = ArrayObject([copy])
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    reader = PdfReader(BytesIO(PdfWrapper(stream).read()))
+
+    acroform = reader.root_object["/AcroForm"]
+    field = acroform["/Fields"][0]
+    assert reader.pages[0]["/Annots"][0].get_object().raw_get(Parent) == field
+    assert acroform["/CO"][0] == field
+    assert field.get_object()["/AA"]["/C"]["/JS"] == "event.value = 1;"
+    assert field.get_object()[TU] == "tooltip"
+    assert field.get_object()[V] == "old"
+
+
 def test_ppf_2100_inline_fields_keep_version(issue_pdf_directory):
     with open(
         os.path.join(issue_pdf_directory, "PPF-2100-inline-parent.pdf"), "rb"
@@ -136,12 +175,24 @@ def test_ppf_2100_hide_target(issue_pdf_directory, assert_catalog_fields, edit):
         assert target.get_object()["/F"] == 4
 
 
-def test_ppf_2100_ambiguous_inline_widgets(issue_pdf_directory):
+def _drop_page(widget):
+    widget.pop("/P", None)
+
+
+def _drop_page_from_copies(widget):
+    # the page widgets and both copies are then equal
+    _drop_page(widget)
+    for kid in widget["/Parent"]["/Kids"]:
+        _drop_page(kid.get_object())
+
+
+@pytest.mark.parametrize(
+    "edit", [_drop_page, _drop_page_from_copies], ids=["widgets", "copies"]
+)
+def test_ppf_2100_ambiguous_inline_widgets(issue_pdf_directory, edit):
     # without /P, each page widget matches both copies, so neither copy is
     # reused and the Hide action keeps its target
-    stream = PdfWrapper(
-        _hide_target_form(issue_pdf_directory, lambda widget: widget.pop("/P"))
-    ).read()
+    stream = PdfWrapper(_hide_target_form(issue_pdf_directory, edit)).read()
 
     reader = PdfReader(BytesIO(stream))
     target = reader.root_object["/OpenAction"].raw_get("/T")
