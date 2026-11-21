@@ -4,6 +4,7 @@ import os
 from io import BytesIO
 
 from pypdf import PdfReader, PdfWriter
+from pypdf.generic import IndirectObject
 
 from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.constants import TU, Parent, V
@@ -54,6 +55,26 @@ def test_ppf_627_fill_1(issue_pdf_directory, request):
         expected = f.read()
         assert len(obj.read()) == len(expected)
         assert obj.read() == expected
+
+
+def test_ppf_2100_refill_inline_widget(issue_pdf_directory, assert_catalog_fields):
+    # saved by PyPDFForm before PPF-2100 after checking check_2 and removing
+    # test_2: check_2's widget is inline in /Annots, with a copy in /Fields
+    path = os.path.join(issue_pdf_directory, "PPF-2100.pdf")
+    reader = PdfReader(path)
+    assert not isinstance(reader.pages[1]["/Annots"][0], IndirectObject)
+    assert (reader.get_fields() or {})["check_2"]["/V"] == "/Yes"
+    names = ["test", "check", "check_2", "test_3", "check_3"]
+
+    stream = PdfWrapper(path).fill({"check_2": False}).read()
+
+    assert_catalog_fields(stream, names)
+    assert (PdfReader(BytesIO(stream)).get_fields() or {})["check_2"]["/V"] == "/Off"
+    # an unchecked checkbox reads False or None
+    assert not PdfWrapper(stream).data["check_2"]
+
+    # saving it again keeps one entry per field
+    assert_catalog_fields(PdfWrapper(stream).read(), names)
 
 
 def test_get_desc_in_schema(issue_pdf_directory):

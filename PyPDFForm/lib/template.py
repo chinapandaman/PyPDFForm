@@ -65,7 +65,12 @@ from .patterns import (
     get_widget_key,
     update_annotation_name,
 )
-from .utils import extract_widget_property, find_pattern_match
+from .utils import (
+    extract_widget_property,
+    find_pattern_match,
+    get_array,
+    get_dictionary,
+)
 
 
 def get_metadata(pdf: bytes) -> dict:
@@ -606,7 +611,9 @@ def remove_widgets_by_keys(
     is removed from the AcroForm `/CO` calculation order, which is deleted
     when it becomes empty. Detached objects are no longer form fields, but
     other objects that refer to them, such as form actions, are not changed.
-    If no keys are provided, the original PDF stream is returned unchanged.
+    Null entries, such as a null `/CO`, are treated as absent. `get_field_keys`
+    lists the keys this function can match. If no keys are provided, the
+    original PDF stream is returned unchanged.
 
     Args:
         pdf (bytes): The PDF stream to remove fields from.
@@ -622,10 +629,7 @@ def remove_widgets_by_keys(
 
     key_set = set(keys)
     writer = PdfWriter(BytesIO(pdf))
-    acroform = cast(
-        DictionaryObject,
-        writer.root_object.get(AcroForm, DictionaryObject()).get_object(),
-    )
+    acroform = get_dictionary(writer.root_object, AcroForm) or DictionaryObject()
 
     matched = {
         id(field): field
@@ -634,17 +638,13 @@ def remove_widgets_by_keys(
     }
 
     for page in writer.pages:
-        annots = page.get(Annots, ArrayObject()).get_object()
+        annots = get_array(page, Annots)
         page_annots = ArrayObject([])
         for reference in annots:
             annot = reference.get_object()
-            if (
-                isinstance(annot, DictionaryObject)
-                and annot.get(Subtype) == Widget
-                and (
-                    get_widget_key(annot, use_full_widget_name) in key_set
-                    or _has_ancestor_in(annot, matched)
-                )
+            if _is_widget_annotation(annot) and (
+                get_widget_key(annot, use_full_widget_name) in key_set
+                or _has_ancestor_in(annot, matched)
             ):
                 matched.setdefault(id(annot), annot)
             else:
@@ -658,8 +658,8 @@ def remove_widgets_by_keys(
         if not _has_ancestor_in(field, matched):
             detached.update((id(each), each) for each in detach_field(writer, field))
 
-    if CO in acroform:
-        calculation_order = cast(ArrayObject, acroform[CO])
+    calculation_order = get_array(acroform, CO)
+    if calculation_order:
         calculation_order[:] = [
             reference
             for reference in calculation_order
@@ -676,10 +676,12 @@ def remove_widgets_by_keys(
 
 def get_field_keys(pdf: bytes, use_full_widget_name: bool) -> set:
     """
-    Gets the keys of the terminal fields in a PDF's AcroForm field tree.
+    Gets the keys that `remove_widgets_by_keys` can match in a PDF.
 
-    Keys follow the same rules as `build_widgets`, but fields without a widget
-    on any page, which `build_widgets` does not list, are included.
+    These are the keys of the terminal fields in the AcroForm field tree and of
+    the widget annotations on pages, using the same key rules as
+    `build_widgets`. Unlike `build_widgets`, fields without a widget on any
+    page and widgets of types PyPDFForm does not support are included.
 
     Args:
         pdf (bytes): The PDF stream to read.
@@ -687,18 +689,34 @@ def get_field_keys(pdf: bytes, use_full_widget_name: bool) -> set:
             parent names, as keys.
 
     Returns:
-        set: The keys of the terminal fields.
+        set: The keys of the terminal fields and page widgets.
     """
     reader = PdfReader(BytesIO(pdf))
-    acroform = cast(
-        DictionaryObject,
-        reader.root_object.get(AcroForm, DictionaryObject()).get_object(),
-    )
+    acroform = get_dictionary(reader.root_object, AcroForm) or DictionaryObject()
+    page_widgets = [
+        annot
+        for page in reader.pages
+        for annot in (each.get_object() for each in get_array(page, Annots))
+        if _is_widget_annotation(annot)
+    ]
 
     return {
-        get_widget_key(field, use_full_widget_name)
-        for field in _get_terminal_fields(acroform)
+        get_widget_key(each, use_full_widget_name)
+        for each in _get_terminal_fields(acroform) + page_widgets
     }
+
+
+def _is_widget_annotation(obj: object) -> bool:
+    """
+    Checks whether an object is a widget annotation dictionary.
+
+    Args:
+        obj (object): A resolved object, such as a page annotation.
+
+    Returns:
+        bool: True if `obj` is a dictionary whose `/Subtype` is `/Widget`.
+    """
+    return isinstance(obj, DictionaryObject) and obj.get(Subtype) == Widget
 
 
 def _get_terminal_fields(acroform: DictionaryObject) -> List[DictionaryObject]:
@@ -716,13 +734,13 @@ def _get_terminal_fields(acroform: DictionaryObject) -> List[DictionaryObject]:
         List[DictionaryObject]: The terminal fields, in tree order.
     """
     result = []
-    stack = list(reversed(acroform.get(Fields, ArrayObject()).get_object()))
+    stack = list(reversed(get_array(acroform, Fields)))
     seen = set()
     while stack:
         field = stack.pop().get_object()
         if isinstance(field, DictionaryObject) and id(field) not in seen:
             seen.add(id(field))
-            kids = field.get(Kids, ArrayObject()).get_object()
+            kids = get_array(field, Kids)
             if any(
                 isinstance(kid.get_object(), DictionaryObject) and T in kid.get_object()
                 for kid in kids
@@ -748,28 +766,14 @@ def _has_ancestor_in(
         bool: True if an ancestor of `obj` is in `objects`.
     """
     seen = {id(obj)}
-    node = _get_parent(obj)
-    while isinstance(node, DictionaryObject) and id(node) not in seen:
+    node = get_dictionary(obj, Parent)
+    while node is not None and id(node) not in seen:
         if id(node) in objects:
             return True
         seen.add(id(node))
-        node = _get_parent(node)
+        node = get_dictionary(node, Parent)
 
     return False
-
-
-def _get_parent(obj: DictionaryObject) -> object:
-    """
-    Gets the resolved `/Parent` of an object.
-
-    Args:
-        obj (DictionaryObject): A field or widget annotation.
-
-    Returns:
-        object: The resolved parent, or None when there is none.
-    """
-    parent = obj.get(Parent)
-    return parent.get_object() if parent is not None else None
 
 
 def _is_detached(obj: object, detached: Dict[int, DictionaryObject]) -> bool:
@@ -807,17 +811,18 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
             emptied ancestor.
     """
     result = [field]
-    while Parent in field:
-        parent = cast(DictionaryObject, field[Parent])
-        kids = cast(ArrayObject, parent.get(Kids, ArrayObject()).get_object())
+    parent = get_dictionary(field, Parent)
+    while parent is not None:
+        kids = get_array(parent, Kids)
         kids[:] = [kid for kid in kids if kid.get_object() is not field]
         if kids or any(parent is each for each in result):
             return result
         field = parent
         result.append(field)
+        parent = get_dictionary(field, Parent)
 
-    acroform = writer.root_object.get(AcroForm, DictionaryObject()).get_object()
-    fields = cast(ArrayObject, acroform.get(Fields, ArrayObject()).get_object())
+    acroform = get_dictionary(writer.root_object, AcroForm) or DictionaryObject()
+    fields = get_array(acroform, Fields)
     fields[:] = [
         reference for reference in fields if reference.get_object() is not field
     ]

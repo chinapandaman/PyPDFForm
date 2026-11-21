@@ -21,17 +21,21 @@ from warnings import catch_warnings, filterwarnings
 
 from pikepdf import Pdf
 from pypdf import PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject
+from pypdf.generic import ArrayObject, DictionaryObject, IndirectObject, NameObject
 
 from .constants import (
     XFA,
     AcroForm,
     Annots,
     Fields,
+    Kids,
     Parent,
+    Rect,
     Subtype,
+    T,
     Widget,
 )
+from .utils import get_array, get_dictionary
 
 
 def write_path(dest: str | bytes | os.PathLike, content: bytes) -> None:
@@ -140,8 +144,10 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
     already had, in their original order. Entries are never removed, so fields
     without a widget on a page, such as hidden fields or fields of widget types
     PyPDFForm does not support, are preserved. Removing fields is left to
-    explicit operations such as `remove_widgets_by_keys`. An AcroForm
-    dictionary is created when necessary. When no page has a widget
+    explicit operations such as `remove_widgets_by_keys`. A widget annotation
+    stored inline in a page's `/Annots` is shared with the field tree through
+    `_share_inline_widget`. An AcroForm dictionary is created when necessary,
+    and null entries are treated as absent. When no page has a widget
     annotation, the original PDF stream is returned unchanged to avoid an
     unnecessary rewrite.
 
@@ -154,13 +160,29 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
     """
     writer = PdfWriter(BytesIO(pdf))
     root = writer._root_object  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+    acroform = get_dictionary(root, AcroForm)
+    existing = get_array(acroform, Fields) if acroform is not None else ArrayObject()
+    on_pages = {
+        id(annot.get_object())
+        for page in writer.pages
+        for annot in get_array(page, Annots)
+    }
+    shared = set()
 
     fields = ArrayObject([])
     seen_fields = set()
     for page in writer.pages:
-        for annot in page.get(Annots, []):
-            if annot.get_object().get(Subtype) != Widget:
+        annots = get_array(page, Annots)
+        for index, annot in enumerate(annots):
+            widget = annot.get_object()
+            if (
+                not isinstance(widget, DictionaryObject)
+                or widget.get(Subtype) != Widget
+            ):
                 continue
+            if not isinstance(annot, IndirectObject):
+                annot = _share_inline_widget(writer, widget, existing, on_pages, shared)
+                annots[index] = annot
             field_ref = _get_root_field_reference(writer, annot)
             field_key = _field_reference_key(field_ref)
             if field_key not in seen_fields:
@@ -170,19 +192,101 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
     if not seen_fields:
         return pdf
 
-    if AcroForm not in root:
-        root[NameObject(AcroForm)] = DictionaryObject({})
-    for field_ref in root[AcroForm].get(Fields, ArrayObject()).get_object():
+    if acroform is None:
+        acroform = DictionaryObject({})
+        root[NameObject(AcroForm)] = acroform
+    for field_ref in existing:
         field_key = _field_reference_key(field_ref)
         if field_key not in seen_fields:
             fields.append(field_ref)
             seen_fields.add(field_key)
-    root[AcroForm][NameObject(Fields)] = fields
+    acroform[NameObject(Fields)] = fields
 
     with BytesIO() as f:
         writer.write(f)
         f.seek(0)
         return f.read()
+
+
+def _share_inline_widget(
+    writer: PdfWriter,
+    widget: DictionaryObject,
+    root_fields: ArrayObject,
+    on_pages: set,
+    shared: set,
+) -> IndirectObject:
+    """
+    Returns the indirect reference a page should use for an inline widget.
+
+    Widget annotations should be indirect objects, so that the page and the
+    field tree share one object. PDFs saved by earlier versions of PyPDFForm
+    can instead list a widget inline in a page's `/Annots`, with a separate
+    copy of it in the field tree. When the widget's parent `/Kids`, or the
+    AcroForm `/Fields` array for a widget without a parent, has an indirect
+    entry that is on no page and has the same `/Subtype`, `/T`, and `/Rect`,
+    that entry is updated to the page's widget and reused, so references to
+    it, such as `/CO` entries, keep working. Otherwise the widget becomes a
+    new indirect object.
+
+    Args:
+        writer (PdfWriter): The PDF writer that owns the page and field tree.
+        widget (DictionaryObject): The inline widget annotation.
+        root_fields (ArrayObject): The AcroForm `/Fields` array.
+        on_pages (set): The `id` of every annotation listed by a page.
+        shared (set): Object numbers of entries already reused, updated in
+            place.
+
+    Returns:
+        IndirectObject: The reference that replaces the inline widget.
+    """
+    parent = get_dictionary(widget, Parent)
+    container = get_array(parent, Kids) if parent is not None else root_fields
+    for entry in container:
+        copy = entry.get_object()
+        if (
+            isinstance(entry, IndirectObject)
+            and entry.idnum not in shared
+            and id(copy) not in on_pages
+            and _is_copy(copy, widget)
+        ):
+            shared.add(entry.idnum)
+            copy.clear()
+            copy.update({key: widget.raw_get(key) for key in widget})
+            return entry
+
+    return writer._add_object(widget)  # type: ignore[attr-defined] # noqa: SLF001 # pylint: disable=W0212
+
+
+def _is_copy(obj: object, widget: DictionaryObject) -> bool:
+    """
+    Checks whether an object is a copy of a widget annotation.
+
+    Args:
+        obj (object): A resolved object, such as a `/Fields` entry.
+        widget (DictionaryObject): The widget annotation.
+
+    Returns:
+        bool: True if `obj` is a dictionary with the widget's `/Subtype`, `/T`,
+            and `/Rect`.
+    """
+    return (
+        isinstance(obj, DictionaryObject)
+        and all(obj.get(key) == widget.get(key) for key in (Subtype, T))
+        and _get_rect(obj) == _get_rect(widget)
+    )
+
+
+def _get_rect(annot: DictionaryObject) -> list:
+    """
+    Gets the `/Rect` of an annotation as numbers.
+
+    Args:
+        annot (DictionaryObject): The annotation.
+
+    Returns:
+        list: The rectangle's coordinates, or an empty list without one.
+    """
+    return [float(each.get_object()) for each in get_array(annot, Rect)]
 
 
 def _get_root_field_reference(writer: PdfWriter, annot):
@@ -192,7 +296,9 @@ def _get_root_field_reference(writer: PdfWriter, annot):
     Widget annotations can be leaf nodes under a parent field dictionary. The
     catalog `/AcroForm/Fields` array must point at root fields rather than
     child widgets, otherwise readers such as pypdf will not expose hierarchical
-    fields like radio groups via `get_fields`.
+    fields like radio groups via `get_fields`. A parent stored inline in its
+    child's `/Parent` is made an indirect object, and the child's `/Parent`
+    points at it, so the child and the catalog share one parent.
 
     Args:
         writer (PdfWriter): The PDF writer that owns the annotation objects.
@@ -205,10 +311,15 @@ def _get_root_field_reference(writer: PdfWriter, annot):
     field_object = field.get_object()
     visited = set()
 
-    while Parent in field_object and id(field_object) not in visited:
+    while (parent := get_dictionary(field_object, Parent)) is not None and id(
+        field_object
+    ) not in visited:
         visited.add(id(field_object))
-        field = field_object[Parent]
-        field_object = field.get_object()
+        field = field_object.raw_get(Parent)
+        if not isinstance(field, IndirectObject):
+            field = _ensure_indirect_reference(writer, parent)
+            field_object[NameObject(Parent)] = field
+        field_object = parent
 
     return _ensure_indirect_reference(writer, field)
 
