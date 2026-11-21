@@ -101,23 +101,39 @@ def test_ppf_2100_inline_parent(issue_pdf_directory, assert_catalog_fields):
     assert widget.raw_get(Parent) == reader.root_object["/AcroForm"]["/Fields"][0]
 
 
-def test_ppf_2100_inline_parent_keeps_catalog_entries(issue_pdf_directory):
-    # the copy in /Fields has a calculation action and a tooltip that the
-    # inline parent lacks, and is in the calculation order
+def _javascript(script):
+    return DictionaryObject(
+        {
+            NameObject("/S"): NameObject("/JavaScript"),
+            NameObject("/JS"): TextStringObject(script),
+        }
+    )
+
+
+@pytest.mark.parametrize("inline_format", [False, True], ids=["copy", "both"])
+def test_ppf_2100_inline_parent_keeps_catalog_entries(
+    issue_pdf_directory, inline_format
+):
+    # the copy in /Fields has calculation and format actions and a tooltip,
+    # and is in the calculation order; the inline parent has none of them, or
+    # its own format action
     writer = PdfWriter(
         clone_from=os.path.join(issue_pdf_directory, "PPF-2100-inline-parent.pdf")
     )
     acroform = writer.root_object["/AcroForm"]
     copy = acroform["/Fields"][0]
-    action = DictionaryObject(
+    copy.get_object()[NameObject("/AA")] = DictionaryObject(
         {
-            NameObject("/S"): NameObject("/JavaScript"),
-            NameObject("/JS"): TextStringObject("event.value = 1;"),
+            NameObject("/C"): _javascript("calculate();"),
+            NameObject("/F"): _javascript("format_copy();"),
         }
     )
-    copy.get_object()[NameObject("/AA")] = DictionaryObject({NameObject("/C"): action})
     copy.get_object()[NameObject(TU)] = TextStringObject("tooltip")
     acroform[NameObject("/CO")] = ArrayObject([copy])
+    if inline_format:
+        writer.pages[0]["/Annots"][0].get_object()[Parent][NameObject("/AA")] = (
+            DictionaryObject({NameObject("/F"): _javascript("format_inline();")})
+        )
     with BytesIO() as f:
         writer.write(f)
         stream = f.getvalue()
@@ -128,7 +144,11 @@ def test_ppf_2100_inline_parent_keeps_catalog_entries(issue_pdf_directory):
     field = acroform["/Fields"][0]
     assert reader.pages[0]["/Annots"][0].get_object().raw_get(Parent) == field
     assert acroform["/CO"][0] == field
-    assert field.get_object()["/AA"]["/C"]["/JS"] == "event.value = 1;"
+    actions = field.get_object()["/AA"]
+    assert actions["/C"]["/JS"] == "calculate();"
+    # the inline parent's action wins for a trigger both have
+    expected = "format_inline();" if inline_format else "format_copy();"
+    assert actions["/F"]["/JS"] == expected
     assert field.get_object()[TU] == "tooltip"
     assert field.get_object()[V] == "old"
 
@@ -162,19 +182,6 @@ def _set_flags(widget):
     widget[NameObject("/F")] = NumberObject(4)
 
 
-@pytest.mark.parametrize("edit", [None, _set_flags], ids=["saved", "edited"])
-def test_ppf_2100_hide_target(issue_pdf_directory, assert_catalog_fields, edit):
-    # each page widget reuses the copy on its own page, even if it was changed
-    stream = PdfWrapper(_hide_target_form(issue_pdf_directory, edit)).read()
-
-    assert_catalog_fields(stream, ["shared"])
-    reader = PdfReader(BytesIO(stream))
-    target = reader.root_object["/OpenAction"].raw_get("/T")
-    assert list(reader.pages[1]["/Annots"]) == [target]
-    if edit is not None:
-        assert target.get_object()["/F"] == 4
-
-
 def _drop_page(widget):
     widget.pop("/P", None)
 
@@ -187,12 +194,29 @@ def _drop_page_from_copies(widget):
 
 
 @pytest.mark.parametrize(
-    "edit", [_drop_page, _drop_page_from_copies], ids=["widgets", "copies"]
+    "edit", [None, _set_flags, _drop_page], ids=["saved", "edited", "widgets"]
 )
-def test_ppf_2100_ambiguous_inline_widgets(issue_pdf_directory, edit):
-    # without /P, each page widget matches both copies, so neither copy is
-    # reused and the Hide action keeps its target
+def test_ppf_2100_hide_target(issue_pdf_directory, assert_catalog_fields, edit):
+    # each page widget reuses the copy whose /P is its page, even if the widget
+    # was changed or lost its own /P
     stream = PdfWrapper(_hide_target_form(issue_pdf_directory, edit)).read()
+
+    assert_catalog_fields(stream, ["shared"])
+    reader = PdfReader(BytesIO(stream))
+    target = reader.root_object["/OpenAction"].raw_get("/T")
+    assert list(reader.pages[1]["/Annots"]) == [target]
+    assert target.get_object().raw_get("/P") == reader.pages[1].indirect_reference
+    if edit is _set_flags:
+        assert target.get_object()["/F"] == 4
+
+
+def test_ppf_2100_ambiguous_inline_widgets(issue_pdf_directory):
+    # without /P on the page widgets and their copies, each page widget matches
+    # both copies, so neither copy is reused and the Hide action keeps its
+    # target
+    stream = PdfWrapper(
+        _hide_target_form(issue_pdf_directory, _drop_page_from_copies)
+    ).read()
 
     reader = PdfReader(BytesIO(stream))
     target = reader.root_object["/OpenAction"].raw_get("/T")

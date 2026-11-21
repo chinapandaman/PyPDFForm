@@ -8,10 +8,10 @@ templates. It leverages the pypdf library for PDF manipulation and defines
 specific patterns for identifying and constructing different types of widgets.
 """
 
+from collections.abc import Callable
 from copy import deepcopy
 from functools import lru_cache
 from io import BytesIO
-from collections.abc import Callable
 from typing import Dict, List, Optional, cast
 
 from pypdf import PdfReader, PdfWriter
@@ -25,6 +25,7 @@ from pypdf.generic import (
 
 from .annotations import AnnotationTypes, LinkAnnotation
 from .constants import (
+    AA,
     CO,
     COMB,
     JS,
@@ -917,13 +918,13 @@ def share_inline_objects(writer: PdfWriter) -> None:
     reference. Its copy in the field tree is reused when the widget's parent
     `/Kids`, or the AcroForm `/Fields` array for a widget without a parent,
     has an indirect entry that is on no page and has the widget's `/T` and
-    `/Rect`, and its `/P` when the widget has one. Each field stored inline in
-    the `/Parent` of a page widget or of such a field is replaced the same
-    way, reusing an entry of its own container that has its `/T` and lists the
-    child in `/Kids`. A reused entry takes the inline object's entries and
-    keeps the ones the inline object lacks, such as actions added to the
-    field, and a parent keeps its own `/Kids`, so references to the entry,
-    such as `/CO` entries or actions, now refer to the object on the page. An
+    `/Rect`. An entry whose `/P` is the page listing the widget, or the
+    widget's own `/P`, is preferred; an entry without `/P` is considered only
+    when none has such a `/P`. Each field stored inline in the `/Parent` of a
+    page widget or of such a field is replaced the same way, reusing an entry
+    of its own container that has its `/T` and lists the child in `/Kids`.
+    A reused entry is updated with `_merge_inline`, so references to it, such
+    as `/CO` entries or actions, now refer to the object on the page. An
     entry is reused only when it is the one exact copy among the matching
     entries, or the only matching entry. Otherwise the inline object becomes
     a new indirect object, added to its container.
@@ -948,7 +949,11 @@ def share_inline_objects(writer: PdfWriter) -> None:
                 continue
             if not isinstance(annot, IndirectObject):
                 annot = _share_inline_widget(
-                    writer, widget, root_fields, on_pages, claimed
+                    writer,
+                    widget,
+                    cast(IndirectObject, page.indirect_reference),
+                    root_fields,
+                    (on_pages, claimed),
                 )
                 annots[index] = annot
             _share_inline_parents(writer, annot, root_fields)
@@ -957,9 +962,9 @@ def share_inline_objects(writer: PdfWriter) -> None:
 def _share_inline_widget(
     writer: PdfWriter,
     widget: DictionaryObject,
+    page: IndirectObject,
     root_fields: ArrayObject,
-    on_pages: set,
-    claimed: set,
+    excluded: tuple[set, set],
 ) -> IndirectObject:
     """
     Returns the reference that replaces an inline page widget.
@@ -967,35 +972,42 @@ def _share_inline_widget(
     Args:
         writer (PdfWriter): The PDF writer that owns the page and field tree.
         widget (DictionaryObject): The inline widget annotation.
+        page (IndirectObject): The page whose `/Annots` lists the widget.
         root_fields (ArrayObject): The AcroForm `/Fields` array.
-        on_pages (set): The `id` of every annotation listed by a page.
-        claimed (set): Object numbers of entries already used for a page
-            widget, updated in place.
+        excluded (tuple[set, set]): The `id` of every annotation listed by a
+            page, and the object numbers of entries already used for a page
+            widget, which this function adds to.
 
     Returns:
         IndirectObject: The reused copy, or a new indirect object.
     """
+    on_pages, claimed = excluded
     parent = get_dictionary(widget, Parent)
     container = get_array(parent, Kids) if parent is not None else root_fields
-    keys = (T, P) if P in widget else (T,)
+    pages = [page, widget.raw_get(P)] if P in widget else [page]
+
+    def is_candidate(copy: object) -> bool:
+        return (
+            _is_widget_annotation(copy)
+            and id(copy) not in on_pages
+            and cast(DictionaryObject, copy).get(T) == widget.get(T)
+            and _get_rect(cast(DictionaryObject, copy)) == _get_rect(widget)
+        )
+
     reference = _find_copy(
         container,
         widget,
-        lambda copy: (
-            _is_widget_annotation(copy)
-            and id(copy) not in on_pages
-            and all(copy.get(key) == widget.get(key) for key in keys)
-            and _get_rect(copy) == _get_rect(widget)
-        ),
+        [
+            lambda copy: is_candidate(copy) and copy.get(P) in pages,
+            lambda copy: is_candidate(copy) and get_dictionary(copy, P) is None,
+        ],
         claimed,
     )
     if reference is None:
         reference = writer._add_object(widget)  # type: ignore[attr-defined] # noqa: SLF001 # pylint: disable=W0212
         container.append(reference)
     else:
-        cast(DictionaryObject, reference.get_object()).update(
-            {key: widget.raw_get(key) for key in widget}
-        )
+        _merge_inline(cast(DictionaryObject, reference.get_object()), widget)
 
     claimed.add(reference.idnum)
     return reference
@@ -1047,28 +1059,55 @@ def _share_inline_parent(
     reference = _find_copy(
         container,
         parent,
-        lambda copy: (
-            isinstance(copy, DictionaryObject)
-            and copy.get(T) == parent.get(T)
-            and child in get_array(copy, Kids)
-        ),
+        [
+            lambda copy: (
+                isinstance(copy, DictionaryObject)
+                and copy.get(T) == parent.get(T)
+                and child in get_array(copy, Kids)
+            )
+        ],
         set(),
     )
     if reference is None:
         reference = writer._add_object(parent)  # type: ignore[attr-defined] # noqa: SLF001 # pylint: disable=W0212
         container.append(reference)
     else:
-        cast(DictionaryObject, reference.get_object()).update(
-            {key: parent.raw_get(key) for key in parent if key != Kids}
-        )
+        _merge_inline(cast(DictionaryObject, reference.get_object()), parent, (Kids,))
 
     return reference
+
+
+def _merge_inline(
+    copy: DictionaryObject, obj: DictionaryObject, skip: tuple = ()
+) -> None:
+    """
+    Updates a reused copy with the entries of the inline object it replaces.
+
+    The inline object's values win, and the copy keeps the entries the inline
+    object lacks, such as actions added to the field. When both have an
+    additional-actions (`/AA`) dictionary, the copy gets a new one with the
+    triggers of both, taking the inline object's action for a trigger both
+    have.
+
+    Args:
+        copy (DictionaryObject): The reused entry, updated in place.
+        obj (DictionaryObject): The inline object.
+        skip (tuple): Keys of `obj` not copied, such as a parent's `/Kids`.
+    """
+    actions = get_dictionary(copy, AA)
+    inline_actions = get_dictionary(obj, AA)
+    copy.update({key: obj.raw_get(key) for key in obj if key not in skip})
+    if actions is not None and inline_actions is not None:
+        copy[NameObject(AA)] = DictionaryObject(
+            {trigger: actions.raw_get(trigger) for trigger in actions}
+            | {trigger: inline_actions.raw_get(trigger) for trigger in inline_actions}
+        )
 
 
 def _find_copy(
     container: ArrayObject,
     obj: DictionaryObject,
-    matches: Callable[[object], bool],
+    tiers: List[Callable[[DictionaryObject], bool]],
     claimed: set,
 ) -> Optional[IndirectObject]:
     """
@@ -1077,26 +1116,31 @@ def _find_copy(
     Args:
         container (ArrayObject): The `/Kids` or `/Fields` array to search.
         obj (DictionaryObject): The inline object.
-        matches (Callable[[object], bool]): Decides which resolved entries
-            match the inline object.
+        tiers (List[Callable[[DictionaryObject], bool]]): Decide which
+            resolved entries match the inline object, in order of
+            preference. A later one is used only when no entry matches the
+            ones before it.
         claimed (set): Object numbers of entries that cannot be used.
 
     Returns:
-        Optional[IndirectObject]: The only matching entry equal to `obj`, or
-            the only matching entry when none is equal to it, or None when
-            the match is not unique.
+        Optional[IndirectObject]: Among the entries of the first tier that
+            matches any, the only one equal to `obj`, or the only one when
+            none is equal to it, or None when the match is not unique.
     """
-    found = [
-        entry
-        for entry in container
-        if isinstance(entry, IndirectObject)
-        and entry.idnum not in claimed
-        and matches(entry.get_object())
-    ]
-    exact = [entry for entry in found if entry.get_object() == obj]
-    candidates = exact or found
+    for matches in tiers:
+        found = [
+            entry
+            for entry in container
+            if isinstance(entry, IndirectObject)
+            and entry.idnum not in claimed
+            and matches(cast(DictionaryObject, entry.get_object()))
+        ]
+        if found:
+            exact = [entry for entry in found if entry.get_object() == obj]
+            candidates = exact or found
+            return candidates[0] if len(candidates) == 1 else None
 
-    return candidates[0] if len(candidates) == 1 else None
+    return None
 
 
 def _get_rect(annot: DictionaryObject) -> list:
