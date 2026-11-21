@@ -90,10 +90,19 @@ pull requests. Follow the issue and pull request guidelines in
 [`docs/dev_intro.md`](docs/dev_intro.md).
 
 Use only the GitHub CLI (`gh`) to interact with GitHub issues and pull
-requests, including reading them, and only with the credential already
-configured for `gh` in the local environment. Do not log in, switch accounts,
-refresh scopes, set or supply tokens, or reach GitHub through other means such
-as a browser, web fetches, MCP servers, or API requests made outside `gh`.
+requests, including reading them. Do not log in, switch accounts, refresh
+scopes, set or supply tokens, or reach GitHub through other means such as a
+browser, web fetches, MCP servers, or API requests made outside `gh`.
+
+Use only the credential already configured for `gh` in the local environment.
+Before any other GitHub request in a task, run `gh auth status` to see where
+the active credential comes from. A login stored by `gh` is authorized. A token
+inherited through `GH_TOKEN`, `GITHUB_TOKEN`, `GH_ENTERPRISE_TOKEN`, or
+`GITHUB_ENTERPRISE_TOKEN` takes precedence over the stored login and is
+authorized only when the user has approved it for the current task. Otherwise,
+stop and ask the user, naming the variable and the account `gh auth status`
+reports. Do not unset or override these variables to fall back to the stored
+login.
 
 Push pull request branches with `git` using the existing local Git
 configuration. Do not add, change, or switch Git credentials.
