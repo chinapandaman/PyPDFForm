@@ -95,14 +95,22 @@ scopes, set or supply tokens, or reach GitHub through other means such as a
 browser, web fetches, MCP servers, or API requests made outside `gh`.
 
 Use only the credential already configured for `gh` in the local environment.
-Before any other GitHub request in a task, run `gh auth status` to see where
-the active credential comes from. A login stored by `gh` is authorized. A token
-inherited through `GH_TOKEN`, `GITHUB_TOKEN`, `GH_ENTERPRISE_TOKEN`, or
-`GITHUB_ENTERPRISE_TOKEN` takes precedence over the stored login and is
-authorized only when the user has approved it for the current task. Otherwise,
-stop and ask the user, naming the variable and the account `gh auth status`
-reports. Do not unset or override these variables to fall back to the stored
-login.
+A login stored by `gh` is authorized. A token inherited through an environment
+variable takes precedence over the stored login and is authorized only when
+the user approves it for the current task. Do not unset or override these
+variables to fall back to the stored login.
+
+Before any GitHub request in a task, including `gh auth status` and
+`git push`, check locally whether a token variable that applies to the target
+host is set, without printing its value. For `github.com`, a subdomain of
+`ghe.com`, or `github.localhost`, these are `GH_TOKEN` and `GITHUB_TOKEN`. For
+any other host, they are `GH_ENTERPRISE_TOKEN` and `GITHUB_ENTERPRISE_TOKEN`.
+
+If none is set, run `gh auth status` to confirm the stored login. If any is
+set, stop and ask the user to approve the token, identifying it only by the
+name of each variable that is set. After approval, run `gh auth status`, tell
+the user the account it reports and which variable it came from, and wait for
+the user to confirm before any other GitHub request.
 
 Push pull request branches with `git` using the existing local Git
 configuration. Do not add, change, or switch Git credentials.
