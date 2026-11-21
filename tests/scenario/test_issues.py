@@ -10,6 +10,7 @@ from pypdf.generic import (
     DictionaryObject,
     IndirectObject,
     NameObject,
+    NullObject,
     NumberObject,
     TextStringObject,
 )
@@ -110,13 +111,33 @@ def _javascript(script):
     )
 
 
-@pytest.mark.parametrize("inline_format", [False, True], ids=["copy", "both"])
+@pytest.mark.parametrize(
+    ("inline_actions", "expected_format"),
+    [
+        (None, "format_copy();"),
+        (
+            lambda: DictionaryObject(
+                {NameObject("/F"): _javascript("format_inline();")}
+            ),
+            "format_inline();",
+        ),
+        (NullObject, "format_copy();"),
+        (
+            lambda: DictionaryObject(
+                {NameObject("/C"): NullObject(), NameObject("/TU"): NullObject()}
+            ),
+            "format_copy();",
+        ),
+    ],
+    ids=["copy", "both", "null", "null_entries"],
+)
 def test_ppf_2100_inline_parent_keeps_catalog_entries(
-    issue_pdf_directory, inline_format
+    issue_pdf_directory, inline_actions, expected_format
 ):
     # the copy in /Fields has calculation and format actions and a tooltip,
-    # and is in the calculation order; the inline parent has none of them, or
-    # its own format action
+    # and is in the calculation order; the inline parent has no /AA, or a
+    # null /TU with its own format action, a null /AA, or null triggers, and
+    # null entries count as absent
     writer = PdfWriter(
         clone_from=os.path.join(issue_pdf_directory, "PPF-2100-inline-parent.pdf")
     )
@@ -130,10 +151,10 @@ def test_ppf_2100_inline_parent_keeps_catalog_entries(
     )
     copy.get_object()[NameObject(TU)] = TextStringObject("tooltip")
     acroform[NameObject("/CO")] = ArrayObject([copy])
-    if inline_format:
-        writer.pages[0]["/Annots"][0].get_object()[Parent][NameObject("/AA")] = (
-            DictionaryObject({NameObject("/F"): _javascript("format_inline();")})
-        )
+    inline = writer.pages[0]["/Annots"][0].get_object()[Parent]
+    if inline_actions is not None:
+        inline[NameObject("/AA")] = inline_actions()
+        inline[NameObject(TU)] = NullObject()
     with BytesIO() as f:
         writer.write(f)
         stream = f.getvalue()
@@ -147,10 +168,30 @@ def test_ppf_2100_inline_parent_keeps_catalog_entries(
     actions = field.get_object()["/AA"]
     assert actions["/C"]["/JS"] == "calculate();"
     # the inline parent's action wins for a trigger both have
-    expected = "format_inline();" if inline_format else "format_copy();"
-    assert actions["/F"]["/JS"] == expected
+    assert actions["/F"]["/JS"] == expected_format
     assert field.get_object()[TU] == "tooltip"
     assert field.get_object()[V] == "old"
+
+
+def test_ppf_2100_stale_page_reference(
+    issue_pdf_directory, assert_catalog_fields, assert_page_ownership
+):
+    # page 1's widget has a /P naming page 2; the page listing it decides which
+    # copy it reuses, and the copy keeps its /P
+    writer = PdfWriter(
+        clone_from=os.path.join(issue_pdf_directory, "PPF-2100-hide-target.pdf")
+    )
+    page_1, page_2 = writer.pages
+    page_1["/Annots"][0].get_object()[NameObject("/P")] = page_2.indirect_reference
+    with BytesIO() as f:
+        writer.write(f)
+        stream = PdfWrapper(f.getvalue()).read()
+
+    assert_catalog_fields(stream, ["shared"])
+    assert_page_ownership(stream)
+    reader = PdfReader(BytesIO(stream))
+    target = reader.root_object["/OpenAction"].raw_get("/T")
+    assert list(reader.pages[1]["/Annots"]) == [target]
 
 
 def test_ppf_2100_inline_fields_keep_version(issue_pdf_directory):

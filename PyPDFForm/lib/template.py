@@ -20,6 +20,7 @@ from pypdf.generic import (
     DictionaryObject,
     IndirectObject,
     NameObject,
+    NullObject,
     TextStringObject,
 )
 
@@ -918,9 +919,10 @@ def share_inline_objects(writer: PdfWriter) -> None:
     reference. Its copy in the field tree is reused when the widget's parent
     `/Kids`, or the AcroForm `/Fields` array for a widget without a parent,
     has an indirect entry that is on no page and has the widget's `/T` and
-    `/Rect`. An entry whose `/P` is the page listing the widget, or the
-    widget's own `/P`, is preferred; an entry without `/P` is considered only
-    when none has such a `/P`. Each field stored inline in the `/Parent` of a
+    `/Rect`. An entry whose `/P` is the page listing the widget is preferred,
+    even when the widget's own `/P` names another page; an entry without `/P`
+    is considered only when none has such a `/P`, and a reused entry keeps its
+    `/P` when the widget's `/P` is not that page. Each field stored inline in the `/Parent` of a
     page widget or of such a field is replaced the same way, reusing an entry
     of its own container that has its `/T` and lists the child in `/Kids`.
     A reused entry is updated with `_merge_inline`, so references to it, such
@@ -984,7 +986,6 @@ def _share_inline_widget(
     on_pages, claimed = excluded
     parent = get_dictionary(widget, Parent)
     container = get_array(parent, Kids) if parent is not None else root_fields
-    pages = [page, widget.raw_get(P)] if P in widget else [page]
 
     def is_candidate(copy: object) -> bool:
         return (
@@ -998,7 +999,7 @@ def _share_inline_widget(
         container,
         widget,
         [
-            lambda copy: is_candidate(copy) and copy.get(P) in pages,
+            lambda copy: is_candidate(copy) and copy.get(P) == page,
             lambda copy: is_candidate(copy) and get_dictionary(copy, P) is None,
         ],
         claimed,
@@ -1007,7 +1008,11 @@ def _share_inline_widget(
         reference = writer._add_object(widget)  # type: ignore[attr-defined] # noqa: SLF001 # pylint: disable=W0212
         container.append(reference)
     else:
-        _merge_inline(cast(DictionaryObject, reference.get_object()), widget)
+        _merge_inline(
+            cast(DictionaryObject, reference.get_object()),
+            widget,
+            () if widget.get(P) == page else (P,),
+        )
 
     claimed.add(reference.idnum)
     return reference
@@ -1087,7 +1092,8 @@ def _merge_inline(
     object lacks, such as actions added to the field. When both have an
     additional-actions (`/AA`) dictionary, the copy gets a new one with the
     triggers of both, taking the inline object's action for a trigger both
-    have.
+    have. Null entries are treated as absent, as ISO 32000-1 specifies, so
+    they don't replace the copy's entries or triggers.
 
     Args:
         copy (DictionaryObject): The reused entry, updated in place.
@@ -1096,12 +1102,30 @@ def _merge_inline(
     """
     actions = get_dictionary(copy, AA)
     inline_actions = get_dictionary(obj, AA)
-    copy.update({key: obj.raw_get(key) for key in obj if key not in skip})
+    copy.update(
+        {key: value for key, value in _get_entries(obj).items() if key not in skip}
+    )
     if actions is not None and inline_actions is not None:
         copy[NameObject(AA)] = DictionaryObject(
-            {trigger: actions.raw_get(trigger) for trigger in actions}
-            | {trigger: inline_actions.raw_get(trigger) for trigger in inline_actions}
+            _get_entries(actions) | _get_entries(inline_actions)
         )
+
+
+def _get_entries(obj: DictionaryObject) -> dict:
+    """
+    Gets the entries of a dictionary that are not null.
+
+    Args:
+        obj (DictionaryObject): The dictionary.
+
+    Returns:
+        dict: Its keys and raw values, without entries whose value is null.
+    """
+    return {
+        key: obj.raw_get(key)
+        for key in obj
+        if not isinstance(obj.raw_get(key).get_object(), NullObject)
+    }
 
 
 def _find_copy(
