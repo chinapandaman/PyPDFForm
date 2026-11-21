@@ -3,8 +3,8 @@
 Prepare PDF output and publish serialized PDFs to filesystem paths.
 
 Preparation helpers manage appearance streams and the /NeedAppearances flag,
-and rebuild the AcroForm `/Fields` array from page widget annotations before
-`PdfWrapper.read()` returns the final bytes.
+and add the fields of page widget annotations to the AcroForm `/Fields` array
+before `PdfWrapper.read()` returns the final bytes.
 
 For path output, `write_path()` writes serialized bytes to a sibling temporary
 file and closes it before atomic replacement. It follows symlinks, preserves
@@ -32,7 +32,6 @@ from .constants import (
     Subtype,
     Widget,
 )
-from .template import get_widget_key
 
 
 def write_path(dest: str | bytes | os.PathLike, content: bytes) -> None:
@@ -119,7 +118,7 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
         with Pdf.open(BytesIO(result)) as f, catch_warnings():
             filterwarnings(
                 "ignore", message=".*/AcroForm.*"
-            )  # handled by rebuild_acroform_fields
+            )  # handled by sync_acroform_fields
 
             f.generate_appearance_streams()
             with BytesIO() as r:
@@ -130,32 +129,29 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     return result
 
 
-def rebuild_acroform_fields(
-    pdf: bytes, widget_keys: set, use_full_widget_name: bool
-) -> bytes:
+def sync_acroform_fields(pdf: bytes) -> bytes:
     """
-    Rebuilds the AcroForm `/Fields` array from matching page annotations.
+    Adds the fields of page widget annotations to the AcroForm `/Fields` array.
 
-    The existing `/Fields` array is replaced, creating an AcroForm dictionary
-    when necessary. Only widget annotations are resolved to a widget key, and
-    those whose keys are present in `widget_keys` contribute their
-    top-level field object to the new array. Page annotation arrays are left
-    unchanged. When no matching page annotations are found, the original PDF
-    stream is returned unchanged to avoid an unnecessary rewrite.
+    Operations such as creating fields, merging, and splitting pages add cloned
+    widget annotations to pages without listing their fields in the catalog.
+    This function lists the top-level field of every widget annotation on a
+    page, in page order, followed by every other entry the `/Fields` array
+    already had, in their original order. Entries are never removed, so fields
+    without a widget on a page, such as hidden fields or fields of widget types
+    PyPDFForm does not support, are preserved. Removing fields is left to
+    explicit operations such as `remove_widgets_by_keys`. An AcroForm
+    dictionary is created when necessary. When no page has a widget
+    annotation, the original PDF stream is returned unchanged to avoid an
+    unnecessary rewrite.
 
     Args:
-        pdf (bytes): The PDF stream whose AcroForm fields should be rebuilt.
-        widget_keys (set): Widget keys to include in the rebuilt `/Fields` array.
-        use_full_widget_name (bool): Whether to resolve annotations using their
-            full widget names, including parent names.
+        pdf (bytes): The PDF stream whose AcroForm fields should be updated.
 
     Returns:
-        bytes: The PDF stream with a rebuilt AcroForm `/Fields` array, or the
-            original stream when there are no matching widgets to rebuild.
+        bytes: The PDF stream with an updated AcroForm `/Fields` array, or the
+            original stream when no page has a widget annotation.
     """
-    if not widget_keys:
-        return pdf
-
     writer = PdfWriter(BytesIO(pdf))
     root = writer._root_object  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 
@@ -163,11 +159,7 @@ def rebuild_acroform_fields(
     seen_fields = set()
     for page in writer.pages:
         for annot in page.get(Annots, []):
-            annotation = annot.get_object()
-            if (
-                annotation.get(Subtype) != Widget
-                or get_widget_key(annotation, use_full_widget_name) not in widget_keys
-            ):
+            if annot.get_object().get(Subtype) != Widget:
                 continue
             field_ref = _get_root_field_reference(writer, annot)
             field_key = _field_reference_key(field_ref)
@@ -180,6 +172,11 @@ def rebuild_acroform_fields(
 
     if AcroForm not in root:
         root[NameObject(AcroForm)] = DictionaryObject({})
+    for field_ref in root[AcroForm].get(Fields, ArrayObject()).get_object():
+        field_key = _field_reference_key(field_ref)
+        if field_key not in seen_fields:
+            fields.append(field_ref)
+            seen_fields.add(field_key)
     root[AcroForm][NameObject(Fields)] = fields
 
     with BytesIO() as f:

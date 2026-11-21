@@ -57,12 +57,14 @@ def test_schema(sample_template_with_full_key):
     assert "0" not in obj.schema
 
 
-def test_remove_fields(sample_template_with_full_key):
+def test_remove_fields(sample_template_with_full_key, assert_catalog_fields):
     obj = PdfWrapper(sample_template_with_full_key, use_full_widget_name=True)
     obj.remove_fields(["Gain de 2 classes.0"])
 
     assert "Gain de 2 classes.0" not in obj.widgets
     assert "0" not in obj.widgets
+    # the parent field is removed with its only child
+    assert_catalog_fields(obj.read(), list(obj.widgets))
 
 
 def test_merge(full_name_forms):

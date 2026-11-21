@@ -11,6 +11,7 @@ either the requested output path or the original file.
 import typer
 
 from .. import PdfWrapper
+from ..lib.template import get_field_keys
 from .common import FIELD_NAMES, INPUT_PDF, OPTIONAL_OUTPUT_PDF, get_widget
 
 remove_cli = typer.Typer(
@@ -32,9 +33,10 @@ def field(
     Remove one or more named form fields from an existing PDF.
 
     The command loads the PDF with the global CLI options stored in `ctx.obj`,
-    validates each requested field name before changing the document, removes
-    the fields through `PdfWrapper.remove_fields`, and writes the modified PDF
-    to the requested output path or back to the input file.
+    validates that each requested name matches a form field, including fields
+    without a widget on any page, before changing the document, removes the
+    fields through `PdfWrapper.remove_fields`, and writes the modified PDF to
+    the requested output path or back to the input file.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
@@ -48,7 +50,13 @@ def field(
         typer.BadParameter: Raised when any requested field does not exist.
     """
     obj = PdfWrapper(str(pdf), **ctx.obj)
-    for field_name in fields:
-        get_widget(obj, field_name, "--field")
+    missing = [field_name for field_name in fields if field_name not in obj.widgets]
+    if missing:
+        field_keys = get_field_keys(
+            pdf.read_bytes(), getattr(obj, "use_full_widget_name")
+        )
+        for field_name in missing:
+            if field_name not in field_keys:
+                get_widget(obj, field_name, "--field")
 
     obj.remove_fields(fields).write(output or pdf)

@@ -24,17 +24,25 @@ from pypdf.generic import (
 
 from .annotations import AnnotationTypes, LinkAnnotation
 from .constants import (
+    CO,
     COMB,
     JS,
     MULTILINE,
     READ_ONLY,
     REQUIRED,
+    AcroForm,
     Annots,
     Dest,
+    Fields,
     JavaScript,
+    Kids,
     OpenAction,
+    Parent,
     S,
+    Subtype,
+    T,
     Title,
+    Widget,
 )
 from .middleware import WIDGET_TYPES
 from .middleware.checkbox import Checkbox
@@ -587,46 +595,234 @@ def remove_widgets_by_keys(
     pdf: bytes, keys: List[str], use_full_widget_name: bool = False
 ) -> bytes:
     """
-    Removes specific widgets from a PDF by their keys.
+    Removes the form fields with the given keys from a PDF.
 
-    This function removes any widget annotation whose key matches one of the
-    provided keys. If no keys are provided, the original PDF stream is returned
-    unchanged.
+    A key matches a widget annotation on a page, or a terminal field anywhere
+    in the AcroForm field tree, including fields without a widget on any page,
+    using the same key rules as `build_widgets`. Matching widgets, and widgets
+    of matching fields, are removed from page `/Annots` arrays, and the other
+    annotations keep their references. Matching fields and widgets are then
+    detached from the field tree with `detach_field`, and every detached field
+    is removed from the AcroForm `/CO` calculation order, which is deleted
+    when it becomes empty. Detached objects are no longer form fields, but
+    other objects that refer to them, such as form actions, are not changed.
+    If no keys are provided, the original PDF stream is returned unchanged.
 
     Args:
-        pdf (bytes): The PDF stream to remove widgets from.
-        keys (List[str]): A list of widget keys to remove.
-        use_full_widget_name (bool): Whether to match widgets by their full
+        pdf (bytes): The PDF stream to remove fields from.
+        keys (List[str]): A list of field keys to remove.
+        use_full_widget_name (bool): Whether to match fields by their full
             names, including parent names.
 
     Returns:
-        bytes: The updated PDF stream with the matching widgets removed.
+        bytes: The updated PDF stream with the matching fields removed.
     """
     if not keys:
         return pdf
 
     key_set = set(keys)
     writer = PdfWriter(BytesIO(pdf))
+    acroform = cast(
+        DictionaryObject,
+        writer.root_object.get(AcroForm, DictionaryObject()).get_object(),
+    )
+
+    matched = {
+        id(field): field
+        for field in _get_terminal_fields(acroform)
+        if get_widget_key(field, use_full_widget_name) in key_set
+    }
 
     for page in writer.pages:
-        needs_update = False
+        annots = page.get(Annots, ArrayObject()).get_object()
         page_annots = ArrayObject([])
-
-        for annot in page.get(Annots, []):
-            annot = cast(DictionaryObject, annot.get_object())
-            key = get_widget_key(annot.get_object(), use_full_widget_name)
-            if key not in key_set:
-                page_annots.append(annot)
+        for reference in annots:
+            annot = reference.get_object()
+            if (
+                isinstance(annot, DictionaryObject)
+                and annot.get(Subtype) == Widget
+                and (
+                    get_widget_key(annot, use_full_widget_name) in key_set
+                    or _has_ancestor_in(annot, matched)
+                )
+            ):
+                matched.setdefault(id(annot), annot)
             else:
-                needs_update = True
+                page_annots.append(reference)
 
-        if needs_update:
+        if len(page_annots) != len(annots):
             page[NameObject(Annots)] = page_annots
+
+    detached = {}
+    for field in matched.values():
+        if not _has_ancestor_in(field, matched):
+            detached.update((id(each), each) for each in detach_field(writer, field))
+
+    if CO in acroform:
+        calculation_order = cast(ArrayObject, acroform[CO])
+        calculation_order[:] = [
+            reference
+            for reference in calculation_order
+            if not _is_detached(reference.get_object(), detached)
+        ]
+        if not calculation_order:
+            del acroform[CO]
 
     with BytesIO() as f:
         writer.write(f)
         f.seek(0)
         return f.read()
+
+
+def get_field_keys(pdf: bytes, use_full_widget_name: bool) -> set:
+    """
+    Gets the keys of the terminal fields in a PDF's AcroForm field tree.
+
+    Keys follow the same rules as `build_widgets`, but fields without a widget
+    on any page, which `build_widgets` does not list, are included.
+
+    Args:
+        pdf (bytes): The PDF stream to read.
+        use_full_widget_name (bool): Whether to use full names, including
+            parent names, as keys.
+
+    Returns:
+        set: The keys of the terminal fields.
+    """
+    reader = PdfReader(BytesIO(pdf))
+    acroform = cast(
+        DictionaryObject,
+        reader.root_object.get(AcroForm, DictionaryObject()).get_object(),
+    )
+
+    return {
+        get_widget_key(field, use_full_widget_name)
+        for field in _get_terminal_fields(acroform)
+    }
+
+
+def _get_terminal_fields(acroform: DictionaryObject) -> List[DictionaryObject]:
+    """
+    Collects the terminal fields of an AcroForm field tree.
+
+    A terminal field has no `/Kids`, or only kids without a `/T`, which are its
+    widget annotations. Other fields are walked into, and each object is
+    visited once.
+
+    Args:
+        acroform (DictionaryObject): The AcroForm dictionary.
+
+    Returns:
+        List[DictionaryObject]: The terminal fields, in tree order.
+    """
+    result = []
+    stack = list(reversed(acroform.get(Fields, ArrayObject()).get_object()))
+    seen = set()
+    while stack:
+        field = stack.pop().get_object()
+        if isinstance(field, DictionaryObject) and id(field) not in seen:
+            seen.add(id(field))
+            kids = field.get(Kids, ArrayObject()).get_object()
+            if any(
+                isinstance(kid.get_object(), DictionaryObject) and T in kid.get_object()
+                for kid in kids
+            ):
+                stack.extend(reversed(kids))
+            else:
+                result.append(field)
+
+    return result
+
+
+def _has_ancestor_in(
+    obj: DictionaryObject, objects: Dict[int, DictionaryObject]
+) -> bool:
+    """
+    Checks whether any object along the `/Parent` chain of an object is listed.
+
+    Args:
+        obj (DictionaryObject): A field or widget annotation.
+        objects (Dict[int, DictionaryObject]): Objects keyed by their `id`.
+
+    Returns:
+        bool: True if an ancestor of `obj` is in `objects`.
+    """
+    seen = {id(obj)}
+    node = _get_parent(obj)
+    while isinstance(node, DictionaryObject) and id(node) not in seen:
+        if id(node) in objects:
+            return True
+        seen.add(id(node))
+        node = _get_parent(node)
+
+    return False
+
+
+def _get_parent(obj: DictionaryObject) -> object:
+    """
+    Gets the resolved `/Parent` of an object.
+
+    Args:
+        obj (DictionaryObject): A field or widget annotation.
+
+    Returns:
+        object: The resolved parent, or None when there is none.
+    """
+    parent = obj.get(Parent)
+    return parent.get_object() if parent is not None else None
+
+
+def _is_detached(obj: object, detached: Dict[int, DictionaryObject]) -> bool:
+    """
+    Checks whether an object or one of its ancestors was detached.
+
+    Args:
+        obj (object): A resolved object, such as a `/CO` entry.
+        detached (Dict[int, DictionaryObject]): Detached objects keyed by `id`.
+
+    Returns:
+        bool: True if `obj` is a detached field or widget, or a descendant of one.
+    """
+    return id(obj) in detached or (
+        isinstance(obj, DictionaryObject) and _has_ancestor_in(obj, detached)
+    )
+
+
+def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryObject]:
+    """
+    Detaches a field or widget and its emptied ancestors from the AcroForm tree.
+
+    The object is removed from its parent's `/Kids`, or from the AcroForm's
+    root `/Fields` array when it has no parent. A parent left without kids is
+    detached the same way, stopping at the first parent with remaining kids.
+    Resolved objects are compared by identity so unrelated fields with the
+    same name keep their references. Page annotations are not changed.
+
+    Args:
+        writer (PdfWriter): The PDF writer that owns the field tree.
+        field (DictionaryObject): The field or widget annotation to detach.
+
+    Returns:
+        List[DictionaryObject]: The detached objects: `field` followed by each
+            emptied ancestor.
+    """
+    result = [field]
+    while Parent in field:
+        parent = cast(DictionaryObject, field[Parent])
+        kids = cast(ArrayObject, parent.get(Kids, ArrayObject()).get_object())
+        kids[:] = [kid for kid in kids if kid.get_object() is not field]
+        if kids or any(parent is each for each in result):
+            return result
+        field = parent
+        result.append(field)
+
+    acroform = writer.root_object.get(AcroForm, DictionaryObject()).get_object()
+    fields = cast(ArrayObject, acroform.get(Fields, ArrayObject()).get_object())
+    fields[:] = [
+        reference for reference in fields if reference.get_object() is not field
+    ]
+
+    return result
 
 
 def update_widget_keys(
