@@ -522,28 +522,44 @@ def _remove_action_targets(
     for key in stopped:
         _make_no_op(actions.following[key][0])
 
-    acting = {
-        key for key, (action, _) in actions.following.items() if not _is_no_op(action)
-    }
-    _delete_entries(
-        actions,
-        _get_reaching(actions.following, stopped)
-        - _get_reaching(actions.following, acting),
+    live = _get_reaching(
+        actions.following,
+        {
+            key
+            for key, (action, _) in actions.following.items()
+            if not _is_no_op(action)
+        },
     )
+    _delete_entries(actions, _get_reaching(actions.following, stopped) - live, live)
 
 
-def _delete_entries(actions: _FormActions, inert: set) -> None:
+def _delete_entries(actions: _FormActions, inert: set, live: set) -> None:
     """
     Deletes the entries whose action is in a set.
 
     An `/A` entry that would let another entry act instead is kept, as
-    described in `_overrides_other_entry`. An `/AA` dictionary left without
+    described in `_overrides_other_entry`. When an `/AA` `/U` trigger is
+    deleted, the `/A` of the same dictionary is deleted too if none of the
+    actions it reaches act, so that a no-op kept for that trigger by an
+    earlier removal doesn't outlive it. An `/AA` dictionary left without
     triggers is deleted too.
 
     Args:
         actions (_FormActions): The actions, found before removal.
         inert (set): The `id` of each action whose entries are deleted.
+        live (set): The `id` of each action that acts, or from which one
+            that acts can be reached through `/Next`.
     """
+    inert = set(inert)
+    for triggers, owners in actions.additional.values():
+        released = _get_entry(triggers, U)
+        if released is None or id(released) not in inert:
+            continue
+        for owner in owners:
+            action = _get_entry(owner, A)
+            if isinstance(action, DictionaryObject) and id(action) not in live:
+                inert.add(id(action))
+
     emptied = set()
     for container, key in actions.entries:
         if id(container[key]) in inert and not _overrides_other_entry(

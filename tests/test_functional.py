@@ -3366,6 +3366,32 @@ def test_remove_fields_actions_in_separate_calls(template_stream, separately):
         assert "/OpenAction" not in pdf.Root
 
 
+@pytest.mark.parametrize("separately", [False, True])
+def test_remove_fields_overriding_action_in_separate_calls(template_stream, separately):
+    # an /A kept only for the /AA /U it takes precedence over goes with it
+    def add(pdf, fields):
+        button = _get_button(pdf)
+        button.A = _build_action(("reset", None), fields["test"])
+        button.AA = Dictionary(
+            U=Dictionary(S=Name.ResetForm, Fields=Array([fields["check"]]))
+        )
+
+    obj = PdfWrapper(_with_actions(template_stream, add))
+    if separately:
+        with Pdf.open(BytesIO(obj.remove_fields(["test"]).read())) as pdf:
+            button = _get_button(pdf)
+            assert _describe_actions(button.A) == ["/Hide"]
+            assert _describe_actions(button.AA.U) == ["/ResetForm"]
+        obj.remove_fields(["check"])
+    else:
+        obj.remove_fields(["test", "check"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        button = _get_button(pdf)
+        assert "/A" not in button
+        assert "/AA" not in button
+
+
 def test_remove_fields_long_action_chain(template_stream):
     # more removed actions in one chain than Python's recursion limit. The
     # last action is indirect too, since pypdf 6.19 can't clone an indirect
