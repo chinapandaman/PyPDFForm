@@ -680,11 +680,9 @@ def get_required_version(pdf: bytes) -> str | None:
                     stack.append(value)
                     if key not in _FEATURE_KEYS:
                         continue
-                    version = _get_feature_version(key, value.get_object())
-                    if (_version_number(version) or ()) > (
-                        _version_number(result) or ()
-                    ):
-                        result = version
+                    result = get_newest_version(
+                        [result, _get_feature_version(key, value.get_object())]
+                    )
     except PyPdfError:
         return None
 
@@ -729,6 +727,25 @@ def get_output_version(
         return version
 
     return required
+
+
+def get_newest_version(versions: Sequence[str | None]) -> str | None:
+    """
+    Gets the newest of several PDF versions.
+
+    Args:
+        versions (Sequence[str | None]): The PDF version strings. None and
+            versions that are not made of numbers are ignored.
+
+    Returns:
+        str | None: The newest version, or None when none can be compared.
+    """
+
+    return max(
+        (version for version in versions if _version_number(version) is not None),
+        key=lambda version: _version_number(version) or (),
+        default=None,
+    )
 
 
 def can_need_newer_version(version: str | None) -> bool:

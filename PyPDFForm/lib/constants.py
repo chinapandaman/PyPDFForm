@@ -195,6 +195,8 @@ URI = "/URI"
 CA = "/CA"
 ca = "/ca"
 FEATURE_VERSIONS_BY_KEY = {
+    # an annotation's title; fields, Hide actions, and threads are 1.1 or later
+    T: "1.1",
     FontFile2: "1.1",
     OpenAction: "1.1",
     AcroForm: "1.2",
@@ -216,6 +218,18 @@ FEATURE_VERSIONS_BY_FIELD_TYPE = {Sig: "1.3"}
 TITLE_VERSION = "1.1"  # the title in the document information dictionary
 ALPHA_VERSION = "1.4"  # a numeric /CA or /ca, for constant opacity
 COMB_VERSION = "1.5"  # also RadiosInUnison, the same bit for radio buttons
+# widget property hooks that add a feature above, which PdfWrapper.version
+# counts while they are queued, without applying them
+FEATURE_VERSIONS_BY_HOOK = {
+    "update_text_field_comb": COMB_VERSION,
+    "update_field_tooltip": FEATURE_VERSIONS_BY_KEY[TU],
+    "update_field_on_hovered_over_javascript": FEATURE_VERSIONS_BY_ACTION[JavaScript],
+    "update_field_on_hovered_off_javascript": FEATURE_VERSIONS_BY_ACTION[JavaScript],
+    "update_field_on_mouse_pressed_javascript": FEATURE_VERSIONS_BY_ACTION[JavaScript],
+    "update_field_on_mouse_released_javascript": FEATURE_VERSIONS_BY_ACTION[JavaScript],
+    "update_field_on_focused_javascript": FEATURE_VERSIONS_BY_ACTION[JavaScript],
+    "update_field_on_blurred_javascript": FEATURE_VERSIONS_BY_ACTION[JavaScript],
+}
 # no feature above needs a newer version, so newer documents are never raised
 NEWEST_FEATURE_VERSION = max(
     [

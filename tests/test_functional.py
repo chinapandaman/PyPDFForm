@@ -34,9 +34,10 @@ from PyPDFForm import (
     RawElements,
 )
 from PyPDFForm.cli.root import cli_app
-from PyPDFForm.lib import egress
+from PyPDFForm.lib import egress, hooks
 from PyPDFForm.lib.constants import (
     DA,
+    FEATURE_VERSIONS_BY_HOOK,
     UNIQUE_SUFFIX_LENGTH,
     AcroForm,
     T,
@@ -49,6 +50,7 @@ from PyPDFForm.lib.deprecation import deprecation_notice
 from PyPDFForm.lib.middleware.base import Widget
 from PyPDFForm.lib.middleware.checkbox import Checkbox
 from PyPDFForm.lib.middleware.radio import Radio
+from PyPDFForm.lib.middleware.text import Text
 from PyPDFForm.lib.template import get_widget_key, get_widgets_by_page
 from PyPDFForm.lib.utils import (
     get_output_version,
@@ -865,6 +867,7 @@ def _blank_pdf(version):
         ({"/Subtype": NameObject("/StrikeOut")}, "1.3"),
         ({"/Subtype": NameObject("/Squiggly")}, "1.4"),
         ({"/Subtype": NameObject("/Text")}, None),
+        ({"/T": TextStringObject("Reviewer")}, "1.1"),
         ({"/Subtype": DictionaryObject()}, None),
         ({"/SMask": NameObject("/None")}, "1.4"),
         ({"/CA": FloatObject(0.5)}, "1.4"),
@@ -953,6 +956,14 @@ def test_output_version(version, baseline, required, expected):
         (
             "1.0",
             lambda obj, font, image: setattr(obj, "title", "My PDF"),
+            "1.1",
+            "1.1",
+        ),
+        (
+            "1.0",
+            lambda obj, font, image: obj.annotate(
+                [Annotations.TextAnnotation(1, 10, 10, title="Reviewer")]
+            ),
             "1.1",
             "1.1",
         ),
@@ -1053,6 +1064,7 @@ def test_output_version(version, baseline, required, expected):
         "text_annotation",
         "draw_text",
         "title",
+        "text_annotation_title",
         "uri_link",
         "text_field",
         "register_font",
@@ -1119,6 +1131,69 @@ def test_change_version_kept_for_existing_features():
     assert obj.version == "1.3"
     assert obj.read().startswith(b"%PDF-1.3")
     assert obj.pages[0].read().startswith(b"%PDF-1.3")
+
+
+@pytest.mark.parametrize("option", ["need_appearances", "generate_appearance_streams"])
+def test_change_version_kept_for_output_options(option):
+    # without a change, the AcroForm that read() adds for the option raises 1.1
+    assert PdfWrapper(_blank_pdf("1.1"), **{option: True}).version == "1.2"
+
+    obj = PdfWrapper(_blank_pdf("1.7"), **{option: True}).change_version("1.1")
+    assert obj.version == "1.1"
+    assert obj.read().startswith(b"%PDF-1.1")
+    assert obj.pages[0].read().startswith(b"%PDF-1.1")
+
+    obj.annotate([Annotations.RubberStampAnnotation(1, 10, 10)])
+    assert obj.version == "1.3"
+    assert obj.read().startswith(b"%PDF-1.3")
+
+
+@pytest.mark.parametrize("version", ["1.7", "1.4"])
+def test_version_keeps_pending_widget_changes(template_stream, version):
+    stream = _without_default_appearance(template_stream, "test")
+    obj = PdfWrapper(set_version(stream, get_version(stream), version))
+    assert obj.version == version
+
+    obj.widgets["test"].font_size = 20
+    assert obj.version == version
+    assert obj.widgets["test"].font_size == 20
+    assert obj.widgets["test"].hooks_to_trigger
+
+    # the font size can't be set without a default appearance
+    with pytest.raises(KeyError):
+        obj.read()
+
+
+@pytest.mark.parametrize(
+    ("template_version", "name", "value", "expected"),
+    [
+        ("1.2", "tooltip", "tooltip", "1.3"),
+        ("1.2", "on_hovered_over_javascript", "app.alert('over');", "1.3"),
+        ("1.2", "on_blurred_javascript", "app.alert('blurred');", "1.3"),
+        ("1.4", "max_length", 4, "1.4"),
+        ("1.4", "comb", True, "1.5"),
+        ("1.4", "comb", False, "1.4"),
+    ],
+)
+def test_version_counts_pending_widget_changes(template_version, name, value, expected):
+    obj = PdfWrapper(_blank_pdf(template_version)).bulk_create_fields(
+        [Fields.TextField("name", 1, 50, 50, max_length=4)]
+    )
+    setattr(obj.widgets["name"], name, value)
+    assert obj.version == expected
+    assert obj.widgets["name"].hooks_to_trigger
+
+    assert obj.read().startswith(f"%PDF-{expected}".encode())
+    assert obj.version == expected
+
+
+def test_pending_feature_hooks_are_widget_hooks():
+    hook_names = set(
+        Text("name").SET_ATTR_TRIGGER_HOOK_MAP.values()
+    )  # including those of every widget
+    for hook in FEATURE_VERSIONS_BY_HOOK:
+        assert hook in hook_names
+        assert callable(getattr(hooks, hook))
 
 
 def test_fill_font_color(

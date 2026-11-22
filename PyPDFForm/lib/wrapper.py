@@ -42,6 +42,7 @@ from .adapter import (
     fp_or_f_obj_or_stream_to_stream,
     readable,
 )
+from .constants import FEATURE_VERSIONS_BY_HOOK
 from .coordinate import generate_coordinate_grid
 from .deprecation import reject_unsupported_kwargs
 from .egress import (
@@ -74,6 +75,7 @@ from .utils import (
     can_need_newer_version,
     generate_unique_suffix,
     generic_merge,
+    get_newest_version,
     get_output_version,
     get_page_streams,
     get_required_version,
@@ -510,12 +512,21 @@ class PdfWrapper:
         such as a form field added to a PDF 1.1 document. A header that already
         understates the template's own content is kept. When the template has no
         supported header, the version is read from the current PDF stream instead.
+        Pending widget changes are not applied, but those that add a newer
+        feature, such as a comb text field, a tooltip, or widget JavaScript, are
+        counted while they are queued.
 
         Returns:
             str | None: The PDF version as a string, or None if the version cannot be determined.
         """
 
-        return self._serialize()[1]
+        version = (
+            self._version if self._version is not None else get_version(self._stream)
+        )
+        if not can_need_newer_version(version):
+            return version
+
+        return self._choose_version(self._egress(self._stream), version)
 
     def _recorded_version(self) -> str | None:
         """
@@ -647,19 +658,28 @@ class PdfWrapper:
             bytes: The processed PDF document content as a byte string.
         """
 
-        return self._serialize()[0]
+        result = self._egress(self._read())
+        version = self._choose_version(result, self._recorded_version())
+        if version:
+            result = set_version(result, get_version(result), version)
+        return result
 
-    def _serialize(self) -> tuple[bytes, str | None]:
+    def _egress(self, stream: bytes) -> bytes:
         """
-        Produces the output of `read()` and the PDF version in its header.
+        Applies the egress steps of `read()` to a PDF stream, except its version.
+
+        These are the appearance handling for `need_appearances` and the update
+        of the AcroForm `/Fields` array. The wrapper is not changed.
+
+        Args:
+            stream (bytes): The PDF stream, such as the wrapper's stored stream.
 
         Returns:
-            tuple[bytes, str | None]: The processed PDF stream, and the PDF
-                version written into its header, or None when no version was
-                written.
+            bytes: The processed PDF stream, with the header of the last PDF
+                writer that rewrote it.
         """
 
-        result = self._read()
+        result = stream
         if getattr(self, "need_appearances") and result:
             if self._fonts_without_metrics:
                 result = add_font_metrics(
@@ -669,17 +689,43 @@ class PdfWrapper:
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
 
-        version = None
-        if result:
-            result = sync_acroform_fields(result)
-            version = self._recorded_version()
-            if can_need_newer_version(version):
-                version = get_output_version(
-                    version, self._baseline_version, get_required_version(result)
-                )
-            if version:
-                result = set_version(result, get_version(result), version)
-        return result, version
+        return sync_acroform_fields(result) if result else result
+
+    def _choose_version(self, output: bytes, version: str | None) -> str | None:
+        """
+        Chooses the PDF version to write into the header of an egress output.
+
+        Queued widget changes that add a feature in the feature tables count as
+        if they had been applied, so `version` can be chosen without applying
+        them.
+
+        Args:
+            output (bytes): The output of `_egress`.
+            version (str | None): The recorded PDF version.
+
+        Returns:
+            str | None: `version`, raised for the newer features that operations
+                added, or None for an empty output.
+        """
+
+        if not output:
+            return None
+
+        if can_need_newer_version(version):
+            # widget changes that read() would apply; `_read()` leaves none
+            pending = [
+                FEATURE_VERSIONS_BY_HOOK[hook]
+                for widget in self.widgets.values()
+                for hook, value in widget.hooks_to_trigger
+                if value and hook in FEATURE_VERSIONS_BY_HOOK
+            ]
+            return get_output_version(
+                version,
+                self._baseline_version,
+                get_newest_version([get_required_version(output), *pending]),
+            )
+
+        return version
 
     def _read(self) -> bytes:
         """
@@ -769,8 +815,10 @@ class PdfWrapper:
         The method replaces the PDF header version marker of the current stream, which
         an earlier operation's PDF writer may have set to its own default, and updates
         the version that `read()` writes into its output. The version is kept for the
-        content the document has now, even if that content requires a newer version,
-        and later operations that add a newer feature raise it again. It does not
+        content the document has now, including what `read()` adds for the wrapper's
+        current options, such as an AcroForm for `need_appearances`, even if that
+        content requires a newer version. Later operations, and options enabled
+        later, that add a newer feature raise it again. It does not
         otherwise validate or rewrite the document for version-specific compatibility.
 
         Args:
@@ -788,7 +836,7 @@ class PdfWrapper:
             self._stream = updated_stream
             self._version = version
             self._baseline_version = (
-                get_required_version(updated_stream)
+                get_required_version(self._egress(updated_stream))
                 if can_need_newer_version(version)
                 else None
             )
