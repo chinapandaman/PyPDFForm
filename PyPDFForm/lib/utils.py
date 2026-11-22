@@ -365,7 +365,8 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
 
     Nested dictionaries delegate to `find_pattern_match`. Tuple pattern values
     support matching any listed value, and a tuple containing ``"/"`` also
-    matches PDF names with arbitrary slash-prefixed values.
+    matches PDF names with arbitrary slash-prefixed values. Callable pattern
+    values are predicates called with the widget value.
 
     Args:
         pattern_value (Any): The value from the pattern.
@@ -379,6 +380,9 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
     ):
         return find_pattern_match(pattern_value, widget_value)
 
+    if callable(pattern_value):
+        return bool(pattern_value(widget_value))
+
     if isinstance(pattern_value, tuple):
         if widget_value in pattern_value:
             return True
@@ -387,31 +391,23 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
     return pattern_value == widget_value
 
 
-def find_pattern_match(
-    pattern: dict | Callable[[Any], Any], widget: dict | DictionaryObject
-) -> bool:
+def find_pattern_match(pattern: dict, widget: dict | DictionaryObject) -> bool:
     """
     Recursively finds a pattern match within a PDF widget (annotation dictionary).
 
     This function searches for a specific pattern within a PDF widget's
     properties. It checks the widget's immediate keys and recursively descends
     only when the pattern value and widget value are both dictionary-like.
-    A match is found as soon as any requested key/value pair matches. A
-    callable pattern is a predicate called with the widget itself, for a
-    property that isn't read from one key, such as an inherited flag.
+    A match is found as soon as any requested key/value pair matches.
 
     Args:
-        pattern (dict | Callable[[Any], Any]): The pattern to search for,
-            represented as a dictionary or a predicate.
+        pattern (dict): The pattern to search for, represented as a dictionary.
         widget (dict | DictionaryObject): The widget to search within, which
             can be a dictionary or a DictionaryObject.
 
     Returns:
         bool: True if a match is found, False otherwise.
     """
-    if callable(pattern):
-        return bool(pattern(widget))
-
     for key, value in widget.items():
         if key in pattern and _is_value_match(pattern[key], value.get_object()):
             return True

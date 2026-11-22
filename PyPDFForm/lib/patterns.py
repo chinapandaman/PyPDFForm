@@ -134,8 +134,9 @@ WIDGET_TYPE_PATTERNS = [
             {Subtype: Widget},
             {Parent: {FT: Btn}},
             {AS: (Yes, Off)},
-            # the radio flag can be inherited from any field above the widget
-            lambda widget: check_field_flag(widget, RADIO),
+            # the radio flag is resolved from the shared field and its ancestors,
+            # not a widget's own /Ff, so every option of a group has one type
+            {Parent: lambda parent: check_field_flag(parent, RADIO)},
         ),
         Radio,
     ),

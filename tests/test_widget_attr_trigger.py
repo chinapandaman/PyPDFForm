@@ -1218,6 +1218,34 @@ def test_change_flag_of_radio_group_with_inherited_radio_flag(
     assert_widgets_match_output(obj)
 
 
+@pytest.mark.parametrize("local", [0, 1], ids=["first", "last"])
+def test_radio_option_with_own_field_flags(
+    template_with_radiobutton_stream, local, assert_widgets_match_output
+):
+    # one option of "radio_1" has flags of its own, without the radio flag that
+    # its field sets, and the field's /DV is /Off, as a checkbox's can be
+    with Pdf.open(BytesIO(template_with_radiobutton_stream)) as pdf:
+        radio = next(
+            field
+            for field in pdf.Root.AcroForm.Fields
+            if str(field.get("/T")) == "radio_1"
+        )
+        radio.DV = Name.Off
+        radio.Kids[local].Ff = READ_ONLY
+        stream = _save(pdf)
+
+    # every option is classified by its field's flags, whichever comes first
+    obj = PdfWrapper(stream)
+    assert isinstance(obj.widgets["radio_1"], Radio)
+    assert obj.widgets["radio_1"].number_of_options == 2
+
+    obj.widgets["radio_1"].required = True
+    reopened = PdfWrapper(obj.read()).widgets["radio_1"]
+    assert isinstance(reopened, Radio)
+    assert reopened.number_of_options == 2
+    assert_widgets_match_output(obj)
+
+
 @pytest.mark.parametrize(
     ("value", "error"),
     [(String(""), ValueError), (Array([]), TypeError), (Dictionary({}), TypeError)],
