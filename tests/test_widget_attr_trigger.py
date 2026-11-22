@@ -1248,9 +1248,9 @@ def test_radio_option_with_own_field_flags(
 
 
 @pytest.mark.parametrize("radio_flag_on", ["outer", "field"])
-@pytest.mark.parametrize("checkbox_first", [True, False], ids=["first", "last"])
+@pytest.mark.parametrize("position", ["first", "between", "last"])
 def test_radio_group_with_short_name_of_another_field(
-    template_with_radiobutton_stream, radio_flag_on, checkbox_first
+    template_with_radiobutton_stream, radio_flag_on, position
 ):
     # the checkbox "check" and the radio group "outer.group" both have the
     # short name "group", and the radio group's /DV is /Off
@@ -1271,16 +1271,28 @@ def test_radio_group_with_short_name_of_another_field(
         pdf.Root.AcroForm.Fields = Array(
             [field for field in fields if field != radio] + [outer]
         )
-        annots = list(pdf.pages[0].Annots)
-        others = [annot for annot in annots if annot != check]
+        # the checkbox comes before, between, or after the radio group's options
+        options = list(radio.Kids)
+        others = [
+            annot
+            for annot in pdf.pages[0].Annots
+            if annot != check and annot not in options
+        ]
         pdf.pages[0].Annots = Array(
-            [check, *others] if checkbox_first else [*others, check]
+            {
+                "first": [check, *options],
+                "between": [options[0], check, options[1]],
+                "last": [*options, check],
+            }[position]
+            + others
         )
         stream = _save(pdf)
 
-    # the later field replaces the earlier one, as for any widget
+    # the later field replaces the earlier one, as for any widget, and a radio
+    # group keeps the options before the checkbox
+    radio_last = position != "last"
     widget = PdfWrapper(stream).widgets["group"]
-    if checkbox_first:
+    if radio_last:
         assert isinstance(widget, Radio)
         assert widget.number_of_options == 2
     else:
@@ -1293,7 +1305,7 @@ def test_radio_group_with_short_name_of_another_field(
     assert widgets["outer.group"].number_of_options == 2
 
     # filling the name changes only the field it gives access to
-    for value in [0, 1] if checkbox_first else [True]:
+    for value in [0, 1] if radio_last else [True]:
         filled = PdfWrapper(stream).fill({"group": value}).read()
         states = {}
         for annot in PdfReader(BytesIO(filled)).pages[0]["/Annots"]:
@@ -1311,12 +1323,38 @@ def test_radio_group_with_short_name_of_another_field(
                     "/1" if value else "/Off",
                 ],
             }
-            if checkbox_first
+            if radio_last
             else {"group": "/Yes", "outer.group": ["/Off", "/Off"]}
         )
         widgets = PdfWrapper(filled, use_full_widget_name=True).widgets
-        assert widgets["outer.group"].value == (value if checkbox_first else None)
-        assert widgets["group"].value is (None if checkbox_first else True)
+        assert widgets["outer.group"].value == (value if radio_last else None)
+        assert widgets["group"].value is (None if radio_last else True)
+
+
+def test_fill_checkbox_with_own_on_state_again(template_stream):
+    # "check" is unchecked, and its on state is /Custom rather than /Yes
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        check = next(
+            field
+            for field in pdf.Root.AcroForm.Fields
+            if str(field.get("/T")) == "check"
+        )
+        check.AP.N = Dictionary({"/Off": check.AP.N.Off, "/Custom": check.AP.N.Yes})
+        check.AS = Name.Off
+        check.V = Name.Off
+        check.Ff = 0
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    obj.fill({"check": True})
+    widget = _find_widget(obj.read(), "check")
+    assert (widget["/AS"], widget["/V"]) == ("/Custom", "/Custom")
+
+    # the checked state doesn't stop the checkbox from being filled again
+    obj.fill({"check": False})
+    widget = _find_widget(obj.read(), "check")
+    assert (widget["/AS"], widget["/V"]) == ("/Off", "/Off")
+    assert obj.widgets["check"].value is False
 
 
 @pytest.mark.parametrize(

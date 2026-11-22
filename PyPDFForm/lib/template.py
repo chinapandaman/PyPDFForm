@@ -8,10 +8,11 @@ templates. It leverages the pypdf library for PDF manipulation and defines
 specific patterns for identifying and constructing different types of widgets.
 """
 
+from collections import defaultdict
 from copy import deepcopy
 from functools import lru_cache
 from io import BytesIO
-from typing import Dict, List, cast
+from typing import Dict, FrozenSet, List, Tuple, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
@@ -36,6 +37,7 @@ from .constants import (
     S,
     Title,
 )
+from .field_tree import get_full_name
 from .middleware import WIDGET_TYPES
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
@@ -203,14 +205,40 @@ def build_widgets(
         Dict[str, WIDGET_TYPES]: A dictionary of widgets, where keys are widget
             keys and values are widget objects.
     """
-    return deepcopy(_build_widget_cache(pdf_stream, use_full_widget_name))
+    return deepcopy(_build_widget_cache(pdf_stream, use_full_widget_name)[0])
+
+
+def get_shadowed_fields(
+    pdf_stream: bytes, use_full_widget_name: bool
+) -> Dict[str, FrozenSet[str]]:
+    """
+    Gets the fields that a widget key shares with a widget of another type.
+
+    A key, such as the short name `group` of a checkbox `group` and a radio
+    group `outer.group`, gives access only to the widget built for it, which is
+    of one type. The fields of another type with the key are shadowed: filling
+    the key leaves them unchanged. They are identified by their full names, as
+    found when the widgets were built, so that a fill that changes how a field
+    would be classified, such as a checkbox's appearance state, doesn't change
+    which fields the key fills.
+
+    Args:
+        pdf_stream (bytes): The PDF stream to parse.
+        use_full_widget_name (bool): Whether to use the full widget name
+            (including parent names) as the widget key.
+
+    Returns:
+        Dict[str, FrozenSet[str]]: The full names of the shadowed fields, by
+            key, for each key that has any.
+    """
+    return dict(_build_widget_cache(pdf_stream, use_full_widget_name)[1])
 
 
 @lru_cache(maxsize=8)
 def _build_widget_cache(
     pdf_stream: bytes,
     use_full_widget_name: bool,
-) -> Dict[str, WIDGET_TYPES]:
+) -> Tuple[Dict[str, WIDGET_TYPES], Dict[str, FrozenSet[str]]]:
     """
     Builds and caches reusable widget objects from a PDF stream.
 
@@ -223,15 +251,54 @@ def _build_widget_cache(
             (including parent names) as the widget key.
 
     Returns:
-        Dict[str, WIDGET_TYPES]: Cached widget prototypes keyed by widget name.
+        Tuple[Dict[str, WIDGET_TYPES], Dict[str, FrozenSet[str]]]: Cached
+            widget prototypes keyed by widget name, and the full names of the
+            fields each key shadows, as `get_shadowed_fields` returns them.
     """
     results = {}
+    radios = {}
+    found = defaultdict(list)
 
     for page_num, widgets in get_widgets_by_page(pdf_stream).items():
         for widget in widgets:
-            _process_widget(widget, page_num, use_full_widget_name, results)
+            _process_widget(
+                widget, page_num, use_full_widget_name, results, radios, found
+            )
 
-    return results
+    return results, _get_shadowed_fields(results, found)
+
+
+def _get_shadowed_fields(
+    results: Dict[str, WIDGET_TYPES], found: Dict[str, List[tuple]]
+) -> Dict[str, FrozenSet[str]]:
+    """
+    Gets the full names of the fields that each key shadows.
+
+    Args:
+        results (Dict[str, WIDGET_TYPES]): The widgets built, by key.
+        found (Dict[str, List[tuple]]): Each key's widget annotations, with the
+            type each was classified as, in the order they were found.
+
+    Returns:
+        Dict[str, FrozenSet[str]]: For each key with widget annotations of more
+            than one type, the full names of the fields of another type than
+            its widget's. A name that also has an annotation of its widget's
+            type isn't shadowed, so that annotation is still filled.
+    """
+    shadowed = {}
+    for key, annots in found.items():
+        exposed = type(results[key])
+        if all(_type is exposed for _, _type in annots):
+            continue
+
+        names = {
+            get_full_name(annot) for annot, _type in annots if _type is not exposed
+        }
+        names -= {get_full_name(annot) for annot, _type in annots if _type is exposed}
+        if names:
+            shadowed[key] = frozenset(names)
+
+    return shadowed
 
 
 def _process_widget(
@@ -239,6 +306,8 @@ def _process_widget(
     page_number: int,
     use_full_widget_name: bool,
     results: Dict[str, WIDGET_TYPES],
+    radios: Dict[str, Radio],
+    found: Dict[str, List[tuple]],
 ) -> None:
     """
     Processes a single widget and adds it to the results dictionary.
@@ -246,17 +315,23 @@ def _process_widget(
     Common geometry and flags are populated for every recognized widget. Text,
     checkbox, dropdown, and radio widgets then get type-specific state. Radio
     annotations that share a key are aggregated into one middleware object with
-    per-option geometry and a selected option index.
+    per-option geometry and a selected option index. A widget replaces an
+    earlier one with its key, so the key gives access to the last one.
 
     Args:
         widget (dict): The widget dictionary from the PDF.
         page_number (int): The 1-indexed page number the widget appears on.
         use_full_widget_name (bool): Whether to use the full widget name.
         results (Dict[str, WIDGET_TYPES]): The dictionary of widgets being built.
+        radios (Dict[str, Radio]): The radio groups being built, by key, kept
+            when a widget of another type replaces them in `results`.
+        found (Dict[str, List[tuple]]): Each key's widget annotations, with
+            the type each was classified as.
     """
     key = get_widget_key(widget, use_full_widget_name)
     _widget = construct_widget(widget, key)
     if _widget is not None:
+        found[key].append((widget, type(_widget)))
         _populate_common_properties(widget, page_number, _widget)
 
         if isinstance(_widget, Text):
@@ -269,7 +344,8 @@ def _process_widget(
             _populate_dropdown_properties(widget, _widget)
 
         if isinstance(_widget, Radio):
-            _handle_radio_widget(widget, key, _widget, results)
+            _handle_radio_widget(widget, key, _widget, radios)
+            results[key] = radios[key]
         else:
             results[key] = _widget
 
@@ -342,7 +418,7 @@ def _populate_dropdown_properties(widget: dict, _widget: Dropdown) -> None:
 
 
 def _handle_radio_widget(
-    widget: dict, key: str, _widget: Radio, results: Dict[str, WIDGET_TYPES]
+    widget: dict, key: str, _widget: Radio, radios: Dict[str, Radio]
 ) -> None:
     """
     Handles the logic for radio widgets, including aggregating multiple options.
@@ -350,26 +426,26 @@ def _handle_radio_widget(
     Each radio annotation contributes one option to a shared `Radio` object. The
     method stores per-option rectangles as lists, increments the option count for
     schema generation, and records the selected option index when the annotation
-    is currently selected. When the key holds a widget of another type, such as
-    a checkbox with the same short name, a new `Radio` object replaces it, as
-    any widget replaces an earlier one with its key.
+    is currently selected. The group is kept by key apart from the other
+    widgets, so options separated by a widget of another type with the same
+    key, such as a checkbox with the same short name, stay in one group.
 
     Args:
         widget (dict): The widget dictionary from the PDF.
         key (str): The widget key.
         _widget (Radio): The radio widget object.
-        results (Dict[str, WIDGET_TYPES]): The dictionary of widgets being built.
+        radios (Dict[str, Radio]): The radio groups being built, by key.
     """
     field_rect = get_field_rect(widget)
 
-    if not isinstance(results.get(key), Radio):
+    if key not in radios:
         _widget.__dict__["x"] = []
         _widget.__dict__["y"] = []
         _widget.__dict__["width"] = []
         _widget.__dict__["height"] = []
-        results[key] = _widget
+        radios[key] = _widget
 
-    radio = cast(Radio, results[key])
+    radio = radios[key]
     # for schema
     radio.number_of_options += 1
 

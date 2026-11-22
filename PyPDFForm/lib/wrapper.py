@@ -67,6 +67,7 @@ from .template import (
     build_widgets,
     create_annotations,
     get_on_open_javascript,
+    get_shadowed_fields,
     get_title,
     set_on_open_javascript,
     set_title,
@@ -196,6 +197,7 @@ class PdfWrapper:
         self._fonts_without_metrics = {}  # resource name to TTF, for read()
         self._key_update_tracker = {}  # new key to old key, for renamed widgets
         self._keys_to_update = []  # for bulk update keys
+        self._shadowed_fields = {}  # key to fields of another type, for fill
 
         # sets attrs from kwargs
         for attr, default in self.USER_PARAMS:
@@ -312,20 +314,18 @@ class PdfWrapper:
         It rebuilds the widget dictionary and invalidates the lazily loaded font cache.
         Fields no longer in the PDF are dropped. Existing widget objects are kept
         for fields that remain, since queued hooks were already applied to the PDF
-        and their properties match it. A renamed widget is built from the PDF and
-        takes the state the PDF doesn't hold from the widget it replaces, with
-        `Widget.copy_unread_state`.
+        and their properties match it. The fields that each key shadows, of
+        another type than its widget, are recorded for filling. A renamed widget
+        is built from the PDF and takes the state the PDF doesn't hold from the
+        widget it replaces, with `Widget.copy_unread_state`.
         """
 
         self._available_fonts_loaded = False
         stream = self._read()
-        new_widgets = (
-            build_widgets(
-                stream,
-                getattr(self, "use_full_widget_name"),
-            )
-            if stream
-            else {}
+        use_full_widget_name = getattr(self, "use_full_widget_name")
+        new_widgets = build_widgets(stream, use_full_widget_name) if stream else {}
+        self._shadowed_fields = (
+            get_shadowed_fields(stream, use_full_widget_name) if stream else {}
         )
         for k, v in new_widgets.items():
             if k in self.widgets:
@@ -978,6 +978,7 @@ class PdfWrapper:
                 need_appearances=getattr(self, "need_appearances"),
                 use_full_widget_name=getattr(self, "use_full_widget_name"),
                 readonly=readonly,
+                shadowed_fields=self._shadowed_fields,
             )
 
             self._stream = (
