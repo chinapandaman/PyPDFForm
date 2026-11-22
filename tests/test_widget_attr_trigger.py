@@ -9,7 +9,9 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject, NullObject
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
-from PyPDFForm.lib.constants import COMB, MULTILINE, READ_ONLY, REQUIRED
+from PyPDFForm.lib.constants import COMB, MULTILINE, RADIO, READ_ONLY, REQUIRED
+from PyPDFForm.lib.hooks import update_field_readonly
+from PyPDFForm.lib.middleware.radio import Radio
 from PyPDFForm.lib.patterns import get_widget_key
 from PyPDFForm.lib.utils import get_version, set_version
 
@@ -1170,3 +1172,89 @@ def test_fill_readonly_with_parent_cycle(template_stream):
     assert obj.widgets["test"].value is None
     assert obj.widgets["test_2"].value is None
     assert obj.widgets["test_2"].readonly is False
+
+
+@pytest.mark.parametrize(
+    ("name", "flag"), [("readonly", READ_ONLY), ("required", REQUIRED)]
+)
+@pytest.mark.parametrize("selected", [None, 0, 1])
+def test_change_flag_of_radio_group_with_inherited_radio_flag(
+    template_with_radiobutton_stream, name, flag, selected, assert_widgets_match_output
+):
+    # "radio_1" is a kid of "outer", which sets its radio flag, and its /DV is
+    # /Off, as a checkbox's can be
+    with Pdf.open(BytesIO(template_with_radiobutton_stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        radio = next(field for field in fields if str(field.get("/T")) == "radio_1")
+        outer = pdf.make_indirect(
+            Dictionary({"/T": String("outer"), "/Kids": Array([radio]), "/Ff": RADIO})
+        )
+        radio.Parent = outer
+        del radio["/Ff"]
+        radio.DV = Name.Off
+        if selected is not None:
+            radio.V = Name(f"/{selected}")
+            radio.Kids[selected].AS = Name(f"/{selected}")
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in fields if field != radio] + [outer]
+        )
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert isinstance(obj.widgets["radio_1"], Radio)
+    assert obj.widgets["radio_1"].value == selected
+    setattr(obj.widgets["radio_1"], name, True)
+    result = obj.read()
+
+    # the flag change keeps the widget a radio group with the same value
+    reopened = PdfWrapper(result).widgets["radio_1"]
+    assert isinstance(reopened, Radio)
+    assert reopened.value == selected
+    assert getattr(reopened, name) is True
+    # the inherited radio flag is copied to the field's own flags
+    field = _find_widget(result, "radio_1")["/Parent"].get_object()
+    assert field["/Ff"] == RADIO | flag
+    assert field["/Parent"].get_object()["/Ff"] == RADIO
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(
+    ("value", "error"),
+    [(String(""), ValueError), (Array([]), TypeError), (Dictionary({}), TypeError)],
+    ids=["string", "array", "dictionary"],
+)
+def test_reject_field_flags_that_are_not_a_number(template_stream, value, error):
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        for field in pdf.Root.AcroForm.Fields:
+            if str(field.get("/T")) == "test":
+                field.Ff = value
+        stream = _save(pdf)
+
+    # they aren't read as no flags
+    with pytest.raises(error):
+        PdfWrapper(stream)
+
+    # nor overwritten by a change
+    widget = _find_widget(stream, "test")
+    with pytest.raises(error):
+        update_field_readonly(widget, True)
+    assert _find_widget(stream, "test")["/Ff"] == widget["/Ff"]
+
+
+def test_change_null_field_flags(template_stream, assert_widgets_match_output):
+    writer = PdfWriter(BytesIO(template_stream))
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "test":
+            annot[NameObject("/Ff")] = NullObject()
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    # a null /Ff is absent, so the field has no flags
+    obj = PdfWrapper(stream)
+    assert obj.widgets["test"].readonly is False
+    obj.widgets["test"].readonly = True
+
+    assert _find_widget(obj.read(), "test")["/Ff"] == READ_ONLY
+    assert_widgets_match_output(obj)

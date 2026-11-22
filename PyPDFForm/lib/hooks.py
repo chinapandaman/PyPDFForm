@@ -60,9 +60,13 @@ from .constants import (
     X,
 )
 from .default_appearance import change_font, change_font_color, change_font_size
-from .field_tree import check_field_flag, resolve_inherited_entry
 from .middleware.dropdown import DropdownOption
-from .patterns import WIDGET_DESCRIPTION_PATTERNS, get_widget_key
+from .patterns import (
+    WIDGET_DESCRIPTION_PATTERNS,
+    check_field_flag,
+    get_widget_key,
+    resolve_inherited_entry,
+)
 from .utils import extract_widget_property, get_dictionary
 
 
@@ -142,7 +146,7 @@ def _update_field_flag(annot: DictionaryObject, flag: int, should_set: bool) -> 
             found.
     """
     entry = resolve_inherited_entry(annot, Ff, None)
-    flags = int(entry.value or 0)
+    flags = int(entry.value) if entry.value is not None else 0
     entry.target[NameObject(Ff)] = NumberObject(
         flags | flag if should_set else flags & ~flag
     )

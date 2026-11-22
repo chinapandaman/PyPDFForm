@@ -29,6 +29,7 @@ from pypdf.generic import (
     FloatObject,
     IndirectObject,
     NameObject,
+    NullObject,
     NumberObject,
 )
 
@@ -100,6 +101,23 @@ def get_dictionary(obj: DictionaryObject, key: str) -> Optional[DictionaryObject
     value = obj.get(key)
     value = value.get_object() if value is not None else None
     return value if isinstance(value, DictionaryObject) else None
+
+
+def get_entry(obj: DictionaryObject, key: str) -> object:
+    """
+    Gets an entry of a dictionary, resolving an indirect reference.
+
+    Args:
+        obj (DictionaryObject): The dictionary to read.
+        key (str): The entry's key.
+
+    Returns:
+        object: The resolved value, or None when the entry is missing or null,
+            which ISO 32000-1 treats as absent.
+    """
+    value = obj.get(key)
+    value = value.get_object() if value is not None else None
+    return None if isinstance(value, NullObject) else value
 
 
 def remove_all_widgets(pdf: bytes) -> bytes:
@@ -347,8 +365,7 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
 
     Nested dictionaries delegate to `find_pattern_match`. Tuple pattern values
     support matching any listed value, and a tuple containing ``"/"`` also
-    matches PDF names with arbitrary slash-prefixed values. Callable pattern
-    values are predicates called with the widget value.
+    matches PDF names with arbitrary slash-prefixed values.
 
     Args:
         pattern_value (Any): The value from the pattern.
@@ -362,9 +379,6 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
     ):
         return find_pattern_match(pattern_value, widget_value)
 
-    if callable(pattern_value):
-        return bool(pattern_value(widget_value))
-
     if isinstance(pattern_value, tuple):
         if widget_value in pattern_value:
             return True
@@ -373,23 +387,31 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
     return pattern_value == widget_value
 
 
-def find_pattern_match(pattern: dict, widget: dict | DictionaryObject) -> bool:
+def find_pattern_match(
+    pattern: dict | Callable[[Any], Any], widget: dict | DictionaryObject
+) -> bool:
     """
     Recursively finds a pattern match within a PDF widget (annotation dictionary).
 
     This function searches for a specific pattern within a PDF widget's
     properties. It checks the widget's immediate keys and recursively descends
     only when the pattern value and widget value are both dictionary-like.
-    A match is found as soon as any requested key/value pair matches.
+    A match is found as soon as any requested key/value pair matches. A
+    callable pattern is a predicate called with the widget itself, for a
+    property that isn't read from one key, such as an inherited flag.
 
     Args:
-        pattern (dict): The pattern to search for, represented as a dictionary.
+        pattern (dict | Callable[[Any], Any]): The pattern to search for,
+            represented as a dictionary or a predicate.
         widget (dict | DictionaryObject): The widget to search within, which
             can be a dictionary or a DictionaryObject.
 
     Returns:
         bool: True if a match is found, False otherwise.
     """
+    if callable(pattern):
+        return bool(pattern(widget))
+
     for key, value in widget.items():
         if key in pattern and _is_value_match(pattern[key], value.get_object()):
             return True

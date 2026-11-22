@@ -5,10 +5,11 @@ This module defines patterns and utility functions for interacting with PDF form
 It includes patterns for identifying different types of widgets (e.g., text fields,
 checkboxes, radio buttons, dropdowns, images, and signatures) based on their
 properties in the PDF's annotation dictionary. It also provides utility functions
-for updating these widgets.
+for updating these widgets, and resolves the entries that a field inherits from
+its ancestors and the AcroForm, such as its default appearance and flags.
 """
 
-from typing import Tuple
+from typing import Any, NamedTuple, Optional, Tuple
 
 from pypdf.generic import (
     ArrayObject,
@@ -57,7 +58,7 @@ from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .utils import extract_widget_property
+from .utils import extract_widget_property, get_dictionary, get_entry
 
 WIDGET_TYPE_PATTERNS = [
     (
@@ -133,7 +134,8 @@ WIDGET_TYPE_PATTERNS = [
             {Subtype: Widget},
             {Parent: {FT: Btn}},
             {AS: (Yes, Off)},
-            {Parent: {Ff: lambda flags: int(flags) & RADIO}},
+            # the radio flag can be inherited from any field above the widget
+            lambda widget: check_field_flag(widget, RADIO),
         ),
         Radio,
     ),
@@ -487,3 +489,101 @@ def get_field_hidden(annot: DictionaryObject) -> bool:
         bool: True if the field is hidden, False otherwise.
     """
     return bool(int(annot[NameObject(F)] if F in annot else 0) & HIDDEN)
+
+
+class InheritedEntry(NamedTuple):
+    """
+    An inheritable field entry resolved for a widget.
+
+    Attributes:
+        value (Any): The resolved value, or None when nothing sets the entry.
+        target (DictionaryObject): Where a changed value for the widget is
+            written: the dictionary that holds the value when it is the widget
+            or below the widget's own field, or the widget's own field
+            otherwise, so that fields shared with other fields and the AcroForm
+            default are never changed. The widget's own field is the first
+            dictionary along its `/Parent` chain, starting with the widget
+            itself, that has a name (`T`), or the widget when none has one.
+    """
+
+    value: Any
+    target: DictionaryObject
+
+
+def resolve_inherited_entry(
+    widget: DictionaryObject, key: str, acroform: Optional[DictionaryObject]
+) -> InheritedEntry:
+    """
+    Resolves an inheritable field entry, such as `/DA`, for a widget.
+
+    The entry is looked up on the widget, then on each field along its
+    `/Parent` chain, then in the AcroForm, whose entry is the document's
+    default. A value of its own on the widget or a lower field takes
+    precedence over the ones above it. A null entry is treated as absent, as
+    ISO 32000-1 specifies, so the lookup continues past it, and a null `/T`
+    doesn't make a dictionary the widget's own field. Not every entry is
+    inherited, or has an AcroForm default, so callers choose the entries they
+    resolve.
+
+    Args:
+        widget (DictionaryObject): The widget annotation.
+        key (str): The entry to resolve, such as `/DA`.
+        acroform (Optional[DictionaryObject]): The AcroForm dictionary, or
+            None for an entry without a document default.
+
+    Returns:
+        InheritedEntry: The resolved value and where to write a changed value.
+
+    Raises:
+        ValueError: If the `/Parent` chain has a cycle before the entry is
+            found.
+    """
+    own_field = None
+    seen = set()
+    node = widget
+    while node is not None:
+        if id(node) in seen:
+            msg = f"Cannot resolve {key}: the /Parent chain of the field has a cycle."
+            raise ValueError(msg)
+        seen.add(id(node))
+
+        if own_field is None and get_entry(node, T) is not None:
+            own_field = node
+        value = get_entry(node, key)
+        if value is not None:
+            return InheritedEntry(
+                value, node if own_field is None or own_field is node else own_field
+            )
+        node = get_dictionary(node, Parent)
+
+    return InheritedEntry(
+        get_entry(acroform, key) if acroform is not None else None,
+        own_field if own_field is not None else widget,
+    )
+
+
+def check_field_flag(widget: DictionaryObject, flag: int) -> bool:
+    """
+    Checks whether a field flag, such as `READ_ONLY`, is set for a widget.
+
+    The field flags (`/Ff`) are resolved from the widget and the fields along
+    its `/Parent` chain, so the flags of the widget or a lower field take
+    precedence over the ones above it. The AcroForm has no default for them.
+    A cycle in the chain before any flags are found reads as no flags, so a
+    PDF with one can still be opened; changing a flag of such a field raises
+    instead. Missing or null flags read as no flags; flags that aren't a
+    number raise when converted.
+
+    Args:
+        widget (DictionaryObject): The widget annotation.
+        flag (int): The bit flag to check.
+
+    Returns:
+        bool: True if the flag is set.
+    """
+    try:
+        flags = resolve_inherited_entry(widget, Ff, None).value
+    except ValueError:
+        return False
+
+    return bool(int(flags if flags is not None else 0) & flag)
