@@ -45,6 +45,7 @@ from .constants import (
     FEATURE_VERSIONS_BY_SUBTYPE,
     FT,
     NEWEST_FEATURE_VERSION,
+    PDF_VERSIONS,
     SLASH,
     TITLE_VERSION,
     UNIQUE_SUFFIX_LENGTH,
@@ -59,6 +60,7 @@ from .constants import (
     S,
     Subtype,
     Title,
+    Version,
     ca,
 )
 
@@ -727,6 +729,39 @@ def get_output_version(
         return version
 
     return required
+
+
+@lru_cache(maxsize=8)
+def get_catalog_version(pdf: bytes) -> str | None:
+    """
+    Gets the PDF version that the document catalog's `/Version` entry declares.
+
+    A catalog `/Version` overrides the header's version when it is newer. It
+    is lost when only some pages are copied into a new document, so their
+    version has to come from the header and this entry together. The result
+    is cached using lru_cache for performance.
+
+    Args:
+        pdf (bytes): The PDF stream to inspect.
+
+    Returns:
+        str | None: The declared version, or None when the catalog has no
+            `/Version` with a supported version, or the stream cannot be read.
+    """
+
+    if not pdf:
+        return None
+
+    try:
+        value = PdfReader(BytesIO(pdf)).root_object.get(Version)
+        value = value.get_object() if value is not None else None
+    except PyPdfError:
+        return None
+
+    if isinstance(value, NameObject) and value[1:] in PDF_VERSIONS:
+        return value[1:]
+
+    return None
 
 
 def get_newest_version(versions: Sequence[str | None]) -> str | None:

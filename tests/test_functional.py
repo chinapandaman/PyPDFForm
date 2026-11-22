@@ -5,7 +5,7 @@ import re
 import stat
 from contextlib import contextmanager
 from copy import deepcopy
-from io import BytesIO
+from io import BytesIO, StringIO
 from pathlib import Path
 from unittest.mock import patch
 
@@ -37,7 +37,7 @@ from PyPDFForm.cli.root import cli_app
 from PyPDFForm.lib import egress, hooks
 from PyPDFForm.lib.constants import (
     DA,
-    FEATURE_VERSIONS_BY_HOOK,
+    FEATURE_HOOKS,
     UNIQUE_SUFFIX_LENGTH,
     AcroForm,
     T,
@@ -53,6 +53,7 @@ from PyPDFForm.lib.middleware.radio import Radio
 from PyPDFForm.lib.middleware.text import Text
 from PyPDFForm.lib.template import get_widget_key, get_widgets_by_page
 from PyPDFForm.lib.utils import (
+    get_catalog_version,
     get_output_version,
     get_required_version,
     get_version,
@@ -1165,35 +1166,140 @@ def test_version_keeps_pending_widget_changes(template_stream, version):
 
 
 @pytest.mark.parametrize(
-    ("template_version", "name", "value", "expected"),
+    ("template_version", "field_options", "changes", "expected"),
     [
-        ("1.2", "tooltip", "tooltip", "1.3"),
-        ("1.2", "on_hovered_over_javascript", "app.alert('over');", "1.3"),
-        ("1.2", "on_blurred_javascript", "app.alert('blurred');", "1.3"),
-        ("1.4", "max_length", 4, "1.4"),
-        ("1.4", "comb", True, "1.5"),
-        ("1.4", "comb", False, "1.4"),
+        ("1.2", {}, [("tooltip", "tooltip")], "1.3"),
+        ("1.2", {}, [("tooltip", "tooltip"), ("tooltip", "")], "1.2"),
+        ("1.2", {}, [("on_hovered_over_javascript", "app.alert('over');")], "1.3"),
+        ("1.2", {}, [("on_blurred_javascript", "app.alert('blurred');")], "1.3"),
+        # an empty script still writes a JavaScript action
+        ("1.2", {}, [("on_focused_javascript", "")], "1.3"),
+        ("1.4", {}, [("max_length", 4)], "1.4"),
+        ("1.4", {}, [("comb", True)], "1.5"),
+        ("1.4", {}, [("comb", False)], "1.4"),
+        ("1.4", {}, [("comb", True), ("comb", False)], "1.4"),
+        # the only comb field, already written, is cleared
+        ("1.4", {"comb": True}, [("comb", False)], "1.4"),
+        ("1.4", {"comb": True}, [("comb", False), ("comb", True)], "1.5"),
     ],
 )
-def test_version_counts_pending_widget_changes(template_version, name, value, expected):
+def test_version_counts_pending_widget_changes(
+    template_version, field_options, changes, expected
+):
     obj = PdfWrapper(_blank_pdf(template_version)).bulk_create_fields(
-        [Fields.TextField("name", 1, 50, 50, max_length=4)]
+        [Fields.TextField("name", 1, 50, 50, max_length=4, **field_options)]
     )
-    setattr(obj.widgets["name"], name, value)
+    obj.read()
+    for name, value in changes:
+        setattr(obj.widgets["name"], name, value)
+    queued = list(obj.widgets["name"].hooks_to_trigger)
+
     assert obj.version == expected
-    assert obj.widgets["name"].hooks_to_trigger
+    assert obj.widgets["name"].hooks_to_trigger == queued
 
     assert obj.read().startswith(f"%PDF-{expected}".encode())
     assert obj.version == expected
+
+
+def test_version_keeps_pending_javascript_file():
+    obj = PdfWrapper(_blank_pdf("1.2")).bulk_create_fields(
+        [Fields.TextField("name", 1, 50, 50)]
+    )
+    obj.widgets["name"].on_focused_javascript = StringIO("app.alert('focused');")
+    assert obj.version == "1.3"
+
+    annotation = PdfReader(BytesIO(obj.read())).pages[0]["/Annots"][0].get_object()
+    assert annotation["/AA"]["/Fo"]["/JS"] == "app.alert('focused');"
 
 
 def test_pending_feature_hooks_are_widget_hooks():
     hook_names = set(
         Text("name").SET_ATTR_TRIGGER_HOOK_MAP.values()
     )  # including those of every widget
-    for hook in FEATURE_VERSIONS_BY_HOOK:
+    for hook in FEATURE_HOOKS:
         assert hook in hook_names
         assert callable(getattr(hooks, hook))
+
+
+def _pdf_with_catalog_version(header, catalog_version, squiggly_page=None):
+    writer = PdfWriter()
+    writer.add_blank_page(width=360, height=360)
+    writer.add_blank_page(width=360, height=360)
+    writer.pdf_header = f"%PDF-{header}"
+    writer.root_object[NameObject("/Version")] = catalog_version
+    if squiggly_page is not None:
+        writer.pages[squiggly_page - 1][NameObject("/Annots")] = ArrayObject(
+            [
+                writer._add_object(  # type: ignore # noqa: SLF001
+                    DictionaryObject(
+                        {
+                            NameObject("/Type"): NameObject("/Annot"),
+                            NameObject("/Subtype"): NameObject("/Squiggly"),
+                            NameObject("/Rect"): ArrayObject(
+                                [NumberObject(10), NumberObject(10)] * 2
+                            ),
+                        }
+                    )
+                )
+            ]
+        )
+    with BytesIO() as f:
+        writer.write(f)
+        return f.getvalue()
+
+
+@pytest.mark.parametrize(
+    ("catalog_version", "expected"),
+    [
+        (NameObject("/1.4"), "1.4"),
+        (NameObject("/2.0"), "2.0"),
+        (NameObject("/3.0"), None),
+        (TextStringObject("1.4"), None),
+        (NullObject(), None),
+    ],
+)
+def test_catalog_version(catalog_version, expected):
+    stream = _pdf_with_catalog_version("1.1", catalog_version)
+    assert get_catalog_version(stream) == expected
+
+
+def test_catalog_version_of_unreadable_streams():
+    assert get_catalog_version(b"") is None
+    assert get_catalog_version(b"not a pdf") is None
+    assert get_catalog_version(_blank_pdf("1.1")) is None
+
+
+def test_pages_keep_catalog_version():
+    obj = PdfWrapper(
+        _pdf_with_catalog_version("1.1", NameObject("/1.4"), squiggly_page=2)
+    ).bulk_create_fields([Fields.TextField("name", 1, 50, 50)])
+
+    # the catalog override is kept and covers the new form, so the header is too
+    output = obj.read()
+    assert output.startswith(b"%PDF-1.1")
+    assert PdfReader(BytesIO(output)).root_object["/Version"] == "/1.4"
+    assert obj.version == "1.1"
+
+    # the page has no catalog, so the override moves to its header
+    assert obj.pages[0].version == "1.4"
+    assert obj.pages[0].read().startswith(b"%PDF-1.4")
+    assert "/Version" not in PdfReader(BytesIO(obj.pages[0].read())).root_object
+
+    # a feature newer than the override still raises both
+    obj.bulk_create_fields(
+        [Fields.TextField("comb", 1, 50, 100, max_length=4, comb=True)]
+    )
+    assert obj.read().startswith(b"%PDF-1.5")
+    assert obj.pages[0].read().startswith(b"%PDF-1.5")
+
+
+def test_catalog_version_keeps_header_of_document_without_new_features():
+    obj = PdfWrapper(
+        _pdf_with_catalog_version("1.1", NameObject("/1.4"))
+    ).bulk_create_fields([Fields.TextField("name", 1, 50, 50)])
+    assert obj.version == "1.1"
+    assert obj.read().startswith(b"%PDF-1.1")
+    assert obj.pages[0].read().startswith(b"%PDF-1.4")
 
 
 def test_fill_font_color(

@@ -25,6 +25,7 @@ from copy import deepcopy
 from dataclasses import asdict
 from functools import lru_cache
 from os import PathLike
+from types import SimpleNamespace
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -42,7 +43,7 @@ from .adapter import (
     fp_or_f_obj_or_stream_to_stream,
     readable,
 )
-from .constants import FEATURE_VERSIONS_BY_HOOK
+from .constants import FEATURE_HOOKS
 from .coordinate import generate_coordinate_grid
 from .deprecation import reject_unsupported_kwargs
 from .egress import (
@@ -75,6 +76,7 @@ from .utils import (
     can_need_newer_version,
     generate_unique_suffix,
     generic_merge,
+    get_catalog_version,
     get_newest_version,
     get_output_version,
     get_page_streams,
@@ -512,9 +514,9 @@ class PdfWrapper:
         such as a form field added to a PDF 1.1 document. A header that already
         understates the template's own content is kept. When the template has no
         supported header, the version is read from the current PDF stream instead.
-        Pending widget changes are not applied, but those that add a newer
-        feature, such as a comb text field, a tooltip, or widget JavaScript, are
-        counted while they are queued.
+        Pending widget changes are not applied to the wrapper, but those that can
+        change the version, such as comb, tooltips, and widget JavaScript, are
+        applied to a copy of the PDF, so the result matches the next `read()`.
 
         Returns:
             str | None: The PDF version as a string, or None if the version cannot be determined.
@@ -526,7 +528,9 @@ class PdfWrapper:
         if not can_need_newer_version(version):
             return version
 
-        return self._choose_version(self._egress(self._stream), version)
+        return self._choose_version(
+            self._egress(self._with_pending_feature_changes(self._stream)), version
+        )
 
     def _recorded_version(self) -> str | None:
         """
@@ -564,7 +568,8 @@ class PdfWrapper:
         This allows you to work with individual pages of the PDF. Each page wrapper
         preserves the page's original widgets and inherits the current wrapper's user
         parameters and PDF version, which is raised for the newer features that
-        operations added to the page. Content of other pages is not copied: links and
+        operations added to the page. A catalog `/Version` override, which the page
+        doesn't keep, counts toward that version. Content of other pages is not copied: links and
         GoTo actions to other pages are removed, and a field shared with other pages
         keeps only its widgets on the page. Custom font registration events are
         replayed onto the page wrappers when needed.
@@ -578,6 +583,10 @@ class PdfWrapper:
         """
 
         version = self._recorded_version()
+        # pages don't keep the catalog, so a /Version override moves to the header
+        version = (
+            get_newest_version([version, get_catalog_version(self._read())]) or version
+        )
         result = [
             self.__class__(
                 # the stored stream's header may be a PDF writer's default
@@ -695,9 +704,8 @@ class PdfWrapper:
         """
         Chooses the PDF version to write into the header of an egress output.
 
-        Queued widget changes that add a feature in the feature tables count as
-        if they had been applied, so `version` can be chosen without applying
-        them.
+        The version is raised only when the output requires a newer one than the
+        recorded version, the baseline, and a catalog `/Version` override.
 
         Args:
             output (bytes): The output of `_egress`.
@@ -712,20 +720,54 @@ class PdfWrapper:
             return None
 
         if can_need_newer_version(version):
-            # widget changes that read() would apply; `_read()` leaves none
-            pending = [
-                FEATURE_VERSIONS_BY_HOOK[hook]
-                for widget in self.widgets.values()
-                for hook, value in widget.hooks_to_trigger
-                if value and hook in FEATURE_VERSIONS_BY_HOOK
-            ]
             return get_output_version(
                 version,
-                self._baseline_version,
-                get_newest_version([get_required_version(output), *pending]),
+                # a catalog /Version override also covers the output's features
+                get_newest_version(
+                    [self._baseline_version, get_catalog_version(output)]
+                ),
+                get_required_version(output),
             )
 
         return version
+
+    def _with_pending_feature_changes(self, stream: bytes) -> bytes:
+        """
+        Applies the queued widget changes that can add or remove a table feature.
+
+        These are the hooks in `FEATURE_HOOKS`, such as comb, tooltips, and
+        widget JavaScript, applied in queue order to a copy of `stream`, so the
+        result has the features that `read()` would write. Other changes can't
+        change the version, and are left out, so a hook that would fail, such as
+        a font size on a widget without `/DA`, doesn't raise here. The widgets
+        and their queues are not changed. A readable JavaScript value is applied
+        as an empty script, since only whether a script is written matters, and
+        reading it would leave nothing for `read()`.
+
+        Args:
+            stream (bytes): The PDF stream, such as the wrapper's stored stream.
+
+        Returns:
+            bytes: The stream with those changes applied, or `stream` when none
+                are queued.
+        """
+
+        pending = {
+            key: SimpleNamespace(
+                hooks_to_trigger=[
+                    (hook, "" if readable(value) else value)
+                    for hook, value in widget.hooks_to_trigger
+                    if hook in FEATURE_HOOKS
+                ]
+            )
+            for key, widget in self.widgets.items()
+        }
+        if not any(each.hooks_to_trigger for each in pending.values()):
+            return stream
+
+        return trigger_widget_hooks(
+            stream, pending, getattr(self, "use_full_widget_name")
+        )
 
     def _read(self) -> bytes:
         """
