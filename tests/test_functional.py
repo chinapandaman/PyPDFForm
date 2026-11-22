@@ -3287,6 +3287,43 @@ def test_remove_fields_shared_action_branches(template_stream, kept):
     assert result == expected
 
 
+@pytest.mark.parametrize(
+    ("other", "expected"),
+    [
+        ({"/AA": {"/U": "up"}}, (["/Hide"], ["/U"])),
+        ({"/AA": {"/U": "reset"}}, ([], None)),
+        ({"/AA": {"/D": "down"}}, ([], ["/D"])),
+        ({"/Dest": True}, (["/Hide"], None)),
+    ],
+    ids=["mouse_up", "mouse_up_removed", "other_trigger", "destination"],
+)
+def test_remove_fields_keeps_overriding_action(template_stream, other, expected):
+    # an annotation's /A takes precedence over its /AA /U, and a viewer may
+    # read either /A or /Dest when both are present, so deleting /A would let
+    # the other one act
+    def add(pdf, fields):
+        button = _get_button(pdf)
+        button.A = _build_action(("reset", None), fields["test"])
+        if "/Dest" in other:
+            button.Dest = Array([pdf.pages[0].obj, Name.Fit])
+        else:
+            button.AA = Dictionary(
+                {
+                    trigger: _build_action((label, None), fields["test"])
+                    for trigger, label in other["/AA"].items()
+                }
+            )
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        button = _get_button(pdf)
+        assert (
+            _describe_actions(button.get("/A")),
+            sorted(str(trigger) for trigger in button.AA) if "/AA" in button else None,
+        ) == expected
+
+
 def test_remove_fields_keeps_repeated_actions(template_stream):
     # PDFium stops running a trigger's actions when it reaches one a second
     # time, so "k" never runs, before or after removal

@@ -34,6 +34,7 @@ from .constants import (
     A,
     AcroForm,
     Annots,
+    Dest,
     Fields,
     Flags,
     Hide,
@@ -47,6 +48,7 @@ from .constants import (
     Subtype,
     T,
     Type,
+    U,
     Widget,
 )
 from .patterns import get_widget_key
@@ -498,7 +500,9 @@ def _remove_action_targets(
     its shape. An entry that holds actions is deleted when it reaches an
     action that stopped acting and none of the actions it reaches still act,
     counting no-ops left by earlier removals, since running it would do
-    nothing. An `/AA` dictionary left without triggers is deleted too.
+    nothing, unless it is an `/A` that another entry would act in place of, as
+    described in `_delete_entries`. An `/AA` dictionary left without triggers
+    is deleted too.
 
     Args:
         actions (_FormActions): The actions, found before removal.
@@ -532,7 +536,9 @@ def _delete_entries(actions: _FormActions, inert: set) -> None:
     """
     Deletes the entries whose action is in a set.
 
-    An `/AA` dictionary left without triggers is deleted too.
+    An `/A` entry that would let another entry act instead is kept, as
+    described in `_overrides_other_entry`. An `/AA` dictionary left without
+    triggers is deleted too.
 
     Args:
         actions (_FormActions): The actions, found before removal.
@@ -540,7 +546,9 @@ def _delete_entries(actions: _FormActions, inert: set) -> None:
     """
     emptied = set()
     for container, key in actions.entries:
-        if id(container[key]) in inert:
+        if id(container[key]) in inert and not _overrides_other_entry(
+            container, key, inert
+        ):
             del container[key]
             if not container:
                 emptied.add(id(container))
@@ -549,6 +557,37 @@ def _delete_entries(actions: _FormActions, inert: set) -> None:
         if id(actions_dict) in emptied:
             for owner in owners:
                 del owner[AA]
+
+
+def _overrides_other_entry(container: DictionaryObject, key: str, inert: set) -> bool:
+    """
+    Checks whether deleting an `/A` entry would let another entry act instead.
+
+    An annotation's `/A` takes precedence over the `/U` trigger of its `/AA`
+    (ISO 32000-1, Table 194), so deleting it would let that trigger act on
+    mouse release. A link annotation or outline item is not permitted to have
+    both `/A` and `/Dest`, so a viewer may read either one when both are
+    present. A null `/Dest` is treated as absent.
+
+    Args:
+        container (DictionaryObject): The dictionary with the entry.
+        key (str): The entry's key.
+        inert (set): The `id` of each action whose entries are deleted.
+
+    Returns:
+        bool: True if `key` is `/A` and the dictionary has a `/Dest`, or an
+            `/AA` whose `/U` action is not deleted too.
+    """
+    if key != A:
+        return False
+
+    destination = _get_entry(container, Dest)
+    if destination is not None and not isinstance(destination, NullObject):
+        return True
+
+    triggers = get_dictionary(container, AA)
+    released = _get_entry(triggers, U) if triggers is not None else None
+    return isinstance(released, DictionaryObject) and id(released) not in inert
 
 
 def _remove_targets(
