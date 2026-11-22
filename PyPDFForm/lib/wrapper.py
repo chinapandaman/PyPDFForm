@@ -52,6 +52,7 @@ from .egress import (
 from .field_tree import remove_widgets_by_keys, share_inline_fields
 from .filler import fill
 from .font import (
+    add_font_metrics,
     get_all_available_fonts,
     register_font_acroform,
     temporary_font_registration,
@@ -174,6 +175,7 @@ class PdfWrapper:
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
         self._font_register_events = []  # for reregister
+        self._fonts_without_metrics = {}  # resource name to TTF, for read()
         self._key_update_tracker = {}  # new key to old key, for renamed widgets
         self._keys_to_update = []  # for bulk update keys
 
@@ -275,6 +277,7 @@ class PdfWrapper:
         result._available_fonts = dict(self._available_fonts)
         result._available_fonts_loaded = self._available_fonts_loaded
         result._font_register_events = list(self._font_register_events)
+        result._fonts_without_metrics = dict(self._fonts_without_metrics)
         result._keys_to_update = list(self._keys_to_update)
 
         return result
@@ -352,6 +355,8 @@ class PdfWrapper:
 
         Custom fonts registered through `register_font` are stored in the same
         mapping, so loading updates the existing dictionary instead of replacing it.
+        A registered name keeps its registered font when a font in the PDF has the
+        same name.
 
         Returns:
             dict: A mapping from font names to internal PDF font identifiers.
@@ -359,7 +364,14 @@ class PdfWrapper:
 
         if not self._available_fonts_loaded:
             if self._stream:
-                self._available_fonts.update(**get_all_available_fonts(self._stream))
+                registered = {each[0] for each in self._font_register_events}
+                self._available_fonts.update(
+                    {
+                        k: v
+                        for k, v in get_all_available_fonts(self._stream).items()
+                        if k not in registered
+                    }
+                )
             self._available_fonts_loaded = True
 
         return self._available_fonts
@@ -580,7 +592,8 @@ class PdfWrapper:
            propagates.
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
-           generating appearance streams.
+           generating appearance streams. Fonts registered while it was disabled
+           first get the font metrics that appearance generation uses.
         3. Adds the fields of page widget annotations to the AcroForm `/Fields`
            array, keeping every field already listed, including fields without
            a widget on a page. The stream is left unchanged when no page has a
@@ -595,6 +608,10 @@ class PdfWrapper:
 
         result = self._read()
         if getattr(self, "need_appearances") and result:
+            if self._fonts_without_metrics:
+                result = add_font_metrics(
+                    result, tuple(self._fonts_without_metrics.items())
+                )
             result = appearance_streams_handler(
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
@@ -1063,8 +1080,10 @@ class PdfWrapper:
         Valid TrueType font data is embedded into the PDF's AcroForm resources and
         recorded under the user-provided `font_name`. The original registration input
         is kept so the font can be used for drawing and registered again on wrappers
-        created from this one, such as pages and merged PDFs. Invalid font streams are
-        ignored, but a missing font path raises.
+        created from this one, such as pages and merged PDFs. A font registered while
+        `need_appearances` is disabled gets the font metrics that appearance generation
+        uses in `read()` output once it is enabled. Invalid font streams are ignored,
+        but a missing font path raises.
 
         Args:
             font_name (str): The name of the font. This name will be used to reference the font when drawing text.
@@ -1090,6 +1109,8 @@ class PdfWrapper:
             )
             self._available_fonts[font_name] = new_font_name
             self._font_register_events.append((font_name, ttf_file))
+            if not getattr(self, "need_appearances"):
+                self._fonts_without_metrics[new_font_name] = ttf_file
 
         return self
 
