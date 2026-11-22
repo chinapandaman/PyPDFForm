@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 import pytest
 from jsonschema import ValidationError, validate
-from pikepdf import Array, Dictionary, Name, Pdf, Stream, String
+from pikepdf import Array, Dictionary, Name, ObjectStreamMode, Pdf, Stream, String
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
     ArrayObject,
@@ -2563,18 +2563,19 @@ def _with_catalog_extras(stream):
             return f.getvalue()
 
 
+def _get_full_name(field):
+    parts = []
+    while field is not None:
+        if "/T" in field:
+            parts.append(str(field.T))
+        field = field.get("/Parent")
+    return ".".join(reversed(parts))
+
+
 def _describe_catalog(stream):
     # the values of the catalog's fields, by the fully qualified names
     # assert_catalog_fields lists, the calculation order, and the other
     # AcroForm entries
-    def get_name(field):
-        parts = []
-        while field is not None:
-            if "/T" in field:
-                parts.append(str(field.T))
-            field = field.get("/Parent")
-        return ".".join(reversed(parts))
-
     with Pdf.open(BytesIO(stream)) as pdf:
         acroform = pdf.Root.get("/AcroForm", Dictionary())
         values = {}
@@ -2584,11 +2585,13 @@ def _describe_catalog(stream):
             kids = list(field.get("/Kids", []))
             pending.extend(kid for kid in kids if "/T" in kid)
             if not kids or any("/T" not in kid for kid in kids):
-                values[get_name(field)] = str(field.get("/V", ""))
+                values[_get_full_name(field)] = str(field.get("/V", ""))
 
         return {
             "fields": values,
-            "calculation_order": [get_name(field) for field in acroform.get("/CO", [])],
+            "calculation_order": [
+                _get_full_name(field) for field in acroform.get("/CO", [])
+            ],
             "entries": sorted(key for key in acroform if key != "/Fields"),
         }
 
@@ -2854,6 +2857,606 @@ def test_remove_fields_without_widgets_on_pages(sejda_template):
     assert "Make" in names
     assert "date" in names
     assert list(obj.widgets) == widgets
+
+
+def _with_actions(stream, add):
+    # calls add(pdf, fields) on the form from _with_catalog_extras, where
+    # fields maps the fully qualified name of each field to it
+    with Pdf.open(BytesIO(_with_catalog_extras(stream))) as pdf:
+        fields = {str(field.T): field for field in pdf.Root.AcroForm.Fields}
+        fields.update({f"group.{kid.T}": kid for kid in fields["group"].Kids})
+        add(pdf, fields)
+
+        with BytesIO() as f:
+            pdf.save(f)
+            return f.getvalue()
+
+
+def _get_button(pdf):
+    return next(
+        annot for annot in pdf.pages[0].Annots if annot.get("/T") == "submit_button"
+    )
+
+
+def _describe_targets(targets):
+    # names as they are, and references as @ followed by their full names
+    return [
+        f"@{_get_full_name(each)}" if isinstance(each, Dictionary) else str(each)
+        for each in (targets if isinstance(targets, Array) else [targets])
+    ]
+
+
+def _describe_actions(action):
+    # the JavaScript or type of the action and the ones after it, in the
+    # order they are performed, with "again" for one reached a second time
+    result = []
+    seen = set()
+    pending = [] if action is None else [action]
+    while pending:
+        each = pending.pop()
+        if isinstance(each, Array):
+            pending.extend(reversed(list(each)))
+            continue
+        if each.is_indirect and each.objgen in seen:
+            result.append("again")
+            continue
+        seen.add(each.objgen)
+        result.append(str(each.get("/JS", each.get("/N", each.S))))
+        if "/Next" in each:
+            pending.append(each.Next)
+    return result
+
+
+def _build_action(spec, test):
+    # spec is (label, following): "reset" names only test, any other label is
+    # the JavaScript of the action, and following is None, a spec, or a list
+    label, following = spec
+    action = (
+        Dictionary(S=Name.ResetForm, Fields=Array([test]))
+        if label == "reset"
+        else Dictionary(S=Name.JavaScript, JS=String(label))
+    )
+    if isinstance(following, list):
+        action.Next = Array([_build_action(each, test) for each in following])
+    elif following is not None:
+        action.Next = _build_action(following, test)
+    return action
+
+
+def _describe_removal(template_stream, add, read):
+    # the actions read(pdf) finds before removing test, with each action that
+    # names only test shown as the Hide it becomes, and after
+    stream = _with_actions(template_stream, add)
+    with Pdf.open(BytesIO(stream)) as pdf:
+        before = _describe_actions(read(pdf))
+    with Pdf.open(BytesIO(PdfWrapper(stream).remove_fields(["test"]).read())) as pdf:
+        after = _describe_actions(read(pdf))
+    return ["/Hide" if each == "/ResetForm" else each for each in before], after
+
+
+@pytest.mark.parametrize(
+    ("action", "keys", "use_full_widget_name", "expected"),
+    [
+        (("/ResetForm", 0, ["@test", "@check"]), ["test"], False, ["@check"]),
+        (("/ResetForm", 0, ["@test"]), ["test"], False, None),
+        (("/ResetForm", 0, ["test", "check"]), ["test"], False, ["check"]),
+        (("/SubmitForm", 0, ["test"]), ["test"], False, None),
+        (("/SubmitForm", 5, ["@test", "test"]), ["test"], False, []),
+        (("/Hide", None, "@test"), ["test"], False, None),
+        (("/Hide", None, ["@test", "check"]), ["test"], False, ["check"]),
+        (("/Hide", None, "test"), ["check"], False, ["test"]),
+        (
+            ("/ResetForm", 0, ["group", "group.test_2", "@group", "@group.test_2"]),
+            ["test_2"],
+            False,
+            ["group", "@group"],
+        ),
+        (
+            ("/ResetForm", 0, ["group", "@group.test_3"]),
+            ["test_2", "test_3"],
+            False,
+            None,
+        ),
+        (
+            ("/ResetForm", 0, ["group.test_2", "test_2", "test"]),
+            ["group.test_2"],
+            True,
+            ["test_2", "test"],
+        ),
+        (
+            ("/ResetForm", 0, ["unknown", "@hidden_business_id"]),
+            ["hidden_business_id"],
+            False,
+            ["unknown"],
+        ),
+    ],
+    ids=[
+        "reference",
+        "only_reference",
+        "name",
+        "only_name",
+        "exclude",
+        "hide_reference",
+        "hide_array",
+        "hide_other_field",
+        "parent_kept",
+        "parent_removed",
+        "full_name",
+        "unknown_name",
+    ],
+)
+def test_remove_fields_updates_action_targets(
+    template_stream, action, keys, use_full_widget_name, expected
+):
+    kind, flags, targets = action
+    key = "/T" if kind == "/Hide" else "/Fields"
+
+    def add(pdf, fields):
+        values = [
+            fields[each[1:]] if each.startswith("@") else String(each)
+            for each in (targets if isinstance(targets, list) else [targets])
+        ]
+        button = _get_button(pdf)
+        button.A = Dictionary(S=Name(kind))
+        button.A[key] = Array(values) if isinstance(targets, list) else values[0]
+        if flags is not None:
+            button.A.Flags = flags
+
+    obj = PdfWrapper(
+        _with_actions(template_stream, add), use_full_widget_name=use_full_widget_name
+    )
+    obj.remove_fields(keys)
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        result = _get_button(pdf).get("/A")
+        assert (result if result is None else _describe_targets(result[key])) == (
+            expected
+        )
+
+
+@pytest.mark.parametrize(
+    ("keys", "expected"),
+    [(["test_2"], ["@group.test_3"]), (["test_2", "test_3"], None)],
+)
+def test_remove_fields_action_targets_sharing_kids(template_stream, keys, expected):
+    # removal empties /Kids in place, so an action whose /Fields is the same
+    # array would otherwise act on every field
+    def add(pdf, fields):
+        fields["group"].Kids = pdf.make_indirect(Array(fields["group"].Kids))
+        _get_button(pdf).A = Dictionary(S=Name.ResetForm, Fields=fields["group"].Kids)
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(keys)
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        result = _get_button(pdf).get("/A")
+        assert (result if result is None else _describe_targets(result.Fields)) == (
+            expected
+        )
+
+
+def test_remove_fields_action_targets_kids_cycle(template_stream):
+    # a field listed in its own /Kids
+    def add(pdf, fields):
+        fields["group"].Kids.append(fields["group"])
+        _get_button(pdf).A = Dictionary(
+            S=Name.ResetForm, Fields=Array([String("group.test_2"), String("test")])
+        )
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test_2"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        assert _describe_targets(_get_button(pdf).A.Fields) == ["test"]
+
+
+def test_remove_fields_removes_action_targets_from_output(template_stream):
+    # a reset button naming test by reference kept the removed field and its
+    # value in the output
+    def add(pdf, fields):
+        _get_button(pdf).A = Dictionary(
+            S=Name.ResetForm, Fields=Array([fields["test"]])
+        )
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).fill({"test": "SECRET"})
+    obj.remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf, BytesIO() as f:
+        assert "/A" not in _get_button(pdf)
+        # qpdf writes only the objects reachable from the trailer
+        pdf.save(f, object_stream_mode=ObjectStreamMode.disable)
+        assert b"SECRET" not in f.getvalue()
+
+
+def test_remove_fields_updates_actions_everywhere(template_stream):
+    # an action that only names test, followed by JavaScript, in each kind of
+    # entry that holds actions, does nothing in place
+    def add(pdf, fields):
+        def action():
+            return _build_action(("reset", ("after", None)), fields["test"])
+
+        button = _get_button(pdf)
+        button.A = action()
+        button.AA = Dictionary(D=action())
+        pdf.pages[0].obj.AA = Dictionary(O=action())
+        pdf.pages[0].obj.PresSteps = Dictionary(
+            Type=Name.NavNode, NA=action(), PA=action()
+        )
+        fields["group"].AA = Dictionary(K=action())
+        pdf.Root.OpenAction = action()
+        pdf.Root.AA = Dictionary(WC=action())
+        outlines = pdf.make_indirect(Dictionary(Type=Name.Outlines, Count=1))
+        item = pdf.make_indirect(
+            Dictionary(Title=String("item"), Parent=outlines, A=action())
+        )
+        outlines.First = item
+        outlines.Last = item
+        pdf.Root.Outlines = outlines
+        pdf.Root.Names = Dictionary(
+            JavaScript=Dictionary(
+                Names=Array(
+                    [
+                        String("document"),
+                        Dictionary(
+                            S=Name.JavaScript, JS=String("document"), Next=action()
+                        ),
+                    ]
+                )
+            )
+        )
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        button = _get_button(pdf)
+        group = next(
+            field for field in pdf.Root.AcroForm.Fields if field.get("/T") == "group"
+        )
+        result = {
+            "annotation": button.A,
+            "annotation_trigger": button.AA.D,
+            "page_trigger": pdf.pages[0].obj.AA.O,
+            "navigation_forward": pdf.pages[0].obj.PresSteps.NA,
+            "navigation_backward": pdf.pages[0].obj.PresSteps.PA,
+            "field_trigger": group.AA.K,
+            "open_action": pdf.Root.OpenAction,
+            "catalog_trigger": pdf.Root.AA.WC,
+            "outline": pdf.Root.Outlines.First.A,
+            "named_javascript": pdf.Root.Names.JavaScript.Names[1],
+        }
+        assert {key: _describe_actions(value) for key, value in result.items()} == {
+            key: ["document", "/Hide", "after"]
+            if key == "named_javascript"
+            else ["/Hide", "after"]
+            for key in result
+        }
+
+
+@pytest.mark.parametrize(
+    ("a", "aa", "expected"),
+    [
+        (
+            ("reset", [("one", ("two", None)), ("three", None)]),
+            None,
+            (["/Hide", "one", "two", "three"], None),
+        ),
+        (
+            ("one", [("reset", ("two", None)), ("three", None)]),
+            None,
+            (["one", "/Hide", "two", "three"], None),
+        ),
+        (
+            ("one", [("reset", ("reset", None)), ("two", None)]),
+            None,
+            (["one", "/Hide", "/Hide", "two"], None),
+        ),
+        (
+            None,
+            {"/D": ("reset", None), "/U": ("one", None)},
+            ([], {"/U": ["one"]}),
+        ),
+    ],
+    ids=["chain_after", "chain_inside", "stopped_chain", "trigger"],
+)
+def test_remove_fields_chains_with_stopped_actions(template_stream, a, aa, expected):
+    # an action that names only test does nothing in place, and an entry whose
+    # actions all do nothing is removed
+    def add(pdf, fields):
+        button = _get_button(pdf)
+        if a is not None:
+            button.A = _build_action(a, fields["test"])
+        if aa is not None:
+            button.AA = Dictionary(
+                {
+                    trigger: _build_action(spec, fields["test"])
+                    for trigger, spec in aa.items()
+                }
+            )
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        button = _get_button(pdf)
+        assert (
+            _describe_actions(button.get("/A")),
+            {
+                str(trigger): _describe_actions(action)
+                for trigger, action in button.AA.items()
+            }
+            if "/AA" in button
+            else None,
+        ) == expected
+
+
+def test_remove_fields_no_op_keeps_type_and_next(template_stream):
+    def add(pdf, fields):
+        _get_button(pdf).A = Dictionary(
+            Type=Name.Action,
+            S=Name.SubmitForm,
+            F=String("https://example.com/submit"),
+            Flags=4,
+            Fields=Array([fields["test"]]),
+            Next=Dictionary(S=Name.JavaScript, JS=String("after")),
+        )
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        action = _get_button(pdf).A
+        assert sorted(action.keys()) == ["/Next", "/S", "/T", "/Type"]
+        assert (action.Type, action.S, list(action.T)) == ("/Action", "/Hide", [])
+        assert _describe_actions(action.Next) == ["after"]
+
+
+def test_remove_fields_shared_action_cycle(template_stream):
+    # one action that stops acting, in two entries and followed by itself
+    def add(pdf, fields):
+        reset = pdf.make_indirect(_build_action(("reset", None), fields["test"]))
+        reset.Next = reset
+        button = _get_button(pdf)
+        button.A = Dictionary(S=Name.JavaScript, JS=String("one"), Next=reset)
+        button.AA = Dictionary(D=reset)
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        button = _get_button(pdf)
+        assert _describe_actions(button.A) == ["one", "/Hide", "again"]
+        assert "/AA" not in button
+
+
+def test_remove_fields_mutual_action_cycle(template_stream):
+    # actions that stop acting and follow each other, each followed by one
+    # that keeps acting
+    def add(pdf, fields):
+        first, second = (
+            pdf.make_indirect(_build_action(("reset", None), fields["test"]))
+            for _ in range(2)
+        )
+        first.Next = Array([second, Dictionary(S=Name.JavaScript, JS=String("x"))])
+        second.Next = Array([first, Dictionary(S=Name.JavaScript, JS=String("y"))])
+        _get_button(pdf).A = first
+
+    expected, result = _describe_removal(
+        template_stream, add, lambda pdf: _get_button(pdf).A
+    )
+
+    assert expected == ["/Hide", "/Hide", "again", "y", "x"]
+    assert result == expected
+
+
+def test_remove_fields_cycle_through_kept_action(template_stream):
+    # an action that stops acting, followed by one that leads back to it. A
+    # single /Next is written as an array, since pypdf 6.19 can't clone a
+    # /Next dictionary whose own /Next is an array.
+    def add(pdf, fields):
+        reset = pdf.make_indirect(_build_action(("reset", None), fields["test"]))
+        first = pdf.make_indirect(
+            Dictionary(S=Name.Named, N=Name.FirstPage, Next=Array([reset]))
+        )
+        reset.Next = Array([first, Dictionary(S=Name.Named, N=Name.LastPage)])
+        _get_button(pdf).AA = Dictionary(D=reset)
+
+    expected, result = _describe_removal(
+        template_stream, add, lambda pdf: _get_button(pdf).AA.D
+    )
+
+    assert expected == ["/Hide", "/FirstPage", "again", "/LastPage"]
+    assert result == expected
+
+
+@pytest.mark.parametrize("kept", [True, False])
+def test_remove_fields_shared_action_branches(template_stream, kept):
+    # each action that stops acting is followed twice by the next one, so
+    # there are 4,096 paths to the last one. The first /Next is an array,
+    # since pypdf 6.19 can't clone a /Next dictionary whose own /Next is an
+    # array.
+    def add(pdf, fields):
+        action = pdf.make_indirect(_build_action(("reset", None), fields["test"]))
+        if kept:
+            action.Next = pdf.make_indirect(Dictionary(S=Name.Named, N=Name.LastPage))
+        for _ in range(12):
+            parent = pdf.make_indirect(_build_action(("reset", None), fields["test"]))
+            parent.Next = Array([action, action])
+            action = parent
+        _get_button(pdf).A = Dictionary(
+            S=Name.JavaScript, JS=String("one"), Next=Array([action])
+        )
+
+    expected, result = _describe_removal(
+        template_stream, add, lambda pdf: _get_button(pdf).A
+    )
+
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    ("other", "expected"),
+    [
+        ({"/AA": {"/U": "up"}}, (["/Hide"], ["/U"])),
+        ({"/AA": {"/U": "reset"}}, ([], None)),
+        ({"/AA": {"/D": "down"}}, ([], ["/D"])),
+        ({"/Dest": True}, (["/Hide"], None)),
+    ],
+    ids=["mouse_up", "mouse_up_removed", "other_trigger", "destination"],
+)
+def test_remove_fields_keeps_overriding_action(template_stream, other, expected):
+    # an annotation's /A takes precedence over its /AA /U, and a viewer may
+    # read either /A or /Dest when both are present, so deleting /A would let
+    # the other one act
+    def add(pdf, fields):
+        button = _get_button(pdf)
+        button.A = _build_action(("reset", None), fields["test"])
+        if "/Dest" in other:
+            button.Dest = Array([pdf.pages[0].obj, Name.Fit])
+        else:
+            button.AA = Dictionary(
+                {
+                    trigger: _build_action((label, None), fields["test"])
+                    for trigger, label in other["/AA"].items()
+                }
+            )
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        button = _get_button(pdf)
+        assert (
+            _describe_actions(button.get("/A")),
+            sorted(str(trigger) for trigger in button.AA) if "/AA" in button else None,
+        ) == expected
+
+
+def test_remove_fields_keeps_repeated_actions(template_stream):
+    # PDFium stops running a trigger's actions when it reaches one a second
+    # time, so "k" never runs, before or after removal
+    def add(pdf, fields):
+        reset = pdf.make_indirect(_build_action(("reset", None), fields["test"]))
+        _get_button(pdf).A = Dictionary(
+            S=Name.JavaScript,
+            JS=String("j"),
+            Next=Array([reset, reset, Dictionary(S=Name.JavaScript, JS=String("k"))]),
+        )
+
+    expected, result = _describe_removal(
+        template_stream, add, lambda pdf: _get_button(pdf).A
+    )
+
+    assert expected == ["j", "/Hide", "again", "k"]
+    assert result == expected
+
+
+@pytest.mark.parametrize("separately", [False, True])
+def test_remove_fields_actions_in_separate_calls(template_stream, separately):
+    # removing two fields in two calls leaves the same actions as in one
+    def add(pdf, fields):
+        second = pdf.make_indirect(
+            Dictionary(S=Name.ResetForm, Fields=Array([fields["check"]]))
+        )
+        pdf.Root.OpenAction = Dictionary(
+            S=Name.ResetForm, Fields=Array([fields["test"]]), Next=Array([second])
+        )
+
+    obj = PdfWrapper(_with_actions(template_stream, add))
+    if separately:
+        with Pdf.open(BytesIO(obj.remove_fields(["test"]).read())) as pdf:
+            assert _describe_actions(pdf.Root.OpenAction) == ["/Hide", "/ResetForm"]
+        obj.remove_fields(["check"])
+    else:
+        obj.remove_fields(["test", "check"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        assert "/OpenAction" not in pdf.Root
+
+
+@pytest.mark.parametrize("separately", [False, True])
+def test_remove_fields_overriding_action_in_separate_calls(template_stream, separately):
+    # an /A kept only for the /AA /U it takes precedence over goes with it
+    def add(pdf, fields):
+        button = _get_button(pdf)
+        button.A = _build_action(("reset", None), fields["test"])
+        button.AA = Dictionary(
+            U=Dictionary(S=Name.ResetForm, Fields=Array([fields["check"]]))
+        )
+
+    obj = PdfWrapper(_with_actions(template_stream, add))
+    if separately:
+        with Pdf.open(BytesIO(obj.remove_fields(["test"]).read())) as pdf:
+            button = _get_button(pdf)
+            assert _describe_actions(button.A) == ["/Hide"]
+            assert _describe_actions(button.AA.U) == ["/ResetForm"]
+        obj.remove_fields(["check"])
+    else:
+        obj.remove_fields(["test", "check"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        button = _get_button(pdf)
+        assert "/A" not in button
+        assert "/AA" not in button
+
+
+def test_remove_fields_long_action_chain(template_stream):
+    # more actions that stop acting in one chain than Python's recursion
+    # limit. The last action is indirect too, since pypdf 6.19 can't clone an
+    # indirect action whose /Next is a direct one.
+    def add(pdf, fields):
+        action = pdf.make_indirect(Dictionary(S=Name.JavaScript, JS=String("after")))
+        for _ in range(1050):
+            reset = pdf.make_indirect(_build_action(("reset", None), fields["test"]))
+            reset.Next = action
+            action = reset
+        _get_button(pdf).A = action
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        assert _describe_actions(_get_button(pdf).A) == ["/Hide"] * 1050 + ["after"]
+
+
+@pytest.mark.parametrize("kind", ["indirect", "array"])
+def test_remove_fields_resolves_action_types(template_stream, kind):
+    # an indirect /S is resolved, and an /S that isn't a name, as in this
+    # structure attribute, is not an action type
+    def add(pdf, fields):
+        if kind == "indirect":
+            _get_button(pdf).A = Dictionary(
+                S=pdf.make_indirect(Name.ResetForm), Fields=Array([fields["test"]])
+            )
+        else:
+            pdf.Root.StructTreeRoot = Dictionary(
+                Type=Name.StructTreeRoot,
+                K=Dictionary(
+                    Type=Name.StructElem,
+                    S=Name.P,
+                    A=Dictionary(O=Name.Layout, S=Array([Name.ResetForm])),
+                ),
+            )
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        if kind == "indirect":
+            assert "/A" not in _get_button(pdf)
+        else:
+            attribute = pdf.Root.StructTreeRoot.K.A
+            assert [str(each) for each in attribute.S] == ["/ResetForm"]
+
+
+def test_remove_fields_hide_widget_not_in_catalog(template_stream):
+    # a Hide action naming a page widget whose field isn't in /Fields
+    def add(pdf, fields):
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in pdf.Root.AcroForm.Fields if field.T != "submit_button"]
+        )
+        fields["test"].A = Dictionary(
+            S=Name.Hide, T=Array([String("submit_button"), String("check")])
+        )
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(
+        ["submit_button"]
+    )
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        test = next(annot for annot in pdf.pages[0].Annots if annot.get("/T") == "test")
+        assert _describe_targets(test.A.T) == ["check"]
 
 
 @pytest.mark.parametrize("field_name", ["test", "check", "radio_1"])

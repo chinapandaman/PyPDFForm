@@ -35,8 +35,9 @@ def field(
     The command loads the PDF with the global CLI options stored in `ctx.obj`,
     validates that each requested name matches a form field, including fields
     without a widget on any page, before changing the document, removes the
-    fields through `PdfWrapper.remove_fields`, and writes the modified PDF to
-    the requested output path or back to the input file.
+    fields through `PdfWrapper.remove_fields`, which also updates the form
+    actions that name them, and writes the modified PDF to the requested
+    output path or back to the input file.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
