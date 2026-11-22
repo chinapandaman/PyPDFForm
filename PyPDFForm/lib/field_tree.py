@@ -1184,8 +1184,11 @@ def resolve_inherited_entry(
     The entry is looked up on the widget, then on each field along its
     `/Parent` chain, then in the AcroForm, whose entry is the document's
     default. A value of its own on the widget or a lower field takes
-    precedence over the ones above it. Not every entry is inherited, or has an
-    AcroForm default, so callers choose the entries they resolve.
+    precedence over the ones above it. A null entry is treated as absent, as
+    ISO 32000-1 specifies, so the lookup continues past it, and a null `/T`
+    doesn't make a dictionary the widget's own field. Not every entry is
+    inherited, or has an AcroForm default, so callers choose the entries they
+    resolve.
 
     Args:
         widget (DictionaryObject): The widget annotation.
@@ -1209,17 +1212,16 @@ def resolve_inherited_entry(
             raise ValueError(msg)
         seen.add(id(node))
 
-        if own_field is None and T in node:
+        if own_field is None and _get_entry(node, T) is not None:
             own_field = node
-        if key in node:
+        value = _get_entry(node, key)
+        if value is not None:
             return InheritedEntry(
-                node[key].get_object(),
-                node if own_field is None or own_field is node else own_field,
+                value, node if own_field is None or own_field is node else own_field
             )
         node = get_dictionary(node, Parent)
 
-    value = acroform.get(key) if acroform is not None else None
     return InheritedEntry(
-        value.get_object() if value is not None else None,
+        _get_entry(acroform, key) if acroform is not None else None,
         own_field if own_field is not None else widget,
     )

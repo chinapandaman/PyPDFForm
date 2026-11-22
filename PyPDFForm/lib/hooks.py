@@ -18,6 +18,7 @@ from typing import TextIO, cast
 from pypdf import PdfWriter
 from pypdf.generic import (
     ArrayObject,
+    ByteStringObject,
     DictionaryObject,
     FloatObject,
     NameObject,
@@ -225,7 +226,13 @@ def _update_default_appearance(
         msg = "Cannot change /DA: neither the field nor the form sets one."
         raise ValueError(msg)
 
-    entry.target[NameObject(DA)] = TextStringObject(change(entry.value))
+    result = change(entry.value)
+    # a byte string keeps its bytes, which to_text read as Latin-1
+    entry.target[NameObject(DA)] = (
+        ByteStringObject(result.encode("latin-1"))
+        if isinstance(entry.value, bytes)
+        else TextStringObject(result)
+    )
 
 
 def update_text_field_font(

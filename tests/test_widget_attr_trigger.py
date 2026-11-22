@@ -5,7 +5,8 @@ from io import BytesIO
 
 import pytest
 from pikepdf import Array, Dictionary, Pdf, String
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import NameObject, NullObject
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
 from PyPDFForm.lib.patterns import get_widget_key
@@ -815,6 +816,37 @@ def test_change_inherited_dropdown_default_appearance(sample_template_with_dropd
             "/ZaDb 5.6 Tf 1 0 0 rg /Helv 5.6 Tf 1 0 0 rg",
         ),
         ("/Helv 12 Tf 0 g % gray", "font_size", 20, "/Helv 20 Tf 0 g % gray"),
+        # a later color space operation takes effect after the replaced color
+        (
+            "/Arial 12 Tf 0 g /DeviceRGB cs 0 0 1 sc",
+            "font_color",
+            (1, 0, 0),
+            "/Arial 12 Tf 1 0 0 rg /DeviceRGB cs 0 0 1 sc 1 0 0 rg",
+        ),
+        (
+            "/Arial 12 Tf /DeviceRGB cs 0 0 1 sc 2 Tz",
+            "font_color",
+            (1, 0, 0),
+            "/Arial 12 Tf /DeviceRGB cs 0 0 1 sc 1 0 0 rg 2 Tz",
+        ),
+        # a dash pattern, and an array in an array
+        (
+            "/Arial 12 Tf 0 g 2 Tr [2 3] 0 d",
+            "font_size",
+            14,
+            "/Arial 14 Tf 0 g 2 Tr [2 3] 0 d",
+        ),
+        ("/Arial 12 Tf [[1] /X] 0 d", "font", "/Helv", "/Helv 12 Tf [[1] /X] 0 d"),
+        # numbers are written without an exponent
+        ("/Arial 12 Tf 0 g", "font_size", 1e-5, "/Arial 0.00001 Tf 0 g"),
+        (
+            "/Arial 12 Tf 0 g",
+            "font_color",
+            (1e-5, 0, 2.5e-7),
+            "/Arial 12 Tf 0.00001 0 0.00000025 rg",
+        ),
+        # a NUL separator makes pypdf read a byte string
+        (String(b"/Arial\x0012 Tf 0 g"), "font_size", 14, b"/Arial\x0014 Tf 0 g"),
     ],
 )
 def test_change_default_appearance_operands(
@@ -853,6 +885,13 @@ def _with_parent_cycle(stream, name):
         ("/Helv 12 Tf 0", "font_color", (1, 0, 0), "ends with operands"),
         ("/Helv 12 Tf 0 0 g", "font_color", (1, 0, 0), "g operator .* needs 1 number"),
         ("/Helv 12 Tf /X 0 0 rg", "font_color", (1, 0, 0), "needs 3 numbers"),
+        ("/Helv 12 Tf [2 3 0 d", "font_size", 20, r"unclosed '\['"),
+        ("/Helv 12 Tf 2] 0 d", "font_size", 20, r"unexpected '\]'"),
+        ("[/Helv] 12 Tf", "font", "/Cour", "needs a font and a font size"),
+        ("/Helv 12 Tf 0 g", "font_size", float("inf"), "is not a number a PDF"),
+        ("/Helv 12 Tf 0 g", "font_color", (float("nan"), 0, 0), "is not a number"),
+        ("/Helv 12 Tf 0 g", "font_color", (1, 0, "red"), "is not a number"),
+        ("/Helv 12 Tf 0 g", "font", "/My Font", "is not a PDF name"),
         (12, "font_size", 20, "is not a string"),
         (None, "font_size", 20, "the /Parent chain of the field has a cycle"),
     ],
@@ -884,3 +923,46 @@ def test_change_default_appearance_errors(
     assert not obj.widgets["test"].hooks_to_trigger
     assert obj.read() == original
     assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    [("font_size", 1e-5), ("font_size", 1e20), ("font_color", (1e-5, 0, 0))],
+)
+def test_change_default_appearance_again(template_stream, name, value):
+    # a changed /DA can be changed again
+    obj = PdfWrapper(template_stream)
+    setattr(obj.widgets["test"], name, value)
+    obj.read()
+    obj.widgets["test"].font_size = 12
+    obj.widgets["test"].font_color = (0, 0, 1)
+
+    assert _find_widget(obj.read(), "test")["/DA"] == "/Arial 12 Tf 0 0 1 rg"
+
+
+def _with_null_default_appearance(stream, acroform_null):
+    # the field's /DA is null, and the AcroForm's too if acroform_null
+    writer = PdfWriter(BytesIO(stream))
+    if acroform_null:
+        writer.root_object["/AcroForm"][NameObject("/DA")] = NullObject()
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "test":
+            annot[NameObject("/DA")] = NullObject()
+
+    with BytesIO() as f:
+        writer.write(f)
+        return f.getvalue()
+
+
+def test_change_default_appearance_over_null(template_stream):
+    # a null /DA is absent, so the AcroForm default is used
+    obj = PdfWrapper(_with_null_default_appearance(template_stream, False))
+    obj.widgets["test"].font_size = 14
+
+    assert _find_widget(obj.read(), "test")["/DA"] == "/Helv 14 Tf 0 g "
+
+    obj = PdfWrapper(_with_null_default_appearance(template_stream, True))
+    obj.widgets["test"].font_size = 14
+    with pytest.raises(ValueError, match="neither the field nor the form sets one"):
+        obj.read()
