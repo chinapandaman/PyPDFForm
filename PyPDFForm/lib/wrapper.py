@@ -151,9 +151,9 @@ class PdfWrapper:
         Omitting the template, or passing empty bytes or an empty stream, creates an empty
         wrapper; a missing path raises instead.
         The PDF version is read from the template's header before the `title` keyword
-        is applied, so output keeps it after operations that rewrite the PDF, along
-        with the version that the template's own content requires, so output can
-        be raised for newer features that operations add.
+        is applied, so output keeps it after operations that rewrite the PDF. The
+        version that the template's own content requires is recorded too, so only
+        newer features that operations add raise the output's version.
         The title and document-open JavaScript remain in the PDF stream and are read
         lazily when their properties are accessed. A non-None `title` keyword updates
         the title in the PDF stream; None leaves the template's title unchanged. Enabling
@@ -524,9 +524,7 @@ class PdfWrapper:
             str | None: The PDF version as a string, or None if the version cannot be determined.
         """
 
-        version = (
-            self._version if self._version is not None else get_version(self._stream)
-        )
+        version = self._recorded_version()
         if not can_need_newer_version(version):
             return version
 
@@ -539,14 +537,14 @@ class PdfWrapper:
         Returns the PDF version read from the template or set by `change_version`.
 
         When the template has no supported header, the version is read from the
-        current PDF stream instead.
+        stored PDF stream instead, without applying pending widget changes.
 
         Returns:
             str | None: The recorded PDF version, before any raise for features
                 that operations added.
         """
 
-        return self._version if self._version is not None else get_version(self._read())
+        return self._version if self._version is not None else get_version(self._stream)
 
     @property
     def fonts(self) -> list:
@@ -571,10 +569,10 @@ class PdfWrapper:
         preserves the page's original widgets and inherits the current wrapper's user
         parameters and PDF version, which is raised for the newer features that
         operations added to the page. A catalog `/Version` override, which the page
-        doesn't keep, counts toward that version. Content of other pages is not copied: links and
-        GoTo actions to other pages are removed, and a field shared with other pages
-        keeps only its widgets on the page. Custom font registration events are
-        replayed onto the page wrappers when needed.
+        doesn't keep, counts toward that version. Content of other pages is not
+        copied: links and GoTo actions to other pages are removed, and a field
+        shared with other pages keeps only its widgets on the page. Custom font
+        registration events are replayed onto the page wrappers when needed.
 
         Returns:
             Sequence[PdfWrapper]: A list of `PdfWrapper` objects, one for each page in the PDF.
@@ -584,18 +582,17 @@ class PdfWrapper:
                 such as an action that resets a field on another page.
         """
 
+        stream = self._read()
         version = self._recorded_version()
         # pages don't keep the catalog, so a /Version override moves to the header
-        version = (
-            get_newest_version([version, get_catalog_version(self._read())]) or version
-        )
+        version = get_newest_version([version, get_catalog_version(stream)]) or version
         result = [
             self.__class__(
                 # the stored stream's header may be a PDF writer's default
                 set_version(each, get_version(each), version),
                 **{param: getattr(self, param) for param, _ in self.USER_PARAMS},
             )
-            for each in self._get_page_streams_with_widgets(self._read())
+            for each in self._get_page_streams_with_widgets(stream)
         ]
         for page in result:
             # so features that operations added still raise the page's version

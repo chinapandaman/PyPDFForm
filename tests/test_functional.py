@@ -1183,7 +1183,7 @@ def test_version_keeps_pending_widget_changes(template_stream, version):
         ("1.4", {"comb": True}, [("comb", False), ("comb", True)], "1.5"),
     ],
 )
-def test_version_counts_pending_widget_changes(
+def test_version_previews_pending_widget_changes(
     template_version, field_options, changes, expected
 ):
     obj = PdfWrapper(_blank_pdf(template_version)).bulk_create_fields(

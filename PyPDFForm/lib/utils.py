@@ -578,6 +578,25 @@ def _version_number(version: str | None) -> tuple[int, ...] | None:
         return None
 
 
+def get_newest_version(versions: Sequence[str | None]) -> str | None:
+    """
+    Gets the newest of several PDF versions.
+
+    Args:
+        versions (Sequence[str | None]): The PDF version strings. None and
+            versions that are not made of numbers are ignored.
+
+    Returns:
+        str | None: The newest version, or None when none can be compared.
+    """
+
+    return max(
+        (version for version in versions if _version_number(version) is not None),
+        key=lambda version: _version_number(version) or (),
+        default=None,
+    )
+
+
 # entries whose name value is looked up in a feature table
 _FEATURE_VERSIONS_BY_NAME = {
     Subtype: FEATURE_VERSIONS_BY_SUBTYPE,
@@ -625,14 +644,12 @@ def _get_feature_version(key: str, value: Any) -> str | None:
         each.get_object()
         for each in (value if isinstance(value, ArrayObject) else [value])
     ]  # a /Filter can be an array of filters
-    return max(
-        (
+    return get_newest_version(
+        [
             table[name]
             for name in names
             if isinstance(name, NameObject) and name in table
-        ),
-        key=lambda each: _version_number(each) or (),
-        default=None,
+        ]
     )
 
 
@@ -716,16 +733,8 @@ def get_output_version(
             `baseline`, otherwise `version`.
     """
 
-    needed = _version_number(required)
-    if needed is None:
-        return version
-
-    current = [
-        number
-        for number in (_version_number(version), _version_number(baseline))
-        if number is not None
-    ]
-    if current and needed <= max(current):
+    covered = get_newest_version([version, baseline])
+    if get_newest_version([covered, required]) == covered:
         return version
 
     return required
@@ -762,25 +771,6 @@ def get_catalog_version(pdf: bytes) -> str | None:
         return value[1:]
 
     return None
-
-
-def get_newest_version(versions: Sequence[str | None]) -> str | None:
-    """
-    Gets the newest of several PDF versions.
-
-    Args:
-        versions (Sequence[str | None]): The PDF version strings. None and
-            versions that are not made of numbers are ignored.
-
-    Returns:
-        str | None: The newest version, or None when none can be compared.
-    """
-
-    return max(
-        (version for version in versions if _version_number(version) is not None),
-        key=lambda version: _version_number(version) or (),
-        default=None,
-    )
 
 
 def can_need_newer_version(version: str | None) -> bool:

@@ -186,8 +186,7 @@ COMB = 1 << 24
 # annotation flag bits
 HIDDEN = 1 << 1
 
-# Minimum PDF versions of the features that PyPDFForm can add, from the
-# "(PDF 1.x)" marks of the PDF Reference
+# entries read when choosing a PDF version
 Info = "/Info"
 Version = "/Version"
 ToUnicode = "/ToUnicode"
@@ -195,6 +194,9 @@ SMask = "/SMask"
 URI = "/URI"
 CA = "/CA"
 ca = "/ca"
+
+# Minimum PDF versions of the features that PyPDFForm can add, from the
+# "(PDF 1.x)" marks of the PDF Reference
 FEATURE_VERSIONS_BY_KEY = {
     # an annotation's title; fields, Hide actions, and threads are 1.1 or later
     T: "1.1",
