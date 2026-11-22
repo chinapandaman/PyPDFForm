@@ -738,7 +738,7 @@ class PdfWrapper:
         widget JavaScript, applied in queue order to a copy of `stream`, so the
         result has the features that `read()` would write. Other changes can't
         change the version, and are left out, so a hook that would fail, such as
-        a font size on a widget without `/DA`, doesn't raise here. The widgets
+        a font size on a field without a valid `/DA`, doesn't raise here. The widgets
         and their queues are not changed. Every JavaScript value is applied as
         an empty script, since only whether a script is written matters, so a
         path or a readable object is left for `read()` to open or read. If a

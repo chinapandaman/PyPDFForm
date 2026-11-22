@@ -605,3 +605,282 @@ def test_version_leaves_failing_tooltip_removal_to_read(template_stream):
     with pytest.raises(ValueError, match="Cannot remove /TU"):
         obj.read()
     assert widget.tooltip == "own tooltip"
+
+
+def _save(pdf):
+    with BytesIO() as f:
+        pdf.save(f)
+        return f.getvalue()
+
+
+def _set_default_appearance(stream, name, default_appearance):
+    # sets the /DA of a field whose widget has its name
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for field in pdf.Root.AcroForm.Fields:
+            if str(field.get("/T")) == name:
+                field.DA = _pdf_value(default_appearance)
+
+        return _save(pdf)
+
+
+# chosen by the lookup, then changed: font size 20, red, or the /Helv font
+CHOSEN_DA = "/Cour 9 Tf 0 0 1 rg"
+OTHER_DA = "/Helv 5 Tf 0 g"
+
+
+def _nest_fields(stream, default_appearances):
+    # makes "test" and "test_2" kids of "inner", a kid of "outer", and sets the
+    # /DA of "test", "inner", "outer", or the AcroForm as given, without others
+    with Pdf.open(BytesIO(stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        kids = [field for field in fields if str(field.get("/T")) in ("test", "test_2")]
+        inner = pdf.make_indirect(
+            Dictionary({"/T": String("inner"), "/Kids": Array(kids)})
+        )
+        outer = pdf.make_indirect(
+            Dictionary({"/T": String("outer"), "/Kids": Array([inner])})
+        )
+        inner.Parent = outer
+        for kid in kids:
+            kid.Parent = inner
+            del kid["/DA"]
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in fields if field not in kids] + [outer]
+        )
+        del pdf.Root.AcroForm["/DA"]
+
+        holders = {
+            "test": next(kid for kid in kids if str(kid.T) == "test"),
+            "inner": inner,
+            "outer": outer,
+            "/AcroForm": pdf.Root.AcroForm,
+        }
+        for holder, default_appearance in default_appearances.items():
+            holders[holder].DA = String(default_appearance)
+
+        return _save(pdf)
+
+
+def _get_default_appearances(stream):
+    # the /DA of each field of _nest_fields, or None without one
+    reader = PdfReader(BytesIO(stream))
+    inner = _find_widget(stream, "test")["/Parent"].get_object()
+    return {
+        "test": _find_widget(stream, "test").get("/DA"),
+        "test_2": _find_widget(stream, "test_2").get("/DA"),
+        "inner": inner.get("/DA"),
+        "outer": inner["/Parent"].get_object().get("/DA"),
+        "/AcroForm": reader.root_object["/AcroForm"].get("/DA"),
+    }
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+@pytest.mark.parametrize(
+    ("name", "value", "expected"),
+    [
+        ("font_size", 20, "/Cour 20 Tf 0 0 1 rg"),
+        ("font_color", (1, 0, 0), "/Cour 9 Tf 1 0 0 rg"),
+        ("font", "/Helv", "/Helv 9 Tf 0 0 1 rg"),
+    ],
+)
+@pytest.mark.parametrize(
+    "default_appearances",
+    [
+        {"/AcroForm": CHOSEN_DA},
+        {"/AcroForm": OTHER_DA, "outer": CHOSEN_DA},
+        {"/AcroForm": OTHER_DA, "outer": OTHER_DA, "inner": CHOSEN_DA},
+        # the widget's own /DA takes precedence over its fields'
+        {"/AcroForm": OTHER_DA, "inner": OTHER_DA, "test": CHOSEN_DA},
+    ],
+    ids=["acroform", "grandparent", "parent", "widget"],
+)
+def test_change_inherited_default_appearance(
+    template_stream,
+    default_appearances,
+    name,
+    value,
+    expected,
+    use_full_widget_name,
+    assert_widgets_match_output,
+):
+    stream = _nest_fields(template_stream, default_appearances)
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    setattr(
+        obj.widgets["outer.inner.test" if use_full_widget_name else "test"], name, value
+    )
+    result = _get_default_appearances(obj.read())
+
+    # only the widget's own field changes; fields shared with "test_2" and the
+    # AcroForm default don't
+    assert result == {
+        "test": expected,
+        "test_2": None,
+        "inner": default_appearances.get("inner"),
+        "outer": default_appearances.get("outer"),
+        "/AcroForm": default_appearances["/AcroForm"],
+    }
+    assert_widgets_match_output(obj)
+
+    # appearance generation uses the changed /DA
+    filled = PdfWrapper(
+        obj.read(),
+        use_full_widget_name=use_full_widget_name,
+        generate_appearance_streams=True,
+    ).fill({"outer.inner.test" if use_full_widget_name else "test": "foo"})
+    appearance = _find_widget(filled.read(), "test")["/AP"]["/N"].get_data()
+    assert f"\n{expected}\n".encode() in appearance
+
+
+@pytest.mark.parametrize(
+    ("parent", "expected"),
+    [("/Cour  0 Tf 0 g", "/Cour  20 Tf 0 g"), (None, "/Helv 20 Tf 0 g ")],
+    ids=["field", "acroform"],
+)
+def test_change_default_appearance_of_kid_widget(
+    sample_template_with_full_key, parent, expected
+):
+    # the widget of "Date mois" has no name, so its parent is the field
+    stream = sample_template_with_full_key
+    if parent is None:
+        with Pdf.open(BytesIO(stream)) as pdf:
+            for page in pdf.pages:
+                for annot in page.get("/Annots", []):
+                    if (
+                        "/Parent" in annot
+                        and str(annot.Parent.get("/T")) == "Date mois"
+                    ):
+                        del annot.Parent["/DA"]
+            stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    obj.widgets["Date mois"].font_size = 20
+    widget = _find_widget(obj.read(), "Date mois")
+
+    assert "/DA" not in widget
+    assert widget["/Parent"].get_object()["/DA"] == expected
+    assert (
+        PdfReader(BytesIO(obj.read())).root_object["/AcroForm"]["/DA"]
+        == "/Helv 0 Tf 0 g "
+    )
+
+
+def test_change_inherited_dropdown_default_appearance(sample_template_with_dropdown):
+    with Pdf.open(BytesIO(sample_template_with_dropdown)) as pdf:
+        for field in pdf.Root.AcroForm.Fields:
+            if str(field.get("/T")) == "dropdown_1":
+                del field["/DA"]
+        pdf.Root.AcroForm.DA = String("/Helv 0 Tf 0 g")
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    obj.widgets["dropdown_1"].font_size = 20
+    obj.widgets["dropdown_1"].font_color = (1, 0, 0)
+
+    assert _find_widget(obj.read(), "dropdown_1")["/DA"] == "/Helv 20 Tf 1 0 0 rg"
+    assert (
+        PdfReader(BytesIO(obj.read())).root_object["/AcroForm"]["/DA"]
+        == "/Helv 0 Tf 0 g"
+    )
+
+
+@pytest.mark.parametrize(
+    ("default_appearance", "name", "value", "expected"),
+    [
+        ("/Helv 12  Tf 0 g", "font_size", 20, "/Helv 20  Tf 0 g"),
+        ("/Helv 12 Tf\n0 g", "font_color", (1, 0, 0), "/Helv 12 Tf\n1 0 0 rg"),
+        (
+            ".2666667 .2666667 .2666667 rg\n/F0 8 Tf\n",
+            "font_color",
+            (1, 0, 0),
+            "1 0 0 rg\n/F0 8 Tf\n",
+        ),
+        ("/Helv 12 Tf 0 g 2 Tz", "font_color", (1, 0, 0), "/Helv 12 Tf 1 0 0 rg 2 Tz"),
+        ("/Helv 12 Tf 0 0 0 .9 k", "font_color", (0, 0, 1), "/Helv 12 Tf 0 0 1 rg"),
+        ("/Helv 12 Tf", "font_color", (1, 0, 0), "/Helv 12 Tf 1 0 0 rg"),
+        ("1 0 0 rg ", "font_color", (0, 0, 1), "0 0 1 rg "),
+        ("", "font_color", (1, 0, 0), "1 0 0 rg"),
+        # a font name without its slash, as some producers write it
+        ("Courier 12 Tf .1 .1 .1 rg", "font", "/Helv", "/Helv 12 Tf .1 .1 .1 rg"),
+        ("Courier 12 Tf .1 .1 .1 rg", "font_size", 20, "Courier 20 Tf .1 .1 .1 rg"),
+        (
+            "/ZaDb 5.6 Tf 0 g /Helv 5.6 Tf 0 g",
+            "font_size",
+            9,
+            "/ZaDb 9 Tf 0 g /Helv 9 Tf 0 g",
+        ),
+        (
+            "/ZaDb 5.6 Tf 0 g /Helv 5.6 Tf 0 g",
+            "font_color",
+            (1, 0, 0),
+            "/ZaDb 5.6 Tf 1 0 0 rg /Helv 5.6 Tf 1 0 0 rg",
+        ),
+        ("/Helv 12 Tf 0 g % gray", "font_size", 20, "/Helv 20 Tf 0 g % gray"),
+    ],
+)
+def test_change_default_appearance_operands(
+    template_stream, default_appearance, name, value, expected
+):
+    obj = PdfWrapper(
+        _set_default_appearance(template_stream, "test", default_appearance)
+    )
+    setattr(obj.widgets["test"], name, value)
+
+    assert _find_widget(obj.read(), "test")["/DA"] == expected
+
+
+def _with_parent_cycle(stream, name):
+    # the field's /DA is removed, and its parent is its own parent
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for field in pdf.Root.AcroForm.Fields:
+            if str(field.get("/T")) == name:
+                parent = pdf.make_indirect(Dictionary({"/Kids": Array([field])}))
+                parent.Parent = parent
+                field.Parent = parent
+                del field["/DA"]
+
+        return _save(pdf)
+
+
+@pytest.mark.parametrize(
+    ("default_appearance", "name", "value", "message"),
+    [
+        ("0 g", "font_size", 20, "has no Tf operator"),
+        ("0 g", "font", "/Helv", "has no Tf operator"),
+        ("/Helv Tf 0 g", "font_size", 20, "needs a font and a font size"),
+        ("12 Tf 0 g", "font", "/Helv", "needs a font and a font size"),
+        ("/Helv /F1 Tf 0 g", "font_size", 20, "needs a font and a font size"),
+        ("/Helv 12 Tf (x) Tj", "font_size", 20, r"unexpected '\('"),
+        ("/Helv 12 Tf 0", "font_color", (1, 0, 0), "ends with operands"),
+        ("/Helv 12 Tf 0 0 g", "font_color", (1, 0, 0), "g operator .* needs 1 number"),
+        ("/Helv 12 Tf /X 0 0 rg", "font_color", (1, 0, 0), "needs 3 numbers"),
+        (12, "font_size", 20, "is not a string"),
+        (None, "font_size", 20, "the /Parent chain of the field has a cycle"),
+    ],
+)
+def test_change_default_appearance_errors(
+    template_stream,
+    default_appearance,
+    name,
+    value,
+    message,
+    assert_widgets_match_output,
+):
+    stream = (
+        _with_parent_cycle(template_stream, "test")
+        if default_appearance is None
+        else _set_default_appearance(template_stream, "test", default_appearance)
+    )
+    obj = PdfWrapper(stream)
+    original = obj.read()
+    # applied before the failing change, and discarded with it
+    obj.widgets["test"].alignment = 2
+    setattr(obj.widgets["test"], name, value)
+
+    with pytest.raises(ValueError, match=message):
+        obj.read()
+
+    assert obj.widgets["test"].alignment is None
+    assert getattr(obj.widgets["test"], name) is None
+    assert not obj.widgets["test"].hooks_to_trigger
+    assert obj.read() == original
+    assert_widgets_match_output(obj)

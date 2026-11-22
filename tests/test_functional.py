@@ -1161,7 +1161,7 @@ def test_version_keeps_pending_widget_changes(template_stream, version):
     assert obj.widgets["test"].hooks_to_trigger
 
     # the font size can't be set without a default appearance
-    with pytest.raises(KeyError):
+    with pytest.raises(ValueError, match="Cannot change /DA"):
         obj.read()
 
 
@@ -1769,7 +1769,9 @@ def test_commit_widget_key_updates_keeps_pending_value(
 
 
 def _without_default_appearance(stream, key):
+    # neither the field nor the AcroForm default sets a default appearance
     writer = PdfWriter(BytesIO(stream))
+    del writer.root_object["/AcroForm"][NameObject(DA)]
     for annot in writer.pages[0]["/Annots"]:
         annot = annot.get_object()
         if annot.get(T) == key:
@@ -1790,7 +1792,7 @@ def test_failed_hook_reverts_queued_updates(
     obj.widgets["test"].font_size = 20
 
     # the font size can't be set without a default appearance
-    with pytest.raises(KeyError):
+    with pytest.raises(ValueError, match="Cannot change /DA"):
         obj.read()
 
     assert obj.widgets["test_2"].x == x
@@ -1803,6 +1805,51 @@ def test_failed_hook_reverts_queued_updates(
 
     obj.widgets["test_2"].x = 300
     assert PdfWrapper(obj.read()).widgets["test_2"].x == 300
+
+
+@pytest.mark.cli_test
+def test_cli_font_size_of_acroform_default_appearance(template_stream, tmp_path):
+    # the field's /DA is the AcroForm default, which raised KeyError('/DA')
+    writer = PdfWriter(BytesIO(template_stream))
+    field = next(
+        annot.get_object()
+        for annot in writer.pages[0]["/Annots"]
+        if annot.get_object().get(T) == "test"
+    )
+    writer.root_object[AcroForm][NameObject(DA)] = field[DA]
+    del field[DA]
+    path = tmp_path / "input.pdf"
+    with open(path, "wb") as f:
+        writer.write(f)
+
+    result = CliRunner().invoke(
+        cli_app, ["update", "field", str(path), "--field", "test", "--font_size", "14"]
+    )
+
+    assert result.exit_code == 0, result.output
+    reader = PdfReader(path)
+    widget = next(
+        annot.get_object()
+        for annot in reader.pages[0]["/Annots"]
+        if annot.get_object().get(T) == "test"
+    )
+    assert widget[DA] == "/Arial 14 Tf 0 g"
+    assert reader.root_object[AcroForm][DA] == "/Arial 0 Tf 0 g"
+
+
+@pytest.mark.cli_test
+def test_cli_font_size_without_default_appearance(template_stream, tmp_path):
+    original = _without_default_appearance(template_stream, "test")
+    path = tmp_path / "input.pdf"
+    path.write_bytes(original)
+
+    result = CliRunner().invoke(
+        cli_app, ["update", "field", str(path), "--field", "test", "--font_size", "14"]
+    )
+
+    assert result.exit_code == 1
+    assert isinstance(result.exception, ValueError)
+    assert path.read_bytes() == original
 
 
 @pytest.mark.parametrize(
