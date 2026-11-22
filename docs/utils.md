@@ -170,3 +170,5 @@ PyPDFForm allows you to set the PDF version to any supported value up to 2.0:
     ```shell
     pypdfform update version sample_template.pdf -v 2.0 -o output.pdf
     ```
+
+Otherwise, the output keeps the template's PDF version, unless an operation adds something that needs a newer version. For example, adding a form field to a PDF 1.1 document makes it PDF 1.2. A version you set is kept for what the PDF already contains, and later operations can raise it again.

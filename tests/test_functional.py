@@ -16,6 +16,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
     ArrayObject,
     DictionaryObject,
+    FloatObject,
     NameObject,
     NullObject,
     NumberObject,
@@ -49,7 +50,12 @@ from PyPDFForm.lib.middleware.base import Widget
 from PyPDFForm.lib.middleware.checkbox import Checkbox
 from PyPDFForm.lib.middleware.radio import Radio
 from PyPDFForm.lib.template import get_widget_key, get_widgets_by_page
-from PyPDFForm.lib.utils import get_version, set_version
+from PyPDFForm.lib.utils import (
+    get_output_version,
+    get_required_version,
+    get_version,
+    set_version,
+)
 
 
 def test_deprecation_warning():
@@ -815,6 +821,301 @@ def test_change_version_after_rewrite(template_stream):
 
     # the version PDF writers emit by default
     obj.fill({"test_2": "test_2"}).change_version("1.3")
+    assert obj.version == "1.3"
+    assert obj.read().startswith(b"%PDF-1.3")
+    assert obj.pages[0].read().startswith(b"%PDF-1.3")
+
+
+def _blank_pdf(version):
+    writer = PdfWriter()
+    writer.add_blank_page(width=360, height=360)
+    writer.pdf_header = f"%PDF-{version}"
+    with BytesIO() as f:
+        writer.write(f)
+        return f.getvalue()
+
+
+@pytest.mark.parametrize(
+    ("entries", "expected"),
+    [
+        ({}, None),
+        ({"/FontFile2": NullObject()}, "1.1"),
+        ({"/OpenAction": ArrayObject()}, "1.1"),
+        ({"/S": NameObject("/URI")}, "1.1"),
+        ({"/AcroForm": DictionaryObject()}, "1.2"),
+        ({"/Subtype": NameObject("/Widget")}, "1.2"),
+        ({"/Filter": NameObject("/FlateDecode")}, "1.2"),
+        (
+            {
+                "/Filter": ArrayObject(
+                    [NameObject("/ASCIIHexDecode"), NameObject("/FlateDecode")]
+                )
+            },
+            "1.2",
+        ),
+        ({"/Filter": NameObject("/ASCIIHexDecode")}, None),
+        ({"/ToUnicode": NullObject()}, "1.2"),
+        ({"/S": NameObject("/JavaScript")}, "1.3"),
+        ({"/FT": NameObject("/Sig")}, "1.3"),
+        ({"/FT": NameObject("/Tx")}, None),
+        ({"/TU": TextStringObject("tooltip")}, "1.3"),
+        ({"/Subtype": NameObject("/Stamp")}, "1.3"),
+        ({"/Subtype": NameObject("/Highlight")}, "1.3"),
+        ({"/Subtype": NameObject("/Underline")}, "1.3"),
+        ({"/Subtype": NameObject("/StrikeOut")}, "1.3"),
+        ({"/Subtype": NameObject("/Squiggly")}, "1.4"),
+        ({"/Subtype": NameObject("/Text")}, None),
+        ({"/Subtype": DictionaryObject()}, None),
+        ({"/SMask": NameObject("/None")}, "1.4"),
+        ({"/CA": FloatObject(0.5)}, "1.4"),
+        ({"/ca": NumberObject(1)}, "1.4"),
+        # a widget's caption in /MK
+        ({"/CA": TextStringObject("4")}, None),
+        ({"/Ff": NumberObject(1 << 24)}, "1.5"),
+        ({"/Ff": NumberObject(1 << 12)}, None),
+        ({"/S": NameObject("/JavaScript"), "/Ff": NumberObject(1 << 24)}, "1.5"),
+    ],
+)
+def test_required_version(entries, expected):
+    writer = PdfWriter()
+    writer.add_blank_page(width=360, height=360)
+    add_object = writer._add_object  # type: ignore # noqa: SLF001
+    test_dict = DictionaryObject(
+        {NameObject(key): value for key, value in entries.items()}
+    )
+    reference = add_object(test_dict)
+    # an indirect value, and a cycle back to the dictionary
+    test_dict[NameObject("/Self")] = reference
+    writer.root_object[NameObject("/Test")] = add_object(
+        ArrayObject([reference, add_object(DictionaryObject())])
+    )
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    assert get_required_version(stream) == expected
+
+
+def test_required_version_of_title_and_unreadable_streams():
+    writer = PdfWriter()
+    writer.add_blank_page(width=360, height=360)
+    writer.root_object[NameObject("/Test")] = DictionaryObject(
+        {NameObject("/Title"): TextStringObject("not the document title")}
+    )
+    with BytesIO() as f:
+        writer.write(f)
+        assert get_required_version(f.getvalue()) is None
+
+    writer.add_metadata({"/Title": "My PDF"})
+    with BytesIO() as f:
+        writer.write(f)
+        assert get_required_version(f.getvalue()) == "1.1"
+
+    assert get_required_version(b"") is None
+    assert get_required_version(b"not a pdf") is None
+
+
+@pytest.mark.parametrize(
+    ("version", "baseline", "required", "expected"),
+    [
+        ("1.7", "1.4", "1.5", "1.7"),
+        ("1.1", None, "1.2", "1.2"),
+        ("1.1", "1.0", "1.2", "1.2"),
+        # the template already understates its own content
+        ("1.0", "1.4", "1.2", "1.0"),
+        ("1.1", "1.0", None, "1.1"),
+        (None, None, "1.2", "1.2"),
+        (None, None, None, None),
+        ("unknown", None, "1.2", "1.2"),
+    ],
+)
+def test_output_version(version, baseline, required, expected):
+    assert get_output_version(version, baseline, required) == expected
+
+
+@pytest.mark.parametrize(
+    ("template_version", "operation", "expected", "expected_page"),
+    [
+        (
+            "1.0",
+            lambda obj, font, image: obj.annotate(
+                [Annotations.TextAnnotation(1, 10, 10)]
+            ),
+            "1.0",
+            "1.0",
+        ),
+        (
+            "1.0",
+            lambda obj, font, image: obj.draw([RawElements.RawText("text", 1, 10, 10)]),
+            "1.0",
+            "1.0",
+        ),
+        (
+            "1.0",
+            lambda obj, font, image: setattr(obj, "title", "My PDF"),
+            "1.1",
+            "1.1",
+        ),
+        (
+            "1.0",
+            lambda obj, font, image: obj.annotate(
+                [Annotations.LinkAnnotation(1, 10, 10, uri="https://example.com")]
+            ),
+            "1.1",
+            "1.1",
+        ),
+        (
+            "1.1",
+            lambda obj, font, image: obj.bulk_create_fields(
+                [Fields.TextField("name", 1, 50, 50, width=100, height=20)]
+            ),
+            "1.2",
+            "1.2",
+        ),
+        (
+            "1.0",
+            lambda obj, font, image: obj.register_font("new_font", font),
+            "1.2",
+            "1.2",
+        ),
+        (
+            "1.2",
+            lambda obj, font, image: setattr(
+                obj, "on_open_javascript", "app.alert('opened');"
+            ),
+            "1.3",
+            # pages don't copy the document-open action
+            "1.2",
+        ),
+        (
+            "1.2",
+            lambda obj, font, image: obj.bulk_create_fields(
+                [Fields.SignatureField("signature", 1, 50, 50)]
+            ),
+            "1.3",
+            "1.3",
+        ),
+        (
+            "1.2",
+            lambda obj, font, image: obj.bulk_create_fields(
+                [Fields.TextField("name", 1, 50, 50, tooltip="tooltip")]
+            ),
+            "1.3",
+            "1.3",
+        ),
+        (
+            "1.2",
+            lambda obj, font, image: obj.annotate(
+                [
+                    Annotations.RubberStampAnnotation(1, 10, 10),
+                    Annotations.HighlightAnnotation(1, 40, 10),
+                    Annotations.UnderlineAnnotation(1, 70, 10),
+                    Annotations.StrikeOutAnnotation(1, 100, 10),
+                ]
+            ),
+            "1.3",
+            "1.3",
+        ),
+        (
+            "1.3",
+            lambda obj, font, image: obj.annotate(
+                [Annotations.SquigglyAnnotation(1, 10, 10)]
+            ),
+            "1.4",
+            "1.4",
+        ),
+        (
+            "1.3",
+            lambda obj, font, image: obj.draw(
+                [RawElements.RawImage(image, 1, 10, 10, 50, 50)]
+            ),
+            "1.4",
+            "1.4",
+        ),
+        (
+            "1.4",
+            lambda obj, font, image: obj.bulk_create_fields(
+                [Fields.TextField("name", 1, 50, 50, max_length=4, comb=True)]
+            ),
+            "1.5",
+            "1.5",
+        ),
+        (
+            "1.7",
+            lambda obj, font, image: obj.bulk_create_fields(
+                [Fields.TextField("name", 1, 50, 50, max_length=4, comb=True)]
+            ),
+            "1.7",
+            "1.7",
+        ),
+    ],
+    ids=[
+        "text_annotation",
+        "draw_text",
+        "title",
+        "uri_link",
+        "text_field",
+        "register_font",
+        "on_open_javascript",
+        "signature_field",
+        "tooltip",
+        "stamp_and_text_markup",
+        "squiggly",
+        "transparent_image",
+        "comb",
+        "comb_on_newer_template",
+    ],
+)
+def test_version_raised_for_added_feature(
+    sample_font_stream,
+    image_samples,
+    template_version,
+    operation,
+    expected,
+    expected_page,
+):
+    obj = PdfWrapper(_blank_pdf(template_version))
+    operation(
+        obj,
+        sample_font_stream,
+        os.path.join(image_samples, "sample_transparent_png.png"),
+    )
+
+    assert obj.version == expected
+    assert obj.read().startswith(f"%PDF-{expected}".encode())
+    assert obj.pages[0].version == expected_page
+    assert obj.pages[0].read().startswith(f"%PDF-{expected_page}".encode())
+    assert PdfArray([obj]).merge().read().startswith(f"%PDF-{expected}".encode())
+
+
+def test_version_kept_when_template_understates_its_content(pdf_samples):
+    # the template declares 1.0 but has an AcroForm and constant opacity (1.4)
+    obj = PdfWrapper(os.path.join(pdf_samples, "versions", "1.0.pdf"))
+    obj.annotate([Annotations.RubberStampAnnotation(1, 10, 10)])
+    assert obj.version == "1.0"
+    assert obj.read().startswith(b"%PDF-1.0")
+    assert obj.pages[0].read().startswith(b"%PDF-1.0")
+
+    obj.bulk_create_fields(
+        [Fields.TextField("name", 1, 50, 50, max_length=4, comb=True)]
+    )
+    assert obj.version == "1.5"
+    assert obj.read().startswith(b"%PDF-1.5")
+
+
+def test_change_version_kept_for_existing_features():
+    obj = PdfWrapper(_blank_pdf("1.1")).bulk_create_fields(
+        [Fields.TextField("name", 1, 50, 50, width=100, height=20)]
+    )
+    assert obj.version == "1.2"
+
+    obj.change_version("1.1")
+    assert obj.version == "1.1"
+    assert obj.read().startswith(b"%PDF-1.1")
+    assert obj.pages[0].read().startswith(b"%PDF-1.1")
+    assert PdfArray([obj]).merge().read().startswith(b"%PDF-1.1")
+
+    obj.annotate([Annotations.RubberStampAnnotation(1, 10, 10)])
     assert obj.version == "1.3"
     assert obj.read().startswith(b"%PDF-1.3")
     assert obj.pages[0].read().startswith(b"%PDF-1.3")

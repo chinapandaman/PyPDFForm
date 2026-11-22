@@ -186,6 +186,51 @@ COMB = 1 << 24
 # annotation flag bits
 HIDDEN = 1 << 1
 
+# Minimum PDF versions of the features that PyPDFForm can add, from the
+# "(PDF 1.x)" marks of the PDF Reference
+Info = "/Info"
+ToUnicode = "/ToUnicode"
+SMask = "/SMask"
+URI = "/URI"
+CA = "/CA"
+ca = "/ca"
+FEATURE_VERSIONS_BY_KEY = {
+    FontFile2: "1.1",
+    OpenAction: "1.1",
+    AcroForm: "1.2",
+    ToUnicode: "1.2",
+    TU: "1.3",
+    SMask: "1.4",
+}
+FEATURE_VERSIONS_BY_SUBTYPE = {
+    Widget: "1.2",
+    "/Stamp": "1.3",
+    "/Highlight": "1.3",
+    "/Underline": "1.3",
+    "/StrikeOut": "1.3",
+    "/Squiggly": "1.4",
+}
+FEATURE_VERSIONS_BY_ACTION = {URI: "1.1", JavaScript: "1.3"}
+FEATURE_VERSIONS_BY_FILTER = {FlateDecode: "1.2"}
+FEATURE_VERSIONS_BY_FIELD_TYPE = {Sig: "1.3"}
+TITLE_VERSION = "1.1"  # the title in the document information dictionary
+ALPHA_VERSION = "1.4"  # a numeric /CA or /ca, for constant opacity
+COMB_VERSION = "1.5"  # also RadiosInUnison, the same bit for radio buttons
+# no feature above needs a newer version, so newer documents are never raised
+NEWEST_FEATURE_VERSION = max(
+    [
+        *FEATURE_VERSIONS_BY_KEY.values(),
+        *FEATURE_VERSIONS_BY_SUBTYPE.values(),
+        *FEATURE_VERSIONS_BY_ACTION.values(),
+        *FEATURE_VERSIONS_BY_FILTER.values(),
+        *FEATURE_VERSIONS_BY_FIELD_TYPE.values(),
+        TITLE_VERSION,
+        ALPHA_VERSION,
+        COMB_VERSION,
+    ],
+    key=lambda version: tuple(int(part) for part in version.split(".")),
+)
+
 # reportlab acroform func
 fieldFlags = "fieldFlags"
 required = "required"
