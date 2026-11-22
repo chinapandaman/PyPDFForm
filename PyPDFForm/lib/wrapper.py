@@ -143,6 +143,8 @@ class PdfWrapper:
         operations change one object.
         Omitting the template, or passing empty bytes or an empty stream, creates an empty
         wrapper; a missing path raises instead.
+        The PDF version is read from the template's header before the `title` keyword
+        is applied, so output keeps it after operations that rewrite the PDF.
         The title and document-open JavaScript remain in the PDF stream and are read
         lazily when their properties are accessed. A non-None `title` keyword updates
         the title in the PDF stream; None leaves the template's title unchanged. Enabling
@@ -171,7 +173,7 @@ class PdfWrapper:
         self._stream = share_inline_fields(fp_or_f_obj_or_stream_to_stream(template))
         self.widgets = {}
 
-        self._version = None
+        self._version = get_version(self._stream)  # before PDF writers rewrite it
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
         self._font_register_events = []  # for drawing, font lookups, and new wrappers
@@ -488,9 +490,11 @@ class PdfWrapper:
         """
         Returns the PDF version of the underlying PDF document.
 
-        The version is read from the PDF header lazily and cached so egress-only
-        rewrites can restore the wrapper's original version even if an underlying
-        PDF writer emits a different default header.
+        The version is read from the template's header when the wrapper is created,
+        or set by `change_version`. `read()` writes it into the output header, since
+        an underlying PDF writer may emit a different default header. When the
+        template has no supported header, the version is read from the current PDF
+        stream instead.
 
         Returns:
             str | None: The PDF version as a string, or None if the version cannot be determined.
@@ -522,10 +526,10 @@ class PdfWrapper:
 
         This allows you to work with individual pages of the PDF. Each page wrapper
         preserves the page's original widgets and inherits the current wrapper's user
-        parameters. Content of other pages is not copied: links and GoTo actions to
-        other pages are removed, and a field shared with other pages keeps only its
-        widgets on the page. Custom font registration events are replayed onto the
-        page wrappers when needed.
+        parameters and PDF version. Content of other pages is not copied: links and
+        GoTo actions to other pages are removed, and a field shared with other pages
+        keeps only its widgets on the page. Custom font registration events are
+        replayed onto the page wrappers when needed.
 
         Returns:
             Sequence[PdfWrapper]: A list of `PdfWrapper` objects, one for each page in the PDF.
@@ -535,9 +539,11 @@ class PdfWrapper:
                 such as an action that resets a field on another page.
         """
 
+        version = self.version
         result = [
             self.__class__(
-                each,
+                # the stored stream's header may be a PDF writer's default
+                set_version(each, get_version(each), version),
                 **{param: getattr(self, param) for param, _ in self.USER_PARAMS},
             )
             for each in self._get_page_streams_with_widgets(self._read())
@@ -599,7 +605,7 @@ class PdfWrapper:
            array, keeping every field already listed, including fields without
            a widget on a page. The stream is left unchanged when no page has a
            widget annotation.
-        4. Restores the wrapper's cached PDF header version after egress
+        4. Writes the wrapper's PDF version into the header after egress
            processing, since PDF writers may emit their own default version.
         The wrapper's stored stream is not replaced by these final egress-only changes.
 
@@ -708,9 +714,10 @@ class PdfWrapper:
         """
         Changes the PDF version of the underlying document.
 
-        The method replaces the first PDF header version marker in the current stream
-        and updates the cached version used by later egress processing. It does not
-        otherwise validate or rewrite the document for version-specific compatibility.
+        The method replaces the PDF header version marker of the current stream, which
+        an earlier operation's PDF writer may have set to its own default, and updates
+        the version that `read()` writes into its output. It does not otherwise
+        validate or rewrite the document for version-specific compatibility.
 
         Args:
             version (str): The new PDF version string (e.g., "1.7").
@@ -720,8 +727,10 @@ class PdfWrapper:
         """
 
         current_stream = self._read()
-        updated_stream = set_version(current_stream, self.version, version)
-        if updated_stream != current_stream:
+        updated_stream = set_version(
+            current_stream, get_version(current_stream), version
+        )
+        if updated_stream != current_stream or get_version(updated_stream) == version:
             self._stream = updated_stream
             self._version = version
 

@@ -779,6 +779,47 @@ def test_version(pdf_samples):
     assert obj.read().startswith(b"%PDF-2.0")
 
 
+@pytest.mark.parametrize("read_version_first", [False, True])
+@pytest.mark.parametrize(
+    "operation",
+    [
+        lambda obj: obj.remove_fields(["test"]),
+        lambda obj: obj.fill({"test": "test_1"}),
+        lambda obj: setattr(obj.widgets["test"], "font_size", 20),
+        lambda obj: setattr(obj, "title", "My PDF"),
+    ],
+    ids=["remove_fields", "fill", "widget_property", "title"],
+)
+def test_version_kept_after_rewrite(template_stream, operation, read_version_first):
+    obj = PdfWrapper(template_stream)
+    if read_version_first:
+        assert obj.version == "1.7"
+
+    operation(obj)
+
+    assert obj.version == "1.7"
+    assert obj.read().startswith(b"%PDF-1.7")
+    assert obj.pages[0].version == "1.7"
+    assert obj.pages[0].read().startswith(b"%PDF-1.7")
+
+
+def test_change_version_after_rewrite(template_stream):
+    obj = PdfWrapper(template_stream, title="My PDF")
+    assert obj.version == "1.7"
+    assert obj.read().startswith(b"%PDF-1.7")
+
+    obj.remove_fields(["test"]).change_version("2.0")
+    assert obj.version == "2.0"
+    assert obj.read().startswith(b"%PDF-2.0")
+    assert obj.pages[0].read().startswith(b"%PDF-2.0")
+
+    # the version PDF writers emit by default
+    obj.fill({"test_2": "test_2"}).change_version("1.3")
+    assert obj.version == "1.3"
+    assert obj.read().startswith(b"%PDF-1.3")
+    assert obj.pages[0].read().startswith(b"%PDF-1.3")
+
+
 def test_fill_font_color(
     sample_template_with_font_colors, pdf_samples, request, assert_same_pdf
 ):
