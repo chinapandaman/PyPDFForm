@@ -475,7 +475,9 @@ def get_all_available_fonts(pdf: bytes) -> dict:
 
     This function extracts font resources from the PDF's AcroForm default resources
     and maps each base font name without its leading slash to the resource key used
-    in the PDF, such as `/F1`.
+    in the PDF, such as `/F1`. Each key is written as a PDF name, as a default
+    appearance (`/DA`) uses it, so a character such as a space is escaped, as in
+    `/My#20Font`.
 
     Args:
         pdf (bytes): The PDF file data.
@@ -493,6 +495,7 @@ def get_all_available_fonts(pdf: bytes) -> dict:
 
     result = {}
     for key, value in fonts.items():
-        result[value[BaseFont].replace("/", "")] = key
+        # pypdf decodes escapes in names, such as #20 for a space
+        result[value[BaseFont].replace("/", "")] = NameObject(key).renumber().decode()
 
     return result

@@ -371,7 +371,8 @@ def change_font_color(default_appearance: object, font_color: tuple) -> str:
 
     Args:
         default_appearance (object): The resolved `/DA` value.
-        font_color (tuple): The RGB color, each component from 0 to 1.
+        font_color (tuple): The RGB color, each component from 0 to 1, as a
+            tuple or list of three numbers.
 
     Returns:
         str: The changed `/DA` string.
@@ -379,10 +380,17 @@ def change_font_color(default_appearance: object, font_color: tuple) -> str:
     Raises:
         ValueError: If the `/DA` can't be read, a gray, RGB, or CMYK fill
             color operation doesn't have the number of numeric operands it
-            takes, or a component has no decimal form.
+            takes, the color doesn't have three components, or a component
+            has no decimal form.
     """
     text = to_text(default_appearance, "font color")
     operations = _parse(text, "font color")
+    if not isinstance(font_color, (tuple, list)) or len(font_color) != 3:
+        msg = (
+            f"Cannot change the font color: {font_color!r} is not an RGB color "
+            "with three components."
+        )
+        raise ValueError(msg)
     color = (
         " ".join(_format_number(each, "font color") for each in font_color)
         + f" {_RGB_OPERATOR}"

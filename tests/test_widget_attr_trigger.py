@@ -4,7 +4,7 @@ import os
 from io import BytesIO
 
 import pytest
-from pikepdf import Array, Dictionary, Pdf, String
+from pikepdf import Array, Dictionary, Name, Object, Pdf, String
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject, NullObject
 
@@ -845,6 +845,8 @@ def test_change_inherited_dropdown_default_appearance(sample_template_with_dropd
             (1e-5, 0, 2.5e-7),
             "/Arial 12 Tf 0.00001 0 0.00000025 rg",
         ),
+        # the CLI passes a list
+        ("/Helv 12 Tf 0 g", "font_color", [0, 0, 1], "/Helv 12 Tf 0 0 1 rg"),
         # a NUL separator makes pypdf read a byte string
         (String(b"/Arial\x0012 Tf 0 g"), "font_size", 14, b"/Arial\x0014 Tf 0 g"),
     ],
@@ -891,6 +893,9 @@ def _with_parent_cycle(stream, name):
         ("/Helv 12 Tf 0 g", "font_size", float("inf"), "is not a number a PDF"),
         ("/Helv 12 Tf 0 g", "font_color", (float("nan"), 0, 0), "is not a number"),
         ("/Helv 12 Tf 0 g", "font_color", (1, 0, "red"), "is not a number"),
+        ("/Helv 12 Tf 0 g", "font_color", (1, 0), "with three components"),
+        ("/Helv 12 Tf 0 g", "font_color", (1, 0, 0, 0), "with three components"),
+        ("/Helv 12 Tf 0 g", "font_color", 0.5, "with three components"),
         ("/Helv 12 Tf 0 g", "font", "/My Font", "is not a PDF name"),
         (12, "font_size", 20, "is not a string"),
         (None, "font_size", 20, "the /Parent chain of the field has a cycle"),
@@ -966,3 +971,25 @@ def test_change_default_appearance_over_null(template_stream):
     obj.widgets["test"].font_size = 14
     with pytest.raises(ValueError, match="neither the field nor the form sets one"):
         obj.read()
+
+
+@pytest.mark.parametrize(
+    ("key", "expected"),
+    [("/My Font", "/My#20Font 0 Tf 0 g"), ("/My#Font", "/My#23Font 0 Tf 0 g")],
+)
+def test_change_font_to_resource_with_escaped_name(template_stream, key, expected):
+    # the font's resource key has characters that a PDF name escapes
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        pdf.Root.AcroForm.DR.Font[Name(key)] = pdf.make_indirect(
+            Dictionary(Type=Name.Font, Subtype=Name.Type1, BaseFont=Name.Courier)
+        )
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert "Courier" in obj.fonts
+    obj.widgets["test"].font = "Courier"
+    default_appearance = _find_widget(obj.read(), "test")["/DA"]
+
+    assert default_appearance == expected
+    # the name in /DA is the resource key
+    assert Object.parse(default_appearance.split(" ")[0].encode()) == Name(key)
