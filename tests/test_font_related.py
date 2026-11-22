@@ -9,6 +9,7 @@ from io import BytesIO
 from unittest.mock import MagicMock, patch
 
 import pytest
+from fontTools.ttLib import TTFont as FontToolsTTFont
 from fontTools.ttLib import TTLibError
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject
@@ -368,3 +369,36 @@ def test_font_metrics_added_when_need_appearances_enabled_later(
     assert set(font) == set(expected_fonts["/F1"])
     assert set(font[FontDescriptor]) == set(expected_fonts["/F1"][FontDescriptor])
     assert font[Widths] == expected_fonts["/F1"][Widths]
+
+
+@pytest.mark.parametrize("need_appearances", [False, True])
+def test_font_metrics_for_font_named_like_builtin_font(
+    template_stream, sample_font_stream, need_appearances
+):
+    ttf = FontToolsTTFont(BytesIO(sample_font_stream))
+    for record in ttf["name"].names:
+        if record.nameID == 6:
+            record.string = "Helvetica"
+    with BytesIO() as stream:
+        ttf.save(stream)
+        helvetica = stream.getvalue()
+
+    obj = PdfWrapper(template_stream, need_appearances=need_appearances)
+    obj.register_font("new_font", helvetica)
+    obj.need_appearances = True
+    obj.widgets["test"].font = "new_font"
+    obj.fill({"test": "foo"})
+
+    expected = PdfReader(
+        BytesIO(
+            PdfWrapper(template_stream, need_appearances=True)
+            .register_font("new_font", sample_font_stream)
+            .read()
+        )
+    )
+    expected_font = expected.root_object[AcroForm][DR][Font]["/F1"]
+    font = _font_of_widget(PdfReader(BytesIO(obj.read())), "test")
+    assert font["/BaseFont"] == "/Helvetica"
+    assert font[FontDescriptor]["/FontFile2"].get_data() == helvetica
+    assert set(font[FontDescriptor]) == set(expected_font[FontDescriptor])
+    assert font[Widths] == expected_font[Widths]

@@ -10,7 +10,7 @@ for extracting font information from TTF streams and managing font names within 
 from contextlib import contextmanager
 from functools import lru_cache
 from io import BytesIO
-from re import fullmatch
+from re import fullmatch, sub
 from typing import Generator
 from uuid import uuid4
 from zlib import compress
@@ -103,8 +103,10 @@ def _get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
     """
     Retrieves additional font parameters from a PDF document for a given base font name.
 
-    This function searches the first page's font resources for a font dictionary matching
-    the provided base font name. If a match is found, it extracts the font descriptor
+    This function searches the first page's font resources for a font dictionary with a
+    font descriptor whose base font name, without a subset prefix such as `AAAAAA+`, is
+    the provided base font name. Fonts without a descriptor, such as ReportLab's built-in
+    Helvetica, are skipped. If a match is found, it extracts the font descriptor
     parameters and the font dictionary parameters so they can be copied into a new
     AcroForm font resource.
 
@@ -124,9 +126,14 @@ def _get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
     first_page = reader.get_page(0)
 
     for font in first_page[Resources][Font].values():
-        if base_font_name.replace("/", "") in font[BaseFont]:
+        font = font.get_object()
+        if (
+            FontDescriptor in font
+            and sub(r"^[A-Z]{6}\+", "", font[BaseFont][1:]) == base_font_name[1:]
+        ):
             font_descriptor_params = dict(font[FontDescriptor])
-            font_dict_params = dict(font)
+            # resolved, so no reference into this PDF is copied, such as /ToUnicode
+            font_dict_params = {key: font[key] for key in font}
             break
 
     return font_descriptor_params, font_dict_params
