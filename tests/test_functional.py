@@ -2888,7 +2888,7 @@ def _describe_targets(targets):
 
 def _describe_actions(action):
     # the JavaScript or type of the action and the ones after it, in the
-    # order they are performed, ending a /Next cycle with "cycle"
+    # order they are performed, with "again" for one reached a second time
     result = []
     seen = set()
     pending = [] if action is None else [action]
@@ -2898,7 +2898,7 @@ def _describe_actions(action):
             pending.extend(reversed(list(each)))
             continue
         if each.is_indirect and each.objgen in seen:
-            result.append("cycle")
+            result.append("again")
             continue
         seen.add(each.objgen)
         result.append(str(each.get("/JS", each.get("/N", each.S))))
@@ -2921,6 +2921,17 @@ def _build_action(spec, test):
     elif following is not None:
         action.Next = _build_action(following, test)
     return action
+
+
+def _describe_removal(template_stream, add, read):
+    # the actions read(pdf) finds before removing test, with each action that
+    # names only test shown as the Hide it becomes, and after
+    stream = _with_actions(template_stream, add)
+    with Pdf.open(BytesIO(stream)) as pdf:
+        before = _describe_actions(read(pdf))
+    with Pdf.open(BytesIO(PdfWrapper(stream).remove_fields(["test"]).read())) as pdf:
+        after = _describe_actions(read(pdf))
+    return ["/Hide" if each == "/ResetForm" else each for each in before], after
 
 
 @pytest.mark.parametrize(
@@ -3145,7 +3156,7 @@ def test_remove_fields_updates_actions_everywhere(template_stream):
     ],
     ids=["chain_after", "chain_inside", "stopped_chain", "trigger"],
 )
-def test_remove_fields_chains_with_removed_actions(template_stream, a, aa, expected):
+def test_remove_fields_chains_with_stopped_actions(template_stream, a, aa, expected):
     # an action that names only test does nothing in place, and an entry whose
     # actions all do nothing is removed
     def add(pdf, fields):
@@ -3175,7 +3186,7 @@ def test_remove_fields_chains_with_removed_actions(template_stream, a, aa, expec
         ) == expected
 
 
-def test_remove_fields_makes_followed_action_no_op(template_stream):
+def test_remove_fields_no_op_keeps_type_and_next(template_stream):
     def add(pdf, fields):
         _get_button(pdf).A = Dictionary(
             Type=Name.Action,
@@ -3196,7 +3207,7 @@ def test_remove_fields_makes_followed_action_no_op(template_stream):
 
 
 def test_remove_fields_shared_action_cycle(template_stream):
-    # one removed action in two entries, followed by itself
+    # one action that stops acting, in two entries and followed by itself
     def add(pdf, fields):
         reset = pdf.make_indirect(_build_action(("reset", None), fields["test"]))
         reset.Next = reset
@@ -3208,24 +3219,13 @@ def test_remove_fields_shared_action_cycle(template_stream):
 
     with Pdf.open(BytesIO(obj.read())) as pdf:
         button = _get_button(pdf)
-        assert _describe_actions(button.A) == ["one", "/Hide", "cycle"]
+        assert _describe_actions(button.A) == ["one", "/Hide", "again"]
         assert "/AA" not in button
 
 
-def _describe_removal(template_stream, add, read):
-    # the actions read(pdf) finds before removing test, with each action that
-    # names only test shown as the Hide it becomes, and after
-    stream = _with_actions(template_stream, add)
-    with Pdf.open(BytesIO(stream)) as pdf:
-        before = _describe_actions(read(pdf))
-    with Pdf.open(BytesIO(PdfWrapper(stream).remove_fields(["test"]).read())) as pdf:
-        after = _describe_actions(read(pdf))
-    return ["/Hide" if each == "/ResetForm" else each for each in before], after
-
-
 def test_remove_fields_mutual_action_cycle(template_stream):
-    # removed actions that follow each other, each followed by an action that
-    # keeps acting
+    # actions that stop acting and follow each other, each followed by one
+    # that keeps acting
     def add(pdf, fields):
         first, second = (
             pdf.make_indirect(_build_action(("reset", None), fields["test"]))
@@ -3239,14 +3239,14 @@ def test_remove_fields_mutual_action_cycle(template_stream):
         template_stream, add, lambda pdf: _get_button(pdf).A
     )
 
-    assert expected == ["/Hide", "/Hide", "cycle", "y", "x"]
+    assert expected == ["/Hide", "/Hide", "again", "y", "x"]
     assert result == expected
 
 
 def test_remove_fields_cycle_through_kept_action(template_stream):
-    # a removed action followed by an action that leads back to it. A single
-    # /Next is written as an array, since pypdf 6.19 can't clone a /Next
-    # dictionary whose own /Next is an array.
+    # an action that stops acting, followed by one that leads back to it. A
+    # single /Next is written as an array, since pypdf 6.19 can't clone a
+    # /Next dictionary whose own /Next is an array.
     def add(pdf, fields):
         reset = pdf.make_indirect(_build_action(("reset", None), fields["test"]))
         first = pdf.make_indirect(
@@ -3259,15 +3259,16 @@ def test_remove_fields_cycle_through_kept_action(template_stream):
         template_stream, add, lambda pdf: _get_button(pdf).AA.D
     )
 
-    assert expected == ["/Hide", "/FirstPage", "cycle", "/LastPage"]
+    assert expected == ["/Hide", "/FirstPage", "again", "/LastPage"]
     assert result == expected
 
 
 @pytest.mark.parametrize("kept", [True, False])
 def test_remove_fields_shared_action_branches(template_stream, kept):
-    # each removed action is followed twice by the next one, so there are
-    # 4,096 paths to the last one. The first /Next is an array, since pypdf
-    # 6.19 can't clone a /Next dictionary whose own /Next is an array.
+    # each action that stops acting is followed twice by the next one, so
+    # there are 4,096 paths to the last one. The first /Next is an array,
+    # since pypdf 6.19 can't clone a /Next dictionary whose own /Next is an
+    # array.
     def add(pdf, fields):
         action = pdf.make_indirect(_build_action(("reset", None), fields["test"]))
         if kept:
@@ -3339,7 +3340,7 @@ def test_remove_fields_keeps_repeated_actions(template_stream):
         template_stream, add, lambda pdf: _get_button(pdf).A
     )
 
-    assert expected == ["j", "/Hide", "cycle", "k"]
+    assert expected == ["j", "/Hide", "again", "k"]
     assert result == expected
 
 
@@ -3393,9 +3394,9 @@ def test_remove_fields_overriding_action_in_separate_calls(template_stream, sepa
 
 
 def test_remove_fields_long_action_chain(template_stream):
-    # more removed actions in one chain than Python's recursion limit. The
-    # last action is indirect too, since pypdf 6.19 can't clone an indirect
-    # action whose /Next is a direct one.
+    # more actions that stop acting in one chain than Python's recursion
+    # limit. The last action is indirect too, since pypdf 6.19 can't clone an
+    # indirect action whose /Next is a direct one.
     def add(pdf, fields):
         action = pdf.make_indirect(Dictionary(S=Name.JavaScript, JS=String("after")))
         for _ in range(1050):

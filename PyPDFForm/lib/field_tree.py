@@ -264,10 +264,12 @@ def _get_entry(obj: DictionaryObject, key: str) -> object:
         key (str): The entry's key.
 
     Returns:
-        object: The resolved value, or None when the entry is missing.
+        object: The resolved value, or None when the entry is missing or null,
+            which ISO 32000-1 treats as absent.
     """
     value = obj.get(key)
-    return value.get_object() if value is not None else None
+    value = value.get_object() if value is not None else None
+    return None if isinstance(value, NullObject) else value
 
 
 def _get_field_names(writer: PdfWriter) -> set:
@@ -383,9 +385,10 @@ def _find_actions(root: DictionaryObject) -> _FormActions:
     Every dictionary and array reachable from the catalog is visited once. The
     dictionaries in an `/A`, `/OpenAction`, `/NA`, `/PA`, or `/AA` trigger
     entry are actions; `/NA` and `/PA` are the forward and backward actions of
-    a navigation node. So are the dictionaries with an `/S` entry, which every
-    action has, and the ones in their `/Next` entry. Outline items and
-    navigation nodes, whose `/Next` is the next item or node, have no `/S`.
+    a navigation node. So are the dictionaries with both an `/S` entry, which
+    every action has, and a `/Next` entry, and the dictionaries in that
+    `/Next`. Outline items and navigation nodes, whose `/Next` is the next
+    item or node, have no `/S`.
     Stream contents are not read.
 
     Args:
@@ -514,7 +517,7 @@ def _remove_action_targets(
     stopped = {
         id(action)
         for action, key, targets in actions.targets
-        if _remove_targets(action, key, targets, (detached, names))
+        if _remove_targets(action, key, targets, detached, names)
     }
     if not stopped:
         return
@@ -550,20 +553,20 @@ def _delete_entries(actions: _FormActions, inert: set, live: set) -> None:
         live (set): The `id` of each action that acts, or from which one
             that acts can be reached through `/Next`.
     """
-    inert = set(inert)
+    deleted = set(inert)
     for triggers, owners in actions.additional.values():
         released = _get_entry(triggers, U)
-        if released is None or id(released) not in inert:
+        if released is None or id(released) not in deleted:
             continue
         for owner in owners:
             action = _get_entry(owner, A)
             if isinstance(action, DictionaryObject) and id(action) not in live:
-                inert.add(id(action))
+                deleted.add(id(action))
 
     emptied = set()
     for container, key in actions.entries:
-        if id(container[key]) in inert and not _overrides_other_entry(
-            container, key, inert
+        if id(container[key]) in deleted and not _overrides_other_entry(
+            container, key, deleted
         ):
             del container[key]
             if not container:
@@ -583,7 +586,7 @@ def _overrides_other_entry(container: DictionaryObject, key: str, inert: set) ->
     (ISO 32000-1, Table 194), so deleting it would let that trigger act on
     mouse release. A link annotation or outline item is not permitted to have
     both `/A` and `/Dest`, so a viewer may read either one when both are
-    present. A null `/Dest` is treated as absent.
+    present.
 
     Args:
         container (DictionaryObject): The dictionary with the entry.
@@ -597,8 +600,7 @@ def _overrides_other_entry(container: DictionaryObject, key: str, inert: set) ->
     if key != A:
         return False
 
-    destination = _get_entry(container, Dest)
-    if destination is not None and not isinstance(destination, NullObject):
+    if _get_entry(container, Dest) is not None:
         return True
 
     triggers = get_dictionary(container, AA)
@@ -610,7 +612,8 @@ def _remove_targets(
     action: DictionaryObject,
     key: str,
     targets: list,
-    removal: tuple[Dict[int, DictionaryObject], set],
+    detached: Dict[int, DictionaryObject],
+    names: set,
 ) -> bool:
     """
     Removes removed fields from the targets of one form action.
@@ -619,16 +622,18 @@ def _remove_targets(
         action (DictionaryObject): A ResetForm, SubmitForm, or Hide action.
         key (str): The entry that names its targets.
         targets (list): Its targets, listed before removal.
-        removal (tuple[Dict[int, DictionaryObject], set]): The detached fields
-            and widgets keyed by `id`, and the fully qualified names of the
-            removed fields.
+        detached (Dict[int, DictionaryObject]): Detached fields and widgets
+            keyed by `id`.
+        names (set): The fully qualified names of the removed fields.
 
     Returns:
         bool: True if the action would be left without targets and must
             stop acting instead, as described in `_remove_action_targets`.
     """
     remaining = [
-        each for each in targets if not _is_removed_target(each.get_object(), *removal)
+        each
+        for each in targets
+        if not _is_removed_target(each.get_object(), detached, names)
     ]
     if len(remaining) == len(targets):
         return False
