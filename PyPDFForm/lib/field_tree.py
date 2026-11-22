@@ -22,14 +22,15 @@ from pypdf.generic import (
     IndirectObject,
     NameObject,
     NullObject,
-    NumberObject,
 )
 
 from .constants import (
     AA,
     CO,
     INCLUDE_EXCLUDE,
+    NA,
     NAMED_TARGETS,
+    PA,
     A,
     AcroForm,
     Annots,
@@ -85,7 +86,7 @@ def remove_widgets_by_keys(
     key_set = set(keys)
     writer = PdfWriter(BytesIO(pdf))
     acroform = get_dictionary(writer.root_object, AcroForm) or DictionaryObject()
-    names = _get_field_names(acroform)
+    names = _get_field_names(writer)
     actions = _find_actions(writer.root_object)
 
     matched = {
@@ -125,7 +126,7 @@ def remove_widgets_by_keys(
         if not calculation_order:
             del acroform[CO]
 
-    _remove_action_targets(actions, detached, names - _get_field_names(acroform))
+    _remove_action_targets(actions, detached, names - _get_field_names(writer))
 
     with BytesIO() as f:
         writer.write(f)
@@ -251,21 +252,39 @@ def _is_detached(obj: object, detached: Dict[int, DictionaryObject]) -> bool:
     )
 
 
-def _get_field_names(acroform: DictionaryObject) -> set:
+def _get_entry(obj: DictionaryObject, key: str) -> object:
     """
-    Gets the fully qualified names of the fields in an AcroForm field tree.
-
-    The tree is walked from the `/Fields` array through `/Kids`, joining the
-    partial names (`/T`) of each field and its ancestors with dots, which is
-    how form actions name fields. A `/T` that is not a text string, such as a
-    null, is treated as absent. Each object is visited once.
+    Gets an entry of a dictionary, resolving an indirect reference.
 
     Args:
-        acroform (DictionaryObject): The AcroForm dictionary.
+        obj (DictionaryObject): The dictionary to read.
+        key (str): The entry's key.
 
     Returns:
-        set: The fully qualified names of the fields in the tree.
+        object: The resolved value, or None when the entry is missing.
     """
+    value = obj.get(key)
+    return value.get_object() if value is not None else None
+
+
+def _get_field_names(writer: PdfWriter) -> set:
+    """
+    Gets the fully qualified names of the fields in a PDF.
+
+    These are the names of the fields in the AcroForm field tree, walked from
+    the `/Fields` array through `/Kids`, and of the widget annotations on
+    pages, including widgets whose field is missing from the tree. A name
+    joins the partial names (`/T`) of a field and its ancestors with dots,
+    which is how form actions name fields. A `/T` that is not a text string,
+    such as a null, is treated as absent. Each object is visited once.
+
+    Args:
+        writer (PdfWriter): The PDF writer that owns the pages and field tree.
+
+    Returns:
+        set: The fully qualified names of the fields.
+    """
+    acroform = get_dictionary(writer.root_object, AcroForm) or DictionaryObject()
     result = set()
     stack = [(field, "") for field in get_array(acroform, Fields)]
     seen = set()
@@ -275,14 +294,58 @@ def _get_field_names(acroform: DictionaryObject) -> set:
         if not isinstance(node, DictionaryObject) or id(node) in seen:
             continue
         seen.add(id(node))
-        name = node.get(T)
-        name = name.get_object() if name is not None else None
+        name = _get_entry(node, T)
         if isinstance(name, str):
             prefix = f"{prefix}.{name}" if prefix else str(name)
             result.add(prefix)
         stack.extend((kid, prefix) for kid in get_array(node, Kids))
 
+    for page in writer.pages:
+        for annot in get_array(page, Annots):
+            widget = annot.get_object()
+            if _is_widget_annotation(widget) and (name := _get_full_name(widget)):
+                result.add(name)
+
     return result
+
+
+def _get_full_name(obj: DictionaryObject) -> str:
+    """
+    Gets the fully qualified name of a field or widget from its ancestors.
+
+    Args:
+        obj (DictionaryObject): A field or widget annotation.
+
+    Returns:
+        str: The partial names (`/T`) along its `/Parent` chain, outermost
+            first, joined with dots. The chain ends at a cycle.
+    """
+    parts = []
+    seen = set()
+    node: Optional[DictionaryObject] = obj
+    while node is not None and id(node) not in seen:
+        seen.add(id(node))
+        name = _get_entry(node, T)
+        if isinstance(name, str):
+            parts.append(str(name))
+        node = get_dictionary(node, Parent)
+
+    return ".".join(reversed(parts))
+
+
+def _get_action_type(action: DictionaryObject) -> Optional[NameObject]:
+    """
+    Gets the type of an action.
+
+    Args:
+        action (DictionaryObject): A dictionary in an action entry.
+
+    Returns:
+        Optional[NameObject]: Its resolved `/S` entry, or None when that is
+            missing or not a name, as in some structure attributes.
+    """
+    kind = _get_entry(action, S)
+    return kind if isinstance(kind, NameObject) else None
 
 
 class _FormActions(NamedTuple):
@@ -291,22 +354,23 @@ class _FormActions(NamedTuple):
 
     Attributes:
         entries (list): The `(dictionary, key)` pairs of the `/A`,
-            `/OpenAction`, and `/AA` trigger entries whose value is a
-            dictionary.
-        chains (list): The actions with a `/Next` entry.
-        additional (dict): Each `/AA` dictionary with the dictionaries that
-            hold it, keyed by its `id`.
+            `/OpenAction`, navigation node `/NA` and `/PA`, and `/AA` trigger
+            entries whose value is a dictionary.
+        following (dict): Each action with the actions in its `/Next`,
+            listed before removal, keyed by its `id`.
         targets (list): An `(action, key, targets)` triple for each ResetForm,
             SubmitForm, and Hide action: the entry that names its targets and
             a list of them. The list is taken before removal, which changes
             arrays such as `/Kids` in place, so an action whose array is
             shared with them still lists every target it had.
+        additional (dict): Each `/AA` dictionary with the dictionaries that
+            hold it, keyed by its `id`.
     """
 
     entries: list
-    chains: list
-    additional: dict
+    following: dict
     targets: list
+    additional: dict
 
 
 def _find_actions(root: DictionaryObject) -> _FormActions:
@@ -314,17 +378,20 @@ def _find_actions(root: DictionaryObject) -> _FormActions:
     Finds the actions in the objects reachable from a catalog.
 
     Every dictionary and array reachable from the catalog is visited once. The
-    dictionaries in an `/A`, `/OpenAction`, or `/AA` trigger entry are
-    actions, and so are those in the `/Next` entry of a dictionary with an
-    `/S` entry, which every action has. Outline items, whose `/Next` is the
-    next item, have none. Stream contents are not read.
+    dictionaries in an `/A`, `/OpenAction`, `/NA`, `/PA`, or `/AA` trigger
+    entry are actions; `/NA` and `/PA` are the forward and backward actions of
+    a navigation node. So are the dictionaries with an `/S` entry, which every
+    action has, and the ones in their `/Next` entry. Outline items and
+    navigation nodes, whose `/Next` is the next item or node, have no `/S`.
+    Stream contents are not read.
 
     Args:
         root (DictionaryObject): The document catalog.
 
     Returns:
-        _FormActions: The entries that hold actions, and the targets of the
-            ResetForm, SubmitForm, and Hide actions among them.
+        _FormActions: The entries that hold actions, the actions that follow
+            each action, and the targets of the ResetForm, SubmitForm, and
+            Hide actions among them.
     """
     entries = []
     chains = []
@@ -345,7 +412,9 @@ def _find_actions(root: DictionaryObject) -> _FormActions:
             target = value.get_object()
             if key == Next and S in obj:
                 chains.append(obj)
-            elif key in (A, OpenAction) and isinstance(target, DictionaryObject):
+            elif key in (A, OpenAction, NA, PA) and isinstance(
+                target, DictionaryObject
+            ):
                 entries.append((obj, key))
             elif key == AA and isinstance(target, DictionaryObject):
                 if id(target) not in additional:
@@ -358,19 +427,36 @@ def _find_actions(root: DictionaryObject) -> _FormActions:
                 additional[id(target)][1].append(obj)
             stack.append(value)
 
+    return _FormActions(entries, *_list_actions(entries, chains), additional)
+
+
+def _list_actions(entries: list, chains: list) -> tuple[dict, list]:
+    """
+    Lists the actions that follow each action, and the targets of form actions.
+
+    Args:
+        entries (list): The `(dictionary, key)` pairs of the entries that hold
+            actions.
+        chains (list): The actions with a `/Next` entry.
+
+    Returns:
+        tuple[dict, list]: The `following` and `targets` of `_FormActions`,
+            for the actions in `entries`, the ones in `chains`, and the ones
+            that follow them.
+    """
     actions = {id(container[key]): container[key] for container, key in entries}
     for chain in chains:
-        actions.update(
-            (id(each.get_object()), each.get_object()) for each in _get_next(chain)
-        )
+        actions[id(chain)] = chain
+        for each in _get_next(chain):
+            action = each.get_object()
+            if isinstance(action, DictionaryObject):
+                actions[id(action)] = action
 
+    following = {}
     targets = []
     for action in actions.values():
-        key = (
-            NAMED_TARGETS.get(action.get(S))
-            if isinstance(action, DictionaryObject)
-            else None
-        )
+        following[id(action)] = (action, _get_next(action))
+        key = NAMED_TARGETS.get(_get_action_type(action))
         if key is not None and key in action:
             value = action[key]
             targets.append(
@@ -383,7 +469,7 @@ def _find_actions(root: DictionaryObject) -> _FormActions:
                 )
             )
 
-    return _FormActions(entries, chains, additional, targets)
+    return following, targets
 
 
 def _remove_action_targets(
@@ -406,10 +492,13 @@ def _remove_action_targets(
     SubmitForm action that acts on every field except the ones it names
     (`INCLUDE_EXCLUDE`) is kept with an empty `/Fields`, which still means
     every field. Each entry that holds a removed action gets the actions in
-    its `/Next` instead, in order; an `/A`, `/OpenAction`, or `/AA` trigger
-    entry that would get several gets a copy of the first one, followed by
-    its own `/Next` and then the others. An entry left without actions is
-    deleted, and so is an `/AA` dictionary left without triggers.
+    its `/Next` instead, in order, as described in `_get_remaining`. Every
+    replacement is worked out before any entry is changed, so each one
+    follows the original `/Next` links. An `/A`, `/OpenAction`, `/NA`, `/PA`,
+    or `/AA` trigger entry that would get several actions gets a copy of the
+    first one, followed by its own `/Next` and then the others. An entry left
+    without actions is deleted, and so is an `/AA` dictionary left without
+    triggers.
 
     Args:
         actions (_FormActions): The actions, found before removal.
@@ -426,19 +515,27 @@ def _remove_action_targets(
     if not removed:
         return
 
-    for chain in actions.chains:
-        following = _get_next(chain)
-        if any(id(each.get_object()) in removed for each in following):
-            _set_actions(chain, Next, _get_remaining(following, removed))
+    following = {key: value[1] for key, value in actions.following.items()}
+    chains = [
+        (action, _get_remaining(next_actions, removed, following))
+        for key, (action, next_actions) in actions.following.items()
+        if key not in removed
+        and any(id(each.get_object()) in removed for each in next_actions)
+    ]
+    entries = [
+        (container, key, _get_remaining([container.raw_get(key)], removed, following))
+        for container, key in actions.entries
+        if id(container[key]) in removed
+    ]
+
+    for action, remaining in chains:
+        _set_actions(action, Next, remaining)
 
     emptied = set()
-    for container, key in actions.entries:
-        if key in container and id(container[key]) in removed:
-            _set_actions(
-                container, key, _get_remaining([container.raw_get(key)], removed)
-            )
-            if not container:
-                emptied.add(id(container))
+    for container, key, remaining in entries:
+        _set_actions(container, key, remaining)
+        if not container:
+            emptied.add(id(container))
 
     for actions_dict, owners in actions.additional.values():
         if id(actions_dict) in emptied:
@@ -473,9 +570,9 @@ def _remove_targets(
     if len(remaining) == len(targets):
         return False
 
-    flags = action.get(Flags, NumberObject(0)).get_object()
+    flags = _get_entry(action, Flags)
     if not remaining and (
-        action.get(S) == Hide
+        _get_action_type(action) == Hide
         or not (isinstance(flags, int) and flags & INCLUDE_EXCLUDE)
     ):
         return True
@@ -528,29 +625,43 @@ def _get_next(action: DictionaryObject) -> list:
     )
 
 
-def _get_remaining(actions: list, removed: set, path: frozenset = frozenset()) -> list:
+def _get_remaining(actions: list, removed: set, following: dict) -> list:
     """
     Replaces removed actions in a list with the actions that follow them.
+
+    A removed action is replaced by its remaining following actions, which
+    are found the same way. A removed action reached again while it is being
+    replaced is skipped, so a `/Next` cycle ends. The lists are walked with a
+    stack rather than recursion, so a long chain of removed actions doesn't
+    exhaust Python's recursion limit.
 
     Args:
         actions (list): Actions, possibly indirect references.
         removed (set): The `id` of each removed action.
-        path (frozenset): The `id` of each removed action already replaced on
-            the way here, so that a `/Next` cycle ends.
+        following (dict): The actions in the `/Next` of each action, listed
+            before removal, keyed by its `id`.
 
     Returns:
         list: The actions, each removed one replaced by its remaining
             following actions.
     """
     result = []
-    for each in actions:
-        action = each.get_object()
-        if id(action) not in removed:
+    replacing = set()
+    stack = [(None, iter(actions))]
+    while stack:
+        replaced, entries = stack[-1]
+        each = next(entries, None)
+        if each is None:
+            stack.pop()
+            replacing.discard(replaced)
+            continue
+
+        key = id(each.get_object())
+        if key not in removed:
             result.append(each)
-        elif id(action) not in path:
-            result.extend(
-                _get_remaining(_get_next(action), removed, path | {id(action)})
-            )
+        elif key not in replacing:
+            replacing.add(key)
+            stack.append((key, iter(following[key])))
 
     return result
 

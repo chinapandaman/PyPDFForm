@@ -3066,6 +3066,9 @@ def test_remove_fields_updates_actions_everywhere(template_stream):
         button.A = action()
         button.AA = Dictionary(D=action())
         pdf.pages[0].obj.AA = Dictionary(O=action())
+        pdf.pages[0].obj.PresSteps = Dictionary(
+            Type=Name.NavNode, NA=action(), PA=action()
+        )
         fields["group"].AA = Dictionary(K=action())
         pdf.Root.OpenAction = action()
         pdf.Root.AA = Dictionary(WC=action())
@@ -3100,6 +3103,8 @@ def test_remove_fields_updates_actions_everywhere(template_stream):
             "annotation": button.A,
             "annotation_trigger": button.AA.D,
             "page_trigger": pdf.pages[0].obj.AA.O,
+            "navigation_forward": pdf.pages[0].obj.PresSteps.NA,
+            "navigation_backward": pdf.pages[0].obj.PresSteps.PA,
             "field_trigger": group.AA.K,
             "open_action": pdf.Root.OpenAction,
             "catalog_trigger": pdf.Root.AA.WC,
@@ -3176,6 +3181,90 @@ def test_remove_fields_shared_action_cycle(template_stream):
         button = _get_button(pdf)
         assert _describe_actions(button.A) == ["one"]
         assert "/AA" not in button
+
+
+def test_remove_fields_mutual_action_cycle(template_stream):
+    # removed actions that follow each other are replaced by following the
+    # original links, skipping the one being replaced
+    def add(pdf, fields):
+        first, second = (
+            pdf.make_indirect(_build_action(("reset", None), fields["test"]))
+            for _ in range(2)
+        )
+        first.Next = Array([second, Dictionary(S=Name.JavaScript, JS=String("x"))])
+        second.Next = Array([first, Dictionary(S=Name.JavaScript, JS=String("y"))])
+        _get_button(pdf).A = first
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        assert _describe_actions(_get_button(pdf).A) == ["y", "x"]
+
+
+def test_remove_fields_long_action_chain(template_stream):
+    # more removed actions in one chain than Python's recursion limit. The
+    # last action is indirect too, since pypdf 6.19 can't clone an indirect
+    # action whose /Next is a direct one.
+    def add(pdf, fields):
+        action = pdf.make_indirect(Dictionary(S=Name.JavaScript, JS=String("after")))
+        for _ in range(1050):
+            reset = pdf.make_indirect(_build_action(("reset", None), fields["test"]))
+            reset.Next = action
+            action = reset
+        _get_button(pdf).A = action
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        assert _describe_actions(_get_button(pdf).A) == ["after"]
+
+
+@pytest.mark.parametrize("kind", ["indirect", "array"])
+def test_remove_fields_resolves_action_types(template_stream, kind):
+    # an indirect /S is resolved, and an /S that isn't a name, as in this
+    # structure attribute, is not an action type
+    def add(pdf, fields):
+        if kind == "indirect":
+            _get_button(pdf).A = Dictionary(
+                S=pdf.make_indirect(Name.ResetForm), Fields=Array([fields["test"]])
+            )
+        else:
+            pdf.Root.StructTreeRoot = Dictionary(
+                Type=Name.StructTreeRoot,
+                K=Dictionary(
+                    Type=Name.StructElem,
+                    S=Name.P,
+                    A=Dictionary(O=Name.Layout, S=Array([Name.ResetForm])),
+                ),
+            )
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(["test"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        if kind == "indirect":
+            assert "/A" not in _get_button(pdf)
+        else:
+            attribute = pdf.Root.StructTreeRoot.K.A
+            assert [str(each) for each in attribute.S] == ["/ResetForm"]
+
+
+def test_remove_fields_hide_widget_not_in_catalog(template_stream):
+    # a Hide action naming a page widget whose field isn't in /Fields
+    def add(pdf, fields):
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in pdf.Root.AcroForm.Fields if field.T != "submit_button"]
+        )
+        fields["test"].A = Dictionary(
+            S=Name.Hide, T=Array([String("submit_button"), String("check")])
+        )
+
+    obj = PdfWrapper(_with_actions(template_stream, add)).remove_fields(
+        ["submit_button"]
+    )
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        test = next(annot for annot in pdf.pages[0].Annots if annot.get("/T") == "test")
+        assert _describe_targets(test.A.T) == ["check"]
 
 
 @pytest.mark.parametrize("field_name", ["test", "check", "radio_1"])
