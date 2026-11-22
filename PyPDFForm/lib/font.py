@@ -10,7 +10,7 @@ for extracting font information from TTF streams and managing font names within 
 from contextlib import contextmanager
 from functools import lru_cache
 from io import BytesIO
-from re import fullmatch
+from re import fullmatch, sub
 from typing import Generator
 from uuid import uuid4
 from zlib import compress
@@ -103,8 +103,10 @@ def _get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
     """
     Retrieves additional font parameters from a PDF document for a given base font name.
 
-    This function searches the first page's font resources for a font dictionary matching
-    the provided base font name. If a match is found, it extracts the font descriptor
+    This function searches the first page's font resources for a font dictionary with a
+    font descriptor whose base font name, without a subset prefix such as `AAAAAA+`, is
+    the provided base font name. Fonts without a descriptor, such as ReportLab's built-in
+    Helvetica, are skipped. If a match is found, it extracts the font descriptor
     parameters and the font dictionary parameters so they can be copied into a new
     AcroForm font resource.
 
@@ -124,9 +126,14 @@ def _get_additional_font_params(pdf: bytes, base_font_name: str) -> tuple:
     first_page = reader.get_page(0)
 
     for font in first_page[Resources][Font].values():
-        if base_font_name.replace("/", "") in font[BaseFont]:
+        font = font.get_object()
+        if (
+            FontDescriptor in font
+            and sub(r"^[A-Z]{6}\+", "", font[BaseFont][1:]) == base_font_name[1:]
+        ):
             font_descriptor_params = dict(font[FontDescriptor])
-            font_dict_params = dict(font)
+            # resolved, so no reference into this PDF is copied, such as /ToUnicode
+            font_dict_params = {key: font[key] for key in font}
             break
 
     return font_descriptor_params, font_dict_params
@@ -262,6 +269,73 @@ def _compress_ttf(ttf_stream: bytes) -> bytes:
     return compress(ttf_stream)
 
 
+def _add_metrics(
+    font_dict: DictionaryObject, font_descriptor: DictionaryObject, ttf_stream: bytes
+) -> None:
+    """
+    Adds the font metrics that appearance generation uses to a font resource.
+
+    Descriptor and font dictionary entries are copied from a temporary watermark
+    generated with the same TTF, without replacing entries the resource already
+    has. When the copied entries include `/Widths`, the glyph widths are computed
+    from the TTF.
+
+    Args:
+        font_dict (DictionaryObject): The font dictionary to update.
+        font_descriptor (DictionaryObject): The font descriptor to update.
+        ttf_stream (bytes): The font file data in TTF format.
+    """
+    font_descriptor_params, font_dict_params = _get_additional_font_params(
+        _get_watermark_with_font(ttf_stream), _get_base_font_name(ttf_stream)
+    )
+
+    font_descriptor.update(
+        {k: v for k, v in font_descriptor_params.items() if k not in font_descriptor}
+    )
+    font_dict.update({k: v for k, v in font_dict_params.items() if k not in font_dict})
+
+    if Widths in font_dict:
+        missing_width = font_descriptor.get(MissingWidth, DEFAULT_ASSUMED_GLYPH_WIDTH)
+        widths = compute_font_glyph_widths(BytesIO(ttf_stream), missing_width)
+
+        font_dict.update(
+            {
+                NameObject(FirstChar): NumberObject(FIRST_CHAR_CODE),
+                NameObject(LastChar): NumberObject(LAST_CHAR_CODE),
+                NameObject(Widths): ArrayObject(FloatObject(width) for width in widths),
+            }
+        )
+
+
+@lru_cache(maxsize=8)
+def add_font_metrics(pdf: bytes, fonts: tuple[tuple[str, bytes], ...]) -> bytes:
+    """
+    Adds the font metrics that appearance generation uses to registered fonts.
+
+    `register_font_acroform` adds these metrics only when `need_appearances` is
+    enabled. This adds the same entries to fonts registered without them, so each
+    font keeps its AcroForm resource name. The result is cached for performance.
+
+    Args:
+        pdf (bytes): The PDF file data.
+        fonts (tuple[tuple[str, bytes], ...]): Pairs of an AcroForm font resource
+            name, such as `/F1`, and the TTF stream registered under it.
+
+    Returns:
+        bytes: The PDF with the font metrics added.
+    """
+    writer = PdfWriter(BytesIO(pdf))
+    resources = writer._root_object[AcroForm][DR][Font]  # type: ignore # noqa: SLF001 # pylint: disable=W0212
+    for name, ttf_stream in fonts:
+        font_dict = resources[name]
+        _add_metrics(font_dict, font_dict[FontDescriptor], ttf_stream)
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
+
+
 def register_font_acroform(
     pdf: bytes, ttf_stream: bytes, need_appearances: bool
 ) -> tuple:
@@ -291,13 +365,6 @@ def register_font_acroform(
     base_font_name = _get_base_font_name(ttf_stream)
     writer = PdfWriter(BytesIO(pdf))
 
-    font_descriptor_params = {}
-    font_dict_params = {}
-    if need_appearances:
-        font_descriptor_params, font_dict_params = _get_additional_font_params(
-            _get_watermark_with_font(ttf_stream), base_font_name
-        )
-
     font_file_stream = StreamObject()
     compressed_ttf = _compress_ttf(ttf_stream)
     font_file_stream.set_data(compressed_ttf)
@@ -318,9 +385,6 @@ def register_font_acroform(
             NameObject(FontFile2): font_file_ref,
         }
     )
-    font_descriptor.update(
-        {k: v for k, v in font_descriptor_params.items() if k not in font_descriptor}
-    )
     font_descriptor_ref = writer._add_object(font_descriptor)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 
     font_dict = DictionaryObject()
@@ -334,20 +398,8 @@ def register_font_acroform(
         }
     )
 
-    font_dict.update({k: v for k, v in font_dict_params.items() if k not in font_dict})
-
-    if font_dict and Widths in font_dict:
-        ttf_bytes_io = BytesIO(ttf_stream)
-        missing_width = font_descriptor.get(MissingWidth, DEFAULT_ASSUMED_GLYPH_WIDTH)
-        widths = compute_font_glyph_widths(ttf_bytes_io, missing_width)
-
-        font_dict.update(
-            {
-                NameObject(FirstChar): NumberObject(FIRST_CHAR_CODE),
-                NameObject(LastChar): NumberObject(LAST_CHAR_CODE),
-                NameObject(Widths): ArrayObject(FloatObject(width) for width in widths),
-            }
-        )
+    if need_appearances:
+        _add_metrics(font_dict, font_descriptor, ttf_stream)
 
     font_dict_ref = writer._add_object(font_dict)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
 

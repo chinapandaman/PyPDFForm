@@ -32,6 +32,34 @@ def test_register_font_no_form_fields(
         assert_same_pdf(obj.read(), expected)
 
 
+def test_draw_and_coordinate_grid_keep_registered_fonts(
+    template_stream, sample_font_stream
+):
+    obj = PdfWrapper(template_stream).register_font("new_font", sample_font_stream)
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        fonts = set(pdf.Root.AcroForm.DR.Font.keys())
+
+    for _ in range(2):
+        obj.draw([RawElements.RawText("foo", 1, 100, 100, font="new_font")])
+        obj.generate_coordinate_grid()
+    obj.widgets["test"].font = "new_font"
+    obj.fill({"test": "foo"})
+    obj.draw([RawElements.RawText("bar", 2, 100, 100, font="new_font")])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        dr_fonts = pdf.Root.AcroForm.DR.Font
+        assert set(dr_fonts.keys()) == fonts
+
+        widget = next(each for each in pdf.pages[0].Annots if each.T == "test")
+        assert dr_fonts[str(widget.DA).split()[0]].BaseFont == (
+            "/LiberationSerif-BoldItalic"
+        )
+        assert any(
+            str(font.BaseFont).endswith("LiberationSerif-BoldItalic")
+            for font in pdf.pages[1].Resources.Font.values()
+        )
+
+
 def test_set_text_field_font_sejda(
     pdf_samples, font_samples, sejda_template, request, assert_same_pdf
 ):
