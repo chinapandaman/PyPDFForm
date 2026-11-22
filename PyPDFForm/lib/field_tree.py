@@ -70,6 +70,10 @@ def remove_widgets_by_keys(
     is removed from the AcroForm `/CO` calculation order, which is deleted
     when it becomes empty. Form actions that name detached fields stop naming
     them, as described in `_remove_action_targets`; JavaScript is not changed.
+    When anything was detached, the written PDF is then cloned again, so it
+    contains only objects reachable from its trailer: objects that only
+    removed fields, widgets, or replaced entries used are dropped, while
+    objects other content uses are kept.
     Null entries, such as a null `/CO`, are treated as absent. `get_field_keys`
     lists the keys this function can match. If no keys are provided, the
     original PDF stream is returned unchanged.
@@ -130,6 +134,13 @@ def remove_widgets_by_keys(
             del acroform[CO]
 
     _remove_action_targets(actions, detached, names - _get_field_names(writer))
+
+    if detached:
+        # detached objects are still in the writer, and cloning the written
+        # PDF copies only the objects reachable from its trailer
+        with BytesIO() as f:
+            writer.write(f)
+            writer = PdfWriter(BytesIO(f.getvalue()))
 
     with BytesIO() as f:
         writer.write(f)

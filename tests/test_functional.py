@@ -1137,6 +1137,17 @@ def test_remove_fields_no_keys_specified(template_stream):
     )
 
 
+def test_remove_fields_unknown_key_writes_once(template_stream):
+    obj = PdfWrapper(template_stream)
+
+    with patch("PyPDFForm.lib.field_tree.PdfWriter", wraps=PdfWriter) as writer:
+        obj.remove_fields(["missing"])
+
+    # nothing was detached, so the PDF isn't cloned a second time
+    assert writer.call_count == 1
+    assert obj.widgets.keys() == PdfWrapper(template_stream).widgets.keys()
+
+
 @pytest.mark.parametrize(
     "template",
     [
@@ -2783,6 +2794,8 @@ def test_remove_all_fields_removes_values(template_stream, assert_catalog_fields
     assert_catalog_fields(stream, [])
     assert not PdfReader(BytesIO(stream)).get_fields()
     assert not PdfWrapper(stream).widgets
+    # removed fields aren't kept as unreachable objects
+    assert not get_retained_content(stream, ["REVIEW_SENTINEL"])
 
 
 @pytest.mark.cli_test
