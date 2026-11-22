@@ -25,6 +25,7 @@ from copy import deepcopy
 from dataclasses import asdict
 from functools import lru_cache
 from os import PathLike
+from types import SimpleNamespace
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -42,6 +43,7 @@ from .adapter import (
     fp_or_f_obj_or_stream_to_stream,
     readable,
 )
+from .constants import FEATURE_HOOKS, JAVASCRIPT_HOOKS
 from .coordinate import generate_coordinate_grid
 from .deprecation import reject_unsupported_kwargs
 from .egress import (
@@ -71,9 +73,14 @@ from .template import (
     update_widget_keys,
 )
 from .utils import (
+    can_need_newer_version,
     generate_unique_suffix,
     generic_merge,
+    get_catalog_version,
+    get_newest_version,
+    get_output_version,
     get_page_streams,
+    get_required_version,
     get_version,
     merge_pdfs,
     set_version,
@@ -143,6 +150,10 @@ class PdfWrapper:
         operations change one object.
         Omitting the template, or passing empty bytes or an empty stream, creates an empty
         wrapper; a missing path raises instead.
+        The PDF version is read from the template's header before the `title` keyword
+        is applied, so output keeps it after operations that rewrite the PDF. The
+        version that the template's own content requires is recorded too, so only
+        newer features that operations add raise the output's version.
         The title and document-open JavaScript remain in the PDF stream and are read
         lazily when their properties are accessed. A non-None `title` keyword updates
         the title in the PDF stream; None leaves the template's title unchanged. Enabling
@@ -171,7 +182,14 @@ class PdfWrapper:
         self._stream = share_inline_fields(fp_or_f_obj_or_stream_to_stream(template))
         self.widgets = {}
 
-        self._version = None
+        self._version = get_version(self._stream)  # before PDF writers rewrite it
+        # what the template's own content requires; read() raises the version
+        # only for newer features, so a header that understates it is kept
+        self._baseline_version = (
+            get_required_version(self._stream)
+            if can_need_newer_version(self._version)
+            else None
+        )
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
         self._font_register_events = []  # for drawing, font lookups, and new wrappers
@@ -247,8 +265,9 @@ class PdfWrapper:
         The copy starts from the current PDF stream, which already contains the title
         and registered font resources, so fonts are not embedded again; their mappings,
         registration events, and the fonts that still need metrics in `read()` are
-        copied instead. The cached PDF version is copied
-        so the copy restores the same header when serialized. Widgets and pending key
+        copied instead. The recorded PDF version and the version its content
+        required are copied so the copy writes the same header when serialized,
+        including for features added before copying. Widgets and pending key
         updates are copied so either wrapper can change without affecting the other.
         Readable stream values on widgets are shared because they cannot be duplicated.
 
@@ -275,6 +294,7 @@ class PdfWrapper:
             },
         )
         result._version = self._version
+        result._baseline_version = self._baseline_version
         result._available_fonts = dict(self._available_fonts)
         result._available_fonts_loaded = self._available_fonts_loaded
         result._font_register_events = list(self._font_register_events)
@@ -488,18 +508,43 @@ class PdfWrapper:
         """
         Returns the PDF version of the underlying PDF document.
 
-        The version is read from the PDF header lazily and cached so egress-only
-        rewrites can restore the wrapper's original version even if an underlying
-        PDF writer emits a different default header.
+        This is the version in the header of `read()` output. It is read from the
+        template's header when the wrapper is created, or set by `change_version`,
+        and raised when an operation adds a feature that requires a newer version,
+        such as a form field added to a PDF 1.1 document. A header that already
+        understates the template's own content is kept. When the template has no
+        supported header, the version is read from the current PDF stream instead.
+        Pending widget changes are not applied to the wrapper, but those that can
+        change the version, such as comb, tooltips, and widget JavaScript, are
+        applied to a copy of the PDF, so the result matches the next `read()`.
+        When they can't be applied, the committed document's version is returned,
+        and `read()` raises the error.
 
         Returns:
             str | None: The PDF version as a string, or None if the version cannot be determined.
         """
 
-        if self._version is None:
-            self._version = get_version(self._read())
+        version = self._recorded_version()
+        if not can_need_newer_version(version):
+            return version
 
-        return self._version
+        return self._choose_version(
+            self._egress(self._with_pending_feature_changes(self._stream)), version
+        )
+
+    def _recorded_version(self) -> str | None:
+        """
+        Returns the PDF version read from the template or set by `change_version`.
+
+        When the template has no supported header, the version is read from the
+        stored PDF stream instead, without applying pending widget changes.
+
+        Returns:
+            str | None: The recorded PDF version, before any raise for features
+                that operations added.
+        """
+
+        return self._version if self._version is not None else get_version(self._stream)
 
     @property
     def fonts(self) -> list:
@@ -522,10 +567,12 @@ class PdfWrapper:
 
         This allows you to work with individual pages of the PDF. Each page wrapper
         preserves the page's original widgets and inherits the current wrapper's user
-        parameters. Content of other pages is not copied: links and GoTo actions to
-        other pages are removed, and a field shared with other pages keeps only its
-        widgets on the page. Custom font registration events are replayed onto the
-        page wrappers when needed.
+        parameters and PDF version, which is raised for the newer features that
+        operations added to the page. A catalog `/Version` override, which the page
+        doesn't keep, counts toward that version. Content of other pages is not
+        copied: links and GoTo actions to other pages are removed, and a field
+        shared with other pages keeps only its widgets on the page. Custom font
+        registration events are replayed onto the page wrappers when needed.
 
         Returns:
             Sequence[PdfWrapper]: A list of `PdfWrapper` objects, one for each page in the PDF.
@@ -535,13 +582,21 @@ class PdfWrapper:
                 such as an action that resets a field on another page.
         """
 
+        stream = self._read()
+        version = self._recorded_version()
+        # pages don't keep the catalog, so a /Version override moves to the header
+        version = get_newest_version([version, get_catalog_version(stream)]) or version
         result = [
             self.__class__(
-                each,
+                # the stored stream's header may be a PDF writer's default
+                set_version(each, get_version(each), version),
                 **{param: getattr(self, param) for param, _ in self.USER_PARAMS},
             )
-            for each in self._get_page_streams_with_widgets(self._read())
+            for each in self._get_page_streams_with_widgets(stream)
         ]
+        for page in result:
+            # so features that operations added still raise the page's version
+            page._baseline_version = self._baseline_version  # noqa: SLF001 # pylint: disable=W0212
 
         # because page streams do not copy the AcroForm fonts
         if self._font_register_events:
@@ -599,15 +654,40 @@ class PdfWrapper:
            array, keeping every field already listed, including fields without
            a widget on a page. The stream is left unchanged when no page has a
            widget annotation.
-        4. Restores the wrapper's cached PDF header version after egress
+        4. Writes the wrapper's PDF version into the header after egress
            processing, since PDF writers may emit their own default version.
+           The version read from the template or set by `change_version` is
+           raised when the output has a newer feature than both it and the
+           content it was read or set for, such as an interactive form added to
+           a PDF 1.1 document.
         The wrapper's stored stream is not replaced by these final egress-only changes.
 
         Returns:
             bytes: The processed PDF document content as a byte string.
         """
 
-        result = self._read()
+        result = self._egress(self._read())
+        version = self._choose_version(result, self._recorded_version())
+        if version:
+            result = set_version(result, get_version(result), version)
+        return result
+
+    def _egress(self, stream: bytes) -> bytes:
+        """
+        Applies the egress steps of `read()` to a PDF stream, except its version.
+
+        These are the appearance handling for `need_appearances` and the update
+        of the AcroForm `/Fields` array. The wrapper is not changed.
+
+        Args:
+            stream (bytes): The PDF stream, such as the wrapper's stored stream.
+
+        Returns:
+            bytes: The processed PDF stream, with the header of the last PDF
+                writer that rewrote it.
+        """
+
+        result = stream
         if getattr(self, "need_appearances") and result:
             if self._fonts_without_metrics:
                 result = add_font_metrics(
@@ -617,11 +697,83 @@ class PdfWrapper:
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
 
-        if result:
-            result = sync_acroform_fields(result)
-            if self.version:
-                result = set_version(result, get_version(result), self.version)
-        return result
+        return sync_acroform_fields(result) if result else result
+
+    def _choose_version(self, output: bytes, version: str | None) -> str | None:
+        """
+        Chooses the PDF version to write into the header of an egress output.
+
+        The version is raised only when the output requires a newer one than the
+        recorded version, the baseline, and a catalog `/Version` override.
+
+        Args:
+            output (bytes): The output of `_egress`.
+            version (str | None): The recorded PDF version.
+
+        Returns:
+            str | None: `version`, raised for the newer features that operations
+                added, or None for an empty output.
+        """
+
+        if not output:
+            return None
+
+        if can_need_newer_version(version):
+            return get_output_version(
+                version,
+                # a catalog /Version override also covers the output's features
+                get_newest_version(
+                    [self._baseline_version, get_catalog_version(output)]
+                ),
+                get_required_version(output),
+            )
+
+        return version
+
+    def _with_pending_feature_changes(self, stream: bytes) -> bytes:
+        """
+        Applies the queued widget changes that can add or remove a table feature.
+
+        These are the hooks in `FEATURE_HOOKS`, such as comb, tooltips, and
+        widget JavaScript, applied in queue order to a copy of `stream`, so the
+        result has the features that `read()` would write. Other changes can't
+        change the version, and are left out, so a hook that would fail, such as
+        a font size on a widget without `/DA`, doesn't raise here. The widgets
+        and their queues are not changed. Every JavaScript value is applied as
+        an empty script, since only whether a script is written matters, so a
+        path or a readable object is left for `read()` to open or read. If a
+        change still can't be applied, such as removing a tooltip that a shared
+        parent field sets, `stream` is returned unchanged, so the version is the
+        committed document's, and `read()` raises the error.
+
+        Args:
+            stream (bytes): The PDF stream, such as the wrapper's stored stream.
+
+        Returns:
+            bytes: The stream with those changes applied, or `stream` when none
+                are queued or they can't be applied.
+        """
+
+        pending = {
+            key: SimpleNamespace(
+                hooks_to_trigger=[
+                    (hook, "" if hook in JAVASCRIPT_HOOKS else value)
+                    for hook, value in widget.hooks_to_trigger
+                    if hook in FEATURE_HOOKS
+                ]
+            )
+            for key, widget in self.widgets.items()
+        }
+        if not any(each.hooks_to_trigger for each in pending.values()):
+            return stream
+
+        try:
+            return trigger_widget_hooks(
+                stream, pending, getattr(self, "use_full_widget_name")
+            )
+        # any error a hook raises is left for read(), which reverts the queue
+        except Exception:  # noqa: BLE001 # pylint: disable=W0718
+            return stream
 
     def _read(self) -> bytes:
         """
@@ -708,8 +860,13 @@ class PdfWrapper:
         """
         Changes the PDF version of the underlying document.
 
-        The method replaces the first PDF header version marker in the current stream
-        and updates the cached version used by later egress processing. It does not
+        The method replaces the PDF header version marker of the current stream, which
+        an earlier operation's PDF writer may have set to its own default, and updates
+        the version that `read()` writes into its output. The version is kept for the
+        content the document has now, including what `read()` adds for the wrapper's
+        current options, such as an AcroForm for `need_appearances`, even if that
+        content requires a newer version. Later operations, and options enabled
+        later, that add a newer feature raise it again. It does not
         otherwise validate or rewrite the document for version-specific compatibility.
 
         Args:
@@ -720,10 +877,17 @@ class PdfWrapper:
         """
 
         current_stream = self._read()
-        updated_stream = set_version(current_stream, self.version, version)
-        if updated_stream != current_stream:
+        updated_stream = set_version(
+            current_stream, get_version(current_stream), version
+        )
+        if updated_stream != current_stream or get_version(updated_stream) == version:
             self._stream = updated_stream
             self._version = version
+            self._baseline_version = (
+                get_required_version(self._egress(updated_stream))
+                if can_need_newer_version(version)
+                else None
+            )
 
         return self
 

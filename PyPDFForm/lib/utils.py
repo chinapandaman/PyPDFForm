@@ -11,26 +11,57 @@ It includes functions for:
 - Finding and traversing patterns within PDF widgets.
 - Extracting widget properties based on defined patterns.
 - Generating unique suffixes for internal use.
+- Reading and choosing PDF header versions.
 """
 
 from collections.abc import Callable, Sequence
+from functools import lru_cache
 from io import BytesIO
 from secrets import choice
 from string import ascii_letters, digits, punctuation
 from typing import Any, Dict, List, Optional, cast
 
 from pypdf import PageObject, PdfReader, PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, IndirectObject, NameObject
+from pypdf.errors import PyPdfError
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    FloatObject,
+    IndirectObject,
+    NameObject,
+    NumberObject,
+)
 
 from .clone import ClonePlan
 from .constants import (
+    ALPHA_VERSION,
+    CA,
+    COMB,
+    COMB_VERSION,
+    FEATURE_VERSIONS_BY_ACTION,
+    FEATURE_VERSIONS_BY_FIELD_TYPE,
+    FEATURE_VERSIONS_BY_FILTER,
+    FEATURE_VERSIONS_BY_KEY,
+    FEATURE_VERSIONS_BY_SUBTYPE,
+    FT,
+    NEWEST_FEATURE_VERSION,
+    PDF_VERSIONS,
     SLASH,
+    TITLE_VERSION,
     UNIQUE_SUFFIX_LENGTH,
     VERSION_IDENTIFIER_PREFIX,
     VERSION_IDENTIFIERS,
     Annots,
     B,
+    Ff,
+    Filter,
+    Info,
     Parent,
+    S,
+    Subtype,
+    Title,
+    Version,
+    ca,
 )
 
 
@@ -524,3 +555,239 @@ def set_version(pdf: bytes, old: str | None, new: str | None) -> bytes:
         return new_header + pdf[len(old_header) :]
 
     return pdf.replace(old_header, new_header, 1)
+
+
+def _version_number(version: str | None) -> tuple[int, ...] | None:
+    """
+    Converts a PDF version string to numbers that compare in version order.
+
+    Args:
+        version (str | None): The PDF version string, such as "1.7".
+
+    Returns:
+        tuple[int, ...] | None: The version's numbers, such as (1, 7), or None
+            when the version is None or not made of numbers.
+    """
+
+    if version is None:
+        return None
+
+    try:
+        return tuple(int(part) for part in version.split("."))
+    except ValueError:
+        return None
+
+
+def get_newest_version(versions: Sequence[str | None]) -> str | None:
+    """
+    Gets the newest of several PDF versions.
+
+    Args:
+        versions (Sequence[str | None]): The PDF version strings. None and
+            versions that are not made of numbers are ignored.
+
+    Returns:
+        str | None: The newest version, or None when none can be compared.
+    """
+
+    return max(
+        (version for version in versions if _version_number(version) is not None),
+        key=lambda version: _version_number(version) or (),
+        default=None,
+    )
+
+
+# entries whose name value is looked up in a feature table
+_FEATURE_VERSIONS_BY_NAME = {
+    Subtype: FEATURE_VERSIONS_BY_SUBTYPE,
+    S: FEATURE_VERSIONS_BY_ACTION,
+    FT: FEATURE_VERSIONS_BY_FIELD_TYPE,
+    Filter: FEATURE_VERSIONS_BY_FILTER,
+}
+# every key that `_get_feature_version` can find a feature in
+_FEATURE_KEYS = frozenset(
+    [*FEATURE_VERSIONS_BY_KEY, *_FEATURE_VERSIONS_BY_NAME, Ff, CA, ca]
+)
+
+
+def _get_feature_version(key: str, value: Any) -> str | None:
+    """
+    Gets the minimum PDF version of a dictionary entry that PyPDFForm can add.
+
+    The entry is checked against the feature tables in constants: entries
+    such as `/AcroForm` by key, annotations by `/Subtype`, actions by `/S`,
+    signature fields by `/FT`, compressed streams by `/Filter`, comb text
+    fields and radio buttons in unison by their `/Ff` bit, and constant
+    opacity by a numeric `/CA` or `/ca`, which tells it from the caption of a
+    widget's `/MK`.
+
+    Args:
+        key (str): The entry's key.
+        value (Any): The entry's value, with indirect references resolved.
+
+    Returns:
+        str | None: The minimum PDF version of the feature, or None when the
+            entry is not in the feature tables.
+    """
+
+    if key in FEATURE_VERSIONS_BY_KEY:
+        return FEATURE_VERSIONS_BY_KEY[key]
+
+    if key == Ff and isinstance(value, NumberObject) and value & COMB:
+        return COMB_VERSION
+
+    if key in (CA, ca) and isinstance(value, (NumberObject, FloatObject)):
+        return ALPHA_VERSION
+
+    table = _FEATURE_VERSIONS_BY_NAME.get(key, {})
+    names = [
+        each.get_object()
+        for each in (value if isinstance(value, ArrayObject) else [value])
+    ]  # a /Filter can be an array of filters
+    return get_newest_version(
+        [
+            table[name]
+            for name in names
+            if isinstance(name, NameObject) and name in table
+        ]
+    )
+
+
+@lru_cache(maxsize=8)
+def get_required_version(pdf: bytes) -> str | None:
+    """
+    Gets the lowest PDF version that supports the features PyPDFForm can add.
+
+    Every object reachable from the trailer is checked against the feature
+    tables in constants, such as interactive forms (1.2), JavaScript actions
+    (1.3), and comb text fields (1.5), and so is the title in the document
+    information dictionary (1.1). Features that PyPDFForm doesn't add are not
+    checked. The result is cached using lru_cache for performance.
+
+    Args:
+        pdf (bytes): The PDF stream to inspect.
+
+    Returns:
+        str | None: The highest minimum version among the features found, or
+            None when the stream has none of them or cannot be read.
+    """
+
+    if not pdf:
+        return None
+
+    result = None
+    try:
+        reader = PdfReader(BytesIO(pdf))
+        info = get_dictionary(reader.trailer, Info)
+        if info is not None and Title in info:
+            result = TITLE_VERSION
+
+        seen = set()
+        stack: list = [reader.trailer]
+        while stack:
+            obj = stack.pop()
+            if isinstance(obj, IndirectObject):
+                if (obj.idnum, obj.generation) in seen:
+                    continue
+                seen.add((obj.idnum, obj.generation))
+                obj = obj.get_object()
+
+            if isinstance(obj, ArrayObject):
+                stack.extend(obj)
+            elif isinstance(obj, DictionaryObject):
+                for key, value in obj.items():
+                    stack.append(value)
+                    if key not in _FEATURE_KEYS:
+                        continue
+                    result = get_newest_version(
+                        [result, _get_feature_version(key, value.get_object())]
+                    )
+    except PyPdfError:
+        return None
+
+    return result
+
+
+def get_output_version(
+    version: str | None, baseline: str | None, required: str | None
+) -> str | None:
+    """
+    Chooses the PDF header version to write for a document.
+
+    The document's version, read from its template or set by
+    `PdfWrapper.change_version`, is kept unless the document needs a newer
+    one for a feature that was added since: that is, unless the version it
+    requires is newer than both its version and the baseline, the version its
+    own content required then. A document whose header already understates
+    its own content keeps that header.
+
+    Args:
+        version (str | None): The document's version.
+        baseline (str | None): The version that the document's content
+            required when its version was read or set.
+        required (str | None): The version that the document's current
+            content requires, from `get_required_version`.
+
+    Returns:
+        str | None: `required` when it is newer than both `version` and
+            `baseline`, otherwise `version`.
+    """
+
+    covered = get_newest_version([version, baseline])
+    if get_newest_version([covered, required]) == covered:
+        return version
+
+    return required
+
+
+@lru_cache(maxsize=8)
+def get_catalog_version(pdf: bytes) -> str | None:
+    """
+    Gets the PDF version that the document catalog's `/Version` entry declares.
+
+    A catalog `/Version` overrides the header's version when it is newer. It
+    is lost when only some pages are copied into a new document, so their
+    version has to come from the header and this entry together. The result
+    is cached using lru_cache for performance.
+
+    Args:
+        pdf (bytes): The PDF stream to inspect.
+
+    Returns:
+        str | None: The declared version, or None when the catalog has no
+            `/Version` with a supported version, or the stream cannot be read.
+    """
+
+    if not pdf:
+        return None
+
+    try:
+        value = PdfReader(BytesIO(pdf)).root_object.get(Version)
+        value = value.get_object() if value is not None else None
+    except PyPdfError:
+        return None
+
+    if isinstance(value, NameObject) and value[1:] in PDF_VERSIONS:
+        return value[1:]
+
+    return None
+
+
+def can_need_newer_version(version: str | None) -> bool:
+    """
+    Checks whether a feature that PyPDFForm can add may need a newer version.
+
+    No feature in the feature tables needs a version newer than
+    `NEWEST_FEATURE_VERSION`, so a document at that version or newer is never
+    raised, and scanning it with `get_required_version` can be skipped.
+
+    Args:
+        version (str | None): The document's version.
+
+    Returns:
+        bool: False when `version` is at least `NEWEST_FEATURE_VERSION`,
+            otherwise True, including when the version is unknown.
+    """
+
+    number = _version_number(version)
+    return number is None or number < (_version_number(NEWEST_FEATURE_VERSION) or ())
