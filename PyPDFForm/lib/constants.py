@@ -117,6 +117,8 @@ GoTo = "/GoTo"
 ResetForm = "/ResetForm"
 SubmitForm = "/SubmitForm"
 Hide = "/Hide"
+Next = "/Next"
+Flags = "/Flags"
 JavaScript = "/JavaScript"
 JS = "/JS"
 OpenAction = "/OpenAction"
@@ -165,6 +167,11 @@ AcroForm = "/AcroForm"
 Fields = "/Fields"
 CO = "/CO"
 XFA = "/XFA"
+
+# action type -> the entry that names the fields or annotations it acts on
+NAMED_TARGETS = {ResetForm: Fields, SubmitForm: Fields, Hide: T}
+# ResetForm and SubmitForm flag bit: act on every field except the named ones
+INCLUDE_EXCLUDE = 1 << 0
 
 # Field flag bits
 READ_ONLY = 1 << 0

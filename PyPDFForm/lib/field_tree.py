@@ -2,18 +2,18 @@
 """
 Module for maintaining the AcroForm field tree.
 
-It removes form fields by key from page annotations, the field tree, and the
-calculation order, lists the keys that removal can match, and detaches fields
-and widgets from the tree. It also shares widget annotations and parent fields
-stored inline, as earlier versions of PyPDFForm could save them, with their
-copies in the field tree, so that a page and the field tree refer to one
-object.
+It removes form fields by key from page annotations, the field tree, the
+calculation order, and the form actions that name them, lists the keys that
+removal can match, and detaches fields and widgets from the tree. It also
+shares widget annotations and parent fields stored inline, as earlier versions
+of PyPDFForm could save them, with their copies in the field tree, so that a
+page and the field tree refer to one object.
 """
 
 from collections.abc import Callable
 from functools import lru_cache
 from io import BytesIO
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, NamedTuple, Optional, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
@@ -22,18 +22,27 @@ from pypdf.generic import (
     IndirectObject,
     NameObject,
     NullObject,
+    NumberObject,
 )
 
 from .constants import (
     AA,
     CO,
+    INCLUDE_EXCLUDE,
+    NAMED_TARGETS,
+    A,
     AcroForm,
     Annots,
     Fields,
+    Flags,
+    Hide,
     Kids,
+    Next,
+    OpenAction,
     P,
     Parent,
     Rect,
+    S,
     Subtype,
     T,
     Widget,
@@ -55,8 +64,8 @@ def remove_widgets_by_keys(
     annotations keep their references. Matching fields and widgets are then
     detached from the field tree with `detach_field`, and every detached field
     is removed from the AcroForm `/CO` calculation order, which is deleted
-    when it becomes empty. Detached objects are no longer form fields, but
-    other objects that refer to them, such as form actions, are not changed.
+    when it becomes empty. Form actions that name detached fields stop naming
+    them, as described in `_remove_action_targets`; JavaScript is not changed.
     Null entries, such as a null `/CO`, are treated as absent. `get_field_keys`
     lists the keys this function can match. If no keys are provided, the
     original PDF stream is returned unchanged.
@@ -76,6 +85,8 @@ def remove_widgets_by_keys(
     key_set = set(keys)
     writer = PdfWriter(BytesIO(pdf))
     acroform = get_dictionary(writer.root_object, AcroForm) or DictionaryObject()
+    names = _get_field_names(acroform)
+    actions = _find_actions(writer.root_object)
 
     matched = {
         id(field): field
@@ -113,6 +124,8 @@ def remove_widgets_by_keys(
         ]
         if not calculation_order:
             del acroform[CO]
+
+    _remove_action_targets(actions, detached, names - _get_field_names(acroform))
 
     with BytesIO() as f:
         writer.write(f)
@@ -236,6 +249,336 @@ def _is_detached(obj: object, detached: Dict[int, DictionaryObject]) -> bool:
     return id(obj) in detached or (
         isinstance(obj, DictionaryObject) and _has_ancestor_in(obj, detached)
     )
+
+
+def _get_field_names(acroform: DictionaryObject) -> set:
+    """
+    Gets the fully qualified names of the fields in an AcroForm field tree.
+
+    The tree is walked from the `/Fields` array through `/Kids`, joining the
+    partial names (`/T`) of each field and its ancestors with dots, which is
+    how form actions name fields. A `/T` that is not a text string, such as a
+    null, is treated as absent. Each object is visited once.
+
+    Args:
+        acroform (DictionaryObject): The AcroForm dictionary.
+
+    Returns:
+        set: The fully qualified names of the fields in the tree.
+    """
+    result = set()
+    stack = [(field, "") for field in get_array(acroform, Fields)]
+    seen = set()
+    while stack:
+        reference, prefix = stack.pop()
+        node = reference.get_object()
+        if not isinstance(node, DictionaryObject) or id(node) in seen:
+            continue
+        seen.add(id(node))
+        name = node.get(T)
+        name = name.get_object() if name is not None else None
+        if isinstance(name, str):
+            prefix = f"{prefix}.{name}" if prefix else str(name)
+            result.add(prefix)
+        stack.extend((kid, prefix) for kid in get_array(node, Kids))
+
+    return result
+
+
+class _FormActions(NamedTuple):
+    """
+    The actions reachable from a catalog, found before any field is removed.
+
+    Attributes:
+        entries (list): The `(dictionary, key)` pairs of the `/A`,
+            `/OpenAction`, and `/AA` trigger entries whose value is a
+            dictionary.
+        chains (list): The actions with a `/Next` entry.
+        additional (dict): Each `/AA` dictionary with the dictionaries that
+            hold it, keyed by its `id`.
+        targets (list): An `(action, key, targets)` triple for each ResetForm,
+            SubmitForm, and Hide action: the entry that names its targets and
+            a list of them. The list is taken before removal, which changes
+            arrays such as `/Kids` in place, so an action whose array is
+            shared with them still lists every target it had.
+    """
+
+    entries: list
+    chains: list
+    additional: dict
+    targets: list
+
+
+def _find_actions(root: DictionaryObject) -> _FormActions:
+    """
+    Finds the actions in the objects reachable from a catalog.
+
+    Every dictionary and array reachable from the catalog is visited once. The
+    dictionaries in an `/A`, `/OpenAction`, or `/AA` trigger entry are
+    actions, and so are those in the `/Next` entry of a dictionary with an
+    `/S` entry, which every action has. Outline items, whose `/Next` is the
+    next item, have none. Stream contents are not read.
+
+    Args:
+        root (DictionaryObject): The document catalog.
+
+    Returns:
+        _FormActions: The entries that hold actions, and the targets of the
+            ResetForm, SubmitForm, and Hide actions among them.
+    """
+    entries = []
+    chains = []
+    additional: Dict[int, tuple[DictionaryObject, list]] = {}
+    stack: list = [root]
+    seen = set()
+    while stack:
+        obj = stack.pop().get_object()
+        if not isinstance(obj, (ArrayObject, DictionaryObject)) or id(obj) in seen:
+            continue
+        seen.add(id(obj))
+        if isinstance(obj, ArrayObject):
+            stack.extend(obj)
+            continue
+
+        for key in obj:
+            value = obj.raw_get(key)
+            target = value.get_object()
+            if key == Next and S in obj:
+                chains.append(obj)
+            elif key in (A, OpenAction) and isinstance(target, DictionaryObject):
+                entries.append((obj, key))
+            elif key == AA and isinstance(target, DictionaryObject):
+                if id(target) not in additional:
+                    additional[id(target)] = (target, [])
+                    entries.extend(
+                        (target, trigger)
+                        for trigger in target
+                        if isinstance(target[trigger], DictionaryObject)
+                    )
+                additional[id(target)][1].append(obj)
+            stack.append(value)
+
+    actions = {id(container[key]): container[key] for container, key in entries}
+    for chain in chains:
+        actions.update(
+            (id(each.get_object()), each.get_object()) for each in _get_next(chain)
+        )
+
+    targets = []
+    for action in actions.values():
+        key = (
+            NAMED_TARGETS.get(action.get(S))
+            if isinstance(action, DictionaryObject)
+            else None
+        )
+        if key is not None and key in action:
+            value = action[key]
+            targets.append(
+                (
+                    action,
+                    key,
+                    list(value)
+                    if isinstance(value, ArrayObject)
+                    else [action.raw_get(key)],
+                )
+            )
+
+    return _FormActions(entries, chains, additional, targets)
+
+
+def _remove_action_targets(
+    actions: _FormActions, detached: Dict[int, DictionaryObject], names: set
+) -> None:
+    """
+    Removes removed fields from the form actions that name them.
+
+    ResetForm and SubmitForm actions name fields in `/Fields`, and Hide
+    actions name fields and annotations in `/T`, by reference or by fully
+    qualified name. Every action found by `_find_actions` is searched. A
+    reference to a detached object, or to a descendant of one, is removed,
+    and so is a name in `names`. The action gets a new array of its remaining
+    targets, so an array shared with other objects, such as a field's
+    `/Kids`, is not changed by it.
+
+    An empty `/Fields` makes ResetForm and SubmitForm act on every field, and
+    a Hide action without targets has nothing to act on, so an action that
+    would be left without targets is removed instead. A ResetForm or
+    SubmitForm action that acts on every field except the ones it names
+    (`INCLUDE_EXCLUDE`) is kept with an empty `/Fields`, which still means
+    every field. Each entry that holds a removed action gets the actions in
+    its `/Next` instead, in order; an `/A`, `/OpenAction`, or `/AA` trigger
+    entry that would get several gets a copy of the first one, followed by
+    its own `/Next` and then the others. An entry left without actions is
+    deleted, and so is an `/AA` dictionary left without triggers.
+
+    Args:
+        actions (_FormActions): The actions, found before removal.
+        detached (Dict[int, DictionaryObject]): Detached fields and widgets
+            keyed by `id`.
+        names (set): The fully qualified names of the removed fields that no
+            remaining field has.
+    """
+    removed = {
+        id(action)
+        for action, key, targets in actions.targets
+        if _remove_targets(action, key, targets, (detached, names))
+    }
+    if not removed:
+        return
+
+    for chain in actions.chains:
+        following = _get_next(chain)
+        if any(id(each.get_object()) in removed for each in following):
+            _set_actions(chain, Next, _get_remaining(following, removed))
+
+    emptied = set()
+    for container, key in actions.entries:
+        if key in container and id(container[key]) in removed:
+            _set_actions(
+                container, key, _get_remaining([container.raw_get(key)], removed)
+            )
+            if not container:
+                emptied.add(id(container))
+
+    for actions_dict, owners in actions.additional.values():
+        if id(actions_dict) in emptied:
+            for owner in owners:
+                del owner[AA]
+
+
+def _remove_targets(
+    action: DictionaryObject,
+    key: str,
+    targets: list,
+    removal: tuple[Dict[int, DictionaryObject], set],
+) -> bool:
+    """
+    Removes removed fields from the targets of one form action.
+
+    Args:
+        action (DictionaryObject): A ResetForm, SubmitForm, or Hide action.
+        key (str): The entry that names its targets.
+        targets (list): Its targets, listed before removal.
+        removal (tuple[Dict[int, DictionaryObject], set]): The detached fields
+            and widgets keyed by `id`, and the fully qualified names of the
+            removed fields.
+
+    Returns:
+        bool: True if the action would be left without targets and must be
+            removed instead, as described in `_remove_action_targets`.
+    """
+    remaining = [
+        each for each in targets if not _is_removed_target(each.get_object(), *removal)
+    ]
+    if len(remaining) == len(targets):
+        return False
+
+    flags = action.get(Flags, NumberObject(0)).get_object()
+    if not remaining and (
+        action.get(S) == Hide
+        or not (isinstance(flags, int) and flags & INCLUDE_EXCLUDE)
+    ):
+        return True
+
+    action[NameObject(key)] = ArrayObject(remaining)
+    return False
+
+
+def _is_removed_target(
+    target: object, detached: Dict[int, DictionaryObject], names: set
+) -> bool:
+    """
+    Checks whether a form action's target is a removed field.
+
+    Args:
+        target (object): A resolved target, such as a field or a name.
+        detached (Dict[int, DictionaryObject]): Detached fields and widgets
+            keyed by `id`.
+        names (set): The fully qualified names of the removed fields.
+
+    Returns:
+        bool: True if `target` names a removed field, or is a detached object
+            or a descendant of one.
+    """
+    if isinstance(target, str):
+        return str(target) in names
+
+    return _is_detached(target, detached)
+
+
+def _get_next(action: DictionaryObject) -> list:
+    """
+    Gets the actions that follow an action.
+
+    Args:
+        action (DictionaryObject): An action dictionary.
+
+    Returns:
+        list: The entries of its `/Next` array, its single `/Next` action, or
+            an empty list without `/Next`.
+    """
+    if Next not in action:
+        return []
+
+    following = action[Next]
+    return (
+        list(following)
+        if isinstance(following, ArrayObject)
+        else [action.raw_get(Next)]
+    )
+
+
+def _get_remaining(actions: list, removed: set, path: frozenset = frozenset()) -> list:
+    """
+    Replaces removed actions in a list with the actions that follow them.
+
+    Args:
+        actions (list): Actions, possibly indirect references.
+        removed (set): The `id` of each removed action.
+        path (frozenset): The `id` of each removed action already replaced on
+            the way here, so that a `/Next` cycle ends.
+
+    Returns:
+        list: The actions, each removed one replaced by its remaining
+            following actions.
+    """
+    result = []
+    for each in actions:
+        action = each.get_object()
+        if id(action) not in removed:
+            result.append(each)
+        elif id(action) not in path:
+            result.extend(
+                _get_remaining(_get_next(action), removed, path | {id(action)})
+            )
+
+    return result
+
+
+def _set_actions(container: DictionaryObject, key: str, actions: list) -> None:
+    """
+    Sets the actions of an entry, deleting it when there are none.
+
+    A `/Next` entry with several actions gets an array of them. Other entries
+    hold one action, so they get a copy of the first one whose `/Next` lists
+    its own following actions and then the others.
+
+    Args:
+        container (DictionaryObject): The dictionary with the entry.
+        key (str): The entry's key.
+        actions (list): The actions, possibly indirect references.
+    """
+    if not actions:
+        del container[key]
+    elif len(actions) == 1:
+        container[NameObject(key)] = actions[0]
+    elif key == Next:
+        container[NameObject(key)] = ArrayObject(actions)
+    else:
+        first = cast(DictionaryObject, actions[0].get_object())
+        copy = DictionaryObject({name: first.raw_get(name) for name in first})
+        copy[NameObject(Next)] = ArrayObject(_get_next(first) + actions[1:])
+        container[NameObject(key)] = copy
 
 
 def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryObject]:

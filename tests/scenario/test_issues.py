@@ -284,6 +284,27 @@ def test_ppf_2100_fill_inline_signature(
     assert list(PdfReader(BytesIO(stream)).get_fields() or {}) == ["text_1"]
 
 
+def test_ppf_2128_remove_hidden_button(issue_pdf_directory):
+    # ImageSign runs JavaScript and then hides the LoadImage button by name
+    def get_action(stream):
+        page = PdfReader(BytesIO(stream)).pages[0]
+        return next(
+            annot.get_object()["/A"]
+            for annot in page["/Annots"]
+            if annot.get_object().get("/T") == "ImageSign"
+        )
+
+    obj = PdfWrapper(os.path.join(issue_pdf_directory, "560.pdf"))
+    script = get_action(obj.read())["/JS"]
+    assert get_action(obj.read())["/Next"] == {"/S": "/Hide", "/T": "LoadImage"}
+
+    action = get_action(obj.remove_fields(["LoadImage"]).read())
+
+    assert action["/S"] == "/JavaScript"
+    assert action["/JS"] == script
+    assert "/Next" not in action
+
+
 def test_get_desc_in_schema(issue_pdf_directory):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "757.pdf"))
 

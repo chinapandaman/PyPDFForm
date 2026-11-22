@@ -25,6 +25,7 @@ from .constants import (
     AS,
     DV,
     FT,
+    NAMED_TARGETS,
     A,
     AcroForm,
     Annots,
@@ -33,7 +34,6 @@ from .constants import (
     Dest,
     Fields,
     GoTo,
-    Hide,
     Kids,
     Link,
     N,
@@ -42,10 +42,8 @@ from .constants import (
     P,
     Parent,
     R,
-    ResetForm,
     Root,
     S,
-    SubmitForm,
     Subtype,
     T,
     V,
@@ -80,7 +78,6 @@ class ClonePlan:
     """
 
     _REMOVE = object()
-    _NAMED_TARGETS = {ResetForm: Fields, SubmitForm: Fields, Hide: T}
 
     def __init__(
         self,
@@ -381,7 +378,7 @@ class ClonePlan:
         Raises:
             ValueError: If the action names a field that is not cloned.
         """
-        key = self._NAMED_TARGETS.get(action.get(S))
+        key = NAMED_TARGETS.get(action.get(S))
         if key is None or key not in action:
             return
 
