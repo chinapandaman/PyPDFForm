@@ -12,7 +12,7 @@ from collections import defaultdict
 from copy import deepcopy
 from functools import lru_cache
 from io import BytesIO
-from typing import Dict, FrozenSet, List, Tuple, cast
+from typing import Dict, List, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
@@ -205,45 +205,26 @@ def build_widgets(
         Dict[str, WIDGET_TYPES]: A dictionary of widgets, where keys are widget
             keys and values are widget objects.
     """
-    return deepcopy(_build_widget_cache(pdf_stream, use_full_widget_name)[0])
-
-
-def get_shadowed_fields(
-    pdf_stream: bytes, use_full_widget_name: bool
-) -> Dict[str, FrozenSet[str]]:
-    """
-    Gets the fields that a widget key shares with a widget of another type.
-
-    A key, such as the short name `group` of a checkbox `group` and a radio
-    group `outer.group`, gives access only to the widget built for it, which is
-    of one type. The fields of another type with the key are shadowed: filling
-    the key leaves them unchanged. They are identified by their full names, as
-    found when the widgets were built, so that a fill that changes how a field
-    would be classified, such as a checkbox's appearance state, doesn't change
-    which fields the key fills.
-
-    Args:
-        pdf_stream (bytes): The PDF stream to parse.
-        use_full_widget_name (bool): Whether to use the full widget name
-            (including parent names) as the widget key.
-
-    Returns:
-        Dict[str, FrozenSet[str]]: The full names of the shadowed fields, by
-            key, for each key that has any.
-    """
-    return dict(_build_widget_cache(pdf_stream, use_full_widget_name)[1])
+    return deepcopy(_build_widget_cache(pdf_stream, use_full_widget_name))
 
 
 @lru_cache(maxsize=8)
 def _build_widget_cache(
     pdf_stream: bytes,
     use_full_widget_name: bool,
-) -> Tuple[Dict[str, WIDGET_TYPES], Dict[str, FrozenSet[str]]]:
+) -> Dict[str, WIDGET_TYPES]:
     """
     Builds and caches reusable widget objects from a PDF stream.
 
     The cached widgets must be treated as prototypes only. Use `build_widgets`
-    to get independent copies that are safe to mutate.
+    to get independent copies that are safe to mutate. A key can name fields of
+    different types, such as a checkbox and a radio group with the same short
+    name. Each widget records the full names of the fields it is built from,
+    the fields of its type with its key, in `_field_names`, and of the fields of
+    another type with its key in `_other_field_names`, for filling. The names
+    are kept with the widget, as it is retained or copied, so a later change to
+    how a field would be classified, such as a checkbox's appearance state,
+    doesn't change which fields the widget fills.
 
     Args:
         pdf_stream (bytes): The PDF stream to parse.
@@ -251,9 +232,7 @@ def _build_widget_cache(
             (including parent names) as the widget key.
 
     Returns:
-        Tuple[Dict[str, WIDGET_TYPES], Dict[str, FrozenSet[str]]]: Cached
-            widget prototypes keyed by widget name, and the full names of the
-            fields each key shadows, as `get_shadowed_fields` returns them.
+        Dict[str, WIDGET_TYPES]: Cached widget prototypes keyed by widget name.
     """
     results = {}
     radios = {}
@@ -265,40 +244,15 @@ def _build_widget_cache(
                 widget, page_num, use_full_widget_name, results, radios, found
             )
 
-    return results, _get_shadowed_fields(results, found)
+    for key, _widget in results.items():
+        names = [(get_full_name(annot), _type) for annot, _type in found[key]]
+        own = frozenset(name for name, _type in names if _type is type(_widget))
+        _widget.__dict__["_field_names"] = own
+        _widget.__dict__["_other_field_names"] = (
+            frozenset(name for name, _type in names if _type is not type(_widget)) - own
+        )
 
-
-def _get_shadowed_fields(
-    results: Dict[str, WIDGET_TYPES], found: Dict[str, List[tuple]]
-) -> Dict[str, FrozenSet[str]]:
-    """
-    Gets the full names of the fields that each key shadows.
-
-    Args:
-        results (Dict[str, WIDGET_TYPES]): The widgets built, by key.
-        found (Dict[str, List[tuple]]): Each key's widget annotations, with the
-            type each was classified as, in the order they were found.
-
-    Returns:
-        Dict[str, FrozenSet[str]]: For each key with widget annotations of more
-            than one type, the full names of the fields of another type than
-            its widget's. A name that also has an annotation of its widget's
-            type isn't shadowed, so that annotation is still filled.
-    """
-    shadowed = {}
-    for key, annots in found.items():
-        exposed = type(results[key])
-        if all(_type is exposed for _, _type in annots):
-            continue
-
-        names = {
-            get_full_name(annot) for annot, _type in annots if _type is not exposed
-        }
-        names -= {get_full_name(annot) for annot, _type in annots if _type is exposed}
-        if names:
-            shadowed[key] = frozenset(names)
-
-    return shadowed
+    return results
 
 
 def _process_widget(

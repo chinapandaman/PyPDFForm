@@ -9,7 +9,7 @@ supports making the filled form read-only to prevent further modifications.
 """
 
 from io import BytesIO
-from typing import Dict, FrozenSet, cast
+from typing import Dict, cast
 
 from pypdf import PdfWriter
 from pypdf.generic import DictionaryObject
@@ -78,6 +78,32 @@ def signature_image_handler(
     return any_image_to_draw
 
 
+def _is_filled_by(widget: WIDGET_TYPES, annot: DictionaryObject) -> bool:
+    """Checks whether filling a widget changes an annotation with its key.
+
+    A key can name fields of different types, such as a checkbox and a radio
+    group with the same short name, and annotations that weren't recognized as
+    widgets, such as a checked checkbox whose on state isn't `/Yes`. The fields
+    of another type than the widget, which `build_widgets` records by full name
+    in `_other_field_names`, keep their values. A radio group fills only the
+    options it was built from, in `_field_names`, so no other annotation takes
+    an option index.
+
+    Args:
+        widget (WIDGET_TYPES): The widget under the annotation's key, from
+            `build_widgets`.
+        annot (DictionaryObject): The widget annotation.
+
+    Returns:
+        bool: True if filling the widget changes the annotation.
+    """
+    name = get_full_name(annot)
+    if isinstance(widget, Radio):
+        return name in widget.__dict__["_field_names"]
+
+    return name not in widget.__dict__["_other_field_names"]
+
+
 def update_widget(
     annot: DictionaryObject,
     widget: WIDGET_TYPES,
@@ -86,15 +112,14 @@ def update_widget(
     images_to_draw_page: list,
     need_appearances: bool,
     readonly: bool,
-    shadowed: bool = False,
 ) -> bool:
     """Updates a single widget's value and handles its properties.
 
     This function updates the value of a single PDF form widget based on its type. It sets
     the read-only flag first when requested, skips value updates when the
-    middleware value is ``None`` or the annotation belongs to a field that the
-    key shadows, such as a checkbox with the short name of a radio group, tracks
-    radio option indices within each group,
+    middleware value is ``None`` or filling the widget doesn't change the
+    annotation, such as a checkbox with the short name of a radio group,
+    tracks radio option indices within each group,
     updates the entire radio group when its selected option is reached, and
     prepares images or signatures for later drawing instead of writing image data directly
     into the annotation.
@@ -107,15 +132,13 @@ def update_widget(
         images_to_draw_page (list): A list to store image data for the current page.
         need_appearances (bool): If True, skips updating appearance streams for certain fields.
         readonly (bool): Whether to make the widget read-only to prevent further editing.
-        shadowed (bool): Whether the annotation belongs to a field of another
-            type than the widget, which keeps its value. Defaults to False.
 
     Returns:
         bool: True if an image or signature was prepared for drawing, False otherwise.
     """
     if readonly:
         update_field_readonly(annot, True)
-    if widget.value is None or shadowed:
+    if widget.value is None or not _is_filled_by(widget, annot):
         return False
 
     any_image_to_draw = False
@@ -169,19 +192,19 @@ def fill(
     need_appearances: bool,
     use_full_widget_name: bool,
     readonly: bool = False,
-    shadowed_fields: Dict[str, FrozenSet[str]] | None = None,
 ) -> tuple:
     """Fills a PDF template with the given widgets.
 
     This function fills a PDF template with the provided widget values. It iterates through the
     widgets on each page of the PDF and updates their values based on the provided `widgets`
     dictionary. The function supports text fields, checkboxes, radio buttons, dropdowns,
-    images, and signatures. A field that its key shadows, one of another type than
-    the widget under the key, such as a checkbox with the short name of a radio
-    group, keeps its value. It can set fields read-only during filling, and when
-    images or signatures are present it removes only the widgets whose images were prepared,
-    including their field-tree entries, and returns a second stream with the image
-    watermarks applied. All other annotations retain their existing references.
+    images, and signatures. A field of another type than the widget under its key,
+    such as a checkbox with the short name of a radio group, keeps its value, and a
+    radio group fills only its own options. It can set fields read-only during
+    filling, and when images or signatures are present it removes only the widgets
+    whose images were prepared, including their field-tree entries, and returns a
+    second stream with the image watermarks applied. All other annotations retain
+    their existing references.
 
     Args:
         template (bytes): The PDF template as bytes.
@@ -193,9 +216,6 @@ def fill(
         use_full_widget_name (bool): Whether to use the full widget name when looking up widgets
                                       in the `widgets` dictionary.
         readonly (bool): Whether to make form fields read-only. Defaults to False.
-        shadowed_fields (Dict[str, FrozenSet[str]] | None): The full names of the
-            fields each key shadows, from `get_shadowed_fields`. Defaults to None,
-            for none.
 
     Returns:
         tuple: A tuple containing the filled PDF as bytes and the image-drawn
@@ -203,7 +223,6 @@ def fill(
                tuple item is None when no image drawing is needed.
     """
     out = PdfWriter(BytesIO(template))
-    shadowed = shadowed_fields or {}
 
     radio_button_tracker = {}
     images_to_draw = {}
@@ -233,7 +252,6 @@ def fill(
                 images_to_draw[page_num + 1],
                 need_appearances,
                 readonly,
-                key in shadowed and get_full_name(annot) in shadowed[key],
             )
             if consumed:
                 any_image_to_draw = True
