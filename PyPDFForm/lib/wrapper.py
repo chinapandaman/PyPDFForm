@@ -968,7 +968,8 @@ class PdfWrapper:
         the PDF's form fields and calculation order. Reset, submit, and hide
         actions stop naming them. An action left with no field to act on does
         nothing, and is removed unless other actions run with it; JavaScript
-        is not changed. Keys that match no field are ignored. If removal
+        is not changed. Objects that only removed fields used are dropped from
+        the PDF. Keys that match no field are ignored. If removal
         raises, the PDF and widgets are restored.
 
         Args:

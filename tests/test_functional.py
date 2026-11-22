@@ -2783,6 +2783,8 @@ def test_remove_all_fields_removes_values(template_stream, assert_catalog_fields
     assert_catalog_fields(stream, [])
     assert not PdfReader(BytesIO(stream)).get_fields()
     assert not PdfWrapper(stream).widgets
+    # removed fields aren't kept as unreachable objects
+    assert not get_retained_content(stream, ["REVIEW_SENTINEL"])
 
 
 @pytest.mark.cli_test
