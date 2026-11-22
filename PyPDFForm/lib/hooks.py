@@ -11,12 +11,14 @@ and behavior.
 """
 
 import sys
+from collections.abc import Callable
 from io import BytesIO
 from typing import TextIO, cast
 
 from pypdf import PdfWriter
 from pypdf.generic import (
     ArrayObject,
+    ByteStringObject,
     DictionaryObject,
     FloatObject,
     NameObject,
@@ -29,14 +31,14 @@ from .constants import (
     AA,
     COMB,
     DA,
-    FONT_COLOR_IDENTIFIER,
-    FONT_SIZE_IDENTIFIER,
+    DEFAULT_APPEARANCE_HOOKS,
     HIDDEN,
     JS,
     MULTILINE,
     READ_ONLY,
     REQUIRED,
     TU,
+    AcroForm,
     Action,
     Annots,
     Bl,
@@ -57,9 +59,11 @@ from .constants import (
     U,
     X,
 )
+from .default_appearance import change_font, change_font_color, change_font_size
+from .field_tree import resolve_inherited_entry
 from .middleware.dropdown import DropdownOption
 from .patterns import WIDGET_DESCRIPTION_PATTERNS, check_field_flag, get_widget_key
-from .utils import extract_widget_property
+from .utils import extract_widget_property, get_dictionary
 
 
 def trigger_widget_hooks(
@@ -74,9 +78,10 @@ def trigger_widget_hooks(
     if a widget is associated with an annotation and has hooks to trigger,
     it executes those hooks. Hooks are functions defined in this module that
     modify the annotation dictionary, allowing for dynamic changes to the form field's
-    appearance or behavior. Widget hook queues are left unchanged, so the caller
-    can clear them once the modified PDF is returned, or revert them if a hook
-    or writing the PDF raises.
+    appearance or behavior. Hooks that change the default appearance also get
+    the AcroForm dictionary, for its default. Widget hook queues are left
+    unchanged, so the caller can clear them once the modified PDF is returned,
+    or revert them if a hook or writing the PDF raises.
 
     Args:
         pdf (bytes): The PDF file data as bytes.
@@ -90,6 +95,7 @@ def trigger_widget_hooks(
         bytes: The modified PDF data as bytes, with the widget hooks applied.
     """
     output = PdfWriter(BytesIO(pdf))
+    acroform = get_dictionary(output.root_object, AcroForm) or DictionaryObject()
 
     for page in output.pages:
         for annot in page.get(Annots, []):
@@ -100,8 +106,12 @@ def trigger_widget_hooks(
             if widget is None or not widget.hooks_to_trigger:
                 continue
 
-            for hook in widget.hooks_to_trigger:
-                getattr(sys.modules[__name__], hook[0])(annot, hook[1])
+            for hook, value in widget.hooks_to_trigger:
+                function = getattr(sys.modules[__name__], hook)
+                if hook in DEFAULT_APPEARANCE_HOOKS:
+                    function(annot, value, acroform)
+                else:
+                    function(annot, value)
 
     with BytesIO() as f:
         output.write(f)
@@ -184,116 +194,112 @@ def _remove_field_entry(
         raise ValueError(msg)
 
 
-def update_text_field_font(annot: DictionaryObject, val: str) -> None:
+def _update_default_appearance(
+    annot: DictionaryObject,
+    acroform: DictionaryObject,
+    change: Callable[[object], str | bytes],
+) -> None:
+    """
+    Changes the default appearance (`/DA`) of a widget.
+
+    The `/DA` is resolved from the widget, the fields along its `/Parent`
+    chain, and then the AcroForm default, so a widget's own `/DA` takes
+    precedence. The changed `/DA` replaces the one that was found when it is on
+    the widget or below its own field, and is otherwise written to the
+    widget's own field, so fields shared with other fields and the AcroForm
+    default are not changed. The change is computed before anything is
+    written, and hooks change a PDF writer that is written only when every
+    hook succeeds, so an error leaves the PDF unchanged.
+
+    Args:
+        annot (DictionaryObject): The widget annotation dictionary.
+        acroform (DictionaryObject): The AcroForm dictionary, for its default.
+        change (Callable[[object], str | bytes]): Returns the changed `/DA`
+            for the resolved `/DA` value, such as `change_font_size`, as bytes
+            when it was a byte string.
+
+    Raises:
+        ValueError: If no `/DA` is set, the `/Parent` chain has a cycle, or
+            the `/DA` can't be changed, such as one without a `Tf` operator.
+    """
+    entry = resolve_inherited_entry(annot, DA, acroform)
+    if entry.value is None:
+        msg = "Cannot change /DA: neither the field nor the form sets one."
+        raise ValueError(msg)
+
+    result = change(entry.value)
+    entry.target[NameObject(DA)] = (
+        ByteStringObject(result)
+        if isinstance(result, bytes)
+        else TextStringObject(result)
+    )
+
+
+def update_text_field_font(
+    annot: DictionaryObject, val: str, acroform: DictionaryObject
+) -> None:
     """
     Updates the font of a text field annotation.
 
-    This function modifies the appearance string (DA) in the annotation dictionary
-    to change the font used for the text field. It ensures that the provided font
-    name is a proper PDF font by checking if it starts with a slash "/".
-    The function then correctly identifies and updates the font in the appearance
-    stream by locating the existing font identifier (which also starts with a slash).
+    This function changes the font of the field's default appearance (`/DA`),
+    as `_update_default_appearance` describes. The font must be a PDF font
+    resource name starting with a slash "/"; any other name leaves the
+    annotation unchanged.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
         val (str): The new font name to use for the text field. Must start with "/".
+        acroform (DictionaryObject): The AcroForm dictionary, for its default.
+
+    Raises:
+        ValueError: If the `/DA` can't be resolved or has no `Tf` operator
+            with a font and a numeric size.
     """
     if not val.startswith("/"):
         return
-    if Parent in annot and DA not in annot:
-        text_appearance = annot[Parent][DA]
-    else:
-        text_appearance = annot[DA]
-
-    text_appearance = text_appearance.split(" ")
-
-    index_to_update = 0
-    for i, each in enumerate(text_appearance):
-        if each.startswith("/"):
-            index_to_update = i
-            break
-
-    text_appearance[index_to_update] = val
-    new_text_appearance = " ".join(text_appearance)
-
-    if Parent in annot and DA not in annot:
-        annot[NameObject(Parent)][NameObject(DA)] = TextStringObject(
-            new_text_appearance
-        )
-    else:
-        annot[NameObject(DA)] = TextStringObject(new_text_appearance)
+    _update_default_appearance(annot, acroform, lambda da: change_font(da, val))
 
 
-def update_text_field_font_size(annot: DictionaryObject, val: float) -> None:
+def update_text_field_font_size(
+    annot: DictionaryObject, val: float, acroform: DictionaryObject
+) -> None:
     """
     Updates the font size of a text field annotation.
 
-    This function modifies the appearance string (DA) in the annotation dictionary
-    to change the font size used for the text field.
+    This function changes the font size of the field's default appearance
+    (`/DA`), as `_update_default_appearance` describes.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
         val (float): The new font size to use for the text field.
+        acroform (DictionaryObject): The AcroForm dictionary, for its default.
+
+    Raises:
+        ValueError: If the `/DA` can't be resolved or has no `Tf` operator
+            with a font and a numeric size.
     """
-    if Parent in annot and DA not in annot:
-        text_appearance = annot[Parent][DA]
-    else:
-        text_appearance = annot[DA]
-
-    text_appearance = text_appearance.split(" ")
-    font_size_index = 0
-    for i, value in enumerate(text_appearance):
-        if value.startswith(FONT_SIZE_IDENTIFIER):
-            font_size_index = i - 1
-            break
-
-    text_appearance[font_size_index] = str(val)
-    new_text_appearance = " ".join(text_appearance)
-
-    if Parent in annot and DA not in annot:
-        annot[NameObject(Parent)][NameObject(DA)] = TextStringObject(
-            new_text_appearance
-        )
-    else:
-        annot[NameObject(DA)] = TextStringObject(new_text_appearance)
+    _update_default_appearance(annot, acroform, lambda da: change_font_size(da, val))
 
 
-def update_text_field_font_color(annot: DictionaryObject, val: tuple) -> None:
+def update_text_field_font_color(
+    annot: DictionaryObject, val: tuple, acroform: DictionaryObject
+) -> None:
     """
     Updates the font color of a text field annotation.
 
-    This function modifies the appearance string (DA) in the annotation dictionary
-    to change the font color used for the text field.
+    This function changes the fill color of the field's default appearance
+    (`/DA`) to an RGB color, as `_update_default_appearance` describes.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
         val (tuple): The new font color as an RGB tuple (e.g., (1, 0, 0) for red).
+        acroform (DictionaryObject): The AcroForm dictionary, for its default.
+
+    Raises:
+        ValueError: If the `/DA` can't be resolved, or has a fill color
+            operator without the numeric operands it takes.
     """
-    if Parent in annot and DA not in annot:
-        text_appearance = annot[Parent][DA]
-    else:
-        text_appearance = annot[DA]
-
-    text_appearance = text_appearance.split(" ")
-    font_size_identifier_index = 0
-    for i, value in enumerate(text_appearance):
-        if value == FONT_SIZE_IDENTIFIER:
-            font_size_identifier_index = i
-            break
-
-    new_text_appearance = (
-        text_appearance[:font_size_identifier_index]
-        + [FONT_SIZE_IDENTIFIER]
-        + [str(each) for each in val]
-    )
-    new_text_appearance = " ".join(new_text_appearance) + FONT_COLOR_IDENTIFIER
-
-    if Parent in annot and DA not in annot:
-        annot[NameObject(Parent)][NameObject(DA)] = TextStringObject(
-            new_text_appearance
-        )
-    else:
-        annot[NameObject(DA)] = TextStringObject(new_text_appearance)
+    _update_default_appearance(annot, acroform, lambda da: change_font_color(da, val))
 
 
 def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:

@@ -238,6 +238,15 @@ JAVASCRIPT_HOOKS = frozenset(
 FEATURE_HOOKS = (
     frozenset({"update_text_field_comb", "update_field_tooltip"}) | JAVASCRIPT_HOOKS
 )
+# widget property hooks that change the default appearance (/DA), which a
+# field can inherit from its ancestors or the AcroForm; they get the AcroForm
+DEFAULT_APPEARANCE_HOOKS = frozenset(
+    {
+        "update_text_field_font",
+        "update_text_field_font_size",
+        "update_text_field_font_color",
+    }
+)
 # no feature above needs a newer version, so newer documents are never raised
 NEWEST_FEATURE_VERSION = max(
     [
@@ -257,8 +266,6 @@ NEWEST_FEATURE_VERSION = max(
 fieldFlags = "fieldFlags"
 required = "required"
 
-FONT_SIZE_IDENTIFIER = "Tf"
-FONT_COLOR_IDENTIFIER = " rg"
 DEFAULT_FONT = "Helvetica"
 DEFAULT_FONT_SIZE = 12
 DEFAULT_FONT_COLOR = (0, 0, 0)

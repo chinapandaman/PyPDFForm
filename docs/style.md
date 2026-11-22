@@ -2,7 +2,7 @@
 
 PyPDFForm lets you modify PDF-level metadata and form field settings in code. You can update document titles, field appearances, and field behavior without altering the PDF form template.
 
-Changes to a field's properties are written to the PDF the next time it is read, for example by `read()` or `write()`. A value the PDF can't store, such as `None` for `readonly` or a coordinate that isn't a number, raises an error right away and leaves the field unchanged. If writing the changes fails, all pending changes are discarded before the error is raised, so the fields still match the PDF.
+Changes to a field's properties are written to the PDF the next time it is read, for example by `read()` or `write()`. A value the PDF can't store, such as `None` for `readonly` or a coordinate that isn't a number, raises an error right away and leaves the field unchanged. If writing the changes fails, for example because a font size is set on a field whose default appearance has no font, all pending changes are discarded before the error is raised, so the fields still match the PDF.
 
 The examples in this section primarily use [this PDF](pdfs/sample_template.pdf).
 
