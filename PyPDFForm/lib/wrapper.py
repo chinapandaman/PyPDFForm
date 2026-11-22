@@ -174,7 +174,7 @@ class PdfWrapper:
         self._version = None
         self._available_fonts = {}  # for setting /F1
         self._available_fonts_loaded = None  # for lazy loading fonts
-        self._font_register_events = []  # for reregister
+        self._font_register_events = []  # for drawing, font lookups, and new wrappers
         self._fonts_without_metrics = {}  # resource name to TTF, for read()
         self._key_update_tracker = {}  # new key to old key, for renamed widgets
         self._keys_to_update = []  # for bulk update keys
@@ -245,8 +245,9 @@ class PdfWrapper:
         Creates an independent copy of this wrapper.
 
         The copy starts from the current PDF stream, which already contains the title
-        and registered font resources, so fonts are not embedded again; their mappings
-        and registration events are copied instead. The cached PDF version is copied
+        and registered font resources, so fonts are not embedded again; their mappings,
+        registration events, and the fonts that still need metrics in `read()` are
+        copied instead. The cached PDF version is copied
         so the copy restores the same header when serialized. Widgets and pending key
         updates are copied so either wrapper can change without affecting the other.
         Readable stream values on widgets are shared because they cannot be duplicated.
