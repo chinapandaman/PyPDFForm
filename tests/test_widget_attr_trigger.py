@@ -897,6 +897,7 @@ def _with_parent_cycle(stream, name):
         ("/Helv 12 Tf 0 g", "font_color", (1, 0, 0, 0), "with three components"),
         ("/Helv 12 Tf 0 g", "font_color", 0.5, "with three components"),
         ("/Helv 12 Tf 0 g", "font", "/My Font", "is not a PDF name"),
+        ("/Helv 12 Tf 0 g", "font", "/\u4e2d", "is not a PDF name"),
         (12, "font_size", 20, "is not a string"),
         (None, "font_size", 20, "the /Parent chain of the field has a cycle"),
     ],
@@ -975,7 +976,11 @@ def test_change_default_appearance_over_null(template_stream):
 
 @pytest.mark.parametrize(
     ("key", "expected"),
-    [("/My Font", "/My#20Font 0 Tf 0 g"), ("/My#Font", "/My#23Font 0 Tf 0 g")],
+    [
+        ("/My Font", "/My#20Font 0 Tf 0 g"),
+        ("/My#Font", "/My#23Font 0 Tf 0 g"),
+        ("/\u4e2d", "/#E4#B8#AD 0 Tf 0 g"),
+    ],
 )
 def test_change_font_to_resource_with_escaped_name(template_stream, key, expected):
     # the font's resource key has characters that a PDF name escapes

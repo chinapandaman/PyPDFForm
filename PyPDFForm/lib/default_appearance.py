@@ -359,13 +359,18 @@ def change_font(default_appearance: object, font: str) -> str | bytes:
         str | bytes: The changed `/DA`, as bytes when it was a byte string.
 
     Raises:
-        ValueError: If the font is not a single PDF name, such as one with a
-            space, or the `/DA` can't be read or has no `Tf` operation with a
-            font and a numeric size.
+        ValueError: If the font is not a single PDF name written in ASCII, such
+            as one with a space or a character outside ASCII, which a name
+            writes as an escape such as `#20`, or the `/DA` can't be read or
+            has no `Tf` operation with a font and a numeric size.
     """
+    # pypdf writes a /DA with characters outside its text encoding as UTF-16
     match = _TOKEN_PATTERN.fullmatch(font)
-    if match is None or match.lastgroup != "name":
-        msg = f"Cannot change the font: {font!r} is not a PDF name."
+    if match is None or match.lastgroup != "name" or not font.isascii():
+        msg = (
+            f"Cannot change the font: {font!r} is not a PDF name written in "
+            "ASCII, with escapes such as #20 for a space."
+        )
         raise ValueError(msg)
 
     return _replace_font_operands(default_appearance, "font", 0, font)
