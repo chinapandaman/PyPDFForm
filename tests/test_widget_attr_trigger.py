@@ -11,6 +11,7 @@ from pypdf.generic import NameObject, NullObject
 from PyPDFForm import Fields, PdfWrapper, RawElements
 from PyPDFForm.lib.constants import COMB, MULTILINE, RADIO, READ_ONLY, REQUIRED
 from PyPDFForm.lib.hooks import update_field_readonly
+from PyPDFForm.lib.middleware.checkbox import Checkbox
 from PyPDFForm.lib.middleware.radio import Radio
 from PyPDFForm.lib.patterns import get_widget_key
 from PyPDFForm.lib.utils import get_version, set_version
@@ -1244,6 +1245,52 @@ def test_radio_option_with_own_field_flags(
     assert isinstance(reopened, Radio)
     assert reopened.number_of_options == 2
     assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize("radio_flag_on", ["outer", "field"])
+@pytest.mark.parametrize("checkbox_first", [True, False], ids=["first", "last"])
+def test_radio_group_with_short_name_of_another_field(
+    template_with_radiobutton_stream, radio_flag_on, checkbox_first
+):
+    # the checkbox "check" and the radio group "outer.group" both have the
+    # short name "group", and the radio group's /DV is /Off
+    with Pdf.open(BytesIO(template_with_radiobutton_stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        check = next(field for field in fields if str(field.get("/T")) == "check")
+        radio = next(field for field in fields if str(field.get("/T")) == "radio_1")
+        check.T = String("group")
+        radio.T = String("group")
+        outer = pdf.make_indirect(
+            Dictionary({"/T": String("outer"), "/Kids": Array([radio])})
+        )
+        radio.Parent = outer
+        if radio_flag_on == "outer":
+            outer.Ff = RADIO
+            del radio["/Ff"]
+        radio.DV = Name.Off
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in fields if field != radio] + [outer]
+        )
+        annots = list(pdf.pages[0].Annots)
+        others = [annot for annot in annots if annot != check]
+        pdf.pages[0].Annots = Array(
+            [check, *others] if checkbox_first else [*others, check]
+        )
+        stream = _save(pdf)
+
+    # the later field replaces the earlier one, as for any widget
+    widget = PdfWrapper(stream).widgets["group"]
+    if checkbox_first:
+        assert isinstance(widget, Radio)
+        assert widget.number_of_options == 2
+    else:
+        assert type(widget) is Checkbox
+
+    # full names tell them apart
+    widgets = PdfWrapper(stream, use_full_widget_name=True).widgets
+    assert type(widgets["group"]) is Checkbox
+    assert isinstance(widgets["outer.group"], Radio)
+    assert widgets["outer.group"].number_of_options == 2
 
 
 @pytest.mark.parametrize(

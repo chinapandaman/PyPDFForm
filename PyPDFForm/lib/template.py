@@ -350,7 +350,9 @@ def _handle_radio_widget(
     Each radio annotation contributes one option to a shared `Radio` object. The
     method stores per-option rectangles as lists, increments the option count for
     schema generation, and records the selected option index when the annotation
-    is currently selected.
+    is currently selected. When the key holds a widget of another type, such as
+    a checkbox with the same short name, a new `Radio` object replaces it, as
+    any widget replaces an earlier one with its key.
 
     Args:
         widget (dict): The widget dictionary from the PDF.
@@ -360,7 +362,7 @@ def _handle_radio_widget(
     """
     field_rect = get_field_rect(widget)
 
-    if key not in results:
+    if not isinstance(results.get(key), Radio):
         _widget.__dict__["x"] = []
         _widget.__dict__["y"] = []
         _widget.__dict__["width"] = []
