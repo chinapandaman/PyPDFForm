@@ -302,7 +302,8 @@ def test_ppf_2128_remove_hidden_button(issue_pdf_directory):
 
     assert action["/S"] == "/JavaScript"
     assert action["/JS"] == script
-    assert "/Next" not in action
+    # the Hide does nothing, and stays so that the chain keeps its shape
+    assert action["/Next"] == {"/S": "/Hide", "/T": []}
 
 
 def test_get_desc_in_schema(issue_pdf_directory):

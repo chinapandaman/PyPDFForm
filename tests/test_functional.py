@@ -3135,7 +3135,7 @@ def test_remove_fields_updates_actions_everywhere(template_stream):
         (
             ("one", [("reset", ("reset", None)), ("two", None)]),
             None,
-            (["one", "two"], None),
+            (["one", "/Hide", "/Hide", "two"], None),
         ),
         (
             None,
@@ -3143,11 +3143,11 @@ def test_remove_fields_updates_actions_everywhere(template_stream):
             ([], {"/U": ["one"]}),
         ),
     ],
-    ids=["chain_after", "chain_inside", "removed_chain", "trigger"],
+    ids=["chain_after", "chain_inside", "stopped_chain", "trigger"],
 )
 def test_remove_fields_chains_with_removed_actions(template_stream, a, aa, expected):
-    # an action that names only test does nothing when actions that keep
-    # acting follow it, and is removed otherwise
+    # an action that names only test does nothing in place, and an entry whose
+    # actions all do nothing is removed
     def add(pdf, fields):
         button = _get_button(pdf)
         if a is not None:
@@ -3208,7 +3208,7 @@ def test_remove_fields_shared_action_cycle(template_stream):
 
     with Pdf.open(BytesIO(obj.read())) as pdf:
         button = _get_button(pdf)
-        assert _describe_actions(button.A) == ["one"]
+        assert _describe_actions(button.A) == ["one", "/Hide", "cycle"]
         assert "/AA" not in button
 
 
@@ -3284,7 +3284,49 @@ def test_remove_fields_shared_action_branches(template_stream, kept):
         template_stream, add, lambda pdf: _get_button(pdf).A
     )
 
-    assert result == (expected if kept else ["one"])
+    assert result == expected
+
+
+def test_remove_fields_keeps_repeated_actions(template_stream):
+    # PDFium stops running a trigger's actions when it reaches one a second
+    # time, so "k" never runs, before or after removal
+    def add(pdf, fields):
+        reset = pdf.make_indirect(_build_action(("reset", None), fields["test"]))
+        _get_button(pdf).A = Dictionary(
+            S=Name.JavaScript,
+            JS=String("j"),
+            Next=Array([reset, reset, Dictionary(S=Name.JavaScript, JS=String("k"))]),
+        )
+
+    expected, result = _describe_removal(
+        template_stream, add, lambda pdf: _get_button(pdf).A
+    )
+
+    assert expected == ["j", "/Hide", "cycle", "k"]
+    assert result == expected
+
+
+@pytest.mark.parametrize("separately", [False, True])
+def test_remove_fields_actions_in_separate_calls(template_stream, separately):
+    # removing two fields in two calls leaves the same actions as in one
+    def add(pdf, fields):
+        second = pdf.make_indirect(
+            Dictionary(S=Name.ResetForm, Fields=Array([fields["check"]]))
+        )
+        pdf.Root.OpenAction = Dictionary(
+            S=Name.ResetForm, Fields=Array([fields["test"]]), Next=Array([second])
+        )
+
+    obj = PdfWrapper(_with_actions(template_stream, add))
+    if separately:
+        with Pdf.open(BytesIO(obj.remove_fields(["test"]).read())) as pdf:
+            assert _describe_actions(pdf.Root.OpenAction) == ["/Hide", "/ResetForm"]
+        obj.remove_fields(["check"])
+    else:
+        obj.remove_fields(["test", "check"])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        assert "/OpenAction" not in pdf.Root
 
 
 def test_remove_fields_long_action_chain(template_stream):

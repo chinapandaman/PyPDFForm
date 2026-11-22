@@ -489,15 +489,16 @@ def _remove_action_targets(
 
     An empty `/Fields` makes ResetForm and SubmitForm act on every field, and
     a Hide action without targets has nothing to act on, so an action that
-    would be left without targets must stop acting instead. A ResetForm or
-    SubmitForm action that acts on every field except the ones it names
-    (`INCLUDE_EXCLUDE`) is kept with an empty `/Fields`, which still means
-    every field. When another action can be reached through the `/Next` of an
-    action that must stop acting, it becomes a no-op in place, as described
-    in `_make_no_op`, so every chain keeps its shape. Otherwise, it and the
-    actions after it do nothing, so it is removed from every entry and `/Next`
-    that holds it. An entry or `/Next` left without actions is deleted, and so
-    is an `/AA` dictionary left without triggers.
+    would be left without targets stops acting instead: it becomes a no-op in
+    place, as described in `_make_no_op`. A ResetForm or SubmitForm action
+    that acts on every field except the ones it names (`INCLUDE_EXCLUDE`) is
+    kept with an empty `/Fields`, which still means every field. No action is
+    taken out of a `/Next`, since some viewers, such as PDFium, stop running a
+    trigger's actions when they reach one a second time, so every chain keeps
+    its shape. An entry that holds actions is deleted when it reaches an
+    action that stopped acting and none of the actions it reaches still act,
+    counting no-ops left by earlier removals, since running it would do
+    nothing. An `/AA` dictionary left without triggers is deleted too.
 
     Args:
         actions (_FormActions): The actions, found before removal.
@@ -514,40 +515,32 @@ def _remove_action_targets(
     if not stopped:
         return
 
-    followed = _get_followed(actions.following, stopped)
-    for key in followed:
+    for key in stopped:
         _make_no_op(actions.following[key][0])
-    _remove_actions(actions, stopped - followed)
+
+    acting = {
+        key for key, (action, _) in actions.following.items() if not _is_no_op(action)
+    }
+    _delete_entries(
+        actions,
+        _get_reaching(actions.following, stopped)
+        - _get_reaching(actions.following, acting),
+    )
 
 
-def _remove_actions(actions: _FormActions, removed: set) -> None:
+def _delete_entries(actions: _FormActions, inert: set) -> None:
     """
-    Removes actions from every entry and `/Next` that holds them.
+    Deletes the entries whose action is in a set.
 
-    An entry or `/Next` left without actions is deleted, and so is an `/AA`
-    dictionary left without triggers.
+    An `/AA` dictionary left without triggers is deleted too.
 
     Args:
         actions (_FormActions): The actions, found before removal.
-        removed (set): The `id` of each action to remove.
+        inert (set): The `id` of each action whose entries are deleted.
     """
-    if not removed:
-        return
-
-    for key, (action, next_actions) in actions.following.items():
-        remaining = [
-            each for each in next_actions if id(each.get_object()) not in removed
-        ]
-        if key in removed or len(remaining) == len(next_actions):
-            continue
-        if remaining:
-            action[NameObject(Next)] = ArrayObject(remaining)
-        else:
-            del action[Next]
-
     emptied = set()
     for container, key in actions.entries:
-        if id(container[key]) in removed:
+        if id(container[key]) in inert:
             del container[key]
             if not container:
                 emptied.add(id(container))
@@ -640,33 +633,32 @@ def _get_next(action: DictionaryObject) -> list:
     )
 
 
-def _get_followed(following: dict, stopped: set) -> set:
+def _get_reaching(following: dict, keys: set) -> set:
     """
-    Finds the actions that must stop acting but lead to another action.
+    Finds the actions from which an action in a set can be reached.
 
-    The `/Next` links are followed backwards from every action that keeps
-    acting, through actions that must stop, so each action is visited once,
-    including in shared branches and cycles.
+    The `/Next` links are followed backwards from the actions in the set, so
+    each action is visited once, including in shared branches and cycles.
 
     Args:
         following (dict): Each action with the actions in its `/Next`, keyed
             by its `id`, as `_FormActions` lists them.
-        stopped (set): The `id` of each action that must stop acting.
+        keys (set): The `id` of each action to reach.
 
     Returns:
-        set: The `id` of each action in `stopped` from which an action that
-            keeps acting can be reached through `/Next`.
+        set: The `id` of each action in `keys`, and of each action from which
+            one of them can be reached through `/Next`.
     """
     preceding: Dict[int, list] = {}
     for key, (_, next_actions) in following.items():
         for each in next_actions:
             preceding.setdefault(id(each.get_object()), []).append(key)
 
-    result = set()
-    stack = [key for key in following if key not in stopped]
+    result = set(keys)
+    stack = list(keys)
     while stack:
         for key in preceding.get(stack.pop(), []):
-            if key in stopped and key not in result:
+            if key not in result:
                 result.add(key)
                 stack.append(key)
 
@@ -690,6 +682,24 @@ def _make_no_op(action: DictionaryObject) -> None:
             del action[key]
     action[NameObject(S)] = NameObject(Hide)
     action[NameObject(T)] = ArrayObject()
+
+
+def _is_no_op(action: DictionaryObject) -> bool:
+    """
+    Checks whether an action is a no-op that `_make_no_op` could have made.
+
+    Args:
+        action (DictionaryObject): A dictionary in an action entry.
+
+    Returns:
+        bool: True if it is a Hide action whose `/T` is an empty array.
+    """
+    targets = _get_entry(action, T)
+    return (
+        _get_action_type(action) == Hide
+        and isinstance(targets, ArrayObject)
+        and not targets
+    )
 
 
 def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryObject]:
