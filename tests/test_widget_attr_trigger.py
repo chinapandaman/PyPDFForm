@@ -9,6 +9,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject, NullObject
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
+from PyPDFForm.lib.constants import COMB, MULTILINE, READ_ONLY, REQUIRED
 from PyPDFForm.lib.patterns import get_widget_key
 from PyPDFForm.lib.utils import get_version, set_version
 
@@ -629,9 +630,9 @@ CHOSEN_DA = "/Cour 9 Tf 0 0 1 rg"
 OTHER_DA = "/Helv 5 Tf 0 g"
 
 
-def _nest_fields(stream, default_appearances):
+def _nest_fields(stream, values, entry="/DA"):
     # makes "test" and "test_2" kids of "inner", a kid of "outer", and sets the
-    # /DA of "test", "inner", "outer", or the AcroForm as given, without others
+    # entry of "test", "inner", "outer", or the AcroForm as given, without others
     with Pdf.open(BytesIO(stream)) as pdf:
         fields = pdf.Root.AcroForm.Fields
         kids = [field for field in fields if str(field.get("/T")) in ("test", "test_2")]
@@ -644,11 +645,13 @@ def _nest_fields(stream, default_appearances):
         inner.Parent = outer
         for kid in kids:
             kid.Parent = inner
-            del kid["/DA"]
+            if entry in kid:
+                del kid[entry]
         pdf.Root.AcroForm.Fields = Array(
             [field for field in fields if field not in kids] + [outer]
         )
-        del pdf.Root.AcroForm["/DA"]
+        if entry in pdf.Root.AcroForm:
+            del pdf.Root.AcroForm[entry]
 
         holders = {
             "test": next(kid for kid in kids if str(kid.T) == "test"),
@@ -656,22 +659,22 @@ def _nest_fields(stream, default_appearances):
             "outer": outer,
             "/AcroForm": pdf.Root.AcroForm,
         }
-        for holder, default_appearance in default_appearances.items():
-            holders[holder].DA = String(default_appearance)
+        for holder, value in values.items():
+            holders[holder][entry] = _pdf_value(value)
 
         return _save(pdf)
 
 
-def _get_default_appearances(stream):
-    # the /DA of each field of _nest_fields, or None without one
+def _get_nested_entries(stream, entry="/DA"):
+    # the entry of each field of _nest_fields, or None without one
     reader = PdfReader(BytesIO(stream))
     inner = _find_widget(stream, "test")["/Parent"].get_object()
     return {
-        "test": _find_widget(stream, "test").get("/DA"),
-        "test_2": _find_widget(stream, "test_2").get("/DA"),
-        "inner": inner.get("/DA"),
-        "outer": inner["/Parent"].get_object().get("/DA"),
-        "/AcroForm": reader.root_object["/AcroForm"].get("/DA"),
+        "test": _find_widget(stream, "test").get(entry),
+        "test_2": _find_widget(stream, "test_2").get(entry),
+        "inner": inner.get(entry),
+        "outer": inner["/Parent"].get_object().get(entry),
+        "/AcroForm": reader.root_object["/AcroForm"].get(entry),
     }
 
 
@@ -709,7 +712,7 @@ def test_change_inherited_default_appearance(
     setattr(
         obj.widgets["outer.inner.test" if use_full_widget_name else "test"], name, value
     )
-    result = _get_default_appearances(obj.read())
+    result = _get_nested_entries(obj.read())
 
     # only the widget's own field changes; fields shared with "test_2" and the
     # AcroForm default don't
@@ -1011,3 +1014,159 @@ def test_change_font_to_resource_with_escaped_name(template_stream, key, expecte
     assert default_appearance == expected
     # the name in /DA is the resource key
     assert Object.parse(default_appearance.split(" ")[0].encode()) == Name(key)
+
+
+# a flag that no property changes, which a change keeps
+OTHER_FLAG = 1 << 22
+FLAG_PROPERTIES = [
+    ("readonly", READ_ONLY),
+    ("required", REQUIRED),
+    ("multiline", MULTILINE),
+    ("comb", COMB),
+]
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+@pytest.mark.parametrize(("name", "flag"), FLAG_PROPERTIES)
+@pytest.mark.parametrize(
+    ("holders", "is_set"),
+    [
+        ((), False),
+        (("outer",), False),
+        (("outer",), True),
+        (("outer", "inner"), False),
+        (("outer", "inner"), True),
+        (("outer", "inner", "test"), False),
+        (("outer", "inner", "test"), True),
+    ],
+    ids=[
+        "none",
+        "grandparent-unset",
+        "grandparent-set",
+        "parent-unset",
+        "parent-set",
+        "widget-unset",
+        "widget-set",
+    ],
+)
+def test_change_inherited_field_flag(
+    template_stream,
+    holders,
+    is_set,
+    name,
+    flag,
+    use_full_widget_name,
+    assert_widgets_match_output,
+):
+    # each holder has flags; the lowest one has the flag set if is_set, and the
+    # ones above it the other way, so the lowest one takes precedence
+    flags = {
+        holder: OTHER_FLAG | (flag if (holder == holders[-1]) == is_set else 0)
+        for holder in holders
+    }
+    # "test_2" inherits from "inner" and "outer" only
+    shared = is_set if holders[-1:] != ("test",) else not is_set
+    stream = _nest_fields(template_stream, flags, "/Ff")
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    key, other = (
+        ("outer.inner.test", "outer.inner.test_2")
+        if use_full_widget_name
+        else ("test", "test_2")
+    )
+    assert getattr(obj.widgets[key], name) is is_set
+    assert getattr(obj.widgets[other], name) is shared
+
+    setattr(obj.widgets[key], name, not is_set)
+    result = obj.read()
+
+    # only the widget's own field changes, keeping the flags it inherited;
+    # fields shared with "test_2" don't
+    assert _get_nested_entries(result, "/Ff") == {
+        "test": OTHER_FLAG if is_set else flag | (OTHER_FLAG if holders else 0),
+        "test_2": None,
+        "inner": flags.get("inner"),
+        "outer": flags.get("outer"),
+        "/AcroForm": None,
+    }
+    reopened = PdfWrapper(result, use_full_widget_name=use_full_widget_name)
+    assert getattr(reopened.widgets[key], name) is not is_set
+    assert getattr(reopened.widgets[other], name) is shared
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize("own", [False, True], ids=["field", "widget"])
+def test_change_field_flag_of_kid_widget(
+    sample_template_with_full_key, own, assert_widgets_match_output
+):
+    # the widget of "Date mois" has no name, so its parent is the field
+    stream = _set_parent_entry(
+        sample_template_with_full_key,
+        "Date mois",
+        "/Ff",
+        OTHER_FLAG if own else OTHER_FLAG | READ_ONLY,
+    )
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for page in pdf.pages:
+            for annot in page.get("/Annots", []):
+                if "/Parent" in annot and str(annot.Parent.get("/T")) == "Date mois":
+                    if own:
+                        annot.Ff = OTHER_FLAG | READ_ONLY
+                    elif "/Ff" in annot:
+                        del annot["/Ff"]
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert obj.widgets["Date mois"].readonly
+    obj.widgets["Date mois"].readonly = False
+    widget = _find_widget(obj.read(), "Date mois")
+
+    # the flags that were found change
+    assert widget.get("/Ff") == (OTHER_FLAG if own else None)
+    assert widget["/Parent"].get_object()["/Ff"] == OTHER_FLAG
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(("name", "flag"), FLAG_PROPERTIES)
+def test_change_field_flag_with_parent_cycle(
+    template_stream, name, flag, assert_widgets_match_output
+):
+    obj = PdfWrapper(_with_parent_cycle(template_stream, "test"))
+    # the cycle is reached before any flags, which read as unset
+    assert getattr(obj.widgets["test"], name) is False
+    original = obj.read()
+    # applied before the failing change, and discarded with it
+    obj.widgets["test"].alignment = 2
+    setattr(obj.widgets["test"], name, True)
+
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
+        obj.read()
+
+    assert obj.widgets["test"].alignment is None
+    assert getattr(obj.widgets["test"], name) is False
+    assert not obj.widgets["test"].hooks_to_trigger
+    assert obj.read() == original
+    assert_widgets_match_output(obj)
+
+    # the field's own flags are found before the cycle
+    with Pdf.open(BytesIO(original)) as pdf:
+        for field in pdf.Root.AcroForm.Fields:
+            if str(field.get("/T")) == "test":
+                field.Ff = flag
+        obj = PdfWrapper(_save(pdf))
+    assert getattr(obj.widgets["test"], name) is True
+    setattr(obj.widgets["test"], name, False)
+
+    assert _find_widget(obj.read(), "test")["/Ff"] == 0
+
+
+def test_fill_readonly_with_parent_cycle(template_stream):
+    obj = PdfWrapper(_with_parent_cycle(template_stream, "test"))
+    original = obj.read()
+
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
+        obj.fill({"test": "foo", "test_2": "bar"}, readonly=True)
+
+    assert obj.read() == original
+    assert obj.widgets["test"].value is None
+    assert obj.widgets["test_2"].value is None
+    assert obj.widgets["test_2"].readonly is False

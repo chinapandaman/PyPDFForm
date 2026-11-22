@@ -169,33 +169,6 @@ DROPDOWN_CHOICE_PATTERNS = [
 ]
 
 
-def check_field_flag(annot: DictionaryObject, flag: int) -> bool:
-    """
-    Checks if a specific flag is set for a field annotation.
-
-    This function inspects the 'Ff' (field flags) entry of the annotation
-    dictionary (or its parent if it's a child annotation) to determine if the
-    provided flag is set.
-
-    Args:
-        annot (DictionaryObject): The annotation dictionary.
-        flag (int): The bit flag to check for.
-
-    Returns:
-        bool: True if the flag is set, False otherwise.
-    """
-    if Parent in annot and Ff not in annot:
-        return bool(
-            int(
-                annot[NameObject(Parent)][NameObject(Ff)]
-                if Ff in annot[NameObject(Parent)]
-                else 0
-            )
-            & flag
-        )
-    return bool(int(annot[NameObject(Ff)] if Ff in annot else 0) & flag)
-
-
 def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
     """
     Extracts the widget key from a widget dictionary.

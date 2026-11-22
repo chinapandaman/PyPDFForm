@@ -36,6 +36,7 @@ from .constants import (
     S,
     Title,
 )
+from .field_tree import check_field_flag
 from .middleware import WIDGET_TYPES
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
@@ -44,7 +45,6 @@ from .middleware.text import Text
 from .patterns import (
     WIDGET_DESCRIPTION_PATTERNS,
     WIDGET_TYPE_PATTERNS,
-    check_field_flag,
     get_checkbox_value,
     get_dropdown_choices,
     get_dropdown_value,

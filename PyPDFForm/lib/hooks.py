@@ -60,9 +60,9 @@ from .constants import (
     X,
 )
 from .default_appearance import change_font, change_font_color, change_font_size
-from .field_tree import resolve_inherited_entry
+from .field_tree import check_field_flag, resolve_inherited_entry
 from .middleware.dropdown import DropdownOption
-from .patterns import WIDGET_DESCRIPTION_PATTERNS, check_field_flag, get_widget_key
+from .patterns import WIDGET_DESCRIPTION_PATTERNS, get_widget_key
 from .utils import extract_widget_property, get_dictionary
 
 
@@ -123,33 +123,29 @@ def _update_field_flag(annot: DictionaryObject, flag: int, should_set: bool) -> 
     """
     Sets or unsets a bit flag for a form field annotation.
 
-    This internal helper function modifies the 'Ff' (field flags) entry in the
-    annotation dictionary or, for child annotations whose field flags live on the
-    parent, the parent dictionary. It preserves all other bits while setting or
-    unsetting the requested flag.
+    The field flags (`/Ff`) are resolved from the widget and the fields along
+    its `/Parent` chain, so a widget's own flags take precedence. The changed
+    flags replace the ones that were found when they are on the widget or
+    below its own field, and are otherwise written to the widget's own field,
+    with the bits it inherited, so fields shared with other fields are not
+    changed. All other bits are preserved. Hooks change a PDF writer that is
+    written only when every hook succeeds, so an error leaves the PDF
+    unchanged.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
         flag (int): The bit flag to set or unset.
         should_set (bool): True to set the flag, False to unset it.
+
+    Raises:
+        ValueError: If the `/Parent` chain has a cycle before any flags are
+            found.
     """
-    # Ff in annot[Parent] only in hooks.py, or when editing instead of retrieving
-    if Parent in annot and (Ff in annot[Parent] or Ff not in annot):
-        annot[NameObject(Parent)][NameObject(Ff)] = NumberObject(
-            (
-                int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) | flag
-                if should_set
-                else int(annot[NameObject(Parent)].get(NameObject(Ff), 0)) & ~flag
-            )
-        )
-    else:
-        annot[NameObject(Ff)] = NumberObject(
-            (
-                int(annot.get(NameObject(Ff), 0)) | flag
-                if should_set
-                else int(annot.get(NameObject(Ff), 0)) & ~flag
-            )
-        )
+    entry = resolve_inherited_entry(annot, Ff, None)
+    flags = int(entry.value or 0)
+    entry.target[NameObject(Ff)] = NumberObject(
+        flags | flag if should_set else flags & ~flag
+    )
 
 
 def _remove_field_entry(
@@ -329,13 +325,18 @@ def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
     """
     Updates the multiline property of a text field annotation.
 
-    This function modifies the Ff (flags) entry in the annotation dictionary to
-    enable or disable the multiline property of the text field. Disabling a field
-    that is not multiline leaves the annotation unchanged.
+    This function modifies the Ff (flags) entry of the field, as
+    `_update_field_flag` does, to enable or disable the multiline property of
+    the text field. Disabling a field that is not multiline leaves the
+    annotation unchanged.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
         val (bool): True to enable multiline, False to disable.
+
+    Raises:
+        ValueError: If the flags are changed and the `/Parent` chain has a
+            cycle before any flags are found.
     """
     if val or check_field_flag(annot, MULTILINE):
         _update_field_flag(annot, MULTILINE, bool(val))
@@ -345,14 +346,19 @@ def update_text_field_comb(annot: DictionaryObject, val: bool) -> None:
     """
     Updates the comb property of a text field annotation.
 
-    This function modifies the Ff (flags) entry in the annotation dictionary to
-    enable or disable the comb property of the text field, which displays fixed
-    character positions for fields with a maximum length. Disabling a field that
-    is not a comb field leaves the annotation unchanged.
+    This function modifies the Ff (flags) entry of the field, as
+    `_update_field_flag` does, to enable or disable the comb property of the
+    text field, which displays fixed character positions for fields with a
+    maximum length. Disabling a field that is not a comb field leaves the
+    annotation unchanged.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
         val (bool): True to enable comb, False to disable.
+
+    Raises:
+        ValueError: If the flags are changed and the `/Parent` chain has a
+            cycle before any flags are found.
     """
     if val or check_field_flag(annot, COMB):
         _update_field_flag(annot, COMB, bool(val))
@@ -446,13 +452,17 @@ def update_field_readonly(annot: DictionaryObject, val: bool) -> None:
     Sets or unsets the ReadOnly flag on a form field annotation,
     making it read-only or editable based on the `val` parameter.
 
-    This function modifies the Ff (flags) entry in the annotation dictionary to
-    set or unset the ReadOnly flag, preventing or allowing the user from
-    interacting with the form field.
+    This function modifies the Ff (flags) entry of the field, as
+    `_update_field_flag` does, to set or unset the ReadOnly flag, preventing or
+    allowing the user from interacting with the form field.
 
     Args:
         annot (DictionaryObject): The annotation dictionary.
         val (bool): True to make the field read-only, False to make it editable.
+
+    Raises:
+        ValueError: If the `/Parent` chain has a cycle before any flags are
+            found.
     """
     _update_field_flag(annot, READ_ONLY, val)
 
@@ -558,13 +568,17 @@ def update_field_required(annot: DictionaryObject, val: bool) -> None:
     """
     Updates the 'Required' flag of a form field annotation.
 
-    This function modifies the Ff (flags) entry in the annotation dictionary
-    (or its parent if applicable) to set or unset the 'Required' flag,
-    making the field mandatory or optional.
+    This function modifies the Ff (flags) entry of the field, as
+    `_update_field_flag` does, to set or unset the 'Required' flag, making the
+    field mandatory or optional.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
         val (bool): True to set the field as required, False to make it optional.
+
+    Raises:
+        ValueError: If the `/Parent` chain has a cycle before any flags are
+            found.
     """
     _update_field_flag(annot, REQUIRED, val)
 

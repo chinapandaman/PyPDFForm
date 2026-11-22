@@ -948,8 +948,10 @@ class PdfWrapper:
 
         Raises:
             TypeError: If a keyword argument other than `readonly` is passed. Nothing is changed.
-            ValueError: If an integer dropdown or radio index is out of range, or a
-                dropdown string matches options that differ. Nothing is changed.
+            ValueError: If an integer dropdown or radio index is out of range, a
+                dropdown string matches options that differ, or `readonly` is
+                True and the parent fields of a field form a cycle. Nothing is
+                changed.
         """
 
         reject_unsupported_kwargs(self, "fill", kwargs, ["readonly"])

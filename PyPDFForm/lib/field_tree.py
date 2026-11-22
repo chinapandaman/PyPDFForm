@@ -36,6 +36,7 @@ from .constants import (
     AcroForm,
     Annots,
     Dest,
+    Ff,
     Fields,
     Flags,
     Hide,
@@ -1225,3 +1226,29 @@ def resolve_inherited_entry(
         _get_entry(acroform, key) if acroform is not None else None,
         own_field if own_field is not None else widget,
     )
+
+
+def check_field_flag(widget: DictionaryObject, flag: int) -> bool:
+    """
+    Checks whether a field flag, such as `READ_ONLY`, is set for a widget.
+
+    The field flags (`/Ff`) are resolved from the widget and the fields along
+    its `/Parent` chain, so the flags of the widget or a lower field take
+    precedence over the ones above it. The AcroForm has no default for them.
+    A cycle in the chain before any flags are found reads as no flags, so a
+    PDF with one can still be opened; changing a flag of such a field raises
+    instead.
+
+    Args:
+        widget (DictionaryObject): The widget annotation.
+        flag (int): The bit flag to check.
+
+    Returns:
+        bool: True if the flag is set.
+    """
+    try:
+        flags = resolve_inherited_entry(widget, Ff, None).value
+    except ValueError:
+        return False
+
+    return bool(int(flags or 0) & flag)
