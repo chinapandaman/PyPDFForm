@@ -197,7 +197,7 @@ def _remove_field_entry(
 def _update_default_appearance(
     annot: DictionaryObject,
     acroform: DictionaryObject,
-    change: Callable[[object], str],
+    change: Callable[[object], str | bytes],
 ) -> None:
     """
     Changes the default appearance (`/DA`) of a widget.
@@ -214,8 +214,9 @@ def _update_default_appearance(
     Args:
         annot (DictionaryObject): The widget annotation dictionary.
         acroform (DictionaryObject): The AcroForm dictionary, for its default.
-        change (Callable[[object], str]): Returns the changed `/DA` string for
-            the resolved `/DA` value, such as `change_font_size`.
+        change (Callable[[object], str | bytes]): Returns the changed `/DA`
+            for the resolved `/DA` value, such as `change_font_size`, as bytes
+            when it was a byte string.
 
     Raises:
         ValueError: If no `/DA` is set, the `/Parent` chain has a cycle, or
@@ -227,10 +228,9 @@ def _update_default_appearance(
         raise ValueError(msg)
 
     result = change(entry.value)
-    # a byte string keeps its bytes, which to_text read as Latin-1
     entry.target[NameObject(DA)] = (
-        ByteStringObject(result.encode("latin-1"))
-        if isinstance(entry.value, bytes)
+        ByteStringObject(result)
+        if isinstance(result, bytes)
         else TextStringObject(result)
     )
 

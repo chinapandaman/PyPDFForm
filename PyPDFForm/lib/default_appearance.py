@@ -14,12 +14,13 @@ one.
 """
 
 import re
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import suppress
 from decimal import Decimal, InvalidOperation
 from typing import List, NamedTuple
 
-# PDF whitespace, then any other character except a delimiter
+# PDF whitespace, a comment, a name, a run of other characters that aren't
+# delimiters, such as a number or an operator, or an array bracket
 _TOKEN_PATTERN = re.compile(
     r"(?P<space>[\x00\t\n\x0c\r ]+)"
     r"|(?P<comment>%[^\r\n]*)"
@@ -43,10 +44,10 @@ _OPERATORS = frozenset(
 )
 _FONT_OPERATOR = "Tf"
 _RGB_OPERATOR = "rg"
-# fill color operators that set a color, and the number of operands each takes
-_COLOR_OPERATORS = {"g": 1, _RGB_OPERATOR: 3, "k": 4}
+# the gray, RGB, and CMYK fill color operators, and the operands each takes
+_COLOR_OPERAND_COUNTS = {"g": 1, _RGB_OPERATOR: 3, "k": 4}
 # every operator that changes the fill color, including through a color space
-_FILL_COLOR_OPERATORS = frozenset({"cs", "sc", "scn", *_COLOR_OPERATORS})
+_FILL_COLOR_OPERATORS = frozenset({"cs", "sc", "scn", *_COLOR_OPERAND_COUNTS})
 
 
 class _Token(NamedTuple):
@@ -80,35 +81,6 @@ class _Operation(NamedTuple):
     operator: str
     end: int
     operands: List[_Token]
-
-
-def to_text(default_appearance: object, change: str) -> str:
-    """
-    Gets a resolved `/DA` value as text.
-
-    A string that pypdf can't decode as text, such as one with a NUL
-    character, which is PDF whitespace, is a byte string. Its bytes are read as
-    Latin-1, which maps each byte to the character with the same code, so the
-    text can be encoded back to the same bytes.
-
-    Args:
-        default_appearance (object): The resolved `/DA` value.
-        change (str): What is being changed, such as `font size`, for errors.
-
-    Returns:
-        str: The `/DA` string.
-
-    Raises:
-        ValueError: If the value is not a string.
-    """
-    if isinstance(default_appearance, bytes):
-        return default_appearance.decode("latin-1")
-    if not isinstance(default_appearance, str):
-        msg = f"Cannot change the {change}: the field's /DA is not a string."
-        # malformed PDF data, raised like every other /DA error
-        raise ValueError(msg)  # noqa: TRY004
-
-    return default_appearance
 
 
 def _tokenize(default_appearance: str, change: str) -> Iterator[_Token]:
@@ -153,15 +125,7 @@ def _tokenize(default_appearance: str, change: str) -> Iterator[_Token]:
         elif not depth and match.lastgroup == "name":
             yield _Token("name", match.start(), position)
         elif not depth and match.lastgroup == "word":
-            text = match.group()
-            kind = (
-                "number"
-                if _NUMBER_PATTERN.fullmatch(text)
-                else "operator"
-                if text in _OPERATORS
-                else "word"
-            )
-            yield _Token(kind, match.start(), position)
+            yield _Token(_get_word_kind(match.group()), match.start(), position)
 
     if depth:
         msg = (
@@ -169,6 +133,22 @@ def _tokenize(default_appearance: str, change: str) -> Iterator[_Token]:
             "unclosed '['."
         )
         raise ValueError(msg)
+
+
+def _get_word_kind(text: str) -> str:
+    """
+    Gets the kind of a token that is neither a name nor an array.
+
+    Args:
+        text (str): The token's text.
+
+    Returns:
+        str: `number`, `operator`, or `word` for any other operand.
+    """
+    if _NUMBER_PATTERN.fullmatch(text):
+        return "number"
+
+    return "operator" if text in _OPERATORS else "word"
 
 
 def _parse(default_appearance: str, change: str) -> List[_Operation]:
@@ -298,7 +278,76 @@ def _replace(default_appearance: str, replacements: List[tuple]) -> str:
     return result
 
 
-def change_font(default_appearance: object, font: str) -> str:
+def _rewrite(
+    default_appearance: object,
+    change: str,
+    get_replacements: Callable[[str, List[_Operation]], List[tuple]],
+) -> str | bytes:
+    """
+    Replaces parts of a resolved `/DA` value, keeping its type.
+
+    A string that pypdf can't decode as text, such as one with a NUL
+    character, which is PDF whitespace, is a byte string. Its bytes are read as
+    Latin-1, which maps each byte to the character with the same code, and the
+    result is encoded the same way, so the bytes outside the replaced parts
+    don't change.
+
+    Args:
+        default_appearance (object): The resolved `/DA` value.
+        change (str): What is being changed, such as `font size`, for errors.
+        get_replacements (Callable[[str, List[_Operation]], List[tuple]]):
+            Returns the `(start, end, text)` replacements for the `/DA` string
+            and its operations.
+
+    Returns:
+        str | bytes: The changed `/DA`, as bytes when it was a byte string.
+
+    Raises:
+        ValueError: If the value is not a string or can't be read.
+    """
+    if isinstance(default_appearance, bytes):
+        text = default_appearance.decode("latin-1")
+    elif isinstance(default_appearance, str):
+        text = default_appearance
+    else:
+        msg = f"Cannot change the {change}: the field's /DA is not a string."
+        # malformed PDF data, raised like every other /DA error
+        raise ValueError(msg)  # noqa: TRY004
+
+    result = _replace(text, get_replacements(text, _parse(text, change)))
+    return result.encode("latin-1") if isinstance(default_appearance, bytes) else result
+
+
+def _replace_font_operands(
+    default_appearance: object, change: str, index: int, replacement: str
+) -> str | bytes:
+    """
+    Replaces an operand of every `Tf` operation of a default appearance.
+
+    Args:
+        default_appearance (object): The resolved `/DA` value.
+        change (str): What is being changed, such as `font size`, for errors.
+        index (int): The operand to replace: 0 for the font, 1 for the size.
+        replacement (str): The operand's new text.
+
+    Returns:
+        str | bytes: The changed `/DA`, as bytes when it was a byte string.
+
+    Raises:
+        ValueError: If the `/DA` can't be read, or has no `Tf` operation with a
+            font and a numeric size.
+    """
+    return _rewrite(
+        default_appearance,
+        change,
+        lambda text, operations: [
+            (each.operands[index].start, each.operands[index].end, replacement)
+            for each in _get_font_operations(text, operations, change)
+        ],
+    )
+
+
+def change_font(default_appearance: object, font: str) -> str | bytes:
     """
     Changes the font of every `Tf` operation of a default appearance.
 
@@ -307,30 +356,22 @@ def change_font(default_appearance: object, font: str) -> str:
         font (str): The font resource name, such as `/F1`.
 
     Returns:
-        str: The changed `/DA` string.
+        str | bytes: The changed `/DA`, as bytes when it was a byte string.
 
     Raises:
-        ValueError: If the `/DA` can't be read, has no `Tf` operation with a
-            font and a numeric size, or the font is not a single PDF name,
-            such as one with a space.
+        ValueError: If the font is not a single PDF name, such as one with a
+            space, or the `/DA` can't be read or has no `Tf` operation with a
+            font and a numeric size.
     """
-    text = to_text(default_appearance, "font")
-    operations = _parse(text, "font")
     match = _TOKEN_PATTERN.fullmatch(font)
     if match is None or match.lastgroup != "name":
         msg = f"Cannot change the font: {font!r} is not a PDF name."
         raise ValueError(msg)
 
-    return _replace(
-        text,
-        [
-            (each.operands[0].start, each.operands[0].end, font)
-            for each in _get_font_operations(text, operations, "font")
-        ],
-    )
+    return _replace_font_operands(default_appearance, "font", 0, font)
 
 
-def change_font_size(default_appearance: object, font_size: float) -> str:
+def change_font_size(default_appearance: object, font_size: float) -> str | bytes:
     """
     Changes the font size of every `Tf` operation of a default appearance.
 
@@ -339,26 +380,67 @@ def change_font_size(default_appearance: object, font_size: float) -> str:
         font_size (float): The font size, where 0 sizes the text to fit.
 
     Returns:
-        str: The changed `/DA` string.
+        str | bytes: The changed `/DA`, as bytes when it was a byte string.
 
     Raises:
-        ValueError: If the `/DA` can't be read, has no `Tf` operation with a
-            font and a numeric size, or the size has no decimal form.
+        ValueError: If the size has no decimal form, or the `/DA` can't be
+            read or has no `Tf` operation with a font and a numeric size.
     """
-    text = to_text(default_appearance, "font size")
-    operations = _parse(text, "font size")
-    size = _format_number(font_size, "font size")
-
-    return _replace(
-        text,
-        [
-            (each.operands[1].start, each.operands[1].end, size)
-            for each in _get_font_operations(text, operations, "font size")
-        ],
+    return _replace_font_operands(
+        default_appearance, "font size", 1, _format_number(font_size, "font size")
     )
 
 
-def change_font_color(default_appearance: object, font_color: tuple) -> str:
+def _get_color_replacements(
+    default_appearance: str, operations: List[_Operation], color: str
+) -> List[tuple]:
+    """
+    Gets the replacements that change the fill color of a default appearance.
+
+    Args:
+        default_appearance (str): The `/DA` string, for errors.
+        operations (List[_Operation]): Its operations.
+        color (str): The `rg` operation that sets the new color.
+
+    Returns:
+        List[tuple]: The `(start, end, text)` replacements.
+
+    Raises:
+        ValueError: If a gray, RGB, or CMYK fill color operation doesn't have
+            the number of numeric operands it takes.
+    """
+    replacements = []
+    last = None
+    for each in operations:
+        if each.operator not in _FILL_COLOR_OPERATORS:
+            continue
+        last = each
+        count = _COLOR_OPERAND_COUNTS.get(each.operator)
+        if count is None:
+            continue
+        if len(each.operands) != count or any(
+            operand.kind != "number" for operand in each.operands
+        ):
+            msg = (
+                f"Cannot change the font color: the {each.operator} operator of "
+                f"/DA {default_appearance!r} needs {count} "
+                f"{'number' if count == 1 else 'numbers'}."
+            )
+            raise ValueError(msg)
+        replacements.append((each.operands[0].start, each.end, color))
+
+    # without a fill color operation, the color goes after the last operation
+    if last is None and operations:
+        last = operations[-1]
+    if last is None:
+        replacements.append((0, 0, color))
+    elif last.operator not in _COLOR_OPERAND_COUNTS:
+        replacements.append((last.end, last.end, f" {color}"))
+
+    return replacements
+
+
+def change_font_color(default_appearance: object, font_color: tuple) -> str | bytes:
     """
     Changes the fill color of a default appearance to an RGB color.
 
@@ -375,16 +457,14 @@ def change_font_color(default_appearance: object, font_color: tuple) -> str:
             tuple or list of three numbers.
 
     Returns:
-        str: The changed `/DA` string.
+        str | bytes: The changed `/DA`, as bytes when it was a byte string.
 
     Raises:
-        ValueError: If the `/DA` can't be read, a gray, RGB, or CMYK fill
-            color operation doesn't have the number of numeric operands it
-            takes, the color doesn't have three components, or a component
-            has no decimal form.
+        ValueError: If the color doesn't have three components, or a component
+            has no decimal form, or the `/DA` can't be read, or a gray, RGB, or
+            CMYK fill color operation doesn't have the number of numeric
+            operands it takes.
     """
-    text = to_text(default_appearance, "font color")
-    operations = _parse(text, "font color")
     if not isinstance(font_color, (tuple, list)) or len(font_color) != 3:
         msg = (
             f"Cannot change the font color: {font_color!r} is not an RGB color "
@@ -396,32 +476,8 @@ def change_font_color(default_appearance: object, font_color: tuple) -> str:
         + f" {_RGB_OPERATOR}"
     )
 
-    replacements = []
-    last = None
-    for each in operations:
-        if each.operator not in _FILL_COLOR_OPERATORS:
-            continue
-        last = each
-        count = _COLOR_OPERATORS.get(each.operator)
-        if count is None:
-            continue
-        if len(each.operands) != count or any(
-            operand.kind != "number" for operand in each.operands
-        ):
-            msg = (
-                f"Cannot change the font color: the {each.operator} operator of "
-                f"/DA {text!r} needs {count} "
-                f"{'number' if count == 1 else 'numbers'}."
-            )
-            raise ValueError(msg)
-        replacements.append((each.operands[0].start, each.end, color))
-
-    if last is None or last.operator not in _COLOR_OPERATORS:
-        if last is None and operations:
-            last = operations[-1]
-        if last is None:
-            replacements.append((0, 0, color))
-        else:
-            replacements.append((last.end, last.end, f" {color}"))
-
-    return _replace(text, replacements)
+    return _rewrite(
+        default_appearance,
+        "font color",
+        lambda text, operations: _get_color_replacements(text, operations, color),
+    )
