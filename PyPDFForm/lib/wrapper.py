@@ -966,9 +966,10 @@ class PdfWrapper:
         Keys use the same names as `widgets` and also match fields without a
         widget on any page. Removed fields are taken off their pages and out of
         the PDF's form fields and calculation order. Reset, submit, and hide
-        actions stop naming them, and an action left with no field to act on
-        is removed; JavaScript is not changed. Keys that match no field are
-        ignored. If removal raises, the PDF and widgets are restored.
+        actions stop naming them. An action left with no field to act on is
+        removed, or does nothing if other actions run after it; JavaScript is
+        not changed. Keys that match no field are ignored. If removal raises,
+        the PDF and widgets are restored.
 
         Args:
             keys (List[str]): A list of form field keys to remove.
