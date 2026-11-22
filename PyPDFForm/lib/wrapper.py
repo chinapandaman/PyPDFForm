@@ -922,7 +922,10 @@ class PdfWrapper:
         """
         Fills the PDF form with data from a dictionary.
 
-        Only keys that already exist in `self.widgets` are applied. Filling delegates
+        Only keys that already exist in `self.widgets` are applied. A field that
+        shares a key with a widget of another type, such as a checkbox and a radio
+        group with the same short name, keeps its value; its widgets are still made
+        read-only with `readonly=True`. Filling delegates
         to the lower-level filler, which draws image/signature values onto the page
         and removes only the consumed widgets. Other annotations and unfilled
         signature/image fields are preserved. After image drawing, the widget cache

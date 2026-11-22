@@ -122,7 +122,9 @@ For a PDF viewer to display content in a form field (especially text fields), it
 
 According to section 12.7.3.2 of the [PDF standard](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf#page=442), PDF form fields can have fully qualified names constructed using the pattern `<parent_field_name>.<field_name>`.
 
-PyPDFForm allows you to access fields by their full names. For example, to use [this PDF](pdfs/sample_template_with_full_key.pdf):
+PyPDFForm allows you to access fields by their full names. Without them, fields of different types can share a name, such as a checkbox `group` and a radio button group `outer.group`. Only the one that comes last in the PDF can then be accessed and filled by that name.
+
+For example, to use [this PDF](pdfs/sample_template_with_full_key.pdf):
 
 === "Library"
     Set `use_full_widget_name` to `True` when instantiating `PdfWrapper`:

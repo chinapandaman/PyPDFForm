@@ -32,6 +32,7 @@ from .patterns import (
     update_radio_value,
     update_text_value,
 )
+from .template import construct_widget
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -91,7 +92,9 @@ def update_widget(
 
     This function updates the value of a single PDF form widget based on its type. It sets
     the read-only flag first when requested, skips value updates when the
-    middleware value is ``None``, tracks radio option indices within each group,
+    middleware value is ``None`` or the annotation is of another widget type,
+    such as the checkbox of another field with the same short name, tracks
+    radio option indices within each group,
     updates the entire radio group when its selected option is reached, and
     prepares images or signatures for later drawing instead of writing image data directly
     into the annotation.
@@ -110,7 +113,7 @@ def update_widget(
     """
     if readonly:
         update_field_readonly(annot, True)
-    if widget.value is None:
+    if widget.value is None or type(construct_widget(annot, key)) is not type(widget):
         return False
 
     any_image_to_draw = False
@@ -170,7 +173,9 @@ def fill(
     This function fills a PDF template with the provided widget values. It iterates through the
     widgets on each page of the PDF and updates their values based on the provided `widgets`
     dictionary. The function supports text fields, checkboxes, radio buttons, dropdowns,
-    images, and signatures. It can set fields read-only during filling, and when images or
+    images, and signatures. An annotation whose widget type differs from the widget
+    under its key, such as another field with the same short name, keeps its value.
+    It can set fields read-only during filling, and when images or
     signatures are present it removes only the widgets whose images were prepared,
     including their field-tree entries, and returns a second stream with the image
     watermarks applied. All other annotations retain their existing references.

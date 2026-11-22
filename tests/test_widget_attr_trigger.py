@@ -1292,6 +1292,32 @@ def test_radio_group_with_short_name_of_another_field(
     assert isinstance(widgets["outer.group"], Radio)
     assert widgets["outer.group"].number_of_options == 2
 
+    # filling the name changes only the field it gives access to
+    for value in [0, 1] if checkbox_first else [True]:
+        filled = PdfWrapper(stream).fill({"group": value}).read()
+        states = {}
+        for annot in PdfReader(BytesIO(filled)).pages[0]["/Annots"]:
+            annot = annot.get_object()
+            if annot.get("/T") == "group":
+                states["group"] = annot["/AS"]
+            elif annot.get("/Parent", {}).get("/T") == "group":
+                states.setdefault("outer.group", []).append(annot["/AS"])
+
+        assert states == (
+            {
+                "group": "/Off",
+                "outer.group": [
+                    "/0" if value == 0 else "/Off",
+                    "/1" if value else "/Off",
+                ],
+            }
+            if checkbox_first
+            else {"group": "/Yes", "outer.group": ["/Off", "/Off"]}
+        )
+        widgets = PdfWrapper(filled, use_full_widget_name=True).widgets
+        assert widgets["outer.group"].value == (value if checkbox_first else None)
+        assert widgets["group"].value is (None if checkbox_first else True)
+
 
 @pytest.mark.parametrize(
     ("value", "error"),
