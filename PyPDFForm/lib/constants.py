@@ -219,13 +219,9 @@ FEATURE_VERSIONS_BY_FIELD_TYPE = {Sig: "1.3"}
 TITLE_VERSION = "1.1"  # the title in the document information dictionary
 ALPHA_VERSION = "1.4"  # a numeric /CA or /ca, for constant opacity
 COMB_VERSION = "1.5"  # also RadiosInUnison, the same bit for radio buttons
-# widget property hooks that can add or remove a feature above: comb (1.5),
-# tooltips (/TU), and JavaScript actions; PdfWrapper.version applies them to
-# a copy of the PDF while they are queued
-FEATURE_HOOKS = frozenset(
+# widget property hooks that write a JavaScript action, whatever the script
+JAVASCRIPT_HOOKS = frozenset(
     {
-        "update_text_field_comb",
-        "update_field_tooltip",
         "update_field_on_hovered_over_javascript",
         "update_field_on_hovered_off_javascript",
         "update_field_on_mouse_pressed_javascript",
@@ -233,6 +229,12 @@ FEATURE_HOOKS = frozenset(
         "update_field_on_focused_javascript",
         "update_field_on_blurred_javascript",
     }
+)
+# widget property hooks that can add or remove a feature above: comb (1.5),
+# tooltips (/TU), and JavaScript actions; PdfWrapper.version applies them to
+# a copy of the PDF while they are queued
+FEATURE_HOOKS = (
+    frozenset({"update_text_field_comb", "update_field_tooltip"}) | JAVASCRIPT_HOOKS
 )
 # no feature above needs a newer version, so newer documents are never raised
 NEWEST_FEATURE_VERSION = max(

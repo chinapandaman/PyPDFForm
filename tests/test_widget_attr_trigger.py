@@ -9,6 +9,7 @@ from pypdf import PdfReader
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
 from PyPDFForm.lib.patterns import get_widget_key
+from PyPDFForm.lib.utils import get_version, set_version
 
 
 def test_register_font_no_form_fields(
@@ -587,3 +588,20 @@ def test_clear_property_set_by_shared_parent(
     assert obj.read() == expected
     assert _find_widget(expected, "test_2").get_inherited(entry) == parent
     assert_widgets_match_output(obj)
+
+
+def test_version_leaves_failing_tooltip_removal_to_read(template_stream):
+    stream = _group_fields(template_stream, ("test", "test_2"), "/TU", "shared tooltip")
+    # below 1.5, the version getter previews queued tooltip changes
+    obj = PdfWrapper(set_version(stream, get_version(stream), "1.4"))
+    widget = obj.widgets["test"]
+    widget.tooltip = "own tooltip"
+    obj.read()
+
+    widget.tooltip = None
+    assert obj.version == "1.4"
+    assert widget.hooks_to_trigger
+
+    with pytest.raises(ValueError, match="Cannot remove /TU"):
+        obj.read()
+    assert widget.tooltip == "own tooltip"

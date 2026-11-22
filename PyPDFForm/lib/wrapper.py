@@ -43,7 +43,7 @@ from .adapter import (
     fp_or_f_obj_or_stream_to_stream,
     readable,
 )
-from .constants import FEATURE_HOOKS
+from .constants import FEATURE_HOOKS, JAVASCRIPT_HOOKS
 from .coordinate import generate_coordinate_grid
 from .deprecation import reject_unsupported_kwargs
 from .egress import (
@@ -517,6 +517,8 @@ class PdfWrapper:
         Pending widget changes are not applied to the wrapper, but those that can
         change the version, such as comb, tooltips, and widget JavaScript, are
         applied to a copy of the PDF, so the result matches the next `read()`.
+        When they can't be applied, the committed document's version is returned,
+        and `read()` raises the error.
 
         Returns:
             str | None: The PDF version as a string, or None if the version cannot be determined.
@@ -740,22 +742,25 @@ class PdfWrapper:
         result has the features that `read()` would write. Other changes can't
         change the version, and are left out, so a hook that would fail, such as
         a font size on a widget without `/DA`, doesn't raise here. The widgets
-        and their queues are not changed. A readable JavaScript value is applied
-        as an empty script, since only whether a script is written matters, and
-        reading it would leave nothing for `read()`.
+        and their queues are not changed. Every JavaScript value is applied as
+        an empty script, since only whether a script is written matters, so a
+        path or a readable object is left for `read()` to open or read. If a
+        change still can't be applied, such as removing a tooltip that a shared
+        parent field sets, `stream` is returned unchanged, so the version is the
+        committed document's, and `read()` raises the error.
 
         Args:
             stream (bytes): The PDF stream, such as the wrapper's stored stream.
 
         Returns:
             bytes: The stream with those changes applied, or `stream` when none
-                are queued.
+                are queued or they can't be applied.
         """
 
         pending = {
             key: SimpleNamespace(
                 hooks_to_trigger=[
-                    (hook, "" if readable(value) else value)
+                    (hook, "" if hook in JAVASCRIPT_HOOKS else value)
                     for hook, value in widget.hooks_to_trigger
                     if hook in FEATURE_HOOKS
                 ]
@@ -765,9 +770,13 @@ class PdfWrapper:
         if not any(each.hooks_to_trigger for each in pending.values()):
             return stream
 
-        return trigger_widget_hooks(
-            stream, pending, getattr(self, "use_full_widget_name")
-        )
+        try:
+            return trigger_widget_hooks(
+                stream, pending, getattr(self, "use_full_widget_name")
+            )
+        # any error a hook raises is left for read(), which reverts the queue
+        except Exception:  # noqa: BLE001 # pylint: disable=W0718
+            return stream
 
     def _read(self) -> bytes:
         """

@@ -1212,6 +1212,23 @@ def test_version_keeps_pending_javascript_file():
     assert annotation["/AA"]["/Fo"]["/JS"] == "app.alert('focused');"
 
 
+def test_version_leaves_unreadable_javascript_path_to_read(tmp_path):
+    path = tmp_path / "invalid.js"
+    path.write_bytes(b"app.alert('\xff\xfe');")
+    obj = PdfWrapper(_blank_pdf("1.2")).bulk_create_fields(
+        [Fields.TextField("name", 1, 50, 50)]
+    )
+    obj.read()
+
+    obj.widgets["name"].on_focused_javascript = str(path)
+    # only whether a script is written matters, so the file isn't opened
+    assert obj.version == "1.3"
+    assert obj.widgets["name"].hooks_to_trigger
+
+    with pytest.raises(UnicodeDecodeError):
+        obj.read()
+
+
 def test_pending_feature_hooks_are_widget_hooks():
     hook_names = set(
         Text("name").SET_ATTR_TRIGGER_HOOK_MAP.values()
