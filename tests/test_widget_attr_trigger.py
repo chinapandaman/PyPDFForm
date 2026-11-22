@@ -845,6 +845,15 @@ def test_change_inherited_dropdown_default_appearance(sample_template_with_dropd
             (1e-5, 0, 2.5e-7),
             "/Arial 12 Tf 0.00001 0 0.00000025 rg",
         ),
+        # digits of other scripts are written as ASCII digits
+        ("/Arial 9 Tf 0 g", "font_size", "\uff11\uff12", "/Arial 12 Tf 0 g"),
+        (
+            "/Arial 9 Tf 0 g",
+            "font_color",
+            ("\uff10", "\uff10", "\uff11"),
+            "/Arial 9 Tf 0 0 1 rg",
+        ),
+        ("/Arial 9 Tf 0 g", "font", "/My#20Font", "/My#20Font 9 Tf 0 g"),
         # the CLI passes a list
         ("/Helv 12 Tf 0 g", "font_color", [0, 0, 1], "/Helv 12 Tf 0 0 1 rg"),
         # a NUL separator makes pypdf read a byte string
@@ -898,6 +907,10 @@ def _with_parent_cycle(stream, name):
         ("/Helv 12 Tf 0 g", "font_color", 0.5, "with three components"),
         ("/Helv 12 Tf 0 g", "font", "/My Font", "is not a PDF name"),
         ("/Helv 12 Tf 0 g", "font", "/\u4e2d", "is not a PDF name"),
+        ("/Helv 12 Tf 0 g", "font", "/Arial#", "is not a PDF name"),
+        ("/Helv 12 Tf 0 g", "font", "/Arial#00", "is not a PDF name"),
+        ("/Helv 12 Tf 0 g", "font", "/Arial#4G", "is not a PDF name"),
+        ("/Arial \uff11\uff12 Tf 0 g", "font_size", 20, "needs a font and a font size"),
         (12, "font_size", 20, "is not a string"),
         (None, "font_size", 20, "the /Parent chain of the field has a cycle"),
     ],

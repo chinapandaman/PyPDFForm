@@ -29,7 +29,10 @@ _TOKEN_PATTERN = re.compile(
     r"|(?P<open>\[)"
     r"|(?P<close>\])"
 )
-_NUMBER_PATTERN = re.compile(r"[+-]?(?:\d+\.?\d*|\.\d+)")
+# ASCII digits only, since \d also matches the digits of other scripts
+_NUMBER_PATTERN = re.compile(r"[+-]?(?:[0-9]+\.?[0-9]*|\.[0-9]+)")
+# a # in a name that isn't followed by two hex digits, or that escapes NUL
+_INVALID_NAME_ESCAPE = re.compile(r"#(?![0-9A-Fa-f]{2})|#00")
 # the content stream operators of ISO 32000; any other word is an operand,
 # such as a font name written without its slash
 _OPERATORS = frozenset(
@@ -194,7 +197,9 @@ def _format_number(value: object, change: str) -> str:
     Writes a number in the decimal form of a PDF number.
 
     A value whose text already has that form, such as `12` or `30.5`, is
-    written as it is, and other numbers, such as `1e-05`, without an exponent.
+    written as it is, and other numbers, such as `1e-05` or `１２` written
+    with digits other than ASCII, are written in that form, as `0.00001` and
+    `12`.
 
     Args:
         value (object): The number.
@@ -361,15 +366,22 @@ def change_font(default_appearance: object, font: str) -> str | bytes:
     Raises:
         ValueError: If the font is not a single PDF name written in ASCII, such
             as one with a space or a character outside ASCII, which a name
-            writes as an escape such as `#20`, or the `/DA` can't be read or
-            has no `Tf` operation with a font and a numeric size.
+            writes as an escape such as `#20`, or has a `#` that isn't followed
+            by two hex digits, or `#00`, or the `/DA` can't be read or has no
+            `Tf` operation with a font and a numeric size.
     """
     # pypdf writes a /DA with characters outside its text encoding as UTF-16
     match = _TOKEN_PATTERN.fullmatch(font)
-    if match is None or match.lastgroup != "name" or not font.isascii():
+    if (
+        match is None
+        or match.lastgroup != "name"
+        or not font.isascii()
+        or _INVALID_NAME_ESCAPE.search(font)
+    ):
         msg = (
             f"Cannot change the font: {font!r} is not a PDF name written in "
-            "ASCII, with escapes such as #20 for a space."
+            "ASCII, with each # followed by two hex digits other than 00, such "
+            "as #20 for a space."
         )
         raise ValueError(msg)
 
