@@ -386,27 +386,6 @@ class PdfWrapper:
 
         return tuple(get_page_streams(stream))
 
-    def _reregister_font(self) -> PdfWrapper:
-        """
-        Reregisters fonts after PDF content modifications.
-
-        This method is called after operations that modify the PDF content
-        (e.g., drawing text, drawing images) to ensure that custom fonts
-        are correctly registered and available for use. It replays the font
-        registration events that existed at method entry, then trims those
-        replayed events so only newly added events remain queued.
-        """
-
-        font_register_events_len = len(self._font_register_events)
-        for i in range(font_register_events_len):
-            event = self._font_register_events[i]
-            self.register_font(event[0], event[1])
-        self._font_register_events = self._font_register_events[
-            font_register_events_len:
-        ]
-
-        return self
-
     @property
     def title(self) -> str | None:
         """
@@ -739,7 +718,7 @@ class PdfWrapper:
         The grid is drawn as page watermarks merged into the page content.
         Annotations, including widgets, keep their objects, so references to
         them, such as the AcroForm field tree, are unchanged. Registered fonts
-        are registered again afterward.
+        stay in the AcroForm resources and are not embedded again.
 
         Args:
             color (Tuple[float, float, float]): The color of the grid lines, specified as an RGB tuple (default: red).
@@ -750,7 +729,6 @@ class PdfWrapper:
         """
 
         self._stream = generate_coordinate_grid(self._read(), color, margin)
-        self._reregister_font()
 
         return self
 
@@ -1055,7 +1033,8 @@ class PdfWrapper:
         for ReportLab drawing, renders the elements onto page watermarks, and merges
         those watermarks into the page content. Annotations, including widgets, keep
         their objects, so references to them, such as the AcroForm field tree, are
-        unchanged. Registered fonts are registered again afterward.
+        unchanged. Registered fonts stay in the AcroForm resources and are not
+        embedded again.
 
         Args:
             elements (Sequence[RawTypes]): A list of raw elements to draw (e.g., [RawText(...), RawImage(...)]).
@@ -1070,7 +1049,6 @@ class PdfWrapper:
             )
 
         self._stream = merge_watermarks_with_pdf(self._read(), watermarks)
-        self._reregister_font()
 
         return self
 
@@ -1084,8 +1062,9 @@ class PdfWrapper:
 
         Valid TrueType font data is embedded into the PDF's AcroForm resources and
         recorded under the user-provided `font_name`. The original registration input
-        is kept so font resources can be replayed after operations that rewrite the
-        PDF stream. Invalid font streams are ignored, but a missing font path raises.
+        is kept so the font can be used for drawing and registered again on wrappers
+        created from this one, such as pages and merged PDFs. Invalid font streams are
+        ignored, but a missing font path raises.
 
         Args:
             font_name (str): The name of the font. This name will be used to reference the font when drawing text.
