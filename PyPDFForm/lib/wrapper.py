@@ -928,9 +928,8 @@ class PdfWrapper:
         group with the same short name, keeps its value; its widgets are still made
         read-only with `readonly=True`. A radio group fills only its own options.
         A checkbox whose value isn't supplied, and is still the one the PDF holds,
-        as read or last filled, isn't written again.
-        Filling delegates
-        to the lower-level filler, which draws image/signature values onto the page
+        as read or last filled, isn't written again. Filling delegates to the
+        lower-level filler, which draws image/signature values onto the page
         and removes only the consumed widgets. Other annotations and unfilled
         signature/image fields are preserved. After image drawing, the widget cache
         is refreshed to remove consumed fields while retaining the middleware objects
@@ -981,8 +980,8 @@ class PdfWrapper:
                 self.widgets,
                 need_appearances=getattr(self, "need_appearances"),
                 use_full_widget_name=getattr(self, "use_full_widget_name"),
-                readonly=readonly,
                 supplied=set(data),
+                readonly=readonly,
             )
 
             self._stream = (

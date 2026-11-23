@@ -28,7 +28,6 @@ from .constants import (
     COMB,
     JS,
     MULTILINE,
-    PUSHBUTTON,
     READ_ONLY,
     REQUIRED,
     Annots,
@@ -36,9 +35,7 @@ from .constants import (
     JavaScript,
     Off,
     OpenAction,
-    Parent,
     S,
-    T,
     Title,
 )
 from .middleware import WIDGET_TYPES
@@ -60,9 +57,10 @@ from .patterns import (
     get_text_field_max_length,
     get_text_value,
     get_widget_key,
+    is_pushbutton,
     update_annotation_name,
 )
-from .utils import extract_widget_property, find_pattern_match, get_dictionary
+from .utils import extract_widget_property, find_pattern_match
 
 
 def get_metadata(pdf: bytes) -> dict:
@@ -477,24 +475,6 @@ def get_widget_type(widget: dict) -> type | None:
             return _type
 
     return None
-
-
-def is_pushbutton(widget: dict) -> bool:
-    """
-    Checks whether the field of a widget annotation is a pushbutton.
-
-    The flag is read from the widget when it is its own field, which has a
-    name (`T`), and otherwise from its parent field and the fields above it,
-    as the radio flag is, so every widget of a field has the same type.
-
-    Args:
-        widget (dict): The widget annotation dictionary.
-
-    Returns:
-        bool: True if the field sets the Pushbutton flag.
-    """
-    field = widget if T in widget else get_dictionary(widget, Parent) or widget
-    return check_field_flag(field, PUSHBUTTON)
 
 
 def _is_widget(widget: dict) -> bool:

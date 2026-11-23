@@ -9,7 +9,7 @@ supports making the filled form read-only to prevent further modifications.
 """
 
 from io import BytesIO
-from typing import Dict, Optional, Set, cast
+from typing import Dict, Set, cast
 
 from pypdf import PdfWriter
 from pypdf.generic import DictionaryObject
@@ -27,12 +27,13 @@ from .middleware.signature import Signature
 from .middleware.text import Text
 from .patterns import (
     get_widget_key,
+    is_pushbutton,
     update_checkbox_value,
     update_dropdown_value,
     update_radio_value,
     update_text_value,
 )
-from .template import get_widget_type, is_pushbutton
+from .template import get_widget_type
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -212,8 +213,8 @@ def fill(
     widgets: Dict[str, WIDGET_TYPES],
     need_appearances: bool,
     use_full_widget_name: bool,
+    supplied: Set[str],
     readonly: bool = False,
-    supplied: Optional[Set[str]] = None,
 ) -> tuple:
     """Fills a PDF template with the given widgets.
 
@@ -240,9 +241,8 @@ def fill(
             behavior for certain fields.
         use_full_widget_name (bool): Whether to use the full widget name when looking up widgets
                                       in the `widgets` dictionary.
+        supplied (Set[str]): The keys whose values the caller supplied.
         readonly (bool): Whether to make form fields read-only. Defaults to False.
-        supplied (Optional[Set[str]]): The keys whose values the caller
-            supplied. Defaults to None, which treats every value as supplied.
 
     Returns:
         tuple: A tuple containing the filled PDF as bytes and the image-drawn
@@ -250,6 +250,10 @@ def fill(
                tuple item is None when no image drawing is needed.
     """
     out = PdfWriter(BytesIO(template))
+    write_values = {
+        key: key in supplied or not _is_unchanged_checkbox(widget)
+        for key, widget in widgets.items()
+    }
 
     radio_button_tracker = {}
     images_to_draw = {}
@@ -279,9 +283,7 @@ def fill(
                 images_to_draw[page_num + 1],
                 need_appearances,
                 readonly,
-                supplied is None
-                or key in supplied
-                or not _is_unchanged_checkbox(widget),
+                write_values[key],
             )
             if consumed:
                 any_image_to_draw = True

@@ -27,6 +27,7 @@ from .constants import (
     HIDDEN,
     IMAGE_IMPORT_JAVASCRIPT,
     JS,
+    PUSHBUTTON,
     RADIO,
     TU,
     A,
@@ -597,6 +598,24 @@ def check_field_flag(widget: DictionaryObject, flag: int) -> bool:
     """
     flags = _get_inherited_value(widget, Ff)
     return bool(int(flags if flags is not None else 0) & flag)
+
+
+def is_pushbutton(widget: DictionaryObject) -> bool:
+    """
+    Checks whether the field of a widget annotation is a pushbutton.
+
+    The flag is read from the widget when it is its own field, which has a
+    name (`T`), and otherwise from its parent field and the fields above it,
+    as the radio flag is, so every widget of a field has the same type.
+
+    Args:
+        widget (DictionaryObject): The widget annotation.
+
+    Returns:
+        bool: True if the field sets the Pushbutton flag.
+    """
+    field = widget if T in widget else get_dictionary(widget, Parent) or widget
+    return check_field_flag(field, PUSHBUTTON)
 
 
 def _get_inherited_value(widget: DictionaryObject, key: str) -> Any:
