@@ -312,7 +312,10 @@ class PdfWrapper:
         It rebuilds the widget dictionary and invalidates the lazily loaded font cache.
         Fields no longer in the PDF are dropped. Existing widget objects are kept
         for fields that remain, since queued hooks were already applied to the PDF
-        and their properties match it. A renamed widget is built from the PDF and
+        and their properties match it. They take the fields found with their key
+        from the rebuilt widgets, so that filling them, such as after a rename gave
+        another field their key, changes only fields of their type. A renamed
+        widget is built from the PDF and
         takes the state the PDF doesn't hold from the widget it replaces, with
         `Widget.copy_unread_state`.
         """
@@ -329,6 +332,7 @@ class PdfWrapper:
         )
         for k, v in new_widgets.items():
             if k in self.widgets:
+                self.widgets[k].__dict__["_key_fields"] = v.__dict__["_key_fields"]
                 new_widgets[k] = self.widgets[k]
             elif self._key_update_tracker.get(k) in self.widgets:
                 v.copy_unread_state(self.widgets[self._key_update_tracker[k]])

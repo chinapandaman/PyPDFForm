@@ -1249,17 +1249,23 @@ def test_radio_option_with_own_field_flags(
 
 
 def _name_checkbox_like_radio_group(
-    stream, position, radio_flag_on="field", checkbox_state=None, selected=None
+    stream,
+    position,
+    radio_flag_on="field",
+    checkbox_state=None,
+    selected=None,
+    radio_name="group",
 ):
     # the checkbox "check" and the radio group "outer.group" both get the short
-    # name "group", and the radio group's /DV is /Off; with a checkbox_state,
-    # the checkbox's on state is /Custom, and its /AS and /V are checkbox_state
+    # name "group", unless the radio group is given another, and the radio
+    # group's /DV is /Off; with a checkbox_state, the checkbox's on state is
+    # /Custom, and its /AS and /V are checkbox_state
     with Pdf.open(BytesIO(stream)) as pdf:
         fields = pdf.Root.AcroForm.Fields
         check = next(field for field in fields if str(field.get("/T")) == "check")
         radio = next(field for field in fields if str(field.get("/T")) == "radio_1")
         check.T = String("group")
-        radio.T = String("group")
+        radio.T = String(radio_name)
         if checkbox_state is not None:
             check.AP.N = Dictionary({"/Off": check.AP.N.Off, "/Custom": check.AP.N.Yes})
             check.AS = Name(checkbox_state)
@@ -1377,6 +1383,29 @@ def test_fill_radio_group_with_unrecognized_field_of_its_name(
         "outer.group": ["/0", "/Off"],
         "outer.group /V": "/0",
     }
+
+
+def test_fill_checkbox_after_rename_gives_radio_group_its_name(
+    template_with_radiobutton_stream,
+):
+    # the radio group "outer.radio" comes before the checkbox "group"
+    stream = _name_checkbox_like_radio_group(
+        template_with_radiobutton_stream, "last", radio_name="radio"
+    )
+    obj = PdfWrapper(stream)
+    obj.update_widget_key("radio", "group").commit_widget_key_updates()
+    assert type(obj.widgets["group"]) is Checkbox
+
+    # the checkbox kept under the name fills only itself, as after reopening
+    expected = {
+        "group": ["/Yes", "/Yes"],
+        "outer.group": ["/Off", "/Off"],
+        "outer.group /V": None,
+    }
+    renamed = obj.read()
+    assert _get_checkbox_and_radio_states(obj.fill({"group": True}).read()) == expected
+    filled = PdfWrapper(renamed).fill({"group": True}).read()
+    assert _get_checkbox_and_radio_states(filled) == expected
 
 
 def test_fill_checkbox_with_short_name_of_unrecognized_checkbox(template_stream):

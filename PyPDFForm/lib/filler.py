@@ -83,11 +83,12 @@ def _is_filled_by(widget: WIDGET_TYPES, annot: DictionaryObject) -> bool:
 
     A key can name fields of different types, such as a checkbox and a radio
     group with the same short name, and annotations that weren't recognized as
-    widgets, such as a checked checkbox whose on state isn't `/Yes`. The fields
-    of another type than the widget, which `build_widgets` records by full name
-    in `_other_field_names`, keep their values. A radio group fills only the
-    options it was built from, in `_field_names`, so no other annotation takes
-    an option index.
+    widgets, such as a checked checkbox whose on state isn't `/Yes`. The widget
+    records the types found for each field with its key in `_key_fields`. A
+    field found only as another type than the widget keeps its value. A radio
+    group fills only fields found as radio options, so no other annotation
+    takes an option index; other widgets also fill annotations that weren't
+    recognized.
 
     Args:
         widget (WIDGET_TYPES): The widget under the annotation's key, from
@@ -97,11 +98,11 @@ def _is_filled_by(widget: WIDGET_TYPES, annot: DictionaryObject) -> bool:
     Returns:
         bool: True if filling the widget changes the annotation.
     """
-    name = get_full_name(annot)
-    if isinstance(widget, Radio):
-        return name in widget.__dict__["_field_names"]
+    types = widget.__dict__["_key_fields"].get(get_full_name(annot))
+    if types is None:
+        return not isinstance(widget, Radio)
 
-    return name not in widget.__dict__["_other_field_names"]
+    return type(widget) in types
 
 
 def update_widget(

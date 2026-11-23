@@ -219,12 +219,11 @@ def _build_widget_cache(
     The cached widgets must be treated as prototypes only. Use `build_widgets`
     to get independent copies that are safe to mutate. A key can name fields of
     different types, such as a checkbox and a radio group with the same short
-    name. Each widget records the full names of the fields it is built from,
-    the fields of its type with its key, in `_field_names`, and of the fields of
-    another type with its key in `_other_field_names`, for filling. The names
-    are kept with the widget, as it is retained or copied, so a later change to
-    how a field would be classified, such as a checkbox's appearance state,
-    doesn't change which fields the widget fills.
+    name. Each widget records in `_key_fields`, for filling, the full name of
+    each field with its key and the widget types its annotations were found to
+    be. They are kept with the widget, as it is copied, so a later change to how
+    a field would be classified, such as a checkbox's appearance state, doesn't
+    change which fields the widget fills.
 
     Args:
         pdf_stream (bytes): The PDF stream to parse.
@@ -245,12 +244,12 @@ def _build_widget_cache(
             )
 
     for key, _widget in results.items():
-        names = [(get_full_name(annot), _type) for annot, _type in found[key]]
-        own = frozenset(name for name, _type in names if _type is type(_widget))
-        _widget.__dict__["_field_names"] = own
-        _widget.__dict__["_other_field_names"] = (
-            frozenset(name for name, _type in names if _type is not type(_widget)) - own
-        )
+        fields = defaultdict(set)
+        for annot, _type in found[key]:
+            fields[get_full_name(annot)].add(_type)
+        _widget.__dict__["_key_fields"] = {
+            name: frozenset(types) for name, types in fields.items()
+        }
 
     return results
 
