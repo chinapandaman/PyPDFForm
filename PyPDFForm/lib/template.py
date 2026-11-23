@@ -274,6 +274,8 @@ def _process_widget(
 
         if type(_widget) is Checkbox:
             _widget.value = get_checkbox_value(widget)
+            # so that filling doesn't write it again unless it changes
+            _widget.__dict__["_read_value"] = _widget.value
 
         if isinstance(_widget, Dropdown):
             _populate_dropdown_properties(widget, _widget)
@@ -470,14 +472,14 @@ def get_widget_type(widget: dict) -> type | None:
 
     for patterns, _type in WIDGET_TYPE_PATTERNS:
         if all(find_pattern_match(pattern, widget) for pattern in patterns):
-            if issubclass(_type, Checkbox) and _is_pushbutton(widget):
+            if issubclass(_type, Checkbox) and is_pushbutton(widget):
                 return None
             return _type
 
     return None
 
 
-def _is_pushbutton(widget: dict) -> bool:
+def is_pushbutton(widget: dict) -> bool:
     """
     Checks whether the field of a widget annotation is a pushbutton.
 

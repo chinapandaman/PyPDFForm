@@ -1568,20 +1568,11 @@ def test_pushbutton_is_not_a_checkbox(template_stream, state):
     assert "/V" not in widget
 
 
-@pytest.mark.parametrize(
-    ("states", "value", "expected"),
-    [
-        (["/Custom"], "/Custom", True),
-        (["/A", "/B"], "/B", True),
-        (["/A", "/B"], "/A", None),
-        (["/A", "/B"], "/Off", None),
-    ],
-    ids=["one", "last", "other", "off"],
-)
-def test_checkbox_value_of_its_field(template_stream, states, value, expected):
+def _checkbox_field(stream, states, value):
     # the widgets of "check", and of "check_2" with two states, become kids of
-    # a field "check" with the value, and none has a value of its own
-    with Pdf.open(BytesIO(template_stream)) as pdf:
+    # a field "check" with the value, and none has a value of its own; a widget
+    # is on when the value names its state
+    with Pdf.open(BytesIO(stream)) as pdf:
         fields = pdf.Root.AcroForm.Fields
         names = ["check", "check_2"][: len(states)]
         kids = [
@@ -1610,13 +1601,124 @@ def test_checkbox_value_of_its_field(template_stream, states, value, expected):
         pdf.Root.AcroForm.Fields = Array(
             [each for each in fields if each not in kids] + [field]
         )
-        stream = _save(pdf)
+        return _save(pdf)
+
+
+def _get_checkbox_field_states(stream):
+    # the /AS and /V of each widget of the field "check", and the field's /V
+    widgets = [
+        annot
+        for page in PdfReader(BytesIO(stream)).pages
+        for annot in (each.get_object() for each in page["/Annots"])
+        if annot.get("/Parent", {}).get("/T") == "check"
+    ]
+    return [[each.get("/AS"), each.get("/V")] for each in widgets] + [
+        widgets[0]["/Parent"].get("/V")
+    ]
+
+
+@pytest.mark.parametrize(
+    ("states", "value", "expected"),
+    [
+        (["/Custom"], "/Custom", True),
+        (["/A", "/B"], "/B", True),
+        (["/A", "/B"], "/A", None),
+        (["/A", "/B"], "/Off", None),
+    ],
+    ids=["one", "last", "other", "off"],
+)
+def test_checkbox_value_of_its_field(template_stream, states, value, expected):
+    stream = _checkbox_field(template_stream, states, value)
 
     # the field's value counts for a widget whose state it names, here the
     # last one, which "check" gives access to
     obj = PdfWrapper(stream)
     assert type(obj.widgets["check"]) is Checkbox
     assert obj.data["check"] is expected
+
+
+def test_fill_keeps_checkboxes_not_supplied(template_stream, pdf_samples):
+    # "check" reads True from the field's value, which names its last widget's
+    # state, while its first widget is off
+    stream = _checkbox_field(template_stream, ["/A", "/B"], "/B")
+    obj = PdfWrapper(stream)
+    assert obj.widgets["check"].value is True
+    expected = [["/Off", None], ["/B", None], "/B"]
+
+    # a value that wasn't supplied and is still the one read isn't written
+    assert _get_checkbox_field_states(obj.fill({}).read()) == expected
+    assert _get_checkbox_field_states(obj.fill({"test": "foo"}).read()) == expected
+
+    # one that was assigned since is
+    obj.widgets["check"].value = False
+    assert _get_checkbox_field_states(obj.fill({}).read()) == [
+        ["/Off", "/Off"],
+        ["/Off", "/Off"],
+        "/B",
+    ]
+
+    # two checkboxes are named "c1_3[1]"; the later, checked one gives the
+    # name its value, and the other stays unchecked
+    path = os.path.join(pdf_samples, "scenario", "issues", "PPF-939_expected_2.pdf")
+    with open(path, "rb") as f:
+        sample = f.read()
+    filled = PdfWrapper(sample).fill({}).read()
+    for stream in (sample, filled):
+        assert [
+            annot["/AS"]
+            for page in PdfReader(BytesIO(stream)).pages
+            for annot in (each.get_object() for each in page.get("/Annots", []))
+            if annot.get("/Subtype") == "/Widget"
+            and get_widget_key(annot, False) == "c1_3[1]"
+        ] == ["/Off", "/5"]
+
+
+def test_fill_checkbox_with_short_name_of_pushbutton(template_stream):
+    # the widget of "test" becomes the only widget of the pushbutton
+    # "outer.action", which comes before the checkbox "check", renamed "action"
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        widget = next(field for field in fields if str(field.get("/T")) == "test")
+        check = next(field for field in fields if str(field.get("/T")) == "check")
+        check.T = String("action")
+        outer = pdf.make_indirect(Dictionary({"/T": String("outer")}))
+        action = pdf.make_indirect(
+            Dictionary(
+                {
+                    "/T": String("action"),
+                    "/FT": Name.Btn,
+                    "/Ff": PUSHBUTTON,
+                    "/Kids": Array([widget]),
+                    "/Parent": outer,
+                }
+            )
+        )
+        outer.Kids = Array([action])
+        for entry in ("/T", "/FT", "/V", "/DA", "/Ff", "/MaxLen", "/Q"):
+            if entry in widget:
+                del widget[entry]
+        widget.Parent = action
+        widget.AP = Dictionary(
+            N=Dictionary({"/Off": check.AP.N.Off, "/Activate": check.AP.N.Yes})
+        )
+        widget.AS = Name.Off
+        pdf.Root.AcroForm.Fields = Array(
+            [each for each in fields if each != widget] + [outer]
+        )
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert type(obj.widgets["action"]) is Checkbox
+    filled = obj.fill({"action": True}).read()
+
+    # the pushbutton keeps having no value
+    annots = [
+        each.get_object() for each in PdfReader(BytesIO(filled)).pages[0]["/Annots"]
+    ]
+    assert [(annot.get("/AS"), annot.get("/V")) for annot in annots] == [
+        ("/Off", None),
+        ("/Yes", "/Yes"),
+    ]
 
 
 @pytest.mark.parametrize(
