@@ -1673,6 +1673,30 @@ def test_fill_keeps_checkboxes_not_supplied(template_stream, pdf_samples):
         ] == ["/Off", "/5"]
 
 
+def test_fill_checkbox_back_to_value_read(template_stream):
+    # "check" is checked
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        check = next(
+            field
+            for field in pdf.Root.AcroForm.Fields
+            if str(field.get("/T")) == "check"
+        )
+        check.AS = Name.Yes
+        check.V = Name.Yes
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    obj.fill({"check": False})
+    widget = _find_widget(obj.read(), "check")
+    assert (widget["/AS"], widget["/V"]) == ("/Off", "/Off")
+
+    # the value read is assigned again after the PDF changed, so it is written
+    obj.widgets["check"].value = True
+    obj.fill({})
+    widget = _find_widget(obj.read(), "check")
+    assert (widget["/AS"], widget["/V"]) == ("/Yes", "/Yes")
+
+
 def test_fill_checkbox_with_short_name_of_pushbutton(template_stream):
     # the widget of "test" becomes the only widget of the pushbutton
     # "outer.action", which comes before the checkbox "check", renamed "action"

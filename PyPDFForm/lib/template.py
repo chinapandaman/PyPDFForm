@@ -274,8 +274,8 @@ def _process_widget(
 
         if type(_widget) is Checkbox:
             _widget.value = get_checkbox_value(widget)
-            # so that filling doesn't write it again unless it changes
-            _widget.__dict__["_read_value"] = _widget.value
+            # the value the PDF holds, which filling doesn't write again
+            _widget.__dict__["_pdf_value"] = _widget.value
 
         if isinstance(_widget, Dropdown):
             _populate_dropdown_properties(widget, _widget)

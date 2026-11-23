@@ -106,18 +106,19 @@ def _is_filled_by(widget: WIDGET_TYPES, annot: DictionaryObject) -> bool:
     return _type is type(widget)
 
 
-def _is_read_checkbox(widget: WIDGET_TYPES) -> bool:
-    """Checks whether a widget is a checkbox still at the value read from the PDF.
+def _is_unchanged_checkbox(widget: WIDGET_TYPES) -> bool:
+    """Checks whether a widget is a checkbox still at the value the PDF holds.
 
     Args:
         widget (WIDGET_TYPES): The widget to check.
 
     Returns:
         bool: True if the widget is a checkbox, not a radio group, whose value
-            is the one `build_widgets` read.
+            is the one in `_pdf_value`, which `build_widgets` read and
+            `PdfWrapper.fill` updates after each fill.
     """
     return type(widget) is Checkbox and widget.value == widget.__dict__.get(
-        "_read_value"
+        "_pdf_value"
     )
 
 
@@ -222,7 +223,7 @@ def fill(
     images, and signatures. A field of another type than the widget under its key,
     such as a checkbox with the short name of a radio group, keeps its value, and a
     radio group fills only its own options. A checkbox whose value wasn't
-    supplied, and is still the one read from the PDF, isn't written again,
+    supplied, and is still the one the PDF holds, isn't written again,
     since its key can name other widgets that read differently, such as the
     widgets of a field with different on states. It can set fields read-only during
     filling, and when images or signatures are present it removes only the widgets
@@ -278,7 +279,9 @@ def fill(
                 images_to_draw[page_num + 1],
                 need_appearances,
                 readonly,
-                supplied is None or key in supplied or not _is_read_checkbox(widget),
+                supplied is None
+                or key in supplied
+                or not _is_unchanged_checkbox(widget),
             )
             if consumed:
                 any_image_to_draw = True
