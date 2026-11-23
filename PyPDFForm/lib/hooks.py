@@ -67,7 +67,7 @@ from .patterns import (
     get_widget_key,
     resolve_inherited_entry,
 )
-from .utils import extract_widget_property, get_dictionary
+from .utils import extract_widget_property, get_dictionary, get_entry
 
 
 def trigger_widget_hooks(
@@ -152,6 +152,30 @@ def _update_field_flag(annot: DictionaryObject, flag: int, should_set: bool) -> 
     )
 
 
+def _set_field_entry(annot: DictionaryObject, key: str, value: NumberObject) -> None:
+    """
+    Sets an inheritable field entry, such as `/Q`, for a widget.
+
+    The entry is resolved from the widget and the fields along its `/Parent`
+    chain, as `resolve_inherited_entry` describes, without an AcroForm
+    default. The new value replaces the one that was found when it is on the
+    widget or below its own field, and is otherwise written to the widget's
+    own field, so fields shared with other fields are not changed. Hooks
+    change a PDF writer that is written only when every hook succeeds, so an
+    error leaves the PDF unchanged.
+
+    Args:
+        annot (DictionaryObject): The widget annotation dictionary.
+        key (str): The entry to set, such as `/MaxLen` or `/Q`.
+        value (NumberObject): The new value.
+
+    Raises:
+        ValueError: If the `/Parent` chain has a cycle before the entry is
+            found.
+    """
+    resolve_inherited_entry(annot, key, None).target[NameObject(key)] = value
+
+
 def _remove_field_entry(
     annot: DictionaryObject, key: str, patterns: list | None = None
 ) -> None:
@@ -176,16 +200,24 @@ def _remove_field_entry(
 
     Raises:
         ValueError: If a shared field above the widget's own field supplies
-            the entry.
+            the entry, or the `/Parent` chain has a cycle.
     """
     field = annot
-    field.pop(NameObject(key), None)
-    while T not in field and Parent in field:
-        field = cast(DictionaryObject, field[Parent].get_object())
+    seen = set()
+    while True:
+        if id(field) in seen:
+            msg = f"Cannot remove {key}: the /Parent chain of the field has a cycle."
+            raise ValueError(msg)
+        seen.add(id(field))
+
         field.pop(NameObject(key), None)
+        parent = get_dictionary(field, Parent)
+        if get_entry(field, T) is not None or parent is None:
+            break
+        field = parent
 
     value = (
-        annot.get_inherited(key, None)
+        resolve_inherited_entry(annot, key, None).value
         if patterns is None
         else extract_widget_property(annot, patterns, None, None)
     )
@@ -306,9 +338,10 @@ def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
     """
     Updates the text alignment of a text field annotation.
 
-    This function modifies the Q entry in the annotation dictionary to change
-    the text alignment of the text field. None removes the entry from the
-    annotation and its own field, since the field's alignment is inheritable.
+    This function modifies the Q entry of the field, as `_set_field_entry`
+    does, to change the text alignment of the text field. None removes the
+    entry from the annotation and its own field, since the field's alignment
+    is inheritable.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
@@ -317,12 +350,12 @@ def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
 
     Raises:
         ValueError: If None is given and a parent field shared with other
-            fields sets the alignment.
+            fields sets the alignment, or the `/Parent` chain has a cycle.
     """
     if val is None:
         _remove_field_entry(annot, Q)
     else:
-        annot[NameObject(Q)] = NumberObject(val)
+        _set_field_entry(annot, Q, NumberObject(val))
 
 
 def update_text_field_multiline(annot: DictionaryObject, val: bool) -> None:
@@ -372,10 +405,10 @@ def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
     """
     Updates the maximum length of a text field annotation.
 
-    This function sets the 'MaxLen' entry in the annotation dictionary, which
-    specifies the maximum number of characters that can be entered into the text field.
-    None removes the entry from the annotation and its own field, since the
-    field's maximum length is inheritable.
+    This function sets the MaxLen entry of the field, as `_set_field_entry`
+    does, which specifies the maximum number of characters that can be
+    entered into the text field. None removes the entry from the annotation
+    and its own field, since the field's maximum length is inheritable.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
@@ -384,12 +417,12 @@ def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
 
     Raises:
         ValueError: If None is given and a parent field shared with other
-            fields sets the maximum length.
+            fields sets the maximum length, or the `/Parent` chain has a cycle.
     """
     if val is None:
         _remove_field_entry(annot, MaxLen)
     else:
-        annot[NameObject(MaxLen)] = NumberObject(val)
+        _set_field_entry(annot, MaxLen, NumberObject(val))
 
 
 def _normalize_geometry_value(val: int | float) -> float:

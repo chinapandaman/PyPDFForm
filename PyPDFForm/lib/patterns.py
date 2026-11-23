@@ -400,6 +400,11 @@ def get_text_field_max_length(widget: dict) -> int | None:
     """
     Extracts the maximum length of a text field from a widget dictionary.
 
+    The maximum length (`/MaxLen`) is resolved from the widget and the fields
+    along its `/Parent` chain, so the value of the widget or a lower field
+    takes precedence over the ones above it. A `/Parent` cycle before it is
+    found reads as no maximum length.
+
     Args:
         widget (dict): The widget dictionary to extract the max length from.
 
@@ -407,21 +412,29 @@ def get_text_field_max_length(widget: dict) -> int | None:
         int | None: The maximum length of the text field, or None
             if the max length is not specified.
     """
-    return int(widget[MaxLen]) or None if MaxLen in widget else None
+    max_length = _get_inherited_value(widget, MaxLen)
+    return int(max_length) or None if max_length is not None else None
 
 
 def get_text_field_alignment(widget: dict) -> int | None:
     """
     Extracts the alignment (quadding) of a text field from a widget dictionary.
 
+    The alignment (`/Q`) is resolved from the widget and the fields along its
+    `/Parent` chain, so the value of the widget or a lower field takes
+    precedence over the ones above it. The AcroForm's default isn't read, so
+    None means that no field sets an alignment and the form's default
+    applies. A `/Parent` cycle before it is found reads as no alignment.
+
     Args:
         widget (dict): The widget dictionary to extract the alignment from.
 
     Returns:
-        int | None: The alignment of the text field, or None if the
-            alignment is not specified or is the default (left-justified).
+        int | None: The alignment of the text field, or None if no field
+            sets one.
     """
-    return int(widget[Q]) if Q in widget else None
+    alignment = _get_inherited_value(widget, Q)
+    return int(alignment) if alignment is not None else None
 
 
 def get_dropdown_choices(widget: dict) -> Tuple[str | Tuple[str, str], ...]:
