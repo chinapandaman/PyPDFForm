@@ -47,7 +47,6 @@ from .constants import (
     FT,
     NEWEST_FEATURE_VERSION,
     PDF_VERSIONS,
-    SLASH,
     TITLE_VERSION,
     UNIQUE_SUFFIX_LENGTH,
     VERSION_IDENTIFIER_PREFIX,
@@ -364,9 +363,8 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
     Checks if a widget value matches a pattern value.
 
     Nested dictionaries delegate to `find_pattern_match`. Tuple pattern values
-    support matching any listed value, and a tuple containing ``"/"`` also
-    matches PDF names with arbitrary slash-prefixed values. Callable pattern
-    values are predicates called with the widget value.
+    support matching any listed value. Callable pattern values are predicates
+    called with the widget value.
 
     Args:
         pattern_value (Any): The value from the pattern.
@@ -384,9 +382,7 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
         return bool(pattern_value(widget_value))
 
     if isinstance(pattern_value, tuple):
-        if widget_value in pattern_value:
-            return True
-        return SLASH in pattern_value and widget_value.startswith(SLASH)
+        return widget_value in pattern_value
 
     return pattern_value == widget_value
 

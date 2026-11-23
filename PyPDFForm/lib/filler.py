@@ -15,7 +15,7 @@ from pypdf import PdfWriter
 from pypdf.generic import DictionaryObject
 
 from .constants import Subtype, Widget
-from .field_tree import detach_field, get_full_name
+from .field_tree import detach_field
 from .hooks import update_field_readonly
 from .image import get_draw_image_resolutions, get_image_dimensions
 from .middleware import WIDGET_TYPES
@@ -32,6 +32,7 @@ from .patterns import (
     update_radio_value,
     update_text_value,
 )
+from .template import get_widget_type
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -82,27 +83,24 @@ def _is_filled_by(widget: WIDGET_TYPES, annot: DictionaryObject) -> bool:
     """Checks whether filling a widget changes an annotation with its key.
 
     A key can name fields of different types, such as a checkbox and a radio
-    group with the same short name, and annotations that weren't recognized as
-    widgets, such as a checked checkbox whose on state isn't `/Yes`. The widget
-    records the types found for each field with its key in `_key_fields`. A
-    field found only as another type than the widget keeps its value. A radio
-    group fills only fields found as radio options, so no other annotation
-    takes an option index; other widgets also fill annotations that weren't
-    recognized.
+    group with the same short name. An annotation of another type than the
+    widget, from `get_widget_type`, which doesn't depend on its appearance
+    state, keeps its value. A radio group fills only radio options, so no
+    other annotation takes an option index; other widgets also fill
+    annotations that aren't a supported widget.
 
     Args:
-        widget (WIDGET_TYPES): The widget under the annotation's key, from
-            `build_widgets`.
+        widget (WIDGET_TYPES): The widget under the annotation's key.
         annot (DictionaryObject): The widget annotation.
 
     Returns:
         bool: True if filling the widget changes the annotation.
     """
-    types = widget.__dict__["_key_fields"].get(get_full_name(annot))
-    if types is None:
-        return not isinstance(widget, Radio)
+    _type = get_widget_type(annot)
+    if isinstance(widget, Radio):
+        return _type is Radio
 
-    return type(widget) in types
+    return _type is None or _type is type(widget)
 
 
 def update_widget(

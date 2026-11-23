@@ -302,13 +302,13 @@ def _get_field_names(writer: PdfWriter) -> set:
     for page in writer.pages:
         for annot in get_array(page, Annots):
             widget = annot.get_object()
-            if _is_widget_annotation(widget) and (name := get_full_name(widget)):
+            if _is_widget_annotation(widget) and (name := _get_full_name(widget)):
                 result.add(name)
 
     return result
 
 
-def get_full_name(obj: DictionaryObject) -> str:
+def _get_full_name(obj: DictionaryObject) -> str:
     """
     Gets the fully qualified name of a field or widget from its ancestors.
 

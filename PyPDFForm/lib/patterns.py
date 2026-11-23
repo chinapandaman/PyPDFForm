@@ -28,7 +28,6 @@ from .constants import (
     IMAGE_IMPORT_JAVASCRIPT,
     JS,
     RADIO,
-    SLASH,
     TU,
     A,
     Btn,
@@ -60,6 +59,8 @@ from .middleware.signature import Signature
 from .middleware.text import Text
 from .utils import extract_widget_property, get_dictionary, get_entry
 
+# get_widget_type reads /AS as /Off, so an /AS pattern requires an appearance
+# state, whichever it is, and a field's type doesn't change as it is filled
 WIDGET_TYPE_PATTERNS = [
     (
         (
@@ -95,7 +96,7 @@ WIDGET_TYPE_PATTERNS = [
             {Subtype: Widget},
             {FT: Btn},
             {Parent: {FT: Btn}},
-            {AS: (Yes, Off, SLASH)},
+            {AS: (Yes, Off)},
         ),
         Radio,
     ),
@@ -153,7 +154,7 @@ WIDGET_TYPE_PATTERNS = [
         (
             {Subtype: Widget},
             {Parent: {FT: Btn}},
-            {AS: (Yes, Off, SLASH)},
+            {AS: (Yes, Off)},
         ),
         Radio,
     ),
