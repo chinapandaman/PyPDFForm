@@ -9,8 +9,20 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject, NullObject
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
+from PyPDFForm.lib.constants import (
+    COMB,
+    MULTILINE,
+    PUSHBUTTON,
+    RADIO,
+    READ_ONLY,
+    REQUIRED,
+)
+from PyPDFForm.lib.hooks import update_field_readonly
+from PyPDFForm.lib.middleware.checkbox import Checkbox
+from PyPDFForm.lib.middleware.radio import Radio
 from PyPDFForm.lib.patterns import get_widget_key
 from PyPDFForm.lib.utils import get_version, set_version
+from PyPDFForm.lib.wrapper import PdfArray
 
 
 def test_register_font_no_form_fields(
@@ -629,9 +641,9 @@ CHOSEN_DA = "/Cour 9 Tf 0 0 1 rg"
 OTHER_DA = "/Helv 5 Tf 0 g"
 
 
-def _nest_fields(stream, default_appearances):
+def _nest_fields(stream, values, entry="/DA"):
     # makes "test" and "test_2" kids of "inner", a kid of "outer", and sets the
-    # /DA of "test", "inner", "outer", or the AcroForm as given, without others
+    # entry of "test", "inner", "outer", or the AcroForm as given, without others
     with Pdf.open(BytesIO(stream)) as pdf:
         fields = pdf.Root.AcroForm.Fields
         kids = [field for field in fields if str(field.get("/T")) in ("test", "test_2")]
@@ -644,11 +656,13 @@ def _nest_fields(stream, default_appearances):
         inner.Parent = outer
         for kid in kids:
             kid.Parent = inner
-            del kid["/DA"]
+            if entry in kid:
+                del kid[entry]
         pdf.Root.AcroForm.Fields = Array(
             [field for field in fields if field not in kids] + [outer]
         )
-        del pdf.Root.AcroForm["/DA"]
+        if entry in pdf.Root.AcroForm:
+            del pdf.Root.AcroForm[entry]
 
         holders = {
             "test": next(kid for kid in kids if str(kid.T) == "test"),
@@ -656,22 +670,22 @@ def _nest_fields(stream, default_appearances):
             "outer": outer,
             "/AcroForm": pdf.Root.AcroForm,
         }
-        for holder, default_appearance in default_appearances.items():
-            holders[holder].DA = String(default_appearance)
+        for holder, value in values.items():
+            holders[holder][entry] = _pdf_value(value)
 
         return _save(pdf)
 
 
-def _get_default_appearances(stream):
-    # the /DA of each field of _nest_fields, or None without one
+def _get_nested_entries(stream, entry="/DA"):
+    # the entry of each field of _nest_fields, or None without one
     reader = PdfReader(BytesIO(stream))
     inner = _find_widget(stream, "test")["/Parent"].get_object()
     return {
-        "test": _find_widget(stream, "test").get("/DA"),
-        "test_2": _find_widget(stream, "test_2").get("/DA"),
-        "inner": inner.get("/DA"),
-        "outer": inner["/Parent"].get_object().get("/DA"),
-        "/AcroForm": reader.root_object["/AcroForm"].get("/DA"),
+        "test": _find_widget(stream, "test").get(entry),
+        "test_2": _find_widget(stream, "test_2").get(entry),
+        "inner": inner.get(entry),
+        "outer": inner["/Parent"].get_object().get(entry),
+        "/AcroForm": reader.root_object["/AcroForm"].get(entry),
     }
 
 
@@ -709,7 +723,7 @@ def test_change_inherited_default_appearance(
     setattr(
         obj.widgets["outer.inner.test" if use_full_widget_name else "test"], name, value
     )
-    result = _get_default_appearances(obj.read())
+    result = _get_nested_entries(obj.read())
 
     # only the widget's own field changes; fields shared with "test_2" and the
     # AcroForm default don't
@@ -1011,3 +1025,742 @@ def test_change_font_to_resource_with_escaped_name(template_stream, key, expecte
     assert default_appearance == expected
     # the name in /DA is the resource key
     assert Object.parse(default_appearance.split(" ")[0].encode()) == Name(key)
+
+
+def _get_field(pdf, name):
+    # a field of the AcroForm by its name
+    return next(
+        field for field in pdf.Root.AcroForm.Fields if str(field.get("/T")) == name
+    )
+
+
+def _set_on_state(widget, state="/Custom"):
+    # gives a checkbox widget an on state other than /Yes
+    widget.AP.N = Dictionary({"/Off": widget.AP.N.Off, state: widget.AP.N.Yes})
+
+
+def _get_widget_states(stream, name):
+    # the /AS and /V of each widget with the short name, in page order
+    return [
+        [annot.get("/AS"), annot.get("/V")]
+        for page in PdfReader(BytesIO(stream)).pages
+        for annot in (each.get_object() for each in page.get("/Annots", []))
+        if annot.get("/Subtype") == "/Widget" and get_widget_key(annot, False) == name
+    ]
+
+
+# a flag that no property changes, which a change keeps
+OTHER_FLAG = 1 << 22
+FLAG_PROPERTIES = [
+    ("readonly", READ_ONLY),
+    ("required", REQUIRED),
+    ("multiline", MULTILINE),
+    ("comb", COMB),
+]
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+@pytest.mark.parametrize(("name", "flag"), FLAG_PROPERTIES)
+@pytest.mark.parametrize(
+    ("holders", "is_set"),
+    [
+        ((), False),
+        (("outer",), False),
+        (("outer",), True),
+        (("outer", "inner"), False),
+        (("outer", "inner"), True),
+        (("outer", "inner", "test"), False),
+        (("outer", "inner", "test"), True),
+    ],
+    ids=[
+        "none",
+        "grandparent-unset",
+        "grandparent-set",
+        "parent-unset",
+        "parent-set",
+        "widget-unset",
+        "widget-set",
+    ],
+)
+def test_change_inherited_field_flag(
+    template_stream,
+    holders,
+    is_set,
+    name,
+    flag,
+    use_full_widget_name,
+    assert_widgets_match_output,
+):
+    # each holder has flags; the lowest one has the flag set if is_set, and the
+    # ones above it the other way, so the lowest one takes precedence
+    flags = {
+        holder: OTHER_FLAG | (flag if (holder == holders[-1]) == is_set else 0)
+        for holder in holders
+    }
+    # "test_2" inherits from "inner" and "outer" only
+    shared = is_set if holders[-1:] != ("test",) else not is_set
+    stream = _nest_fields(template_stream, flags, "/Ff")
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    key, other = (
+        ("outer.inner.test", "outer.inner.test_2")
+        if use_full_widget_name
+        else ("test", "test_2")
+    )
+    assert getattr(obj.widgets[key], name) is is_set
+    assert getattr(obj.widgets[other], name) is shared
+
+    setattr(obj.widgets[key], name, not is_set)
+    result = obj.read()
+
+    # only the widget's own field changes, keeping the flags it inherited;
+    # fields shared with "test_2" don't
+    assert _get_nested_entries(result, "/Ff") == {
+        "test": OTHER_FLAG if is_set else flag | (OTHER_FLAG if holders else 0),
+        "test_2": None,
+        "inner": flags.get("inner"),
+        "outer": flags.get("outer"),
+        "/AcroForm": None,
+    }
+    reopened = PdfWrapper(result, use_full_widget_name=use_full_widget_name)
+    assert getattr(reopened.widgets[key], name) is not is_set
+    assert getattr(reopened.widgets[other], name) is shared
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize("own", [False, True], ids=["field", "widget"])
+def test_change_field_flag_of_kid_widget(
+    sample_template_with_full_key, own, assert_widgets_match_output
+):
+    # the widget of "Date mois" has no name, so its parent is the field
+    stream = _set_parent_entry(
+        sample_template_with_full_key,
+        "Date mois",
+        "/Ff",
+        OTHER_FLAG if own else OTHER_FLAG | READ_ONLY,
+    )
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for page in pdf.pages:
+            for annot in page.get("/Annots", []):
+                if "/Parent" in annot and str(annot.Parent.get("/T")) == "Date mois":
+                    if own:
+                        annot.Ff = OTHER_FLAG | READ_ONLY
+                    elif "/Ff" in annot:
+                        del annot["/Ff"]
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert obj.widgets["Date mois"].readonly
+    obj.widgets["Date mois"].readonly = False
+    widget = _find_widget(obj.read(), "Date mois")
+
+    # the flags that were found change
+    assert widget.get("/Ff") == (OTHER_FLAG if own else None)
+    assert widget["/Parent"].get_object()["/Ff"] == OTHER_FLAG
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(("name", "flag"), FLAG_PROPERTIES)
+def test_change_field_flag_with_parent_cycle(
+    template_stream, name, flag, assert_widgets_match_output
+):
+    obj = PdfWrapper(_with_parent_cycle(template_stream, "test"))
+    # the cycle is reached before any flags, which read as unset
+    assert getattr(obj.widgets["test"], name) is False
+    original = obj.read()
+    # applied before the failing change, and discarded with it
+    obj.widgets["test"].alignment = 2
+    setattr(obj.widgets["test"], name, True)
+
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
+        obj.read()
+
+    assert obj.widgets["test"].alignment is None
+    assert getattr(obj.widgets["test"], name) is False
+    assert not obj.widgets["test"].hooks_to_trigger
+    assert obj.read() == original
+    assert_widgets_match_output(obj)
+
+    # the field's own flags are found before the cycle
+    with Pdf.open(BytesIO(original)) as pdf:
+        _get_field(pdf, "test").Ff = flag
+        obj = PdfWrapper(_save(pdf))
+    assert getattr(obj.widgets["test"], name) is True
+    setattr(obj.widgets["test"], name, False)
+
+    assert _find_widget(obj.read(), "test")["/Ff"] == 0
+
+
+def test_fill_readonly_with_parent_cycle(template_stream):
+    obj = PdfWrapper(_with_parent_cycle(template_stream, "test"))
+    original = obj.read()
+
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
+        obj.fill({"test": "foo", "test_2": "bar"}, readonly=True)
+
+    assert obj.read() == original
+    assert obj.widgets["test"].value is None
+    assert obj.widgets["test_2"].value is None
+    assert obj.widgets["test_2"].readonly is False
+
+
+@pytest.mark.parametrize(
+    ("value", "error"),
+    [(String(""), ValueError), (Array([]), TypeError), (Dictionary({}), TypeError)],
+    ids=["string", "array", "dictionary"],
+)
+def test_reject_field_flags_that_are_not_a_number(template_stream, value, error):
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        _get_field(pdf, "test").Ff = value
+        stream = _save(pdf)
+
+    # they aren't read as no flags
+    with pytest.raises(error):
+        PdfWrapper(stream)
+
+    # nor overwritten by a change
+    widget = _find_widget(stream, "test")
+    with pytest.raises(error):
+        update_field_readonly(widget, True)
+    assert _find_widget(stream, "test")["/Ff"] == widget["/Ff"]
+
+
+def test_change_null_field_flags(template_stream, assert_widgets_match_output):
+    writer = PdfWriter(BytesIO(template_stream))
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "test":
+            annot[NameObject("/Ff")] = NullObject()
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    # a null /Ff is absent, so the field has no flags
+    obj = PdfWrapper(stream)
+    assert obj.widgets["test"].readonly is False
+    obj.widgets["test"].readonly = True
+
+    assert _find_widget(obj.read(), "test")["/Ff"] == READ_ONLY
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(
+    ("name", "flag"), [("readonly", READ_ONLY), ("required", REQUIRED)]
+)
+@pytest.mark.parametrize("selected", [None, 0, 1])
+def test_change_flag_of_radio_group_with_inherited_radio_flag(
+    template_with_radiobutton_stream, name, flag, selected, assert_widgets_match_output
+):
+    # "radio_1" is a kid of "outer", which sets its radio flag, and its /DV is
+    # /Off, as a checkbox's can be
+    with Pdf.open(BytesIO(template_with_radiobutton_stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        radio = _get_field(pdf, "radio_1")
+        outer = pdf.make_indirect(
+            Dictionary({"/T": String("outer"), "/Kids": Array([radio]), "/Ff": RADIO})
+        )
+        radio.Parent = outer
+        del radio["/Ff"]
+        radio.DV = Name.Off
+        if selected is not None:
+            radio.V = Name(f"/{selected}")
+            radio.Kids[selected].AS = Name(f"/{selected}")
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in fields if field != radio] + [outer]
+        )
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert isinstance(obj.widgets["radio_1"], Radio)
+    assert obj.widgets["radio_1"].value == selected
+    setattr(obj.widgets["radio_1"], name, True)
+    result = obj.read()
+
+    # the flag change keeps the widget a radio group with the same value
+    reopened = PdfWrapper(result).widgets["radio_1"]
+    assert isinstance(reopened, Radio)
+    assert reopened.value == selected
+    assert getattr(reopened, name) is True
+    # the inherited radio flag is copied to the field's own flags
+    field = _find_widget(result, "radio_1")["/Parent"].get_object()
+    assert field["/Ff"] == RADIO | flag
+    assert field["/Parent"].get_object()["/Ff"] == RADIO
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize("local", [0, 1], ids=["first", "last"])
+def test_radio_option_with_own_field_flags(
+    template_with_radiobutton_stream, local, assert_widgets_match_output
+):
+    # one option of "radio_1" has flags of its own, without the radio flag that
+    # its field sets, and the field's /DV is /Off, as a checkbox's can be
+    with Pdf.open(BytesIO(template_with_radiobutton_stream)) as pdf:
+        radio = _get_field(pdf, "radio_1")
+        radio.DV = Name.Off
+        radio.Kids[local].Ff = READ_ONLY
+        stream = _save(pdf)
+
+    # every option is classified by its field's flags, whichever comes first
+    obj = PdfWrapper(stream)
+    assert isinstance(obj.widgets["radio_1"], Radio)
+    assert obj.widgets["radio_1"].number_of_options == 2
+
+    obj.widgets["radio_1"].required = True
+    reopened = PdfWrapper(obj.read()).widgets["radio_1"]
+    assert isinstance(reopened, Radio)
+    assert reopened.number_of_options == 2
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize("rebuild", [False, True], ids=["same", "rebuilt"])
+@pytest.mark.parametrize("separate", [False, True], ids=["merged", "separate"])
+def test_fill_checkbox_with_own_on_state_again(template_stream, separate, rebuild):
+    # "check" is unchecked, and its on state is /Custom rather than /Yes; with
+    # separate, its widget is the kid of a field whose /DV is /Off
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        check = _get_field(pdf, "check")
+        _set_on_state(check)
+        check.AS = Name.Off
+        check.V = Name.Off
+        check.Ff = 0
+        if separate:
+            field = pdf.make_indirect(
+                Dictionary(
+                    {
+                        "/T": String("check"),
+                        "/FT": Name.Btn,
+                        "/Ff": 0,
+                        "/DV": Name.Off,
+                        "/Kids": Array([check]),
+                    }
+                )
+            )
+            for entry in ("/T", "/FT", "/Ff"):
+                del check[entry]
+            check.Parent = field
+            pdf.Root.AcroForm.Fields = Array(
+                [each for each in fields if each != check] + [field]
+            )
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    obj.fill({"check": True})
+    widget = _find_widget(obj.read(), "check")
+    assert (widget["/AS"], widget["/V"]) == ("/Custom", "/Custom")
+    # it is still a checkbox when the PDF is read again
+    reopened = PdfWrapper(obj.read()).widgets["check"]
+    assert type(reopened) is Checkbox
+    assert reopened.value is True
+
+    # the checked state doesn't stop the checkbox from being filled again
+    if rebuild:
+        obj.remove_fields(["absent"])
+    obj.fill({"check": False})
+    widget = _find_widget(obj.read(), "check")
+    assert (widget["/AS"], widget["/V"]) == ("/Off", "/Off")
+    assert obj.widgets["check"].value is False
+
+
+@pytest.mark.parametrize("state", ["/Standby", "/Off"])
+def test_pushbutton_is_not_a_checkbox(template_stream, state):
+    # "check" becomes the pushbutton "action", which has appearance states but
+    # no value
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        action = _get_field(pdf, "check")
+        action.T = String("action")
+        action.Ff = PUSHBUTTON
+        action.AP = Dictionary(
+            N=Dictionary({"/Activate": action.AP.N.Yes, "/Standby": action.AP.N.Off})
+        )
+        action.AS = Name(state)
+        for entry in ("/V", "/DV"):
+            if entry in action:
+                del action[entry]
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert "action" not in obj.widgets
+
+    # filling leaves it unchanged
+    widget = _find_widget(obj.fill({"action": True}).read(), "action")
+    assert widget["/AS"] == state
+    assert "/V" not in widget
+
+
+def _checkbox_field(stream, states, value):
+    # the widgets of "check", and of "check_2" with two states, become kids of
+    # a field "check" with the value, and none has a value of its own; a widget
+    # is on when the value names its state
+    with Pdf.open(BytesIO(stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        names = ["check", "check_2"][: len(states)]
+        kids = [_get_field(pdf, name) for name in names]
+        field = pdf.make_indirect(
+            Dictionary(
+                {
+                    "/T": String("check"),
+                    "/FT": Name.Btn,
+                    "/Ff": 0,
+                    "/DV": Name.Off,
+                    "/V": Name(value),
+                    "/Kids": Array(kids),
+                }
+            )
+        )
+        for kid, state in zip(kids, states, strict=True):
+            for entry in ("/T", "/FT", "/Ff", "/V"):
+                if entry in kid:
+                    del kid[entry]
+            kid.Parent = field
+            _set_on_state(kid, state)
+            kid.AS = Name(state) if state == value else Name.Off
+        pdf.Root.AcroForm.Fields = Array(
+            [each for each in fields if each not in kids] + [field]
+        )
+        return _save(pdf)
+
+
+def _get_checkbox_field_states(stream):
+    # the /AS and /V of each widget of the field "check", and the field's /V
+    field = _find_widget(stream, "check")["/Parent"].get_object()
+    return _get_widget_states(stream, "check") + [field.get("/V")]
+
+
+@pytest.mark.parametrize(
+    ("states", "value", "expected"),
+    [
+        (["/Custom"], "/Custom", True),
+        (["/A", "/B"], "/B", True),
+        (["/A", "/B"], "/A", None),
+        (["/A", "/B"], "/Off", None),
+    ],
+    ids=["one", "last", "other", "off"],
+)
+def test_checkbox_value_of_its_field(template_stream, states, value, expected):
+    stream = _checkbox_field(template_stream, states, value)
+
+    # the field's value counts for a widget whose state it names, here the
+    # last one, which "check" gives access to
+    obj = PdfWrapper(stream)
+    assert type(obj.widgets["check"]) is Checkbox
+    assert obj.data["check"] is expected
+
+
+def test_fill_keeps_checkboxes_not_supplied(template_stream, pdf_samples):
+    # "check" reads True from the field's value, which names its last widget's
+    # state, while its first widget is off
+    stream = _checkbox_field(template_stream, ["/A", "/B"], "/B")
+    obj = PdfWrapper(stream)
+    assert obj.widgets["check"].value is True
+    expected = [["/Off", None], ["/B", None], "/B"]
+
+    # a value that wasn't supplied and is still the one read isn't written
+    assert _get_checkbox_field_states(obj.fill({}).read()) == expected
+    assert _get_checkbox_field_states(obj.fill({"test": "foo"}).read()) == expected
+
+    # one that was assigned since is
+    obj.widgets["check"].value = False
+    assert _get_checkbox_field_states(obj.fill({}).read()) == [
+        ["/Off", "/Off"],
+        ["/Off", "/Off"],
+        "/B",
+    ]
+
+    # two checkboxes are named "c1_3[1]"; the later, checked one gives the
+    # name its value, and the other stays unchecked
+    path = os.path.join(pdf_samples, "scenario", "issues", "PPF-939_expected_2.pdf")
+    with open(path, "rb") as f:
+        sample = f.read()
+    filled = PdfWrapper(sample).fill({}).read()
+    for stream in (sample, filled):
+        assert _get_widget_states(stream, "c1_3[1]") == [["/Off", "/Off"], ["/5", "/5"]]
+
+
+def test_fill_checkbox_back_to_value_read(template_stream):
+    # "check" is checked
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        check = _get_field(pdf, "check")
+        check.AS = Name.Yes
+        check.V = Name.Yes
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    obj.fill({"check": False})
+    widget = _find_widget(obj.read(), "check")
+    assert (widget["/AS"], widget["/V"]) == ("/Off", "/Off")
+
+    # the value read is assigned again after the PDF changed, so it is written
+    obj.widgets["check"].value = True
+    obj.fill({})
+    widget = _find_widget(obj.read(), "check")
+    assert (widget["/AS"], widget["/V"]) == ("/Yes", "/Yes")
+
+
+def _name_checkbox_like_radio_group(
+    stream,
+    position,
+    radio_flag_on="field",
+    checkbox_state=None,
+    selected=None,
+    radio_name="group",
+):
+    # the checkbox "check" and the radio group "outer.group" both get the short
+    # name "group", unless the radio group is given another, and the radio
+    # group's /DV is /Off; with a checkbox_state, the checkbox's on state is
+    # /Custom, and its /AS and /V are checkbox_state, or absent if it is empty,
+    # which makes it match no widget type
+    with Pdf.open(BytesIO(stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        check = _get_field(pdf, "check")
+        radio = _get_field(pdf, "radio_1")
+        check.T = String("group")
+        radio.T = String(radio_name)
+        if checkbox_state is not None:
+            _set_on_state(check)
+            check.Ff = 0
+            for entry in ("/AS", "/V"):
+                if checkbox_state:
+                    check[entry] = Name(checkbox_state)
+                elif entry in check:
+                    del check[entry]
+        outer = pdf.make_indirect(
+            Dictionary({"/T": String("outer"), "/Kids": Array([radio])})
+        )
+        radio.Parent = outer
+        if radio_flag_on == "outer":
+            outer.Ff = RADIO
+            del radio["/Ff"]
+        radio.DV = Name.Off
+        if selected is not None:
+            radio.V = Name(f"/{selected}")
+            radio.Kids[selected].AS = Name(f"/{selected}")
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in fields if field != radio] + [outer]
+        )
+        # the checkbox comes before, between, or after the radio group's options
+        options = list(radio.Kids)
+        others = [
+            annot
+            for annot in pdf.pages[0].Annots
+            if annot != check and annot not in options
+        ]
+        pdf.pages[0].Annots = Array(
+            {
+                "first": [check, *options],
+                "between": [options[0], check, options[1]],
+                "last": [*options, check],
+            }[position]
+            + others
+        )
+        return _save(pdf)
+
+
+def _get_checkbox_and_radio_states(stream):
+    # the /AS and /V of the checkbox "group", and the /AS of each option and
+    # the /V of the radio group "outer.group"
+    states = {"outer.group": []}
+    for annot in PdfReader(BytesIO(stream)).pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "group":
+            states["group"] = [annot.get("/AS"), annot.get("/V")]
+        elif annot.get("/Parent", {}).get("/T") == "group":
+            states["outer.group"].append(annot.get("/AS"))
+            states["outer.group /V"] = annot["/Parent"].get("/V")
+
+    return states
+
+
+@pytest.mark.parametrize("radio_flag_on", ["outer", "field"])
+@pytest.mark.parametrize("position", ["first", "between", "last"])
+def test_radio_group_with_short_name_of_another_field(
+    template_with_radiobutton_stream, radio_flag_on, position
+):
+    stream = _name_checkbox_like_radio_group(
+        template_with_radiobutton_stream, position, radio_flag_on
+    )
+
+    # the later field replaces the earlier one, as for any widget, and a radio
+    # group keeps the options before the checkbox
+    radio_last = position != "last"
+    widget = PdfWrapper(stream).widgets["group"]
+    if radio_last:
+        assert isinstance(widget, Radio)
+        assert widget.number_of_options == 2
+    else:
+        assert type(widget) is Checkbox
+
+    # full names tell them apart
+    widgets = PdfWrapper(stream, use_full_widget_name=True).widgets
+    assert type(widgets["group"]) is Checkbox
+    assert isinstance(widgets["outer.group"], Radio)
+    assert widgets["outer.group"].number_of_options == 2
+
+    # filling the name changes only the field it gives access to
+    for value in [0, 1] if radio_last else [True]:
+        filled = PdfWrapper(stream).fill({"group": value}).read()
+        assert _get_checkbox_and_radio_states(filled) == (
+            {
+                "group": ["/Off", None],
+                "outer.group": [
+                    "/0" if value == 0 else "/Off",
+                    "/1" if value else "/Off",
+                ],
+                "outer.group /V": f"/{value}",
+            }
+            if radio_last
+            else {
+                "group": ["/Yes", "/Yes"],
+                "outer.group": ["/Off", "/Off"],
+                "outer.group /V": None,
+            }
+        )
+        widgets = PdfWrapper(filled, use_full_widget_name=True).widgets
+        assert widgets["outer.group"].value == (value if radio_last else None)
+        assert widgets["group"].value is (None if radio_last else True)
+
+
+@pytest.mark.parametrize(
+    "checkbox_state", ["/Custom", ""], ids=["checked", "unrecognized"]
+)
+def test_fill_radio_group_with_other_field_of_its_name(
+    template_with_radiobutton_stream, checkbox_state
+):
+    # the checkbox comes first, checked with its own on state, or without an
+    # appearance state
+    stream = _name_checkbox_like_radio_group(
+        template_with_radiobutton_stream, "first", checkbox_state=checkbox_state
+    )
+    obj = PdfWrapper(stream)
+    assert obj.widgets["group"].number_of_options == 2
+
+    # it doesn't take an option index from the radio group
+    state = checkbox_state or None
+    assert _get_checkbox_and_radio_states(obj.fill({"group": 0}).read()) == {
+        "group": [state, state],
+        "outer.group": ["/0", "/Off"],
+        "outer.group /V": "/0",
+    }
+
+
+@pytest.mark.parametrize(
+    "other_state", ["/Custom", ""], ids=["checked", "unrecognized"]
+)
+def test_fill_checkboxes_with_one_short_name(template_stream, other_state):
+    # "check_2" becomes "outer.check", which shares the short name of the
+    # checkbox "check", and has its own on state; it is checked, or has no
+    # appearance state, which makes it match no widget type
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        other = _get_field(pdf, "check_2")
+        other.T = String("check")
+        _set_on_state(other)
+        for entry in ("/AS", "/V"):
+            if other_state:
+                other[entry] = Name(other_state)
+            elif entry in other:
+                del other[entry]
+        outer = pdf.make_indirect(
+            Dictionary({"/T": String("outer"), "/Kids": Array([other])})
+        )
+        other.Parent = outer
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in fields if field != other] + [outer]
+        )
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert type(obj.widgets["check"]) is Checkbox
+    filled = obj.fill({"check": False}).read()
+
+    # filling the name changes both, as before; "outer.check" is on page 2
+    assert _get_widget_states(filled, "check") == [["/Off", "/Off"], ["/Off", "/Off"]]
+
+
+def test_fill_checkbox_with_short_name_of_pushbutton(template_stream):
+    # the widget of "test" becomes the only widget of the pushbutton
+    # "outer.action", which comes before the checkbox "check", renamed "action"
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        widget = _get_field(pdf, "test")
+        check = _get_field(pdf, "check")
+        check.T = String("action")
+        outer = pdf.make_indirect(Dictionary({"/T": String("outer")}))
+        action = pdf.make_indirect(
+            Dictionary(
+                {
+                    "/T": String("action"),
+                    "/FT": Name.Btn,
+                    "/Ff": PUSHBUTTON,
+                    "/Kids": Array([widget]),
+                    "/Parent": outer,
+                }
+            )
+        )
+        outer.Kids = Array([action])
+        for entry in ("/T", "/FT", "/V", "/DA", "/Ff", "/MaxLen", "/Q"):
+            if entry in widget:
+                del widget[entry]
+        widget.Parent = action
+        widget.AP = Dictionary(
+            N=Dictionary({"/Off": check.AP.N.Off, "/Activate": check.AP.N.Yes})
+        )
+        widget.AS = Name.Off
+        pdf.Root.AcroForm.Fields = Array(
+            [each for each in fields if each != widget] + [outer]
+        )
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert type(obj.widgets["action"]) is Checkbox
+    filled = obj.fill({"action": True}).read()
+
+    # the pushbutton keeps having no value
+    assert _get_widget_states(filled, "action") == [["/Off", None], ["/Yes", "/Yes"]]
+
+
+@pytest.mark.parametrize("operation", ["rebuild", "copy"])
+def test_fill_checkbox_with_short_name_of_radio_group_again(
+    template_with_radiobutton_stream, operation
+):
+    # the unchecked checkbox comes last, and the radio group's second option
+    # is selected
+    stream = _name_checkbox_like_radio_group(
+        template_with_radiobutton_stream, "last", checkbox_state="/Off", selected=1
+    )
+    obj = PdfWrapper(stream)
+    obj.fill({"group": True})
+    # the checkbox that is kept, or copied, still fills only itself
+    if operation == "rebuild":
+        obj.remove_fields(["absent"])
+    else:
+        obj = PdfArray([obj]).merge()
+    assert type(obj.widgets["group"]) is Checkbox
+
+    assert _get_checkbox_and_radio_states(obj.fill({"group": False}).read()) == {
+        "group": ["/Off", "/Off"],
+        "outer.group": ["/Off", "/1"],
+        "outer.group /V": "/1",
+    }
+
+
+def test_fill_checkbox_after_rename_gives_radio_group_its_name(
+    template_with_radiobutton_stream,
+):
+    # the radio group "outer.radio" comes before the checkbox "group"
+    stream = _name_checkbox_like_radio_group(
+        template_with_radiobutton_stream, "last", radio_name="radio"
+    )
+    obj = PdfWrapper(stream)
+    obj.update_widget_key("radio", "group").commit_widget_key_updates()
+    assert type(obj.widgets["group"]) is Checkbox
+
+    # the checkbox kept under the name fills only itself, as after reopening
+    expected = {
+        "group": ["/Yes", "/Yes"],
+        "outer.group": ["/Off", "/Off"],
+        "outer.group /V": None,
+    }
+    renamed = obj.read()
+    assert _get_checkbox_and_radio_states(obj.fill({"group": True}).read()) == expected
+    filled = PdfWrapper(renamed).fill({"group": True}).read()
+    assert _get_checkbox_and_radio_states(filled) == expected

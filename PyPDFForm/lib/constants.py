@@ -181,6 +181,7 @@ READ_ONLY = 1 << 0
 REQUIRED = 1 << 1
 MULTILINE = 1 << 12
 RADIO = 1 << 15
+PUSHBUTTON = 1 << 16
 COMB = 1 << 24
 
 # annotation flag bits
@@ -274,8 +275,6 @@ IMAGE_IMPORT_JAVASCRIPT = "event.target.buttonImportIcon();"
 
 COORDINATE_GRID_FONT_SIZE_MARGIN_RATIO = DEFAULT_FONT_SIZE / 100
 UNIQUE_SUFFIX_LENGTH = 20
-
-SLASH = "/"
 
 # blank page
 BLANK_PAGE_DEFAULT_WIDTH = 612

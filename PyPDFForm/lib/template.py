@@ -24,6 +24,7 @@ from pypdf.generic import (
 
 from .annotations import AnnotationTypes, LinkAnnotation
 from .constants import (
+    AS,
     COMB,
     JS,
     MULTILINE,
@@ -32,6 +33,7 @@ from .constants import (
     Annots,
     Dest,
     JavaScript,
+    Off,
     OpenAction,
     S,
     Title,
@@ -55,6 +57,7 @@ from .patterns import (
     get_text_field_max_length,
     get_text_value,
     get_widget_key,
+    is_pushbutton,
     update_annotation_name,
 )
 from .utils import extract_widget_property, find_pattern_match
@@ -226,10 +229,11 @@ def _build_widget_cache(
         Dict[str, WIDGET_TYPES]: Cached widget prototypes keyed by widget name.
     """
     results = {}
+    radios = {}
 
     for page_num, widgets in get_widgets_by_page(pdf_stream).items():
         for widget in widgets:
-            _process_widget(widget, page_num, use_full_widget_name, results)
+            _process_widget(widget, page_num, use_full_widget_name, results, radios)
 
     return results
 
@@ -239,6 +243,7 @@ def _process_widget(
     page_number: int,
     use_full_widget_name: bool,
     results: Dict[str, WIDGET_TYPES],
+    radios: Dict[str, Radio],
 ) -> None:
     """
     Processes a single widget and adds it to the results dictionary.
@@ -246,13 +251,16 @@ def _process_widget(
     Common geometry and flags are populated for every recognized widget. Text,
     checkbox, dropdown, and radio widgets then get type-specific state. Radio
     annotations that share a key are aggregated into one middleware object with
-    per-option geometry and a selected option index.
+    per-option geometry and a selected option index. A widget replaces an
+    earlier one with its key, so the key gives access to the last one.
 
     Args:
         widget (dict): The widget dictionary from the PDF.
         page_number (int): The 1-indexed page number the widget appears on.
         use_full_widget_name (bool): Whether to use the full widget name.
         results (Dict[str, WIDGET_TYPES]): The dictionary of widgets being built.
+        radios (Dict[str, Radio]): The radio groups being built, by key, kept
+            when a widget of another type replaces them in `results`.
     """
     key = get_widget_key(widget, use_full_widget_name)
     _widget = construct_widget(widget, key)
@@ -264,12 +272,15 @@ def _process_widget(
 
         if type(_widget) is Checkbox:
             _widget.value = get_checkbox_value(widget)
+            # the value the PDF holds, which filling doesn't write again
+            _widget.__dict__["_pdf_value"] = _widget.value
 
         if isinstance(_widget, Dropdown):
             _populate_dropdown_properties(widget, _widget)
 
         if isinstance(_widget, Radio):
-            _handle_radio_widget(widget, key, _widget, results)
+            _handle_radio_widget(widget, key, _widget, radios)
+            results[key] = radios[key]
         else:
             results[key] = _widget
 
@@ -342,7 +353,7 @@ def _populate_dropdown_properties(widget: dict, _widget: Dropdown) -> None:
 
 
 def _handle_radio_widget(
-    widget: dict, key: str, _widget: Radio, results: Dict[str, WIDGET_TYPES]
+    widget: dict, key: str, _widget: Radio, radios: Dict[str, Radio]
 ) -> None:
     """
     Handles the logic for radio widgets, including aggregating multiple options.
@@ -350,24 +361,26 @@ def _handle_radio_widget(
     Each radio annotation contributes one option to a shared `Radio` object. The
     method stores per-option rectangles as lists, increments the option count for
     schema generation, and records the selected option index when the annotation
-    is currently selected.
+    is currently selected. The group is kept by key apart from the other
+    widgets, so options separated by a widget of another type with the same
+    key, such as a checkbox with the same short name, stay in one group.
 
     Args:
         widget (dict): The widget dictionary from the PDF.
         key (str): The widget key.
         _widget (Radio): The radio widget object.
-        results (Dict[str, WIDGET_TYPES]): The dictionary of widgets being built.
+        radios (Dict[str, Radio]): The radio groups being built, by key.
     """
     field_rect = get_field_rect(widget)
 
-    if key not in results:
+    if key not in radios:
         _widget.__dict__["x"] = []
         _widget.__dict__["y"] = []
         _widget.__dict__["width"] = []
         _widget.__dict__["height"] = []
-        results[key] = _widget
+        radios[key] = _widget
 
-    radio = cast(Radio, results[key])
+    radio = radios[key]
     # for schema
     radio.number_of_options += 1
 
@@ -432,12 +445,43 @@ def _get_widgets_on_page(page) -> List[dict]:
     return result
 
 
+def get_widget_type(widget: dict) -> type | None:
+    """
+    Gets the middleware type of a widget annotation from its fixed entries.
+
+    The type is the one whose patterns the annotation satisfies first. A
+    button's appearance state (`/AS`) is read as `/Off`, since filling changes
+    it: a checked checkbox whose on state isn't `/Yes` is still a checkbox, and
+    a field keeps its type as it is filled, rebuilt, or copied. A pushbutton,
+    whose field sets the Pushbutton flag, has appearance states but no value,
+    so it is not a checkbox or radio button; image fields, which are
+    pushbuttons, are found by their action first.
+
+    Args:
+        widget (dict): The widget annotation dictionary.
+
+    Returns:
+        type | None: The middleware type, such as `Checkbox`, or None if the
+            annotation is not a supported widget.
+    """
+    if AS in widget:
+        widget = DictionaryObject(widget)
+        widget[NameObject(AS)] = NameObject(Off)
+
+    for patterns, _type in WIDGET_TYPE_PATTERNS:
+        if all(find_pattern_match(pattern, widget) for pattern in patterns):
+            if issubclass(_type, Checkbox) and is_pushbutton(widget):
+                return None
+            return _type
+
+    return None
+
+
 def _is_widget(widget: dict) -> bool:
     """
     Checks if a dictionary represents a valid widget.
 
-    A widget is considered valid when it satisfies all patterns for one of the
-    supported middleware widget types.
+    A widget is considered valid when `get_widget_type` finds its type.
 
     Args:
         widget (dict): The dictionary to check.
@@ -445,22 +489,15 @@ def _is_widget(widget: dict) -> bool:
     Returns:
         bool: True if the dictionary represents a widget, False otherwise.
     """
-    for each in WIDGET_TYPE_PATTERNS:
-        patterns = each[0]
-        check = True
-        for pattern in patterns:
-            check = check and find_pattern_match(pattern, widget)
-        if check:
-            return True
-    return False
+    return get_widget_type(widget) is not None
 
 
 def construct_widget(widget: dict, key: str) -> WIDGET_TYPES | None:
     """
     Constructs a widget object based on the widget dictionary and key.
 
-    This function determines the type of widget based on predefined patterns
-    and constructs the corresponding middleware widget object using the supplied
+    This function determines the type of widget with `get_widget_type` and
+    constructs the corresponding middleware widget object using the supplied
     key as its name.
 
     Args:
@@ -471,16 +508,8 @@ def construct_widget(widget: dict, key: str) -> WIDGET_TYPES | None:
         WIDGET_TYPES | None: The constructed widget object, or None
             if the widget type is not recognized.
     """
-    result = None
-    for each in WIDGET_TYPE_PATTERNS:
-        patterns, _type = each
-        check = True
-        for pattern in patterns:
-            check = check and find_pattern_match(pattern, widget)
-        if check:
-            result = _type(key)
-            break
-    return result
+    _type = get_widget_type(widget)
+    return _type(key) if _type is not None else None
 
 
 def _group_annotations_by_page(

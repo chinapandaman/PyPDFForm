@@ -61,6 +61,7 @@ from .font import (
     validate_font,
 )
 from .hooks import trigger_widget_hooks
+from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.text import Text
 from .template import (
@@ -922,8 +923,13 @@ class PdfWrapper:
         """
         Fills the PDF form with data from a dictionary.
 
-        Only keys that already exist in `self.widgets` are applied. Filling delegates
-        to the lower-level filler, which draws image/signature values onto the page
+        Only keys that already exist in `self.widgets` are applied. A field that
+        shares a key with a widget of another type, such as a checkbox and a radio
+        group with the same short name, keeps its value; its widgets are still made
+        read-only with `readonly=True`. A radio group fills only its own options.
+        A checkbox whose value isn't supplied, and is still the one the PDF holds,
+        as read or last filled, isn't written again. Filling delegates to the
+        lower-level filler, which draws image/signature values onto the page
         and removes only the consumed widgets. Other annotations and unfilled
         signature/image fields are preserved. After image drawing, the widget cache
         is refreshed to remove consumed fields while retaining the middleware objects
@@ -948,8 +954,10 @@ class PdfWrapper:
 
         Raises:
             TypeError: If a keyword argument other than `readonly` is passed. Nothing is changed.
-            ValueError: If an integer dropdown or radio index is out of range, or a
-                dropdown string matches options that differ. Nothing is changed.
+            ValueError: If an integer dropdown or radio index is out of range, a
+                dropdown string matches options that differ, or `readonly` is
+                True and the parent fields of a field form a cycle. Nothing is
+                changed.
         """
 
         reject_unsupported_kwargs(self, "fill", kwargs, ["readonly"])
@@ -972,12 +980,17 @@ class PdfWrapper:
                 self.widgets,
                 need_appearances=getattr(self, "need_appearances"),
                 use_full_widget_name=getattr(self, "use_full_widget_name"),
+                supplied=set(data),
                 readonly=readonly,
             )
 
             self._stream = (
                 image_drawn_stream if image_drawn_stream is not None else filled_stream
             )
+            for widget in self.widgets.values():
+                if type(widget) is Checkbox and widget.value is not None:
+                    # the PDF now holds it, so the next fill doesn't write it again
+                    widget.__dict__["_pdf_value"] = widget.value
             if image_drawn_stream is not None:
                 self._init_helper()
 
