@@ -181,6 +181,7 @@ READ_ONLY = 1 << 0
 REQUIRED = 1 << 1
 MULTILINE = 1 << 12
 RADIO = 1 << 15
+PUSHBUTTON = 1 << 16
 COMB = 1 << 24
 
 # annotation flag bits

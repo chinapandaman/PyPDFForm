@@ -236,7 +236,11 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     is not `/Off`, it means the checkbox is checked, and True is returned.
     Otherwise, if the value is `/Off` or not present, None is returned rather
     than False so unspecified fill data can be distinguished from an explicit
-    unchecked value.
+    unchecked value. A widget without a value of its own, such as a separate
+    widget of its field, takes its field's value, inherited from the fields
+    above it, when that names one of the widget's appearance states, since
+    other widgets of the field can have other on states. A `/Parent` cycle
+    before a value is found reads as no value.
 
     Args:
         annot (DictionaryObject): The checkbox annotation dictionary.
@@ -244,7 +248,15 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     Returns:
         bool | None: True if the checkbox is checked, None otherwise.
     """
-    return True if annot.get(V, Off) != Off else None
+    value = annot.get(V)
+    if value is None:
+        value = _get_inherited_value(annot, V)
+        appearance = get_dictionary(annot, AP)
+        states = get_dictionary(appearance, N) if appearance is not None else None
+        if not isinstance(value, NameObject) or states is None or value not in states:
+            value = None
+
+    return True if value not in (None, Off) else None
 
 
 def update_radio_value(annot: DictionaryObject) -> None:
@@ -583,9 +595,25 @@ def check_field_flag(widget: DictionaryObject, flag: int) -> bool:
     Returns:
         bool: True if the flag is set.
     """
-    try:
-        flags = resolve_inherited_entry(widget, Ff, None).value
-    except ValueError:
-        return False
-
+    flags = _get_inherited_value(widget, Ff)
     return bool(int(flags if flags is not None else 0) & flag)
+
+
+def _get_inherited_value(widget: DictionaryObject, key: str) -> Any:
+    """
+    Reads an inheritable entry of a widget without an AcroForm default.
+
+    A `/Parent` cycle reached before the entry is found reads as no entry, so
+    a PDF with one can still be opened; changing such an entry raises instead.
+
+    Args:
+        widget (DictionaryObject): The widget annotation.
+        key (str): The entry to read, such as `/Ff`.
+
+    Returns:
+        Any: The resolved value, or None when nothing sets the entry.
+    """
+    try:
+        return resolve_inherited_entry(widget, key, None).value
+    except ValueError:
+        return None

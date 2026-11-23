@@ -28,6 +28,7 @@ from .constants import (
     COMB,
     JS,
     MULTILINE,
+    PUSHBUTTON,
     READ_ONLY,
     REQUIRED,
     Annots,
@@ -35,7 +36,9 @@ from .constants import (
     JavaScript,
     Off,
     OpenAction,
+    Parent,
     S,
+    T,
     Title,
 )
 from .middleware import WIDGET_TYPES
@@ -59,7 +62,7 @@ from .patterns import (
     get_widget_key,
     update_annotation_name,
 )
-from .utils import extract_widget_property, find_pattern_match
+from .utils import extract_widget_property, find_pattern_match, get_dictionary
 
 
 def get_metadata(pdf: bytes) -> dict:
@@ -449,7 +452,10 @@ def get_widget_type(widget: dict) -> type | None:
     The type is the one whose patterns the annotation satisfies first. A
     button's appearance state (`/AS`) is read as `/Off`, since filling changes
     it: a checked checkbox whose on state isn't `/Yes` is still a checkbox, and
-    a field keeps its type as it is filled, rebuilt, or copied.
+    a field keeps its type as it is filled, rebuilt, or copied. A pushbutton,
+    whose field sets the Pushbutton flag, has appearance states but no value,
+    so it is not a checkbox or radio button; image fields, which are
+    pushbuttons, are found by their action first.
 
     Args:
         widget (dict): The widget annotation dictionary.
@@ -464,9 +470,29 @@ def get_widget_type(widget: dict) -> type | None:
 
     for patterns, _type in WIDGET_TYPE_PATTERNS:
         if all(find_pattern_match(pattern, widget) for pattern in patterns):
+            if issubclass(_type, Checkbox) and _is_pushbutton(widget):
+                return None
             return _type
 
     return None
+
+
+def _is_pushbutton(widget: dict) -> bool:
+    """
+    Checks whether the field of a widget annotation is a pushbutton.
+
+    The flag is read from the widget when it is its own field, which has a
+    name (`T`), and otherwise from its parent field and the fields above it,
+    as the radio flag is, so every widget of a field has the same type.
+
+    Args:
+        widget (dict): The widget annotation dictionary.
+
+    Returns:
+        bool: True if the field sets the Pushbutton flag.
+    """
+    field = widget if T in widget else get_dictionary(widget, Parent) or widget
+    return check_field_flag(field, PUSHBUTTON)
 
 
 def _is_widget(widget: dict) -> bool:
