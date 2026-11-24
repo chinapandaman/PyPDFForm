@@ -537,7 +537,6 @@ def test_dropdown_tutorial(issue_pdf_directory, request, assert_same_pdf):
                 page_number=1,
                 x=100,
                 y=700,
-                font="my_font",
                 font_size=25,
                 font_color=(1, 0, 0),
             ),
@@ -547,7 +546,6 @@ def test_dropdown_tutorial(issue_pdf_directory, request, assert_same_pdf):
                 x=100,
                 y=600,
                 alignment=2,
-                font="my_font",
                 max_length=5,
             ),
             Fields.TextField(
@@ -557,7 +555,6 @@ def test_dropdown_tutorial(issue_pdf_directory, request, assert_same_pdf):
                 y=400,
                 width=200,
                 height=100,
-                font="my_font",
                 multiline=True,
             ),
             Fields.RadioGroup(

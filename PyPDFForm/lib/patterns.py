@@ -22,6 +22,7 @@ from pypdf.generic import (
 from .constants import (
     AP,
     AS,
+    DA,
     DV,
     FT,
     HIDDEN,
@@ -52,6 +53,7 @@ from .constants import (
     Widget,
     Yes,
 )
+from .default_appearance import TextStyle, read_default_appearance
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown, DropdownOption
 from .middleware.image import Image
@@ -446,6 +448,36 @@ def get_text_field_alignment(widget: dict) -> int | None:
             sets one.
     """
     return parse_alignment(_get_inherited_value(widget, Q))
+
+
+def get_text_field_style(
+    widget: dict, acroform: Optional[DictionaryObject]
+) -> TextStyle:
+    """
+    Reads the font, font size, and font color of a text field or dropdown.
+
+    They are read from the default appearance (`/DA`) that a change to them
+    edits: the widget's own, or else the one of the nearest field along its
+    `/Parent` chain, or else the AcroForm's, which is the document's default,
+    as `read_default_appearance` describes. A `/Parent` cycle before a `/DA`
+    is found reads as no `/DA`, so a PDF with one can still be opened;
+    changing the style of such a field raises instead.
+
+    Args:
+        widget (dict): The widget dictionary.
+        acroform (Optional[DictionaryObject]): The AcroForm dictionary, or
+            None when the PDF has none.
+
+    Returns:
+        TextStyle: The font, font size, and font color, each None when the
+            `/DA` doesn't set it.
+    """
+    try:
+        default_appearance = resolve_inherited_entry(widget, DA, acroform).value
+    except ValueError:
+        default_appearance = None
+
+    return read_default_appearance(default_appearance)
 
 
 def parse_max_length(value: Any) -> int | None:

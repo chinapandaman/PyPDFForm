@@ -282,8 +282,8 @@ class Widget:
         A widget rebuilt from the PDF, such as after renaming, takes the value
         of the widget it replaces, since a value assigned without filling is not
         in the PDF yet. It also takes the hooked properties that are not read
-        back from the PDF, such as fonts, sizes, and JavaScript, and the settings
-        in `LOCAL_SETTINGS` that were assigned on the widget. A value of None
+        back from the PDF, such as JavaScript, and the settings in
+        `LOCAL_SETTINGS` that were assigned on the widget. A value of None
         keeps the value read from the PDF. Nothing is copied through hooks, so
         no update is queued again.
 

@@ -62,8 +62,6 @@ from .font import (
 )
 from .hooks import trigger_widget_hooks
 from .middleware.checkbox import Checkbox
-from .middleware.dropdown import Dropdown
-from .middleware.text import Text
 from .template import (
     build_widgets,
     create_annotations,
@@ -780,9 +778,10 @@ class PdfWrapper:
         """
         Reads the PDF stream, triggering widget hooks and updating fonts if necessary.
 
-        This internal method executes queued widget hooks. When a pending font hook
-        exists, user-facing registered font names are mapped to their internal PDF
-        resource names before hooks are applied. Applying hooks updates the wrapper's
+        This internal method executes queued widget hooks. Fonts being changed to a
+        registered font or a font of the PDF are mapped from their user-facing names
+        to their internal PDF resource names before hooks are applied, both in the
+        hook queues and on the widgets. Applying hooks updates the wrapper's
         stored stream and clears each widget's hook queue. If a hook raises, every
         widget's queued hooks are discarded and their properties are restored to
         their committed values, so the stream and widgets are unchanged and later
@@ -809,14 +808,31 @@ class PdfWrapper:
 
             if has_font_hook:
                 available_fonts = self._ensure_available_fonts_loaded()
-                for widget in self.widgets.values():
-                    if (
-                        isinstance(widget, (Text, Dropdown))
-                        and widget.font not in available_fonts.values()
-                        and widget.font in available_fonts
+
+                def to_resource(font: Any) -> Any:
+                    # from `new_font` to `/F1`
+                    if font in available_fonts and font not in available_fonts.values():
+                        return available_fonts[font]
+                    return font
+
+                # only fonts being changed are translated, in the queue and on
+                # the widget, so a font read from the PDF that has the name of
+                # a registered font, such as `Courier`, is left as it is
+                for widget in widgets_with_hooks:
+                    if any(
+                        hook == "update_text_field_font"
+                        for hook, _ in widget.hooks_to_trigger
                     ):
-                        # from `new_font` to `/F1`
-                        widget.font = available_fonts.get(widget.font)
+                        widget.hooks_to_trigger = [
+                            (
+                                hook,
+                                to_resource(value)
+                                if hook == "update_text_field_font"
+                                else value,
+                            )
+                            for hook, value in widget.hooks_to_trigger
+                        ]
+                        widget.__dict__["font"] = to_resource(widget.font)
 
             try:
                 self._stream = trigger_widget_hooks(

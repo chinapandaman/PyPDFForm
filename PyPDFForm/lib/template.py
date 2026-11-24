@@ -11,7 +11,7 @@ specific patterns for identifying and constructing different types of widgets.
 from copy import deepcopy
 from functools import lru_cache
 from io import BytesIO
-from typing import Dict, List, cast
+from typing import Dict, List, Optional, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
@@ -30,6 +30,7 @@ from .constants import (
     MULTILINE,
     READ_ONLY,
     REQUIRED,
+    AcroForm,
     Annots,
     Dest,
     JavaScript,
@@ -55,12 +56,13 @@ from .patterns import (
     get_radio_value,
     get_text_field_alignment,
     get_text_field_max_length,
+    get_text_field_style,
     get_text_value,
     get_widget_key,
     is_pushbutton,
     update_annotation_name,
 )
-from .utils import extract_widget_property, find_pattern_match
+from .utils import extract_widget_property, find_pattern_match, get_dictionary
 
 
 def get_metadata(pdf: bytes) -> dict:
@@ -230,10 +232,14 @@ def _build_widget_cache(
     """
     results = {}
     radios = {}
+    reader = PdfReader(BytesIO(pdf_stream))
+    acroform = get_dictionary(reader.root_object, AcroForm)
 
-    for page_num, widgets in get_widgets_by_page(pdf_stream).items():
-        for widget in widgets:
-            _process_widget(widget, page_num, use_full_widget_name, results, radios)
+    for page_num, page in enumerate(reader.pages, start=1):
+        for widget in _get_widgets_on_page(page):
+            _process_widget(
+                widget, page_num, use_full_widget_name, results, radios, acroform
+            )
 
     return results
 
@@ -244,6 +250,7 @@ def _process_widget(
     use_full_widget_name: bool,
     results: Dict[str, WIDGET_TYPES],
     radios: Dict[str, Radio],
+    acroform: Optional[DictionaryObject],
 ) -> None:
     """
     Processes a single widget and adds it to the results dictionary.
@@ -261,11 +268,16 @@ def _process_widget(
         results (Dict[str, WIDGET_TYPES]): The dictionary of widgets being built.
         radios (Dict[str, Radio]): The radio groups being built, by key, kept
             when a widget of another type replaces them in `results`.
+        acroform (Optional[DictionaryObject]): The AcroForm dictionary, whose
+            default appearance text fields and dropdowns can inherit.
     """
     key = get_widget_key(widget, use_full_widget_name)
     _widget = construct_widget(widget, key)
     if _widget is not None:
         _populate_common_properties(widget, page_number, _widget)
+
+        if isinstance(_widget, (Text, Dropdown)):
+            _populate_style_properties(widget, _widget, acroform)
 
         if isinstance(_widget, Text):
             _populate_text_properties(widget, _widget)
@@ -314,6 +326,27 @@ def _populate_common_properties(
         _widget.__dict__["width"],
         _widget.__dict__["height"],
     ) = get_field_rect(widget)
+
+
+def _populate_style_properties(
+    widget: dict, _widget: Text | Dropdown, acroform: Optional[DictionaryObject]
+) -> None:
+    """
+    Populates the font, font size, and font color of a text field or dropdown.
+
+    They are read from the default appearance that a change to them edits, as
+    `get_text_field_style` describes, and assigned directly so loading
+    existing PDF state does not trigger write hooks.
+
+    Args:
+        widget (dict): The widget dictionary from the PDF.
+        _widget (Text | Dropdown): The widget object to populate.
+        acroform (Optional[DictionaryObject]): The AcroForm dictionary.
+    """
+    style = get_text_field_style(widget, acroform)
+    _widget.__dict__["font"] = style.font
+    _widget.__dict__["font_size"] = style.font_size
+    _widget.__dict__["font_color"] = style.font_color
 
 
 def _populate_text_properties(widget: dict, _widget: Text) -> None:

@@ -103,6 +103,9 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 
     form.write("output.pdf")
     ```
+
+    A font that isn't registered or in the PDF raises an error when the changes are written. Reading `font` gives the name the PDF uses for the text field's font, such as `/Helv`, which you can also assign to other fields.
+
 === "CLI"
     In the CLI, provide a `.ttf` file path for each text field's `font` value:
 
@@ -151,6 +154,9 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 
     form.write("output.pdf")
     ```
+
+    Reading `font_size` gives the text field's current font size. A size of `0` means the text is sized to fit the field.
+
 === "CLI"
     Set each text field's `font_size` in YAML:
 
@@ -199,6 +205,9 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 
     form.write("output.pdf")
     ```
+
+    Reading `font_color` gives the text field's current font color as an RGB `tuple`. A gray or CMYK color in the PDF is converted to RGB.
+
 === "CLI"
     Express each text field's RGB font color as a three-item YAML sequence:
 
@@ -521,6 +530,9 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 
     form.write("output.pdf")
     ```
+
+    A font that isn't registered or in the PDF raises an error when the changes are written. Reading `font` gives the name the PDF uses for the dropdown field's font, such as `/Helv`, which you can also assign to other fields.
+
 === "CLI"
     In the CLI, provide a `.ttf` file path for the dropdown field's `font` value:
 
@@ -548,6 +560,9 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 
     form.write("output.pdf")
     ```
+
+    Reading `font_size` gives the dropdown field's current font size. A size of `0` means the text is sized to fit the field.
+
 === "CLI"
     Set the dropdown field's `font_size` in YAML:
 
@@ -575,6 +590,9 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 
     form.write("output.pdf")
     ```
+
+    Reading `font_color` gives the dropdown field's current font color as an RGB `tuple`. A gray or CMYK color in the PDF is converted to RGB.
+
 === "CLI"
     Express the dropdown field's RGB font color as a three-item YAML sequence:
 

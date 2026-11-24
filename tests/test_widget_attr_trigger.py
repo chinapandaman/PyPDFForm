@@ -462,19 +462,25 @@ def test_clear_absent_text_field_properties(template_stream):
         ("sample_template.pdf", "test", "hidden", None, TypeError),
         ("sample_template.pdf", "test", "multiline", None, TypeError),
         ("sample_template.pdf", "test", "comb", None, TypeError),
+        ("sample_template.pdf", "test", "font", None, TypeError),
+        ("sample_template.pdf", "test", "font_size", None, TypeError),
+        ("sample_template.pdf", "test", "font_color", None, TypeError),
         ("sample_template.pdf", "test", "max_length", 0, ValueError),
         ("sample_template.pdf", "test", "max_length", -1, ValueError),
         ("sample_template.pdf", "test", "alignment", 3, ValueError),
         ("sample_template.pdf", "test", "alignment", -1, ValueError),
         ("sample_template_with_radio_button.pdf", "radio_1", "x", None, TypeError),
         ("sample_template_with_radio_button.pdf", "radio_1", "x", [1, 2], TypeError),
-        (
-            os.path.join("dropdown", "sample_template_with_dropdown.pdf"),
-            "dropdown_1",
-            "choices",
-            None,
-            TypeError,
-        ),
+        *[
+            (
+                os.path.join("dropdown", "sample_template_with_dropdown.pdf"),
+                "dropdown_1",
+                name,
+                None,
+                TypeError,
+            )
+            for name in ("choices", "font", "font_size", "font_color")
+        ],
     ],
 )
 def test_reject_property_value_not_stored_in_pdf(
@@ -722,9 +728,11 @@ def test_change_inherited_default_appearance(
 ):
     stream = _nest_fields(template_stream, default_appearances)
     obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
-    setattr(
-        obj.widgets["outer.inner.test" if use_full_widget_name else "test"], name, value
-    )
+    widget = obj.widgets["outer.inner.test" if use_full_widget_name else "test"]
+    # the /DA that the change edits is the one read
+    assert (widget.font, widget.font_size, widget.font_color) == ("/Cour", 9, (0, 0, 1))
+
+    setattr(widget, name, value)
     result = _get_nested_entries(obj.read())
 
     # only the widget's own field changes; fields shared with "test_2" and the
@@ -781,7 +789,9 @@ def test_change_default_appearance_of_kid_widget(
     )
 
 
-def test_change_inherited_dropdown_default_appearance(sample_template_with_dropdown):
+def test_change_inherited_dropdown_default_appearance(
+    sample_template_with_dropdown, assert_widgets_match_output
+):
     with Pdf.open(BytesIO(sample_template_with_dropdown)) as pdf:
         for field in pdf.Root.AcroForm.Fields:
             if str(field.get("/T")) == "dropdown_1":
@@ -790,14 +800,17 @@ def test_change_inherited_dropdown_default_appearance(sample_template_with_dropd
         stream = _save(pdf)
 
     obj = PdfWrapper(stream)
-    obj.widgets["dropdown_1"].font_size = 20
-    obj.widgets["dropdown_1"].font_color = (1, 0, 0)
+    widget = obj.widgets["dropdown_1"]
+    assert (widget.font, widget.font_size, widget.font_color) == ("/Helv", 0, (0, 0, 0))
+    widget.font_size = 20
+    widget.font_color = (1, 0, 0)
 
     assert _find_widget(obj.read(), "dropdown_1")["/DA"] == "/Helv 20 Tf 1 0 0 rg"
     assert (
         PdfReader(BytesIO(obj.read())).root_object["/AcroForm"]["/DA"]
         == "/Helv 0 Tf 0 g"
     )
+    assert_widgets_match_output(obj)
 
 
 @pytest.mark.parametrize(
@@ -901,6 +914,44 @@ def _with_parent_cycle(stream, name):
 
 
 @pytest.mark.parametrize(
+    ("default_appearance", "expected"),
+    [
+        ("/Helv 12 Tf 0 g", ("/Helv", 12, (0, 0, 0))),
+        (
+            ".2666667 .2666667 .2666667 rg\n/F0 8 Tf\n",
+            ("/F0", 8, (0.2666667, 0.2666667, 0.2666667)),
+        ),
+        # CMYK is converted to RGB, each component 1 - min(1, color + black)
+        ("/Helv 10.5 Tf 0 0 0 .9 k", ("/Helv", 10.5, (0.1, 0.1, 0.1))),
+        ("/Helv 0 Tf 1 .5 0 .5 k", ("/Helv", 0, (0, 0, 0.5))),
+        ("Courier 12 Tf .1 .1 .1 rg", ("Courier", 12, (0.1, 0.1, 0.1))),
+        ("/My#20Font 12.0 Tf 0 g", ("/My#20Font", 12, (0, 0, 0))),
+        # the last font and the last fill color take effect
+        ("/ZaDb 5.6 Tf 0 g /Helv 9 Tf 1 0 0 rg", ("/Helv", 9, (1, 0, 0))),
+        ("/Arial 12 Tf 0 g /DeviceRGB cs 0 0 1 sc", ("/Arial", 12, None)),
+        ("/Arial 12 Tf /DeviceRGB cs 0 0 1 sc 0 0 1 rg", ("/Arial", 12, (0, 0, 1))),
+        ("/Helv 12 Tf", ("/Helv", 12, None)),
+        ("0 g", (None, None, (0, 0, 0))),
+        ("/Helv Tf 0 g", (None, None, (0, 0, 0))),
+        ("/Helv 12 Tf 0 0 g", ("/Helv", 12, None)),
+        ("/Helv 12 Tf (x) Tj", (None, None, None)),
+        (String(b"/Arial\x0012 Tf 0 g"), ("/Arial", 12, (0, 0, 0))),
+        (12, (None, None, None)),
+        (None, (None, None, None)),
+    ],
+)
+def test_read_default_appearance(template_stream, default_appearance, expected):
+    stream = (
+        _with_parent_cycle(template_stream, "test")
+        if default_appearance is None
+        else _set_default_appearance(template_stream, "test", default_appearance)
+    )
+    widget = PdfWrapper(stream).widgets["test"]
+
+    assert (widget.font, widget.font_size, widget.font_color) == expected
+
+
+@pytest.mark.parametrize(
     ("default_appearance", "name", "value", "message"),
     [
         ("0 g", "font_size", 20, "has no Tf operator"),
@@ -946,6 +997,7 @@ def test_change_default_appearance_errors(
     )
     obj = PdfWrapper(stream)
     original = obj.read()
+    read_value = getattr(obj.widgets["test"], name)
     # applied before the failing change, and discarded with it
     obj.widgets["test"].alignment = 2
     setattr(obj.widgets["test"], name, value)
@@ -954,7 +1006,8 @@ def test_change_default_appearance_errors(
         obj.read()
 
     assert obj.widgets["test"].alignment is None
-    assert getattr(obj.widgets["test"], name) is None
+    # the value read from the PDF is restored
+    assert getattr(obj.widgets["test"], name) == read_value
     assert not obj.widgets["test"].hooks_to_trigger
     assert obj.read() == original
     assert_widgets_match_output(obj)
@@ -993,12 +1046,16 @@ def _with_null_default_appearance(stream, acroform_null):
 def test_change_default_appearance_over_null(template_stream):
     # a null /DA is absent, so the AcroForm default is used
     obj = PdfWrapper(_with_null_default_appearance(template_stream, False))
-    obj.widgets["test"].font_size = 14
+    widget = obj.widgets["test"]
+    assert (widget.font, widget.font_size, widget.font_color) == ("/Helv", 0, (0, 0, 0))
+    widget.font_size = 14
 
     assert _find_widget(obj.read(), "test")["/DA"] == "/Helv 14 Tf 0 g "
 
     obj = PdfWrapper(_with_null_default_appearance(template_stream, True))
-    obj.widgets["test"].font_size = 14
+    widget = obj.widgets["test"]
+    assert (widget.font, widget.font_size, widget.font_color) == (None, None, None)
+    widget.font_size = 14
     with pytest.raises(ValueError, match="neither the field nor the form sets one"):
         obj.read()
 
@@ -1027,6 +1084,89 @@ def test_change_font_to_resource_with_escaped_name(template_stream, key, expecte
     assert default_appearance == expected
     # the name in /DA is the resource key
     assert Object.parse(default_appearance.split(" ")[0].encode()) == Name(key)
+
+
+@pytest.mark.parametrize("key", ["test", "dropdown_1"])
+@pytest.mark.parametrize("font", ["nonexistent", "Liberation Serif"])
+def test_change_font_to_unknown_name(
+    template_stream,
+    sample_template_with_dropdown,
+    sample_font_stream,
+    key,
+    font,
+    assert_widgets_match_output,
+):
+    obj = PdfWrapper(
+        template_stream if key == "test" else sample_template_with_dropdown
+    ).register_font("new_font", sample_font_stream)
+    original = obj.read()
+    widget = obj.widgets[key]
+    read_style = (widget.font, widget.font_size)
+    # applied before the failing change, and discarded with it
+    widget.font_size = 20
+    widget.font = font
+
+    with pytest.raises(ValueError, match=f"^Cannot change the font: '{font}' is not"):
+        obj.read()
+
+    assert (widget.font, widget.font_size) == read_style
+    assert not widget.hooks_to_trigger
+    assert obj.read() == original
+    assert_widgets_match_output(obj)
+
+
+def test_change_font_keeps_other_fonts_read_from_pdf(
+    template_stream, sample_font_stream, assert_widgets_match_output
+):
+    # both fields write their font without a slash, as the name of a
+    # registered font
+    stream = _set_default_appearance(template_stream, "test", "Courier 12 Tf 0 g")
+    stream = _set_default_appearance(stream, "test_2", "Courier 10 Tf 0 g")
+    obj = PdfWrapper(stream).register_font("Courier", sample_font_stream)
+    assert obj.widgets["test_2"].font == "Courier"
+
+    obj.widgets["test"].font = "Courier"
+    result = obj.read()
+    resource = obj.widgets["test"].font
+
+    # only the font being changed becomes the registered font's resource
+    assert resource.startswith("/")
+    assert _find_widget(result, "test")["/DA"] == f"{resource} 12 Tf 0 g"
+    assert _find_widget(result, "test_2")["/DA"] == "Courier 10 Tf 0 g"
+    assert obj.widgets["test_2"].font == "Courier"
+    assert_widgets_match_output(obj)
+
+
+def test_read_style_of_created_fields(template_stream, assert_widgets_match_output):
+    obj = PdfWrapper(template_stream).bulk_create_fields(
+        [
+            Fields.TextField(
+                name="new_text",
+                page_number=1,
+                x=100,
+                y=100,
+                font="Helvetica",
+                font_size=20,
+                font_color=(0, 0, 1),
+            ),
+            Fields.DropdownField(
+                name="new_dropdown",
+                page_number=1,
+                x=300,
+                y=100,
+                options=["a", "b"],
+                font_size=15,
+                font_color=(1, 0, 0),
+            ),
+        ]
+    )
+    obj.read()
+
+    text = obj.widgets["new_text"]
+    dropdown = obj.widgets["new_dropdown"]
+    assert (text.font, text.font_size, text.font_color) == ("/Helv", 20, (0, 0, 1))
+    assert (dropdown.font_size, dropdown.font_color) == (15, (1, 0, 0))
+    assert_widgets_match_output(obj)
 
 
 def _get_field(pdf, name):

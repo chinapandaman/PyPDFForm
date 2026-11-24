@@ -107,7 +107,8 @@ class Dropdown(Widget):
     differ are rejected. Integer indices must identify an existing option.
 
     Key attributes:
-        font (str): The font of the dropdown field.
+        font (str): The font of the dropdown field, as the font resource name
+            its default appearance uses, such as `/Helv`.
         choices (List[str | Tuple[str, str]]): The available options. Each is a
             string when its displayed text and export value are equal, or a
             `(display, export)` tuple when they differ.
@@ -119,7 +120,12 @@ class Dropdown(Widget):
     """
 
     TYPE_SPECIFIC_PROPERTIES = frozenset({"font", "font_size", "font_color", "choices"})
-    READ_PROPERTIES = Widget.READ_PROPERTIES | {"choices"}
+    READ_PROPERTIES = Widget.READ_PROPERTIES | {
+        "font",
+        "font_size",
+        "font_color",
+        "choices",
+    }
 
     def __init__(
         self,
@@ -137,7 +143,12 @@ class Dropdown(Widget):
             value (int): The initial value of the dropdown. Defaults to None.
 
         Attributes:
-            font (str): The font of the dropdown field.
+            font (str): The font resource name of the dropdown field, such as
+                `/Helv`. Defaults to None.
+            font_size (float): The font size of the dropdown field, where 0
+                sizes the text to fit. Defaults to None.
+            font_color (tuple): The RGB font color of the dropdown field.
+                Defaults to None.
             choices (List[str | Tuple[str, str]]): The list of choices for the
                 dropdown, as strings or `(display, export)` tuples.
         """
