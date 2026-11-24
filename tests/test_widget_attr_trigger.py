@@ -1879,10 +1879,8 @@ def test_rename_by_index(
 
     # each key reads its field, and the value stays with the field it was set on
     for key, (font_size, value) in (("test", kept), ("renamed", renamed)):
-        assert (obj.widgets[key].font_size, obj.widgets[key].value) == (
-            font_size,
-            value,
-        )
+        assert obj.widgets[key].font_size == font_size
+        assert obj.widgets[key].value == value
     obj.fill({})
     assert_widgets_match_output(obj)
 

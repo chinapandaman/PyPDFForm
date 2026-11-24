@@ -44,7 +44,7 @@ from .adapter import (
     fp_or_f_obj_or_stream_to_stream,
     readable,
 )
-from .constants import FEATURE_HOOKS, JAVASCRIPT_HOOKS
+from .constants import FEATURE_HOOKS, FONT_HOOK, JAVASCRIPT_HOOKS
 from .coordinate import generate_coordinate_grid
 from .deprecation import reject_unsupported_kwargs
 from .egress import (
@@ -812,13 +812,15 @@ class PdfWrapper:
         ]
 
         if widgets_with_hooks:
-            has_font_hook = any(
-                hook[0] == "update_text_field_font"
+            # only fonts being changed are translated, in the queue and on the
+            # widget, so a font read from the PDF that has the name of a
+            # registered font, such as `Courier`, is left as it is
+            widgets_with_font_hooks = [
+                widget
                 for widget in widgets_with_hooks
-                for hook in widget.hooks_to_trigger
-            )
-
-            if has_font_hook:
+                if any(hook == FONT_HOOK for hook, _ in widget.hooks_to_trigger)
+            ]
+            if widgets_with_font_hooks:
                 available_fonts = self._ensure_available_fonts_loaded()
 
                 def to_resource(font: Any) -> Any:
@@ -827,24 +829,12 @@ class PdfWrapper:
                         return available_fonts[font]
                     return font
 
-                # only fonts being changed are translated, in the queue and on
-                # the widget, so a font read from the PDF that has the name of
-                # a registered font, such as `Courier`, is left as it is
-                for widget in widgets_with_hooks:
-                    if any(
-                        hook == "update_text_field_font"
-                        for hook, _ in widget.hooks_to_trigger
-                    ):
-                        widget.hooks_to_trigger = [
-                            (
-                                hook,
-                                to_resource(value)
-                                if hook == "update_text_field_font"
-                                else value,
-                            )
-                            for hook, value in widget.hooks_to_trigger
-                        ]
-                        widget.__dict__["font"] = to_resource(widget.font)
+                for widget in widgets_with_font_hooks:
+                    widget.hooks_to_trigger = [
+                        (hook, to_resource(value) if hook == FONT_HOOK else value)
+                        for hook, value in widget.hooks_to_trigger
+                    ]
+                    widget.__dict__["font"] = to_resource(widget.font)
 
             try:
                 self._stream = trigger_widget_hooks(

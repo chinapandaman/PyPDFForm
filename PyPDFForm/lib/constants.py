@@ -239,11 +239,13 @@ JAVASCRIPT_HOOKS = frozenset(
 FEATURE_HOOKS = (
     frozenset({"update_text_field_comb", "update_field_tooltip"}) | JAVASCRIPT_HOOKS
 )
+# the font hook, whose user-facing font names PdfWrapper maps to resource names
+FONT_HOOK = "update_text_field_font"
 # widget property hooks that change the default appearance (/DA), which a
 # field can inherit from its ancestors or the AcroForm; they get the AcroForm
 DEFAULT_APPEARANCE_HOOKS = frozenset(
     {
-        "update_text_field_font",
+        FONT_HOOK,
         "update_text_field_font_size",
         "update_text_field_font_color",
     }
