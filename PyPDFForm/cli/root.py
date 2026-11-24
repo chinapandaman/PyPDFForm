@@ -27,6 +27,7 @@ from .common import (
     data_file_option,
     load_data_file,
     load_data_options,
+    without_unnamed,
 )
 from .create import create_cli
 from .inspect import inspect_cli
@@ -165,7 +166,8 @@ def fill(
     accept path objects, validates the input data, normalizes image and
     signature values, and writes the filled PDF to the requested output path or
     back to the input file. When both a data file and field options are supplied,
-    the data file takes precedence.
+    the data file takes precedence. Fields without a name are left out of the
+    schema, as `without_unnamed` describes, so the data can't fill them.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
@@ -182,7 +184,8 @@ def fill(
     obj = PdfWrapper(str(pdf), **ctx.obj)
 
     schema = obj.schema
-    for key, widget in obj.widgets.items():
+    schema["properties"] = without_unnamed(schema["properties"])
+    for key, widget in without_unnamed(obj.widgets).items():
         if isinstance(widget, (Widgets.Image, Widgets.Signature)):
             schema["properties"][key] = {
                 "anyOf": [
