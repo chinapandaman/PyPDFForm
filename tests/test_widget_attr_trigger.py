@@ -1665,6 +1665,62 @@ def test_clear_alignment_below_unnamed_parent_cycle(template_stream):
     assert obj.read() == original
 
 
+def _with_named_parent_cycle(stream, shape):
+    # "test" is moved under a field "a" whose /Parent chain loops back
+    with Pdf.open(BytesIO(stream)) as pdf:
+        field = _get_field(pdf, "test")
+        a = pdf.make_indirect(Dictionary({"/T": String("a"), "/Kids": Array([field])}))
+        if shape == "field":
+            a.Parent = field
+        else:
+            b = pdf.make_indirect(Dictionary({"/T": String("b"), "/Kids": Array([a])}))
+            a.Parent = b
+            b.Parent = a
+        if shape == "unnamed":
+            del field["/T"]
+        field.Parent = a
+
+        return _save(pdf)
+
+
+@pytest.mark.parametrize(
+    ("shape", "key"),
+    [
+        # "a" and "b" are each other's parent
+        ("named", "b.a.test"),
+        # the widget has no name, so the key is its field's
+        ("unnamed", "b.a"),
+        # the parent of "a" is the field, which is reached once as an ancestor
+        ("field", "test.a.test"),
+    ],
+)
+def test_full_widget_name_with_parent_cycle(
+    template_stream, shape, key, assert_round_trip, assert_widgets_match_output
+):
+    stream = _with_named_parent_cycle(template_stream, shape)
+    others = ["check", "test_2", "check_2", "test_3", "check_3"]
+    # the key ends before an ancestor is reached a second time
+    obj = PdfWrapper(stream, use_full_widget_name=True)
+    assert list(obj.widgets) == [key, *others]
+    original = obj.read()
+    # the cycle is reached before any flags, so changing one raises
+    obj.widgets[key].readonly = True
+
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
+        obj.read()
+
+    assert obj.widgets[key].readonly is False
+    assert obj.read() == original
+
+    obj.fill({key: "foo"})
+    assert_round_trip(obj, {key: "foo"})
+    assert_widgets_match_output(obj)
+
+    # removing reads the keys of the PDF's objects, which are the same
+    obj = PdfWrapper(stream, use_full_widget_name=True).remove_fields([key])
+    assert list(obj.widgets) == others
+
+
 def test_change_null_text_field_entries(template_stream, assert_widgets_match_output):
     writer = PdfWriter(BytesIO(template_stream))
     for annot in writer.pages[0]["/Annots"]:
