@@ -11,7 +11,7 @@ specific patterns for identifying and constructing different types of widgets.
 from copy import deepcopy
 from functools import lru_cache
 from io import BytesIO
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, Optional, Tuple, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
@@ -236,11 +236,11 @@ def _build_widget_cache(
     acroform = get_dictionary(reader.root_object, AcroForm)
 
     for page_num, page in enumerate(reader.pages, start=1):
-        for index, widget in enumerate(_get_widgets_on_page(page)):
+        for index, (widget, annot) in enumerate(_get_widget_annotations(page)):
             _process_widget(
                 widget,
+                get_widget_key(annot, use_full_widget_name),
                 page_num,
-                use_full_widget_name,
                 results,
                 radios,
                 acroform,
@@ -275,8 +275,8 @@ def get_widget_positions(pdf_stream: bytes) -> Dict[str, tuple]:
 
 def _process_widget(
     widget: dict,
+    key: str,
     page_number: int,
-    use_full_widget_name: bool,
     results: Dict[str, WIDGET_TYPES],
     radios: Dict[str, Radio],
     acroform: Optional[DictionaryObject],
@@ -293,8 +293,9 @@ def _process_widget(
 
     Args:
         widget (dict): The widget dictionary from the PDF.
+        key (str): The widget's key, computed from the PDF's own annotation,
+            as `get_widget_key` requires.
         page_number (int): The 1-indexed page number the widget appears on.
-        use_full_widget_name (bool): Whether to use the full widget name.
         results (Dict[str, WIDGET_TYPES]): The dictionary of widgets being built.
         radios (Dict[str, Radio]): The radio groups being built, by key, kept
             when a widget of another type replaces them in `results`.
@@ -302,7 +303,6 @@ def _process_widget(
             default appearance text fields and dropdowns can inherit.
         index (int): The index of the widget among the widgets on its page.
     """
-    key = get_widget_key(widget, use_full_widget_name)
     _widget = construct_widget(widget, key)
     if _widget is not None:
         # which widget the key gives access to, as `get_widget_positions` reads it
@@ -501,13 +501,32 @@ def _get_widgets_on_page(page) -> List[dict]:
     Returns:
         List[dict]: A list of widget dictionaries found on the page.
     """
+    return [widget for widget, _ in _get_widget_annotations(page)]
+
+
+def _get_widget_annotations(page) -> List[Tuple[dict, DictionaryObject]]:
+    """
+    Retrieves the widgets of a single PDF page with their annotations.
+
+    Each widget is a plain dictionary copied from the page annotation, as
+    `_get_widgets_on_page` returns it, and is paired with the annotation
+    itself, which is the PDF's own object that `get_widget_key` requires.
+
+    Args:
+        page: The PDF page object.
+
+    Returns:
+        List[Tuple[dict, DictionaryObject]]: The widget dictionaries found on
+            the page, each with its annotation.
+    """
     widgets = page.annotations
     result = []
     if widgets:
         for widget in widgets:
-            widget = dict(widget.get_object())
-            if _is_widget(widget):
-                result.append(widget)
+            annot = widget.get_object()
+            copy = dict(annot)
+            if _is_widget(copy):
+                result.append((copy, annot))
     return result
 
 

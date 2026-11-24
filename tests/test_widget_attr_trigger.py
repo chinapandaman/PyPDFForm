@@ -18,6 +18,7 @@ from PyPDFForm.lib.constants import (
     READ_ONLY,
     REQUIRED,
 )
+from PyPDFForm.lib.field_tree import get_field_keys
 from PyPDFForm.lib.hooks import update_field_readonly
 from PyPDFForm.lib.middleware.checkbox import Checkbox
 from PyPDFForm.lib.middleware.radio import Radio
@@ -1668,7 +1669,11 @@ def test_clear_alignment_below_unnamed_parent_cycle(template_stream):
 def _with_named_parent_cycle(stream, shape):
     # "test" is moved under a field "a" whose /Parent chain loops back
     with Pdf.open(BytesIO(stream)) as pdf:
-        field = _get_field(pdf, "test")
+        fields = pdf.Root.AcroForm.Fields
+        index = next(
+            i for i, each in enumerate(fields) if str(each.get("/T")) == "test"
+        )
+        field = fields[index]
         a = pdf.make_indirect(Dictionary({"/T": String("a"), "/Kids": Array([field])}))
         if shape == "field":
             a.Parent = field
@@ -1676,32 +1681,44 @@ def _with_named_parent_cycle(stream, shape):
             b = pdf.make_indirect(Dictionary({"/T": String("b"), "/Kids": Array([a])}))
             a.Parent = b
             b.Parent = a
-        if shape == "unnamed":
+        if shape in ("unnamed", "listed"):
             del field["/T"]
+        if shape == "listed":
+            # the AcroForm lists the field instead of its widget
+            fields[index] = a
         field.Parent = a
 
         return _save(pdf)
 
 
 @pytest.mark.parametrize(
-    ("shape", "key"),
+    ("shape", "key", "short_key"),
     [
         # "a" and "b" are each other's parent
-        ("named", "b.a.test"),
+        ("named", "b.a.test", "test"),
         # the widget has no name, so the key is its field's
-        ("unnamed", "b.a"),
-        # the parent of "a" is the field, which is reached once as an ancestor
-        ("field", "test.a.test"),
+        ("unnamed", "b.a", "a"),
+        ("listed", "b.a", "a"),
+        # the parent of "a" is the field
+        ("field", "a.test", "test"),
     ],
 )
 def test_full_widget_name_with_parent_cycle(
-    template_stream, shape, key, assert_round_trip, assert_widgets_match_output
+    template_stream,
+    shape,
+    key,
+    short_key,
+    assert_round_trip,
+    assert_widgets_match_output,
+    assert_catalog_fields,
 ):
     stream = _with_named_parent_cycle(template_stream, shape)
     others = ["check", "test_2", "check_2", "test_3", "check_3"]
-    # the key ends before an ancestor is reached a second time
+    # the key ends before a field is reached a second time
     obj = PdfWrapper(stream, use_full_widget_name=True)
     assert list(obj.widgets) == [key, *others]
+    # the field and its widget have the same key for removal
+    assert get_field_keys(stream, True) == {key, *others}
     original = obj.read()
     # the cycle is reached before any flags, so changing one raises
     obj.widgets[key].readonly = True
@@ -1716,9 +1733,15 @@ def test_full_widget_name_with_parent_cycle(
     assert_round_trip(obj, {key: "foo"})
     assert_widgets_match_output(obj)
 
-    # removing reads the keys of the PDF's objects, which are the same
-    obj = PdfWrapper(stream, use_full_widget_name=True).remove_fields([key])
+    # the field and its value leave the form with its widget
+    obj.remove_fields([key])
     assert list(obj.widgets) == others
+    assert_catalog_fields(obj.read(), others)
+    assert get_field_keys(obj.read(), True) == set(others)
+
+    # and so they do without full names
+    obj = PdfWrapper(stream).fill({short_key: "foo"}).remove_fields([short_key])
+    assert_catalog_fields(obj.read(), others)
 
 
 def test_change_null_text_field_entries(template_stream, assert_widgets_match_output):

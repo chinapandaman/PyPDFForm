@@ -180,9 +180,11 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
     name by joining the names along the widget's `/Parent` chain with dots,
     outermost first, while handling child annotations that inherit the parent
     name. The chain ends at a parent without a name, at a parent with the same
-    name as its child, and before an ancestor is reached a second time, so
-    each ancestor in a `/Parent` cycle is named once. A null name is absent,
-    as `has_name` describes.
+    name as its child, and before a dictionary is reached a second time, the
+    widget included, so each field in a `/Parent` cycle is named once and a
+    widget without a name gets its field's key. Dictionaries are recognized by
+    identity, so the widget must be the PDF's own object, not a copy of it. A
+    null name is absent, as `has_name` describes.
 
     Args:
         widget (dict): The widget dictionary to extract the key from.
@@ -202,9 +204,7 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
         return cast(str, str(key) if key else None)
 
     names = []
-    # only ancestors, which resolve to the PDF's objects, so a copy of a widget
-    # gets the same key as the widget
-    seen = set()
+    seen = {id(widget)}
     while (
         parent is not None
         and id(parent) not in seen

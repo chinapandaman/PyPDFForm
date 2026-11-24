@@ -760,11 +760,14 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
     """
     Detaches a field or widget and its emptied ancestors from the AcroForm tree.
 
-    The object is removed from its parent's `/Kids`, or from the AcroForm's
-    root `/Fields` array when it has no parent. A parent left without kids is
-    detached the same way, stopping at the first parent with remaining kids.
-    Resolved objects are compared by identity so unrelated fields with the
-    same name keep their references. Page annotations are not changed.
+    The object is removed from its parent's `/Kids`. A parent left without
+    kids is detached the same way, stopping at the first parent with remaining
+    kids, at the top of the tree, or at a `/Parent` cycle. Every detached
+    object is then removed from the AcroForm's root `/Fields` array, so a
+    field listed there although it has a parent, or whose ancestors form a
+    cycle, doesn't stay in the form. Resolved objects are compared by
+    identity so unrelated fields with the same name keep their references.
+    Page annotations are not changed.
 
     Args:
         writer (PdfWriter): The PDF writer that owns the field tree.
@@ -780,7 +783,7 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
         kids = get_array(parent, Kids)
         kids[:] = [kid for kid in kids if kid.get_object() is not field]
         if kids or any(parent is each for each in result):
-            return result
+            break
         field = parent
         result.append(field)
         parent = get_dictionary(field, Parent)
@@ -788,7 +791,9 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
     acroform = get_dictionary(writer.root_object, AcroForm) or DictionaryObject()
     fields = get_array(acroform, Fields)
     fields[:] = [
-        reference for reference in fields if reference.get_object() is not field
+        reference
+        for reference in fields
+        if not any(reference.get_object() is each for each in result)
     ]
 
     return result
