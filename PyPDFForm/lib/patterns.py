@@ -209,6 +209,25 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
     return str(key) if key else ""
 
 
+def _get_value_field(annot: DictionaryObject) -> DictionaryObject:
+    """
+    Gets the dictionary that holds a widget's value (`/V`) and name (`/T`).
+
+    It is the widget's parent field when the widget has no name, as
+    `has_name` describes, and its `/Parent` is a dictionary. Otherwise it is
+    the widget itself, which is merged with its field, so a null `/Parent`,
+    or one that isn't a dictionary, is absent.
+
+    Args:
+        annot (DictionaryObject): The widget annotation dictionary.
+
+    Returns:
+        DictionaryObject: The parent field or the widget.
+    """
+    parent = get_dictionary(annot, Parent)
+    return parent if parent is not None and not has_name(annot) else annot
+
+
 def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
     """
     Updates the value of a checkbox annotation, setting it to checked or unchecked.
@@ -321,9 +340,7 @@ def update_dropdown_value(
             maintain compatibility with Adobe Reader's behavior for certain fields.
     """
     option = widget.options[widget.value]
-    field = (
-        annot[NameObject(Parent)] if Parent in annot and not has_name(annot) else annot
-    )
+    field = _get_value_field(annot)
     field[NameObject(V)] = TextStringObject(option.export)
     field[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
     if not need_appearances:
@@ -345,9 +362,7 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         annot (DictionaryObject): The dropdown annotation dictionary.
         widget (Dropdown): The Dropdown widget object to update with the retrieved value.
     """
-    field = (
-        annot[NameObject(Parent)] if Parent in annot and not has_name(annot) else annot
-    )
+    field = _get_value_field(annot)
     # discovered annotations are plain dictionaries, so entries can be references
     value = field[NameObject(V)].get_object() if V in field else None
     indices = field[NameObject(I)].get_object() if I in field else None
@@ -371,14 +386,9 @@ def update_text_value(
         need_appearances (bool): If True, skips updating the appearance stream (AP) to
             maintain compatibility with Adobe Reader's behavior for certain fields.
     """
-    if Parent in annot and not has_name(annot):
-        annot[NameObject(Parent)][NameObject(V)] = TextStringObject(widget.value)
-        if not need_appearances:
-            annot[NameObject(AP)] = TextStringObject(widget.value)
-    else:
-        annot[NameObject(V)] = TextStringObject(widget.value)
-        if not need_appearances:
-            annot[NameObject(AP)] = TextStringObject(widget.value)
+    _get_value_field(annot)[NameObject(V)] = TextStringObject(widget.value)
+    if not need_appearances:
+        annot[NameObject(AP)] = TextStringObject(widget.value)
 
 
 def get_text_value(annot: DictionaryObject, widget: Text) -> None:
@@ -393,10 +403,7 @@ def get_text_value(annot: DictionaryObject, widget: Text) -> None:
         annot (DictionaryObject): The text annotation dictionary.
         widget (Text): The Text widget object to update with the retrieved value.
     """
-    if Parent in annot and not has_name(annot):
-        widget.value = annot[Parent].get(V)
-    else:
-        widget.value = annot.get(V)
+    widget.value = _get_value_field(annot).get(V)
 
 
 def get_text_field_max_length(widget: dict) -> int | None:
@@ -534,10 +541,7 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
         annot (DictionaryObject): The annotation dictionary.
         val (str): The new name for the annotation.
     """
-    if Parent in annot and not has_name(annot):
-        annot[NameObject(Parent)][NameObject(T)] = TextStringObject(val)
-    else:
-        annot[NameObject(T)] = TextStringObject(val)
+    _get_value_field(annot)[NameObject(T)] = TextStringObject(val)
 
 
 def get_field_rect(annot: DictionaryObject) -> Tuple[float, float, float, float]:

@@ -89,8 +89,9 @@ class Text(Widget):
         """
         Validates a hooked property value before the text field changes.
 
-        An integer maximum length must be at least one, since reopening the PDF
-        reports a smaller maximum length as None.
+        An integer maximum length must be at least one, and an integer
+        alignment must be 0, 1, or 2, since reopening the PDF reports other
+        values as None.
 
         Args:
             name (str): The name of the property.
@@ -103,10 +104,14 @@ class Text(Widget):
         Raises:
             TypeError: Raised when a property read back from the PDF is set to
                 None, or geometry is not a number.
-            ValueError: Raised when an integer maximum length is less than one.
+            ValueError: Raised when an integer maximum length is less than one,
+                or an integer alignment isn't 0, 1, or 2.
         """
         if name == "max_length" and isinstance(value, int) and value < 1:
             msg = f"Text field '{self.name}' max_length must be at least 1."
+            raise ValueError(msg)
+        if name == "alignment" and isinstance(value, int) and value not in (0, 1, 2):
+            msg = f"Text field '{self.name}' alignment must be 0, 1, or 2."
             raise ValueError(msg)
 
         return super().prepare_property(name, value)
@@ -161,11 +166,11 @@ class Text(Widget):
 
         The sample value is used to generate example data for the
         text field. It returns the name of the field, truncated to
-        the maximum length if specified.
+        the maximum length if specified, or an empty string for a field
+        without a name.
 
         Returns:
             str: A sample value for the text field.
         """
-        return (
-            self.name[: self.max_length] if self.max_length is not None else self.name
-        )
+        name = self.name or ""
+        return name[: self.max_length] if self.max_length is not None else name

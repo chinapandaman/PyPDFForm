@@ -6,7 +6,7 @@ from io import BytesIO
 import pytest
 from pikepdf import Array, Dictionary, Name, Object, Pdf, String
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import NameObject, NullObject
+from pypdf.generic import NameObject, NullObject, NumberObject
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
 from PyPDFForm.lib.constants import (
@@ -464,6 +464,8 @@ def test_clear_absent_text_field_properties(template_stream):
         ("sample_template.pdf", "test", "comb", None, TypeError),
         ("sample_template.pdf", "test", "max_length", 0, ValueError),
         ("sample_template.pdf", "test", "max_length", -1, ValueError),
+        ("sample_template.pdf", "test", "alignment", 3, ValueError),
+        ("sample_template.pdf", "test", "alignment", -1, ValueError),
         ("sample_template_with_radio_button.pdf", "radio_1", "x", None, TypeError),
         ("sample_template_with_radio_button.pdf", "radio_1", "x", [1, 2], TypeError),
         (
@@ -1681,6 +1683,38 @@ def test_rename_field_with_null_named_widget(template_stream):
     assert "test" not in obj.widgets
     assert obj.widgets["renamed"].value == "value"
     assert PdfWrapper(obj.read()).widgets["renamed"].value == "value"
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+@pytest.mark.parametrize("parent", [None, NullObject(), NumberObject(5)])
+@pytest.mark.parametrize("name", [None, NullObject()], ids=["absent", "null"])
+def test_text_field_without_name(template_stream, name, parent, use_full_widget_name):
+    # the merged field and widget "test" loses its name, or has a null one, and
+    # may have a /Parent that isn't a dictionary, which is absent too
+    writer = PdfWriter(BytesIO(template_stream))
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "test":
+            if name is None:
+                del annot["/T"]
+            else:
+                annot[NameObject("/T")] = name
+            if parent is not None:
+                annot[NameObject("/Parent")] = parent
+            annot[NameObject("/MaxLen")] = NumberObject(4)
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    # it opens as a field of its own, without a name
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    key = "" if use_full_widget_name else None
+    assert obj.widgets[key].max_length == 4
+    assert obj.sample_data[key] == ""
+
+    obj.fill({key: "ab"})
+    reopened = PdfWrapper(obj.read(), use_full_widget_name=use_full_widget_name)
+    assert reopened.widgets[key].value == "ab"
 
 
 @pytest.mark.parametrize("rebuild", [False, True], ids=["same", "rebuilt"])
