@@ -6,7 +6,7 @@ from io import BytesIO
 import pytest
 from pikepdf import Array, Dictionary, Name, Object, Pdf, String
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import NameObject, NullObject
+from pypdf.generic import NameObject, NullObject, NumberObject
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
 from PyPDFForm.lib.constants import (
@@ -464,6 +464,8 @@ def test_clear_absent_text_field_properties(template_stream):
         ("sample_template.pdf", "test", "comb", None, TypeError),
         ("sample_template.pdf", "test", "max_length", 0, ValueError),
         ("sample_template.pdf", "test", "max_length", -1, ValueError),
+        ("sample_template.pdf", "test", "alignment", 3, ValueError),
+        ("sample_template.pdf", "test", "alignment", -1, ValueError),
         ("sample_template_with_radio_button.pdf", "radio_1", "x", None, TypeError),
         ("sample_template_with_radio_button.pdf", "radio_1", "x", [1, 2], TypeError),
         (
@@ -1311,6 +1313,410 @@ def test_radio_option_with_own_field_flags(
     assert_widgets_match_output(obj)
 
 
+# a text field property, its entry, and values for it: the one chosen by the
+# lookup, another one, and the one it is changed to
+TEXT_FIELD_ENTRIES = [
+    ("alignment", "/Q", 1, 2, 0),
+    ("max_length", "/MaxLen", 3, 7, 5),
+]
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+@pytest.mark.parametrize(
+    ("name", "entry", "chosen", "other", "new"), TEXT_FIELD_ENTRIES
+)
+@pytest.mark.parametrize(
+    ("holders", "found"),
+    [
+        ((), None),
+        # the AcroForm's /Q is the form's default, not the field's alignment
+        (("/AcroForm",), None),
+        (("/AcroForm", "outer"), "outer"),
+        (("/AcroForm", "outer", "inner"), "inner"),
+        # the widget's own entry takes precedence over its fields'
+        (("/AcroForm", "inner", "test"), "test"),
+    ],
+    ids=["none", "acroform", "grandparent", "parent", "widget"],
+)
+def test_change_inherited_text_field_entry(
+    template_stream,
+    holders,
+    found,
+    name,
+    entry,
+    chosen,
+    other,
+    new,
+    use_full_widget_name,
+    assert_widgets_match_output,
+):
+    # the lowest holder has the chosen value, and the ones above it another
+    values = {holder: chosen if holder == holders[-1] else other for holder in holders}
+    stream = _nest_fields(template_stream, values, entry)
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    key, other_key = (
+        ("outer.inner.test", "outer.inner.test_2")
+        if use_full_widget_name
+        else ("test", "test_2")
+    )
+    # "test_2" inherits from "inner" and "outer" only
+    shared = {None: None, "outer": chosen, "inner": chosen, "test": other}[found]
+    assert getattr(obj.widgets[key], name) == (chosen if found else None)
+    assert getattr(obj.widgets[other_key], name) == shared
+
+    setattr(obj.widgets[key], name, new)
+    result = obj.read()
+
+    # only the widget's own field changes; fields shared with "test_2" and the
+    # AcroForm don't
+    assert _get_nested_entries(result, entry) == {
+        "test": new,
+        "test_2": None,
+        "inner": values.get("inner"),
+        "outer": values.get("outer"),
+        "/AcroForm": values.get("/AcroForm"),
+    }
+    reopened = PdfWrapper(result, use_full_widget_name=use_full_widget_name)
+    assert getattr(reopened.widgets[key], name) == new
+    assert getattr(reopened.widgets[other_key], name) == shared
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(
+    ("name", "entry", "chosen", "other", "new"), TEXT_FIELD_ENTRIES
+)
+@pytest.mark.parametrize("holder", ["none", "field", "widget"])
+def test_change_text_field_entry_of_kid_widget(
+    sample_template_with_full_key,
+    holder,
+    name,
+    entry,
+    chosen,
+    other,
+    new,
+    assert_widgets_match_output,
+):
+    # the widget of "Date mois" has no name, so its parent is the field
+    with Pdf.open(BytesIO(sample_template_with_full_key)) as pdf:
+        for page in pdf.pages:
+            for annot in page.get("/Annots", []):
+                if "/Parent" in annot and str(annot.Parent.get("/T")) == "Date mois":
+                    for each in (annot, annot.Parent):
+                        if entry in each:
+                            del each[entry]
+                    if holder == "field":
+                        annot.Parent[entry] = chosen
+                    elif holder == "widget":
+                        annot.Parent[entry] = other
+                        annot[entry] = chosen
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert getattr(obj.widgets["Date mois"], name) == (
+        None if holder == "none" else chosen
+    )
+    setattr(obj.widgets["Date mois"], name, new)
+    widget = _find_widget(obj.read(), "Date mois")
+
+    # the value that was found changes, and without one, the field gets it
+    assert widget.get(entry) == (new if holder == "widget" else None)
+    assert widget["/Parent"].get_object().get(entry) == (
+        other if holder == "widget" else new
+    )
+    assert_widgets_match_output(obj)
+
+
+def test_read_max_length_of_kid_widget(sample_template_with_full_key):
+    # the widget of "Date mois" has no name, and its field allows 2 characters
+    obj = PdfWrapper(sample_template_with_full_key)
+
+    assert obj.widgets["Date mois"].max_length == 2
+    assert obj.schema["properties"]["Date mois"]["maxLength"] == 2
+    assert obj.sample_data["Date mois"] == "Da"
+
+
+@pytest.mark.parametrize(
+    ("name", "entry", "chosen", "new"),
+    [(name, entry, chosen, new) for name, entry, chosen, _, new in TEXT_FIELD_ENTRIES],
+)
+@pytest.mark.parametrize("clear", [False, True], ids=["set", "clear"])
+def test_change_text_field_entry_with_parent_cycle(
+    template_stream,
+    name,
+    entry,
+    chosen,
+    new,
+    clear,
+    assert_widgets_match_output,
+):
+    obj = PdfWrapper(_with_parent_cycle(template_stream, "test"))
+    # the cycle is reached before the entry, which reads as unset
+    assert getattr(obj.widgets["test"], name) is None
+    original = obj.read()
+    # applied before the failing change, and discarded with it
+    obj.widgets["test_2"].alignment = 2
+    setattr(obj.widgets["test"], name, None if clear else new)
+
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
+        obj.read()
+
+    assert obj.widgets["test_2"].alignment is None
+    assert getattr(obj.widgets["test"], name) is None
+    assert not obj.widgets["test"].hooks_to_trigger
+    assert not obj.widgets["test_2"].hooks_to_trigger
+    assert obj.read() == original
+    assert_widgets_match_output(obj)
+
+    # the field's own value is found before the cycle
+    with Pdf.open(BytesIO(original)) as pdf:
+        _get_field(pdf, "test")[entry] = chosen
+        obj = PdfWrapper(_save(pdf))
+    assert getattr(obj.widgets["test"], name) == chosen
+    setattr(obj.widgets["test"], name, new)
+
+    assert _find_widget(obj.read(), "test")[entry] == new
+
+
+def test_clear_alignment_below_unnamed_parent_cycle(template_stream):
+    # "test" loses its name, and its parent, which has none, is its own parent
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        field = _get_field(pdf, "test")
+        parent = pdf.make_indirect(Dictionary({"/Kids": Array([field])}))
+        parent.Parent = parent
+        field.Parent = parent
+        field.Q = 1
+        del field["/T"]
+        stream = _save(pdf)
+
+    # with full names, the widget's key is empty
+    obj = PdfWrapper(stream, use_full_widget_name=True)
+    original = obj.read()
+    assert obj.widgets[""].alignment == 1
+    obj.widgets[""].alignment = None
+
+    with pytest.raises(ValueError, match="Cannot remove /Q: the /Parent chain"):
+        obj.read()
+
+    assert obj.widgets[""].alignment == 1
+    assert obj.read() == original
+
+
+def test_change_null_text_field_entries(template_stream, assert_widgets_match_output):
+    writer = PdfWriter(BytesIO(template_stream))
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "test":
+            annot[NameObject("/Q")] = NullObject()
+            annot[NameObject("/MaxLen")] = NullObject()
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    # null entries are absent, so the field has no alignment or maximum length
+    obj = PdfWrapper(stream)
+    assert obj.widgets["test"].alignment is None
+    assert obj.widgets["test"].max_length is None
+    obj.widgets["test"].alignment = 1
+    obj.widgets["test"].max_length = 4
+    widget = _find_widget(obj.read(), "test")
+
+    assert widget["/Q"] == 1
+    assert widget["/MaxLen"] == 4
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(
+    ("name", "entry", "parent", "own", "expected"),
+    [
+        ("alignment", "/Q", Name("/invalid"), None, None),
+        ("alignment", "/Q", 5, None, None),
+        # the first value found decides, as viewers use it, and isn't skipped
+        # for a valid one above it
+        ("alignment", "/Q", 2, Name("/invalid"), None),
+        ("alignment", "/Q", 2, -1, None),
+        ("alignment", "/Q", 2, String("1"), None),
+        ("alignment", "/Q", 1, Object.parse(b"2.0"), 2),
+        ("max_length", "/MaxLen", Name("/invalid"), None, None),
+        ("max_length", "/MaxLen", -1, None, None),
+        ("max_length", "/MaxLen", 4, 0, None),
+        ("max_length", "/MaxLen", 4, Object.parse(b"2.5"), None),
+        ("max_length", "/MaxLen", 4, Object.parse(b"3.0"), 3),
+    ],
+)
+def test_read_malformed_text_field_entry(
+    template_stream, name, entry, parent, own, expected, assert_widgets_match_output
+):
+    # "test" and "test_2" share a parent with the entry, and "test" may have
+    # its own
+    stream = _group_fields(template_stream, ("test", "test_2"), entry, parent)
+    if own is not None:
+        with Pdf.open(BytesIO(stream)) as pdf:
+            group = _get_field(pdf, "group")
+            next(kid for kid in group.Kids if str(kid.T) == "test")[entry] = own
+            stream = _save(pdf)
+
+    # a malformed value means that the field has none
+    obj = PdfWrapper(stream)
+    assert getattr(obj.widgets["test"], name) == expected
+    assert obj.schema["properties"]["test"].get("maxLength") == (
+        expected if name == "max_length" else None
+    )
+    shared = getattr(obj.widgets["test_2"], name)
+
+    setattr(obj.widgets["test"], name, 1)
+    reopened = PdfWrapper(obj.read())
+    assert getattr(reopened.widgets["test"], name) == 1
+    assert getattr(reopened.widgets["test_2"], name) == shared
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(
+    ("name", "entry"), [("alignment", "/Q"), ("max_length", "/MaxLen")]
+)
+def test_clear_text_field_entry_over_malformed_parent(
+    template_stream, name, entry, assert_widgets_match_output
+):
+    stream = _group_fields(template_stream, ("test", "test_2"), entry, Name("/invalid"))
+    obj = PdfWrapper(stream)
+    obj.widgets["test"].alignment = 2
+    obj.read()
+
+    # the shared parent's value is malformed, so it doesn't give the field one
+    setattr(obj.widgets["test"], name, None)
+    result = obj.read()
+
+    assert _find_widget(result, "test")["/Parent"].get_object()[entry] == "/invalid"
+    assert getattr(PdfWrapper(result).widgets["test"], name) is None
+    assert_widgets_match_output(obj)
+
+
+def _with_null_named_widget(stream):
+    # "test" becomes a field with a value and a tooltip, and two widgets: the
+    # first without a name, and the second with a null one, which ISO 32000-1
+    # treats as absent
+    widget_entries = ("/Type", "/Subtype", "/Rect", "/F", "/P", "/MK")
+    with Pdf.open(BytesIO(stream)) as pdf:
+        field = _get_field(pdf, "test")
+        kids = []
+        for name in (None, "null"):
+            widget = pdf.make_indirect(
+                Dictionary({key: field[key] for key in widget_entries if key in field})
+            )
+            widget.Parent = field
+            if name is not None:
+                # replaced with null below, since pikepdf removes null entries
+                widget.T = String(name)
+            kids.append(widget)
+        for key in widget_entries:
+            if key in field:
+                del field[key]
+        field.Kids = Array(kids)
+        field.V = String("value")
+        field.TU = String("tooltip")
+        page = pdf.pages[0]
+        page.Annots = Array(
+            [
+                kids[0] if annot.objgen == field.objgen else annot
+                for annot in page.Annots
+            ]
+            + [kids[1]]
+        )
+        stream = _save(pdf)
+
+    writer = PdfWriter(BytesIO(stream))
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "null":
+            annot[NameObject("/T")] = NullObject()
+    with BytesIO() as f:
+        writer.write(f)
+        return f.getvalue()
+
+
+def _get_field_and_widgets(stream, name):
+    # a field that has widget kids, and its kids, by the field's name
+    reader = PdfReader(BytesIO(stream))
+    field = next(
+        each.get_object()
+        for each in reader.root_object["/AcroForm"]["/Fields"]
+        if each.get_object().get("/T") == name
+    )
+    return field, [kid.get_object() for kid in field["/Kids"]]
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_widget_with_null_name_belongs_to_its_field(
+    template_stream, use_full_widget_name, assert_widgets_match_output
+):
+    obj = PdfWrapper(
+        _with_null_named_widget(template_stream),
+        use_full_widget_name=use_full_widget_name,
+    )
+    # the widget with a null name has no key of its own, and reads its field
+    assert not any("NullObject" in key for key in obj.widgets)
+    assert obj.widgets["test"].value == "value"
+    assert obj.widgets["test"].tooltip == "tooltip"
+
+    obj.widgets["test"].alignment = 2
+    obj.widgets["test"].max_length = 9
+    obj.widgets["test"].tooltip = None
+    obj.fill({"test": "new"})
+    field, widgets = _get_field_and_widgets(obj.read(), "test")
+
+    # changes go to the field, not to a widget
+    assert (field["/Q"], field["/MaxLen"], field["/V"]) == (2, 9, "new")
+    assert "/TU" not in field
+    for widget in widgets:
+        assert not {"/Q", "/MaxLen", "/V", "/TU"} & set(widget)
+    assert_widgets_match_output(obj)
+
+
+def test_rename_field_with_null_named_widget(template_stream):
+    obj = PdfWrapper(_with_null_named_widget(template_stream))
+    # renamed through the second widget, whose name is null
+    obj.update_widget_key("test", "renamed", 1)
+    obj.commit_widget_key_updates()
+    _, widgets = _get_field_and_widgets(obj.read(), "renamed")
+
+    # the field is renamed, and the widget isn't given a name of its own
+    assert isinstance(widgets[1]["/T"], NullObject)
+    assert "test" not in obj.widgets
+    assert obj.widgets["renamed"].value == "value"
+    assert PdfWrapper(obj.read()).widgets["renamed"].value == "value"
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+@pytest.mark.parametrize("parent", [None, NullObject(), NumberObject(5)])
+@pytest.mark.parametrize("name", [None, NullObject()], ids=["absent", "null"])
+def test_text_field_without_name(template_stream, name, parent, use_full_widget_name):
+    # the merged field and widget "test" loses its name, or has a null one, and
+    # may have a /Parent that isn't a dictionary, which is absent too
+    writer = PdfWriter(BytesIO(template_stream))
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "test":
+            if name is None:
+                del annot["/T"]
+            else:
+                annot[NameObject("/T")] = name
+            if parent is not None:
+                annot[NameObject("/Parent")] = parent
+            annot[NameObject("/MaxLen")] = NumberObject(4)
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    # it opens as a field of its own, without a name
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    key = "" if use_full_widget_name else None
+    assert obj.widgets[key].max_length == 4
+    assert obj.sample_data[key] == ""
+
+    obj.fill({key: "ab"})
+    reopened = PdfWrapper(obj.read(), use_full_widget_name=use_full_widget_name)
+    assert reopened.widgets[key].value == "ab"
+
+
 @pytest.mark.parametrize("rebuild", [False, True], ids=["same", "rebuilt"])
 @pytest.mark.parametrize("separate", [False, True], ids=["merged", "separate"])
 def test_fill_checkbox_with_own_on_state_again(template_stream, separate, rebuild):
@@ -1385,6 +1791,43 @@ def test_pushbutton_is_not_a_checkbox(template_stream, state):
     widget = _find_widget(obj.fill({"action": True}).read(), "action")
     assert widget["/AS"] == state
     assert "/V" not in widget
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_unnamed_pushbutton_with_empty_parent(template_stream, use_full_widget_name):
+    # "check" becomes a pushbutton without a name, whose parent is empty, so
+    # its own flags decide
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        check = _get_field(pdf, "check")
+        check.Ff = PUSHBUTTON
+        check.Parent = pdf.make_indirect(Dictionary())
+        # replaced with null below, since pikepdf removes null entries
+        check.T = String("null")
+        if "/V" in check:
+            del check["/V"]
+        stream = _save(pdf)
+    writer = PdfWriter(BytesIO(stream))
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "null":
+            annot[NameObject("/T")] = NullObject()
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    assert ("" if use_full_widget_name else None) not in obj.widgets
+
+    # filling leaves it unchanged
+    pushbutton = next(
+        annot.get_object()
+        for annot in PdfReader(BytesIO(obj.fill(obj.sample_data).read())).pages[0][
+            "/Annots"
+        ]
+        if annot.get_object().get("/Ff") == PUSHBUTTON
+    )
+    assert pushbutton["/AS"] == "/Off"
+    assert "/V" not in pushbutton
 
 
 def _checkbox_field(stream, states, value):

@@ -59,6 +59,7 @@ from .constants import (
     Parent,
     S,
     Subtype,
+    T,
     Title,
     Version,
     ca,
@@ -117,6 +118,23 @@ def get_entry(obj: DictionaryObject, key: str) -> object:
     value = obj.get(key)
     value = value.get_object() if value is not None else None
     return None if isinstance(value, NullObject) else value
+
+
+def has_name(obj: DictionaryObject) -> bool:
+    """
+    Checks whether a field or widget dictionary has a name (`/T`).
+
+    A null name is absent, as ISO 32000-1 specifies for null entries, so a
+    widget whose `/T` is null belongs to its parent field like a widget
+    without one.
+
+    Args:
+        obj (DictionaryObject): The field or widget dictionary.
+
+    Returns:
+        bool: True if the dictionary has a `/T` that isn't null.
+    """
+    return get_entry(obj, T) is not None
 
 
 def remove_all_widgets(pdf: bytes) -> bytes:

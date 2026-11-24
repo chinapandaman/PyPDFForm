@@ -248,6 +248,26 @@ def load_data_options(options: list[str], schema: dict, param_hint: str) -> Any:
     return _validate_input_data(input_data, schema, "CLI options", param_hint)
 
 
+def without_unnamed(values: dict) -> dict:
+    """
+    Leaves out the entries of fields without a name from a mapping by widget key.
+
+    Without full widget names, a widget whose field has no name has the key
+    None, which JSON can't represent: it would be written as `"null"`, which
+    another field may be named, and a data file couldn't fill it. Such fields
+    are left out of the CLI's JSON output and of the schema that fill data is
+    validated against. With full names, such a widget's key is `""`, which is
+    kept.
+
+    Args:
+        values (dict): A mapping by widget key, such as `PdfWrapper.data`.
+
+    Returns:
+        dict: A copy of the mapping without the None key.
+    """
+    return {key: value for key, value in values.items() if key is not None}
+
+
 def get_widget(wrapper: PdfWrapper, field: str, param_hint: str) -> Widget:
     """
     Look up a widget and report missing names as CLI input errors.

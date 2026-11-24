@@ -13,7 +13,7 @@ import json
 import typer
 
 from .. import PdfWrapper
-from .common import FIELD_NAME, INPUT_PDF, get_widget
+from .common import FIELD_NAME, INPUT_PDF, get_widget, without_unnamed
 
 inspect_cli = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]}, no_args_is_help=True
@@ -55,14 +55,16 @@ def schema(
 
     The command loads the PDF with the global CLI options stored in `ctx.obj`,
     reads `PdfWrapper.schema`, serializes it as JSON, and writes it to standard
-    output.
+    output. Fields without a name are left out, as `without_unnamed` describes.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
     """
-    typer.echo(json.dumps(PdfWrapper(str(pdf), **ctx.obj).schema))
+    form_schema = PdfWrapper(str(pdf), **ctx.obj).schema
+    form_schema["properties"] = without_unnamed(form_schema["properties"])
+    typer.echo(json.dumps(form_schema))
 
 
 @inspect_cli.command(
@@ -78,14 +80,14 @@ def data(
 
     The command loads the PDF with the global CLI options stored in `ctx.obj`,
     reads `PdfWrapper.data`, serializes it as JSON, and writes it to standard
-    output.
+    output. Fields without a name are left out, as `without_unnamed` describes.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
     """
-    typer.echo(json.dumps(PdfWrapper(str(pdf), **ctx.obj).data))
+    typer.echo(json.dumps(without_unnamed(PdfWrapper(str(pdf), **ctx.obj).data)))
 
 
 @inspect_cli.command(
@@ -101,14 +103,15 @@ def sample(
 
     The command loads the PDF with the global CLI options stored in `ctx.obj`,
     reads `PdfWrapper.sample_data`, serializes it as JSON, and writes it to
-    standard output.
+    standard output. Fields without a name are left out, as `without_unnamed`
+    describes.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`
             options in `ctx.obj`.
         pdf (Path): Input PDF path.
     """
-    typer.echo(json.dumps(PdfWrapper(str(pdf), **ctx.obj).sample_data))
+    typer.echo(json.dumps(without_unnamed(PdfWrapper(str(pdf), **ctx.obj).sample_data)))
 
 
 @inspect_cli.command(

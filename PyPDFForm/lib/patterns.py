@@ -9,7 +9,7 @@ for updating these widgets, and resolves the entries that a field inherits from
 its ancestors and the AcroForm, such as its default appearance and flags.
 """
 
-from typing import Any, NamedTuple, Optional, Tuple
+from typing import Any, NamedTuple, Optional, Tuple, cast
 
 from pypdf.generic import (
     ArrayObject,
@@ -58,7 +58,7 @@ from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .utils import extract_widget_property, get_dictionary, get_entry
+from .utils import extract_widget_property, get_dictionary, get_entry, has_name
 
 # get_widget_type reads /AS as /Off, so an /AS pattern requires an appearance
 # state, whichever it is, and a field's type doesn't change as it is filled
@@ -161,11 +161,6 @@ WIDGET_TYPE_PATTERNS = [
     ),
 ]
 
-WIDGET_KEY_PATTERNS = [
-    {T: True},
-    {Parent: {T: True}},
-]
-
 WIDGET_DESCRIPTION_PATTERNS = [{TU: True}, {Parent: {TU: True}}]
 
 DROPDOWN_CHOICE_PATTERNS = [
@@ -178,10 +173,11 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
     """
     Extracts the widget key from a widget dictionary.
 
-    This function extracts the widget key from a widget dictionary based on
-    predefined patterns. If `use_full_widget_name` is True, it recursively
-    constructs the full widget name by concatenating parent and child names with
-    dots, while handling child annotations that inherit the parent name.
+    The short key is the widget's name (`/T`), or its parent's when the widget
+    has none. If `use_full_widget_name` is True, it recursively constructs the
+    full widget name by concatenating parent and child names with dots, while
+    handling child annotations that inherit the parent name. A null name is
+    absent, as `has_name` describes.
 
     Args:
         widget (dict): The widget dictionary to extract the key from.
@@ -189,25 +185,48 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
             (including parent names) as the widget key.
 
     Returns:
-        str: The extracted widget key.
+        str: The extracted widget key. Without full names, it is None when
+            neither the widget nor its parent has a name.
     """
+    key = get_entry(widget, T)
+    parent = get_dictionary(widget, Parent)
     if not use_full_widget_name:
-        return extract_widget_property(widget, WIDGET_KEY_PATTERNS, None, str)
+        if not key and parent is not None:
+            key = get_entry(parent, T)
+        # None when neither has a name
+        return cast(str, str(key) if key else None)
 
-    key = widget.get(T)
     if (
-        Parent in widget
-        and T in widget[Parent].get_object()
-        and widget[Parent].get_object()[T] != key  # sejda case
+        parent is not None
+        and has_name(parent)
+        and get_entry(parent, T) != key  # sejda case
     ):
         if key is None:
-            return get_widget_key(widget[Parent].get_object(), use_full_widget_name)
+            return get_widget_key(parent, use_full_widget_name)
 
-        return (
-            f"{get_widget_key(widget[Parent].get_object(), use_full_widget_name)}.{key}"
-        )
+        return f"{get_widget_key(parent, use_full_widget_name)}.{key}"
 
-    return key or ""
+    return str(key) if key else ""
+
+
+def _get_widget_field(annot: DictionaryObject) -> DictionaryObject:
+    """
+    Gets the field that a widget belongs to, which holds its value (`/V`) and
+    name (`/T`).
+
+    It is the widget's parent when the widget has no name, as `has_name`
+    describes, and its `/Parent` is a dictionary. Otherwise it is the widget
+    itself, which is merged with its field, so a null `/Parent`, or one that
+    isn't a dictionary, is absent.
+
+    Args:
+        annot (DictionaryObject): The widget annotation dictionary.
+
+    Returns:
+        DictionaryObject: The parent field or the widget.
+    """
+    parent = get_dictionary(annot, Parent)
+    return parent if parent is not None and not has_name(annot) else annot
 
 
 def update_checkbox_value(annot: DictionaryObject, check: bool = False) -> None:
@@ -322,7 +341,7 @@ def update_dropdown_value(
             maintain compatibility with Adobe Reader's behavior for certain fields.
     """
     option = widget.options[widget.value]
-    field = annot[NameObject(Parent)] if Parent in annot and T not in annot else annot
+    field = _get_widget_field(annot)
     field[NameObject(V)] = TextStringObject(option.export)
     field[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
     if not need_appearances:
@@ -344,7 +363,7 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         annot (DictionaryObject): The dropdown annotation dictionary.
         widget (Dropdown): The Dropdown widget object to update with the retrieved value.
     """
-    field = annot[NameObject(Parent)] if Parent in annot and T not in annot else annot
+    field = _get_widget_field(annot)
     # discovered annotations are plain dictionaries, so entries can be references
     value = field[NameObject(V)].get_object() if V in field else None
     indices = field[NameObject(I)].get_object() if I in field else None
@@ -368,14 +387,9 @@ def update_text_value(
         need_appearances (bool): If True, skips updating the appearance stream (AP) to
             maintain compatibility with Adobe Reader's behavior for certain fields.
     """
-    if Parent in annot and T not in annot:
-        annot[NameObject(Parent)][NameObject(V)] = TextStringObject(widget.value)
-        if not need_appearances:
-            annot[NameObject(AP)] = TextStringObject(widget.value)
-    else:
-        annot[NameObject(V)] = TextStringObject(widget.value)
-        if not need_appearances:
-            annot[NameObject(AP)] = TextStringObject(widget.value)
+    _get_widget_field(annot)[NameObject(V)] = TextStringObject(widget.value)
+    if not need_appearances:
+        annot[NameObject(AP)] = TextStringObject(widget.value)
 
 
 def get_text_value(annot: DictionaryObject, widget: Text) -> None:
@@ -390,15 +404,18 @@ def get_text_value(annot: DictionaryObject, widget: Text) -> None:
         annot (DictionaryObject): The text annotation dictionary.
         widget (Text): The Text widget object to update with the retrieved value.
     """
-    if Parent in annot and T not in annot:
-        widget.value = annot[Parent].get(V)
-    else:
-        widget.value = annot.get(V)
+    widget.value = _get_widget_field(annot).get(V)
 
 
 def get_text_field_max_length(widget: dict) -> int | None:
     """
     Extracts the maximum length of a text field from a widget dictionary.
+
+    The maximum length (`/MaxLen`) is resolved from the widget and the fields
+    along its `/Parent` chain, so the value of the widget or a lower field
+    takes precedence over the ones above it. A `/Parent` cycle before it is
+    found reads as no maximum length, and so does a value that
+    `parse_max_length` rejects.
 
     Args:
         widget (dict): The widget dictionary to extract the max length from.
@@ -407,21 +424,85 @@ def get_text_field_max_length(widget: dict) -> int | None:
         int | None: The maximum length of the text field, or None
             if the max length is not specified.
     """
-    return int(widget[MaxLen]) or None if MaxLen in widget else None
+    return parse_max_length(_get_inherited_value(widget, MaxLen))
 
 
 def get_text_field_alignment(widget: dict) -> int | None:
     """
     Extracts the alignment (quadding) of a text field from a widget dictionary.
 
+    The alignment (`/Q`) is resolved from the widget and the fields along its
+    `/Parent` chain, so the value of the widget or a lower field takes
+    precedence over the ones above it. The AcroForm's default isn't read, so
+    None means that no field sets an alignment and the form's default
+    applies. A `/Parent` cycle before it is found reads as no alignment, and
+    so does a value that `parse_alignment` rejects.
+
     Args:
         widget (dict): The widget dictionary to extract the alignment from.
 
     Returns:
-        int | None: The alignment of the text field, or None if the
-            alignment is not specified or is the default (left-justified).
+        int | None: The alignment of the text field, or None if no field
+            sets one.
     """
-    return int(widget[Q]) if Q in widget else None
+    return parse_alignment(_get_inherited_value(widget, Q))
+
+
+def parse_max_length(value: Any) -> int | None:
+    """
+    Reads a resolved `/MaxLen` as a maximum length.
+
+    The first `/MaxLen` found decides, as viewers such as Poppler use it, so a
+    malformed one isn't skipped for a valid one above it: it means that the
+    field has no maximum length.
+
+    Args:
+        value (Any): The resolved `/MaxLen`, or None.
+
+    Returns:
+        int | None: The maximum length, or None unless the value is a whole
+            number of at least 1.
+    """
+    max_length = _get_whole_number(value)
+    return max_length if max_length is not None and max_length >= 1 else None
+
+
+def parse_alignment(value: Any) -> int | None:
+    """
+    Reads a resolved `/Q` as an alignment.
+
+    The first `/Q` found decides, as viewers such as Poppler use it, so a
+    malformed one isn't skipped for a valid one above it: it means that the
+    field has no alignment.
+
+    Args:
+        value (Any): The resolved `/Q`, or None.
+
+    Returns:
+        int | None: The alignment, or None unless the value is a whole number
+            from 0 (left) to 2 (right).
+    """
+    alignment = _get_whole_number(value)
+    return alignment if alignment is not None and 0 <= alignment <= 2 else None
+
+
+def _get_whole_number(value: Any) -> int | None:
+    """
+    Converts a PDF number with a whole value, such as `2` or `2.0`, to an int.
+
+    Args:
+        value (Any): The value to convert.
+
+    Returns:
+        int | None: The number, or None for any other value, such as a name,
+            a string, or a number with a fraction.
+    """
+    # a PDF boolean is a BooleanObject, which isn't an int
+    if isinstance(value, int):
+        return int(value)
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    return None
 
 
 def get_dropdown_choices(widget: dict) -> Tuple[str | Tuple[str, str], ...]:
@@ -461,10 +542,7 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
         annot (DictionaryObject): The annotation dictionary.
         val (str): The new name for the annotation.
     """
-    if Parent in annot and T not in annot:
-        annot[NameObject(Parent)][NameObject(T)] = TextStringObject(val)
-    else:
-        annot[NameObject(T)] = TextStringObject(val)
+    _get_widget_field(annot)[NameObject(T)] = TextStringObject(val)
 
 
 def get_field_rect(annot: DictionaryObject) -> Tuple[float, float, float, float]:
@@ -562,7 +640,7 @@ def resolve_inherited_entry(
             raise ValueError(msg)
         seen.add(id(node))
 
-        if own_field is None and get_entry(node, T) is not None:
+        if own_field is None and has_name(node):
             own_field = node
         value = get_entry(node, key)
         if value is not None:
@@ -604,9 +682,10 @@ def is_pushbutton(widget: DictionaryObject) -> bool:
     """
     Checks whether the field of a widget annotation is a pushbutton.
 
-    The flag is read from the widget when it is its own field, which has a
-    name (`T`), and otherwise from its parent field and the fields above it,
-    as the radio flag is, so every widget of a field has the same type.
+    The flag is read from the field the widget belongs to, as
+    `_get_widget_field` describes, and the fields above it, as the radio flag
+    is, so every widget of a field has the same type. When that field is an
+    empty parent, which has no flags, it is read from the widget instead.
 
     Args:
         widget (DictionaryObject): The widget annotation.
@@ -614,8 +693,8 @@ def is_pushbutton(widget: DictionaryObject) -> bool:
     Returns:
         bool: True if the field sets the Pushbutton flag.
     """
-    field = widget if T in widget else get_dictionary(widget, Parent) or widget
-    return check_field_flag(field, PUSHBUTTON)
+    # an empty parent is falsy, so the widget's own flags are read
+    return check_field_flag(_get_widget_field(widget) or widget, PUSHBUTTON)
 
 
 def _get_inherited_value(widget: DictionaryObject, key: str) -> Any:

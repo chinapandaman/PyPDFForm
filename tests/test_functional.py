@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 import os
 import re
 import stat
@@ -1850,6 +1851,58 @@ def test_cli_font_size_without_default_appearance(template_stream, tmp_path):
     assert result.exit_code == 1
     assert isinstance(result.exception, ValueError)
     assert path.read_bytes() == original
+
+
+def _without_duplicate_keys(pairs):
+    # a JSON object hook that fails on a key written twice
+    keys = [key for key, _ in pairs]
+    assert len(keys) == len(set(keys)), keys
+    return dict(pairs)
+
+
+@pytest.mark.cli_test
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_cli_fill_with_sample_of_field_without_name(
+    template_stream, tmp_path, use_full_widget_name
+):
+    # "test" has a null name, so it has none, and "test_2" is named "null"
+    writer = PdfWriter(BytesIO(template_stream))
+    for page in writer.pages:
+        for annot in page["/Annots"]:
+            annot = annot.get_object()
+            if annot.get(T) == "test":
+                annot[NameObject(T)] = NullObject()
+            elif annot.get(T) == "test_2":
+                annot[NameObject(T)] = TextStringObject("null")
+    path = tmp_path / "input.pdf"
+    with open(path, "wb") as f:
+        writer.write(f)
+    options = ["--use-full-widget-name"] if use_full_widget_name else []
+    runner = CliRunner()
+
+    # without full names, JSON can't name the field, so it is left out; with
+    # them, its key is ""
+    expected = {"check", "null", "check_2", "test_3", "check_3"} | (
+        {""} if use_full_widget_name else set()
+    )
+    for command in ("schema", "data", "sample"):
+        result = runner.invoke(cli_app, [*options, "inspect", command, str(path)])
+        assert result.exit_code == 0, result.output
+        output = json.loads(result.output, object_pairs_hook=_without_duplicate_keys)
+        assert set(output["properties"] if command == "schema" else output) == expected
+
+    sample = tmp_path / "sample.json"
+    sample.write_text(result.output)
+    output_path = tmp_path / "output.pdf"
+    result = runner.invoke(
+        cli_app,
+        [*options, "fill", str(path), "-f", str(sample), "-o", str(output_path)],
+    )
+
+    assert result.exit_code == 0, result.output
+    data = PdfWrapper(str(output_path), use_full_widget_name=use_full_widget_name).data
+    assert data["null"] == "null"
+    assert data["test_3"] == "test_3"
 
 
 @pytest.mark.parametrize(
