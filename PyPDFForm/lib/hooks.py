@@ -13,7 +13,7 @@ and behavior.
 import sys
 from collections.abc import Callable
 from io import BytesIO
-from typing import TextIO, cast
+from typing import Any, TextIO, cast
 
 from pypdf import PdfWriter
 from pypdf.generic import (
@@ -54,7 +54,6 @@ from .constants import (
     Q,
     Rect,
     S,
-    T,
     Type,
     U,
     X,
@@ -65,9 +64,11 @@ from .patterns import (
     WIDGET_DESCRIPTION_PATTERNS,
     check_field_flag,
     get_widget_key,
+    parse_alignment,
+    parse_max_length,
     resolve_inherited_entry,
 )
-from .utils import extract_widget_property, get_dictionary, get_entry
+from .utils import extract_widget_property, get_dictionary, has_name
 
 
 def trigger_widget_hooks(
@@ -176,31 +177,79 @@ def _set_field_entry(annot: DictionaryObject, key: str, value: NumberObject) -> 
     resolve_inherited_entry(annot, key, None).target[NameObject(key)] = value
 
 
+def _read_alignment(annot: DictionaryObject) -> int | None:
+    """
+    Reads the alignment of a widget's field, as `get_text_field_alignment`
+    does, except that a `/Parent` cycle raises.
+
+    Args:
+        annot (DictionaryObject): The widget annotation dictionary.
+
+    Returns:
+        int | None: The alignment, or None if the field has none.
+
+    Raises:
+        ValueError: If the `/Parent` chain has a cycle before `/Q` is found.
+    """
+    return parse_alignment(resolve_inherited_entry(annot, Q, None).value)
+
+
+def _read_max_length(annot: DictionaryObject) -> int | None:
+    """
+    Reads the maximum length of a widget's field, as
+    `get_text_field_max_length` does, except that a `/Parent` cycle raises.
+
+    Args:
+        annot (DictionaryObject): The widget annotation dictionary.
+
+    Returns:
+        int | None: The maximum length, or None if the field has none.
+
+    Raises:
+        ValueError: If the `/Parent` chain has a cycle before `/MaxLen` is
+            found.
+    """
+    return parse_max_length(resolve_inherited_entry(annot, MaxLen, None).value)
+
+
+def _read_tooltip(annot: DictionaryObject) -> Any:
+    """
+    Reads the tooltip of a widget's field from the widget or its parent.
+
+    Args:
+        annot (DictionaryObject): The widget annotation dictionary.
+
+    Returns:
+        Any: The tooltip, or None if neither sets one.
+    """
+    return extract_widget_property(annot, WIDGET_DESCRIPTION_PATTERNS, None, None)
+
+
 def _remove_field_entry(
-    annot: DictionaryObject, key: str, patterns: list | None = None
+    annot: DictionaryObject, key: str, read: Callable[[DictionaryObject], Any]
 ) -> None:
     """
     Removes a field entry from a widget and its own field.
 
     The widget's own field is the first dictionary in its `/Parent` chain,
-    starting with the widget itself, that has a name (`T`). The entry is removed
-    from every dictionary up to and including that field, so the field no longer
-    has it, even when it was stored on the parent of a widget. Fields above the
-    widget's own field are shared with other fields, so they are never changed.
-    If the field still has the entry afterwards, one of them supplies it, and an
-    error is raised. Hooks change a PDF writer that is written only when every
-    hook succeeds, so raising discards the removal.
+    starting with the widget itself, that has a name, as `has_name` describes.
+    The entry is removed from every dictionary up to and including that field,
+    so the field no longer has it, even when it was stored on the parent of a
+    widget. Fields above the widget's own field are shared with other fields,
+    so they are never changed. If the field still has a value afterwards, one
+    of them supplies it, and an error is raised. Hooks change a PDF writer that
+    is written only when every hook succeeds, so raising discards the removal.
 
     Args:
         annot (DictionaryObject): The widget annotation dictionary.
         key (str): The entry to remove, such as `/MaxLen`, `/Q`, or `/TU`.
-        patterns (list | None): The patterns used to read a non-inheritable
-            entry, such as `WIDGET_DESCRIPTION_PATTERNS`. None for an
-            inheritable entry, which the field takes from any ancestor.
+        read (Callable[[DictionaryObject], Any]): Reads the field's value from
+            the widget as its property does, such as `_read_alignment`, None
+            when it has none.
 
     Raises:
         ValueError: If a shared field above the widget's own field supplies
-            the entry, or the `/Parent` chain has a cycle.
+            a value, or the `/Parent` chain has a cycle.
     """
     field = annot
     seen = set()
@@ -212,16 +261,11 @@ def _remove_field_entry(
 
         field.pop(NameObject(key), None)
         parent = get_dictionary(field, Parent)
-        if get_entry(field, T) is not None or parent is None:
+        if has_name(field) or parent is None:
             break
         field = parent
 
-    value = (
-        resolve_inherited_entry(annot, key, None).value
-        if patterns is None
-        else extract_widget_property(annot, patterns, None, None)
-    )
-    if value is not None:
+    if read(annot) is not None:
         msg = f"Cannot remove {key}: a parent field shared with other fields sets it."
         raise ValueError(msg)
 
@@ -353,7 +397,7 @@ def update_text_field_alignment(annot: DictionaryObject, val: int) -> None:
             fields sets the alignment, or the `/Parent` chain has a cycle.
     """
     if val is None:
-        _remove_field_entry(annot, Q)
+        _remove_field_entry(annot, Q, _read_alignment)
     else:
         _set_field_entry(annot, Q, NumberObject(val))
 
@@ -420,7 +464,7 @@ def update_text_field_max_length(annot: DictionaryObject, val: int) -> None:
             fields sets the maximum length, or the `/Parent` chain has a cycle.
     """
     if val is None:
-        _remove_field_entry(annot, MaxLen)
+        _remove_field_entry(annot, MaxLen, _read_max_length)
     else:
         _set_field_entry(annot, MaxLen, NumberObject(val))
 
@@ -598,7 +642,7 @@ def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
     if val:
         annot[NameObject(TU)] = TextStringObject(val)
     else:
-        _remove_field_entry(annot, TU, WIDGET_DESCRIPTION_PATTERNS)
+        _remove_field_entry(annot, TU, _read_tooltip)
 
 
 def update_field_required(annot: DictionaryObject, val: bool) -> None:
