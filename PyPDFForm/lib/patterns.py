@@ -684,7 +684,8 @@ def is_pushbutton(widget: DictionaryObject) -> bool:
 
     The flag is read from the field the widget belongs to, as
     `_get_widget_field` describes, and the fields above it, as the radio flag
-    is, so every widget of a field has the same type.
+    is, so every widget of a field has the same type. When that field is an
+    empty parent, which has no flags, it is read from the widget instead.
 
     Args:
         widget (DictionaryObject): The widget annotation.
@@ -692,7 +693,8 @@ def is_pushbutton(widget: DictionaryObject) -> bool:
     Returns:
         bool: True if the field sets the Pushbutton flag.
     """
-    return check_field_flag(_get_widget_field(widget), PUSHBUTTON)
+    # an empty parent is falsy, so the widget's own flags are read
+    return check_field_flag(_get_widget_field(widget) or widget, PUSHBUTTON)
 
 
 def _get_inherited_value(widget: DictionaryObject, key: str) -> Any:

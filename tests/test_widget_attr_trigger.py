@@ -1793,6 +1793,43 @@ def test_pushbutton_is_not_a_checkbox(template_stream, state):
     assert "/V" not in widget
 
 
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_unnamed_pushbutton_with_empty_parent(template_stream, use_full_widget_name):
+    # "check" becomes a pushbutton without a name, whose parent is empty, so
+    # its own flags decide
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        check = _get_field(pdf, "check")
+        check.Ff = PUSHBUTTON
+        check.Parent = pdf.make_indirect(Dictionary())
+        # replaced with null below, since pikepdf removes null entries
+        check.T = String("null")
+        if "/V" in check:
+            del check["/V"]
+        stream = _save(pdf)
+    writer = PdfWriter(BytesIO(stream))
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "null":
+            annot[NameObject("/T")] = NullObject()
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    assert ("" if use_full_widget_name else None) not in obj.widgets
+
+    # filling leaves it unchanged
+    pushbutton = next(
+        annot.get_object()
+        for annot in PdfReader(BytesIO(obj.fill(obj.sample_data).read())).pages[0][
+            "/Annots"
+        ]
+        if annot.get_object().get("/Ff") == PUSHBUTTON
+    )
+    assert pushbutton["/AS"] == "/Off"
+    assert "/V" not in pushbutton
+
+
 def _checkbox_field(stream, states, value):
     # the widgets of "check", and of "check_2" with two states, become kids of
     # a field "check" with the value, and none has a value of its own; a widget
