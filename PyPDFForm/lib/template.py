@@ -236,12 +236,41 @@ def _build_widget_cache(
     acroform = get_dictionary(reader.root_object, AcroForm)
 
     for page_num, page in enumerate(reader.pages, start=1):
-        for widget in _get_widgets_on_page(page):
+        for index, widget in enumerate(_get_widgets_on_page(page)):
             _process_widget(
-                widget, page_num, use_full_widget_name, results, radios, acroform
+                widget,
+                page_num,
+                use_full_widget_name,
+                results,
+                radios,
+                acroform,
+                index,
             )
 
     return results
+
+
+def get_widget_positions(pdf_stream: bytes) -> Dict[str, tuple]:
+    """
+    Gets where the widget that each short key gives access to is in a PDF.
+
+    The position is the page number and the index of the widget among the
+    widgets on that page, which renaming doesn't change. For a radio group, it
+    is the position of its first option.
+
+    Args:
+        pdf_stream (bytes): The PDF stream to parse.
+
+    Returns:
+        Dict[str, tuple]: The `(page number, index)` of each key's widget.
+    """
+    if not pdf_stream:
+        return {}
+
+    return {
+        key: widget.__dict__["_position"]
+        for key, widget in _build_widget_cache(pdf_stream, False).items()
+    }
 
 
 def _process_widget(
@@ -251,6 +280,7 @@ def _process_widget(
     results: Dict[str, WIDGET_TYPES],
     radios: Dict[str, Radio],
     acroform: Optional[DictionaryObject],
+    index: int,
 ) -> None:
     """
     Processes a single widget and adds it to the results dictionary.
@@ -270,10 +300,13 @@ def _process_widget(
             when a widget of another type replaces them in `results`.
         acroform (Optional[DictionaryObject]): The AcroForm dictionary, whose
             default appearance text fields and dropdowns can inherit.
+        index (int): The index of the widget among the widgets on its page.
     """
     key = get_widget_key(widget, use_full_widget_name)
     _widget = construct_widget(widget, key)
     if _widget is not None:
+        # which widget the key gives access to, as `get_widget_positions` reads it
+        _widget.__dict__["_position"] = (page_number, index)
         _populate_common_properties(widget, page_number, _widget)
 
         if isinstance(_widget, (Text, Dropdown)):

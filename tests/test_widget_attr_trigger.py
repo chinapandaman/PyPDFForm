@@ -1849,32 +1849,126 @@ def test_rename_field_with_null_named_widget(template_stream):
     assert PdfWrapper(obj.read()).widgets["renamed"].value == "value"
 
 
-@pytest.mark.parametrize(("index", "kept", "renamed"), [(0, 20, 10), (1, 10, 20)])
-def test_rename_by_index_reads_field_kept(
+@pytest.mark.parametrize(
+    ("index", "kept", "renamed"),
+    [(0, (20, "pending"), (10, "first")), (1, (10, "first"), (20, "pending"))],
+    ids=["first", "last"],
+)
+def test_rename_by_index(
     template_stream, index, kept, renamed, assert_widgets_match_output
 ):
-    # two text fields named "test", with their own style and alignment
+    # two text fields named "test", with their own style, alignment, and value
     with Pdf.open(BytesIO(template_stream)) as pdf:
         fields = pdf.Root.AcroForm.Fields
         first = next(field for field in fields if str(field.get("/T")) == "test")
         second = next(field for field in fields if str(field.get("/T")) == "test_2")
         first.DA = String("/Helv 10 Tf 0 g")
         first.Q = 0
+        first.V = String("first")
         second.T = String("test")
         second.DA = String("/Cour 20 Tf 1 0 0 rg")
         second.Q = 2
+        second.V = String("second")
         stream = _save(pdf)
 
     obj = PdfWrapper(stream)
-    # the key gives access to the last field
-    assert obj.widgets["test"].font_size == 20
+    # the key gives access to the last field, whose value isn't filled yet
+    obj.widgets["test"].value = "pending"
     obj.update_widget_key("test", "renamed", index)
     obj.commit_widget_key_updates()
 
-    # after renaming the last field, the key gives access to the first
-    assert obj.widgets["test"].font_size == kept
-    assert obj.widgets["renamed"].font_size == renamed
+    # each key reads its field, and the value stays with the field it was set on
+    for key, (font_size, value) in (("test", kept), ("renamed", renamed)):
+        assert (obj.widgets[key].font_size, obj.widgets[key].value) == (
+            font_size,
+            value,
+        )
+    obj.fill({})
     assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(
+    ("index", "kept", "renamed"),
+    [
+        (0, (("x", "y", "z"), 2), (("a", "b"), 0)),
+        (1, (("a", "b"), 0), (("x", "y", "z"), 2)),
+    ],
+    ids=["first", "last"],
+)
+def test_rename_dropdown_by_index(
+    template_stream, index, kept, renamed, assert_widgets_match_output
+):
+    # two dropdowns named "dropdown", with two and three choices
+    stream = (
+        PdfWrapper(template_stream)
+        .bulk_create_fields(
+            [
+                Fields.DropdownField(
+                    name="dropdown", page_number=1, x=100, y=100, options=["a", "b"]
+                ),
+                Fields.DropdownField(
+                    name="other", page_number=1, x=300, y=100, options=["x", "y", "z"]
+                ),
+            ]
+        )
+        .read()
+    )
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for field in pdf.Root.AcroForm.Fields:
+            if str(field.get("/T")) == "other":
+                field.T = String("dropdown")
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    # the key gives access to the last dropdown, whose selection isn't filled yet
+    obj.widgets["dropdown"].value = 2
+    obj.update_widget_key("dropdown", "renamed", index)
+    obj.commit_widget_key_updates()
+
+    # the choices and the selection are those of one field
+    for key, (choices, value) in (("dropdown", kept), ("renamed", renamed)):
+        assert (obj.widgets[key].choices, obj.widgets[key].value) == (choices, value)
+    obj.fill({"test": "foo"})
+    assert_widgets_match_output(obj)
+
+
+def test_create_field_beside_field_without_name(template_stream):
+    # without full names, "test", which has no name, is keyed None
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        for field in pdf.Root.AcroForm.Fields:
+            if str(field.get("/T")) == "test":
+                del field["/T"]
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    obj.widgets[None].value = "pending"
+    obj.bulk_create_fields([Fields.TextField(name="new", page_number=1, x=100, y=100)])
+
+    # the created field doesn't take the state of the field without a name
+    assert obj.widgets[None].value == "pending"
+    assert obj.widgets["new"].value == PdfWrapper(obj.read()).widgets["new"].value
+
+
+def test_rename_to_key_of_field_of_another_type(
+    template_stream, assert_widgets_match_output
+):
+    obj = PdfWrapper(template_stream)
+    obj.widgets["check"].value = True
+    obj.update_widget_key("check", "test").commit_widget_key_updates()
+
+    # the key gives access to the checkbox, which comes after the text field,
+    # as after reopening, and its value not filled yet stays with it
+    assert type(obj.widgets["test"]) is Checkbox
+    assert obj.widgets["test"].value is True
+    obj.fill({})
+    assert_widgets_match_output(obj)
+
+
+def test_commit_widget_key_updates_without_pdf():
+    # a wrapper without a PDF has no fields to rename
+    obj = PdfWrapper().update_widget_key("a", "b").commit_widget_key_updates()
+
+    assert obj.widgets == {}
 
 
 @pytest.mark.parametrize("use_full_widget_name", [False, True])

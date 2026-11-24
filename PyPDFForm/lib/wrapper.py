@@ -30,6 +30,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     BinaryIO,
+    Collection,
     Dict,
     Iterator,
     List,
@@ -67,6 +68,7 @@ from .template import (
     create_annotations,
     get_on_open_javascript,
     get_title,
+    get_widget_positions,
     set_on_open_javascript,
     set_title,
     update_widget_keys,
@@ -302,7 +304,7 @@ class PdfWrapper:
 
         return result
 
-    def _init_helper(self) -> None:
+    def _init_helper(self, repointed: Collection[str] = ()) -> None:
         """
         Helper method to initialize widgets.
 
@@ -310,12 +312,17 @@ class PdfWrapper:
         that modify the PDF content (e.g., filling, creating widgets, updating keys).
         It rebuilds the widget dictionary and invalidates the lazily loaded font cache.
         Fields no longer in the PDF are dropped. Existing widget objects are kept
-        for keys that remain, and take the properties read from the PDF from the
-        rebuilt widget of the same type, with `Widget.copy_read_state`, since the
-        key can give access to another field than before, such as after renaming
-        by index. A renamed widget is built from the PDF and takes the state the
-        PDF doesn't hold from the widget it replaces, with
+        for keys that remain, since queued hooks were already applied to the PDF
+        and their properties match it, unless the key gives access to another
+        field than before. A renamed widget is built from the PDF and takes the
+        state the PDF doesn't hold from the widget it replaces, with
         `Widget.copy_unread_state`.
+
+        Args:
+            repointed (Collection[str]): Keys that remain but give access to
+                another field than before, such as after renaming the field a
+                key gave access to by index. Their widgets are built from the
+                PDF rather than kept.
         """
 
         self._available_fonts_loaded = False
@@ -329,11 +336,12 @@ class PdfWrapper:
             else {}
         )
         for k, v in new_widgets.items():
-            if k in self.widgets:
-                if type(self.widgets[k]) is type(v):
-                    self.widgets[k].copy_read_state(v)
+            if k in self.widgets and k not in repointed:
                 new_widgets[k] = self.widgets[k]
-            elif self._key_update_tracker.get(k) in self.widgets:
+            elif (
+                k in self._key_update_tracker
+                and self._key_update_tracker[k] in self.widgets
+            ):
                 v.copy_unread_state(self.widgets[self._key_update_tracker[k]])
         self._key_update_tracker = {}
 
@@ -1212,9 +1220,12 @@ class PdfWrapper:
 
         This method applies all widget key updates queued by the `update_widget_key` method. It updates
         the underlying PDF stream with the new key names, rebuilds the widget cache, and clears the queue.
-        Renamed widgets are read from the PDF and keep the old widgets' state that the PDF doesn't hold,
-        such as values not filled yet and fonts, without queuing their hooks again. If committing raises,
-        the PDF, widgets, and queue are restored.
+        Renamed widgets are read from the PDF. A renamed field keeps the state of the widget its old key
+        gave access to that the PDF doesn't hold, such as a value not filled yet or JavaScript, without
+        queuing hooks again, when it is that widget's field. A key that gives access to another field
+        after the rename, such as one whose field was renamed by index, gets a widget read from the PDF,
+        so that state stays with the field it was set on. If committing raises, the PDF, widgets, and
+        queue are restored.
 
         Returns:
             PdfWrapper: The PdfWrapper object.
@@ -1228,13 +1239,19 @@ class PdfWrapper:
         indices = [each[2] for each in self._keys_to_update]
 
         with self._restore_on_failure():
+            before = get_widget_positions(self._stream)
             self._stream = update_widget_keys(
                 self._stream, self.widgets, old_keys, new_keys, indices
             )
+            after = get_widget_positions(self._stream)
 
-            for each in self._keys_to_update:
-                self._key_update_tracker[each[1]] = each[0]
-            self._init_helper()
+            for old_key, new_key, _ in self._keys_to_update:
+                # only the field the old key gave access to takes its widget's state
+                if old_key in before and after.get(new_key) == before[old_key]:
+                    self._key_update_tracker[new_key] = old_key
+            self._init_helper(
+                {key for key in before if key in after and before[key] != after[key]}
+            )
             self._keys_to_update = []
 
         return self
