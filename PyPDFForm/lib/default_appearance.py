@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Module for changing the default appearance (`/DA`) of variable text fields.
+Module for reading and changing the default appearance (`/DA`) of variable
+text fields.
 
 A default appearance is a sequence of PDF content stream operations, such as
 `/Helv 12 Tf 0 g`, that sets the font, font size, and color of a field's text.
@@ -10,14 +11,17 @@ order are understood. A change rewrites only the operands it replaces and keeps
 the rest of the string as it was, and writes numbers and names that the next
 change can read. A string that can't be read, or that lacks the operation a
 change needs, is rejected with an error rather than rewritten into an invalid
-one.
+one; reading such a string gives no value instead.
 """
 
 import re
 from collections.abc import Callable, Iterator
 from contextlib import suppress
 from decimal import Decimal, InvalidOperation
-from typing import List, NamedTuple
+from fractions import Fraction
+from typing import List, NamedTuple, Optional
+
+from pypdf.generic import NameObject
 
 # PDF whitespace, a comment, a name, a run of other characters that aren't
 # delimiters, such as a number or an operator, or an array bracket
@@ -223,6 +227,39 @@ def _format_number(value: object, change: str) -> str:
     return text
 
 
+def _has_font_and_size(operation: _Operation) -> bool:
+    """
+    Checks whether a `Tf` operation has a font followed by a numeric size.
+
+    Args:
+        operation (_Operation): The `Tf` operation.
+
+    Returns:
+        bool: True if its operands are a font, with or without its slash, and
+            a number.
+    """
+    return (
+        len(operation.operands) == 2
+        and operation.operands[0].kind in ("name", "word")
+        and operation.operands[1].kind == "number"
+    )
+
+
+def _has_color_operands(operation: _Operation) -> bool:
+    """
+    Checks whether a gray, RGB, or CMYK fill color operation has its operands.
+
+    Args:
+        operation (_Operation): A `g`, `rg`, or `k` operation.
+
+    Returns:
+        bool: True if it has the number of numeric operands it takes.
+    """
+    return len(operation.operands) == _COLOR_OPERAND_COUNTS[operation.operator] and all(
+        operand.kind == "number" for operand in operation.operands
+    )
+
+
 def _get_font_operations(
     default_appearance: str, operations: List[_Operation], change: str
 ) -> List[_Operation]:
@@ -250,11 +287,7 @@ def _get_font_operations(
         raise ValueError(msg)
 
     for each in result:
-        if (
-            len(each.operands) != 2
-            or each.operands[0].kind not in ("name", "word")
-            or each.operands[1].kind != "number"
-        ):
+        if not _has_font_and_size(each):
             msg = (
                 f"Cannot change the {change}: the {_FONT_OPERATOR} operator of "
                 f"/DA {default_appearance!r} needs a font and a font size."
@@ -283,6 +316,31 @@ def _replace(default_appearance: str, replacements: List[tuple]) -> str:
     return result
 
 
+def _decode(default_appearance: object) -> str | None:
+    """
+    Reads a resolved `/DA` value as a string.
+
+    A string that pypdf can't decode as text, such as one with a NUL
+    character, which is PDF whitespace, is a byte string. Its bytes are read as
+    Latin-1, which maps each byte to the character with the same code. A PDF
+    name isn't a string, although pypdf reads it as a `str`.
+
+    Args:
+        default_appearance (object): The resolved `/DA` value.
+
+    Returns:
+        str | None: The `/DA` string, or None when the value is not a string.
+    """
+    if isinstance(default_appearance, NameObject):
+        return None
+    if isinstance(default_appearance, bytes):
+        return default_appearance.decode("latin-1")
+    if isinstance(default_appearance, str):
+        return default_appearance
+
+    return None
+
+
 def _rewrite(
     default_appearance: object,
     change: str,
@@ -291,11 +349,8 @@ def _rewrite(
     """
     Replaces parts of a resolved `/DA` value, keeping its type.
 
-    A string that pypdf can't decode as text, such as one with a NUL
-    character, which is PDF whitespace, is a byte string. Its bytes are read as
-    Latin-1, which maps each byte to the character with the same code, and the
-    result is encoded the same way, so the bytes outside the replaced parts
-    don't change.
+    A byte string is read as `_decode` describes, and the result is encoded
+    the same way, so the bytes outside the replaced parts don't change.
 
     Args:
         default_appearance (object): The resolved `/DA` value.
@@ -310,14 +365,11 @@ def _rewrite(
     Raises:
         ValueError: If the value is not a string or can't be read.
     """
-    if isinstance(default_appearance, bytes):
-        text = default_appearance.decode("latin-1")
-    elif isinstance(default_appearance, str):
-        text = default_appearance
-    else:
+    text = _decode(default_appearance)
+    if text is None:
         msg = f"Cannot change the {change}: the field's /DA is not a string."
         # malformed PDF data, raised like every other /DA error
-        raise ValueError(msg)  # noqa: TRY004
+        raise ValueError(msg)
 
     result = _replace(text, get_replacements(text, _parse(text, change)))
     return result.encode("latin-1") if isinstance(default_appearance, bytes) else result
@@ -435,9 +487,7 @@ def _get_color_replacements(
         count = _COLOR_OPERAND_COUNTS.get(each.operator)
         if count is None:
             continue
-        if len(each.operands) != count or any(
-            operand.kind != "number" for operand in each.operands
-        ):
+        if not _has_color_operands(each):
             msg = (
                 f"Cannot change the font color: the {each.operator} operator of "
                 f"/DA {default_appearance!r} needs {count} "
@@ -498,3 +548,122 @@ def change_font_color(default_appearance: object, font_color: tuple) -> str | by
         "font color",
         lambda text, operations: _get_color_replacements(text, operations, color),
     )
+
+
+class TextStyle(NamedTuple):
+    """
+    The font, font size, and font color that a default appearance sets.
+
+    Attributes:
+        font (Optional[str]): The font resource name, as the `/DA` writes it,
+            such as `/Helv` or `/My#20Font`.
+        font_size (Optional[float]): The font size, where 0 sizes the text to
+            fit.
+        font_color (Optional[tuple]): The fill color, as an RGB tuple.
+    """
+
+    font: Optional[str]
+    font_size: Optional[float]
+    font_color: Optional[tuple]
+
+
+def read_default_appearance(default_appearance: object) -> TextStyle:
+    """
+    Reads the font, font size, and font color of a default appearance.
+
+    The last `Tf` operation sets the font and font size, and the last
+    operation that changes the fill color sets the color, as for the text a
+    viewer draws. A gray (`g`) or CMYK (`k`) color is converted to RGB as
+    ISO 32000-1 specifies: a gray level `v` is `(v, v, v)`, and a CMYK color
+    `(c, m, y, k)` is `(1 - min(1, c + k), 1 - min(1, m + k), 1 - min(1, y + k))`.
+    Each is None when the `/DA` doesn't set it, or sets it in a way that can't
+    be read, such as a `Tf` without a numeric size, or a color set through a
+    color space with `sc`. A value that isn't a string, or a string that can't
+    be read, such as one with `(`, sets none of them. A whole number reads as
+    an int, such as `12` or `12.0`, and any other number as a float.
+
+    Args:
+        default_appearance (object): The resolved `/DA` value, or None.
+
+    Returns:
+        TextStyle: The font, font size, and font color, each None when the
+            `/DA` doesn't set it.
+    """
+    font = font_size = font_color = None
+    text = _decode(default_appearance)
+    if text is None:
+        return TextStyle(font, font_size, font_color)
+
+    operations = []
+    with suppress(ValueError):
+        operations = _parse(text, "default appearance")
+
+    fonts = [each for each in operations if each.operator == _FONT_OPERATOR]
+    if fonts and _has_font_and_size(fonts[-1]):
+        name, size = fonts[-1].operands
+        font = text[name.start : name.end]
+        font_size = _read_number(text[size.start : size.end])
+
+    colors = [each for each in operations if each.operator in _FILL_COLOR_OPERATORS]
+    if (
+        colors
+        and colors[-1].operator in _COLOR_OPERAND_COUNTS
+        and _has_color_operands(colors[-1])
+    ):
+        font_color = _read_rgb_color(text, colors[-1])
+
+    return TextStyle(font, font_size, font_color)
+
+
+def _read_rgb_color(default_appearance: str, operation: _Operation) -> tuple:
+    """
+    Reads a gray, RGB, or CMYK fill color operation as an RGB color.
+
+    The components are computed as exact fractions, so the result doesn't
+    depend on the caller's decimal context.
+
+    Args:
+        default_appearance (str): The `/DA` string.
+        operation (_Operation): A `g`, `rg`, or `k` operation with its
+            numeric operands.
+
+    Returns:
+        tuple: The red, green, and blue components.
+    """
+    values = [
+        Fraction(default_appearance[each.start : each.end])
+        for each in operation.operands
+    ]
+    if operation.operator == "g":
+        values *= 3
+    elif operation.operator == "k":
+        black = values[3]
+        values = [1 - min(Fraction(1), each + black) for each in values[:3]]
+
+    return tuple(_to_number(each) for each in values)
+
+
+def _read_number(text: str) -> float:
+    """
+    Reads the text of a PDF number.
+
+    Args:
+        text (str): The number's text, such as `12` or `.5`.
+
+    Returns:
+        float: The number, as an int when it is whole.
+    """
+    return _to_number(Fraction(text))
+
+
+def _to_number(value: Fraction) -> float:
+    """
+    Converts an exact number to an int when it is whole, or to a float.
+
+    Args:
+        value (Fraction): The number.
+
+    Returns:
+        float: The number, as an int when it is whole.
+    """
+    return int(value) if value.denominator == 1 else float(value)

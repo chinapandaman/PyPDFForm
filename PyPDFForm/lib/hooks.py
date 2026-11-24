@@ -319,8 +319,9 @@ def update_text_field_font(
 
     This function changes the font of the field's default appearance (`/DA`),
     as `_update_default_appearance` describes. The font must be a PDF font
-    resource name starting with a slash "/"; any other name leaves the
-    annotation unchanged.
+    resource name starting with a slash "/". The wrapper maps the name of a
+    registered font or a font of the PDF to its resource name before the hook
+    is applied, so any other name is one the PDF doesn't have.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
@@ -328,11 +329,16 @@ def update_text_field_font(
         acroform (DictionaryObject): The AcroForm dictionary, for its default.
 
     Raises:
-        ValueError: If the `/DA` can't be resolved or has no `Tf` operator
-            with a font and a numeric size.
+        ValueError: If the font is not a resource name starting with "/", or
+            the `/DA` can't be resolved or has no `Tf` operator with a font and
+            a numeric size.
     """
     if not val.startswith("/"):
-        return
+        msg = (
+            f"Cannot change the font: {val!r} is not a registered font, a font "
+            "of the PDF, or a font resource name starting with '/'."
+        )
+        raise ValueError(msg)
     _update_default_appearance(annot, acroform, lambda da: change_font(da, val))
 
 

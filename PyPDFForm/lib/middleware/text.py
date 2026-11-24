@@ -36,6 +36,9 @@ class Text(Widget):
         }
     )
     READ_PROPERTIES = Widget.READ_PROPERTIES | {
+        "font",
+        "font_size",
+        "font_color",
         "comb",
         "alignment",
         "multiline",
@@ -56,9 +59,12 @@ class Text(Widget):
             value (str): The initial value of the text field. Defaults to None.
 
         Attributes:
-            font (str): The font of the text field. Defaults to None.
-            font_size (int): The font size of the text field. Defaults to None.
-            font_color (str): The font color of the text field. Defaults to None.
+            font (str): The font resource name of the text field, such as
+                `/Helv`. Defaults to None.
+            font_size (float): The font size of the text field, where 0 sizes
+                the text to fit. Defaults to None.
+            font_color (tuple): The RGB font color of the text field. Defaults
+                to None.
             comb (bool): Whether the text field is a comb field. Defaults to None.
             alignment (str): The alignment of the text field. Defaults to None.
             multiline (bool): Whether the text field is multiline. Defaults to None.
