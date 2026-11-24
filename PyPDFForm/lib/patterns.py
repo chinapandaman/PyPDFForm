@@ -193,7 +193,7 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
     if not use_full_widget_name:
         if not key and parent is not None:
             key = get_entry(parent, T)
-        # None when neither has a name, as before
+        # None when neither has a name
         return cast(str, str(key) if key else None)
 
     if (
@@ -209,14 +209,15 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
     return str(key) if key else ""
 
 
-def _get_value_field(annot: DictionaryObject) -> DictionaryObject:
+def _get_widget_field(annot: DictionaryObject) -> DictionaryObject:
     """
-    Gets the dictionary that holds a widget's value (`/V`) and name (`/T`).
+    Gets the field that a widget belongs to, which holds its value (`/V`) and
+    name (`/T`).
 
-    It is the widget's parent field when the widget has no name, as
-    `has_name` describes, and its `/Parent` is a dictionary. Otherwise it is
-    the widget itself, which is merged with its field, so a null `/Parent`,
-    or one that isn't a dictionary, is absent.
+    It is the widget's parent when the widget has no name, as `has_name`
+    describes, and its `/Parent` is a dictionary. Otherwise it is the widget
+    itself, which is merged with its field, so a null `/Parent`, or one that
+    isn't a dictionary, is absent.
 
     Args:
         annot (DictionaryObject): The widget annotation dictionary.
@@ -340,7 +341,7 @@ def update_dropdown_value(
             maintain compatibility with Adobe Reader's behavior for certain fields.
     """
     option = widget.options[widget.value]
-    field = _get_value_field(annot)
+    field = _get_widget_field(annot)
     field[NameObject(V)] = TextStringObject(option.export)
     field[NameObject(I)] = ArrayObject([NumberObject(widget.value)])
     if not need_appearances:
@@ -362,7 +363,7 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         annot (DictionaryObject): The dropdown annotation dictionary.
         widget (Dropdown): The Dropdown widget object to update with the retrieved value.
     """
-    field = _get_value_field(annot)
+    field = _get_widget_field(annot)
     # discovered annotations are plain dictionaries, so entries can be references
     value = field[NameObject(V)].get_object() if V in field else None
     indices = field[NameObject(I)].get_object() if I in field else None
@@ -386,7 +387,7 @@ def update_text_value(
         need_appearances (bool): If True, skips updating the appearance stream (AP) to
             maintain compatibility with Adobe Reader's behavior for certain fields.
     """
-    _get_value_field(annot)[NameObject(V)] = TextStringObject(widget.value)
+    _get_widget_field(annot)[NameObject(V)] = TextStringObject(widget.value)
     if not need_appearances:
         annot[NameObject(AP)] = TextStringObject(widget.value)
 
@@ -403,7 +404,7 @@ def get_text_value(annot: DictionaryObject, widget: Text) -> None:
         annot (DictionaryObject): The text annotation dictionary.
         widget (Text): The Text widget object to update with the retrieved value.
     """
-    widget.value = _get_value_field(annot).get(V)
+    widget.value = _get_widget_field(annot).get(V)
 
 
 def get_text_field_max_length(widget: dict) -> int | None:
@@ -541,7 +542,7 @@ def update_annotation_name(annot: DictionaryObject, val: str) -> None:
         annot (DictionaryObject): The annotation dictionary.
         val (str): The new name for the annotation.
     """
-    _get_value_field(annot)[NameObject(T)] = TextStringObject(val)
+    _get_widget_field(annot)[NameObject(T)] = TextStringObject(val)
 
 
 def get_field_rect(annot: DictionaryObject) -> Tuple[float, float, float, float]:
@@ -681,9 +682,9 @@ def is_pushbutton(widget: DictionaryObject) -> bool:
     """
     Checks whether the field of a widget annotation is a pushbutton.
 
-    The flag is read from the widget when it is its own field, which has a
-    name (`T`), and otherwise from its parent field and the fields above it,
-    as the radio flag is, so every widget of a field has the same type.
+    The flag is read from the field the widget belongs to, as
+    `_get_widget_field` describes, and the fields above it, as the radio flag
+    is, so every widget of a field has the same type.
 
     Args:
         widget (DictionaryObject): The widget annotation.
@@ -691,8 +692,7 @@ def is_pushbutton(widget: DictionaryObject) -> bool:
     Returns:
         bool: True if the field sets the Pushbutton flag.
     """
-    field = widget if has_name(widget) else get_dictionary(widget, Parent) or widget
-    return check_field_flag(field, PUSHBUTTON)
+    return check_field_flag(_get_widget_field(widget), PUSHBUTTON)
 
 
 def _get_inherited_value(widget: DictionaryObject, key: str) -> Any:

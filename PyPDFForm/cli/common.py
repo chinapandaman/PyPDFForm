@@ -250,7 +250,7 @@ def load_data_options(options: list[str], schema: dict, param_hint: str) -> Any:
 
 def without_unnamed(values: dict) -> dict:
     """
-    Removes the entries of fields without a name from a mapping by widget key.
+    Leaves out the entries of fields without a name from a mapping by widget key.
 
     Without full widget names, a widget whose field has no name has the key
     None, which JSON can't represent: it would be written as `"null"`, which
@@ -263,7 +263,7 @@ def without_unnamed(values: dict) -> dict:
         values (dict): A mapping by widget key, such as `PdfWrapper.data`.
 
     Returns:
-        dict: The mapping without the None key.
+        dict: A copy of the mapping without the None key.
     """
     return {key: value for key, value in values.items() if key is not None}
 

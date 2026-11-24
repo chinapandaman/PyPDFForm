@@ -1436,7 +1436,8 @@ def test_read_max_length_of_kid_widget(sample_template_with_full_key):
 
 
 @pytest.mark.parametrize(
-    ("name", "entry", "chosen", "other", "new"), TEXT_FIELD_ENTRIES
+    ("name", "entry", "chosen", "new"),
+    [(name, entry, chosen, new) for name, entry, chosen, _, new in TEXT_FIELD_ENTRIES],
 )
 @pytest.mark.parametrize("clear", [False, True], ids=["set", "clear"])
 def test_change_text_field_entry_with_parent_cycle(
@@ -1444,7 +1445,6 @@ def test_change_text_field_entry_with_parent_cycle(
     name,
     entry,
     chosen,
-    other,
     new,
     clear,
     assert_widgets_match_output,
