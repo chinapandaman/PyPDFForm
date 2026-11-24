@@ -6,6 +6,8 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
 The CLI examples pipe JSON output through `jq -S` for sorted, readable output.
 
+Without full names, the CLI leaves fields that have no name out of `inspect schema`, `inspect data`, and `inspect sample`, and `pypdfform fill` can't fill them. To include and fill such a field, use [full names](basic.md#use-full-name-for-pdf-form-fields), which give it the empty name `""`.
+
 ## Generate a JSON schema that describes a PDF form
 
 PyPDFForm can describe the data needed to fill a PDF form as a JSON schema:
