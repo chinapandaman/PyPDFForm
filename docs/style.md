@@ -104,7 +104,7 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
     form.write("output.pdf")
     ```
 
-    Reading `font` gives the name the PDF uses for the text field's font, such as `/Helv`. The name of a registered font, even one starting with `/`, sets that font. Another name starting with `/` is written as it is, without checking that the PDF has a font with that name. Any other name must be the name of a font in the PDF, or writing the changes raises an error.
+    Reading `font` gives the name the PDF uses for the text field's font, such as `/Helv`. Assigning a name the PDF already uses for one of its fonts selects that font, even when a registered font has the same name. Otherwise, the name of a registered font or a font in the PDF, as [`fonts`](font.md#get-registered-fonts) lists them, selects that font. Any other name starting with `/` is written as it is, without checking that the PDF has a font with that name, and any other name raises an error when the changes are written.
 
 === "CLI"
     In the CLI, provide a `.ttf` file path for each text field's `font` value:
@@ -531,7 +531,7 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
     form.write("output.pdf")
     ```
 
-    Reading `font` gives the name the PDF uses for the dropdown field's font, such as `/Helv`. The name of a registered font, even one starting with `/`, sets that font. Another name starting with `/` is written as it is, without checking that the PDF has a font with that name. Any other name must be the name of a font in the PDF, or writing the changes raises an error.
+    Reading `font` gives the name the PDF uses for the dropdown field's font, such as `/Helv`. Assigning a name the PDF already uses for one of its fonts selects that font, even when a registered font has the same name. Otherwise, the name of a registered font or a font in the PDF, as [`fonts`](font.md#get-registered-fonts) lists them, selects that font. Any other name starting with `/` is written as it is, without checking that the PDF has a font with that name, and any other name raises an error when the changes are written.
 
 === "CLI"
     In the CLI, provide a `.ttf` file path for the dropdown field's `font` value:
