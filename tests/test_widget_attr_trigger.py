@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import decimal
 import os
 from io import BytesIO
 
@@ -937,6 +938,8 @@ def _with_parent_cycle(stream, name):
         ("/Helv 12 Tf (x) Tj", (None, None, None)),
         (String(b"/Arial\x0012 Tf 0 g"), ("/Arial", 12, (0, 0, 0))),
         (12, (None, None, None)),
+        # a name isn't a string, although it reads as one
+        (Name("/Arial 12 Tf 0 g"), (None, None, None)),
         (None, (None, None, None)),
     ],
 )
@@ -949,6 +952,26 @@ def test_read_default_appearance(template_stream, default_appearance, expected):
     widget = PdfWrapper(stream).widgets["test"]
 
     assert (widget.font, widget.font_size, widget.font_color) == expected
+
+
+def test_default_appearance_in_any_decimal_context(template_stream):
+    stream = _set_default_appearance(
+        template_stream, "test", "/Helv 12.5 Tf 0 0 0 .9876 k"
+    )
+    # a caller's context with little precision, which traps rounding
+    with decimal.localcontext(prec=2) as context:
+        context.traps[decimal.Inexact] = True
+        obj = PdfWrapper(stream)
+        widget = obj.widgets["test"]
+        assert widget.font_size == 12.5
+        assert widget.font_color == (0.0124, 0.0124, 0.0124)
+
+        widget.font_size = 1.23456
+        widget.font_color = (0.98765, 0, 1e-5)
+        assert (
+            _find_widget(obj.read(), "test")["/DA"]
+            == "/Helv 1.23456 Tf 0.98765 0 0.00001 rg"
+        )
 
 
 @pytest.mark.parametrize(
@@ -979,6 +1002,7 @@ def test_read_default_appearance(template_stream, default_appearance, expected):
         ("/Helv 12 Tf 0 g", "font", "/Arial#4G", "is not a PDF name"),
         ("/Arial \uff11\uff12 Tf 0 g", "font_size", 20, "needs a font and a font size"),
         (12, "font_size", 20, "is not a string"),
+        (Name("/Arial 12 Tf 0 g"), "font_size", 20, "is not a string"),
         (None, "font_size", 20, "the /Parent chain of the field has a cycle"),
     ],
 )
@@ -1823,6 +1847,34 @@ def test_rename_field_with_null_named_widget(template_stream):
     assert "test" not in obj.widgets
     assert obj.widgets["renamed"].value == "value"
     assert PdfWrapper(obj.read()).widgets["renamed"].value == "value"
+
+
+@pytest.mark.parametrize(("index", "kept", "renamed"), [(0, 20, 10), (1, 10, 20)])
+def test_rename_by_index_reads_field_kept(
+    template_stream, index, kept, renamed, assert_widgets_match_output
+):
+    # two text fields named "test", with their own style and alignment
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        first = next(field for field in fields if str(field.get("/T")) == "test")
+        second = next(field for field in fields if str(field.get("/T")) == "test_2")
+        first.DA = String("/Helv 10 Tf 0 g")
+        first.Q = 0
+        second.T = String("test")
+        second.DA = String("/Cour 20 Tf 1 0 0 rg")
+        second.Q = 2
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    # the key gives access to the last field
+    assert obj.widgets["test"].font_size == 20
+    obj.update_widget_key("test", "renamed", index)
+    obj.commit_widget_key_updates()
+
+    # after renaming the last field, the key gives access to the first
+    assert obj.widgets["test"].font_size == kept
+    assert obj.widgets["renamed"].font_size == renamed
+    assert_widgets_match_output(obj)
 
 
 @pytest.mark.parametrize("use_full_widget_name", [False, True])

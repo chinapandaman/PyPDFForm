@@ -297,6 +297,24 @@ class Widget:
             if name not in self.READ_PROPERTIES and name in other.__dict__:
                 self.__dict__[name] = other.__dict__[name]
 
+    def copy_read_state(self, other: "Widget") -> None:
+        """
+        Copies the properties read from the PDF from a widget rebuilt from it.
+
+        A widget kept for a key that remains in the PDF takes the properties
+        in `READ_PROPERTIES` and the page number of the widget rebuilt for the
+        key, since the key can give access to another field than before, such
+        as when the field it gave access to is renamed by index. The value and
+        the state that `copy_unread_state` copies are kept. Nothing is copied
+        through hooks, so no update is queued.
+
+        Args:
+            other (Widget): The widget rebuilt from the PDF, of the same type.
+        """
+        for name in (*self.READ_PROPERTIES, "page_number"):
+            if name in other.__dict__:
+                self.__dict__[name] = other.__dict__[name]
+
     def check_property_supported(self, name: str) -> None:
         """
         Checks whether the widget type supports a property.

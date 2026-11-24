@@ -310,9 +310,11 @@ class PdfWrapper:
         that modify the PDF content (e.g., filling, creating widgets, updating keys).
         It rebuilds the widget dictionary and invalidates the lazily loaded font cache.
         Fields no longer in the PDF are dropped. Existing widget objects are kept
-        for fields that remain, since queued hooks were already applied to the PDF
-        and their properties match it. A renamed widget is built from the PDF and
-        takes the state the PDF doesn't hold from the widget it replaces, with
+        for keys that remain, and take the properties read from the PDF from the
+        rebuilt widget of the same type, with `Widget.copy_read_state`, since the
+        key can give access to another field than before, such as after renaming
+        by index. A renamed widget is built from the PDF and takes the state the
+        PDF doesn't hold from the widget it replaces, with
         `Widget.copy_unread_state`.
         """
 
@@ -328,6 +330,8 @@ class PdfWrapper:
         )
         for k, v in new_widgets.items():
             if k in self.widgets:
+                if type(self.widgets[k]) is type(v):
+                    self.widgets[k].copy_read_state(v)
                 new_widgets[k] = self.widgets[k]
             elif self._key_update_tracker.get(k) in self.widgets:
                 v.copy_unread_state(self.widgets[self._key_update_tracker[k]])

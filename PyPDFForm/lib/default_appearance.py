@@ -18,7 +18,10 @@ import re
 from collections.abc import Callable, Iterator
 from contextlib import suppress
 from decimal import Decimal, InvalidOperation
+from fractions import Fraction
 from typing import List, NamedTuple, Optional
+
+from pypdf.generic import NameObject
 
 # PDF whitespace, a comment, a name, a run of other characters that aren't
 # delimiters, such as a number or an operator, or an array bracket
@@ -319,7 +322,8 @@ def _decode(default_appearance: object) -> str | None:
 
     A string that pypdf can't decode as text, such as one with a NUL
     character, which is PDF whitespace, is a byte string. Its bytes are read as
-    Latin-1, which maps each byte to the character with the same code.
+    Latin-1, which maps each byte to the character with the same code. A PDF
+    name isn't a string, although pypdf reads it as a `str`.
 
     Args:
         default_appearance (object): The resolved `/DA` value.
@@ -327,6 +331,8 @@ def _decode(default_appearance: object) -> str | None:
     Returns:
         str | None: The `/DA` string, or None when the value is not a string.
     """
+    if isinstance(default_appearance, NameObject):
+        return None
     if isinstance(default_appearance, bytes):
         return default_appearance.decode("latin-1")
     if isinstance(default_appearance, str):
@@ -613,6 +619,9 @@ def _read_rgb_color(default_appearance: str, operation: _Operation) -> tuple:
     """
     Reads a gray, RGB, or CMYK fill color operation as an RGB color.
 
+    The components are computed as exact fractions, so the result doesn't
+    depend on the caller's decimal context.
+
     Args:
         default_appearance (str): The `/DA` string.
         operation (_Operation): A `g`, `rg`, or `k` operation with its
@@ -622,14 +631,14 @@ def _read_rgb_color(default_appearance: str, operation: _Operation) -> tuple:
         tuple: The red, green, and blue components.
     """
     values = [
-        Decimal(default_appearance[each.start : each.end])
+        Fraction(default_appearance[each.start : each.end])
         for each in operation.operands
     ]
     if operation.operator == "g":
         values *= 3
     elif operation.operator == "k":
         black = values[3]
-        values = [1 - min(Decimal(1), each + black) for each in values[:3]]
+        values = [1 - min(Fraction(1), each + black) for each in values[:3]]
 
     return tuple(_to_number(each) for each in values)
 
@@ -644,17 +653,17 @@ def _read_number(text: str) -> float:
     Returns:
         float: The number, as an int when it is whole.
     """
-    return _to_number(Decimal(text))
+    return _to_number(Fraction(text))
 
 
-def _to_number(value: Decimal) -> float:
+def _to_number(value: Fraction) -> float:
     """
-    Converts a decimal number to an int when it is whole, or to a float.
+    Converts an exact number to an int when it is whole, or to a float.
 
     Args:
-        value (Decimal): The number.
+        value (Fraction): The number.
 
     Returns:
         float: The number, as an int when it is whole.
     """
-    return int(value) if value == value.to_integral_value() else float(value)
+    return int(value) if value.denominator == 1 else float(value)

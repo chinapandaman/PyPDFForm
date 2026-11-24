@@ -104,7 +104,7 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
     form.write("output.pdf")
     ```
 
-    A font that isn't registered or in the PDF raises an error when the changes are written. Reading `font` gives the name the PDF uses for the text field's font, such as `/Helv`, which you can also assign to other fields.
+    Reading `font` gives the name the PDF uses for the text field's font, such as `/Helv`. A name starting with `/` is written as it is, without checking that the PDF has a font with that name. Any other name must be a registered font or a font in the PDF, or writing the changes raises an error.
 
 === "CLI"
     In the CLI, provide a `.ttf` file path for each text field's `font` value:
@@ -531,7 +531,7 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
     form.write("output.pdf")
     ```
 
-    A font that isn't registered or in the PDF raises an error when the changes are written. Reading `font` gives the name the PDF uses for the dropdown field's font, such as `/Helv`, which you can also assign to other fields.
+    Reading `font` gives the name the PDF uses for the dropdown field's font, such as `/Helv`. A name starting with `/` is written as it is, without checking that the PDF has a font with that name. Any other name must be a registered font or a font in the PDF, or writing the changes raises an error.
 
 === "CLI"
     In the CLI, provide a `.ttf` file path for the dropdown field's `font` value:
