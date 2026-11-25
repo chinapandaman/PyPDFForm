@@ -1746,8 +1746,9 @@ def test_full_widget_name_with_parent_cycle(
     assert_catalog_fields(obj.read(), others)
 
 
-def _with_two_field_cycle(stream, shape):
-    # "test" and "test_2" are in a /Parent cycle
+def _with_field_cycle(stream, shape):
+    # "test" and "test_2" are in a /Parent cycle, and "test_2" is in the
+    # calculation order
     with Pdf.open(BytesIO(stream)) as pdf:
         test, test_2 = _get_field(pdf, "test"), _get_field(pdf, "test_2")
         if shape == "group":
@@ -1764,6 +1765,14 @@ def _with_two_field_cycle(stream, shape):
             test_2.Parent = group
             group.Parent = test
             pdf.Root.AcroForm.Fields = Array([group, *others])
+        elif shape.startswith("three"):
+            # "test", "test_2", and "test_3" are each the next one's child
+            test_3 = _get_field(pdf, "test_3")
+            test.Parent = test_2
+            test_2.Parent = test_3
+            test_3.Parent = test
+            if shape == "three reversed":
+                pdf.Root.AcroForm.Fields = Array(reversed(pdf.Root.AcroForm.Fields))
         else:
             # each is the other's parent, and both are still listed
             test.Parent = test_2
@@ -1775,6 +1784,7 @@ def _with_two_field_cycle(stream, shape):
                     [each for each in page.Annots if str(each.get("/T")) != "test_2"]
                 )
             del test_2["/Subtype"]
+        pdf.Root.AcroForm.CO = Array([test_2])
 
         return _save(pdf)
 
@@ -1788,6 +1798,9 @@ def _with_two_field_cycle(stream, shape):
         ("mutual", {"test"}, ["test_2"]),
         # "test_2" didn't list "test" as a kid, so it isn't emptied
         ("hidden", {"test"}, ["test_2"]),
+        # in either order of the AcroForm's fields
+        ("three", {"test", "test_3"}, ["test_2"]),
+        ("three reversed", {"test", "test_3"}, ["test_2"]),
     ],
 )
 @pytest.mark.parametrize("use_full_widget_name", [False, True])
@@ -1801,25 +1814,80 @@ def test_remove_fields_in_parent_cycle(
     assert_widgets_match_output,
 ):
     obj = PdfWrapper(
-        _with_two_field_cycle(template_stream, shape),
+        _with_field_cycle(template_stream, shape),
         use_full_widget_name=use_full_widget_name,
     )
-    obj.fill({key: "foo" for key in obj.widgets if key.endswith(("test", "test_2"))})
+    obj.fill(
+        {
+            key: key.split(".")[-1]
+            for key in obj.widgets
+            if key.split(".")[-1] in ("test", "test_2", "test_3")
+        }
+    )
     obj.remove_fields([key for key in obj.widgets if key.split(".")[-1] in removed])
     stream = obj.read()
 
-    # only the removed fields leave the pages and the form
-    assert_catalog_fields(stream, [*kept, "check", "check_2", "test_3", "check_3"])
+    # only the removed fields leave the pages, the form, and the calculation
+    # order
+    others = ["check", "check_2", "test_3", "check_3"]
+    assert_catalog_fields(
+        stream, [*kept, *(each for each in others if each not in removed)]
+    )
     assert_widgets_match_output(obj)
-    assert all(obj.data[key] == "foo" for key in obj.widgets if key.endswith("test_2"))
-    # and the removed fields and their values can't be reached through the cycle
+    assert all(
+        obj.data[key] == "test_2" for key in obj.widgets if key.endswith("test_2")
+    )
     with Pdf.open(BytesIO(stream)) as pdf:
+        assert [str(each.get("/T")) for each in pdf.Root.AcroForm.get("/CO", [])] == [
+            "test_2"
+        ] * len(kept)
+        # and the removed fields and their values can't be reached through the
+        # cycle
         names = {
             str(each.get("/T"))
             for each in pdf.objects
             if isinstance(each, Dictionary) and "/T" in each
         }
     assert not names & removed
+
+
+@pytest.mark.parametrize(
+    ("first", "second"),
+    [("SignatureField", "SignatureField"), ("ImageField", "TextField")],
+)
+def test_fill_consumed_widget_in_parent_cycle(
+    template_stream, image_samples, first, second
+):
+    obj = PdfWrapper(template_stream)
+    obj.bulk_create_fields(
+        [
+            getattr(Fields, first)("first", 1, 100, 600, width=100, height=40),
+            getattr(Fields, second)("second", 1, 300, 600, width=100, height=40),
+        ]
+    )
+    # the two fields are each other's parent
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        _get_field(pdf, "first").Parent = _get_field(pdf, "second")
+        _get_field(pdf, "second").Parent = _get_field(pdf, "first")
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream, use_full_widget_name=True)
+    image = os.path.join(image_samples, "sample_signature.png")
+    obj.fill(
+        {
+            "second.first": image,
+            "first.second": image if second == "SignatureField" else "foo",
+        }
+    )
+    widgets = PdfWrapper(obj.read(), use_full_widget_name=True).widgets
+
+    # an image or signature widget is drawn and leaves the page, which doesn't
+    # change the other field's key before it is filled
+    assert {
+        key: widget.value
+        for key, widget in widgets.items()
+        if key.split(".")[-1] in ("first", "second")
+    } == ({} if second == "SignatureField" else {"first.second": "foo"})
 
 
 def test_change_null_text_field_entries(template_stream, assert_widgets_match_output):

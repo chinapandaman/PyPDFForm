@@ -70,10 +70,12 @@ def remove_widgets_by_keys(
     is removed from the AcroForm `/CO` calculation order, which is deleted
     when it becomes empty. Form actions that name detached fields stop naming
     them, as described in `_remove_action_targets`; JavaScript is not changed.
-    When anything was detached, the written PDF is then cloned again, so it
-    contains only objects reachable from its trailer: objects that only
-    removed fields, widgets, or replaced entries used are dropped, while
-    objects other content uses are kept.
+    Only then, when a `/Parent` cycle leads back to a detached object, is the
+    link removed, as `_unlink_cycles` describes, so the steps before it read
+    the PDF's own links. When anything was detached, the written PDF is then
+    cloned again, so it contains only objects reachable from its trailer:
+    objects that only removed fields, widgets, or replaced entries used are
+    dropped, while objects other content uses are kept.
     Null entries, such as a null `/CO`, are treated as absent. `get_field_keys`
     lists the keys this function can match. If no keys are provided, the
     original PDF stream is returned unchanged.
@@ -134,6 +136,7 @@ def remove_widgets_by_keys(
             del acroform[CO]
 
     _remove_action_targets(actions, detached, names - _get_field_names(writer))
+    _unlink_cycles(detached)
 
     if detached:
         # detached objects are still in the writer, and cloning the written
@@ -286,6 +289,32 @@ def _has_ancestor_in(
         bool: True if an ancestor of `obj` is in `objects`.
     """
     return any(id(each) in objects for each in _get_ancestors(obj))
+
+
+def _unlink_cycles(detached: Dict[int, DictionaryObject]) -> None:
+    """
+    Removes the `/Parent` links through which cycles lead back to detached
+    objects.
+
+    For each detached object in a `/Parent` cycle, the object of the cycle
+    whose `/Parent` is the detached object loses its `/Parent`, so a field
+    that stays, which then has no parent, can't reach the detached object and
+    its value through the cycle. The links are all found before any is
+    removed, so the result doesn't depend on the order in which the objects
+    were detached.
+
+    Args:
+        detached (Dict[int, DictionaryObject]): Detached objects keyed by `id`.
+    """
+    ends = []
+    for each in detached.values():
+        chain, entry = _get_parent_chain(each)
+        if entry == 0:
+            # the cycle closes at the detached object
+            ends.append(chain[-1])
+
+    for each in ends:
+        del each[NameObject(Parent)]
 
 
 def _is_detached(obj: object, detached: Dict[int, DictionaryObject]) -> bool:
@@ -804,12 +833,10 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
     two that are each other's parent, and at a parent already detached.
     Every detached object is then removed from the AcroForm's root `/Fields`
     array, so a field listed there although it has a parent, or whose
-    ancestors form a cycle, doesn't stay in the form. When the `/Parent`
-    chain of a detached object leads back to it, the object it leads back
-    from loses its `/Parent`, so the detached object can't be reached through
-    the cycle. Resolved objects are compared by identity so unrelated fields
-    with the same name keep their references. Page annotations are not
-    changed.
+    ancestors form a cycle, doesn't stay in the form. No `/Parent` changes,
+    so the keys of other widgets don't change while a caller goes through
+    them. Resolved objects are compared by identity so unrelated fields with
+    the same name keep their references. Page annotations are not changed.
 
     Args:
         writer (PdfWriter): The PDF writer that owns the field tree.
@@ -831,11 +858,6 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
         field = parent
         result.append(field)
         parent = get_dictionary(field, Parent)
-
-    for each in result:
-        chain, entry = _get_parent_chain(each)
-        if entry == 0:
-            del chain[-1][NameObject(Parent)]
 
     acroform = get_dictionary(writer.root_object, AcroForm) or DictionaryObject()
     fields = get_array(acroform, Fields)
