@@ -13,7 +13,7 @@ page and the field tree refer to one object.
 from collections.abc import Callable
 from functools import lru_cache
 from io import BytesIO
-from typing import Dict, List, NamedTuple, Optional, cast
+from typing import Dict, List, NamedTuple, Optional, Tuple, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
@@ -226,11 +226,57 @@ def _get_terminal_fields(acroform: DictionaryObject) -> List[DictionaryObject]:
     return result
 
 
+def _get_parent_chain(
+    obj: DictionaryObject,
+) -> Tuple[List[DictionaryObject], Optional[int]]:
+    """
+    Follows the `/Parent` chain of a field or widget, each object once.
+
+    Args:
+        obj (DictionaryObject): A field or widget annotation.
+
+    Returns:
+        Tuple[List[DictionaryObject], Optional[int]]: `obj` followed by the
+            objects along its `/Parent` chain until the chain ends or reaches
+            one of them a second time, and in the latter case the index of
+            that object, where the chain closes a cycle, or None otherwise.
+    """
+    chain = [obj]
+    indices = {id(obj): 0}
+    node = get_dictionary(obj, Parent)
+    while node is not None and id(node) not in indices:
+        indices[id(node)] = len(chain)
+        chain.append(node)
+        node = get_dictionary(node, Parent)
+
+    return chain, (indices[id(node)] if node is not None else None)
+
+
+def _get_ancestors(obj: DictionaryObject) -> List[DictionaryObject]:
+    """
+    Gets the ancestors of a field or widget along its `/Parent` chain.
+
+    When the chain closes a `/Parent` cycle, the ancestors end at the object
+    where it enters the cycle, since the cycle's other objects are as much
+    below that object as above it. An object in a cycle therefore has no
+    ancestors, and isn't treated as below another field of the cycle.
+
+    Args:
+        obj (DictionaryObject): A field or widget annotation.
+
+    Returns:
+        List[DictionaryObject]: The ancestors, nearest first.
+    """
+    chain, entry = _get_parent_chain(obj)
+    return chain[1:] if entry is None else chain[1 : entry + 1]
+
+
 def _has_ancestor_in(
     obj: DictionaryObject, objects: Dict[int, DictionaryObject]
 ) -> bool:
     """
-    Checks whether any object along the `/Parent` chain of an object is listed.
+    Checks whether any ancestor of an object, as `_get_ancestors` gives them,
+    is listed.
 
     Args:
         obj (DictionaryObject): A field or widget annotation.
@@ -239,15 +285,7 @@ def _has_ancestor_in(
     Returns:
         bool: True if an ancestor of `obj` is in `objects`.
     """
-    seen = {id(obj)}
-    node = get_dictionary(obj, Parent)
-    while node is not None and id(node) not in seen:
-        if id(node) in objects:
-            return True
-        seen.add(id(node))
-        node = get_dictionary(node, Parent)
-
-    return False
+    return any(id(each) in objects for each in _get_ancestors(obj))
 
 
 def _is_detached(obj: object, detached: Dict[int, DictionaryObject]) -> bool:
@@ -760,14 +798,18 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
     """
     Detaches a field or widget and its emptied ancestors from the AcroForm tree.
 
-    The object is removed from its parent's `/Kids`. A parent left without
-    kids is detached the same way, stopping at the first parent with remaining
-    kids, at the top of the tree, or at a `/Parent` cycle. Every detached
-    object is then removed from the AcroForm's root `/Fields` array, so a
-    field listed there although it has a parent, or whose ancestors form a
-    cycle, doesn't stay in the form. Resolved objects are compared by
-    identity so unrelated fields with the same name keep their references.
-    Page annotations are not changed.
+    The object is removed from its parent's `/Kids`. A parent that listed it
+    there and has no kids left is detached the same way, stopping at the first
+    parent that keeps other kids or didn't list it, such as the other field of
+    two that are each other's parent, and at a parent already detached.
+    Every detached object is then removed from the AcroForm's root `/Fields`
+    array, so a field listed there although it has a parent, or whose
+    ancestors form a cycle, doesn't stay in the form. When the `/Parent`
+    chain of a detached object leads back to it, the object it leads back
+    from loses its `/Parent`, so the detached object can't be reached through
+    the cycle. Resolved objects are compared by identity so unrelated fields
+    with the same name keep their references. Page annotations are not
+    changed.
 
     Args:
         writer (PdfWriter): The PDF writer that owns the field tree.
@@ -781,12 +823,19 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
     parent = get_dictionary(field, Parent)
     while parent is not None:
         kids = get_array(parent, Kids)
-        kids[:] = [kid for kid in kids if kid.get_object() is not field]
-        if kids or any(parent is each for each in result):
+        remaining = [kid for kid in kids if kid.get_object() is not field]
+        listed = len(remaining) != len(kids)
+        kids[:] = remaining
+        if remaining or not listed or any(parent is each for each in result):
             break
         field = parent
         result.append(field)
         parent = get_dictionary(field, Parent)
+
+    for each in result:
+        chain, entry = _get_parent_chain(each)
+        if entry == 0:
+            del chain[-1][NameObject(Parent)]
 
     acroform = get_dictionary(writer.root_object, AcroForm) or DictionaryObject()
     fields = get_array(acroform, Fields)

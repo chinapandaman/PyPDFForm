@@ -1675,17 +1675,18 @@ def _with_named_parent_cycle(stream, shape):
         )
         field = fields[index]
         a = pdf.make_indirect(Dictionary({"/T": String("a"), "/Kids": Array([field])}))
-        if shape == "field":
-            a.Parent = field
-        else:
-            b = pdf.make_indirect(Dictionary({"/T": String("b"), "/Kids": Array([a])}))
-            a.Parent = b
-            b.Parent = a
-        if shape in ("unnamed", "listed"):
+        b = pdf.make_indirect(Dictionary({"/T": String("b"), "/Kids": Array([a])}))
+        b.Parent = a
+        # "a"'s parent is "b", or the field itself
+        a.Parent = field if shape == "field" else b
+        if shape in ("unnamed", "listed", "root"):
             del field["/T"]
         if shape == "listed":
             # the AcroForm lists the field instead of its widget
             fields[index] = a
+        if shape == "root":
+            # the AcroForm lists "b", whose /Parent "a" is its only kid
+            fields[index] = b
         field.Parent = a
 
         return _save(pdf)
@@ -1699,6 +1700,7 @@ def _with_named_parent_cycle(stream, shape):
         # the widget has no name, so the key is its field's
         ("unnamed", "b.a", "a"),
         ("listed", "b.a", "a"),
+        ("root", "b.a", "a"),
         # the parent of "a" is the field
         ("field", "a.test", "test"),
     ],
@@ -1742,6 +1744,82 @@ def test_full_widget_name_with_parent_cycle(
     # and so they do without full names
     obj = PdfWrapper(stream).fill({short_key: "foo"}).remove_fields([short_key])
     assert_catalog_fields(obj.read(), others)
+
+
+def _with_two_field_cycle(stream, shape):
+    # "test" and "test_2" are in a /Parent cycle
+    with Pdf.open(BytesIO(stream)) as pdf:
+        test, test_2 = _get_field(pdf, "test"), _get_field(pdf, "test_2")
+        if shape == "group":
+            # they are under "group", whose /Parent is "test"
+            others = [
+                each
+                for each in pdf.Root.AcroForm.Fields
+                if str(each.get("/T")) not in ("test", "test_2")
+            ]
+            group = pdf.make_indirect(
+                Dictionary({"/T": String("group"), "/Kids": Array([test, test_2])})
+            )
+            test.Parent = group
+            test_2.Parent = group
+            group.Parent = test
+            pdf.Root.AcroForm.Fields = Array([group, *others])
+        else:
+            # each is the other's parent, and both are still listed
+            test.Parent = test_2
+            test_2.Parent = test
+        if shape == "hidden":
+            # "test_2" is a field without a widget
+            for page in pdf.pages:
+                page.Annots = Array(
+                    [each for each in page.Annots if str(each.get("/T")) != "test_2"]
+                )
+            del test_2["/Subtype"]
+
+        return _save(pdf)
+
+
+@pytest.mark.parametrize(
+    ("shape", "removed", "kept"),
+    [
+        # "test_2" stays under "group", which is "test"'s parent and child
+        ("group", {"test"}, ["group.test_2"]),
+        ("mutual", {"test", "test_2"}, []),
+        ("mutual", {"test"}, ["test_2"]),
+        # "test_2" didn't list "test" as a kid, so it isn't emptied
+        ("hidden", {"test"}, ["test_2"]),
+    ],
+)
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_remove_fields_in_parent_cycle(
+    template_stream,
+    shape,
+    removed,
+    kept,
+    use_full_widget_name,
+    assert_catalog_fields,
+    assert_widgets_match_output,
+):
+    obj = PdfWrapper(
+        _with_two_field_cycle(template_stream, shape),
+        use_full_widget_name=use_full_widget_name,
+    )
+    obj.fill({key: "foo" for key in obj.widgets if key.endswith(("test", "test_2"))})
+    obj.remove_fields([key for key in obj.widgets if key.split(".")[-1] in removed])
+    stream = obj.read()
+
+    # only the removed fields leave the pages and the form
+    assert_catalog_fields(stream, [*kept, "check", "check_2", "test_3", "check_3"])
+    assert_widgets_match_output(obj)
+    assert all(obj.data[key] == "foo" for key in obj.widgets if key.endswith("test_2"))
+    # and the removed fields and their values can't be reached through the cycle
+    with Pdf.open(BytesIO(stream)) as pdf:
+        names = {
+            str(each.get("/T"))
+            for each in pdf.objects
+            if isinstance(each, Dictionary) and "/T" in each
+        }
+    assert not names & removed
 
 
 def test_change_null_text_field_entries(template_stream, assert_widgets_match_output):
