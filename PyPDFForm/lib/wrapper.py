@@ -1168,6 +1168,10 @@ class PdfWrapper:
 
         Returns:
             PdfWrapper: The `PdfWrapper` object, allowing for method chaining.
+
+        Raises:
+            ValueError: If the `/Parent` chain of a field or widget to remove has
+                a cycle.
         """
 
         with self._restore_on_failure():

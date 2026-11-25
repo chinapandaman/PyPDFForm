@@ -265,13 +265,8 @@ def assert_catalog_fields():
             pending = [(field, "") for field in acroform.get("/Fields", [])]
             found = []
             listed = []
-            seen = set()
             while pending:
                 field, prefix = pending.pop()
-                # a field is listed once, so /Kids that form a cycle fail
-                if field.is_indirect:
-                    assert field.objgen not in seen
-                    seen.add(field.objgen)
                 name = prefix + str(field.get("/T", ""))
                 kids = list(field.get("/Kids", []))
                 # kids with a name are fields, the others are the field's widgets

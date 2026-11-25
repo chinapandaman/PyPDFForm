@@ -1712,7 +1712,6 @@ def test_full_widget_name_with_parent_cycle(
     short_key,
     assert_round_trip,
     assert_widgets_match_output,
-    assert_catalog_fields,
 ):
     stream = _with_named_parent_cycle(template_stream, shape)
     others = ["check", "test_2", "check_2", "test_3", "check_3"]
@@ -1735,20 +1734,23 @@ def test_full_widget_name_with_parent_cycle(
     assert_round_trip(obj, {key: "foo"})
     assert_widgets_match_output(obj)
 
-    # the field and its value leave the form with its widget
-    obj.remove_fields([key])
-    assert list(obj.widgets) == others
-    assert_catalog_fields(obj.read(), others)
-    assert get_field_keys(obj.read(), True) == set(others)
+    # removing the field raises and changes nothing, with full names or without
+    for use_full_widget_name, name in ((True, key), (False, short_key)):
+        obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+        obj.fill({name: "foo"})
+        filled = obj.read()
 
-    # and so they do without full names
-    obj = PdfWrapper(stream).fill({short_key: "foo"}).remove_fields([short_key])
-    assert_catalog_fields(obj.read(), others)
+        with pytest.raises(
+            ValueError, match="the /Parent chain of the field has a cycle"
+        ):
+            obj.remove_fields([name])
+
+        assert obj.read() == filled
+        assert obj.data[name] == "foo"
 
 
 def _with_field_cycle(stream, shape):
-    # "test" and "test_2" are in a /Parent cycle, and "test_2" is in the
-    # calculation order
+    # "test" and "test_2" are in a /Parent cycle
     with Pdf.open(BytesIO(stream)) as pdf:
         test, test_2 = _get_field(pdf, "test"), _get_field(pdf, "test_2")
         if shape == "group":
@@ -1765,59 +1767,32 @@ def _with_field_cycle(stream, shape):
             test_2.Parent = group
             group.Parent = test
             pdf.Root.AcroForm.Fields = Array([group, *others])
-        elif shape.startswith("three"):
-            # "test", "test_2", and "test_3" are each the next one's child
+        elif shape == "three":
+            # "test", "test_2", and "test_3" are each the next one's child, as
+            # the /Kids also say
             test_3 = _get_field(pdf, "test_3")
             test.Parent = test_2
             test_2.Parent = test_3
             test_3.Parent = test
-            if shape == "three reversed":
-                pdf.Root.AcroForm.Fields = Array(reversed(pdf.Root.AcroForm.Fields))
+            test_2.Kids = Array([test])
+            test_3.Kids = Array([test_2])
+            test.Kids = Array([test_3])
         else:
             # each is the other's parent, and both are still listed
             test.Parent = test_2
             test_2.Parent = test
-        if shape == "hidden":
-            # "test_2" is a field without a widget
-            for page in pdf.pages:
-                page.Annots = Array(
-                    [each for each in page.Annots if str(each.get("/T")) != "test_2"]
-                )
-            del test_2["/Subtype"]
         if shape == "listing":
-            # each also lists the other as a kid, so neither is below the other
+            # each also lists the other as a kid
             test.Kids = Array([test_2])
             test_2.Kids = Array([test])
-        pdf.Root.AcroForm.CO = Array([test_2])
 
         return _save(pdf)
 
 
-@pytest.mark.parametrize(
-    ("shape", "removed", "kept"),
-    [
-        # "test_2" stays under "group", which is "test"'s parent and child
-        ("group", {"test"}, ["group.test_2"]),
-        ("mutual", {"test", "test_2"}, []),
-        ("mutual", {"test"}, ["test_2"]),
-        # "test_2" didn't list "test" as a kid, so it isn't emptied
-        ("hidden", {"test"}, ["test_2"]),
-        ("listing", {"test", "test_2"}, []),
-        ("listing", {"test"}, ["test_2"]),
-        # in either order of the AcroForm's fields
-        ("three", {"test", "test_3"}, ["test_2"]),
-        ("three reversed", {"test", "test_3"}, ["test_2"]),
-    ],
-)
+@pytest.mark.parametrize("shape", ["group", "mutual", "listing", "three"])
 @pytest.mark.parametrize("use_full_widget_name", [False, True])
 def test_remove_fields_in_parent_cycle(
-    template_stream,
-    shape,
-    removed,
-    kept,
-    use_full_widget_name,
-    assert_catalog_fields,
-    assert_widgets_match_output,
+    template_stream, shape, use_full_widget_name, assert_widgets_match_output
 ):
     obj = PdfWrapper(
         _with_field_cycle(template_stream, shape),
@@ -1827,134 +1802,39 @@ def test_remove_fields_in_parent_cycle(
         {
             key: key.split(".")[-1]
             for key in obj.widgets
-            if key.split(".")[-1] in ("test", "test_2", "test_3")
+            if key.split(".")[-1].startswith("test")
         }
     )
-    obj.remove_fields([key for key in obj.widgets if key.split(".")[-1] in removed])
-    stream = obj.read()
+    original = obj.read()
+    keys = list(obj.widgets)
+    test = next(key for key in keys if key.split(".")[-1] == "test")
 
-    # only the removed fields leave the pages, the form, and the calculation
-    # order
-    others = ["check", "check_2", "test_3", "check_3"]
-    assert_catalog_fields(
-        stream, [*kept, *(each for each in others if each not in removed)]
-    )
+    # which fields are below "test", and would go with it, isn't defined, so
+    # removing it raises and changes nothing, including the other field
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
+        obj.remove_fields([test, "check"])
+
+    assert obj.read() == original
+    assert list(obj.widgets) == keys
     assert_widgets_match_output(obj)
+
+    # a field outside the cycle can be removed
+    obj.remove_fields(["check"])
+    assert list(obj.widgets) == [key for key in keys if key != "check"]
     assert all(
-        obj.data[key] == "test_2" for key in obj.widgets if key.endswith("test_2")
+        obj.data[key] == key.split(".")[-1]
+        for key in obj.widgets
+        if key.split(".")[-1].startswith("test")
     )
-    with Pdf.open(BytesIO(stream)) as pdf:
-        assert [str(each.get("/T")) for each in pdf.Root.AcroForm.get("/CO", [])] == [
-            "test_2"
-        ] * len(kept)
-        # and the removed fields and their values, which are their names, aren't
-        # left in the PDF, as fields or as values a field inherited from them
-        names, values = (
-            {
-                str(each.get(entry))
-                for each in pdf.objects
-                if isinstance(each, Dictionary) and entry in each
-            }
-            for entry in ("/T", "/V")
-        )
-    assert not names & removed
-    assert not values & removed
-
-
-@pytest.mark.parametrize(
-    ("cycle", "entry", "value", "own", "name", "expected"),
-    [
-        # "test_2" stays a text field
-        (["test", "test_2"], "/FT", Name("/Tx"), None, "value", None),
-        (["test", "test_2"], "/Ff", 1, None, "readonly", True),
-        (["test", "test_2"], "/DA", String("/Helv 7 Tf 0 g"), None, "font_size", 7),
-        (["test", "test_2"], "/Q", 2, None, "alignment", 2),
-        (["test", "test_2"], "/MaxLen", 5, None, "max_length", 5),
-        # "test_3" inherits the flags from "test_2", above the removed "test"
-        (["test", "test_2", "test_3"], "/Ff", 1, None, "readonly", True),
-        # its own flags take precedence
-        (["test", "test_2"], "/Ff", 1, 0, "readonly", False),
-    ],
-)
-@pytest.mark.parametrize("use_full_widget_name", [False, True])
-def test_remove_field_keeps_inherited_entries(
-    template_stream,
-    cycle,
-    entry,
-    value,
-    own,
-    name,
-    expected,
-    use_full_widget_name,
-    assert_widgets_match_output,
-):
-    # each field's parent is the next one, and the last one's is "test", so
-    # the last field inherits the entry through "test", from the field farthest
-    # up its chain, unless it has its own
-    with Pdf.open(BytesIO(template_stream)) as pdf:
-        fields = [_get_field(pdf, each) for each in cycle]
-        for field, parent in zip(fields, [*fields[1:], fields[0]], strict=True):
-            field.Parent = parent
-            if entry in field:
-                del field[entry]
-        fields[-2][entry] = value
-        if own is not None:
-            fields[-1][entry] = own
-        stream = _save(pdf)
-    kept = cycle[-1]
-
-    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
-    obj.remove_fields([key for key in obj.widgets if key.split(".")[-1] == "test"])
-
-    # removing "test" makes the last field a top-level field with the entry,
-    # which the wrapper reads as the PDF does, and it can still be filled
-    assert str(_find_widget(obj.read(), kept)[entry]) == str(
-        value if own is None else own
-    )
-    assert getattr(obj.widgets[kept], name) == expected
-    assert_widgets_match_output(obj)
-    obj.fill({kept: "foo"})
-    assert PdfWrapper(obj.read()).data[kept] == "foo"
-
-
-@pytest.mark.parametrize("use_full_widget_name", [False, True])
-def test_remove_radio_group_below_its_option(
-    template_stream,
-    use_full_widget_name,
-    assert_catalog_fields,
-    assert_widgets_match_output,
-):
-    # "check" is a radio group, whose /Kids list "check_2", which inherits its
-    # type and flags, and the /Parent of "check" is "check_2"
-    with Pdf.open(BytesIO(template_stream)) as pdf:
-        check, check_2 = _get_field(pdf, "check"), _get_field(pdf, "check_2")
-        check.Parent = check_2
-        check_2.Parent = check
-        check.Kids = Array([check_2])
-        check.Ff = RADIO
-        for entry in ("/FT", "/Ff"):
-            if entry in check_2:
-                del check_2[entry]
-        stream = _save(pdf)
-
-    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
-    option = next(key for key in obj.widgets if key.split(".")[-1] == "check_2")
-    assert type(obj.widgets[option]) is Radio
-    obj.remove_fields([key for key in obj.widgets if key.split(".")[-1] == "check"])
-
-    # the /Kids of "check" show that "check_2" is its option, which goes with it
-    others = ["test", "test_2", "test_3", "check_3"]
-    assert list(obj.widgets) == others
-    assert_catalog_fields(obj.read(), others)
-    assert_widgets_match_output(obj)
 
 
 @pytest.mark.parametrize(
     ("first", "second"),
     [("SignatureField", "SignatureField"), ("ImageField", "TextField")],
 )
+@pytest.mark.parametrize("listing", [False, True], ids=["parents", "listing"])
 def test_fill_consumed_widget_in_parent_cycle(
-    template_stream, image_samples, first, second
+    template_stream, image_samples, first, second, listing
 ):
     obj = PdfWrapper(template_stream)
     obj.bulk_create_fields(
@@ -1963,10 +1843,14 @@ def test_fill_consumed_widget_in_parent_cycle(
             getattr(Fields, second)("second", 1, 300, 600, width=100, height=40),
         ]
     )
-    # the two fields are each other's parent
+    # the two fields are each other's parent, and may list each other as kids
     with Pdf.open(BytesIO(obj.read())) as pdf:
-        _get_field(pdf, "first").Parent = _get_field(pdf, "second")
-        _get_field(pdf, "second").Parent = _get_field(pdf, "first")
+        first_field, second_field = _get_field(pdf, "first"), _get_field(pdf, "second")
+        first_field.Parent = second_field
+        second_field.Parent = first_field
+        if listing:
+            first_field.Kids = Array([second_field])
+            second_field.Kids = Array([first_field])
         stream = _save(pdf)
 
     obj = PdfWrapper(stream, use_full_widget_name=True)
@@ -1986,6 +1870,19 @@ def test_fill_consumed_widget_in_parent_cycle(
         for key, widget in widgets.items()
         if key.split(".")[-1] in ("first", "second")
     } == ({} if second == "SignatureField" else {"first.second": "foo"})
+    # and the form lists only the other field, which doesn't list it as a kid
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        assert [
+            str(each.get("/T"))
+            for each in pdf.Root.AcroForm.Fields
+            if str(each.get("/T")) in ("first", "second")
+        ] == ([] if second == "SignatureField" else ["second"])
+        assert not [
+            kid
+            for page in pdf.pages
+            for annot in page.get("/Annots", [])
+            for kid in annot.get("/Kids", [])
+        ]
 
 
 def test_change_null_text_field_entries(template_stream, assert_widgets_match_output):
