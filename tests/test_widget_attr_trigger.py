@@ -455,6 +455,19 @@ def test_clear_absent_text_field_properties(template_stream):
     assert {entry: annot.get(entry) for entry in entries} == expected
 
 
+def test_read_null_tooltip_as_absent(template_stream):
+    writer = PdfWriter(BytesIO(template_stream))
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "test":
+            annot[NameObject("/TU")] = NullObject()
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    assert PdfWrapper(stream).widgets["test"].tooltip is None
+
+
 @pytest.mark.parametrize(
     ("template", "key", "name", "value", "error"),
     [

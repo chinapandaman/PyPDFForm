@@ -438,7 +438,8 @@ def traverse_pattern(
     This function searches for a specific pattern within a PDF widget's
     properties. It recursively follows nested pattern dictionaries and returns
     the first truthy widget value whose pattern entry is the sentinel ``True``.
-    Falsey values are ignored and treated as not found.
+    Falsey values are ignored and treated as not found, as are null values,
+    which ISO 32000-1 treats as absent entries.
 
     Args:
         pattern (dict): The pattern to traverse, represented as a dictionary.
@@ -457,7 +458,7 @@ def traverse_pattern(
             ):
                 result = traverse_pattern(pattern[key], value)
             else:
-                if pattern[key] is True and value:
+                if pattern[key] is True and value and not isinstance(value, NullObject):
                     return value
         if result:
             return result
