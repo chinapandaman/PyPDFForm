@@ -425,7 +425,8 @@ class PdfWrapper:
 
         Raises:
             ValueError: If a page refers to content of another page in a way
-                that cannot be removed.
+                that cannot be removed, or a field shared with another page
+                has a `/Parent` cycle before an entry it inherits.
         """
 
         return tuple(get_page_streams(stream))
@@ -590,7 +591,9 @@ class PdfWrapper:
 
         Raises:
             ValueError: If a page refers to content of another page in another way,
-                such as an action that resets a field on another page.
+                such as an action that resets a field on another page, or a
+                field shared with another page has a `/Parent` cycle before an
+                entry it inherits.
         """
 
         stream = self._read()

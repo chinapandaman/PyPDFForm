@@ -1885,6 +1885,120 @@ def test_fill_consumed_widget_in_parent_cycle(
         ]
 
 
+@pytest.mark.parametrize("shape", ["group", "listing", "three"])
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_pages_in_parent_cycle(template_stream, shape, use_full_widget_name):
+    obj = PdfWrapper(
+        _with_field_cycle(template_stream, shape),
+        use_full_widget_name=use_full_widget_name,
+    )
+    original = obj.read()
+    keys = list(obj.widgets)
+
+    # page 1 keeps only part of a field in the cycle, and the cycle is reached
+    # before the field's /Opt is found
+    with pytest.raises(
+        ValueError,
+        match="Cannot copy page 1: the /Parent chain of the field has a cycle",
+    ):
+        obj.pages  # noqa: B018 # pylint: disable=W0104
+
+    assert obj.read() == original
+    assert list(obj.widgets) == keys
+
+
+def _with_radio_group_in_parent_cycle(stream, group, other):
+    # the widgets of "check" (page 1) and "check_2" (page 2) become the
+    # options of a radio group "a" with these entries, and "a" and "b", which
+    # has the other entries, are each other's parent
+    with Pdf.open(BytesIO(stream)) as pdf:
+        options = [_get_field(pdf, "check"), _get_field(pdf, "check_2")]
+        radio = pdf.make_indirect(
+            Dictionary(
+                {
+                    "/T": String("a"),
+                    "/FT": Name.Btn,
+                    "/Ff": RADIO,
+                    "/Kids": Array(options),
+                    **group,
+                }
+            )
+        )
+        parent = pdf.make_indirect(
+            Dictionary({"/T": String("b"), "/Kids": Array([radio]), **other})
+        )
+        radio.Parent = parent
+        parent.Parent = radio
+        for index, option in enumerate(options):
+            del option.T
+            del option.FT
+            option.Parent = radio
+            option.AP = Dictionary(
+                N=Dictionary({"/Off": option.AP.N.Off, f"/{index}": option.AP.N.Yes})
+            )
+            option.AS = Name(f"/{index}") if index else Name.Off
+        pdf.Root.AcroForm.Fields = Array(
+            [
+                each
+                for each in pdf.Root.AcroForm.Fields
+                if str(each.get("/T")) not in ("check", "check_2")
+            ]
+            + [parent]
+        )
+
+        return _save(pdf)
+
+
+@pytest.mark.parametrize(
+    ("group", "other", "expected"),
+    [
+        # /Opt is found before the cycle, but /DV isn't
+        ({"/V": Name("/1")}, {}, None),
+        # /V names the option on page 2, and the cycle is reached before page
+        # 1 finds whether a field above "a" has a value
+        ({"/V": Name("/1"), "/DV": Name("/1")}, {}, None),
+        # every entry is found before the cycle, including on "b", so the
+        # pages are split and renumbered
+        (
+            {"/V": Name("/1"), "/DV": Name.Off},
+            {"/V": Name.Off},
+            [("x", "/Off", "/Off", None), ("y", "/0", "/0", 0)],
+        ),
+    ],
+    ids=["default", "value", "found"],
+)
+def test_pages_with_radio_group_in_parent_cycle(
+    template_stream, group, other, expected
+):
+    group = {"/Opt": Array([String("x"), String("y")]), **group}
+    obj = PdfWrapper(_with_radio_group_in_parent_cycle(template_stream, group, other))
+    original = obj.read()
+
+    if expected is None:
+        with pytest.raises(
+            ValueError,
+            match="Cannot copy page 1: the /Parent chain of the field has a cycle",
+        ):
+            obj.pages  # noqa: B018 # pylint: disable=W0104
+        assert obj.read() == original
+        return
+
+    pages = obj.pages
+    for page, (option, value, state, data) in zip(
+        (pages[0], pages[1]), expected, strict=True
+    ):
+        with Pdf.open(BytesIO(page.read())) as pdf:
+            widget = next(annot for annot in pdf.pages[0].Annots if "/Parent" in annot)
+            radio = widget.Parent
+            # the group keeps only its option on the page
+            assert [str(each) for each in radio.Opt] == [option]
+            assert len(radio.Kids) == 1
+            assert str(radio.V) == value
+            assert str(widget.AS) == state
+        assert PdfWrapper(page.read()).data["a"] == data
+    assert obj.read() == original
+
+
 def test_change_null_text_field_entries(template_stream, assert_widgets_match_output):
     writer = PdfWriter(BytesIO(template_stream))
     for annot in writer.pages[0]["/Annots"]:

@@ -64,6 +64,8 @@ This section of the documentation uses [this PDF](pdfs/sample_template.pdf) as a
 
     Extraction raises a `ValueError` if a page refers to another page's content in any other way, such as a button that resets a field on another page.
 
+    In a damaged PDF, the parent fields of a field can loop back on themselves, for example when two fields are each other's parent. Extracting a page that keeps only part of such a field can also raise a `ValueError`.
+
     Extraction is not redaction. Content the extracted page uses itself, including resources it shares with other pages, is kept.
 
 === "Library"
