@@ -1784,6 +1784,10 @@ def _with_field_cycle(stream, shape):
                     [each for each in page.Annots if str(each.get("/T")) != "test_2"]
                 )
             del test_2["/Subtype"]
+        if shape == "listing":
+            # each also lists the other as a kid, so neither is below the other
+            test.Kids = Array([test_2])
+            test_2.Kids = Array([test])
         pdf.Root.AcroForm.CO = Array([test_2])
 
         return _save(pdf)
@@ -1798,6 +1802,8 @@ def _with_field_cycle(stream, shape):
         ("mutual", {"test"}, ["test_2"]),
         # "test_2" didn't list "test" as a kid, so it isn't emptied
         ("hidden", {"test"}, ["test_2"]),
+        ("listing", {"test", "test_2"}, []),
+        ("listing", {"test"}, ["test_2"]),
         # in either order of the AcroForm's fields
         ("three", {"test", "test_3"}, ["test_2"]),
         ("three reversed", {"test", "test_3"}, ["test_2"]),
@@ -1909,6 +1915,38 @@ def test_remove_field_keeps_inherited_entries(
     assert_widgets_match_output(obj)
     obj.fill({kept: "foo"})
     assert PdfWrapper(obj.read()).data[kept] == "foo"
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_remove_radio_group_below_its_option(
+    template_stream,
+    use_full_widget_name,
+    assert_catalog_fields,
+    assert_widgets_match_output,
+):
+    # "check" is a radio group, whose /Kids list "check_2", which inherits its
+    # type and flags, and the /Parent of "check" is "check_2"
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        check, check_2 = _get_field(pdf, "check"), _get_field(pdf, "check_2")
+        check.Parent = check_2
+        check_2.Parent = check
+        check.Kids = Array([check_2])
+        check.Ff = RADIO
+        for entry in ("/FT", "/Ff"):
+            if entry in check_2:
+                del check_2[entry]
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    option = next(key for key in obj.widgets if key.split(".")[-1] == "check_2")
+    assert type(obj.widgets[option]) is Radio
+    obj.remove_fields([key for key in obj.widgets if key.split(".")[-1] == "check"])
+
+    # the /Kids of "check" show that "check_2" is its option, which goes with it
+    others = ["test", "test_2", "test_3", "check_3"]
+    assert list(obj.widgets) == others
+    assert_catalog_fields(obj.read(), others)
+    assert_widgets_match_output(obj)
 
 
 @pytest.mark.parametrize(
