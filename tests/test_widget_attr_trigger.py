@@ -1735,18 +1735,18 @@ def test_full_widget_name_with_parent_cycle(
     assert_widgets_match_output(obj)
 
     # removing the field raises and changes nothing, with full names or without
-    for use_full_widget_name, name in ((True, key), (False, short_key)):
-        obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
-        obj.fill({name: "foo"})
-        filled = obj.read()
+    without_full_names = PdfWrapper(stream)
+    without_full_names.fill({short_key: "foo"})
+    for each, name in ((obj, key), (without_full_names, short_key)):
+        filled = each.read()
 
         with pytest.raises(
             ValueError, match="the /Parent chain of the field has a cycle"
         ):
-            obj.remove_fields([name])
+            each.remove_fields([name])
 
-        assert obj.read() == filled
-        assert obj.data[name] == "foo"
+        assert each.read() == filled
+        assert each.data[name] == "foo"
 
 
 def _with_field_cycle(stream, shape):

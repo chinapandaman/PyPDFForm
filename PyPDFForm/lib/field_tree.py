@@ -74,10 +74,9 @@ def remove_widgets_by_keys(
     `ValueError` before anything is detached, since which fields are below it,
     and would go with it, isn't defined. Other fields in a cycle don't stop
     the removal. When anything was detached, the written PDF is then cloned
-    again, so it
-    contains only objects reachable from its trailer: objects that only
-    removed fields, widgets, or replaced entries used are dropped, while
-    objects other content uses are kept.
+    again, so it contains only objects reachable from its trailer: objects
+    that only removed fields, widgets, or replaced entries used are dropped,
+    while objects other content uses are kept.
     Null entries, such as a null `/CO`, are treated as absent. `get_field_keys`
     lists the keys this function can match. If no keys are provided, the
     original PDF stream is returned unchanged.
@@ -126,6 +125,7 @@ def remove_widgets_by_keys(
         if len(page_annots) != len(annots):
             page[NameObject(Annots)] = page_annots
 
+    # every match first, so that a cycle raises before anything is detached
     for each in matched.values():
         _check_parent_chain(each)
 

@@ -519,14 +519,14 @@ def _get_widget_annotations(page) -> List[Tuple[dict, DictionaryObject]]:
         List[Tuple[dict, DictionaryObject]]: The widget dictionaries found on
             the page, each with its annotation.
     """
-    widgets = page.annotations
+    annotations = page.annotations
     result = []
-    if widgets:
-        for widget in widgets:
-            annot = widget.get_object()
-            copy = dict(annot)
-            if _is_widget(copy):
-                result.append((copy, annot))
+    if annotations:
+        for reference in annotations:
+            annot = reference.get_object()
+            widget = dict(annot)
+            if _is_widget(widget):
+                result.append((widget, annot))
     return result
 
 
