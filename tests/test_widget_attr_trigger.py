@@ -1841,14 +1841,74 @@ def test_remove_fields_in_parent_cycle(
         assert [str(each.get("/T")) for each in pdf.Root.AcroForm.get("/CO", [])] == [
             "test_2"
         ] * len(kept)
-        # and the removed fields and their values can't be reached through the
-        # cycle
-        names = {
-            str(each.get("/T"))
-            for each in pdf.objects
-            if isinstance(each, Dictionary) and "/T" in each
-        }
+        # and the removed fields and their values, which are their names, aren't
+        # left in the PDF, as fields or as values a field inherited from them
+        names, values = (
+            {
+                str(each.get(entry))
+                for each in pdf.objects
+                if isinstance(each, Dictionary) and entry in each
+            }
+            for entry in ("/T", "/V")
+        )
     assert not names & removed
+    assert not values & removed
+
+
+@pytest.mark.parametrize(
+    ("cycle", "entry", "value", "own", "name", "expected"),
+    [
+        # "test_2" stays a text field
+        (["test", "test_2"], "/FT", Name("/Tx"), None, "value", None),
+        (["test", "test_2"], "/Ff", 1, None, "readonly", True),
+        (["test", "test_2"], "/DA", String("/Helv 7 Tf 0 g"), None, "font_size", 7),
+        (["test", "test_2"], "/Q", 2, None, "alignment", 2),
+        (["test", "test_2"], "/MaxLen", 5, None, "max_length", 5),
+        # "test_3" inherits the flags from "test_2", above the removed "test"
+        (["test", "test_2", "test_3"], "/Ff", 1, None, "readonly", True),
+        # its own flags take precedence
+        (["test", "test_2"], "/Ff", 1, 0, "readonly", False),
+    ],
+)
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_remove_field_keeps_inherited_entries(
+    template_stream,
+    cycle,
+    entry,
+    value,
+    own,
+    name,
+    expected,
+    use_full_widget_name,
+    assert_widgets_match_output,
+):
+    # each field's parent is the next one, and the last one's is "test", so
+    # the last field inherits the entry through "test", from the field farthest
+    # up its chain, unless it has its own
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        fields = [_get_field(pdf, each) for each in cycle]
+        for field, parent in zip(fields, [*fields[1:], fields[0]], strict=True):
+            field.Parent = parent
+            if entry in field:
+                del field[entry]
+        fields[-2][entry] = value
+        if own is not None:
+            fields[-1][entry] = own
+        stream = _save(pdf)
+    kept = cycle[-1]
+
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    obj.remove_fields([key for key in obj.widgets if key.split(".")[-1] == "test"])
+
+    # removing "test" makes the last field a top-level field with the entry,
+    # which the wrapper reads as the PDF does, and it can still be filled
+    assert str(_find_widget(obj.read(), kept)[entry]) == str(
+        value if own is None else own
+    )
+    assert getattr(obj.widgets[kept], name) == expected
+    assert_widgets_match_output(obj)
+    obj.fill({kept: "foo"})
+    assert PdfWrapper(obj.read()).data[kept] == "foo"
 
 
 @pytest.mark.parametrize(

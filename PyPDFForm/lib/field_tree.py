@@ -27,6 +27,8 @@ from pypdf.generic import (
 from .constants import (
     AA,
     CO,
+    DA,
+    FT,
     INCLUDE_EXCLUDE,
     NA,
     NAMED_TARGETS,
@@ -35,14 +37,17 @@ from .constants import (
     AcroForm,
     Annots,
     Dest,
+    Ff,
     Fields,
     Flags,
     Hide,
     Kids,
+    MaxLen,
     Next,
     OpenAction,
     P,
     Parent,
+    Q,
     Rect,
     S,
     Subtype,
@@ -53,6 +58,10 @@ from .constants import (
 )
 from .patterns import get_widget_key
 from .utils import get_array, get_dictionary, get_entry, get_version, set_version
+
+# the entries ISO 32000-1 makes inheritable, other than a field's value (/V)
+# and default value (/DV), which leave the PDF with a removed field
+UNLINKED_INHERITED_ENTRIES = (FT, Ff, DA, Q, MaxLen)
 
 
 def remove_widgets_by_keys(
@@ -299,9 +308,13 @@ def _unlink_cycles(detached: Dict[int, DictionaryObject]) -> None:
     For each detached object in a `/Parent` cycle, the object of the cycle
     whose `/Parent` is the detached object loses its `/Parent`, so a field
     that stays, which then has no parent, can't reach the detached object and
-    its value through the cycle. The links are all found before any is
-    removed, so the result doesn't depend on the order in which the objects
-    were detached.
+    its value through the cycle. Before that, the object gets each entry of
+    `UNLINKED_INHERITED_ENTRIES` that it doesn't have but inherits through
+    the link, from the nearest object of the cycle that has it, so a field
+    that stays keeps its type, flags, and default appearance; a value it
+    inherited leaves with the detached object. The links and entries are all
+    found before anything changes, so the result doesn't depend on the order
+    in which the objects were detached.
 
     Args:
         detached (Dict[int, DictionaryObject]): Detached objects keyed by `id`.
@@ -313,6 +326,19 @@ def _unlink_cycles(detached: Dict[int, DictionaryObject]) -> None:
             # the cycle closes at the detached object
             ends.append(chain[-1])
 
+    copies = []
+    for end in ends:
+        # the objects above it, which are the rest of the cycle
+        above = _get_parent_chain(end)[0][1:]
+        for key in UNLINKED_INHERITED_ENTRIES:
+            holder = next(
+                (each for each in above if get_entry(each, key) is not None), None
+            )
+            if get_entry(end, key) is None and holder is not None:
+                copies.append((end, key, holder.raw_get(key)))
+
+    for end, key, value in copies:
+        end[NameObject(key)] = value
     for each in ends:
         del each[NameObject(Parent)]
 
