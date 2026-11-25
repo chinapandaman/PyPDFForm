@@ -901,13 +901,13 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
 
     The object is removed from the `/Kids` of its parent when the parent is
     one of its ancestors, as `_get_ancestors` gives them, which every parent
-    is unless the `/Parent` chain has a cycle. A parent that listed it there
-    and has no kids left is detached the same way, stopping at the first one
-    that keeps other kids or didn't list it, and at the last ancestor. A
-    parent that isn't an ancestor, such as the other field of two that are
-    each other's parent and list each other as kids, keeps listing the
-    object, so that reading the ancestors of other fields isn't affected
-    while the caller goes on; `remove_widgets_by_keys` removes it at the end.
+    is unless the `/Parent` chain has a cycle. A parent left without kids is
+    detached the same way, stopping at the first one with remaining kids and
+    at the last ancestor. A parent that isn't an ancestor, such as the other
+    field of two that are each other's parent and list each other as kids,
+    keeps listing the object, so that reading the ancestors of other fields
+    isn't affected while the caller goes on; `remove_widgets_by_keys` removes
+    it at the end.
     Every detached object is then removed from the AcroForm's root `/Fields`
     array, so a field listed there although it has a parent, or whose
     ancestors form a cycle, doesn't stay in the form. No `/Parent` changes,
@@ -927,10 +927,8 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
     # each ancestor is the parent of the one before it
     for parent in _get_ancestors(field):
         kids = get_array(parent, Kids)
-        remaining = [kid for kid in kids if kid.get_object() is not field]
-        listed = len(remaining) != len(kids)
-        kids[:] = remaining
-        if remaining or not listed:
+        kids[:] = [kid for kid in kids if kid.get_object() is not field]
+        if kids:
             break
         field = parent
         result.append(field)
