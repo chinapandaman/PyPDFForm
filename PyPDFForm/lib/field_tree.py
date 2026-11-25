@@ -70,10 +70,13 @@ def remove_widgets_by_keys(
     is removed from the AcroForm `/CO` calculation order, which is deleted
     when it becomes empty. Form actions that name detached fields stop naming
     them, as described in `_remove_action_targets`; JavaScript is not changed.
-    When anything was detached, the written PDF is then cloned again, so it
-    contains only objects reachable from its trailer: objects that only
-    removed fields, widgets, or replaced entries used are dropped, while
-    objects other content uses are kept.
+    A field or widget to remove whose `/Parent` chain has a cycle raises a
+    `ValueError` before anything is detached, since which fields are below it,
+    and would go with it, isn't defined. Other fields in a cycle don't stop
+    the removal. When anything was detached, the written PDF is then cloned
+    again, so it contains only objects reachable from its trailer: objects
+    that only removed fields, widgets, or replaced entries used are dropped,
+    while objects other content uses are kept.
     Null entries, such as a null `/CO`, are treated as absent. `get_field_keys`
     lists the keys this function can match. If no keys are provided, the
     original PDF stream is returned unchanged.
@@ -86,6 +89,10 @@ def remove_widgets_by_keys(
 
     Returns:
         bytes: The updated PDF stream with the matching fields removed.
+
+    Raises:
+        ValueError: If the `/Parent` chain of a field or widget to remove has a
+            cycle.
     """
     if not keys:
         return pdf
@@ -117,6 +124,10 @@ def remove_widgets_by_keys(
 
         if len(page_annots) != len(annots):
             page[NameObject(Annots)] = page_annots
+
+    # every match first, so that a cycle raises before anything is detached
+    for each in matched.values():
+        _check_parent_chain(each)
 
     detached = {}
     for field in matched.values():
@@ -248,6 +259,26 @@ def _has_ancestor_in(
         node = get_dictionary(node, Parent)
 
     return False
+
+
+def _check_parent_chain(obj: DictionaryObject) -> None:
+    """
+    Checks that the `/Parent` chain of a field or widget to remove has no cycle.
+
+    Args:
+        obj (DictionaryObject): A field or widget annotation.
+
+    Raises:
+        ValueError: If the chain reaches an object a second time.
+    """
+    seen = set()
+    node: Optional[DictionaryObject] = obj
+    while node is not None:
+        if id(node) in seen:
+            msg = "Cannot remove the field: the /Parent chain of the field has a cycle."
+            raise ValueError(msg)
+        seen.add(id(node))
+        node = get_dictionary(node, Parent)
 
 
 def _is_detached(obj: object, detached: Dict[int, DictionaryObject]) -> bool:
@@ -760,11 +791,14 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
     """
     Detaches a field or widget and its emptied ancestors from the AcroForm tree.
 
-    The object is removed from its parent's `/Kids`, or from the AcroForm's
-    root `/Fields` array when it has no parent. A parent left without kids is
-    detached the same way, stopping at the first parent with remaining kids.
-    Resolved objects are compared by identity so unrelated fields with the
-    same name keep their references. Page annotations are not changed.
+    The object is removed from its parent's `/Kids`. A parent left without
+    kids is detached the same way, stopping at the first parent with remaining
+    kids, at the top of the tree, or at a `/Parent` cycle. Every detached
+    object is then removed from the AcroForm's root `/Fields` array, so a
+    field listed there although it has a parent, or whose ancestors form a
+    cycle, doesn't stay in the form. Resolved objects are compared by
+    identity so unrelated fields with the same name keep their references.
+    Page annotations are not changed.
 
     Args:
         writer (PdfWriter): The PDF writer that owns the field tree.
@@ -780,7 +814,7 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
         kids = get_array(parent, Kids)
         kids[:] = [kid for kid in kids if kid.get_object() is not field]
         if kids or any(parent is each for each in result):
-            return result
+            break
         field = parent
         result.append(field)
         parent = get_dictionary(field, Parent)
@@ -788,7 +822,9 @@ def detach_field(writer: PdfWriter, field: DictionaryObject) -> List[DictionaryO
     acroform = get_dictionary(writer.root_object, AcroForm) or DictionaryObject()
     fields = get_array(acroform, Fields)
     fields[:] = [
-        reference for reference in fields if reference.get_object() is not field
+        reference
+        for reference in fields
+        if not any(reference.get_object() is each for each in result)
     ]
 
     return result

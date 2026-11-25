@@ -176,10 +176,15 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
     Extracts the widget key from a widget dictionary.
 
     The short key is the widget's name (`/T`), or its parent's when the widget
-    has none. If `use_full_widget_name` is True, it recursively constructs the
-    full widget name by concatenating parent and child names with dots, while
-    handling child annotations that inherit the parent name. A null name is
-    absent, as `has_name` describes.
+    has none. If `use_full_widget_name` is True, it constructs the full widget
+    name by joining the names along the widget's `/Parent` chain with dots,
+    outermost first, while handling child annotations that inherit the parent
+    name. The chain ends at a parent without a name, at a parent with the same
+    name as its child, and before a dictionary is reached a second time, the
+    widget included, so each field in a `/Parent` cycle is named once and a
+    widget without a name gets its field's key. Dictionaries are recognized by
+    identity, so the widget must be the PDF's own object, not a copy of it. A
+    null name is absent, as `has_name` describes.
 
     Args:
         widget (dict): The widget dictionary to extract the key from.
@@ -198,17 +203,22 @@ def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
         # None when neither has a name
         return cast(str, str(key) if key else None)
 
-    if (
+    names = []
+    seen = {id(widget)}
+    while (
         parent is not None
+        and id(parent) not in seen
         and has_name(parent)
         and get_entry(parent, T) != key  # sejda case
     ):
-        if key is None:
-            return get_widget_key(parent, use_full_widget_name)
+        if key is not None:
+            names.append(str(key))
+        seen.add(id(parent))
+        key = get_entry(parent, T)
+        parent = get_dictionary(parent, Parent)
 
-        return f"{get_widget_key(parent, use_full_widget_name)}.{key}"
-
-    return str(key) if key else ""
+    names.append(str(key) if key else "")
+    return ".".join(reversed(names))
 
 
 def _get_widget_field(annot: DictionaryObject) -> DictionaryObject:
