@@ -46,7 +46,7 @@ PyPDFForm doesn't pin its dependencies. Any version in its dependency ranges is 
 
 `pdf_samples/fixture_environment.json` records the environment the expected PDFs were last regenerated in. Regenerating them in place, for example with `make generate-new-pdf-samples` or `update` in the development container, rewrites this file, so commit it with the regenerated PDFs. Regenerating in place stops with an error when Python uses zlib-ng.
 
-Regenerating expected PDFs in place runs one test at a time, because some tests read expected PDFs that other tests write. It stops with an error when pytest runs with `-n`. Regenerating them into another directory, as `make compare-pdf-diffs` does, runs in parallel.
+Regenerating expected PDFs in place runs one test at a time, because some tests read expected PDFs that other tests write. It stops with an error when pytest runs with `-n`. Regenerating them into another directory, as `make compare-pdf-diffs` does, runs in parallel. `make compare-pdf-diffs` fails when tests fail but no regenerated PDF differs from its expected PDF.
 
 Each test run prints the current environment and any differences from the record at the top of its output, for example:
 
@@ -76,7 +76,9 @@ The test owns this expected PDF. Regenerating expected PDFs writes the test's PD
 expect_pdf(actual, same_as=expected_path)
 ```
 
-If two tests own the same expected PDF, the run ends with exit status 4 and lists them, because the PDF written last would hide the other.
+When the comparison fails, regenerating expected PDFs into another directory writes the other test's PDF as `<expected PDF>.<test>.pdf`, so `make compare-pdf-diffs` shows it next to the expected PDF.
+
+If two tests own the same expected PDF, the run ends with exit status 4 and lists them, because the PDF written last would hide the other. Regenerating in place then leaves that expected PDF as it was.
 
 A PDF created from a blank page holds the time it was created. Pass `timestamped=True` for such a PDF. Its `/CreationDate` and `/ModDate` are then ignored, with standard zlib only the length of the bytes is compared, and it is regenerated only when the comparison fails.
 
