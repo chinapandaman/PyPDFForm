@@ -3,7 +3,10 @@
 import json
 import os
 import platform
+import re
 import runpy
+import shutil
+import tempfile
 import tomllib
 from importlib import metadata
 
@@ -18,7 +21,7 @@ from tests.support.snapshots import OWNED, ExpectPdf
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURE_ENVIRONMENT_PATH = os.path.join(ROOT, "pdf_samples", "fixture_environment.json")
-regenerated_in_place = pytest.StashKey[bool]()
+in_place_writes = pytest.StashKey[object]()
 shared_expected_pdfs = pytest.StashKey[dict]()
 
 
@@ -73,6 +76,43 @@ class ExpectedPdfOwners:
                 self.owners.setdefault(value, set()).add(report.nodeid)
 
 
+class InPlaceWrites:
+    # regenerating in place runs one test at a time, so the first test that
+    # writes an expected PDF owns it; a second owner's PDF isn't written, and
+    # the expected PDF goes back to what it was before the run
+
+    def __init__(self):
+        super().__init__()
+        self.backup_dir = tempfile.mkdtemp(prefix="expected_pdf_backups_")
+        self.owners = {}
+        # the backup of each written expected PDF, or None if it didn't exist
+        self.backups = {}
+
+    def write(self, path, stream, nodeid):
+        if self.owners.setdefault(path, nodeid) != nodeid:
+            self.restore(path)
+            return
+        if path not in self.backups:
+            backup = None
+            if os.path.exists(path):
+                backup = os.path.join(self.backup_dir, f"{len(self.backups)}.pdf")
+                shutil.copyfile(path, backup)
+            self.backups[path] = backup
+
+        with open(path, "wb") as f:
+            f.write(stream)
+
+    def restore(self, path):
+        backup = self.backups[path]
+        if backup is not None:
+            shutil.copyfile(backup, path)
+        elif os.path.exists(path):
+            os.remove(path)
+
+    def close(self):
+        shutil.rmtree(self.backup_dir, ignore_errors=True)
+
+
 def pytest_configure(config):
     config.pluginmanager.register(ExpectedPdfOwners(), "expected_pdf_owners")
     if _regenerating_in_place(config) and _zlib_info()["zlib_backend"] != "zlib":
@@ -89,6 +129,14 @@ def pytest_configure(config):
             "Run without -n."
         )
         raise pytest.UsageError(msg)
+    if _regenerating_in_place(config):
+        config.stash[in_place_writes] = InPlaceWrites()
+
+
+def pytest_unconfigure(config):
+    writes = config.stash.get(in_place_writes, None)
+    if isinstance(writes, InPlaceWrites):
+        writes.close()
 
 
 def pytest_addoption(parser):
@@ -153,7 +201,8 @@ def pytest_sessionfinish(session):
             session.exitstatus = pytest.ExitCode.USAGE_ERROR
 
     # record the environment of the latest in-place regeneration
-    if config.stash.get(regenerated_in_place, False):
+    writes = config.stash.get(in_place_writes, None)
+    if isinstance(writes, InPlaceWrites) and writes.owners:
         with open(FIXTURE_ENVIRONMENT_PATH, "w", encoding="utf-8", newline="\n") as f:
             json.dump(fixture_environment(), f, indent=2)
             f.write("\n")
@@ -165,10 +214,20 @@ def pytest_terminal_summary(terminalreporter, config):
         terminalreporter.section("expected PDFs owned by more than one test", red=True)
         for path, nodeids in shared.items():
             terminalreporter.line(f"{path}: {', '.join(nodeids)}")
+        if isinstance(config.stash.get(in_place_writes, None), InPlaceWrites):
+            terminalreporter.line(
+                "Regenerating in place left these expected PDFs as they were."
+            )
         terminalreporter.line(
             "Each expected PDF has one owner. The other tests compare with it "
             "using expect_pdf(stream, same_as=path)."
         )
+
+
+def _write_artifact(path, stream):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "wb") as f:
+        f.write(stream)
 
 
 @pytest.fixture(scope="session")
@@ -187,17 +246,29 @@ def expect_pdf(request, standard_zlib):
     if request.config.getoption("--regenerate") != "1":
         return
     regenerate_dir = request.config.getoption("--regenerate-dir")
-    for path, stream in expect.outputs.items():
-        if regenerate_dir:
-            # write to the same relative path under regenerate_dir instead of
-            # overwriting the expected PDF
-            path = os.path.join(regenerate_dir, os.path.relpath(path, ROOT))
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-        else:
-            request.config.stash[regenerated_in_place] = True
+    if not regenerate_dir:
+        writes = request.config.stash[in_place_writes]
+        assert isinstance(writes, InPlaceWrites)
+        for path, stream in expect.outputs.items():
+            writes.write(path, stream, request.node.nodeid)
+        return
 
-        with open(path, "wb") as f:
-            f.write(stream)
+    for path, stream in expect.outputs.items():
+        # the same relative path under regenerate_dir, instead of overwriting
+        # the expected PDF
+        _write_artifact(
+            os.path.join(regenerate_dir, os.path.relpath(path, ROOT)), stream
+        )
+    test_name = re.sub(r"[^\w.-]+", "_", request.node.nodeid)
+    for path, stream in expect.mismatches.items():
+        # named <expected PDF>.<test>.pdf, so that a comparison run shows it
+        # without overwriting the version of the test that owns the PDF
+        _write_artifact(
+            os.path.join(
+                regenerate_dir, f"{os.path.relpath(path, ROOT)}.{test_name}.pdf"
+            ),
+            stream,
+        )
 
 
 @pytest.fixture

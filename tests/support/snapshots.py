@@ -20,6 +20,9 @@ class ExpectPdf:
         self.standard_zlib = standard_zlib
         # the outputs to regenerate, by the path of their expected PDF
         self.outputs = {}
+        # the outputs that differ from an expected PDF compared with same_as,
+        # which a comparison run shows without regenerating that PDF
+        self.mismatches = {}
 
     def __call__(
         self, stream, path=None, *, same_as=None, timestamped=False, length_only=False
@@ -36,7 +39,7 @@ class ExpectPdf:
             # recorded before comparing, so that a failing test is regenerated
             self.outputs[expected_path] = stream
         elif path is None and same_as is not None:
-            expected_path = same_as
+            expected_path = os.path.abspath(same_as)
         else:
             msg = "expect_pdf takes either path or same_as"
             raise TypeError(msg)
@@ -44,13 +47,19 @@ class ExpectPdf:
         with open(expected_path, "rb") as f:
             expected = f.read()
 
-        if length_only:
-            # the objects differ, for example because they are numbered differently
-            if self.standard_zlib:
-                assert len(stream) == len(expected)
-            return
+        try:
+            if length_only:
+                # the objects differ, for example because they are numbered
+                # differently
+                if self.standard_zlib:
+                    assert len(stream) == len(expected)
+            else:
+                assert_same_pdf(stream, expected, self.standard_zlib, timestamped)
+        except Exception:
+            if path is None:
+                self.mismatches[expected_path] = stream
+            raise
 
-        assert_same_pdf(stream, expected, self.standard_zlib, timestamped)
         if timestamped and path is not None:
             # a timestamped PDF is regenerated only when it changed
             del self.outputs[expected_path]
