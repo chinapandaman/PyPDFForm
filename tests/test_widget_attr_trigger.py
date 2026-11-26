@@ -18,6 +18,7 @@ from pypdf.generic import (
 )
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
+from PyPDFForm.lib import wrapper
 from PyPDFForm.lib.constants import (
     COMB,
     MULTILINE,
@@ -3887,4 +3888,36 @@ def test_font_change_is_decided_per_annotation(
             "Helvetica 12 Tf 0 g",
         ]
     assert obj.widgets["test"].font == "Helvetica"
+    assert_widgets_match_output(obj)
+
+
+def test_failed_font_readback_commits_nothing(
+    template_stream, monkeypatch, assert_widgets_match_output
+):
+    obj = PdfWrapper(template_stream)
+    original = obj.read()
+    font = obj.widgets["test"].font
+    obj.widgets["test"].font = "/Helv"
+
+    # reading the changed fonts back fails once, after the hooks applied
+    real_build_widgets = wrapper.build_widgets
+    error = OSError("injected readback failure")
+
+    def fail(*_args):
+        monkeypatch.setattr(wrapper, "build_widgets", real_build_widgets)
+        raise error
+
+    monkeypatch.setattr(wrapper, "build_widgets", fail)
+    with pytest.raises(OSError, match="injected readback failure"):
+        obj.read()
+
+    # the PDF, the widget, and its queue are as before the change
+    assert obj.read() == original
+    assert obj.widgets["test"].font == font
+    assert not obj.widgets["test"].hooks_to_trigger
+
+    # and the change can be made again
+    obj.widgets["test"].font = "/Helv"
+    assert _find_widget(obj.read(), "test")["/DA"].startswith("/Helv ")
+    assert obj.widgets["test"].font == "/Helv"
     assert_widgets_match_output(obj)

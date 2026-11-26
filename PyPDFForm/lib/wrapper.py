@@ -793,21 +793,22 @@ class PdfWrapper:
         """
         Reads the PDF stream, triggering widget hooks and updating fonts if necessary.
 
-        This internal method executes queued widget hooks. Fonts being changed to a
-        registered font or a font of the PDF are mapped from their user-facing names
-        to their internal PDF resource names before hooks are applied, both in the
-        hook queues and on the widgets. Applying hooks updates the wrapper's
-        stored stream and clears each widget's hook queue. If a hook raises, every
-        widget's queued hooks are discarded and their properties are restored to
-        their committed values, so the stream and widgets are unchanged and later
-        reads do not retry the failed updates.
+        This internal method executes queued widget hooks. A font being changed is
+        passed to its hook with the resource name of the registered font or font
+        of the PDF with its name, and each changed widget's font is then read back
+        from the changed PDF, as reopening it reads it. The changed PDF and those
+        fonts are committed together, which updates the wrapper's stored stream
+        and clears each widget's hook queue. If a hook or reading the fonts back
+        raises, every widget's queued hooks are discarded and their properties are
+        restored to their committed values, so the stream and widgets are
+        unchanged and later reads do not retry the failed updates.
 
         Returns:
             bytes: The raw PDF stream.
 
         Raises:
-            Exception: Any error raised while applying a hook is re-raised after
-                the queued updates are reverted.
+            Exception: Any error raised while applying a hook or reading the
+                fonts back is re-raised after the queued updates are reverted.
         """
 
         widgets_with_hooks = [
@@ -843,30 +844,35 @@ class PdfWrapper:
                         for hook, value in widget.hooks_to_trigger
                     ]
 
+            # the changed PDF and the fonts read back from it are committed
+            # only when both succeed
+            fonts = {}
             try:
-                self._stream = trigger_widget_hooks(
+                stream = trigger_widget_hooks(
                     self._stream,
                     self.widgets,
                     getattr(self, "use_full_widget_name"),
                 )
+                if widgets_with_font_hooks:
+                    # each annotation's hook decides by its own /DA, so the
+                    # font is read back as reopening the PDF reads it
+                    written = build_widgets(
+                        stream, getattr(self, "use_full_widget_name")
+                    )
+                    fonts = {
+                        id(widget): getattr(written[key], "font", widget.font)
+                        for key, widget in self.widgets.items()
+                        if id(widget) in widgets_with_font_hooks and key in written
+                    }
             except Exception:
                 for widget in self.widgets.values():
                     widget.revert_property_updates()
                 raise
 
-            if widgets_with_font_hooks:
-                # each annotation's hook decides by its own /DA, so the font
-                # is read back as reopening the PDF reads it
-                written = build_widgets(
-                    self._stream, getattr(self, "use_full_widget_name")
-                )
-                for key, widget in self.widgets.items():
-                    if id(widget) in widgets_with_font_hooks and key in written:
-                        widget.__dict__["font"] = getattr(
-                            written[key], "font", widget.font
-                        )
-
+            self._stream = stream
             for widget in self.widgets.values():
+                if id(widget) in fonts:
+                    widget.__dict__["font"] = fonts[id(widget)]
                 widget.clear_property_updates()
 
         return self._stream
