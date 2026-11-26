@@ -533,23 +533,6 @@ def get_field_tooltip(widget: dict) -> str | None:
     return None
 
 
-def get_tooltip_target(annot: DictionaryObject) -> DictionaryObject:
-    """
-    Gets where a changed tooltip (`/TU`) of a widget is written.
-
-    It is the widget when it has a tooltip of its own, which is read first,
-    as `get_field_tooltip` describes, and otherwise the field the widget
-    belongs to, as `get_widget_field` describes.
-
-    Args:
-        annot (DictionaryObject): The widget annotation dictionary.
-
-    Returns:
-        DictionaryObject: The widget or its field.
-    """
-    return annot if get_entry(annot, TU) else get_widget_field(annot)
-
-
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:
     """
     Updates the name of an annotation, setting the T (title) entry.

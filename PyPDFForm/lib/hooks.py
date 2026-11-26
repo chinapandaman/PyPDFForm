@@ -67,7 +67,6 @@ from .middleware.dropdown import DropdownOption
 from .patterns import (
     check_field_flag,
     get_field_tooltip,
-    get_tooltip_target,
     get_widget_field,
     get_widget_key,
     parse_alignment,
@@ -75,7 +74,7 @@ from .patterns import (
     parse_max_length,
     resolve_inherited_entry,
 )
-from .utils import get_dictionary
+from .utils import get_dictionary, get_entry
 
 
 class FontChange(NamedTuple):
@@ -663,10 +662,10 @@ def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
     Updates the tooltip (alternate field name) of a form field annotation.
 
     This function sets the 'TU' entry, which provides a text string that can be
-    used as a tooltip for the field, where `get_tooltip_target` puts it: the
-    widget when it has a tooltip of its own, and otherwise the field it belongs
-    to. None or an empty string removes the tooltip from the annotation and its
-    own field. A tooltip isn't inherited, as `get_field_tooltip` describes, so
+    used as a tooltip for the field, on the widget when it has a tooltip of its
+    own, which `get_field_tooltip` reads first, and otherwise on the field it
+    belongs to, as `get_widget_field` describes. None or an empty string
+    removes the tooltip from the annotation and its own field. A tooltip isn't inherited, as `get_field_tooltip` describes, so
     fields above the widget's own field are neither read nor changed.
 
     Args:
@@ -675,7 +674,8 @@ def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
             remove it.
     """
     if val:
-        get_tooltip_target(annot)[NameObject(TU)] = TextStringObject(val)
+        target = annot if get_entry(annot, TU) else get_widget_field(annot)
+        target[NameObject(TU)] = TextStringObject(val)
     else:
         _remove_field_entry(annot, TU, get_field_tooltip)
 
