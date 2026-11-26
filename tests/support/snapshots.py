@@ -14,6 +14,7 @@ class ExpectPdf:
     # write when expected PDFs are regenerated
 
     def __init__(self, node, root, standard_zlib):
+        super().__init__()
         self.node = node
         self.root = root
         self.standard_zlib = standard_zlib
@@ -25,21 +26,22 @@ class ExpectPdf:
     ):
         # path is the expected PDF this test owns and regenerates; same_as is
         # only compared, for example one that another test owns
-        if (path is None) == (same_as is None):
-            msg = "expect_pdf takes either path or same_as"
-            raise TypeError(msg)
         if length_only and same_as is None:
             msg = "length_only only applies to same_as"
             raise TypeError(msg)
-
-        if path is not None:
-            path = os.path.abspath(path)
-            owned = os.path.relpath(path, self.root).replace(os.sep, "/")
+        if path is not None and same_as is None:
+            expected_path = os.path.abspath(path)
+            owned = os.path.relpath(expected_path, self.root).replace(os.sep, "/")
             self.node.user_properties.append((OWNED, owned))
             # recorded before comparing, so that a failing test is regenerated
-            self.outputs[path] = stream
+            self.outputs[expected_path] = stream
+        elif path is None and same_as is not None:
+            expected_path = same_as
+        else:
+            msg = "expect_pdf takes either path or same_as"
+            raise TypeError(msg)
 
-        with open(path or same_as, "rb") as f:
+        with open(expected_path, "rb") as f:
             expected = f.read()
 
         if length_only:
@@ -51,4 +53,4 @@ class ExpectPdf:
         assert_same_pdf(stream, expected, self.standard_zlib, timestamped)
         if timestamped and path is not None:
             # a timestamped PDF is regenerated only when it changed
-            del self.outputs[path]
+            del self.outputs[expected_path]

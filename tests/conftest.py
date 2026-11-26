@@ -64,6 +64,7 @@ class ExpectedPdfOwners:
     # the controller of a parallel run receives from every worker
 
     def __init__(self):
+        super().__init__()
         self.owners = {}
 
     def pytest_runtest_logreport(self, report):
