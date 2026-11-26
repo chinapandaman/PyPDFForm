@@ -8,9 +8,9 @@
   "pillow_zlib_version": "1.3.1.zlib-ng",
   "qpdf": "12.4.2",
   "cryptography": "50.0.2",
-  "fonttools": "4.68.0",
+  "fonttools": "4.69.1",
   "pikepdf": "10.18.2",
   "pillow": "13.0.0",
   "pypdf": "7.1.1",
-  "reportlab": "5.1.0"
+  "reportlab": "5.1.2"
 }
