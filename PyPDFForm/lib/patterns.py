@@ -46,9 +46,11 @@ from .constants import (
     Q,
     Rect,
     Sig,
+    Subtype,
     T,
     Tx,
     V,
+    Widget,
     Yes,
 )
 from .default_appearance import TextStyle, read_default_appearance
@@ -178,13 +180,11 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     is not `/Off`, it means the checkbox is checked, and True is returned.
     Otherwise, if the value is `/Off` or not present, None is returned rather
     than False so unspecified fill data can be distinguished from an explicit
-    unchecked value. A widget without a name or a value of its own, which is a
-    separate widget of its field, takes its field's value, inherited from the
-    fields above it, when that names one of the widget's appearance states,
-    since other widgets of the field can have other on states. A `/Parent`
-    cycle before a value is found reads as no value. A widget with a name is
-    a field of its own, as `_get_widget_field` describes, so it reads only its
-    own value, even below another checkbox.
+    unchecked value. A widget without a value of its own, such as a separate
+    widget of its field, takes the value inherited from the fields above it,
+    as `_get_field_value` describes, when that names one of the widget's
+    appearance states, since other widgets of the field can have other on
+    states.
 
     Args:
         annot (DictionaryObject): The checkbox annotation dictionary.
@@ -193,8 +193,8 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
         bool | None: True if the checkbox is checked, None otherwise.
     """
     value = annot.get(V)
-    if value is None and not has_name(annot):
-        value = _get_inherited_value(annot, V)
+    if value is None:
+        value = _get_field_value(annot)
         appearance = get_dictionary(annot, AP)
         states = get_dictionary(appearance, N) if appearance is not None else None
         if not isinstance(value, NameObject) or states is None or value not in states:
@@ -731,6 +731,40 @@ def get_button_type(widget: DictionaryObject) -> type | None:
         return Radio
     # a radio group's /DV can be /Yes or /Off too, so the radio flag comes first
     return Checkbox if get_entry(field, DV) in (Yes, Off) else Radio
+
+
+def _get_field_value(widget: DictionaryObject) -> Any:
+    """
+    Reads the value (`/V`) that a widget inherits along its `/Parent` chain.
+
+    The value is the first one found on the widget or a field above it, as
+    `_get_inherited_value` resolves it, except that a field with a name
+    doesn't inherit from a `/Parent` that is a widget annotation. Such a
+    parent can't be a field above it: it is a field of its own, such as a
+    checkbox whose widget is merged with it, so the two fields' values stay
+    independent. A widget without a name still takes the value of the field
+    it belongs to, as `_get_widget_field` describes. A `/Parent` cycle
+    before a value is found reads as no value.
+
+    Args:
+        widget (DictionaryObject): The widget annotation.
+
+    Returns:
+        Any: The value, or None when nothing sets it.
+    """
+    seen = set()
+    node = widget
+    while id(node) not in seen:
+        seen.add(id(node))
+        value = get_entry(node, V)
+        if value is not None:
+            return value
+        parent = get_dictionary(node, Parent)
+        if parent is None or (has_name(node) and get_entry(parent, Subtype) == Widget):
+            return None
+        node = parent
+
+    return None
 
 
 def _get_inherited_value(widget: DictionaryObject, key: str) -> Any:
