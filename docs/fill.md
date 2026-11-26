@@ -78,7 +78,7 @@ Use string values for text fields and boolean values for checkboxes. The followi
 
 ## Fill radio button group
 
-A radio button group is a collection of radio buttons sharing the same name on a PDF form.
+A radio button group is a collection of radio buttons sharing the same name on a PDF form. A radio button field with only one button is a group with one option, so fill it with `0`, not `True`.
 
 Fill each radio button group with the zero-based index of the option to select. The index must satisfy the [choice-index bounds](#choice-index-validation). For example, to fill [this PDF](pdfs/sample_template_with_radio_button.pdf):
 

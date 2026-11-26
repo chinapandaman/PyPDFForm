@@ -9,7 +9,7 @@ supports making the filled form read-only to prevent further modifications.
 """
 
 from io import BytesIO
-from typing import Dict, Set, cast
+from typing import Dict, List, Set, cast
 
 from pypdf import PdfWriter
 from pypdf.generic import DictionaryObject
@@ -27,13 +27,13 @@ from .middleware.signature import Signature
 from .middleware.text import Text
 from .patterns import (
     get_widget_key,
+    get_widget_type,
     is_pushbutton,
     update_checkbox_value,
     update_dropdown_value,
     update_radio_value,
     update_text_value,
 )
-from .template import get_widget_type
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -127,7 +127,7 @@ def update_widget(
     annot: DictionaryObject,
     widget: WIDGET_TYPES,
     key: str,
-    radio_button_tracker: Dict[str, int],
+    radio_options: Dict[str, List[DictionaryObject]],
     images_to_draw_page: list,
     need_appearances: bool,
     readonly: bool,
@@ -139,8 +139,8 @@ def update_widget(
     the read-only flag first when requested, skips value updates when the
     middleware value is ``None`` or filling the widget doesn't change the
     annotation, such as a checkbox with the short name of a radio group,
-    tracks radio option indices within each group,
-    updates the entire radio group when its selected option is reached, and
+    collects the options of each radio group in order, which `fill` selects
+    once every page is visited, and
     prepares images or signatures for later drawing instead of writing image data directly
     into the annotation.
 
@@ -148,7 +148,8 @@ def update_widget(
         annot (DictionaryObject): The annotation object representing the widget in the PDF.
         widget (WIDGET_TYPES): The widget middleware object containing the new value.
         key (str): The unique key identifying the widget.
-        radio_button_tracker (Dict[str, int]): A tracker for radio button groups to manage their indices.
+        radio_options (Dict[str, List[DictionaryObject]]): The options of
+            each radio group so far, by key, in the order they are filled.
         images_to_draw_page (list): A list to store image data for the current page.
         need_appearances (bool): If True, skips updating appearance streams for certain fields.
         readonly (bool): Whether to make the widget read-only to prevent further editing.
@@ -169,11 +170,7 @@ def update_widget(
     elif type(widget) is Checkbox:
         update_checkbox_value(annot, widget.value)
     elif isinstance(widget, Radio):
-        if key not in radio_button_tracker:
-            radio_button_tracker[key] = 0
-        radio_button_tracker[key] += 1
-        if widget.value == radio_button_tracker[key] - 1:
-            update_radio_value(annot)
+        radio_options.setdefault(key, []).append(annot)
     elif isinstance(widget, Dropdown):
         update_dropdown_value(annot, widget, need_appearances)
     elif isinstance(widget, Text):
@@ -223,10 +220,13 @@ def fill(
     dictionary. The function supports text fields, checkboxes, radio buttons, dropdowns,
     images, and signatures. A field of another type than the widget under its key,
     such as a checkbox with the short name of a radio group, keeps its value, and a
-    radio group fills only its own options. A checkbox whose value wasn't
-    supplied, and is still the one the PDF holds, isn't written again,
-    since its key can name other widgets that read differently, such as the
-    widgets of a field with different on states. It can set fields read-only during
+    radio group fills only its own options. Once every page is visited, the
+    option at a radio group's index is selected, and the other widgets of its
+    field are cleared, including those that the field's `/Kids` doesn't list.
+    A checkbox whose value wasn't supplied, and is still the one the PDF
+    holds, isn't written again, since its key can name other widgets that
+    read differently, such as the widgets of a field with different on
+    states. It can set fields read-only during
     filling, and when images or signatures are present it removes only the widgets
     whose images were prepared, including their field-tree entries, and returns a
     second stream with the image watermarks applied. All other annotations retain
@@ -255,7 +255,7 @@ def fill(
         for key, widget in widgets.items()
     }
 
-    radio_button_tracker = {}
+    radio_options = {}
     images_to_draw = {}
     any_image_to_draw = False
 
@@ -279,7 +279,7 @@ def fill(
                 annot,
                 widget,
                 key,
-                radio_button_tracker,
+                radio_options,
                 images_to_draw[page_num + 1],
                 need_appearances,
                 readonly,
@@ -291,6 +291,13 @@ def fill(
                     item for item in annotations if item.get_object() is not annot
                 ]
                 detach_field(out, annot)
+
+    # every option is known now, so the other widgets of the selected
+    # option's field are cleared on any page
+    for key, options in radio_options.items():
+        index = cast(int, widgets[key].value)
+        if index < len(options):
+            update_radio_value(options[index], options)
 
     with BytesIO() as f:
         out.write(f)

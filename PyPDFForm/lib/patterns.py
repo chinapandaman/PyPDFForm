@@ -9,7 +9,7 @@ for updating these widgets, and resolves the entries that a field inherits from
 its ancestors and the AcroForm, such as its default appearance and flags.
 """
 
-from typing import Any, NamedTuple, Optional, Tuple, cast
+from typing import Any, NamedTuple, Optional, Sequence, Tuple, cast
 
 from pypdf.generic import (
     ArrayObject,
@@ -60,108 +60,22 @@ from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
-from .utils import extract_widget_property, get_dictionary, get_entry, has_name
+from .utils import (
+    extract_widget_property,
+    find_pattern_match,
+    get_array,
+    get_dictionary,
+    get_entry,
+    has_name,
+)
 
-# get_widget_type reads /AS as /Off, so an /AS pattern requires an appearance
-# state, whichever it is, and a field's type doesn't change as it is filled
-WIDGET_TYPE_PATTERNS = [
-    (
-        (
-            {Subtype: Widget},
-            {A: {JS: IMAGE_IMPORT_JAVASCRIPT}},
-        ),
-        Image,
-    ),
-    (
-        (
-            {Subtype: Widget},
-            {FT: Sig},
-        ),
-        Signature,
-    ),
-    (
-        (
-            {Subtype: Widget},
-            {Parent: {FT: Sig}},
-        ),
-        Signature,
-    ),
-    (
-        (
-            {Subtype: Widget},
-            {FT: Tx},
-        ),
-        Text,
-    ),
-    (
-        # reportlab creation pattern
-        (
-            {Subtype: Widget},
-            {FT: Btn},
-            {Parent: {FT: Btn}},
-            {AS: (Yes, Off)},
-        ),
-        Radio,
-    ),
-    (
-        (
-            {Subtype: Widget},
-            {FT: Btn},
-            {AS: (Yes, Off)},
-        ),
-        Checkbox,
-    ),
-    (
-        (
-            {Subtype: Widget},
-            {FT: Ch},
-        ),
-        Dropdown,
-    ),
-    (
-        (
-            {Subtype: Widget},
-            {Parent: {FT: Ch}},
-        ),
-        Dropdown,
-    ),
-    (
-        (
-            {Subtype: Widget},
-            {Parent: {FT: Tx}},
-        ),
-        Text,
-    ),
-    (
-        # a radio group's /DV can be /Yes or /Off too, so check it before the /DV rule
-        (
-            {Subtype: Widget},
-            {Parent: {FT: Btn}},
-            {AS: (Yes, Off)},
-            # the radio flag is resolved from the shared field and its ancestors,
-            # not a widget's own /Ff, so every option of a group has one type
-            {Parent: lambda parent: check_field_flag(parent, RADIO)},
-        ),
-        Radio,
-    ),
-    (
-        (
-            {Subtype: Widget},
-            {Parent: {FT: Btn}},
-            {Parent: {DV: (Yes, Off)}},
-            {AS: (Yes, Off)},
-        ),
-        Checkbox,
-    ),
-    (
-        (
-            {Subtype: Widget},
-            {Parent: {FT: Btn}},
-            {AS: (Yes, Off)},
-        ),
-        Radio,
-    ),
-]
+# an image field is a pushbutton, so it is found by the action that imports
+# its image before its field type is read
+IMAGE_PATTERN = {A: {JS: IMAGE_IMPORT_JAVASCRIPT}}
+
+# the middleware type of each field type (/FT), except buttons, which
+# _get_button_type tells apart
+FIELD_TYPES = ((Sig, Signature), (Tx, Text), (Ch, Dropdown))
 
 WIDGET_DESCRIPTION_PATTERNS = [{TU: True}, {Parent: {TU: True}}]
 
@@ -269,10 +183,10 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     Otherwise, if the value is `/Off` or not present, None is returned rather
     than False so unspecified fill data can be distinguished from an explicit
     unchecked value. A widget without a value of its own, such as a separate
-    widget of its field, takes its field's value, inherited from the fields
-    above it, when that names one of the widget's appearance states, since
-    other widgets of the field can have other on states. A `/Parent` cycle
-    before a value is found reads as no value.
+    widget of its field, takes the value inherited from the fields above it,
+    as `_get_field_value` describes, when that names one of the widget's
+    appearance states, since other widgets of the field can have other on
+    states.
 
     Args:
         annot (DictionaryObject): The checkbox annotation dictionary.
@@ -282,7 +196,7 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     """
     value = annot.get(V)
     if value is None:
-        value = _get_inherited_value(annot, V)
+        value = _get_field_value(annot)
         appearance = get_dictionary(annot, AP)
         states = get_dictionary(appearance, N) if appearance is not None else None
         if not isinstance(value, NameObject) or states is None or value not in states:
@@ -291,24 +205,41 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     return True if value not in (None, Off) else None
 
 
-def update_radio_value(annot: DictionaryObject) -> None:
+def update_radio_value(
+    annot: DictionaryObject, options: Sequence[DictionaryObject]
+) -> None:
     """
     Selects a radio button and clears every other widget in its group.
 
-    The selected widget's non-Off normal appearance supplies the parent value
-    (V) and selected appearance state (AS). All other children, including those
-    on other pages, receive /Off. The parent's Opt export mapping is preserved.
+    The group is the field the widget belongs to, as `_get_widget_field`
+    describes: its parent, or the widget itself when it has a name. The
+    selected widget's non-Off normal appearance supplies the field's value (V)
+    and the widget's appearance state (AS), even when the field doesn't list
+    the widget in its `/Kids`. The other widgets of the field receive /Off:
+    those in its `/Kids`, including those on other pages, but not a kid with
+    a name, which is a field of its own, and those among `options` that
+    belong to the field, which its `/Kids` may not list. The field's Opt
+    export mapping is preserved.
 
     Args:
         annot (DictionaryObject): The radio button annotation dictionary.
+        options (Sequence[DictionaryObject]): Other widgets that may belong
+            to the field, such as the options of its group on every page.
     """
     for each in annot[AP][N]:
         if str(each) != Off:
-            parent = annot[Parent]
-            parent[NameObject(V)] = NameObject(each)
-            for reference in parent[Kids]:
-                child = reference.get_object()
-                child[NameObject(AS)] = NameObject(each if child is annot else Off)
+            field = _get_widget_field(annot)
+            field[NameObject(V)] = NameObject(each)
+            kids = [reference.get_object() for reference in get_array(field, Kids)]
+            others = [
+                kid
+                for kid in kids
+                if isinstance(kid, DictionaryObject) and not has_name(kid)
+            ] + [option for option in options if _get_widget_field(option) is field]
+            for other in others:
+                if other is not annot:
+                    other[NameObject(AS)] = NameObject(Off)
+            annot[NameObject(AS)] = NameObject(each)
             break
 
 
@@ -317,9 +248,12 @@ def get_radio_value(annot: DictionaryObject) -> bool:
     Retrieves the boolean value of a radio button annotation.
 
     This function iterates through the appearance states (AP) of the radio button
-    annotation. If the value (V) of the parent dictionary matches any of these
-    appearance states other than `/Off`, it means the radio button is selected, and
-    True is returned. Otherwise, False is returned.
+    annotation. If the value (V) of the field it belongs to, as
+    `_get_widget_field` describes, matches any of these appearance states
+    other than `/Off`, it means the radio button is selected, and True is
+    returned. Otherwise, False is returned. A field without a value of its
+    own takes the one inherited from the fields above it, as
+    `_get_field_value` describes.
 
     Args:
         annot (DictionaryObject): The radio button annotation dictionary.
@@ -327,11 +261,8 @@ def get_radio_value(annot: DictionaryObject) -> bool:
     Returns:
         bool: True if the radio button is selected, False otherwise.
     """
-    for each in annot.get(AP, {}).get(N, []):
-        if each != Off and annot.get(Parent, {}).get(V) == each:
-            return True
-
-    return False
+    value = _get_field_value(_get_widget_field(annot))
+    return any(each != Off and value == each for each in annot.get(AP, {}).get(N, []))
 
 
 def update_dropdown_value(
@@ -737,6 +668,122 @@ def is_pushbutton(widget: DictionaryObject) -> bool:
     """
     # an empty parent is falsy, so the widget's own flags are read
     return check_field_flag(_get_widget_field(widget) or widget, PUSHBUTTON)
+
+
+def get_widget_type(widget: dict) -> type | None:
+    """
+    Gets the middleware type of a widget annotation from its fixed entries.
+
+    Image fields, which are pushbuttons, are found by their action first.
+    Other widgets get the middleware type of their field type (`/FT`), which
+    is resolved from the widget and the fields along its `/Parent` chain, so
+    the type of the widget or a lower field takes precedence over the ones
+    above it. The AcroForm has no default for it, and a `/Parent` cycle before
+    it is found reads as no type, as a missing or null one does. Buttons are
+    told apart by `_get_button_type`, which doesn't read their appearance
+    state (`/AS`), since filling changes it: a checked checkbox whose on state
+    isn't `/Yes` is still a checkbox, and a field keeps its type as it is
+    filled, rebuilt, or copied.
+
+    Args:
+        widget (dict): The widget annotation dictionary.
+
+    Returns:
+        type | None: The middleware type, such as `Checkbox`, or None if the
+            annotation is not a supported widget.
+    """
+    if get_entry(widget, Subtype) != Widget:
+        return None
+    if find_pattern_match(IMAGE_PATTERN, widget):
+        return Image
+
+    field_type = _get_inherited_value(widget, FT)
+    if field_type == Btn:
+        return _get_button_type(widget)
+    for value, _type in FIELD_TYPES:
+        if field_type == value:
+            return _type
+
+    return None
+
+
+def _get_button_type(widget: DictionaryObject) -> type | None:
+    """
+    Gets the middleware type of a widget whose field type is `/Btn`.
+
+    A button without an appearance state (`/AS`), or whose field sets the
+    Pushbutton flag, has no value, so it is neither a checkbox nor a radio
+    button. The state itself isn't read, since filling changes it, so a field
+    keeps its type as it is filled, rebuilt, or copied.
+
+    A widget with a name, or without a parent field, is a field of its own,
+    as `_get_widget_field` describes. It is a radio button with one option
+    when its flags, resolved along its `/Parent` chain, set the radio flag,
+    and a checkbox otherwise, even when its parent is a button field.
+
+    A widget without a name is an option of its parent field. It is a radio
+    button when it repeats the field type, as ReportLab writes options, and
+    the field is a button field, or when the field sets the radio flag. That
+    flag is resolved from the field and the fields above it, not the option's
+    own flags, so every option of a group has one type. Otherwise, since not
+    every PDF sets the radio flag, it is a checkbox when the field's default
+    value (`/DV`) is `/Yes` or `/Off`, and a radio button when it isn't.
+
+    Args:
+        widget (DictionaryObject): The widget annotation.
+
+    Returns:
+        type | None: `Checkbox`, `Radio`, or None when the widget is neither.
+    """
+    if AS not in widget or is_pushbutton(widget):
+        return None
+
+    field = get_dictionary(widget, Parent)
+    if field is None or has_name(widget):
+        return Radio if check_field_flag(widget, RADIO) else Checkbox
+
+    if get_entry(widget, FT) == Btn:
+        # reportlab creation pattern
+        return Radio if _get_inherited_value(field, FT) == Btn else Checkbox
+    if check_field_flag(field, RADIO):
+        return Radio
+    # a radio group's /DV can be /Yes or /Off too, so the radio flag comes first
+    return Checkbox if get_entry(field, DV) in (Yes, Off) else Radio
+
+
+def _get_field_value(widget: DictionaryObject) -> Any:
+    """
+    Reads the value (`/V`) of a widget or field along its `/Parent` chain.
+
+    The value is the first one found on the widget or field or one above it,
+    as `_get_inherited_value` resolves it, except that a field with a name
+    doesn't inherit from a `/Parent` that is a widget annotation. Such a
+    parent can't be a field above it: it is a field of its own, such as a
+    checkbox whose widget is merged with it, so the two fields' values stay
+    independent. A widget without a name still takes the value of the field
+    it belongs to, as `_get_widget_field` describes. A `/Parent` cycle
+    before a value is found reads as no value.
+
+    Args:
+        widget (DictionaryObject): The widget annotation, or the field that
+            a widget belongs to.
+
+    Returns:
+        Any: The value, or None when nothing sets it.
+    """
+    seen = set()
+    node = widget
+    while id(node) not in seen:
+        seen.add(id(node))
+        value = get_entry(node, V)
+        if value is not None:
+            return value
+        parent = get_dictionary(node, Parent)
+        if parent is None or (has_name(node) and get_entry(parent, Subtype) == Widget):
+            return None
+        node = parent
+
+    return None
 
 
 def _get_inherited_value(widget: DictionaryObject, key: str) -> Any:

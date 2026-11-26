@@ -24,7 +24,6 @@ from pypdf.generic import (
 
 from .annotations import AnnotationTypes, LinkAnnotation
 from .constants import (
-    AS,
     COMB,
     JS,
     MULTILINE,
@@ -34,7 +33,6 @@ from .constants import (
     Annots,
     Dest,
     JavaScript,
-    Off,
     OpenAction,
     S,
     Title,
@@ -46,7 +44,6 @@ from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (
     WIDGET_DESCRIPTION_PATTERNS,
-    WIDGET_TYPE_PATTERNS,
     check_field_flag,
     get_checkbox_value,
     get_dropdown_choices,
@@ -59,10 +56,10 @@ from .patterns import (
     get_text_field_style,
     get_text_value,
     get_widget_key,
-    is_pushbutton,
+    get_widget_type,
     update_annotation_name,
 )
-from .utils import extract_widget_property, find_pattern_match, get_dictionary
+from .utils import extract_widget_property, get_dictionary
 
 
 def get_metadata(pdf: bytes) -> dict:
@@ -528,38 +525,6 @@ def _get_widget_annotations(page) -> List[Tuple[dict, DictionaryObject]]:
             if _is_widget(widget):
                 result.append((widget, annot))
     return result
-
-
-def get_widget_type(widget: dict) -> type | None:
-    """
-    Gets the middleware type of a widget annotation from its fixed entries.
-
-    The type is the one whose patterns the annotation satisfies first. A
-    button's appearance state (`/AS`) is read as `/Off`, since filling changes
-    it: a checked checkbox whose on state isn't `/Yes` is still a checkbox, and
-    a field keeps its type as it is filled, rebuilt, or copied. A pushbutton,
-    whose field sets the Pushbutton flag, has appearance states but no value,
-    so it is not a checkbox or radio button; image fields, which are
-    pushbuttons, are found by their action first.
-
-    Args:
-        widget (dict): The widget annotation dictionary.
-
-    Returns:
-        type | None: The middleware type, such as `Checkbox`, or None if the
-            annotation is not a supported widget.
-    """
-    if AS in widget:
-        widget = DictionaryObject(widget)
-        widget[NameObject(AS)] = NameObject(Off)
-
-    for patterns, _type in WIDGET_TYPE_PATTERNS:
-        if all(find_pattern_match(pattern, widget) for pattern in patterns):
-            if issubclass(_type, Checkbox) and is_pushbutton(widget):
-                return None
-            return _type
-
-    return None
 
 
 def _is_widget(widget: dict) -> bool:
