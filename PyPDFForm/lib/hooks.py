@@ -13,7 +13,7 @@ and behavior.
 import sys
 from collections.abc import Callable
 from io import BytesIO
-from typing import Any, TextIO, cast
+from typing import Any, NamedTuple, Optional, TextIO, cast
 
 from pypdf import PdfWriter
 from pypdf.generic import (
@@ -76,6 +76,22 @@ from .patterns import (
     resolve_inherited_entry,
 )
 from .utils import get_dictionary
+
+
+class FontChange(NamedTuple):
+    """
+    A font assigned to a text field or dropdown, as the wrapper passes it to
+    `update_text_field_font`.
+
+    Attributes:
+        name (str): The font as assigned, such as `Courier` or `/F1`.
+        resource (Optional[str]): The resource name of the registered font or
+            the font of the PDF with that name, such as `/F1`, or None when no
+            font has it.
+    """
+
+    name: str
+    resource: Optional[str]
 
 
 def trigger_widget_hooks(
@@ -300,45 +316,52 @@ def _update_default_appearance(
 
 
 def update_text_field_font(
-    annot: DictionaryObject, val: str, acroform: DictionaryObject
+    annot: DictionaryObject, val: str | FontChange, acroform: DictionaryObject
 ) -> None:
     """
     Updates the font of a text field annotation.
 
     This function changes the font of the field's default appearance (`/DA`),
-    as `_update_default_appearance` describes. The font must be a PDF font
-    resource name starting with a slash "/". The wrapper maps the name of a
-    registered font or a font of the PDF to its resource name before the hook
-    is applied, so any other name is one the PDF doesn't have, except the font
-    the field's `/DA` already uses without a slash, such as `Courier` in
-    `Courier 12 Tf`, which is read as the field's font. Assigning that font
-    back leaves the `/DA` unchanged.
+    as `_update_default_appearance` describes. A name without a slash that is
+    the font this annotation's `/DA` already uses, such as `Courier` in
+    `Courier 12 Tf`, leaves the `/DA` unchanged, even when a registered font
+    has that name. Otherwise, the font is the resource name of the registered
+    font or font of the PDF with that name, which the wrapper looks up, or the
+    name itself, which must then be a resource name starting with a slash "/".
+    Each annotation is decided by its own `/DA`, as it is when the hook runs,
+    so the widgets of a field, or an earlier change of the same font, can
+    give different results.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
-        val (str): The new font name to use for the text field. Must start with
-            "/", or be the font the field's `/DA` uses.
+        val (str | FontChange): The new font, with the resource name the
+            wrapper found for it, or a resource name starting with "/".
         acroform (DictionaryObject): The AcroForm dictionary, for its default.
 
     Raises:
-        ValueError: If the font is neither a resource name starting with "/"
-            nor the font the field uses, or the `/DA` can't be resolved or has
-            no `Tf` operator with a font and a numeric size.
+        ValueError: If the font is neither the one this annotation uses, the
+            name of a font with a resource name, nor a resource name starting
+            with "/", or the `/DA` can't be resolved or has no `Tf` operator
+            with a font and a numeric size.
     """
-    if not val.startswith("/"):
-        if (
-            read_default_appearance(
-                resolve_inherited_entry(annot, DA, acroform).value
-            ).font
-            == val
-        ):
-            return
+    change = val if isinstance(val, FontChange) else FontChange(val, None)
+    if (
+        not change.name.startswith("/")
+        and read_default_appearance(
+            resolve_inherited_entry(annot, DA, acroform).value
+        ).font
+        == change.name
+    ):
+        return
+
+    font = change.resource if change.resource is not None else change.name
+    if not font.startswith("/"):
         msg = (
-            f"Cannot change the font: {val!r} is not a registered font, a font "
+            f"Cannot change the font: {font!r} is not a registered font, a font "
             "of the PDF, or a font resource name starting with '/'."
         )
         raise ValueError(msg)
-    _update_default_appearance(annot, acroform, lambda da: change_font(da, val))
+    _update_default_appearance(annot, acroform, lambda da: change_font(da, font))
 
 
 def update_text_field_font_size(

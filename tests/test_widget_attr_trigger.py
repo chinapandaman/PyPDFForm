@@ -3831,3 +3831,60 @@ def test_assign_back_font_with_name_of_registered_font(
     font = _find_widget(obj.read(), "test_2")["/DA"].split()[0]
     assert font != "Helvetica"
     assert PdfWrapper(obj.read()).widgets["test_2"].font == font
+
+
+def _with_two_text_widgets(stream, default_appearances):
+    # "test" gets two widgets without a name, each with its own /DA
+    with Pdf.open(BytesIO(stream)) as pdf:
+        field = _get_field(pdf, "test")
+        kids = []
+        for index, default_appearance in enumerate(default_appearances):
+            kid = pdf.make_indirect(Dictionary(field))
+            for key in ("/T", "/FT", "/V", "/Ff", "/DA", "/Parent"):
+                if key in kid:
+                    del kid[key]
+            kid.Parent = field
+            kid.DA = String(default_appearance)
+            kid.Rect = Array([10, 10 + 30 * index, 100, 30 + 30 * index])
+            kids.append(kid)
+        for key in ("/Type", "/Subtype", "/Rect", "/AP", "/MK", "/P", "/F", "/DA"):
+            if key in field:
+                del field[key]
+        field.Kids = Array(kids)
+        page = pdf.pages[0]
+        page.Annots = Array([each for each in page.Annots if each != field] + kids)
+
+        return _save(pdf)
+
+
+def test_font_change_is_decided_per_annotation(
+    template_stream, assert_widgets_match_output
+):
+    # the PDF's /Helv font has the base font Helvetica
+    stream = _set_default_appearance(template_stream, "test", "Helvetica 12 Tf 0 g")
+
+    # a font changed and changed back is looked up again
+    obj = PdfWrapper(stream)
+    obj.widgets["test"].font = "/Arial"
+    obj.widgets["test"].font = "Helvetica"
+    assert _find_widget(obj.read(), "test")["/DA"] == "/Helv 12 Tf 0 g"
+    assert obj.widgets["test"].font == "/Helv"
+    assert_widgets_match_output(obj)
+
+    # only the widget that uses the font keeps it, and the field reads it from
+    # its last widget, as reopening does
+    obj = PdfWrapper(
+        _with_two_text_widgets(
+            template_stream, ("/Arial 9 Tf 0 g", "Helvetica 12 Tf 0 g")
+        )
+    )
+    assert obj.widgets["test"].font == "Helvetica"
+    obj.widgets["test"].font = obj.widgets["test"].font
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        kids = _get_field(pdf, "test").Kids
+        assert [str(kid.DA) for kid in kids] == [
+            "/Helv 9 Tf 0 g",
+            "Helvetica 12 Tf 0 g",
+        ]
+    assert obj.widgets["test"].font == "Helvetica"
+    assert_widgets_match_output(obj)

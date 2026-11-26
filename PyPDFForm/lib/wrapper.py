@@ -61,7 +61,7 @@ from .font import (
     temporary_font_registration,
     validate_font,
 )
-from .hooks import trigger_widget_hooks
+from .hooks import FontChange, trigger_widget_hooks
 from .middleware.checkbox import Checkbox
 from .template import (
     build_widgets,
@@ -815,38 +815,33 @@ class PdfWrapper:
         ]
 
         if widgets_with_hooks:
-            # only fonts being changed are translated, in the queue and on the
-            # widget, so a font read from the PDF that has the name of a
-            # registered font, such as `Courier`, is left as it is, and so is
-            # the font a field already uses when it is assigned back
-            widgets_with_font_hooks = [
-                widget
+            # only fonts being changed are looked up, so a font read from the
+            # PDF that has the name of a registered font, such as `Courier`, is
+            # left as it is
+            widgets_with_font_hooks = {
+                id(widget): widget
                 for widget in widgets_with_hooks
                 if any(hook == FONT_HOOK for hook, _ in widget.hooks_to_trigger)
-            ]
+            }
             if widgets_with_font_hooks:
                 available_fonts = self._ensure_available_fonts_loaded()
 
-                def to_resource(font: Any, current: Any) -> Any:
-                    # from `new_font` to `/F1`
-                    if (
-                        font != current
-                        and font in available_fonts
+                def to_change(font: Any) -> FontChange:
+                    # `new_font` and its resource name, such as `/F1`, which
+                    # the hook uses unless the annotation already uses the font
+                    return FontChange(
+                        font,
+                        available_fonts[font]
+                        if font in available_fonts
                         and font not in available_fonts.values()
-                    ):
-                        return available_fonts[font]
-                    return font
+                        else None,
+                    )
 
-                for widget in widgets_with_font_hooks:
-                    current = widget.get_committed_value("font")
+                for widget in widgets_with_font_hooks.values():
                     widget.hooks_to_trigger = [
-                        (
-                            hook,
-                            to_resource(value, current) if hook == FONT_HOOK else value,
-                        )
+                        (hook, to_change(value) if hook == FONT_HOOK else value)
                         for hook, value in widget.hooks_to_trigger
                     ]
-                    widget.__dict__["font"] = to_resource(widget.font, current)
 
             try:
                 self._stream = trigger_widget_hooks(
@@ -858,6 +853,18 @@ class PdfWrapper:
                 for widget in self.widgets.values():
                     widget.revert_property_updates()
                 raise
+
+            if widgets_with_font_hooks:
+                # each annotation's hook decides by its own /DA, so the font
+                # is read back as reopening the PDF reads it
+                written = build_widgets(
+                    self._stream, getattr(self, "use_full_widget_name")
+                )
+                for key, widget in self.widgets.items():
+                    if id(widget) in widgets_with_font_hooks and key in written:
+                        widget.__dict__["font"] = getattr(
+                            written[key], "font", widget.font
+                        )
 
             for widget in self.widgets.values():
                 widget.clear_property_updates()
