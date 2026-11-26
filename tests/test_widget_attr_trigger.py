@@ -7,7 +7,7 @@ from io import BytesIO
 import pytest
 from pikepdf import Array, Dictionary, Name, Object, Pdf, String
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import NameObject, NullObject, NumberObject
+from pypdf.generic import IndirectObject, NameObject, NullObject, NumberObject
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
 from PyPDFForm.lib.constants import (
@@ -1952,8 +1952,9 @@ def _with_radio_group_in_parent_cycle(stream, group, other):
 @pytest.mark.parametrize(
     ("group", "other", "expected"),
     [
-        # /Opt is found before the cycle, but /DV isn't
-        ({"/V": Name("/1")}, {}, None),
+        # /Opt and /V, which names the option that page 1 keeps, are found
+        # before the cycle, but /DV isn't
+        ({"/V": Name("/0")}, {}, None),
         # /V names the option on page 2, and the cycle is reached before page
         # 1 finds whether a field above "a" has a value
         ({"/V": Name("/1"), "/DV": Name("/1")}, {}, None),
@@ -1997,6 +1998,38 @@ def test_pages_with_radio_group_in_parent_cycle(
             assert str(widget.AS) == state
         assert PdfWrapper(page.read()).data["a"] == data
     assert obj.read() == original
+
+
+@pytest.mark.parametrize("parent", ["missing", "number", "null"])
+def test_pages_with_parent_not_a_dictionary(template_stream, parent):
+    # "test" (page 1) and "test_2" (page 2) are kids of "group", whose /Parent
+    # doesn't resolve to a dictionary, such as an object that doesn't exist
+    writer = PdfWriter(
+        BytesIO(_group_fields(template_stream, ("test", "test_2"), "/Ff", 0))
+    )
+    group = next(
+        each.get_object()
+        for each in writer.root_object["/AcroForm"]["/Fields"]
+        if each.get_object().get("/T") == "group"
+    )
+    group[NameObject("/Parent")] = {
+        "missing": IndirectObject(9999, 0, writer),
+        "number": NumberObject(5),
+        "null": NullObject(),
+    }[parent]
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    # the chain ends there, as ISO 32000-1 treats a missing object as null, so
+    # each page keeps its own kid of the group
+    pages = PdfWrapper(stream).pages
+    for page, name in zip((pages[0], pages[1]), ("test", "test_2"), strict=True):
+        with Pdf.open(BytesIO(page.read())) as pdf:
+            widget = next(
+                annot for annot in pdf.pages[0].Annots if annot.get("/T") == name
+            )
+            assert [str(kid.T) for kid in widget.Parent.Kids] == [name]
 
 
 def test_change_null_text_field_entries(template_stream, assert_widgets_match_output):

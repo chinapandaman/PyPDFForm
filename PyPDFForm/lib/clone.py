@@ -406,7 +406,10 @@ class ClonePlan:
         It follows the `/Parent` chain as pypdf's `get_inherited` does, but
         raises `ValueError` rather than pypdf's `LimitReachedError` when the
         chain reaches a dictionary a second time before the entry is found. An
-        entry found before that is returned, so the same pages are copied.
+        entry found before that is returned, so the same pages are copied. A
+        `/Parent` that doesn't resolve to a dictionary, such as a number, null,
+        or a reference to a missing object, which ISO 32000-1 treats as null,
+        ends the chain.
 
         Args:
             field (DictionaryObject): A source field.
