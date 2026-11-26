@@ -5,14 +5,14 @@ for measuring test coverage. To run the tests, execute:
 
 === "Virtual Environment"
     ```shell
-    coverage run -m pytest -n auto && coverage combine && coverage report --fail-under=100
+    coverage erase && coverage run -m pytest -n auto && coverage combine && coverage report --fail-under=100
     ```
 === "Development Container"
     ```shell
     test
     ```
 
-The tests run in parallel with [pytest-xdist](https://pytest-xdist.readthedocs.io/): `-n auto` starts one worker per CPU. Coverage measures each worker in its own data file, and `coverage combine` merges them before the report. Without `-n`, pytest runs the tests one at a time, which suits running a single test or using a debugger such as `pudb` or `--pdb`.
+The tests run in parallel with [pytest-xdist](https://pytest-xdist.readthedocs.io/): `-n auto` starts one worker per CPU. Coverage measures each worker in its own data file, and `coverage combine` merges them before the report. `coverage erase` first removes data left by an earlier run, which would otherwise be merged in. Without `-n`, pytest runs the tests one at a time, which suits running a single test or using a debugger such as `pudb` or `--pdb`.
 
 ## Adding tests
 
@@ -45,7 +45,7 @@ Most tests compare the PDF they generate with an expected PDF in `pdf_samples`, 
 
 PyPDFForm doesn't pin its dependencies. Any version in its dependency ranges is supported, and with standard zlib the expected PDFs are the same on Linux, macOS, and Windows, for every supported Python version, and for both the newest and lowest dependency versions.
 
-`pdf_samples/fixture_environment.json` records the environment the expected PDFs were last regenerated in. Regenerating them in place, for example with `make generate-new-pdf-samples` or `update` in the development container, rewrites this file, so commit it with the regenerated PDFs. Regenerating stops with an error when Python uses zlib-ng.
+`pdf_samples/fixture_environment.json` records the environment the expected PDFs were last regenerated in. Regenerating them in place, for example with `make generate-new-pdf-samples` or `update` in the development container, rewrites this file, so commit it with the regenerated PDFs. Regenerating in place runs one test at a time, because some tests read expected PDFs that other tests write. It stops with an error when Python uses zlib-ng or when pytest runs with `-n`.
 
 Each test run prints the current environment and any differences from the record at the top of its output, for example:
 
@@ -92,7 +92,7 @@ To generate a test coverage report, run:
 
 === "Virtual Environment"
     ```shell
-    coverage run -m pytest -n auto && coverage combine && coverage html
+    coverage erase && coverage run -m pytest -n auto && coverage combine && coverage html
     ```
 
     View the coverage report by opening `htmlcov/index.html` in a browser.

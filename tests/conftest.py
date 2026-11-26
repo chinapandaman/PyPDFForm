@@ -61,10 +61,20 @@ def _regenerating_in_place(config):
 
 def pytest_configure(config):
     config.results = {}
-    if _regenerating_in_place(config) and _zlib_info()["zlib_backend"] != "zlib":
+    if not _regenerating_in_place(config):
+        return
+    if _zlib_info()["zlib_backend"] != "zlib":
         msg = (
             "Expected PDFs must be regenerated with standard zlib, but this "
             "Python uses zlib-ng. Regenerate them in the development container."
+        )
+        raise pytest.UsageError(msg)
+    # pytest-xdist sets --dist when it runs the tests in workers
+    if getattr(config.option, "dist", "no") != "no":
+        msg = (
+            "Expected PDFs must be regenerated in place one test at a time, "
+            "because some tests read expected PDFs that other tests write. "
+            "Run without -n, or pass --regenerate-dir."
         )
         raise pytest.UsageError(msg)
 
@@ -108,27 +118,11 @@ def pytest_report_header(config):
 
 
 def pytest_sessionfinish(session):
-    config = session.config
-    regenerated = config.stash.get(regenerated_in_place, False)
-    if hasattr(config, "workeroutput"):
-        # a pytest-xdist worker leaves the record to the controller, so that
-        # it is written once
-        config.workeroutput["regenerated_in_place"] = regenerated
-        return
-
     # record the environment of the latest in-place regeneration
-    if regenerated:
+    if session.config.stash.get(regenerated_in_place, False):
         with open(FIXTURE_ENVIRONMENT_PATH, "w", encoding="utf-8", newline="\n") as f:
             json.dump(fixture_environment(), f, indent=2)
             f.write("\n")
-
-
-@pytest.hookimpl(optionalhook=True)
-def pytest_testnodedown(node, error):
-    # called on the pytest-xdist controller when a worker stops; a worker that
-    # crashed has no output
-    if getattr(node, "workeroutput", {}).get("regenerated_in_place"):
-        node.config.stash[regenerated_in_place] = True
 
 
 @pytest.fixture(autouse=True)
