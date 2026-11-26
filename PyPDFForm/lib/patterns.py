@@ -61,7 +61,6 @@ from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .utils import (
-    extract_widget_property,
     find_pattern_match,
     get_array,
     get_dictionary,
@@ -76,13 +75,6 @@ IMAGE_PATTERN = {A: {JS: IMAGE_IMPORT_JAVASCRIPT}}
 # the middleware type of each field type (/FT), except buttons, which
 # _get_button_type tells apart
 FIELD_TYPES = ((Sig, Signature), (Tx, Text), (Ch, Dropdown))
-
-WIDGET_DESCRIPTION_PATTERNS = [{TU: True}, {Parent: {TU: True}}]
-
-DROPDOWN_CHOICE_PATTERNS = [
-    {Opt: True},
-    {Parent: {Opt: True}},
-]
 
 
 def get_widget_key(widget: dict, use_full_widget_name: bool) -> str:
@@ -184,9 +176,10 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     than False so unspecified fill data can be distinguished from an explicit
     unchecked value. A widget without a value of its own, such as a separate
     widget of its field, takes the value inherited from the fields above it,
-    as `_get_field_value` describes, when that names one of the widget's
-    appearance states, since other widgets of the field can have other on
-    states.
+    as `resolve_inherited_entry` resolves it, when that names one of the
+    widget's appearance states, since other widgets of the field can have
+    other on states. A null value is absent, and a `/Parent` cycle before a
+    value is found reads as no value.
 
     Args:
         annot (DictionaryObject): The checkbox annotation dictionary.
@@ -194,9 +187,9 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     Returns:
         bool | None: True if the checkbox is checked, None otherwise.
     """
-    value = annot.get(V)
+    value = get_entry(annot, V)
     if value is None:
-        value = _get_field_value(annot)
+        value = _get_inherited_value(annot, V)
         appearance = get_dictionary(annot, AP)
         states = get_dictionary(appearance, N) if appearance is not None else None
         if not isinstance(value, NameObject) or states is None or value not in states:
@@ -253,7 +246,8 @@ def get_radio_value(annot: DictionaryObject) -> bool:
     other than `/Off`, it means the radio button is selected, and True is
     returned. Otherwise, False is returned. A field without a value of its
     own takes the one inherited from the fields above it, as
-    `_get_field_value` describes.
+    `resolve_inherited_entry` resolves it, and a `/Parent` cycle before a
+    value is found reads as no value.
 
     Args:
         annot (DictionaryObject): The radio button annotation dictionary.
@@ -261,7 +255,7 @@ def get_radio_value(annot: DictionaryObject) -> bool:
     Returns:
         bool: True if the radio button is selected, False otherwise.
     """
-    value = _get_field_value(_get_widget_field(annot))
+    value = _get_inherited_value(_get_widget_field(annot), V)
     return any(each != Off and value == each for each in annot.get(AP, {}).get(N, []))
 
 
@@ -295,11 +289,15 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
     """
     Retrieves the selected value of a dropdown annotation and updates the widget.
 
-    This function reads the field's value (V) and selected indices (I), from the
-    parent field dictionary for child annotations. V is matched against export
-    values, then displayed text, and I chooses among options with the same
-    value. A matching option sets the widget's value to its index, including
-    zero for the first option. If no option matches, the widget's value is left
+    This function reads the value (V) and selected indices (I) of the field the
+    widget belongs to, as `_get_widget_field` describes. A field without a
+    value of its own takes the one inherited from the fields above it, as
+    `resolve_inherited_entry` resolves it, and a `/Parent` cycle before a
+    value is found reads as no value. The indices aren't inherited, so they
+    are read from the field itself. V is matched against export values, then
+    displayed text, and I chooses among options with the same value. A
+    matching option sets the widget's value to its index, including zero for
+    the first option. If no option matches, the widget's value is left
     unchanged; an initially unselected widget remains None.
 
     Args:
@@ -307,9 +305,8 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         widget (Dropdown): The Dropdown widget object to update with the retrieved value.
     """
     field = _get_widget_field(annot)
-    # discovered annotations are plain dictionaries, so entries can be references
-    value = field[NameObject(V)].get_object() if V in field else None
-    indices = field[NameObject(I)].get_object() if I in field else None
+    value = _get_inherited_value(field, V)
+    indices = get_entry(field, I)
     index = widget.get_selected_index(value, indices)
     if index is not None:
         widget.value = index
@@ -339,15 +336,17 @@ def get_text_value(annot: DictionaryObject, widget: Text) -> None:
     """
     Retrieves the text value of a text annotation and updates the widget.
 
-    This function determines the current text value of the annotation, considering
-    whether it's a child annotation or a top-level one, and then sets the
-    widget's value accordingly.
+    The value (V) is read from the field the widget belongs to, as
+    `_get_widget_field` describes. A field without a value of its own takes
+    the one inherited from the fields above it, as `resolve_inherited_entry`
+    resolves it. A null value is absent, and a `/Parent` cycle before a value
+    is found reads as no value.
 
     Args:
         annot (DictionaryObject): The text annotation dictionary.
         widget (Text): The Text widget object to update with the retrieved value.
     """
-    widget.value = _get_widget_field(annot).get(V)
+    widget.value = _get_inherited_value(_get_widget_field(annot), V)
 
 
 def get_text_field_max_length(widget: dict) -> int | None:
@@ -484,9 +483,13 @@ def get_dropdown_choices(widget: dict) -> Tuple[str | Tuple[str, str], ...]:
 
     This function extracts the choices from a dropdown widget dictionary. Each
     option is returned as a string when its displayed text and export value are
-    equal, or as a `(display, export)` tuple when they differ. Empty or missing
-    options produce an empty tuple. An explicitly empty widget option array is
-    preserved even when its parent has options.
+    equal, or as a `(display, export)` tuple when they differ. The options
+    (`/Opt`) are resolved from the widget and the fields along its `/Parent`
+    chain, as `resolve_inherited_entry` resolves them, without an AcroForm
+    default, so an explicitly empty option array on the widget or a lower
+    field is kept even when a field above it has options. Missing or null
+    options, options that aren't an array, and a `/Parent` cycle before any
+    are found produce an empty tuple.
 
     Args:
         widget (dict): The widget dictionary to extract the choices from.
@@ -495,12 +498,53 @@ def get_dropdown_choices(widget: dict) -> Tuple[str | Tuple[str, str], ...]:
         Tuple[str | Tuple[str, str], ...]: The dropdown choices, or an empty
             tuple when none exist.
     """
-    choices = (
-        widget[Opt]
-        if Opt in widget
-        else extract_widget_property(widget, DROPDOWN_CHOICE_PATTERNS, (), None)
-    )
+    choices = _get_inherited_value(cast(DictionaryObject, widget), Opt)
+    if not isinstance(choices, ArrayObject):
+        return ()
+
     return tuple(DropdownOption.from_pdf(each).choice for each in choices)
+
+
+def get_field_tooltip(widget: dict) -> str | None:
+    """
+    Reads the tooltip (`/TU`) of the field a widget belongs to.
+
+    The tooltip is the field's alternate name, which ISO 32000-1 doesn't let
+    a field inherit, so it is read from the widget, as earlier versions wrote
+    it there, and then from the field the widget belongs to, as
+    `_get_widget_field` describes, but never from a field above that. A
+    missing, null, or empty tooltip is absent.
+
+    Args:
+        widget (dict): The widget annotation dictionary.
+
+    Returns:
+        str | None: The tooltip, or None when neither sets one.
+    """
+    annot = cast(DictionaryObject, widget)
+    for node in (annot, _get_widget_field(annot)):
+        value = get_entry(node, TU)
+        if value:
+            return str(value)
+
+    return None
+
+
+def get_tooltip_target(annot: DictionaryObject) -> DictionaryObject:
+    """
+    Gets where a changed tooltip (`/TU`) of a widget is written.
+
+    It is the widget when it has a tooltip of its own, which is read first,
+    as `get_field_tooltip` describes, and otherwise the field the widget
+    belongs to, as `_get_widget_field` describes.
+
+    Args:
+        annot (DictionaryObject): The widget annotation dictionary.
+
+    Returns:
+        DictionaryObject: The widget or its field.
+    """
+    return annot if get_entry(annot, TU) else _get_widget_field(annot)
 
 
 def update_annotation_name(annot: DictionaryObject, val: str) -> None:
@@ -587,9 +631,13 @@ def resolve_inherited_entry(
     default. A value of its own on the widget or a lower field takes
     precedence over the ones above it. A null entry is treated as absent, as
     ISO 32000-1 specifies, so the lookup continues past it, and a null `/T`
-    doesn't make a dictionary the widget's own field. Not every entry is
-    inherited, or has an AcroForm default, so callers choose the entries they
-    resolve.
+    doesn't make a dictionary the widget's own field. The chain ends before
+    the `/Parent` of a dictionary with a name when that parent is a widget
+    annotation: it can't be a field above it, but is a field of its own,
+    such as a checkbox whose widget is merged with it, so the two don't share
+    entries. A widget without a name still belongs to its parent, as
+    `_get_widget_field` describes. Not every entry is inherited, or has an
+    AcroForm default, so callers choose the entries they resolve.
 
     Args:
         widget (DictionaryObject): The widget annotation.
@@ -620,7 +668,14 @@ def resolve_inherited_entry(
             return InheritedEntry(
                 value, node if own_field is None or own_field is node else own_field
             )
-        node = get_dictionary(node, Parent)
+        parent = get_dictionary(node, Parent)
+        if (
+            parent is not None
+            and has_name(node)
+            and get_entry(parent, Subtype) == Widget
+        ):
+            break
+        node = parent
 
     return InheritedEntry(
         get_entry(acroform, key) if acroform is not None else None,
@@ -638,7 +693,7 @@ def check_field_flag(widget: DictionaryObject, flag: int) -> bool:
     A cycle in the chain before any flags are found reads as no flags, so a
     PDF with one can still be opened; changing a flag of such a field raises
     instead. Missing or null flags read as no flags; flags that aren't a
-    number raise when converted.
+    number raise, as `parse_field_flags` describes.
 
     Args:
         widget (DictionaryObject): The widget annotation.
@@ -646,9 +701,39 @@ def check_field_flag(widget: DictionaryObject, flag: int) -> bool:
 
     Returns:
         bool: True if the flag is set.
+
+    Raises:
+        ValueError: If the resolved flags aren't a number.
     """
-    flags = _get_inherited_value(widget, Ff)
-    return bool(int(flags if flags is not None else 0) & flag)
+    return bool(parse_field_flags(_get_inherited_value(widget, Ff)) & flag)
+
+
+def parse_field_flags(value: Any) -> int:
+    """
+    Converts resolved field flags (`/Ff`) to an integer.
+
+    Flags that aren't a number aren't read as no flags, since the field's
+    actual flags are unknown, so opening the PDF or changing a flag raises
+    instead, wherever along the `/Parent` chain they are found.
+
+    Args:
+        value (Any): The resolved flags, or None when nothing sets them.
+
+    Returns:
+        int: The flags, 0 when nothing sets them.
+
+    Raises:
+        ValueError: If the flags aren't a number.
+    """
+    if value is None:
+        return 0
+    # a PDF boolean is a BooleanObject, which isn't an int
+    if isinstance(value, (int, float)):
+        return int(value)
+
+    # malformed PDF data, raised like the other errors of field entries
+    msg = f"Cannot read the field flags: /Ff {value!r} is not a number."
+    raise ValueError(msg)
 
 
 def is_pushbutton(widget: DictionaryObject) -> bool:
@@ -727,7 +812,8 @@ def _get_button_type(widget: DictionaryObject) -> type | None:
     flag is resolved from the field and the fields above it, not the option's
     own flags, so every option of a group has one type. Otherwise, since not
     every PDF sets the radio flag, it is a checkbox when the field's default
-    value (`/DV`) is `/Yes` or `/Off`, and a radio button when it isn't.
+    value (`/DV`), resolved from the field and the fields above it, is `/Yes`
+    or `/Off`, and a radio button when it isn't.
 
     Args:
         widget (DictionaryObject): The widget annotation.
@@ -748,42 +834,7 @@ def _get_button_type(widget: DictionaryObject) -> type | None:
     if check_field_flag(field, RADIO):
         return Radio
     # a radio group's /DV can be /Yes or /Off too, so the radio flag comes first
-    return Checkbox if get_entry(field, DV) in (Yes, Off) else Radio
-
-
-def _get_field_value(widget: DictionaryObject) -> Any:
-    """
-    Reads the value (`/V`) of a widget or field along its `/Parent` chain.
-
-    The value is the first one found on the widget or field or one above it,
-    as `_get_inherited_value` resolves it, except that a field with a name
-    doesn't inherit from a `/Parent` that is a widget annotation. Such a
-    parent can't be a field above it: it is a field of its own, such as a
-    checkbox whose widget is merged with it, so the two fields' values stay
-    independent. A widget without a name still takes the value of the field
-    it belongs to, as `_get_widget_field` describes. A `/Parent` cycle
-    before a value is found reads as no value.
-
-    Args:
-        widget (DictionaryObject): The widget annotation, or the field that
-            a widget belongs to.
-
-    Returns:
-        Any: The value, or None when nothing sets it.
-    """
-    seen = set()
-    node = widget
-    while id(node) not in seen:
-        seen.add(id(node))
-        value = get_entry(node, V)
-        if value is not None:
-            return value
-        parent = get_dictionary(node, Parent)
-        if parent is None or (has_name(node) and get_entry(parent, Subtype) == Widget):
-            return None
-        node = parent
-
-    return None
+    return Checkbox if _get_inherited_value(field, DV) in (Yes, Off) else Radio
 
 
 def _get_inherited_value(widget: DictionaryObject, key: str) -> Any:

@@ -58,17 +58,24 @@ from .constants import (
     U,
     X,
 )
-from .default_appearance import change_font, change_font_color, change_font_size
+from .default_appearance import (
+    change_font,
+    change_font_color,
+    change_font_size,
+    read_default_appearance,
+)
 from .middleware.dropdown import DropdownOption
 from .patterns import (
-    WIDGET_DESCRIPTION_PATTERNS,
     check_field_flag,
+    get_field_tooltip,
+    get_tooltip_target,
     get_widget_key,
     parse_alignment,
+    parse_field_flags,
     parse_max_length,
     resolve_inherited_entry,
 )
-from .utils import extract_widget_property, get_dictionary, has_name
+from .utils import get_dictionary, has_name
 
 
 def trigger_widget_hooks(
@@ -144,10 +151,10 @@ def _update_field_flag(annot: DictionaryObject, flag: int, should_set: bool) -> 
 
     Raises:
         ValueError: If the `/Parent` chain has a cycle before any flags are
-            found.
+            found, or the flags found aren't a number.
     """
     entry = resolve_inherited_entry(annot, Ff, None)
-    flags = int(entry.value) if entry.value is not None else 0
+    flags = parse_field_flags(entry.value)
     entry.target[NameObject(Ff)] = NumberObject(
         flags | flag if should_set else flags & ~flag
     )
@@ -210,19 +217,6 @@ def _read_max_length(annot: DictionaryObject) -> int | None:
             found.
     """
     return parse_max_length(resolve_inherited_entry(annot, MaxLen, None).value)
-
-
-def _read_tooltip(annot: DictionaryObject) -> Any:
-    """
-    Reads the tooltip of a widget's field from the widget or its parent.
-
-    Args:
-        annot (DictionaryObject): The widget annotation dictionary.
-
-    Returns:
-        Any: The tooltip, or None if neither sets one.
-    """
-    return extract_widget_property(annot, WIDGET_DESCRIPTION_PATTERNS, None, None)
 
 
 def _remove_field_entry(
@@ -321,19 +315,30 @@ def update_text_field_font(
     as `_update_default_appearance` describes. The font must be a PDF font
     resource name starting with a slash "/". The wrapper maps the name of a
     registered font or a font of the PDF to its resource name before the hook
-    is applied, so any other name is one the PDF doesn't have.
+    is applied, so any other name is one the PDF doesn't have, except the font
+    the field's `/DA` already uses without a slash, such as `Courier` in
+    `Courier 12 Tf`, which is read as the field's font. Assigning that font
+    back leaves the `/DA` unchanged.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the text field.
-        val (str): The new font name to use for the text field. Must start with "/".
+        val (str): The new font name to use for the text field. Must start with
+            "/", or be the font the field's `/DA` uses.
         acroform (DictionaryObject): The AcroForm dictionary, for its default.
 
     Raises:
-        ValueError: If the font is not a resource name starting with "/", or
-            the `/DA` can't be resolved or has no `Tf` operator with a font and
-            a numeric size.
+        ValueError: If the font is neither a resource name starting with "/"
+            nor the font the field uses, or the `/DA` can't be resolved or has
+            no `Tf` operator with a font and a numeric size.
     """
     if not val.startswith("/"):
+        if (
+            read_default_appearance(
+                resolve_inherited_entry(annot, DA, acroform).value
+            ).font
+            == val
+        ):
+            return
         msg = (
             f"Cannot change the font: {val!r} is not a registered font, a font "
             "of the PDF, or a font resource name starting with '/'."
@@ -520,16 +525,26 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
     """
     Updates the choices in a dropdown field annotation.
 
-    This function modifies the Opt entry in the annotation dictionary to change
-    the available choices in the dropdown field. String choices use the same
-    export and display value. Two-item sequences are written as `[export, display]`
-    PDF option arrays from the user-facing `(display, export)` order.
+    This function modifies the Opt entry of the field to change the available
+    choices in the dropdown field. The options are resolved from the widget and
+    the fields along its `/Parent` chain, as `get_dropdown_choices` reads them,
+    and the new options replace the ones found when they are on the widget or
+    below its own field, and are otherwise written to the widget's own field,
+    as `resolve_inherited_entry` describes, so every widget of the field gets
+    them and fields shared with other fields are not changed. String choices
+    use the same export and display value. Two-item sequences are written as
+    `[export, display]` PDF option arrays from the user-facing
+    `(display, export)` order.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the dropdown field.
         val (list): A list of strings or tuples representing the new choices for the dropdown.
+
+    Raises:
+        ValueError: If the `/Parent` chain has a cycle before any options are
+            found.
     """
-    annot[NameObject(Opt)] = ArrayObject(
+    resolve_inherited_entry(annot, Opt, None).target[NameObject(Opt)] = ArrayObject(
         [DropdownOption.from_choice(each).to_pdf() for each in val]
     )
 
@@ -630,11 +645,12 @@ def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
     """
     Updates the tooltip (alternate field name) of a form field annotation.
 
-    This function sets the 'TU' entry in the annotation dictionary, which
-    provides a text string that can be used as a tooltip for the field. None or
-    an empty string removes the tooltip from the annotation and its own field.
-    A tooltip is read from the widget or its parent, so a parent shared with
-    other fields keeps its tooltip.
+    This function sets the 'TU' entry, which provides a text string that can be
+    used as a tooltip for the field, where `get_tooltip_target` puts it: the
+    widget when it has a tooltip of its own, and otherwise the field it belongs
+    to. None or an empty string removes the tooltip from the annotation and its
+    own field. A tooltip isn't inherited, as `get_field_tooltip` describes, so
+    fields above the widget's own field are neither read nor changed.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the form field.
@@ -642,13 +658,13 @@ def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
             remove it.
 
     Raises:
-        ValueError: If None is given and the widget's parent is shared with
-            other fields and sets a tooltip.
+        ValueError: If None is given and the `/Parent` chain up to the widget's
+            own field has a cycle.
     """
     if val:
-        annot[NameObject(TU)] = TextStringObject(val)
+        get_tooltip_target(annot)[NameObject(TU)] = TextStringObject(val)
     else:
-        _remove_field_entry(annot, TU, _read_tooltip)
+        _remove_field_entry(annot, TU, get_field_tooltip)
 
 
 def update_field_required(annot: DictionaryObject, val: bool) -> None:

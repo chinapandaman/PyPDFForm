@@ -17,6 +17,7 @@ from pypdf.generic import (
     DictionaryObject,
     IndirectObject,
     NameObject,
+    NullObject,
     StreamObject,
 )
 
@@ -49,6 +50,26 @@ from .constants import (
     V,
     Widget,
 )
+
+
+def _get_entry(obj: DictionaryObject, key: str) -> object:
+    """
+    Gets an entry of a dictionary, resolving an indirect reference.
+
+    It is `utils.get_entry`, which this module can't import, since `utils`
+    imports it.
+
+    Args:
+        obj (DictionaryObject): The dictionary to read.
+        key (str): The entry's key.
+
+    Returns:
+        object: The resolved value, or None when the entry is missing or null,
+            which ISO 32000-1 treats as absent.
+    """
+    value = obj.get(key)
+    value = value.get_object() if value is not None else None
+    return None if isinstance(value, NullObject) else value
 
 
 class ClonePlan:
@@ -346,7 +367,7 @@ class ClonePlan:
             while stack:
                 reference, prefix = stack.pop()
                 node = cast(DictionaryObject, reference.get_object())
-                if T in node:
+                if _get_entry(node, T) is not None:
                     prefix = f"{prefix}.{node[T]}" if prefix else str(node[T])
                     self._field_names.setdefault(prefix, reference)
                 kids = [
@@ -407,9 +428,10 @@ class ClonePlan:
         raises `ValueError` rather than pypdf's `LimitReachedError` when the
         chain reaches a dictionary a second time before the entry is found. An
         entry found before that is returned, so the same pages are copied. A
-        `/Parent` that doesn't resolve to a dictionary, such as a number, null,
-        or a reference to a missing object, which ISO 32000-1 treats as null,
-        ends the chain.
+        null entry is absent, as ISO 32000-1 specifies, so the lookup continues
+        past it. A `/Parent` that doesn't resolve to a dictionary, such as a
+        number, null, or a reference to a missing object, which ISO 32000-1
+        treats as null, ends the chain.
 
         Args:
             field (DictionaryObject): A source field.
@@ -435,7 +457,7 @@ class ClonePlan:
                 )
                 raise ValueError(msg)
             seen.add(id(node))
-            if key in node:
+            if _get_entry(node, key) is not None:
                 return node[key]
             parent = node.get(Parent)
             node = parent.get_object() if parent is not None else None

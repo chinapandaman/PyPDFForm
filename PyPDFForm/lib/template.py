@@ -43,13 +43,13 @@ from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (
-    WIDGET_DESCRIPTION_PATTERNS,
     check_field_flag,
     get_checkbox_value,
     get_dropdown_choices,
     get_dropdown_value,
     get_field_hidden,
     get_field_rect,
+    get_field_tooltip,
     get_radio_value,
     get_text_field_alignment,
     get_text_field_max_length,
@@ -59,7 +59,7 @@ from .patterns import (
     get_widget_type,
     update_annotation_name,
 )
-from .utils import extract_widget_property, get_dictionary
+from .utils import get_dictionary
 
 
 def get_metadata(pdf: bytes) -> dict:
@@ -343,9 +343,7 @@ def _populate_common_properties(
     """
     # widget property extractions don't trigger hooks in this function
     _widget.__dict__["page_number"] = page_number
-    _widget.__dict__["tooltip"] = extract_widget_property(
-        widget, WIDGET_DESCRIPTION_PATTERNS, None, str
-    )
+    _widget.__dict__["tooltip"] = get_field_tooltip(widget)
     _widget.__dict__["readonly"] = check_field_flag(widget, READ_ONLY)
     _widget.__dict__["required"] = check_field_flag(widget, REQUIRED)
     _widget.__dict__["hidden"] = get_field_hidden(widget)

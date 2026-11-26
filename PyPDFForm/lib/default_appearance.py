@@ -24,15 +24,21 @@ from typing import List, NamedTuple, Optional
 from pypdf.generic import NameObject
 
 # PDF whitespace, a comment, a name, a run of other characters that aren't
-# delimiters, such as a number or an operator, or an array bracket
+# delimiters, such as a number or an operator, an array or dictionary
+# bracket, a hexadecimal string, or the start of a literal string
 _TOKEN_PATTERN = re.compile(
     r"(?P<space>[\x00\t\n\x0c\r ]+)"
     r"|(?P<comment>%[^\r\n]*)"
     r"|(?P<name>/[^\x00\t\n\x0c\r ()<>\[\]{}/%]*)"
     r"|(?P<word>[^\x00\t\n\x0c\r ()<>\[\]{}/%]+)"
-    r"|(?P<open>\[)"
-    r"|(?P<close>\])"
+    r"|(?P<open>\[|<<)"
+    r"|(?P<close>\]|>>)"
+    r"|(?P<hex><[0-9A-Fa-f\x00\t\n\x0c\r ]*>)"
+    r"|(?P<string>\()"
 )
+# the closing bracket of each array or dictionary bracket, and the kind of
+# the operand it encloses
+_CONTAINERS = {"[": ("]", "array"), "<<": (">>", "dictionary")}
 # ASCII digits only, since \d also matches the digits of other scripts
 _NUMBER_PATTERN = re.compile(r"[+-]?(?:[0-9]+\.?[0-9]*|\.[0-9]+)")
 # a # in a name that isn't followed by two hex digits, or that escapes NUL
@@ -63,9 +69,10 @@ class _Token(NamedTuple):
 
     Attributes:
         kind (str): `operator`, or the kind of an operand: `name`, `number`,
-            `array` for a whole array, including any arrays in it, or `word`
-            for any other operand, such as a font name written without its
-            slash.
+            `string` for a literal or hexadecimal string, `array` for a whole
+            array or `dictionary` for a whole dictionary, including anything
+            in it, or `word` for any other operand, such as a font name
+            written without its slash.
         start (int): The index of its first character.
         end (int): The index after its last character.
     """
@@ -94,8 +101,8 @@ def _tokenize(default_appearance: str, change: str) -> Iterator[_Token]:
     """
     Reads the tokens of a default appearance string.
 
-    Whitespace and comments are skipped, and an array, with any arrays in it,
-    is one token.
+    Whitespace and comments are skipped. A literal or hexadecimal string is
+    one token, and so is an array or a dictionary, with anything in it.
 
     Args:
         default_appearance (str): The `/DA` string.
@@ -106,40 +113,86 @@ def _tokenize(default_appearance: str, change: str) -> Iterator[_Token]:
 
     Raises:
         ValueError: If the string has a character that can't start a token,
-            such as `(`, or an unbalanced `[` or `]`.
+            such as `{`, a bracket that doesn't close the innermost open
+            array or dictionary, or an unclosed string, array, or dictionary.
     """
-    array_start = 0
-    depth = 0
+    containers: List[str] = []
+    container_start = 0
     position = 0
     while position < len(default_appearance):
         match = _TOKEN_PATTERN.match(default_appearance, position)
-        if match is None or (match.lastgroup == "close" and not depth):
+        if match is None or (
+            match.lastgroup == "close"
+            and (not containers or _CONTAINERS[containers[-1]][0] != match.group())
+        ):
             msg = (
                 f"Cannot change the {change}: /DA {default_appearance!r} has an "
                 f"unexpected {default_appearance[position]!r}."
             )
             raise ValueError(msg)
 
-        position = match.end()
+        start = match.start()
+        position = (
+            _skip_literal_string(default_appearance, position, change)
+            if match.lastgroup == "string"
+            else match.end()
+        )
         if match.lastgroup == "open":
-            if not depth:
-                array_start = match.start()
-            depth += 1
+            if not containers:
+                container_start = start
+            containers.append(match.group())
         elif match.lastgroup == "close":
-            depth -= 1
-            if not depth:
-                yield _Token("array", array_start, position)
-        elif not depth and match.lastgroup == "name":
-            yield _Token("name", match.start(), position)
-        elif not depth and match.lastgroup == "word":
-            yield _Token(_get_word_kind(match.group()), match.start(), position)
+            kind = _CONTAINERS[containers.pop()][1]
+            if not containers:
+                yield _Token(kind, container_start, position)
+        elif not containers and match.lastgroup in ("hex", "string"):
+            yield _Token("string", start, position)
+        elif not containers and match.lastgroup == "name":
+            yield _Token("name", start, position)
+        elif not containers and match.lastgroup == "word":
+            yield _Token(_get_word_kind(match.group()), start, position)
 
-    if depth:
+    if containers:
         msg = (
             f"Cannot change the {change}: /DA {default_appearance!r} has an "
-            "unclosed '['."
+            f"unclosed {containers[-1]!r}."
         )
         raise ValueError(msg)
+
+
+def _skip_literal_string(default_appearance: str, position: int, change: str) -> int:
+    """
+    Finds the end of a literal string, such as `(a \\) (b) c)`.
+
+    Parentheses in it are balanced unless escaped with a backslash, which
+    also escapes a backslash, as ISO 32000-1 specifies.
+
+    Args:
+        default_appearance (str): The `/DA` string.
+        position (int): The index of the string's opening parenthesis.
+        change (str): What is being changed, such as `font size`, for errors.
+
+    Returns:
+        int: The index after its closing parenthesis.
+
+    Raises:
+        ValueError: If the string isn't closed.
+    """
+    depth = 0
+    while position < len(default_appearance):
+        character = default_appearance[position]
+        if character == "\\":
+            position += 1
+        elif character == "(":
+            depth += 1
+        elif character == ")":
+            depth -= 1
+            if not depth:
+                return position + 1
+        position += 1
+
+    msg = f"Cannot change the {change}: /DA {default_appearance!r} has an unclosed '('."
+    raise ValueError(msg)
 
 
 def _get_word_kind(text: str) -> str:
@@ -579,7 +632,7 @@ def read_default_appearance(default_appearance: object) -> TextStyle:
     Each is None when the `/DA` doesn't set it, or sets it in a way that can't
     be read, such as a `Tf` without a numeric size, or a color set through a
     color space with `sc`. A value that isn't a string, or a string that can't
-    be read, such as one with `(`, sets none of them. A whole number reads as
+    be read, such as one with `{`, sets none of them. A whole number reads as
     an int, such as `12` or `12.0`, and any other number as a float.
 
     Args:
