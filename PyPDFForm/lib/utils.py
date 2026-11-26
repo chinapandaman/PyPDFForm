@@ -383,9 +383,8 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
     """
     Checks if a widget value matches a pattern value.
 
-    Nested dictionaries delegate to `find_pattern_match`. Tuple pattern values
-    support matching any listed value. Callable pattern values are predicates
-    called with the widget value.
+    Nested dictionaries delegate to `find_pattern_match`. Other values match
+    when they are equal.
 
     Args:
         pattern_value (Any): The value from the pattern.
@@ -398,12 +397,6 @@ def _is_value_match(pattern_value: Any, widget_value: Any) -> bool:
         widget_value, (dict, DictionaryObject)
     ):
         return find_pattern_match(pattern_value, widget_value)
-
-    if callable(pattern_value):
-        return bool(pattern_value(widget_value))
-
-    if isinstance(pattern_value, tuple):
-        return widget_value in pattern_value
 
     return pattern_value == widget_value
 

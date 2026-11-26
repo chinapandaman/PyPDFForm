@@ -24,7 +24,6 @@ from pypdf.generic import (
 
 from .annotations import AnnotationTypes, LinkAnnotation
 from .constants import (
-    AS,
     COMB,
     JS,
     MULTILINE,
@@ -32,37 +31,47 @@ from .constants import (
     REQUIRED,
     AcroForm,
     Annots,
+    Btn,
     Dest,
     JavaScript,
-    Off,
     OpenAction,
     S,
+    Subtype,
     Title,
+    Widget,
 )
 from .middleware import WIDGET_TYPES
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
+from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (
+    FIELD_TYPES,
+    IMAGE_PATTERN,
     WIDGET_DESCRIPTION_PATTERNS,
-    WIDGET_TYPE_PATTERNS,
     check_field_flag,
+    get_button_type,
     get_checkbox_value,
     get_dropdown_choices,
     get_dropdown_value,
     get_field_hidden,
     get_field_rect,
+    get_field_type,
     get_radio_value,
     get_text_field_alignment,
     get_text_field_max_length,
     get_text_field_style,
     get_text_value,
     get_widget_key,
-    is_pushbutton,
     update_annotation_name,
 )
-from .utils import extract_widget_property, find_pattern_match, get_dictionary
+from .utils import (
+    extract_widget_property,
+    find_pattern_match,
+    get_dictionary,
+    get_entry,
+)
 
 
 def get_metadata(pdf: bytes) -> dict:
@@ -534,13 +543,14 @@ def get_widget_type(widget: dict) -> type | None:
     """
     Gets the middleware type of a widget annotation from its fixed entries.
 
-    The type is the one whose patterns the annotation satisfies first. A
-    button's appearance state (`/AS`) is read as `/Off`, since filling changes
-    it: a checked checkbox whose on state isn't `/Yes` is still a checkbox, and
-    a field keeps its type as it is filled, rebuilt, or copied. A pushbutton,
-    whose field sets the Pushbutton flag, has appearance states but no value,
-    so it is not a checkbox or radio button; image fields, which are
-    pushbuttons, are found by their action first.
+    Image fields, which are pushbuttons, are found by their action first.
+    Other widgets get the type of their field type (`/FT`), which is resolved
+    along the `/Parent` chain, as `get_field_type` describes, so the type of
+    the widget or a lower field takes precedence over the ones above it.
+    Buttons are told apart by `get_button_type`, which doesn't read their
+    appearance state (`/AS`), since filling changes it: a checked checkbox
+    whose on state isn't `/Yes` is still a checkbox, and a field keeps its type
+    as it is filled, rebuilt, or copied.
 
     Args:
         widget (dict): The widget annotation dictionary.
@@ -549,14 +559,16 @@ def get_widget_type(widget: dict) -> type | None:
         type | None: The middleware type, such as `Checkbox`, or None if the
             annotation is not a supported widget.
     """
-    if AS in widget:
-        widget = DictionaryObject(widget)
-        widget[NameObject(AS)] = NameObject(Off)
+    if get_entry(widget, Subtype) != Widget:
+        return None
+    if find_pattern_match(IMAGE_PATTERN, widget):
+        return Image
 
-    for patterns, _type in WIDGET_TYPE_PATTERNS:
-        if all(find_pattern_match(pattern, widget) for pattern in patterns):
-            if issubclass(_type, Checkbox) and is_pushbutton(widget):
-                return None
+    field_type = get_field_type(widget)
+    if field_type == Btn:
+        return get_button_type(widget)
+    for value, _type in FIELD_TYPES:
+        if field_type == value:
             return _type
 
     return None
