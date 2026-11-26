@@ -61,20 +61,21 @@ def _regenerating_in_place(config):
 
 def pytest_configure(config):
     config.results = {}
-    if not _regenerating_in_place(config):
-        return
-    if _zlib_info()["zlib_backend"] != "zlib":
+    if _regenerating_in_place(config) and _zlib_info()["zlib_backend"] != "zlib":
         msg = (
             "Expected PDFs must be regenerated with standard zlib, but this "
             "Python uses zlib-ng. Regenerate them in the development container."
         )
         raise pytest.UsageError(msg)
     # pytest-xdist sets --dist when it runs the tests in workers
-    if getattr(config.option, "dist", "no") != "no":
+    if (
+        config.getoption("--regenerate") == "1"
+        and getattr(config.option, "dist", "no") != "no"
+    ):
         msg = (
-            "Expected PDFs must be regenerated in place one test at a time, "
-            "because some tests read expected PDFs that other tests write. "
-            "Run without -n, or pass --regenerate-dir."
+            "Expected PDFs must be regenerated one test at a time, because "
+            "some tests read expected PDFs that other tests write, and some "
+            "expected PDFs are written by more than one test. Run without -n."
         )
         raise pytest.UsageError(msg)
 

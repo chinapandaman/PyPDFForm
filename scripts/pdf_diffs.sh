@@ -11,7 +11,7 @@ rm -rf "$ARTIFACTS"
 mkdir -p "$AFTER"
 echo "Comparison artifacts: $ARTIFACTS"
 
-PYTHONPATH=. pytest -n auto -m 'not cli_test' --regenerate=1 --regenerate-dir="$AFTER"
+PYTHONPATH=. pytest -m 'not cli_test' --regenerate=1 --regenerate-dir="$AFTER"
 STATUS=$?
 
 # pytest exits with 1 when tests fail, which is expected for changed PDFs.

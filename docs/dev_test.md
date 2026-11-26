@@ -45,7 +45,9 @@ Most tests compare the PDF they generate with an expected PDF in `pdf_samples`, 
 
 PyPDFForm doesn't pin its dependencies. Any version in its dependency ranges is supported, and with standard zlib the expected PDFs are the same on Linux, macOS, and Windows, for every supported Python version, and for both the newest and lowest dependency versions.
 
-`pdf_samples/fixture_environment.json` records the environment the expected PDFs were last regenerated in. Regenerating them in place, for example with `make generate-new-pdf-samples` or `update` in the development container, rewrites this file, so commit it with the regenerated PDFs. Regenerating in place runs one test at a time, because some tests read expected PDFs that other tests write. It stops with an error when Python uses zlib-ng or when pytest runs with `-n`.
+`pdf_samples/fixture_environment.json` records the environment the expected PDFs were last regenerated in. Regenerating them in place, for example with `make generate-new-pdf-samples` or `update` in the development container, rewrites this file, so commit it with the regenerated PDFs. Regenerating in place stops with an error when Python uses zlib-ng.
+
+Regenerating expected PDFs, in place or into another directory, runs one test at a time, because some tests read expected PDFs that other tests write, and some expected PDFs are written by more than one test. It stops with an error when pytest runs with `-n`.
 
 Each test run prints the current environment and any differences from the record at the top of its output, for example:
 
