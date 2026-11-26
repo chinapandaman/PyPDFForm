@@ -128,9 +128,10 @@ def extract(
     by `PdfWrapper.pages`, and writes the extracted pages to the required
     output path. Each page is extracted separately, so links and other GoTo
     actions to other pages are removed, and fields shared with other pages keep
-    only their widgets on each page. A `ValueError` from `PdfWrapper.pages`
-    for other references to another page's content is not converted, so the
-    command exits with an error before writing the output.
+    only their widgets on each page. A `ValueError` from `PdfWrapper.pages`,
+    for other references to another page's content or for a shared field
+    with a `/Parent` cycle, is not converted, so the command exits with an
+    error before writing the output.
 
     Args:
         ctx (typer.Context): Typer context containing global `PdfWrapper`

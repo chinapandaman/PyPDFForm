@@ -220,7 +220,8 @@ def clone_page_annotations(
         List[List[Any]]: The cloned annotations, one list per source page.
 
     Raises:
-        ValueError: If a cloned annotation refers to excluded content.
+        ValueError: If a cloned annotation refers to excluded content, or a
+            field to prune has a `/Parent` cycle before an entry it inherits.
     """
     return ClonePlan(reader, writer, page_references, select).clone_annotations()
 
@@ -244,7 +245,9 @@ def get_page_streams(pdf: bytes) -> List[bytes]:
 
     Raises:
         ValueError: If a page or one of its annotations refers to content of
-            another page in a way that cannot be removed.
+            another page in a way that cannot be removed, or a field shared
+            with another page has a `/Parent` cycle before an entry it
+            inherits.
     """
     result = []
     page_count = len(PdfReader(BytesIO(pdf)).pages)
