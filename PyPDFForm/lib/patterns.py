@@ -9,7 +9,7 @@ for updating these widgets, and resolves the entries that a field inherits from
 its ancestors and the AcroForm, such as its default appearance and flags.
 """
 
-from typing import Any, NamedTuple, Optional, Tuple, cast
+from typing import Any, NamedTuple, Optional, Sequence, Tuple, cast
 
 from pypdf.generic import (
     ArrayObject,
@@ -178,11 +178,13 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     is not `/Off`, it means the checkbox is checked, and True is returned.
     Otherwise, if the value is `/Off` or not present, None is returned rather
     than False so unspecified fill data can be distinguished from an explicit
-    unchecked value. A widget without a value of its own, such as a separate
-    widget of its field, takes its field's value, inherited from the fields
-    above it, when that names one of the widget's appearance states, since
-    other widgets of the field can have other on states. A `/Parent` cycle
-    before a value is found reads as no value.
+    unchecked value. A widget without a name or a value of its own, which is a
+    separate widget of its field, takes its field's value, inherited from the
+    fields above it, when that names one of the widget's appearance states,
+    since other widgets of the field can have other on states. A `/Parent`
+    cycle before a value is found reads as no value. A widget with a name is
+    a field of its own, as `_get_widget_field` describes, so it reads only its
+    own value, even below another checkbox.
 
     Args:
         annot (DictionaryObject): The checkbox annotation dictionary.
@@ -191,7 +193,7 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
         bool | None: True if the checkbox is checked, None otherwise.
     """
     value = annot.get(V)
-    if value is None:
+    if value is None and not has_name(annot):
         value = _get_inherited_value(annot, V)
         appearance = get_dictionary(annot, AP)
         states = get_dictionary(appearance, N) if appearance is not None else None
@@ -201,7 +203,9 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
     return True if value not in (None, Off) else None
 
 
-def update_radio_value(annot: DictionaryObject) -> None:
+def update_radio_value(
+    annot: DictionaryObject, options: Sequence[DictionaryObject] = ()
+) -> None:
     """
     Selects a radio button and clears every other widget in its group.
 
@@ -209,25 +213,31 @@ def update_radio_value(annot: DictionaryObject) -> None:
     describes: its parent, or the widget itself when it has a name. The
     selected widget's non-Off normal appearance supplies the field's value (V)
     and the widget's appearance state (AS), even when the field doesn't list
-    the widget in its `/Kids`. The other widgets in the field's `/Kids`,
-    including those on other pages, receive /Off, but not a kid with a name,
-    which is a field of its own. The field's Opt export mapping is preserved.
+    the widget in its `/Kids`. The other widgets of the field receive /Off:
+    those in its `/Kids`, including those on other pages, but not a kid with
+    a name, which is a field of its own, and those among `options` that
+    belong to the field, which its `/Kids` may not list. The field's Opt
+    export mapping is preserved.
 
     Args:
         annot (DictionaryObject): The radio button annotation dictionary.
+        options (Sequence[DictionaryObject]): Other widgets that may belong
+            to the field, such as the options of its group on every page.
+            Defaults to none.
     """
     for each in annot[AP][N]:
         if str(each) != Off:
             field = _get_widget_field(annot)
             field[NameObject(V)] = NameObject(each)
-            for reference in get_array(field, Kids):
-                child = reference.get_object()
-                if (
-                    isinstance(child, DictionaryObject)
-                    and child is not annot
-                    and not has_name(child)
-                ):
-                    child[NameObject(AS)] = NameObject(Off)
+            kids = [reference.get_object() for reference in get_array(field, Kids)]
+            others = [
+                kid
+                for kid in kids
+                if isinstance(kid, DictionaryObject) and not has_name(kid)
+            ] + [option for option in options if _get_widget_field(option) is field]
+            for other in others:
+                if other is not annot:
+                    other[NameObject(AS)] = NameObject(Off)
             annot[NameObject(AS)] = NameObject(each)
             break
 

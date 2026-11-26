@@ -1570,13 +1570,21 @@ def _with_button_parent(stream, shape):
 @pytest.mark.parametrize(
     ("shape", "keys", "_type", "value", "expected"),
     [
-        # a widget with a name is a field of its own, so it is a checkbox
+        # a widget with a name is a field of its own, so it is a checkbox, and
+        # its value and its parent's are independent
         (
             "named",
             ("check_2", "check.check_2"),
             Checkbox,
             True,
             {"check": [["/Off", None]], "check_2": [["/Yes", "/Yes"]]},
+        ),
+        (
+            "named",
+            ("check", "check"),
+            Checkbox,
+            True,
+            {"check": [["/Yes", "/Yes"]], "check_2": [["/Off", None]]},
         ),
         # a widget without a name is an option of its field, which gets the
         # value, although the field doesn't list it
@@ -1604,7 +1612,7 @@ def _with_button_parent(stream, shape):
             {"check": [["/Off", None]], "check_2": [["/Yes", "/Yes"]]},
         ),
     ],
-    ids=["named", "unnamed", "cycle-check", "cycle-check_2"],
+    ids=["named-check_2", "named-check", "unnamed", "cycle-check", "cycle-check_2"],
 )
 def test_fill_button_widget_its_parent_does_not_list(
     template_stream,
@@ -1622,13 +1630,15 @@ def test_fill_button_widget_its_parent_does_not_list(
         use_full_widget_name=use_full_widget_name,
     )
     assert type(obj.widgets[key]) is _type
+    before = obj.data
 
     obj.fill({key: value})
     result = obj.read()
     for name, states in expected.items():
         assert _get_widget_states(result, name) == states
+    # every other field keeps its value
     reopened = PdfWrapper(result, use_full_widget_name=use_full_widget_name)
-    assert reopened.data[key] == value
+    assert reopened.data == {**before, key: value}
     assert_widgets_match_output(obj)
 
 
@@ -1691,29 +1701,33 @@ def test_radio_button_with_name(
     assert_widgets_match_output(obj)
 
 
-@pytest.mark.parametrize("selected", [None, 0])
+@pytest.mark.parametrize("unlisted", [0, 1], ids=["first-unlisted", "last-unlisted"])
+@pytest.mark.parametrize("indices", [(1, 0), (0, 1)], ids=["last-first", "first-last"])
 def test_fill_radio_option_its_field_does_not_list(
-    template_with_radiobutton_stream, selected, assert_widgets_match_output
+    template_with_radiobutton_stream, unlisted, indices, assert_widgets_match_output
 ):
-    # the second option of "radio_1" isn't in its field's /Kids
+    # one option of "radio_1" isn't in its field's /Kids
     with Pdf.open(BytesIO(template_with_radiobutton_stream)) as pdf:
         radio = _get_field(pdf, "radio_1")
-        if selected is not None:
-            radio.V = radio.Kids[selected].AS = Name(f"/{selected}")
-        radio.Kids = Array([radio.Kids[0]])
+        radio.Kids = Array([radio.Kids[1 - unlisted]])
         stream = _save(pdf)
 
     obj = PdfWrapper(stream)
     assert obj.widgets["radio_1"].number_of_options == 2
-    assert obj.widgets["radio_1"].value == selected
 
-    obj.fill({"radio_1": 1})
-    result = obj.read()
-    # the option is selected, and the field's other options are cleared
-    assert _get_widget_states(result, "radio_1") == [["/Off", None], ["/1", None]]
-    assert _find_widget(result, "radio_1")["/Parent"].get_object()["/V"] == "/1"
-    assert PdfWrapper(result).data["radio_1"] == 1
-    assert_widgets_match_output(obj)
+    # switching the selection selects the option and clears the other one,
+    # whichever of them the field lists
+    for index in indices:
+        obj.fill({"radio_1": index})
+        result = obj.read()
+        expected = [["/Off", None], ["/Off", None]]
+        expected[index][0] = f"/{index}"
+        assert _get_widget_states(result, "radio_1") == expected
+        assert _find_widget(result, "radio_1")["/Parent"].get_object()["/V"] == (
+            f"/{index}"
+        )
+        assert PdfWrapper(result).data["radio_1"] == index
+        assert_widgets_match_output(obj)
 
 
 @pytest.mark.parametrize("shape", ["group", "mutual", "listing", "three"])
