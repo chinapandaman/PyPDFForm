@@ -4,6 +4,7 @@ temp/
 venv/
 htmlcov/
 .coverage
+.coverage.*
 draft.py
 *.swp
 site/

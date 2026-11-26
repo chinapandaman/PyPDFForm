@@ -57,6 +57,7 @@ dev = [
     "pylint>=4.0.5,<5.0.0",
     "pyright>=1.1.409,<2.0.0",
     "pytest>=9.0.3,<10.0.0",
+    "pytest-xdist>=3.8.0,<4.0.0",
     "requests>=2.34.2,<3.0.0",
     "ruff>=0.15.14,<1.0.0",
 ]
@@ -66,6 +67,9 @@ pypdfform = "PyPDFForm.cli.entry:main"
 
 [tool.coverage.run]
 include = ["PyPDFForm/*"]
+# measures the pytest-xdist workers; each process writes its own data file,
+# so run `coverage combine` before reporting
+patch = ["subprocess"]
 
 [tool.pylint."MESSAGES CONTROL"]
 disable = [

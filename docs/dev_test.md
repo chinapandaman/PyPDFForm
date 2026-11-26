@@ -5,12 +5,14 @@ for measuring test coverage. To run the tests, execute:
 
 === "Virtual Environment"
     ```shell
-    coverage run -m pytest && coverage report --fail-under=100
+    coverage run -m pytest -n auto && coverage combine && coverage report --fail-under=100
     ```
 === "Development Container"
     ```shell
     test
     ```
+
+The tests run in parallel with [pytest-xdist](https://pytest-xdist.readthedocs.io/): `-n auto` starts one worker per CPU. Coverage measures each worker in its own data file, and `coverage combine` merges them before the report. Without `-n`, pytest runs the tests one at a time, which suits running a single test or using a debugger such as `pudb` or `--pdb`.
 
 ## Adding tests
 
@@ -90,7 +92,7 @@ To generate a test coverage report, run:
 
 === "Virtual Environment"
     ```shell
-    coverage run -m pytest && coverage html
+    coverage run -m pytest -n auto && coverage combine && coverage html
     ```
 
     View the coverage report by opening `htmlcov/index.html` in a browser.

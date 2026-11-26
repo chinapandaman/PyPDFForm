@@ -108,11 +108,27 @@ def pytest_report_header(config):
 
 
 def pytest_sessionfinish(session):
+    config = session.config
+    regenerated = config.stash.get(regenerated_in_place, False)
+    if hasattr(config, "workeroutput"):
+        # a pytest-xdist worker leaves the record to the controller, so that
+        # it is written once
+        config.workeroutput["regenerated_in_place"] = regenerated
+        return
+
     # record the environment of the latest in-place regeneration
-    if session.config.stash.get(regenerated_in_place, False):
+    if regenerated:
         with open(FIXTURE_ENVIRONMENT_PATH, "w", encoding="utf-8", newline="\n") as f:
             json.dump(fixture_environment(), f, indent=2)
             f.write("\n")
+
+
+@pytest.hookimpl(optionalhook=True)
+def pytest_testnodedown(node, error):
+    # called on the pytest-xdist controller when a worker stops; a worker that
+    # crashed has no output
+    if getattr(node, "workeroutput", {}).get("regenerated_in_place"):
+        node.config.stash[regenerated_in_place] = True
 
 
 @pytest.fixture(autouse=True)
