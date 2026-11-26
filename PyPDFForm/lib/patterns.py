@@ -250,7 +250,9 @@ def get_radio_value(annot: DictionaryObject) -> bool:
     annotation. If the value (V) of the field it belongs to, as
     `_get_widget_field` describes, matches any of these appearance states
     other than `/Off`, it means the radio button is selected, and True is
-    returned. Otherwise, False is returned.
+    returned. Otherwise, False is returned. A field without a value of its
+    own takes the one inherited from the fields above it, as
+    `_get_field_value` describes.
 
     Args:
         annot (DictionaryObject): The radio button annotation dictionary.
@@ -258,12 +260,8 @@ def get_radio_value(annot: DictionaryObject) -> bool:
     Returns:
         bool: True if the radio button is selected, False otherwise.
     """
-    field = _get_widget_field(annot)
-    for each in annot.get(AP, {}).get(N, []):
-        if each != Off and field.get(V) == each:
-            return True
-
-    return False
+    value = _get_field_value(_get_widget_field(annot))
+    return any(each != Off and value == each for each in annot.get(AP, {}).get(N, []))
 
 
 def update_dropdown_value(
@@ -735,10 +733,10 @@ def get_button_type(widget: DictionaryObject) -> type | None:
 
 def _get_field_value(widget: DictionaryObject) -> Any:
     """
-    Reads the value (`/V`) that a widget inherits along its `/Parent` chain.
+    Reads the value (`/V`) of a widget or field along its `/Parent` chain.
 
-    The value is the first one found on the widget or a field above it, as
-    `_get_inherited_value` resolves it, except that a field with a name
+    The value is the first one found on the widget or field or one above it,
+    as `_get_inherited_value` resolves it, except that a field with a name
     doesn't inherit from a `/Parent` that is a widget annotation. Such a
     parent can't be a field above it: it is a field of its own, such as a
     checkbox whose widget is merged with it, so the two fields' values stay
@@ -747,7 +745,8 @@ def _get_field_value(widget: DictionaryObject) -> Any:
     before a value is found reads as no value.
 
     Args:
-        widget (DictionaryObject): The widget annotation.
+        widget (DictionaryObject): The widget annotation, or the field that
+            a widget belongs to.
 
     Returns:
         Any: The value, or None when nothing sets it.

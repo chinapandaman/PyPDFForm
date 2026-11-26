@@ -1705,6 +1705,111 @@ def test_checkbox_value_inherited_from_field_above(
 
 
 @pytest.mark.parametrize("use_full_widget_name", [False, True])
+@pytest.mark.parametrize(
+    ("holder", "value"),
+    [
+        ("parent", 0),
+        ("grandparent", 0),
+        # the cycle is reached before a value is found
+        ("cycle", None),
+    ],
+)
+def test_radio_value_inherited_from_field_above(
+    template_stream, holder, value, use_full_widget_name, assert_widgets_match_output
+):
+    # the selected widget of "check", which keeps its name but has no /FT,
+    # /Ff, or /V of its own, is a kid of the radio field "group" below
+    # "outer", and neither field is a widget; the parent or grandparent has
+    # the value, or "outer" is the parent of "group" too
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        check = _get_field(pdf, "check")
+        group = pdf.make_indirect(
+            Dictionary(
+                {
+                    "/T": String("group"),
+                    "/FT": Name.Btn,
+                    "/Ff": RADIO,
+                    "/Kids": Array([check]),
+                }
+            )
+        )
+        outer = pdf.make_indirect(
+            Dictionary({"/T": String("outer"), "/Kids": Array([group])})
+        )
+        group.Parent = outer
+        check.Parent = group
+        check.AS = Name.Yes
+        del check["/FT"]
+        holders = {"parent": group, "grandparent": outer}
+        if holder == "cycle":
+            outer.Parent = group
+        else:
+            holders[holder].V = Name.Yes
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in fields if field != check] + [outer]
+        )
+        stream = _save(pdf)
+
+    # it is a radio group with one option, whose value is inherited through
+    # the field hierarchy
+    key = "outer.group.check" if use_full_widget_name else "check"
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    assert type(obj.widgets[key]) is Radio
+    assert obj.widgets[key].number_of_options == 1
+    assert obj.data[key] == value
+
+    # selecting it writes a value of its own, and the fields above keep theirs
+    obj.fill({key: 0})
+    result = obj.read()
+    assert _get_widget_states(result, "check") == [["/Yes", "/Yes"]]
+    group = _find_widget(result, "check")["/Parent"].get_object()
+    assert group.get("/V") == ("/Yes" if holder == "parent" else None)
+    assert group["/Parent"].get_object().get("/V") == (
+        "/Yes" if holder == "grandparent" else None
+    )
+    reopened = PdfWrapper(result, use_full_widget_name=use_full_widget_name)
+    assert reopened.data[key] == 0
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_radio_group_value_inherited_from_field_above(
+    template_with_radiobutton_stream, use_full_widget_name, assert_widgets_match_output
+):
+    # "radio_1", without a value of its own, is a kid of "outer", which has the
+    # value of its second option
+    with Pdf.open(BytesIO(template_with_radiobutton_stream)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        radio = _get_field(pdf, "radio_1")
+        outer = pdf.make_indirect(
+            Dictionary(
+                {"/T": String("outer"), "/V": Name("/1"), "/Kids": Array([radio])}
+            )
+        )
+        radio.Parent = outer
+        radio.Kids[1].AS = Name("/1")
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in fields if field != radio] + [outer]
+        )
+        stream = _save(pdf)
+
+    key = "outer.radio_1" if use_full_widget_name else "radio_1"
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    assert obj.data[key] == 1
+
+    # selecting another option writes the group's own value
+    obj.fill({key: 0})
+    result = obj.read()
+    assert _get_widget_states(result, "radio_1") == [["/0", None], ["/Off", None]]
+    radio = _find_widget(result, "radio_1")["/Parent"].get_object()
+    assert radio["/V"] == "/0"
+    assert radio["/Parent"].get_object()["/V"] == "/1"
+    assert PdfWrapper(result, use_full_widget_name=use_full_widget_name).data[key] == 0
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
 @pytest.mark.parametrize("shape", ["merged", "kids"])
 @pytest.mark.parametrize("selected", [False, True])
 def test_radio_button_with_name(
