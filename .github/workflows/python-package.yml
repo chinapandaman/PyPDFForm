@@ -41,7 +41,7 @@ jobs:
         uv pip install -U -r pyproject.toml --all-extras --system
     - name: Test with pytest
       run: |
-        coverage run -m pytest && coverage report --fail-under=100
+        coverage run -m pytest -n auto --durations=20 && coverage combine && coverage report --fail-under=100
 
   distribution:
 

@@ -67,6 +67,17 @@ def pytest_configure(config):
             "Python uses zlib-ng. Regenerate them in the development container."
         )
         raise pytest.UsageError(msg)
+    # pytest-xdist sets --dist when it runs the tests in workers
+    if (
+        config.getoption("--regenerate") == "1"
+        and getattr(config.option, "dist", "no") != "no"
+    ):
+        msg = (
+            "Expected PDFs must be regenerated one test at a time, because "
+            "some tests read expected PDFs that other tests write, and some "
+            "expected PDFs are written by more than one test. Run without -n."
+        )
+        raise pytest.UsageError(msg)
 
 
 def pytest_addoption(parser):
