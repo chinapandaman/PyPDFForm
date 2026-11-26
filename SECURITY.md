@@ -7,8 +7,8 @@ Please consider upgrading your version before reporting any potential vulnerabil
 
 | Version  | Supported          |
 |----------| ------------------ |
-| 6.2.0   | :white_check_mark: |
-| < 6.2.0 | :x:                |
+| 6.3.0   | :white_check_mark: |
+| < 6.3.0 | :x:                |
 
 ## Reporting a Vulnerability
 
