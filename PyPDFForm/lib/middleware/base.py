@@ -257,6 +257,19 @@ class Widget:
         self.__dict__.clear()
         self.__dict__.update(state)
 
+    def get_committed_value(self, name: str) -> Any:
+        """
+        Returns the value a property had before its queued changes.
+
+        Args:
+            name (str): The property's name, such as `font`.
+
+        Returns:
+            Any: The value read from or last applied to the PDF, or the current
+                value when no change to the property is queued.
+        """
+        return self._committed_values.get(name, self.__dict__.get(name))
+
     def clear_property_updates(self) -> None:
         """
         Clears queued hooks and committed values after hooks are applied.

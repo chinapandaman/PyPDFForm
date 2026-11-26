@@ -50,7 +50,6 @@ from .constants import (
     JavaScript,
     MaxLen,
     Opt,
-    Parent,
     Q,
     Rect,
     S,
@@ -69,13 +68,14 @@ from .patterns import (
     check_field_flag,
     get_field_tooltip,
     get_tooltip_target,
+    get_widget_field,
     get_widget_key,
     parse_alignment,
     parse_field_flags,
     parse_max_length,
     resolve_inherited_entry,
 )
-from .utils import get_dictionary, has_name
+from .utils import get_dictionary
 
 
 def trigger_widget_hooks(
@@ -137,9 +137,9 @@ def _update_field_flag(annot: DictionaryObject, flag: int, should_set: bool) -> 
 
     The field flags (`/Ff`) are resolved from the widget and the fields along
     its `/Parent` chain, so a widget's own flags take precedence. The changed
-    flags replace the ones that were found when they are on the widget or
-    below its own field, and are otherwise written to the widget's own field,
-    with the bits it inherited, so fields shared with other fields are not
+    flags replace the widget's own, and are otherwise written to the field the
+    widget belongs to, as `get_widget_field` describes, with the bits it
+    inherited, so fields above it, which other fields can share, are not
     changed. All other bits are preserved. Hooks change a PDF writer that is
     written only when every hook succeeds, so an error leaves the PDF
     unchanged.
@@ -166,9 +166,10 @@ def _set_field_entry(annot: DictionaryObject, key: str, value: NumberObject) -> 
 
     The entry is resolved from the widget and the fields along its `/Parent`
     chain, as `resolve_inherited_entry` describes, without an AcroForm
-    default. The new value replaces the one that was found when it is on the
-    widget or below its own field, and is otherwise written to the widget's
-    own field, so fields shared with other fields are not changed. Hooks
+    default. The new value replaces the widget's own, and is otherwise
+    written to the field the widget belongs to, as `get_widget_field`
+    describes, so fields above it, which other fields can share, are not
+    changed. Hooks
     change a PDF writer that is written only when every hook succeeds, so an
     error leaves the PDF unchanged.
 
@@ -225,13 +226,12 @@ def _remove_field_entry(
     """
     Removes a field entry from a widget and its own field.
 
-    The widget's own field is the first dictionary in its `/Parent` chain,
-    starting with the widget itself, that has a name, as `has_name` describes.
-    The entry is removed from every dictionary up to and including that field,
-    so the field no longer has it, even when it was stored on the parent of a
-    widget. Fields above the widget's own field are shared with other fields,
-    so they are never changed. If the field still has a value afterwards, one
-    of them supplies it, and an error is raised. Hooks change a PDF writer that
+    The widget's own field is the field it belongs to, as `get_widget_field`
+    describes. The entry is removed from the widget and that field, so the
+    field no longer has it, even when it was stored on the parent of a widget.
+    Fields above the widget's own field can be shared with other fields, so
+    they are never changed. If the field still has a value afterwards, one of
+    them supplies it, and an error is raised. Hooks change a PDF writer that
     is written only when every hook succeeds, so raising discards the removal.
 
     Args:
@@ -239,27 +239,21 @@ def _remove_field_entry(
         key (str): The entry to remove, such as `/MaxLen`, `/Q`, or `/TU`.
         read (Callable[[DictionaryObject], Any]): Reads the field's value from
             the widget as its property does, such as `_read_alignment`, None
-            when it has none.
+            when it has none, raising `ValueError` for a `/Parent` cycle.
 
     Raises:
-        ValueError: If a shared field above the widget's own field supplies
-            a value, or the `/Parent` chain has a cycle.
+        ValueError: If a field above the widget's own field supplies a value,
+            or the `/Parent` chain has a cycle before one is found.
     """
-    field = annot
-    seen = set()
-    while True:
-        if id(field) in seen:
-            msg = f"Cannot remove {key}: the /Parent chain of the field has a cycle."
-            raise ValueError(msg)
-        seen.add(id(field))
+    for each in (annot, get_widget_field(annot)):
+        each.pop(NameObject(key), None)
 
-        field.pop(NameObject(key), None)
-        parent = get_dictionary(field, Parent)
-        if has_name(field) or parent is None:
-            break
-        field = parent
-
-    if read(annot) is not None:
+    try:
+        value = read(annot)
+    except ValueError as error:
+        msg = f"Cannot remove {key}: the /Parent chain of the field has a cycle."
+        raise ValueError(msg) from error
+    if value is not None:
         msg = f"Cannot remove {key}: a parent field shared with other fields sets it."
         raise ValueError(msg)
 
@@ -274,10 +268,10 @@ def _update_default_appearance(
 
     The `/DA` is resolved from the widget, the fields along its `/Parent`
     chain, and then the AcroForm default, so a widget's own `/DA` takes
-    precedence. The changed `/DA` replaces the one that was found when it is on
-    the widget or below its own field, and is otherwise written to the
-    widget's own field, so fields shared with other fields and the AcroForm
-    default are not changed. The change is computed before anything is
+    precedence. The changed `/DA` replaces the widget's own, and is otherwise
+    written to the field the widget belongs to, as `get_widget_field`
+    describes, so fields above it, which other fields can share, and the
+    AcroForm default are not changed. The change is computed before anything is
     written, and hooks change a PDF writer that is written only when every
     hook succeeds, so an error leaves the PDF unchanged.
 
@@ -528,10 +522,10 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
     This function modifies the Opt entry of the field to change the available
     choices in the dropdown field. The options are resolved from the widget and
     the fields along its `/Parent` chain, as `get_dropdown_choices` reads them,
-    and the new options replace the ones found when they are on the widget or
-    below its own field, and are otherwise written to the widget's own field,
-    as `resolve_inherited_entry` describes, so every widget of the field gets
-    them and fields shared with other fields are not changed. String choices
+    and the new options replace the widget's own, and are otherwise written to
+    the field the widget belongs to, as `resolve_inherited_entry` describes,
+    so every widget of the field gets them and fields above it, which other
+    fields can share, are not changed. String choices
     use the same export and display value. Two-item sequences are written as
     `[export, display]` PDF option arrays from the user-facing
     `(display, export)` order.
@@ -656,10 +650,6 @@ def update_field_tooltip(annot: DictionaryObject, val: str) -> None:
         annot (DictionaryObject): The annotation dictionary for the form field.
         val (str | None): The new tooltip string for the field, or None to
             remove it.
-
-    Raises:
-        ValueError: If None is given and the `/Parent` chain up to the widget's
-            own field has a cycle.
     """
     if val:
         get_tooltip_target(annot)[NameObject(TU)] = TextStringObject(val)

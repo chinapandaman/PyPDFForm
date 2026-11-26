@@ -817,7 +817,8 @@ class PdfWrapper:
         if widgets_with_hooks:
             # only fonts being changed are translated, in the queue and on the
             # widget, so a font read from the PDF that has the name of a
-            # registered font, such as `Courier`, is left as it is
+            # registered font, such as `Courier`, is left as it is, and so is
+            # the font a field already uses when it is assigned back
             widgets_with_font_hooks = [
                 widget
                 for widget in widgets_with_hooks
@@ -826,18 +827,26 @@ class PdfWrapper:
             if widgets_with_font_hooks:
                 available_fonts = self._ensure_available_fonts_loaded()
 
-                def to_resource(font: Any) -> Any:
+                def to_resource(font: Any, current: Any) -> Any:
                     # from `new_font` to `/F1`
-                    if font in available_fonts and font not in available_fonts.values():
+                    if (
+                        font != current
+                        and font in available_fonts
+                        and font not in available_fonts.values()
+                    ):
                         return available_fonts[font]
                     return font
 
                 for widget in widgets_with_font_hooks:
+                    current = widget.get_committed_value("font")
                     widget.hooks_to_trigger = [
-                        (hook, to_resource(value) if hook == FONT_HOOK else value)
+                        (
+                            hook,
+                            to_resource(value, current) if hook == FONT_HOOK else value,
+                        )
                         for hook, value in widget.hooks_to_trigger
                     ]
-                    widget.__dict__["font"] = to_resource(widget.font)
+                    widget.__dict__["font"] = to_resource(widget.font, current)
 
             try:
                 self._stream = trigger_widget_hooks(

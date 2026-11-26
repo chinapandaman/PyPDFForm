@@ -1191,9 +1191,9 @@ def test_change_font_to_unknown_name(
 def test_change_font_keeps_other_fonts_read_from_pdf(
     template_stream, sample_font_stream, assert_widgets_match_output
 ):
-    # both fields write their font without a slash, as the name of a
-    # registered font
-    stream = _set_default_appearance(template_stream, "test", "Courier 12 Tf 0 g")
+    # "test_2" writes its font without a slash, as the name of a registered
+    # font, and "test" uses another font
+    stream = _set_default_appearance(template_stream, "test", "/Helv 12 Tf 0 g")
     stream = _set_default_appearance(stream, "test_2", "Courier 10 Tf 0 g")
     obj = PdfWrapper(stream).register_font("Courier", sample_font_stream)
     assert obj.widgets["test_2"].font == "Courier"
@@ -2185,21 +2185,14 @@ def test_full_widget_name_with_parent_cycle(
     # the field and its widget have the same key for removal
     assert get_field_keys(stream, True) == {key, *others}
     original = obj.read()
+    # the cycle is reached before any flags, so changing one raises
     obj.widgets[key].readonly = True
-    if shape == "field":
-        # the chain of "test" ends before its widget, the /Parent of "a", so
-        # the cycle isn't reached, and the change goes to the field
-        assert _find_widget(obj.read(), "test")["/Ff"] == READ_ONLY
-        assert obj.widgets[key].readonly is True
-    else:
-        # the cycle is reached before any flags, so changing one raises
-        with pytest.raises(
-            ValueError, match="the /Parent chain of the field has a cycle"
-        ):
-            obj.read()
 
-        assert obj.widgets[key].readonly is False
-        assert obj.read() == original
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
+        obj.read()
+
+    assert obj.widgets[key].readonly is False
+    assert obj.read() == original
 
     obj.fill({key: "foo"})
     assert_round_trip(obj, {key: "foo"})
@@ -3673,3 +3666,168 @@ def test_remove_field_whose_kid_has_null_name(template_stream):
     output = PdfWrapper(stream).remove_fields(["group"]).read()
     fields = PdfReader(BytesIO(output)).root_object["/AcroForm"]["/Fields"]
     assert "group" not in [str(each.get_object().get("/T")) for each in fields]
+
+
+def _below_unnamed_field(stream, entry, value):
+    # "test" loses its name and gets an unnamed field above it, below "outer",
+    # which sets the entry and is also the parent of "test_2"
+    with Pdf.open(BytesIO(stream)) as pdf:
+        test, test_2 = _get_field(pdf, "test"), _get_field(pdf, "test_2")
+        unnamed = pdf.make_indirect(
+            Dictionary({"/FT": Name.Tx, "/Kids": Array([test])})
+        )
+        del test["/T"]
+        for each in (test, test_2):
+            if entry in each:
+                del each[entry]
+        outer = pdf.make_indirect(
+            Dictionary(
+                {
+                    "/T": String("outer"),
+                    "/Kids": Array([unnamed, test_2]),
+                    entry: _pdf_value(value),
+                }
+            )
+        )
+        test.Parent = unnamed
+        unnamed.Parent = outer
+        test_2.Parent = outer
+        pdf.Root.AcroForm.Fields = Array(
+            [each for each in pdf.Root.AcroForm.Fields if each not in (test, test_2)]
+            + [outer]
+        )
+
+        return _save(pdf)
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+@pytest.mark.parametrize(
+    ("name", "entry", "shared", "value"),
+    [
+        ("alignment", "/Q", 2, 1),
+        ("max_length", "/MaxLen", 5, 9),
+        ("readonly", "/Ff", 0, True),
+        ("font_size", "/DA", "/Cour 9 Tf 0 g", 20),
+    ],
+)
+def test_change_below_unnamed_field_keeps_shared_parent(
+    template_stream, name, entry, shared, value, use_full_widget_name
+):
+    stream = _below_unnamed_field(template_stream, entry, shared)
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    # without a name, the key is the unnamed field's, empty with full names
+    key, other = ("", "outer.test_2") if use_full_widget_name else (None, "test_2")
+    before = getattr(obj.widgets[other], name)
+
+    # the change goes to the unnamed field, the widget's own field
+    setattr(obj.widgets[key], name, value)
+    reopened = PdfWrapper(obj.read(), use_full_widget_name=use_full_widget_name)
+    assert getattr(reopened.widgets[key], name) == value
+    assert getattr(reopened.widgets[other], name) == before
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        outer = _get_field(pdf, "outer")
+        assert entry in outer.Kids[0]
+        assert outer[entry] == _pdf_value(shared)
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_clear_entry_below_unnamed_field(template_stream, use_full_widget_name):
+    key = "" if use_full_widget_name else None
+    # "outer", shared with "test_2", sets the alignment, which can't be removed
+    stream = _below_unnamed_field(template_stream, "/Q", 2)
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    original = obj.read()
+    obj.widgets[key].alignment = None
+    with pytest.raises(ValueError, match="Cannot remove /Q: a parent field"):
+        obj.read()
+    assert obj.read() == original
+
+    # the unnamed field's own tooltip is removed, and "outer" keeps its own
+    stream = _below_unnamed_field(template_stream, "/TU", "outer tooltip")
+    with Pdf.open(BytesIO(stream)) as pdf:
+        _get_field(pdf, "outer").Kids[0].TU = String("own tooltip")
+        stream = _save(pdf)
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    assert obj.widgets[key].tooltip == "own tooltip"
+    obj.widgets[key].tooltip = None
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        outer = _get_field(pdf, "outer")
+        assert "/TU" not in outer.Kids[0]
+        assert outer.TU == "outer tooltip"
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_change_choices_below_unnamed_field(
+    sample_template_with_dropdown, use_full_widget_name
+):
+    # "dropdown_1" becomes an unnamed field with an unnamed widget, below
+    # "outer", whose options "sibling" shares
+    with Pdf.open(BytesIO(sample_template_with_dropdown)) as pdf:
+        field = _get_field(pdf, "dropdown_1")
+        sibling = pdf.make_indirect(Dictionary(field))
+        sibling.T = String("sibling")
+        del sibling["/Opt"]
+        pdf.pages[0].Annots.append(sibling)
+        _split_dropdown_widget(pdf, field)
+        del field["/T"]
+        del field["/Opt"]
+        outer = pdf.make_indirect(
+            Dictionary(
+                {
+                    "/T": String("outer"),
+                    "/Opt": Array(["shared"]),
+                    "/Kids": Array([field, sibling]),
+                }
+            )
+        )
+        field.Parent = outer
+        sibling.Parent = outer
+        pdf.Root.AcroForm.Fields = Array(
+            [each for each in pdf.Root.AcroForm.Fields if each != field] + [outer]
+        )
+        stream = _save(pdf)
+
+    key, other = ("", "outer.sibling") if use_full_widget_name else (None, "sibling")
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    assert obj.widgets[key].choices == obj.widgets[other].choices == ("shared",)
+
+    obj.widgets[key].choices = ["new"]
+    reopened = PdfWrapper(obj.read(), use_full_widget_name=use_full_widget_name)
+    assert reopened.widgets[key].choices == ("new",)
+    assert reopened.widgets[other].choices == ("shared",)
+
+
+def test_change_flag_of_widget_that_is_its_own_parent(template_stream):
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        field = _get_field(pdf, "test")
+        field.Parent = field
+        stream = _save(pdf)
+
+    # the cycle is reached before any flags, which read as unset
+    obj = PdfWrapper(stream)
+    original = obj.read()
+    assert obj.widgets["test"].readonly is False
+    obj.widgets["test"].readonly = True
+
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
+        obj.read()
+    assert obj.widgets["test"].readonly is False
+    assert obj.read() == original
+
+
+def test_assign_back_font_with_name_of_registered_font(
+    template_stream, sample_font_stream
+):
+    stream = _set_default_appearance(template_stream, "test", "Helvetica 12 Tf 0 g")
+    obj = PdfWrapper(stream).register_font("Helvetica", sample_font_stream)
+    assert obj.widgets["test"].font == "Helvetica"
+
+    # the font the field uses is kept, not replaced by the registered one
+    obj.widgets["test"].font = obj.widgets["test"].font
+    assert _find_widget(obj.read(), "test")["/DA"] == "Helvetica 12 Tf 0 g"
+
+    # another field gets the registered font
+    obj.widgets["test_2"].font = "Helvetica"
+    font = _find_widget(obj.read(), "test_2")["/DA"].split()[0]
+    assert font != "Helvetica"
+    assert PdfWrapper(obj.read()).widgets["test_2"].font == font
