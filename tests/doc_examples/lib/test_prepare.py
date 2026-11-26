@@ -5,7 +5,7 @@ import os
 from PyPDFForm import Fields, PdfWrapper
 
 
-def test_bulk_create_fields(pdf_samples, request, assert_same_pdf):
+def test_bulk_create_fields(pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_bulk_create_fields.pdf")
 
     fields = [
@@ -39,16 +39,10 @@ def test_bulk_create_fields(pdf_samples, request, assert_same_pdf):
         fields
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = new_form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(new_form.read(), expected)
+    expect_pdf(new_form.read(), expected_path)
 
 
-def test_create_text(pdf_samples, sample_font_stream, request, assert_same_pdf):
+def test_create_text(pdf_samples, sample_font_stream, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_text.pdf")
 
     new_form = (
@@ -83,16 +77,10 @@ def test_create_text(pdf_samples, sample_font_stream, request, assert_same_pdf):
         )
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = new_form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(new_form.read(), expected)
+    expect_pdf(new_form.read(), expected_path)
 
 
-def test_create_check(pdf_samples, request, assert_same_pdf):
+def test_create_check(pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_check.pdf")
 
     new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
@@ -114,16 +102,10 @@ def test_create_check(pdf_samples, request, assert_same_pdf):
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = new_form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(new_form.read(), expected)
+    expect_pdf(new_form.read(), expected_path)
 
 
-def test_create_radio(pdf_samples, request, assert_same_pdf):
+def test_create_radio(pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_radio.pdf")
 
     new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
@@ -146,16 +128,10 @@ def test_create_radio(pdf_samples, request, assert_same_pdf):
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = new_form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(new_form.read(), expected)
+    expect_pdf(new_form.read(), expected_path)
 
 
-def test_create_dropdown(pdf_samples, sample_font_stream, request, assert_same_pdf):
+def test_create_dropdown(pdf_samples, sample_font_stream, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_dropdown.pdf")
 
     new_form = (
@@ -188,16 +164,10 @@ def test_create_dropdown(pdf_samples, sample_font_stream, request, assert_same_p
         )
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = new_form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(new_form.read(), expected)
+    expect_pdf(new_form.read(), expected_path)
 
 
-def test_create_dropdown_with_export_values(pdf_samples, request, assert_same_pdf):
+def test_create_dropdown_with_export_values(pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_create_dropdown_with_export_values.pdf"
     )
@@ -218,16 +188,10 @@ def test_create_dropdown_with_export_values(pdf_samples, request, assert_same_pd
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = new_form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(new_form.read(), expected)
+    expect_pdf(new_form.read(), expected_path)
 
 
-def test_create_sig(pdf_samples, request):
+def test_create_sig(pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_sig.pdf")
 
     new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
@@ -245,17 +209,10 @@ def test_create_sig(pdf_samples, request):
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = new_form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(new_form.read()) == len(expected)
-        assert new_form.read() == expected
+    expect_pdf(new_form.read(), expected_path)
 
 
-def test_create_image(pdf_samples, request):
+def test_create_image(pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_create_image.pdf")
 
     new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
@@ -273,11 +230,4 @@ def test_create_image(pdf_samples, request):
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = new_form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(new_form.read()) == len(expected)
-        assert new_form.read() == expected
+    expect_pdf(new_form.read(), expected_path)

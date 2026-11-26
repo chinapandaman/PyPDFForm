@@ -11,10 +11,12 @@ rm -rf "$ARTIFACTS"
 mkdir -p "$AFTER"
 echo "Comparison artifacts: $ARTIFACTS"
 
-PYTHONPATH=. pytest -m 'not cli_test' --regenerate=1 --regenerate-dir="$AFTER"
+PYTHONPATH=. pytest -n auto -m 'snapshot and not cli_test' --regenerate=1 --regenerate-dir="$AFTER"
 STATUS=$?
 
-# pytest exits with 1 when tests fail, which is expected for changed PDFs.
+# pytest exits with 1 when tests fail, which is expected for changed PDFs. It
+# exits with 4 when two tests own the same expected PDF, since the one written
+# last would hide the other.
 if [ "$STATUS" -gt 1 ]; then
   echo "PDF generation failed with exit status $STATUS. Comparison artifacts: $ARTIFACTS" >&2
   exit "$STATUS"

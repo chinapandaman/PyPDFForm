@@ -6,7 +6,6 @@ import platform
 import runpy
 import tomllib
 from importlib import metadata
-from io import BytesIO
 
 import pikepdf
 import pytest
@@ -14,12 +13,13 @@ from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
 from PIL import features
 
-from PyPDFForm import PdfWrapper
-from PyPDFForm.lib.middleware.checkbox import Checkbox
+from tests.support import checks
+from tests.support.snapshots import OWNED, ExpectPdf
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURE_ENVIRONMENT_PATH = os.path.join(ROOT, "pdf_samples", "fixture_environment.json")
 regenerated_in_place = pytest.StashKey[bool]()
+shared_expected_pdfs = pytest.StashKey[dict]()
 
 
 def _zlib_info():
@@ -59,8 +59,21 @@ def _regenerating_in_place(config):
     )
 
 
+class ExpectedPdfOwners:
+    # the tests that own each expected PDF, collected from the reports, which
+    # the controller of a parallel run receives from every worker
+
+    def __init__(self):
+        self.owners = {}
+
+    def pytest_runtest_logreport(self, report):
+        for name, value in report.user_properties:
+            if name == OWNED:
+                self.owners.setdefault(value, set()).add(report.nodeid)
+
+
 def pytest_configure(config):
-    config.results = {}
+    config.pluginmanager.register(ExpectedPdfOwners(), "expected_pdf_owners")
     if _regenerating_in_place(config) and _zlib_info()["zlib_backend"] != "zlib":
         msg = (
             "Expected PDFs must be regenerated with standard zlib, but this "
@@ -68,14 +81,11 @@ def pytest_configure(config):
         )
         raise pytest.UsageError(msg)
     # pytest-xdist sets --dist when it runs the tests in workers
-    if (
-        config.getoption("--regenerate") == "1"
-        and getattr(config.option, "dist", "no") != "no"
-    ):
+    if _regenerating_in_place(config) and getattr(config.option, "dist", "no") != "no":
         msg = (
-            "Expected PDFs must be regenerated one test at a time, because "
-            "some tests read expected PDFs that other tests write, and some "
-            "expected PDFs are written by more than one test. Run without -n."
+            "Expected PDFs must be regenerated in place one test at a time, "
+            "because some tests read expected PDFs that other tests write. "
+            "Run without -n."
         )
         raise pytest.UsageError(msg)
 
@@ -83,6 +93,14 @@ def pytest_configure(config):
 def pytest_addoption(parser):
     parser.addoption("--regenerate", action="store", default="0")
     parser.addoption("--regenerate-dir", action="store", default="")
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_collection_modifyitems(items):
+    # before -m selects tests, mark every test that compares with an expected PDF
+    for item in items:
+        if "expect_pdf" in getattr(item, "fixturenames", ()):
+            item.add_marker(pytest.mark.snapshot)
 
 
 def pytest_report_header(config):
@@ -119,78 +137,37 @@ def pytest_report_header(config):
 
 
 def pytest_sessionfinish(session):
+    config = session.config
+    # a pytest-xdist worker only sees its own tests, and the controller all of them
+    if not hasattr(config, "workerinput"):
+        owners = config.pluginmanager.get_plugin("expected_pdf_owners").owners
+        shared = {
+            path: sorted(nodeids)
+            for path, nodeids in sorted(owners.items())
+            if len(nodeids) > 1
+        }
+        if shared:
+            # the last writer would win, so regenerated PDFs couldn't be trusted
+            config.stash[shared_expected_pdfs] = shared
+            session.exitstatus = pytest.ExitCode.USAGE_ERROR
+
     # record the environment of the latest in-place regeneration
-    if session.config.stash.get(regenerated_in_place, False):
+    if config.stash.get(regenerated_in_place, False):
         with open(FIXTURE_ENVIRONMENT_PATH, "w", encoding="utf-8", newline="\n") as f:
             json.dump(fixture_environment(), f, indent=2)
             f.write("\n")
 
 
-@pytest.fixture(autouse=True)
-def _generate_new_pdf_samples(request):
-    request.config.results = {}
-    yield
-    if (
-        request.config.getoption("--regenerate") == "1"
-        and request.config.results
-        and not request.config.results.get("skip_regenerate")
-    ):
-        output_path = request.config.results["expected_path"]
-        regenerate_dir = request.config.getoption("--regenerate-dir")
-        if regenerate_dir:
-            # write to the same relative path under regenerate_dir instead of
-            # overwriting the expected PDF
-            output_path = os.path.join(
-                regenerate_dir,
-                os.path.relpath(
-                    output_path, os.path.join(os.path.dirname(__file__), "..")
-                ),
-            )
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        else:
-            request.config.stash[regenerated_in_place] = True
-
-        with open(output_path, "wb+") as f:
-            f.write(request.config.results["stream"])
-
-
-def _read_stream(obj):
-    try:
-        return obj.read_bytes()
-    except pikepdf.PdfError:
-        # stored with a filter qpdf doesn't decode, such as an image codec
-        return obj.read_raw_bytes()
-
-
-def describe_pdf(stream, timestamped=False):
-    # the version, trailer, and objects of a PDF, described so that they don't
-    # depend on how its streams are compressed
-    with pikepdf.Pdf.open(BytesIO(stream)) as pdf:
-        trailer = pikepdf.Dictionary(pdf.trailer)
-        if "/ID" in trailer:
-            # derived from the creation time or from the written bytes
-            del trailer["/ID"]
-        info = pdf.trailer.get("/Info")
-        description = {"version": pdf.pdf_version, "trailer": trailer.unparse()}
-        for index, obj in enumerate(pdf.objects):
-            if not isinstance(obj, pikepdf.Object):
-                # an indirect number or boolean, which has no object number here
-                description[f"object at index {index}"] = repr(obj)
-            elif isinstance(obj, pikepdf.Stream):
-                properties = pikepdf.Dictionary(obj.stream_dict)
-                # the length of the stored, usually compressed, data
-                del properties["/Length"]
-                description[obj.objgen] = properties.unparse(), _read_stream(obj)
-            elif timestamped and info is not None and obj.objgen == info.objgen:
-                dated = pikepdf.Dictionary(obj)
-                for key in ("/CreationDate", "/ModDate"):
-                    if key in dated:
-                        del dated[key]
-                description[obj.objgen] = dated.unparse()
-            else:
-                description[obj.objgen] = obj.unparse(resolved=True)
-
-        return description
+def pytest_terminal_summary(terminalreporter, config):
+    shared = config.stash.get(shared_expected_pdfs, {})
+    if shared:
+        terminalreporter.section("expected PDFs owned by more than one test", red=True)
+        for path, nodeids in shared.items():
+            terminalreporter.line(f"{path}: {', '.join(nodeids)}")
+        terminalreporter.line(
+            "Each expected PDF has one owner. The other tests compare with it "
+            "using expect_pdf(stream, same_as=path)."
+        )
 
 
 @pytest.fixture(scope="session")
@@ -200,277 +177,56 @@ def standard_zlib():
 
 
 @pytest.fixture
-def assert_same_pdf(standard_zlib):
-    # for tests whose expected bytes depend on Python's zlib: the PDF must have
-    # the same objects as the expected PDF on every platform, and the same bytes
-    # with standard zlib
-    def check(actual, expected, timestamped=False):
-        actual_description = describe_pdf(actual, timestamped)
-        expected_description = describe_pdf(expected, timestamped)
-        differences = sorted(
-            str(key)
-            for key in actual_description.keys() | expected_description.keys()
-            if actual_description.get(key) != expected_description.get(key)
-        )
-        assert not differences
+def expect_pdf(request, standard_zlib):
+    # expect_pdf(stream, path) compares with the expected PDF this test owns,
+    # and expect_pdf(stream, same_as=path) with one that another test owns
+    expect = ExpectPdf(request.node, ROOT, standard_zlib)
+    yield expect
 
-        if standard_zlib:
-            assert len(actual) == len(expected)
-            if not timestamped:
-                # a timestamped PDF only keeps its length between runs
-                assert actual == expected
+    if request.config.getoption("--regenerate") != "1":
+        return
+    regenerate_dir = request.config.getoption("--regenerate-dir")
+    for path, stream in expect.outputs.items():
+        if regenerate_dir:
+            # write to the same relative path under regenerate_dir instead of
+            # overwriting the expected PDF
+            path = os.path.join(regenerate_dir, os.path.relpath(path, ROOT))
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+        else:
+            request.config.stash[regenerated_in_place] = True
 
-    return check
+        with open(path, "wb") as f:
+            f.write(stream)
 
 
 @pytest.fixture
 def assert_page_ownership():
-    # every page is in the page tree, every annotation belongs to the page that
-    # lists it, and every widget of a listed field is on a page
-    def check(stream):
-        with pikepdf.Pdf.open(BytesIO(stream)) as pdf:
-            pages = {page.obj.objgen for page in pdf.pages}
-            assert not [
-                obj.objgen
-                for obj in pdf.objects
-                if isinstance(obj, pikepdf.Dictionary)
-                and obj.get("/Type") == pikepdf.Name.Page
-                and obj.objgen not in pages
-            ]
-            annots = {}
-            for page in pdf.pages:
-                for annot in page.get("/Annots", []):
-                    annots[annot.objgen] = annot
-                    if "/P" in annot:
-                        assert annot.P.objgen == page.obj.objgen
-            for annot in annots.values():
-                parent = (
-                    annot.get("/Parent")
-                    if annot.Subtype == pikepdf.Name.Widget
-                    else None
-                )
-                while parent is not None:
-                    assert all(
-                        kid.objgen in annots or "/Kids" in kid for kid in parent.Kids
-                    )
-                    parent = parent.get("/Parent")
-
-    return check
+    return checks.assert_page_ownership
 
 
 @pytest.fixture
 def assert_catalog_fields():
-    # the catalog lists exactly the fields with these fully qualified names, and
-    # their widgets are exactly the widgets on the pages, each of them once; a
-    # field without kids is its own widget unless it isn't a widget annotation,
-    # such as a hidden field
-    def check(stream, names):
-        with pikepdf.Pdf.open(BytesIO(stream)) as pdf:
-            on_pages = [
-                annot.objgen
-                for page in pdf.pages
-                for annot in page.get("/Annots", [])
-                if annot.get("/Subtype") == pikepdf.Name.Widget
-            ]
-            acroform = pdf.Root.get("/AcroForm", pikepdf.Dictionary())
-            pending = [(field, "") for field in acroform.get("/Fields", [])]
-            found = []
-            listed = []
-            while pending:
-                field, prefix = pending.pop()
-                name = prefix + str(field.get("/T", ""))
-                kids = list(field.get("/Kids", []))
-                # kids with a name are fields, the others are the field's widgets
-                pending.extend((kid, f"{name}.") for kid in kids if "/T" in kid)
-                widgets = [kid for kid in kids if "/T" not in kid]
-                if not kids and field.get("/Subtype") == pikepdf.Name.Widget:
-                    widgets = [field]
-                if widgets or not kids:
-                    found.append(name)
-                    listed.extend(each.objgen for each in widgets)
-
-            assert sorted(found) == sorted(names)
-            assert len(set(listed)) == len(listed)
-            assert sorted(listed) == sorted(on_pages)
-
-    return check
+    return checks.assert_catalog_fields
 
 
 @pytest.fixture
 def assert_round_trip():
-    # the wrapper and its reopened output both read these values
-    def check(pdf, data):
-        reopened = PdfWrapper(pdf.read(), use_full_widget_name=pdf.use_full_widget_name)
-        for name, value in data.items():
-            for actual in (pdf.data[name], reopened.data[name]):
-                # True == 1 and False == 0, but a checkbox value isn't an index
-                assert isinstance(actual, bool) == isinstance(value, bool)
-                assert actual == value
-
-    return check
-
-
-def _same_property(actual, expected):
-    # numbers are compared approximately, since the PDF stores them as reals,
-    # and a list or tuple of choices or per-option geometry element by element
-    if isinstance(actual, (list, tuple)) and isinstance(expected, (list, tuple)):
-        return len(actual) == len(expected) and all(
-            _same_property(a, b) for a, b in zip(actual, expected, strict=True)
-        )
-    if isinstance(actual, bool) or isinstance(expected, bool):
-        return actual is expected
-    if isinstance(actual, (int, float)) and isinstance(expected, (int, float)):
-        return actual == pytest.approx(expected)
-
-    return actual == expected
-
-
-# the widget properties that opening a PDF reads from it, independently of
-# the widget classes' own READ_PROPERTIES
-COMPARED_PROPERTIES = (
-    "value",
-    "page_number",
-    "x",
-    "y",
-    "width",
-    "height",
-    "readonly",
-    "required",
-    "hidden",
-    "tooltip",
-    "font",
-    "font_size",
-    "font_color",
-    "comb",
-    "alignment",
-    "multiline",
-    "max_length",
-    "choices",
-    "number_of_options",
-)
+    return checks.assert_round_trip
 
 
 @pytest.fixture
 def assert_widgets_match_output():
-    # the wrapper's fields, values, and properties read from the PDF are the
-    # same as those of its reopened output
-    def check(pdf):
-        stream = pdf.read()
-        reopened = PdfWrapper(stream, use_full_widget_name=pdf.use_full_widget_name)
-        assert list(pdf.widgets) == list(reopened.widgets)
-        for name, widget in pdf.widgets.items():
-            other = reopened.widgets[name]
-            assert type(widget) is type(other)
-            for prop in COMPARED_PROPERTIES:
-                actual, expected = (
-                    getattr(widget, prop, None),
-                    getattr(other, prop, None),
-                )
-                if prop == "value" and type(widget) is Checkbox:
-                    # an unchecked checkbox reads None, filled with False or not
-                    actual, expected = actual or None, expected or None
-                assert _same_property(actual, expected), (name, prop, actual, expected)
-
-    return check
+    return checks.assert_widgets_match_output
 
 
 @pytest.fixture
 def assert_valid_appearances():
-    # every appearance is a dictionary of appearance streams, and a widget with
-    # appearance states selects one of them or none
-    def check(stream):
-        with pikepdf.Pdf.open(BytesIO(stream)) as pdf:
-            for page in pdf.pages:
-                for annot in page.get("/Annots", []):
-                    if "/AP" not in annot:
-                        continue
-                    assert isinstance(annot.AP, pikepdf.Dictionary)
-                    assert "/N" in annot.AP
-                    for key in ("/N", "/R", "/D"):
-                        appearance = annot.AP.get(key)
-                        if appearance is None or isinstance(appearance, pikepdf.Stream):
-                            continue
-                        assert isinstance(appearance, pikepdf.Dictionary)
-                        assert all(
-                            isinstance(each, pikepdf.Stream)
-                            for each in appearance.values()
-                        )
-                    if not isinstance(annot.AP.N, pikepdf.Stream):
-                        state = annot.get("/AS")
-                        # a string with the same characters selects no state
-                        assert isinstance(state, pikepdf.Name)
-                        assert str(state) in ("/Off", *annot.AP.N.keys())
-
-    return check
-
-
-def describe_annotations(stream, changed):
-    # each page's annotations, without the widgets of the changed fields,
-    # described so that they don't depend on object numbers or compression
-    with pikepdf.Pdf.open(BytesIO(stream)) as pdf:
-        pages = {page.obj.objgen: index for index, page in enumerate(pdf.pages)}
-
-        def get_name(field):
-            names = []
-            while field is not None:
-                if "/T" in field:
-                    names.append(str(field.T))
-                field = field.get("/Parent")
-
-            return ".".join(reversed(names))
-
-        def describe(obj, seen):
-            if not isinstance(obj, pikepdf.Object):
-                return repr(obj)
-            if obj.is_indirect:
-                if obj.objgen in pages:
-                    return f"page {pages[obj.objgen] + 1}"
-                if obj.objgen in seen:
-                    # a reference back to an object that is being described
-                    return "seen"
-                seen = {*seen, obj.objgen}
-            if isinstance(obj, pikepdf.Stream):
-                return (
-                    {
-                        key: describe(value, seen)
-                        for key, value in obj.stream_dict.items()
-                        if key != "/Length"
-                    },
-                    _read_stream(obj),
-                )
-            if isinstance(obj, pikepdf.Dictionary):
-                # a field's other widgets are described where their pages list them
-                return {
-                    key: describe(value, seen)
-                    for key, value in obj.items()
-                    if key != "/Kids"
-                }
-            if isinstance(obj, pikepdf.Array):
-                return [describe(each, seen) for each in obj]
-
-            return obj.unparse()
-
-        return [
-            [
-                describe(annot, set())
-                for annot in page.get("/Annots", [])
-                if annot.get("/Subtype") != pikepdf.Name.Widget
-                or get_name(annot) not in changed
-            ]
-            for page in pdf.pages
-        ]
+    return checks.assert_valid_appearances
 
 
 @pytest.fixture
 def assert_annotations_preserved():
-    # every annotation, other than the widgets of the fields with these fully
-    # qualified names, has the same content on the same page in the same order
-    def check(before, after, changed=()):
-        assert describe_annotations(after, changed) == describe_annotations(
-            before, changed
-        )
-
-    return check
+    return checks.assert_annotations_preserved
 
 
 @pytest.fixture

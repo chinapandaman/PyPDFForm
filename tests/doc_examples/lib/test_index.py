@@ -5,7 +5,7 @@ import os
 from PyPDFForm import BlankPage, Fields, PdfWrapper, RawElements
 
 
-def test_index_snippets(pdf_samples, request, monkeypatch, assert_same_pdf):
+def test_index_snippets(pdf_samples, monkeypatch, expect_pdf):
     # Stable ReportLab timestamps prevent variable-length document IDs.
     monkeypatch.setenv("SOURCE_DATE_EPOCH", "946684800")
     expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
@@ -44,16 +44,8 @@ def test_index_snippets(pdf_samples, request, monkeypatch, assert_same_pdf):
     # Fill the newly created form
     pdf.fill({"my_textfield": "this is a text field", "my_checkbox": True})
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
+    expect_pdf(pdf.read(), expected_path, timestamped=True)
 
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(pdf.read(), expected, timestamped=True)
-
-        assert pdf.widgets["my_textfield"].alignment == 1
-        assert pdf.data["my_textfield"] == "this is a text field"
-        assert pdf.data["my_checkbox"]
-
-        request.config.results["skip_regenerate"] = len(pdf.read()) == len(expected)
+    assert pdf.widgets["my_textfield"].alignment == 1
+    assert pdf.data["my_textfield"] == "this is a text field"
+    assert pdf.data["my_checkbox"]

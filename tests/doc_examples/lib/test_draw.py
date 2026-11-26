@@ -6,9 +6,7 @@ import os
 from PyPDFForm import PdfWrapper, RawElements
 
 
-def test_draw_text(
-    static_pdfs, pdf_samples, sample_font_stream, request, assert_same_pdf
-):
+def test_draw_text(static_pdfs, pdf_samples, sample_font_stream, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_text.pdf")
 
     texts = [
@@ -38,16 +36,10 @@ def test_draw_text(
         .draw(texts)
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(pdf.read(), expected)
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_draw_image(static_pdfs, image_samples, pdf_samples, request):
+def test_draw_image(static_pdfs, image_samples, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_image.pdf")
 
     images = [
@@ -73,14 +65,7 @@ def test_draw_image(static_pdfs, image_samples, pdf_samples, request):
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(images)
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)
 
     images = [
         RawElements.RawImage(
@@ -141,7 +126,7 @@ def test_draw_image(static_pdfs, image_samples, pdf_samples, request):
     assert pdf3.read() == pdf.read()
 
 
-def test_draw_line(static_pdfs, pdf_samples, request):
+def test_draw_line(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_line.pdf")
 
     lines = [
@@ -164,17 +149,10 @@ def test_draw_line(static_pdfs, pdf_samples, request):
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(lines)
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_draw_rect(static_pdfs, pdf_samples, request):
+def test_draw_rect(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_rect.pdf")
 
     rectangles = [
@@ -198,17 +176,10 @@ def test_draw_rect(static_pdfs, pdf_samples, request):
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(rectangles)
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_draw_circle(static_pdfs, pdf_samples, request):
+def test_draw_circle(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_circle.pdf")
 
     circles = [
@@ -230,17 +201,10 @@ def test_draw_circle(static_pdfs, pdf_samples, request):
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(circles)
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_draw_ellipse(static_pdfs, pdf_samples, request):
+def test_draw_ellipse(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_ellipse.pdf")
 
     ellipses = [
@@ -264,11 +228,4 @@ def test_draw_ellipse(static_pdfs, pdf_samples, request):
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(ellipses)
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)

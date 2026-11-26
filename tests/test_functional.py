@@ -285,22 +285,18 @@ def test_write_io(template_stream):
     assert PdfWrapper(buff.read()).widgets.keys() == obj.widgets.keys()
 
 
-def test_fill_readonly_then_editable(template_stream, pdf_samples, data_dict, request):
+def test_fill_readonly_then_editable(
+    template_stream, pdf_samples, data_dict, expect_pdf
+):
     expected_path = os.path.join(pdf_samples, "test_fill_readonly_then_editable.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).fill(data_dict, readonly=True)
-        obj.widgets["test_2"].readonly = False
-        obj.widgets["check_3"].readonly = False
+    obj = PdfWrapper(template_stream).fill(data_dict, readonly=True)
+    obj.widgets["test_2"].readonly = False
+    obj.widgets["check_3"].readonly = False
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-        assert len(obj.read()) == len(obj.read())
-        assert obj.read() == obj.read()
+    assert len(obj.read()) == len(obj.read())
+    assert obj.read() == obj.read()
 
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 @pytest.mark.parametrize(
@@ -381,211 +377,126 @@ def test_register_bad_fonts(tmp_path):
 
 
 def test_fill_with_customized_widgets(
-    template_stream,
-    pdf_samples,
-    sample_font_stream,
-    data_dict,
-    request,
-    assert_same_pdf,
+    template_stream, pdf_samples, sample_font_stream, data_dict, expect_pdf
 ):
     expected_path = os.path.join(pdf_samples, "test_fill_with_customized_widgets.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(template_stream).register_font(
-            "new_font",
-            sample_font_stream,
-        )
-        obj.widgets["test"].font = "new_font"
-        obj.widgets["test"].font_size = 20
-        obj.widgets["test"].font_color = (1, 0, 0)
-        obj.widgets["test_2"].font_color = (0, 1, 0)
-        obj.fill(
-            data_dict,
-        )
+    obj = PdfWrapper(template_stream).register_font(
+        "new_font",
+        sample_font_stream,
+    )
+    obj.widgets["test"].font = "new_font"
+    obj.widgets["test"].font_size = 20
+    obj.widgets["test"].font_color = (1, 0, 0)
+    obj.widgets["test_2"].font_color = (0, 1, 0)
+    obj.fill(
+        data_dict,
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert_same_pdf(obj.read(), expected)
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_fill_with_customized_widgets_readonly(
-    template_stream,
-    pdf_samples,
-    sample_font_stream,
-    data_dict,
-    request,
-    assert_same_pdf,
+    template_stream, pdf_samples, sample_font_stream, data_dict, expect_pdf
 ):
     expected_path = os.path.join(
         pdf_samples, "test_fill_with_customized_widgets_readonly.pdf"
     )
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(template_stream).register_font(
-            "new_font",
-            sample_font_stream,
-        )
-        obj.widgets["test"].font = "new_font"
-        obj.widgets["test"].font_size = 20
-        obj.widgets["test"].font_color = (1, 0, 0)
-        obj.widgets["test_2"].font_color = (0, 1, 0)
-        obj.fill(
-            data_dict,
-            readonly=True,
-        )
+    obj = PdfWrapper(template_stream).register_font(
+        "new_font",
+        sample_font_stream,
+    )
+    obj.widgets["test"].font = "new_font"
+    obj.widgets["test"].font_size = 20
+    obj.widgets["test"].font_color = (1, 0, 0)
+    obj.widgets["test_2"].font_color = (0, 1, 0)
+    obj.fill(
+        data_dict,
+        readonly=True,
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert_same_pdf(obj.read(), expected)
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_fill_with_varied_int_values(template_stream, pdf_samples, request):
+def test_fill_with_varied_int_values(template_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_fill_with_varied_int_values.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).fill(
-            {
-                "test": 100,
-                "test_2": -250,
-                "test_3": 0,
-            }
-        )
+    obj = PdfWrapper(template_stream).fill(
+        {
+            "test": 100,
+            "test_2": -250,
+            "test_3": 0,
+        }
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_fill_radiobutton_readonly(
-    template_with_radiobutton_stream, pdf_samples, request
+    template_with_radiobutton_stream, pdf_samples, expect_pdf
 ):
     expected_path = os.path.join(pdf_samples, "test_fill_radiobutton_readonly.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(template_with_radiobutton_stream).fill(
-            {
-                "radio_1": 0,
-                "radio_2": 1,
-                "radio_3": 2,
-            },
-            readonly=True,
-        )
+    obj = PdfWrapper(template_with_radiobutton_stream).fill(
+        {
+            "radio_1": 0,
+            "radio_2": 1,
+            "radio_3": 2,
+        },
+        readonly=True,
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_fill_radiobutton_readonly_then_editable(
-    template_with_radiobutton_stream, pdf_samples, request
+    template_with_radiobutton_stream, pdf_samples, expect_pdf
 ):
     expected_path = os.path.join(
         pdf_samples, "test_fill_radiobutton_readonly_then_editable.pdf"
     )
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(template_with_radiobutton_stream).fill(
-            {
-                "radio_1": 0,
-                "radio_2": 1,
-                "radio_3": 2,
-            },
-            readonly=True,
-        )
-        obj.widgets["radio_2"].readonly = False
+    obj = PdfWrapper(template_with_radiobutton_stream).fill(
+        {
+            "radio_1": 0,
+            "radio_2": 1,
+            "radio_3": 2,
+        },
+        readonly=True,
+    )
+    obj.widgets["radio_2"].readonly = False
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_fill_sejda(sejda_template, pdf_samples, sejda_data, request):
+def test_fill_sejda(sejda_template, pdf_samples, sejda_data, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_fill_sejda.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(sejda_template).fill(sejda_data)
+    obj = PdfWrapper(sejda_template).fill(sejda_data)
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_fill_sejda_readonly(sejda_template, pdf_samples, sejda_data, request):
+def test_fill_sejda_readonly(sejda_template, pdf_samples, sejda_data, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_fill_sejda_readonly.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(sejda_template).fill(
-            sejda_data,
-            readonly=True,
-        )
+    obj = PdfWrapper(sejda_template).fill(
+        sejda_data,
+        readonly=True,
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_fill_sejda_readonly_then_editable(
-    sejda_template, pdf_samples, sejda_data, request
+    sejda_template, pdf_samples, sejda_data, expect_pdf
 ):
     expected_path = os.path.join(
         pdf_samples, "test_fill_sejda_readonly_then_editable.pdf"
     )
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(sejda_template).fill(
-            sejda_data,
-            readonly=True,
-        )
-        obj.widgets["buyer_name"].readonly = False
-        obj.widgets["at_future_date"].readonly = False
-        obj.widgets["purchase_option"].readonly = False
+    obj = PdfWrapper(sejda_template).fill(
+        sejda_data,
+        readonly=True,
+    )
+    obj.widgets["buyer_name"].readonly = False
+    obj.widgets["at_future_date"].readonly = False
+    obj.widgets["purchase_option"].readonly = False
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_addition_operator_3_times(template_stream, data_dict):
@@ -748,25 +659,18 @@ def test_sample_data_max_boundary(sample_template_with_comb_text_field):
 
 
 def test_fill_right_aligned(
-    sample_template_with_right_aligned_text_field, pdf_samples, request
+    sample_template_with_right_aligned_text_field, pdf_samples, expect_pdf
 ):
     expected_path = os.path.join(pdf_samples, "test_fill_right_aligned.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sample_template_with_right_aligned_text_field).fill(
-            {
-                "name": "Hans Mustermann",
-                "fulladdress": "Musterstr. 12, 82903 Musterdorf, Musterland",
-                "advisorname": "Karl Test",
-            },
-        )
+    obj = PdfWrapper(sample_template_with_right_aligned_text_field).fill(
+        {
+            "name": "Hans Mustermann",
+            "fulladdress": "Musterstr. 12, 82903 Musterdorf, Musterland",
+            "advisorname": "Karl Test",
+        },
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_version(pdf_samples):
@@ -1320,120 +1224,88 @@ def test_catalog_version_keeps_header_of_document_without_new_features():
     assert obj.pages[0].read().startswith(b"%PDF-1.4")
 
 
-def test_fill_font_color(
-    sample_template_with_font_colors, pdf_samples, request, assert_same_pdf
-):
+def test_fill_font_color(sample_template_with_font_colors, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_fill_font_color.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sample_template_with_font_colors).fill(
-            {
-                "red_12": "red",
-                "green_14": "green",
-                "blue_16": "blue",
-                "mixed_auto": "mixed",
-            },
-        )
+    obj = PdfWrapper(sample_template_with_font_colors).fill(
+        {
+            "red_12": "red",
+            "green_14": "green",
+            "blue_16": "blue",
+            "mixed_auto": "mixed",
+        },
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert_same_pdf(obj.read(), expected)
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_fill_complex_fonts(
-    sample_template_with_complex_fonts, pdf_samples, request, assert_same_pdf
+    sample_template_with_complex_fonts, pdf_samples, expect_pdf
 ):
     expected_path = os.path.join(pdf_samples, "test_fill_complex_fonts.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sample_template_with_complex_fonts).fill(
-            {
-                "Courier": "Test",
-                "Courier-Bold": "Test",
-                "Courier-BoldOblique": "Test",
-                "Courier-Oblique": "Test",
-                "Helvetica": "Test",
-                "Helvetica-Bold": "Test",
-                "Helvetica-BoldOblique": "Test",
-                "Helvetica-Oblique": "Test",
-                "Times-Bold": "Test",
-                "Times-BoldItalic": "Test",
-                "Times-Italic": "Test",
-                "Times-Roman": "Test",
-            },
-        )
+    obj = PdfWrapper(sample_template_with_complex_fonts).fill(
+        {
+            "Courier": "Test",
+            "Courier-Bold": "Test",
+            "Courier-BoldOblique": "Test",
+            "Courier-Oblique": "Test",
+            "Helvetica": "Test",
+            "Helvetica-Bold": "Test",
+            "Helvetica-BoldOblique": "Test",
+            "Helvetica-Oblique": "Test",
+            "Times-Bold": "Test",
+            "Times-BoldItalic": "Test",
+            "Times-Italic": "Test",
+            "Times-Roman": "Test",
+        },
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert_same_pdf(obj.read(), expected)
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_pages_preserve_font(
-    template_stream, pdf_samples, sample_font_stream, request, assert_same_pdf
+    template_stream, pdf_samples, sample_font_stream, expect_pdf
 ):
     expected_path = os.path.join(pdf_samples, "pages", "test_pages_preserve_font.pdf")
     obj = PdfWrapper(template_stream)
     obj.register_font("new_font", sample_font_stream)
     obj.widgets["test_2"].font = "new_font"
 
-    with open(expected_path, "rb+") as f:
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.pages[1].read()
-        assert_same_pdf(obj.pages[1].read(), f.read())
+    expect_pdf(obj.pages[1].read(), expected_path)
 
 
-def test_sejda_pages_1(sejda_template, pdf_samples, request):
+def test_sejda_pages_1(sejda_template, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "pages", "test_sejda_pages_1.pdf")
     obj = PdfWrapper(sejda_template)
 
-    with open(expected_path, "rb+") as f:
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.pages[0].read()
-        assert obj.pages[0].read() == f.read()
+    expect_pdf(obj.pages[0].read(), expected_path)
 
 
-def test_sejda_pages_2(sejda_template, pdf_samples, request):
+def test_sejda_pages_2(sejda_template, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "pages", "test_sejda_pages_2.pdf")
     obj = PdfWrapper(sejda_template)
 
-    with open(expected_path, "rb+") as f:
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.pages[1].read()
-        assert obj.pages[1].read() == f.read()
+    expect_pdf(obj.pages[1].read(), expected_path)
 
 
-def test_radio_pages_1(template_with_radiobutton_stream, pdf_samples, request):
+def test_radio_pages_1(template_with_radiobutton_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "pages", "test_radio_pages_1.pdf")
     obj = PdfWrapper(template_with_radiobutton_stream)
 
-    with open(expected_path, "rb+") as f:
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.pages[0].read()
-        assert obj.pages[0].read() == f.read()
+    expect_pdf(obj.pages[0].read(), expected_path)
 
 
-def test_radio_pages_2(template_with_radiobutton_stream, pdf_samples, request):
+def test_radio_pages_2(template_with_radiobutton_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "pages", "test_radio_pages_2.pdf")
     obj = PdfWrapper(template_with_radiobutton_stream)
 
-    with open(expected_path, "rb+") as f:
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.pages[1].read()
-        assert obj.pages[1].read() == f.read()
+    expect_pdf(obj.pages[1].read(), expected_path)
 
 
-def test_radio_pages_3(template_with_radiobutton_stream, pdf_samples, request):
+def test_radio_pages_3(template_with_radiobutton_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "pages", "test_radio_pages_3.pdf")
     obj = PdfWrapper(template_with_radiobutton_stream)
 
-    with open(expected_path, "rb+") as f:
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.pages[2].read()
-        assert obj.pages[2].read() == f.read()
+    expect_pdf(obj.pages[2].read(), expected_path)
 
 
 def test_pages_inherit_attributes(template_stream):
@@ -1446,121 +1318,74 @@ def test_pages_inherit_attributes(template_stream):
         assert getattr(page, "use_full_widget_name")
 
 
-def test_generate_coordinate_grid_margin_50(template_stream, pdf_samples, request):
+def test_generate_coordinate_grid_margin_50(template_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "test_generate_coordinate_grid_margin_50.pdf"
     )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).generate_coordinate_grid((1, 0, 1), margin=50)
+    obj = PdfWrapper(template_stream).generate_coordinate_grid((1, 0, 1), margin=50)
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_update_radio_key(template_with_radiobutton_stream, pdf_samples, request):
+def test_update_radio_key(template_with_radiobutton_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_update_radio_key.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_with_radiobutton_stream)
-        obj.update_widget_key("radio_3", "RADIO")
-        obj.commit_widget_key_updates()
-        obj.fill({"RADIO": 0})
+    obj = PdfWrapper(template_with_radiobutton_stream)
+    obj.update_widget_key("radio_3", "RADIO")
+    obj.commit_widget_key_updates()
+    obj.fill({"RADIO": 0})
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_update_sejda_key(sejda_template, pdf_samples, request):
+def test_update_sejda_key(sejda_template, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_update_sejda_key.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sejda_template)
-        obj.update_widget_key("year", "YEAR")
-        obj.update_widget_key("at_future_date", "FUTURE_DATE")
-        obj.update_widget_key("purchase_option", "PURCHASE_OPTION")
-        obj.update_widget_key("buyer_signed_date", "BUYER_SIGNED_DATE")
-        obj.commit_widget_key_updates()
-        obj.fill(
-            {
-                "YEAR": "12",
-                "FUTURE_DATE": True,
-                "PURCHASE_OPTION": 1,
-                "BUYER_SIGNED_DATE": "2012-01-01",
-            }
-        )
+    obj = PdfWrapper(sejda_template)
+    obj.update_widget_key("year", "YEAR")
+    obj.update_widget_key("at_future_date", "FUTURE_DATE")
+    obj.update_widget_key("purchase_option", "PURCHASE_OPTION")
+    obj.update_widget_key("buyer_signed_date", "BUYER_SIGNED_DATE")
+    obj.commit_widget_key_updates()
+    obj.fill(
+        {
+            "YEAR": "12",
+            "FUTURE_DATE": True,
+            "PURCHASE_OPTION": 1,
+            "BUYER_SIGNED_DATE": "2012-01-01",
+        }
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_uncheck_checkbox(pdf_samples, request):
+def test_uncheck_checkbox(pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_uncheck_checkbox.pdf")
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        obj = PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf")).fill(
-            {"check": False, "check_2": False, "check_3": False},
-        )
+    obj = PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf")).fill(
+        {"check": False, "check_2": False, "check_3": False},
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_blank_page(pdf_samples, request, assert_same_pdf):
+def test_blank_page(pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_blank_page.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(BlankPage() * 1)
+    obj = PdfWrapper(BlankPage() * 1)
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
+    expect_pdf(obj.read(), expected_path, timestamped=True)
 
-        expected = f.read()
-
-        assert_same_pdf(obj.read(), expected, timestamped=True)
-
-        assert not obj.widgets
-        assert len(obj.pages) == 1
-
-        request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
+    assert not obj.widgets
+    assert len(obj.pages) == 1
 
 
-def test_blank_page_custom_size_multiply(pdf_samples, request, assert_same_pdf):
+def test_blank_page_custom_size_multiply(pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "test_blank_page_custom_size_multiply.pdf"
     )
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(BlankPage(595.35, 841.995) * 3)
+    obj = PdfWrapper(BlankPage(595.35, 841.995) * 3)
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
+    expect_pdf(obj.read(), expected_path, timestamped=True)
 
-        expected = f.read()
-
-        assert_same_pdf(obj.read(), expected, timestamped=True)
-
-        assert not obj.widgets
-        assert len(obj.pages) == 3
-
-        request.config.results["skip_regenerate"] = len(obj.read()) == len(expected)
+    assert not obj.widgets
+    assert len(obj.pages) == 3
 
 
 def test_widget_coord_resolution():
@@ -1614,52 +1439,31 @@ def test_widget_coord_resolution():
     assert obj.widgets["signature"].height == 500
 
 
-def test_hidden_text_check(template_stream, pdf_samples, request):
+def test_hidden_text_check(template_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_hidden_text_check.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream)
-        obj.widgets["test"].hidden = True
-        obj.widgets["check_2"].hidden = True
+    obj = PdfWrapper(template_stream)
+    obj.widgets["test"].hidden = True
+    obj.widgets["check_2"].hidden = True
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_hidden_radio(template_with_radiobutton_stream, pdf_samples, request):
+def test_hidden_radio(template_with_radiobutton_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_hidden_radio.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_with_radiobutton_stream)
-        obj.widgets["radio_2"].hidden = True
+    obj = PdfWrapper(template_with_radiobutton_stream)
+    obj.widgets["radio_2"].hidden = True
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_hidden_sejda(sejda_template, pdf_samples, request):
+def test_hidden_sejda(sejda_template, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_hidden_sejda.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(sejda_template)
-        obj.widgets["buyer_name"].hidden = True
-        obj.widgets["purchase_option"].hidden = True
-        obj.widgets["at_future_date"].hidden = True
+    obj = PdfWrapper(sejda_template)
+    obj.widgets["buyer_name"].hidden = True
+    obj.widgets["purchase_option"].hidden = True
+    obj.widgets["at_future_date"].hidden = True
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_remove_fields_update_widgets(template_stream):
@@ -2043,231 +1847,206 @@ def test_merge_copy_preserves_widget_settings(pdf_samples, image_samples, tmp_pa
     assert result.widgets["signature"].on_hovered_over_javascript is f
 
 
-def test_annotate(template_stream, pdf_samples, request):
+def test_annotate(template_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_annotate.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).annotate(
-            [
-                Annotations.TextAnnotation(
-                    1, 100, 100, contents="this is an annotation"
-                ),
-                Annotations.TextAnnotation(
-                    1,
-                    200,
-                    100,
-                    contents="this is a second annotation",
-                    title="Annotation 2",
-                    icon=Annotations.TextAnnotation.comment_icon,
-                ),
-                Annotations.TextAnnotation(
-                    1,
-                    100,
-                    200,
-                    contents="this is a third annotation",
-                    icon=Annotations.TextAnnotation.help_icon,
-                ),
-                Annotations.TextAnnotation(
-                    1,
-                    200,
-                    200,
-                    contents="this is a forth annotation",
-                    icon=Annotations.TextAnnotation.key_icon,
-                ),
-                Annotations.TextAnnotation(
-                    2,
-                    100,
-                    300,
-                    contents="this is a fifth annotation",
-                    icon=Annotations.TextAnnotation.insert_icon,
-                ),
-            ]
-        )
+    obj = PdfWrapper(template_stream).annotate(
+        [
+            Annotations.TextAnnotation(1, 100, 100, contents="this is an annotation"),
+            Annotations.TextAnnotation(
+                1,
+                200,
+                100,
+                contents="this is a second annotation",
+                title="Annotation 2",
+                icon=Annotations.TextAnnotation.comment_icon,
+            ),
+            Annotations.TextAnnotation(
+                1,
+                100,
+                200,
+                contents="this is a third annotation",
+                icon=Annotations.TextAnnotation.help_icon,
+            ),
+            Annotations.TextAnnotation(
+                1,
+                200,
+                200,
+                contents="this is a forth annotation",
+                icon=Annotations.TextAnnotation.key_icon,
+            ),
+            Annotations.TextAnnotation(
+                2,
+                100,
+                300,
+                contents="this is a fifth annotation",
+                icon=Annotations.TextAnnotation.insert_icon,
+            ),
+        ]
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_annotate_no_annotations(pdf_samples, request):
+def test_annotate_no_annotations(pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_annotate_no_annotations.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).annotate(
-            [
-                Annotations.TextAnnotation(
-                    1, 100, 100, contents="this is an annotation"
-                ),
-                Annotations.TextAnnotation(
-                    1,
-                    200,
-                    100,
-                    contents="this is a second annotation",
-                    title="Annotation 2",
-                    icon=Annotations.TextAnnotation.comment_icon,
-                ),
-                Annotations.TextAnnotation(
-                    1,
-                    100,
-                    200,
-                    contents="this is a third annotation",
-                    icon=Annotations.TextAnnotation.help_icon,
-                ),
-                Annotations.TextAnnotation(
-                    1,
-                    200,
-                    200,
-                    contents="this is a forth annotation",
-                    icon=Annotations.TextAnnotation.key_icon,
-                ),
-                Annotations.TextAnnotation(
-                    1,
-                    100,
-                    300,
-                    contents="this is a fifth annotation",
-                    icon=Annotations.TextAnnotation.insert_icon,
-                ),
-            ]
-        )
+    obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).annotate(
+        [
+            Annotations.TextAnnotation(1, 100, 100, contents="this is an annotation"),
+            Annotations.TextAnnotation(
+                1,
+                200,
+                100,
+                contents="this is a second annotation",
+                title="Annotation 2",
+                icon=Annotations.TextAnnotation.comment_icon,
+            ),
+            Annotations.TextAnnotation(
+                1,
+                100,
+                200,
+                contents="this is a third annotation",
+                icon=Annotations.TextAnnotation.help_icon,
+            ),
+            Annotations.TextAnnotation(
+                1,
+                200,
+                200,
+                contents="this is a forth annotation",
+                icon=Annotations.TextAnnotation.key_icon,
+            ),
+            Annotations.TextAnnotation(
+                1,
+                100,
+                300,
+                contents="this is a fifth annotation",
+                icon=Annotations.TextAnnotation.insert_icon,
+            ),
+        ]
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_rubber_stamp_annotation(template_stream, pdf_samples, request):
+def test_rubber_stamp_annotation(template_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "test_rubber_stamp_annotation.pdf")
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(template_stream).annotate(
-            [
-                Annotations.RubberStampAnnotation(
-                    1,
-                    0,
-                    400,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.approved,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    100,
-                    400,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.experimental,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    200,
-                    400,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.not_approved,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    300,
-                    400,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.as_is,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    400,
-                    400,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.expired,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    0,
-                    500,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.not_for_public_release,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    100,
-                    500,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.confidential,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    200,
-                    500,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.final,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    300,
-                    500,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.sold,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    400,
-                    500,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.departmental,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    0,
-                    600,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.for_comment,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    100,
-                    600,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.top_secret,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    200,
-                    600,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.draft,
-                ),
-                Annotations.RubberStampAnnotation(
-                    1,
-                    300,
-                    600,
-                    width=50,
-                    height=50,
-                    name=Annotations.RubberStampAnnotation.for_public_release,
-                ),
-            ]
-        )
+    obj = PdfWrapper(template_stream).annotate(
+        [
+            Annotations.RubberStampAnnotation(
+                1,
+                0,
+                400,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.approved,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                100,
+                400,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.experimental,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                200,
+                400,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.not_approved,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                300,
+                400,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.as_is,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                400,
+                400,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.expired,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                0,
+                500,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.not_for_public_release,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                100,
+                500,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.confidential,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                200,
+                500,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.final,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                300,
+                500,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.sold,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                400,
+                500,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.departmental,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                0,
+                600,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.for_comment,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                100,
+                600,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.top_secret,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                200,
+                600,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.draft,
+            ),
+            Annotations.RubberStampAnnotation(
+                1,
+                300,
+                600,
+                width=50,
+                height=50,
+                name=Annotations.RubberStampAnnotation.for_public_release,
+            ),
+        ]
+    )
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def get_link_targets(stream):

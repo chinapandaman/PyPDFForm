@@ -76,7 +76,7 @@ def test_create_annotation_input_methods(static_pdfs, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_text_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_text_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_text_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -94,16 +94,16 @@ def test_text_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_uri_link_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_uri_link_annotations(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_uri_link_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -121,16 +121,16 @@ def test_uri_link_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_page_link_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_page_link_annotations(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_page_link_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -148,16 +148,16 @@ def test_page_link_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path)
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_highlight_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_highlight_annotations(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_highlight_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -175,16 +175,16 @@ def test_highlight_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path)
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_underline_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_underline_annotations(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_underline_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -202,16 +202,16 @@ def test_underline_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path)
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_squiggly_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_squiggly_annotations(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_squiggly_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -229,16 +229,16 @@ def test_squiggly_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_strikeout_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_strikeout_annotations(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_strikeout_annotations.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -256,16 +256,16 @@ def test_strikeout_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path)
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_rubber_stamp_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_rubber_stamp_annotations(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_rubber_stamp_annotations.pdf"
     )
@@ -285,9 +285,7 @@ def test_rubber_stamp_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_pa
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)

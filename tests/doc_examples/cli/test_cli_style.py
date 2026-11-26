@@ -83,9 +83,8 @@ def test_change_text_font(
     static_pdfs,
     yaml_samples,
     tmp_path,
-    request,
-    standard_zlib,
     assert_annotations_preserved,
+    expect_pdf,
 ):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
@@ -120,19 +119,16 @@ def test_change_text_font(
 
         # The CLI reopens the PDF between commands, which numbers its objects
         # differently from the expected PDF, so only the length is the same.
-        if standard_zlib:
-            assert len(expected) == len(actual)
+        expect_pdf(actual, same_as=expected_path, length_only=True)
         assert_annotations_preserved(expected, actual)
 
         result = PdfWrapper(actual)
         assert "LiberationSerif-BoldItalic" in result.fonts
 
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
-
 
 @pytest.mark.cli_test
 def test_change_text_font_size(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, request
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_size.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
@@ -161,11 +157,10 @@ def test_change_text_font_size(
         ],
     )
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
+        expect_pdf(actual, same_as=expected_path, length_only=True)
 
         result = PdfWrapper(actual)
         assert result.data["test"] == "test_1"
@@ -175,12 +170,10 @@ def test_change_text_font_size(
         assert not result.data["check_2"]
         assert result.data["check_3"]
 
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
-
 
 @pytest.mark.cli_test
 def test_change_text_font_color(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, request
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_color.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
@@ -209,11 +202,10 @@ def test_change_text_font_color(
         ],
     )
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
+        expect_pdf(actual, same_as=expected_path, length_only=True)
 
         result = PdfWrapper(actual)
         assert result.data["test"] == "test_1"
@@ -223,12 +215,10 @@ def test_change_text_font_color(
         assert not result.data["check_2"]
         assert result.data["check_3"]
 
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
-
 
 @pytest.mark.cli_test
 def test_change_text_alignment(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, request
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_alignment.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
@@ -257,23 +247,20 @@ def test_change_text_alignment(
         ],
     )
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
+        expect_pdf(actual, same_as=expected_path, length_only=True)
 
         result = PdfWrapper(actual)
         assert result.widgets["test"].alignment == 2
         assert result.widgets["test_2"].alignment == 1
         assert result.widgets["test_3"].alignment == 1
 
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
-
 
 @pytest.mark.cli_test
 def test_change_text_max_length(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, request
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_max_length.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
@@ -302,22 +289,19 @@ def test_change_text_max_length(
         ],
     )
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
+        expect_pdf(actual, same_as=expected_path, length_only=True)
 
         result = PdfWrapper(actual)
         assert result.widgets["test"].max_length == 2
         assert result.widgets["test_2"].max_length == 4
         assert result.widgets["test_3"].max_length == 4
 
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
-
 
 @pytest.mark.cli_test
-def test_change_text_comb(pdf_samples, static_pdfs, yaml_samples, tmp_path, request):
+def test_change_text_comb(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_comb.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -345,23 +329,20 @@ def test_change_text_comb(pdf_samples, static_pdfs, yaml_samples, tmp_path, requ
         ],
     )
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
+        expect_pdf(actual, same_as=expected_path, length_only=True)
 
         result = PdfWrapper(actual)
         assert result.widgets["test"].comb
         assert result.widgets["test_2"].comb
         assert result.widgets["test_3"].comb
 
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
-
 
 @pytest.mark.cli_test
 def test_change_text_multiline(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, request
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_multiline.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
@@ -403,22 +384,21 @@ def test_change_text_multiline(
         ],
     )
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
+        expect_pdf(actual, same_as=expected_path, length_only=True)
 
         result = PdfWrapper(actual)
         assert result.widgets["test"].multiline
         assert not result.widgets["test_2"].multiline
         assert not result.widgets["test_3"].multiline
 
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
-
 
 @pytest.mark.cli_test
-def test_change_check_size(pdf_samples, static_pdfs, yaml_samples, tmp_path, request):
+def test_change_check_size(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_check_size.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
     data_yaml = os.path.join(tmp_path, "data.yaml")
@@ -456,22 +436,21 @@ def test_change_check_size(pdf_samples, static_pdfs, yaml_samples, tmp_path, req
         ],
     )
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
+        expect_pdf(actual, same_as=expected_path, length_only=True)
 
         result = PdfWrapper(actual)
         assert result.data["check"]
         assert result.data["check_2"]
         assert result.data["check_3"]
 
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
-
 
 @pytest.mark.cli_test
-def test_change_dropdown_choices(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_change_dropdown_choices(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_choices.pdf"
     )
@@ -491,17 +470,15 @@ def test_change_dropdown_choices(pdf_samples, static_pdfs, yaml_samples, tmp_pat
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
 def test_change_dropdown_choices_with_export_values(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_choices_with_export_values.pdf"
@@ -524,17 +501,15 @@ def test_change_dropdown_choices_with_export_values(
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
 def test_change_dropdown_font(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, assert_same_pdf
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_font.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
@@ -553,15 +528,16 @@ def test_change_dropdown_font(
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert_same_pdf(actual, expected)
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_change_dropdown_font_size(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_change_dropdown_font_size(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_font_size.pdf"
     )
@@ -581,16 +557,16 @@ def test_change_dropdown_font_size(pdf_samples, static_pdfs, yaml_samples, tmp_p
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_change_dropdown_font_color(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_change_dropdown_font_color(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_font_color.pdf"
     )
@@ -610,12 +586,10 @@ def test_change_dropdown_font_color(pdf_samples, static_pdfs, yaml_samples, tmp_
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
@@ -675,7 +649,7 @@ def test_update_key(static_pdfs, yaml_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_update_key_index(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_update_key_index(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_update_key_index.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
     sample_data = os.path.join(tmp_path, "sample_data.yaml")
@@ -712,16 +686,16 @@ def test_update_key_index(pdf_samples, static_pdfs, yaml_samples, tmp_path):
         ],
     )
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_change_field_editability(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_change_field_editability(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_editability.pdf"
     )
@@ -769,16 +743,16 @@ def test_change_field_editability(pdf_samples, static_pdfs, yaml_samples, tmp_pa
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(readonly_path, "rb") as f2:
-        expected = f1.read()
+    with open(readonly_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_change_field_visibility(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_change_field_visibility(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_visibility.pdf"
     )
@@ -798,16 +772,14 @@ def test_change_field_visibility(pdf_samples, static_pdfs, yaml_samples, tmp_pat
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_remove_fields(pdf_samples, static_pdfs, tmp_path):
+def test_remove_fields(pdf_samples, static_pdfs, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_remove_fields.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -829,9 +801,7 @@ def test_remove_fields(pdf_samples, static_pdfs, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)

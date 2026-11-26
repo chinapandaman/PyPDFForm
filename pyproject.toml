@@ -148,6 +148,9 @@ version = { attr = "PyPDFForm.__version__" }
 include = ["PyPDFForm*"]
 
 [tool.pytest.ini_options]
+# tests import their helpers from tests.support
+pythonpath = ["."]
 markers = [
     "cli_test",
+    "snapshot: compares with an expected PDF; added to every test that uses expect_pdf",
 ]

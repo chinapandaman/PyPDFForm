@@ -11,7 +11,7 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_fill_dynamic_options(pdf_samples, static_pdfs, tmp_path):
+def test_fill_dynamic_options(pdf_samples, static_pdfs, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -38,16 +38,14 @@ def test_fill_dynamic_options(pdf_samples, static_pdfs, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_fill_text_check(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_fill_text_check(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -64,16 +62,14 @@ def test_fill_text_check(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_fill_radio(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_fill_radio(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_radio.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -90,16 +86,14 @@ def test_fill_radio(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_fill_dropdown(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_fill_dropdown(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_dropdown.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -116,16 +110,16 @@ def test_fill_dropdown(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_fill_dropdown_via_str(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_fill_dropdown_via_str(
+    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_dropdown.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -142,16 +136,14 @@ def test_fill_dropdown_via_str(pdf_samples, static_pdfs, yaml_samples, tmp_path)
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_fill_sig(pdf_samples, static_pdfs, yaml_samples, tmp_path, assert_same_pdf):
+def test_fill_sig(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -168,17 +160,14 @@ def test_fill_sig(pdf_samples, static_pdfs, yaml_samples, tmp_path, assert_same_
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert_same_pdf(actual, expected)
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_fill_sig_ratio(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, assert_same_pdf
-):
+def test_fill_sig_ratio(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig_ratio.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -195,15 +184,14 @@ def test_fill_sig_ratio(
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert_same_pdf(actual, expected)
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_fill_image(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_fill_image(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_image.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -220,16 +208,14 @@ def test_fill_image(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_fill_image_ratio(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_fill_image_ratio(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_image_ratio.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -246,9 +232,7 @@ def test_fill_image_ratio(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)

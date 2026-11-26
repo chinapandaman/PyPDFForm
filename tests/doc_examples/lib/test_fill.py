@@ -5,7 +5,7 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_fill_text_check(static_pdfs, pdf_samples, request):
+def test_fill_text_check(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
 
     filled = PdfWrapper(
@@ -22,17 +22,10 @@ def test_fill_text_check(static_pdfs, pdf_samples, request):
         readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = filled.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(filled.read()) == len(expected)
-        assert filled.read() == expected
+    expect_pdf(filled.read(), expected_path)
 
 
-def test_fill_radio(static_pdfs, pdf_samples, request):
+def test_fill_radio(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_radio.pdf")
 
     filled = PdfWrapper(
@@ -46,17 +39,10 @@ def test_fill_radio(static_pdfs, pdf_samples, request):
         readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = filled.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(filled.read()) == len(expected)
-        assert filled.read() == expected
+    expect_pdf(filled.read(), expected_path)
 
 
-def test_fill_dropdown(static_pdfs, pdf_samples, request):
+def test_fill_dropdown(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_dropdown.pdf")
 
     filled = PdfWrapper(
@@ -66,17 +52,10 @@ def test_fill_dropdown(static_pdfs, pdf_samples, request):
         readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = filled.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(filled.read()) == len(expected)
-        assert filled.read() == expected
+    expect_pdf(filled.read(), expected_path)
 
 
-def test_fill_dropdown_via_str(static_pdfs, pdf_samples, request):
+def test_fill_dropdown_via_str(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_dropdown.pdf")
 
     filled = PdfWrapper(
@@ -86,17 +65,10 @@ def test_fill_dropdown_via_str(static_pdfs, pdf_samples, request):
         readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = filled.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(filled.read()) == len(expected)
-        assert filled.read() == expected
+    expect_pdf(filled.read(), same_as=expected_path)
 
 
-def test_fill_sig(static_pdfs, pdf_samples, image_samples, request, assert_same_pdf):
+def test_fill_sig(static_pdfs, pdf_samples, image_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig.pdf")
 
     filled = PdfWrapper(
@@ -106,13 +78,7 @@ def test_fill_sig(static_pdfs, pdf_samples, image_samples, request, assert_same_
         readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = filled.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(filled.read(), expected)
+    expect_pdf(filled.read(), expected_path)
 
     with open(os.path.join(image_samples, "sample_signature.png"), "rb+") as sig:
         filled2 = PdfWrapper(
@@ -135,9 +101,7 @@ def test_fill_sig(static_pdfs, pdf_samples, image_samples, request, assert_same_
     assert filled3.read() == filled.read()
 
 
-def test_fill_sig_ratio(
-    static_pdfs, pdf_samples, image_samples, request, assert_same_pdf
-):
+def test_fill_sig_ratio(static_pdfs, pdf_samples, image_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig_ratio.pdf")
 
     pdf = PdfWrapper(
@@ -149,16 +113,10 @@ def test_fill_sig_ratio(
         readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(pdf.read(), expected)
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_fill_image(static_pdfs, pdf_samples, image_samples, request):
+def test_fill_image(static_pdfs, pdf_samples, image_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_image.pdf")
 
     filled = PdfWrapper(
@@ -168,14 +126,7 @@ def test_fill_image(static_pdfs, pdf_samples, image_samples, request):
         readonly=False,  # optional, set to True to make the filled PDF form read-only
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = filled.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(filled.read()) == len(expected)
-        assert filled.read() == expected
+    expect_pdf(filled.read(), expected_path)
 
     with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as img:
         filled2 = PdfWrapper(
@@ -198,7 +149,7 @@ def test_fill_image(static_pdfs, pdf_samples, image_samples, request):
     assert filled3.read() == filled.read()
 
 
-def test_fill_image_ratio(static_pdfs, pdf_samples, image_samples, request):
+def test_fill_image_ratio(static_pdfs, pdf_samples, image_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_image_ratio.pdf")
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_image_field.pdf"))
@@ -207,11 +158,4 @@ def test_fill_image_ratio(static_pdfs, pdf_samples, image_samples, request):
         {"image_1": os.path.join(image_samples, "sample_image.jpg")},
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)

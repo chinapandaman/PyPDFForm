@@ -17,9 +17,7 @@ def test_change_title(static_pdfs):
     assert PdfWrapper(pdf.read()).title == "New PDF"
 
 
-def test_change_text_font(
-    static_pdfs, sample_font_stream, pdf_samples, request, assert_same_pdf
-):
+def test_change_text_font(static_pdfs, sample_font_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
@@ -44,16 +42,10 @@ def test_change_text_font(
         },
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(form.read(), expected)
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_text_font_size(static_pdfs, pdf_samples, request):
+def test_change_text_font_size(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_size.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
@@ -77,17 +69,10 @@ def test_change_text_font_size(static_pdfs, pdf_samples, request):
         },
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_text_font_color(static_pdfs, pdf_samples, request):
+def test_change_text_font_color(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_color.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
@@ -111,17 +96,10 @@ def test_change_text_font_color(static_pdfs, pdf_samples, request):
         },
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_text_alignment(static_pdfs, pdf_samples, request):
+def test_change_text_alignment(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_alignment.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
@@ -145,17 +123,10 @@ def test_change_text_alignment(static_pdfs, pdf_samples, request):
         },
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_text_max_length(static_pdfs, pdf_samples, request):
+def test_change_text_max_length(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_max_length.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
@@ -179,17 +150,10 @@ def test_change_text_max_length(static_pdfs, pdf_samples, request):
         },
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_text_comb(static_pdfs, pdf_samples, request):
+def test_change_text_comb(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_comb.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
@@ -215,17 +179,10 @@ def test_change_text_comb(static_pdfs, pdf_samples, request):
         },
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_text_multiline(static_pdfs, pdf_samples, request):
+def test_change_text_multiline(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_text_multiline.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
@@ -243,17 +200,10 @@ def test_change_text_multiline(static_pdfs, pdf_samples, request):
         },
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_check_size(static_pdfs, pdf_samples, request):
+def test_change_check_size(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_check_size.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
@@ -270,17 +220,10 @@ def test_change_check_size(static_pdfs, pdf_samples, request):
         },
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_dropdown_choices(static_pdfs, pdf_samples, request):
+def test_change_dropdown_choices(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_choices.pdf"
     )
@@ -289,17 +232,12 @@ def test_change_dropdown_choices(static_pdfs, pdf_samples, request):
 
     form.widgets["dropdown_1"].choices = ["", "apple", "banana", "cherry", "dates"]
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_dropdown_choices_with_export_values(static_pdfs, pdf_samples, request):
+def test_change_dropdown_choices_with_export_values(
+    static_pdfs, pdf_samples, expect_pdf
+):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_choices_with_export_values.pdf"
     )
@@ -314,19 +252,10 @@ def test_change_dropdown_choices_with_export_values(static_pdfs, pdf_samples, re
         ("dates", "dates_export_value"),
     ]
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_dropdown_font(
-    static_pdfs, pdf_samples, sample_font_stream, request, assert_same_pdf
-):
+def test_change_dropdown_font(static_pdfs, pdf_samples, sample_font_stream, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_font.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
@@ -335,16 +264,10 @@ def test_change_dropdown_font(
 
     form.widgets["dropdown_1"].font = "new_font_name"
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert_same_pdf(form.read(), expected)
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_dropdown_font_size(static_pdfs, pdf_samples, request):
+def test_change_dropdown_font_size(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_font_size.pdf"
     )
@@ -353,17 +276,10 @@ def test_change_dropdown_font_size(static_pdfs, pdf_samples, request):
 
     form.widgets["dropdown_1"].font_size = 30
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_dropdown_font_color(static_pdfs, pdf_samples, request):
+def test_change_dropdown_font_color(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_dropdown_font_color.pdf"
     )
@@ -372,14 +288,7 @@ def test_change_dropdown_font_color(static_pdfs, pdf_samples, request):
 
     form.widgets["dropdown_1"].font_color = (1, 0, 0)
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
 def test_update_key(static_pdfs):
@@ -397,7 +306,7 @@ def test_update_key(static_pdfs):
     assert "test_text_2" in form.widgets
 
 
-def test_update_key_index(pdf_samples, static_pdfs, request):
+def test_update_key_index(pdf_samples, static_pdfs, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_update_key_index.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "733.pdf")).update_widget_key(
@@ -407,17 +316,10 @@ def test_update_key_index(pdf_samples, static_pdfs, request):
 
     form.fill(form.sample_data)
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_field_editability(static_pdfs, pdf_samples, request):
+def test_change_field_editability(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_editability.pdf"
     )
@@ -442,17 +344,10 @@ def test_change_field_editability(static_pdfs, pdf_samples, request):
     form.widgets["radio_1"].readonly = False  # radio button group
     form.widgets["dropdown_1"].readonly = False  # dropdown
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_change_field_visibility(static_pdfs, pdf_samples, request):
+def test_change_field_visibility(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_visibility.pdf"
     )
@@ -460,27 +355,13 @@ def test_change_field_visibility(static_pdfs, pdf_samples, request):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     form.widgets["test"].hidden = True
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)
 
 
-def test_remove_fields(static_pdfs, pdf_samples, request):
+def test_remove_fields(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_remove_fields.pdf")
 
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     form.remove_fields(["test", "test_2", "check_2"])
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)

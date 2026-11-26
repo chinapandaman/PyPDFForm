@@ -22,28 +22,18 @@ from PyPDFForm.lib.patterns import get_widget_key
 from PyPDFForm.lib.template import get_widgets_by_page
 
 
-def test_encrypted_edit_pdf_form(issue_pdf_directory, request):
+def test_encrypted_edit_pdf_form(issue_pdf_directory, expect_pdf):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "437.pdf"))
     obj = obj.fill(obj.sample_data)
     expected_path = os.path.join(issue_pdf_directory, "437_expected.pdf")
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_fill_image(issue_pdf_directory, image_samples, request):
+def test_fill_image(issue_pdf_directory, image_samples, expect_pdf):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "560.pdf"))
     obj = obj.fill({"ImageSign": os.path.join(image_samples, "sample_image.jpg")})
     expected_path = os.path.join(issue_pdf_directory, "560_expected.pdf")
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_ppf_627_schema(issue_pdf_directory):
@@ -52,18 +42,13 @@ def test_ppf_627_schema(issue_pdf_directory):
     assert obj.schema["properties"]["S1 GF 7"]["maximum"] == 3
 
 
-def test_ppf_627_fill_1(issue_pdf_directory, request):
+def test_ppf_627_fill_1(issue_pdf_directory, expect_pdf):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-627.pdf")).fill(
         {"S1 GF 7": 1}
     )
 
     expected_path = os.path.join(issue_pdf_directory, "PPF-627-expected-1.pdf")
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_ppf_2100_refill_inline_widget(issue_pdf_directory, assert_catalog_fields):
@@ -341,7 +326,7 @@ def test_get_desc_in_schema_radio(issue_pdf_directory):
                 )
 
 
-def test_use_full_widget_name_1(issue_pdf_directory, request):
+def test_use_full_widget_name_1(issue_pdf_directory, expect_pdf):
     obj = PdfWrapper(
         os.path.join(issue_pdf_directory, "PPF-939.pdf"), use_full_widget_name=True
     ).fill(
@@ -352,15 +337,10 @@ def test_use_full_widget_name_1(issue_pdf_directory, request):
     )
 
     expected_path = os.path.join(issue_pdf_directory, "PPF-939_expected_1.pdf")
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_use_full_widget_name_2(issue_pdf_directory, request):
+def test_use_full_widget_name_2(issue_pdf_directory, expect_pdf):
     obj = PdfWrapper(
         os.path.join(issue_pdf_directory, "PPF-939.pdf"), use_full_widget_name=True
     ).fill(
@@ -371,12 +351,7 @@ def test_use_full_widget_name_2(issue_pdf_directory, request):
     )
 
     expected_path = os.path.join(issue_pdf_directory, "PPF-939_expected_2.pdf")
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_use_full_widget_name_both(issue_pdf_directory):
@@ -426,7 +401,7 @@ def test_merge_sejda_pdf_forms(issue_pdf_directory):
                     assert widget[Parent][V] == v
 
 
-def test_xfa_to_regular_form(issue_pdf_directory, request):
+def test_xfa_to_regular_form(issue_pdf_directory, expect_pdf):
     obj = PdfWrapper(
         os.path.join(issue_pdf_directory, "1087.pdf"), need_appearances=True
     ).fill(
@@ -439,12 +414,7 @@ def test_xfa_to_regular_form(issue_pdf_directory, request):
     )
 
     expected_path = os.path.join(issue_pdf_directory, "1087_expected.pdf")
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_full_widget_name(issue_pdf_directory):
@@ -463,7 +433,7 @@ def test_extract_multiline_property(issue_pdf_directory):
             assert v.multiline
 
 
-def test_get_dropdown_choices(issue_pdf_directory, request):
+def test_get_dropdown_choices(issue_pdf_directory, expect_pdf):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-1213.pdf")).fill(
         {
             "Dropdown8": 1,
@@ -474,15 +444,10 @@ def test_get_dropdown_choices(issue_pdf_directory, request):
     )
 
     expected_path = os.path.join(issue_pdf_directory, "PPF-1213_expected.pdf")
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_sejda_multiline(issue_pdf_directory, request):
+def test_sejda_multiline(issue_pdf_directory, expect_pdf):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "PPF-1349.pdf")).fill(
         {
             "Nombre corp": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas rhoncus est turpis, vitae hendrerit magna vestibulum in. Nulla maximus consectetur varius. Ut lectus nulla, malesuada at felis dictum, tristique lacinia lacus. Phasellus vehicula dui a orci aliquam, at tempus orci consequat. Maecenas sagittis auctor magna, a scelerisque urna ullamcorper at. Nam pellentesque faucibus condimentum. In hac habitasse platea dictumst.",
@@ -496,12 +461,7 @@ def test_sejda_multiline(issue_pdf_directory, request):
     )
 
     expected_path = os.path.join(issue_pdf_directory, "PPF-1349_expected.pdf")
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_not_merge_metadata():
@@ -526,7 +486,7 @@ def test_not_merge_metadata():
     assert metadata["/other_key"] == "other_value"
 
 
-def test_dropdown_tutorial(issue_pdf_directory, request, assert_same_pdf):
+def test_dropdown_tutorial(issue_pdf_directory, expect_pdf):
     obj = PdfWrapper(BlankPage(width=612, height=792) * 3)
     obj.generate_coordinate_grid(margin=100, color=(0, 0, 1))
 
@@ -584,8 +544,4 @@ def test_dropdown_tutorial(issue_pdf_directory, request, assert_same_pdf):
     )
 
     expected_path = os.path.join(issue_pdf_directory, "PPF-1599_expected.pdf")
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        assert_same_pdf(obj.read(), expected)
+    expect_pdf(obj.read(), expected_path)

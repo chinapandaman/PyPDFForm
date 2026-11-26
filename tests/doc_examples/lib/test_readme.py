@@ -5,7 +5,7 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_fill(static_pdfs, request):
+def test_fill(static_pdfs, expect_pdf):
     expected_path = os.path.join(static_pdfs, "sample_filled.pdf")
 
     filled = PdfWrapper(
@@ -22,11 +22,4 @@ def test_fill(static_pdfs, request):
         },
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = filled.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(filled.read()) == len(expected)
-        assert filled.read() == expected
+    expect_pdf(filled.read(), expected_path)

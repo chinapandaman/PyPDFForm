@@ -13,7 +13,7 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_coordinate_grid_view(pdf_samples, static_pdfs, tmp_path):
+def test_coordinate_grid_view(pdf_samples, static_pdfs, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_coordinate_grid_view.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -37,12 +37,10 @@ def test_coordinate_grid_view(pdf_samples, static_pdfs, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
@@ -65,7 +63,9 @@ def test_field_locations_dimensions(static_pdfs):
 
 
 @pytest.mark.cli_test
-def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, tmp_path):
+def test_change_field_coordinates_dimensions(
+    pdf_samples, static_pdfs, tmp_path, expect_pdf
+):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_coordinates_dimensions.pdf"
     )
@@ -93,9 +93,7 @@ def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, tmp_path)
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         output = f2.read()
 
-        assert len(expected) == len(output)
-        assert expected == output
+        expect_pdf(output, same_as=expected_path)

@@ -13,9 +13,7 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_index_snippets(
-    pdf_samples, yaml_samples, tmp_path, request, monkeypatch, assert_same_pdf
-):
+def test_index_snippets(pdf_samples, yaml_samples, tmp_path, monkeypatch, expect_pdf):
     # Stable ReportLab timestamps prevent variable-length document IDs.
     monkeypatch.setenv("SOURCE_DATE_EPOCH", "946684800")
     expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
@@ -72,15 +70,12 @@ def test_index_snippets(
         ],
     )
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert_same_pdf(actual, expected, timestamped=True)
+        expect_pdf(actual, same_as=expected_path, timestamped=True)
 
         result = PdfWrapper(actual)
         assert result.widgets["my_textfield"].alignment == 1
         assert result.data["my_textfield"] == "this is a text field"
         assert result.data["my_checkbox"]
-
-        request.config.results["skip_regenerate"] = len(expected) == len(actual)
