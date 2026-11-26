@@ -56,11 +56,13 @@ from .constants import (
 from .default_appearance import TextStyle, read_default_appearance
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown, DropdownOption
+from .middleware.image import Image
 from .middleware.radio import Radio
 from .middleware.signature import Signature
 from .middleware.text import Text
 from .utils import (
     extract_widget_property,
+    find_pattern_match,
     get_array,
     get_dictionary,
     get_entry,
@@ -72,7 +74,7 @@ from .utils import (
 IMAGE_PATTERN = {A: {JS: IMAGE_IMPORT_JAVASCRIPT}}
 
 # the middleware type of each field type (/FT), except buttons, which
-# get_button_type tells apart
+# _get_button_type tells apart
 FIELD_TYPES = ((Sig, Signature), (Tx, Text), (Ch, Dropdown))
 
 WIDGET_DESCRIPTION_PATTERNS = [{TU: True}, {Parent: {TU: True}}]
@@ -204,7 +206,7 @@ def get_checkbox_value(annot: DictionaryObject) -> bool | None:
 
 
 def update_radio_value(
-    annot: DictionaryObject, options: Sequence[DictionaryObject] = ()
+    annot: DictionaryObject, options: Sequence[DictionaryObject]
 ) -> None:
     """
     Selects a radio button and clears every other widget in its group.
@@ -223,7 +225,6 @@ def update_radio_value(
         annot (DictionaryObject): The radio button annotation dictionary.
         options (Sequence[DictionaryObject]): Other widgets that may belong
             to the field, such as the options of its group on every page.
-            Defaults to none.
     """
     for each in annot[AP][N]:
         if str(each) != Off:
@@ -669,25 +670,44 @@ def is_pushbutton(widget: DictionaryObject) -> bool:
     return check_field_flag(_get_widget_field(widget) or widget, PUSHBUTTON)
 
 
-def get_field_type(widget: DictionaryObject) -> Any:
+def get_widget_type(widget: dict) -> type | None:
     """
-    Reads the field type (`/FT`) of a widget, such as `/Tx` for a text field.
+    Gets the middleware type of a widget annotation from its fixed entries.
 
-    The type is resolved from the widget and the fields along its `/Parent`
-    chain, so the type of the widget or a lower field takes precedence over
-    the ones above it. The AcroForm has no default for it. A `/Parent` cycle
-    before it is found reads as no type, as a missing or null one does.
+    Image fields, which are pushbuttons, are found by their action first.
+    Other widgets get the middleware type of their field type (`/FT`), which
+    is resolved from the widget and the fields along its `/Parent` chain, so
+    the type of the widget or a lower field takes precedence over the ones
+    above it. The AcroForm has no default for it, and a `/Parent` cycle before
+    it is found reads as no type, as a missing or null one does. Buttons are
+    told apart by `_get_button_type`, which doesn't read their appearance
+    state (`/AS`), since filling changes it: a checked checkbox whose on state
+    isn't `/Yes` is still a checkbox, and a field keeps its type as it is
+    filled, rebuilt, or copied.
 
     Args:
-        widget (DictionaryObject): The widget annotation.
+        widget (dict): The widget annotation dictionary.
 
     Returns:
-        Any: The field type, or None when nothing sets it.
+        type | None: The middleware type, such as `Checkbox`, or None if the
+            annotation is not a supported widget.
     """
-    return _get_inherited_value(widget, FT)
+    if get_entry(widget, Subtype) != Widget:
+        return None
+    if find_pattern_match(IMAGE_PATTERN, widget):
+        return Image
+
+    field_type = _get_inherited_value(widget, FT)
+    if field_type == Btn:
+        return _get_button_type(widget)
+    for value, _type in FIELD_TYPES:
+        if field_type == value:
+            return _type
+
+    return None
 
 
-def get_button_type(widget: DictionaryObject) -> type | None:
+def _get_button_type(widget: DictionaryObject) -> type | None:
     """
     Gets the middleware type of a widget whose field type is `/Btn`.
 
@@ -724,7 +744,7 @@ def get_button_type(widget: DictionaryObject) -> type | None:
 
     if get_entry(widget, FT) == Btn:
         # reportlab creation pattern
-        return Radio if get_field_type(field) == Btn else Checkbox
+        return Radio if _get_inherited_value(field, FT) == Btn else Checkbox
     if check_field_flag(field, RADIO):
         return Radio
     # a radio group's /DV can be /Yes or /Off too, so the radio flag comes first

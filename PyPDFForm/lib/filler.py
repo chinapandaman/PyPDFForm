@@ -27,13 +27,13 @@ from .middleware.signature import Signature
 from .middleware.text import Text
 from .patterns import (
     get_widget_key,
+    get_widget_type,
     is_pushbutton,
     update_checkbox_value,
     update_dropdown_value,
     update_radio_value,
     update_text_value,
 )
-from .template import get_widget_type
 from .watermark import create_watermarks_and_draw, merge_watermarks_with_pdf
 
 
@@ -223,10 +223,10 @@ def fill(
     radio group fills only its own options. Once every page is visited, the
     option at a radio group's index is selected, and the other widgets of its
     field are cleared, including those that the field's `/Kids` doesn't list.
-    A checkbox whose value wasn't
-    supplied, and is still the one the PDF holds, isn't written again,
-    since its key can name other widgets that read differently, such as the
-    widgets of a field with different on states. It can set fields read-only during
+    A checkbox whose value wasn't supplied, and is still the one the PDF
+    holds, isn't written again, since its key can name other widgets that
+    read differently, such as the widgets of a field with different on
+    states. It can set fields read-only during
     filling, and when images or signatures are present it removes only the widgets
     whose images were prepared, including their field-tree entries, and returns a
     second stream with the image watermarks applied. All other annotations retain
