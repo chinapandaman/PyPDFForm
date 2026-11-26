@@ -7,9 +7,18 @@ from io import BytesIO
 import pytest
 from pikepdf import Array, Dictionary, Name, Object, Pdf, String
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import IndirectObject, NameObject, NullObject, NumberObject
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    IndirectObject,
+    NameObject,
+    NullObject,
+    NumberObject,
+    TextStringObject,
+)
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
+from PyPDFForm.lib import wrapper
 from PyPDFForm.lib.constants import (
     COMB,
     MULTILINE,
@@ -521,6 +530,20 @@ def _set_parent_entry(stream, name, entry, value):
             return f.getvalue()
 
 
+def _set_null_entries(stream, entries):
+    # sets entries of widgets, by short name, to null
+    writer = PdfWriter(BytesIO(stream))
+    for page in writer.pages:
+        for annot in page.get("/Annots", []):
+            annot = annot.get_object()
+            for key in entries.get(get_widget_key(annot, False), ()):
+                annot[NameObject(key)] = NullObject()
+
+    with BytesIO() as f:
+        writer.write(f)
+        return f.getvalue()
+
+
 @pytest.mark.parametrize(
     ("name", "entry", "parent", "value"),
     [
@@ -583,7 +606,6 @@ def _group_fields(stream, names, entry, value):
     [
         ("max_length", "/MaxLen", 1, 5),
         ("alignment", "/Q", 1, 2),
-        ("tooltip", "/TU", "shared tooltip", "own tooltip"),
     ],
 )
 def test_clear_property_set_by_shared_parent(
@@ -615,21 +637,77 @@ def test_clear_property_set_by_shared_parent(
     assert_widgets_match_output(obj)
 
 
-def test_version_leaves_failing_tooltip_removal_to_read(template_stream):
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_tooltip_of_shared_parent_is_not_inherited(
+    template_stream, use_full_widget_name, assert_widgets_match_output
+):
     stream = _group_fields(template_stream, ("test", "test_2"), "/TU", "shared tooltip")
-    # below 1.5, the version getter previews queued tooltip changes
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    widget = obj.widgets["group.test" if use_full_widget_name else "test"]
+    # the tooltip is the alternate name of "group", not of its kids
+    assert widget.tooltip is None
+
+    widget.tooltip = "own tooltip"
+    assert _find_widget(obj.read(), "test")["/TU"] == "own tooltip"
+    widget.tooltip = None
+    output = obj.read()
+
+    assert "/TU" not in _find_widget(output, "test")
+    assert _find_widget(output, "test")["/Parent"]["/TU"] == "shared tooltip"
+    assert_widgets_match_output(obj)
+
+
+def test_tooltip_of_field_and_its_widget(
+    sample_template_with_full_key, assert_widgets_match_output
+):
+    # the widget of "Date mois" has no name, so its parent is the field
+    stream = _set_parent_entry(
+        sample_template_with_full_key, "Date mois", "/TU", "field tooltip"
+    )
+    obj = PdfWrapper(stream)
+    assert obj.widgets["Date mois"].tooltip == "field tooltip"
+
+    # a new tooltip goes to the field, which every widget of it reads
+    obj.widgets["Date mois"].tooltip = "new tooltip"
+    annot = _find_widget(obj.read(), "Date mois")
+    assert "/TU" not in annot
+    assert annot["/Parent"]["/TU"] == "new tooltip"
+    assert_widgets_match_output(obj)
+
+    # one on the widget, as earlier versions wrote it, is read first and changed
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for page in pdf.pages:
+            for each in page.get("/Annots", []):
+                if str(each.get("/Parent", {}).get("/T")) == "Date mois":
+                    each.TU = String("widget tooltip")
+        stream = _save(pdf)
+    obj = PdfWrapper(stream)
+    assert obj.widgets["Date mois"].tooltip == "widget tooltip"
+    obj.widgets["Date mois"].tooltip = "new tooltip"
+    annot = _find_widget(obj.read(), "Date mois")
+    assert annot["/TU"] == "new tooltip"
+    assert annot["/Parent"]["/TU"] == "field tooltip"
+
+
+def test_null_tooltip(template_stream):
+    # a null tooltip is absent
+    stream = _set_null_entries(template_stream, {"test": ["/TU"]})
+    assert PdfWrapper(stream).widgets["test"].tooltip is None
+
+
+def test_version_leaves_failing_comb_change_to_read(template_stream):
+    stream = _with_parent_cycle(template_stream, "test")
+    # below 1.5, the version getter previews queued comb changes
     obj = PdfWrapper(set_version(stream, get_version(stream), "1.4"))
     widget = obj.widgets["test"]
-    widget.tooltip = "own tooltip"
-    obj.read()
+    widget.comb = True
 
-    widget.tooltip = None
     assert obj.version == "1.4"
     assert widget.hooks_to_trigger
 
-    with pytest.raises(ValueError, match="Cannot remove /TU"):
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
         obj.read()
-    assert widget.tooltip == "own tooltip"
+    assert widget.comb is False
 
 
 def _save(pdf):
@@ -699,6 +777,54 @@ def _get_nested_entries(stream, entry="/DA"):
         "outer": inner["/Parent"].get_object().get(entry),
         "/AcroForm": reader.root_object["/AcroForm"].get(entry),
     }
+
+
+def _put_under_outer(stream, names, entries):
+    # makes "outer" the parent of the fields with these names, in this order,
+    # and moves the entries from them to "outer"
+    with Pdf.open(BytesIO(stream)) as pdf:
+        kids = [_get_field(pdf, name) for name in names]
+        outer = pdf.make_indirect(
+            Dictionary({"/T": String("outer"), "/Kids": Array(kids)})
+        )
+        for entry, value in entries.items():
+            for kid in kids:
+                if entry in kid:
+                    del kid[entry]
+            outer[entry] = _pdf_value(value)
+        for kid in kids:
+            kid.Parent = outer
+        pdf.Root.AcroForm.Fields = Array(
+            [each for each in pdf.Root.AcroForm.Fields if each not in kids] + [outer]
+        )
+
+        return _save(pdf)
+
+
+def _split_widgets(pdf, field, count=1):
+    # the widget merged with the field becomes kids without a name, in its
+    # place on its page, which take the field's entries from the field
+    widgets = []
+    for index in range(count):
+        widget = pdf.make_indirect(Dictionary(field))
+        for key in ("/T", "/FT", "/Ff", "/V", "/DA", "/Opt", "/Parent", "/Kids"):
+            if key in widget:
+                del widget[key]
+        widget.Parent = field
+        if index:
+            widget.Rect = Array([10, 10 + 30 * index, 100, 30 + 30 * index])
+        widgets.append(widget)
+    for key in ("/Type", "/Subtype", "/Rect", "/AP", "/MK", "/P", "/F"):
+        if key in field:
+            del field[key]
+    field.Kids = Array(widgets)
+    for page in pdf.pages:
+        annots = list(page.get("/Annots", []))
+        if field in annots:
+            index = annots.index(field)
+            page.Annots = Array(annots[:index] + widgets + annots[index + 1 :])
+
+    return widgets
 
 
 @pytest.mark.parametrize("use_full_widget_name", [False, True])
@@ -870,6 +996,14 @@ def test_change_inherited_dropdown_default_appearance(
             "/Arial 14 Tf 0 g 2 Tr [2 3] 0 d",
         ),
         ("/Arial 12 Tf [[1] /X] 0 d", "font", "/Helv", "/Helv 12 Tf [[1] /X] 0 d"),
+        # strings and dictionaries are kept as they are
+        (
+            "/Tx <</MCID 0>> BDC /Arial 12 Tf (a\\) Tj) Tj <41> Tj 0 g",
+            "font_color",
+            (0, 0, 1),
+            "/Tx <</MCID 0>> BDC /Arial 12 Tf (a\\) Tj) Tj <41> Tj 0 0 1 rg",
+        ),
+        ("/Arial 12 Tf [(x]) 2] TJ", "font_size", 9, "/Arial 9 Tf [(x]) 2] TJ"),
         # numbers are written without an exponent
         ("/Arial 12 Tf 0 g", "font_size", 1e-5, "/Arial 0.00001 Tf 0 g"),
         (
@@ -938,7 +1072,11 @@ def _with_parent_cycle(stream, name):
         ("0 g", (None, None, (0, 0, 0))),
         ("/Helv Tf 0 g", (None, None, (0, 0, 0))),
         ("/Helv 12 Tf 0 0 g", ("/Helv", 12, None)),
-        ("/Helv 12 Tf (x) Tj", (None, None, None)),
+        # strings and dictionaries are read as single operands
+        ("/Helv 12 Tf (x) Tj", ("/Helv", 12, None)),
+        ("(a \\) (b) c) Tj /F1 9 Tf <</MCID 0>> BDC 0 g", ("/F1", 9, (0, 0, 0))),
+        ("[(a]) <41>] TJ /F1 8.5 Tf (%) Tj 1 0 0 rg", ("/F1", 8.5, (1, 0, 0))),
+        ("/Helv 12 Tf {0} 0 g", (None, None, None)),
         (String(b"/Arial\x0012 Tf 0 g"), ("/Arial", 12, (0, 0, 0))),
         (12, (None, None, None)),
         # a name isn't a string, although it reads as one
@@ -985,7 +1123,16 @@ def test_default_appearance_in_any_decimal_context(template_stream):
         ("/Helv Tf 0 g", "font_size", 20, "needs a font and a font size"),
         ("12 Tf 0 g", "font", "/Helv", "needs a font and a font size"),
         ("/Helv /F1 Tf 0 g", "font_size", 20, "needs a font and a font size"),
-        ("/Helv 12 Tf (x) Tj", "font_size", 20, r"unexpected '\('"),
+        ("/Helv 12 Tf (x 0 g", "font_size", 20, r"unclosed '\('"),
+        # an escaped backslash doesn't escape the parenthesis after it
+        ("/Helv 12 Tf (x\\\\) y) Tj", "font_size", 20, r"unexpected '\)'"),
+        ("/Helv 12 Tf <</A 1 0 g", "font_size", 20, "unclosed '<<'"),
+        ("/Helv 12 Tf <</A [1>>] 0 g", "font_size", 20, "unexpected '>'"),
+        ("/Helv 12 Tf <4G> Tj 0 g", "font_size", 20, "unexpected '<'"),
+        ("/Helv 12 Tf {0} 0 g", "font_size", 20, r"unexpected '\{'"),
+        # a string operand isn't changed
+        ("(Helv) 12 Tf 0 g", "font", "/Cour", "needs a font and a font size"),
+        ("/Helv 12 Tf (0) g", "font_color", (1, 0, 0), "g operator .* needs 1 number"),
         ("/Helv 12 Tf 0", "font_color", (1, 0, 0), "ends with operands"),
         ("/Helv 12 Tf 0 0 g", "font_color", (1, 0, 0), "g operator .* needs 1 number"),
         ("/Helv 12 Tf /X 0 0 rg", "font_color", (1, 0, 0), "needs 3 numbers"),
@@ -1145,9 +1292,9 @@ def test_change_font_to_unknown_name(
 def test_change_font_keeps_other_fonts_read_from_pdf(
     template_stream, sample_font_stream, assert_widgets_match_output
 ):
-    # both fields write their font without a slash, as the name of a
-    # registered font
-    stream = _set_default_appearance(template_stream, "test", "Courier 12 Tf 0 g")
+    # "test_2" writes its font without a slash, as the name of a registered
+    # font, and "test" uses another font
+    stream = _set_default_appearance(template_stream, "test", "/Helv 12 Tf 0 g")
     stream = _set_default_appearance(stream, "test_2", "Courier 10 Tf 0 g")
     obj = PdfWrapper(stream).register_font("Courier", sample_font_stream)
     assert obj.widgets["test_2"].font == "Courier"
@@ -1161,6 +1308,108 @@ def test_change_font_keeps_other_fonts_read_from_pdf(
     assert _find_widget(result, "test")["/DA"] == f"{resource} 12 Tf 0 g"
     assert _find_widget(result, "test_2")["/DA"] == "Courier 10 Tf 0 g"
     assert obj.widgets["test_2"].font == "Courier"
+    assert_widgets_match_output(obj)
+
+
+def test_assign_back_font_read_without_slash(template_stream):
+    stream = _set_default_appearance(template_stream, "test", "Courier 12 Tf 0 g")
+    obj = PdfWrapper(stream)
+    assert obj.widgets["test"].font == "Courier"
+
+    # the font the field uses is kept as it is
+    obj.widgets["test"].font = obj.widgets["test"].font
+    assert _find_widget(obj.read(), "test")["/DA"] == "Courier 12 Tf 0 g"
+
+    # another field doesn't use it, so it is a font the PDF doesn't have
+    original = obj.read()
+    obj.widgets["test_2"].font = "Courier"
+    with pytest.raises(ValueError, match="'Courier' is not a registered font"):
+        obj.read()
+    assert obj.read() == original
+
+
+def test_assign_back_font_with_name_of_registered_font(
+    template_stream, sample_font_stream
+):
+    stream = _set_default_appearance(template_stream, "test", "Helvetica 12 Tf 0 g")
+    obj = PdfWrapper(stream).register_font("Helvetica", sample_font_stream)
+    assert obj.widgets["test"].font == "Helvetica"
+
+    # the font the field uses is kept, not replaced by the registered one
+    obj.widgets["test"].font = obj.widgets["test"].font
+    assert _find_widget(obj.read(), "test")["/DA"] == "Helvetica 12 Tf 0 g"
+
+    # another field gets the registered font
+    obj.widgets["test_2"].font = "Helvetica"
+    font = _find_widget(obj.read(), "test_2")["/DA"].split()[0]
+    assert font != "Helvetica"
+    assert PdfWrapper(obj.read()).widgets["test_2"].font == font
+
+
+def test_font_change_is_decided_per_annotation(
+    template_stream, assert_widgets_match_output
+):
+    # the PDF's /Helv font has the base font Helvetica
+    stream = _set_default_appearance(template_stream, "test", "Helvetica 12 Tf 0 g")
+
+    # a font changed and changed back is looked up again
+    obj = PdfWrapper(stream)
+    obj.widgets["test"].font = "/Arial"
+    obj.widgets["test"].font = "Helvetica"
+    assert _find_widget(obj.read(), "test")["/DA"] == "/Helv 12 Tf 0 g"
+    assert obj.widgets["test"].font == "/Helv"
+    assert_widgets_match_output(obj)
+
+    # only the widget that uses the font keeps it, and the field reads it from
+    # its last widget, as reopening does
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        widgets = _split_widgets(pdf, _get_field(pdf, "test"), 2)
+        for widget, default_appearance in zip(
+            widgets, ("/Arial 9 Tf 0 g", "Helvetica 12 Tf 0 g"), strict=True
+        ):
+            widget.DA = String(default_appearance)
+        obj = PdfWrapper(_save(pdf))
+    assert obj.widgets["test"].font == "Helvetica"
+    obj.widgets["test"].font = obj.widgets["test"].font
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        kids = _get_field(pdf, "test").Kids
+        assert [str(kid.DA) for kid in kids] == [
+            "/Helv 9 Tf 0 g",
+            "Helvetica 12 Tf 0 g",
+        ]
+    assert obj.widgets["test"].font == "Helvetica"
+    assert_widgets_match_output(obj)
+
+
+def test_failed_font_readback_commits_nothing(
+    template_stream, monkeypatch, assert_widgets_match_output
+):
+    obj = PdfWrapper(template_stream)
+    original = obj.read()
+    font = obj.widgets["test"].font
+    obj.widgets["test"].font = "/Helv"
+
+    # reading the changed fonts back fails once, after the hooks applied
+    real_build_widgets = wrapper.build_widgets
+    error = OSError("injected readback failure")
+
+    def fail(*_args):
+        monkeypatch.setattr(wrapper, "build_widgets", real_build_widgets)
+        raise error
+
+    monkeypatch.setattr(wrapper, "build_widgets", fail)
+    with pytest.raises(OSError, match="injected readback failure"):
+        obj.read()
+
+    # the PDF, the widget, and its queue are as before the change
+    assert obj.read() == original
+    assert obj.widgets["test"].font == font
+    assert not obj.widgets["test"].hooks_to_trigger
+
+    # and the change can be made again
+    obj.widgets["test"].font = "/Helv"
+    assert _find_widget(obj.read(), "test")["/DA"].startswith("/Helv ")
+    assert obj.widgets["test"].font == "/Helv"
     assert_widgets_match_output(obj)
 
 
@@ -1372,25 +1621,46 @@ def test_fill_readonly_with_parent_cycle(template_stream):
     assert obj.widgets["test_2"].readonly is False
 
 
-@pytest.mark.parametrize(
-    ("value", "error"),
-    [(String(""), ValueError), (Array([]), TypeError), (Dictionary({}), TypeError)],
-    ids=["string", "array", "dictionary"],
-)
-def test_reject_field_flags_that_are_not_a_number(template_stream, value, error):
+def test_change_flag_of_widget_that_is_its_own_parent(template_stream):
     with Pdf.open(BytesIO(template_stream)) as pdf:
-        _get_field(pdf, "test").Ff = value
+        field = _get_field(pdf, "test")
+        field.Parent = field
         stream = _save(pdf)
 
+    # the cycle is reached before any flags, which read as unset
+    obj = PdfWrapper(stream)
+    original = obj.read()
+    assert obj.widgets["test"].readonly is False
+    obj.widgets["test"].readonly = True
+
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
+        obj.read()
+    assert obj.widgets["test"].readonly is False
+    assert obj.read() == original
+
+
+@pytest.mark.parametrize("holder", ["test", "outer"])
+@pytest.mark.parametrize(
+    "value",
+    [String(""), Array([]), Dictionary({}), True],
+    ids=["string", "array", "dictionary", "boolean"],
+)
+def test_reject_field_flags_that_are_not_a_number(template_stream, value, holder):
+    # on the field, or on a field above its parent
+    stream = _nest_fields(template_stream, {holder: value}, "/Ff")
+    message = "Cannot read the field flags: /Ff .* is not a number"
+
     # they aren't read as no flags
-    with pytest.raises(error):
+    with pytest.raises(ValueError, match=message):
         PdfWrapper(stream)
 
     # nor overwritten by a change
     widget = _find_widget(stream, "test")
-    with pytest.raises(error):
+    chain = [widget, widget["/Parent"], widget["/Parent"]["/Parent"]]
+    before = [repr(each.get("/Ff")) for each in chain]
+    with pytest.raises(ValueError, match=message):
         update_field_readonly(widget, True)
-    assert _find_widget(stream, "test")["/Ff"] == widget["/Ff"]
+    assert [repr(each.get("/Ff")) for each in chain] == before
 
 
 def test_change_null_field_flags(template_stream, assert_widgets_match_output):
@@ -1568,6 +1838,32 @@ def test_field_type_with_parent_cycle(template_stream, shape, use_full_widget_na
     assert PdfWrapper(obj.read()).data["check"] is True
 
 
+@pytest.mark.parametrize(
+    ("default", "_type"),
+    [("/Yes", Checkbox), ("/Off", Checkbox), ("/0", Radio), (None, Radio)],
+)
+def test_inherited_default_value_tells_checkbox_from_radio(
+    template_with_radiobutton_stream, default, _type
+):
+    # "radio_1" sets neither the radio flag nor a default value, and its
+    # options don't repeat its field type, so the default it inherits decides
+    with Pdf.open(BytesIO(template_with_radiobutton_stream)) as pdf:
+        field = _get_field(pdf, "radio_1")
+        del field["/Ff"]
+        outer = pdf.make_indirect(
+            Dictionary({"/T": String("outer"), "/Kids": Array([field])})
+        )
+        if default is not None:
+            outer.DV = Name(default)
+        field.Parent = outer
+        pdf.Root.AcroForm.Fields = Array(
+            [each for each in pdf.Root.AcroForm.Fields if each != field] + [outer]
+        )
+        stream = _save(pdf)
+
+    assert type(PdfWrapper(stream).widgets["radio_1"]) is _type
+
+
 def _with_button_parent(stream, shape):
     # "check_2" gets the /Parent "check", a button field that doesn't list it
     with Pdf.open(BytesIO(stream)) as pdf:
@@ -1614,8 +1910,8 @@ def _with_button_parent(stream, shape):
             0,
             {"check": [["/Off", "/Yes"], ["/Yes", None]]},
         ),
-        # each sets the radio flag, so each is a radio group with one option,
-        # and filling one doesn't clear the other, a kid with a name
+        # "check" sets the radio flag, so it is a radio group with one option,
+        # and filling it doesn't clear "check_2", a kid with a name
         (
             "cycle",
             ("check", "check_2.check"),
@@ -1623,11 +1919,13 @@ def _with_button_parent(stream, shape):
             0,
             {"check": [["/Yes", "/Yes"]], "check_2": [["/Off", None]]},
         ),
+        # "check_2" doesn't inherit the flag from "check", a widget, so it is
+        # a checkbox
         (
             "cycle",
             ("check_2", "check.check_2"),
-            Radio,
-            0,
+            Checkbox,
+            True,
             {"check": [["/Off", None]], "check_2": [["/Yes", "/Yes"]]},
         ),
     ],
@@ -1747,6 +2045,39 @@ def test_fill_radio_option_its_field_does_not_list(
         )
         assert PdfWrapper(result).data["radio_1"] == index
         assert_widgets_match_output(obj)
+
+
+def test_field_below_widget_inherits_nothing_from_it(
+    template_stream, assert_widgets_match_output
+):
+    # "test_2" gets the /Parent "test", a text field merged with its widget
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        test, test_2 = _get_field(pdf, "test"), _get_field(pdf, "test_2")
+        test_2.Parent = test
+        test.Q = 2
+        test.MaxLen = 5
+        test.Ff = READ_ONLY
+        test.DA = String("/Cour 20 Tf 1 0 0 rg")
+        del test_2["/DA"]
+        pdf.Root.AcroForm.DA = String("/Helv 9 Tf 0 g")
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    test_2 = obj.widgets["test_2"]
+    # "test" is a field of its own, not one above "test_2"
+    assert (test_2.alignment, test_2.max_length, test_2.readonly) == (None, None, False)
+    assert (test_2.font, test_2.font_size, test_2.font_color) == ("/Helv", 9, (0, 0, 0))
+    assert obj.widgets["test"].alignment == 2
+
+    # changes go to "test_2", and "test" keeps its entries
+    test_2.alignment = 1
+    test_2.font_size = 12
+    output = obj.read()
+    assert _find_widget(output, "test_2")["/Q"] == 1
+    assert _find_widget(output, "test_2")["/DA"] == "/Helv 12 Tf 0 g"
+    assert _find_widget(output, "test")["/Q"] == 2
+    assert _find_widget(output, "test")["/DA"] == "/Cour 20 Tf 1 0 0 rg"
+    assert_widgets_match_output(obj)
 
 
 def _with_fields_above(stream, entries, holder):
@@ -1889,6 +2220,163 @@ def test_radio_group_value_inherited_from_field_above(
     assert radio["/Parent"].get_object()["/V"] == "/1"
     assert PdfWrapper(result, use_full_widget_name=use_full_widget_name).data[key] == 0
     assert_widgets_match_output(obj)
+
+
+def test_null_checkbox_value(template_stream):
+    # a null value is absent, so the checkbox isn't checked
+    stream = _set_null_entries(template_stream, {"check": ["/V"]})
+    assert PdfWrapper(stream).widgets["check"].value is None
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+@pytest.mark.parametrize(
+    ("values", "expected"),
+    [
+        ({"outer": "outer value"}, "outer value"),
+        ({"inner": "inner value", "outer": "outer value"}, "inner value"),
+        ({"test": "own value", "outer": "outer value"}, "own value"),
+    ],
+)
+def test_inherited_text_value(
+    template_stream, values, expected, use_full_widget_name, assert_widgets_match_output
+):
+    stream = _nest_fields(template_stream, values, "/V")
+    key, other = (
+        ("outer.inner.test", "outer.inner.test_2")
+        if use_full_widget_name
+        else ("test", "test_2")
+    )
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    assert obj.widgets[key].value == expected
+    assert obj.widgets[other].value == values.get("inner", values["outer"])
+
+    # a fill writes the field's own value, so the fields above keep theirs
+    obj.fill({key: "filled"})
+    entries = _get_nested_entries(obj.read(), "/V")
+    assert entries["test"] == "filled"
+    assert entries["inner"] == values.get("inner")
+    assert entries["outer"] == values["outer"]
+    assert obj.widgets[other].value == values.get("inner", values["outer"])
+    assert_widgets_match_output(obj)
+
+
+def test_inherited_text_value_null_and_cycle(template_stream):
+    # a null value is absent, so the value above it is read
+    stream = _set_null_entries(
+        _nest_fields(template_stream, {"outer": "outer value"}, "/V"), {"test": ["/V"]}
+    )
+    assert PdfWrapper(stream).widgets["test"].value == "outer value"
+
+    # a cycle before any value reads as no value
+    obj = PdfWrapper(_with_parent_cycle(template_stream, "test"))
+    assert obj.widgets["test"].value is None
+    obj.fill({"test": "foo"})
+    assert PdfWrapper(obj.read()).widgets["test"].value == "foo"
+
+
+@pytest.mark.parametrize(
+    ("entries", "expected"),
+    [
+        # the value is inherited, and the indices aren't
+        ({"/V": "bar"}, 1),
+        ({"/V": "foo", "/I": Array([1])}, 0),
+        ({"/V": "absent"}, None),
+    ],
+)
+def test_inherited_dropdown_value(
+    sample_template_with_dropdown, entries, expected, assert_widgets_match_output
+):
+    stream = _put_under_outer(sample_template_with_dropdown, ("dropdown_1",), entries)
+    obj = PdfWrapper(stream)
+    assert obj.widgets["dropdown_1"].value == expected
+
+    obj.fill({"dropdown_1": 2})
+    field = _find_widget(obj.read(), "dropdown_1")
+    assert field["/V"] == "foobar"
+    assert field["/Parent"]["/V"] == entries["/V"]
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(
+    ("holder", "expected"),
+    [
+        # the field's own options, then the ones it inherits
+        ("own", ("x", "y")),
+        ("outer", ("a", "b")),
+        # a kid widget inherits them through its field
+        ("kid", ("a", "b")),
+        # options an earlier version wrote on a kid widget are still read
+        ("widget", ("w",)),
+    ],
+)
+def test_inherited_dropdown_choices(
+    sample_template_with_dropdown, holder, expected, assert_widgets_match_output
+):
+    stream = _put_under_outer(
+        sample_template_with_dropdown, ("dropdown_1",), {"/Opt": Array(["a", "b"])}
+    )
+    with Pdf.open(BytesIO(stream)) as pdf:
+        field = _get_field(pdf, "outer").Kids[0]
+        if holder == "own":
+            field.Opt = Array(["x", "y"])
+        elif holder in ("kid", "widget"):
+            (widget,) = _split_widgets(pdf, field)
+            if holder == "widget":
+                widget.Opt = Array(["w"])
+        stream = _save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert obj.widgets["dropdown_1"].choices == expected
+
+    # new options replace the ones found on the widget or its field, or go
+    # to its field, so its other widgets get them, and "outer" keeps its own
+    obj.widgets["dropdown_1"].choices = ["new"]
+    annot = _find_widget(obj.read(), "dropdown_1")
+    if holder in ("own", "outer"):
+        # the field is merged with its widget
+        assert len(annot["/Opt"]) == 1
+        outer = annot["/Parent"]
+    else:
+        field, outer = annot["/Parent"], annot["/Parent"]["/Parent"]
+        changed, unchanged = (annot, field) if holder == "widget" else (field, annot)
+        assert len(changed["/Opt"]) == 1
+        assert "/Opt" not in unchanged
+    assert [str(each) for each in outer["/Opt"]] == ["a", "b"]
+    assert PdfWrapper(obj.read()).widgets["dropdown_1"].choices == ("new",)
+    assert_widgets_match_output(obj)
+
+
+def test_dropdown_choices_null_malformed_and_cycle(sample_template_with_dropdown):
+    stream = _put_under_outer(
+        sample_template_with_dropdown, ("dropdown_1",), {"/Opt": Array(["a", "b"])}
+    )
+    # a null /Opt is absent, so the options above it are read
+    null = _set_null_entries(stream, {"dropdown_1": ["/Opt"]})
+    assert PdfWrapper(null).widgets["dropdown_1"].choices == ("a", "b")
+
+    # options that aren't an array are no options
+    with Pdf.open(BytesIO(stream)) as pdf:
+        _get_field(pdf, "outer").Kids[0].Opt = Name("/foo")
+        malformed = _save(pdf)
+    assert PdfWrapper(malformed).widgets["dropdown_1"].choices == ()
+
+    # a cycle before any options reads as none, and changing them raises
+    with Pdf.open(BytesIO(sample_template_with_dropdown)) as pdf:
+        field = _get_field(pdf, "dropdown_1")
+        del field["/Opt"]
+        parent = pdf.make_indirect(Dictionary({"/Kids": Array([field])}))
+        parent.Parent = parent
+        field.Parent = parent
+        cycle = _save(pdf)
+    obj = PdfWrapper(cycle)
+    original = obj.read()
+    assert obj.widgets["dropdown_1"].choices == ()
+    obj.widgets["dropdown_1"].choices = ["new"]
+
+    with pytest.raises(ValueError, match="the /Parent chain of the field has a cycle"):
+        obj.read()
+    assert obj.widgets["dropdown_1"].choices == ()
+    assert obj.read() == original
 
 
 # a text field property, its entry, and values for it: the one chosen by the
@@ -2077,6 +2565,120 @@ def test_clear_alignment_below_unnamed_parent_cycle(template_stream):
 
     assert obj.widgets[""].alignment == 1
     assert obj.read() == original
+
+
+def _below_unnamed_field(stream, entry, value):
+    # "test" and "test_2" are kids of "outer", which sets the entry, and "test"
+    # loses its name and gets an unnamed field between it and "outer"
+    stream = _put_under_outer(stream, ("test", "test_2"), {entry: value})
+    with Pdf.open(BytesIO(stream)) as pdf:
+        outer = _get_field(pdf, "outer")
+        test = outer.Kids[0]
+        unnamed = pdf.make_indirect(
+            Dictionary({"/FT": Name.Tx, "/Kids": Array([test]), "/Parent": outer})
+        )
+        outer.Kids[0] = unnamed
+        test.Parent = unnamed
+        del test["/T"]
+
+        return _save(pdf)
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+@pytest.mark.parametrize(
+    ("name", "entry", "shared", "value"),
+    [
+        ("alignment", "/Q", 2, 1),
+        ("max_length", "/MaxLen", 5, 9),
+        ("readonly", "/Ff", 0, True),
+        ("font_size", "/DA", "/Cour 9 Tf 0 g", 20),
+    ],
+)
+def test_change_below_unnamed_field_keeps_shared_parent(
+    template_stream, name, entry, shared, value, use_full_widget_name
+):
+    stream = _below_unnamed_field(template_stream, entry, shared)
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    # without a name, the key is the unnamed field's, empty with full names
+    key, other = ("", "outer.test_2") if use_full_widget_name else (None, "test_2")
+    before = getattr(obj.widgets[other], name)
+
+    # the change goes to the unnamed field, the widget's own field
+    setattr(obj.widgets[key], name, value)
+    reopened = PdfWrapper(obj.read(), use_full_widget_name=use_full_widget_name)
+    assert getattr(reopened.widgets[key], name) == value
+    assert getattr(reopened.widgets[other], name) == before
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        outer = _get_field(pdf, "outer")
+        assert entry in outer.Kids[0]
+        assert outer[entry] == _pdf_value(shared)
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_clear_entry_below_unnamed_field(template_stream, use_full_widget_name):
+    key = "" if use_full_widget_name else None
+    # "outer", shared with "test_2", sets the alignment, which can't be removed
+    stream = _below_unnamed_field(template_stream, "/Q", 2)
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    original = obj.read()
+    obj.widgets[key].alignment = None
+    with pytest.raises(ValueError, match="Cannot remove /Q: a parent field"):
+        obj.read()
+    assert obj.read() == original
+
+    # the unnamed field's own tooltip is removed, and "outer" keeps its own
+    stream = _below_unnamed_field(template_stream, "/TU", "outer tooltip")
+    with Pdf.open(BytesIO(stream)) as pdf:
+        _get_field(pdf, "outer").Kids[0].TU = String("own tooltip")
+        stream = _save(pdf)
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    assert obj.widgets[key].tooltip == "own tooltip"
+    obj.widgets[key].tooltip = None
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        outer = _get_field(pdf, "outer")
+        assert "/TU" not in outer.Kids[0]
+        assert outer.TU == "outer tooltip"
+
+
+@pytest.mark.parametrize("use_full_widget_name", [False, True])
+def test_change_choices_below_unnamed_field(
+    sample_template_with_dropdown, use_full_widget_name
+):
+    # "dropdown_1" becomes an unnamed field with an unnamed widget, below
+    # "outer", whose options "sibling" shares
+    with Pdf.open(BytesIO(sample_template_with_dropdown)) as pdf:
+        field = _get_field(pdf, "dropdown_1")
+        sibling = pdf.make_indirect(Dictionary(field))
+        sibling.T = String("sibling")
+        del sibling["/Opt"]
+        pdf.pages[0].Annots.append(sibling)
+        _split_widgets(pdf, field)
+        del field["/T"]
+        del field["/Opt"]
+        outer = pdf.make_indirect(
+            Dictionary(
+                {
+                    "/T": String("outer"),
+                    "/Opt": Array(["shared"]),
+                    "/Kids": Array([field, sibling]),
+                }
+            )
+        )
+        field.Parent = outer
+        sibling.Parent = outer
+        pdf.Root.AcroForm.Fields = Array(
+            [each for each in pdf.Root.AcroForm.Fields if each != field] + [outer]
+        )
+        stream = _save(pdf)
+
+    key, other = ("", "outer.sibling") if use_full_widget_name else (None, "sibling")
+    obj = PdfWrapper(stream, use_full_widget_name=use_full_widget_name)
+    assert obj.widgets[key].choices == obj.widgets[other].choices == ("shared",)
+
+    obj.widgets[key].choices = ["new"]
+    reopened = PdfWrapper(obj.read(), use_full_widget_name=use_full_widget_name)
+    assert reopened.widgets[key].choices == ("new",)
+    assert reopened.widgets[other].choices == ("shared",)
 
 
 def _with_named_parent_cycle(stream, shape):
@@ -2627,6 +3229,29 @@ def test_rename_field_with_null_named_widget(template_stream):
     assert "test" not in obj.widgets
     assert obj.widgets["renamed"].value == "value"
     assert PdfWrapper(obj.read()).widgets["renamed"].value == "value"
+
+
+def test_remove_field_whose_kid_has_null_name(template_stream):
+    # "group", which no page shows, lists a kid with a null /T that doesn't
+    # name it as its /Parent; the kid is a widget of "group", not a field
+    writer = PdfWriter(BytesIO(template_stream))
+    kid = DictionaryObject({NameObject("/T"): NullObject()})
+    group = DictionaryObject(
+        {
+            NameObject("/T"): TextStringObject("group"),
+            NameObject("/Kids"): ArrayObject([kid]),
+        }
+    )
+    writer.root_object["/AcroForm"]["/Fields"].append(group)
+    with BytesIO() as f:
+        writer.write(f)
+        stream = f.getvalue()
+
+    assert "group" in get_field_keys(stream, False)
+    assert None not in get_field_keys(stream, False)
+    output = PdfWrapper(stream).remove_fields(["group"]).read()
+    fields = PdfReader(BytesIO(output)).root_object["/AcroForm"]["/Fields"]
+    assert "group" not in [str(each.get_object().get("/T")) for each in fields]
 
 
 @pytest.mark.parametrize(

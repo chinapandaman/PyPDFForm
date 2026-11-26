@@ -52,7 +52,14 @@ from .constants import (
     Widget,
 )
 from .patterns import get_widget_key
-from .utils import get_array, get_dictionary, get_entry, get_version, set_version
+from .utils import (
+    get_array,
+    get_dictionary,
+    get_entry,
+    get_version,
+    has_name,
+    set_version,
+)
 
 
 def remove_widgets_by_keys(
@@ -208,9 +215,9 @@ def _get_terminal_fields(acroform: DictionaryObject) -> List[DictionaryObject]:
     """
     Collects the terminal fields of an AcroForm field tree.
 
-    A terminal field has no `/Kids`, or only kids without a `/T`, which are its
-    widget annotations. Other fields are walked into, and each object is
-    visited once.
+    A terminal field has no `/Kids`, or only kids without a name, which are
+    its widget annotations; a null `/T` is absent, as `has_name` describes.
+    Other fields are walked into, and each object is visited once.
 
     Args:
         acroform (DictionaryObject): The AcroForm dictionary.
@@ -227,7 +234,8 @@ def _get_terminal_fields(acroform: DictionaryObject) -> List[DictionaryObject]:
             seen.add(id(field))
             kids = get_array(field, Kids)
             if any(
-                isinstance(kid.get_object(), DictionaryObject) and T in kid.get_object()
+                isinstance(kid.get_object(), DictionaryObject)
+                and has_name(kid.get_object())
                 for kid in kids
             ):
                 stack.extend(reversed(kids))

@@ -2719,6 +2719,60 @@ def test_pages_keep_actions_naming_copied_fields():
         assert [str(name) for name in pdf.pages[0].Annots[7].A.Fields] == names
 
 
+def _with_null_entry(stream, name, key):
+    # sets an entry of the field with this name (/T), at any level, to null
+    writer = PdfWriter(BytesIO(stream))
+    stack = list(writer.root_object["/AcroForm"]["/Fields"])
+    while stack:
+        field = stack.pop().get_object()
+        if field.get("/T") == name:
+            field[NameObject(key)] = NullObject()
+        stack.extend(field.get("/Kids", []))
+    with BytesIO() as f:
+        writer.write(f)
+        return f.getvalue()
+
+
+def test_pages_reject_target_below_field_with_null_name():
+    with Pdf.open(BytesIO(build_cross_page_form())) as pdf:
+        # "person" gets a null name, so its kid on page 2 is named "address"
+        pdf.pages[0].Annots[7].A = Dictionary(S=Name.Hide, T="address")
+        stream = BytesIO()
+        pdf.save(stream)
+
+    form = PdfWrapper(_with_null_entry(stream.getvalue(), "person", "/T"))
+    with pytest.raises(
+        ValueError,
+        match=r"Cannot copy page 1: /Annots\[7\]/A/T refers to content that is "
+        "not being copied",
+    ):
+        form.pages  # noqa: B018 # pylint: disable=W0104
+
+
+def test_pages_split_radio_field_with_null_options():
+    with Pdf.open(BytesIO(build_cross_page_form())) as pdf:
+        # "radio" inherits its options from "group", past its own null /Opt
+        radio = pdf.Root.AcroForm.Fields[3]
+        group = pdf.make_indirect(
+            Dictionary(T="group", Kids=[radio], Opt=["FIRST", "THIRD"])
+        )
+        radio.Parent = group
+        radio.Opt = ["placeholder"]
+        pdf.Root.AcroForm.Fields[3] = group
+        stream = BytesIO()
+        pdf.save(stream)
+
+    pages = PdfWrapper(_with_null_entry(stream.getvalue(), "radio", "/Opt")).pages
+    with Pdf.open(BytesIO(pages[0].read())) as pdf:
+        radio = next(
+            annot.Parent
+            for annot in pdf.pages[0].Annots
+            if annot.get("/Parent", {}).get("/T") == "radio"
+        )
+        assert len(radio.Kids) == 1
+        assert [str(each) for each in radio.Opt] == ["FIRST"]
+
+
 def get_values(field):
     return tuple(str(field[key]) if key in field else None for key in ("/V", "/DV"))
 

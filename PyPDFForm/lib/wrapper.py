@@ -61,7 +61,7 @@ from .font import (
     temporary_font_registration,
     validate_font,
 )
-from .hooks import trigger_widget_hooks
+from .hooks import FontChange, trigger_widget_hooks
 from .middleware.checkbox import Checkbox
 from .template import (
     build_widgets,
@@ -793,21 +793,22 @@ class PdfWrapper:
         """
         Reads the PDF stream, triggering widget hooks and updating fonts if necessary.
 
-        This internal method executes queued widget hooks. Fonts being changed to a
-        registered font or a font of the PDF are mapped from their user-facing names
-        to their internal PDF resource names before hooks are applied, both in the
-        hook queues and on the widgets. Applying hooks updates the wrapper's
-        stored stream and clears each widget's hook queue. If a hook raises, every
-        widget's queued hooks are discarded and their properties are restored to
-        their committed values, so the stream and widgets are unchanged and later
-        reads do not retry the failed updates.
+        This internal method executes queued widget hooks. A font being changed is
+        passed to its hook with the resource name of the registered font or font
+        of the PDF with its name, and each changed widget's font is then read back
+        from the changed PDF, as reopening it reads it. The changed PDF and those
+        fonts are committed together, which updates the wrapper's stored stream
+        and clears each widget's hook queue. If a hook or reading the fonts back
+        raises, every widget's queued hooks are discarded and their properties are
+        restored to their committed values, so the stream and widgets are
+        unchanged and later reads do not retry the failed updates.
 
         Returns:
             bytes: The raw PDF stream.
 
         Raises:
-            Exception: Any error raised while applying a hook is re-raised after
-                the queued updates are reverted.
+            Exception: Any error raised while applying a hook or reading the
+                fonts back is re-raised after the queued updates are reverted.
         """
 
         widgets_with_hooks = [
@@ -815,45 +816,95 @@ class PdfWrapper:
         ]
 
         if widgets_with_hooks:
-            # only fonts being changed are translated, in the queue and on the
-            # widget, so a font read from the PDF that has the name of a
-            # registered font, such as `Courier`, is left as it is
-            widgets_with_font_hooks = [
-                widget
-                for widget in widgets_with_hooks
-                if any(hook == FONT_HOOK for hook, _ in widget.hooks_to_trigger)
-            ]
-            if widgets_with_font_hooks:
-                available_fonts = self._ensure_available_fonts_loaded()
+            font_widgets = self._queue_font_changes(widgets_with_hooks)
 
-                def to_resource(font: Any) -> Any:
-                    # from `new_font` to `/F1`
-                    if font in available_fonts and font not in available_fonts.values():
-                        return available_fonts[font]
-                    return font
-
-                for widget in widgets_with_font_hooks:
-                    widget.hooks_to_trigger = [
-                        (hook, to_resource(value) if hook == FONT_HOOK else value)
-                        for hook, value in widget.hooks_to_trigger
-                    ]
-                    widget.__dict__["font"] = to_resource(widget.font)
-
+            # the changed PDF and the fonts read back from it are committed
+            # only when both succeed
             try:
-                self._stream = trigger_widget_hooks(
+                stream = trigger_widget_hooks(
                     self._stream,
                     self.widgets,
                     getattr(self, "use_full_widget_name"),
                 )
+                fonts = self._read_fonts(stream, font_widgets)
             except Exception:
                 for widget in self.widgets.values():
                     widget.revert_property_updates()
                 raise
 
+            self._stream = stream
             for widget in self.widgets.values():
+                if id(widget) in fonts:
+                    widget.__dict__["font"] = fonts[id(widget)]
                 widget.clear_property_updates()
 
         return self._stream
+
+    def _queue_font_changes(self, widgets: list) -> dict:
+        """
+        Passes each queued font change the resource name its font has.
+
+        Only fonts being changed are looked up, so a font read from the PDF that
+        has the name of a registered font, such as `Courier`, is left as it is.
+        Each font hook gets a `FontChange` with the assigned name and the
+        resource name of the registered font or font of the PDF with that name,
+        which the hook uses unless the annotation already uses the font.
+
+        Args:
+            widgets (list): The widgets with queued hooks.
+
+        Returns:
+            dict: The widgets with a queued font change, by `id`.
+        """
+        font_widgets = {
+            id(widget): widget
+            for widget in widgets
+            if any(hook == FONT_HOOK for hook, _ in widget.hooks_to_trigger)
+        }
+        if font_widgets:
+            available_fonts = self._ensure_available_fonts_loaded()
+            for widget in font_widgets.values():
+                widget.hooks_to_trigger = [
+                    (
+                        hook,
+                        FontChange(
+                            value,
+                            available_fonts[value]
+                            if value in available_fonts
+                            and value not in available_fonts.values()
+                            else None,
+                        )
+                        if hook == FONT_HOOK
+                        else value,
+                    )
+                    for hook, value in widget.hooks_to_trigger
+                ]
+
+        return font_widgets
+
+    def _read_fonts(self, stream: bytes, font_widgets: dict) -> dict:
+        """
+        Reads the fonts of widgets back from a changed PDF, as reopening it does.
+
+        Each annotation's font hook decides by its own `/DA`, so the widgets of
+        a field can get different fonts, and the key gives access to the last.
+
+        Args:
+            stream (bytes): The PDF with the font changes applied.
+            font_widgets (dict): The widgets whose font was changed, by `id`.
+
+        Returns:
+            dict: The font of each of those widgets, by `id`.
+        """
+        if not font_widgets:
+            return {}
+
+        written = build_widgets(stream, getattr(self, "use_full_widget_name"))
+        return {
+            id(widget): getattr(written[key], "font", widget.font)
+            for key, widget in self.widgets.items()
+            if id(widget) in font_widgets and key in written
+        }
 
     def write(self, dest: str | bytes | PathLike | BinaryIO) -> PdfWrapper:
         """
