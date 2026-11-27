@@ -2,17 +2,7 @@
 
 import pytest
 
-from PyPDFForm import BlankPage, Fields, PdfWrapper
-
-
-@pytest.fixture
-def full_name_forms():
-    return [
-        PdfWrapper(BlankPage(), use_full_widget_name=True)
-        .bulk_create_fields([Fields.TextField(name, 1, 100, 100)])
-        .fill({name: f"{name} value"})
-        for name in ("left", "right")
-    ]
+from PyPDFForm import PdfWrapper
 
 
 def test_init(sample_template_with_full_key):

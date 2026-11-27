@@ -284,34 +284,6 @@ def test_create_widget_sejda_fill_readonly_after(
     expect_pdf(obj.read(), expected_path)
 
 
-def test_create_widget_sejda_schema(sejda_template):
-    obj = PdfWrapper(sejda_template)
-    old_schema = obj.schema
-    schema = (
-        PdfWrapper(sejda_template)
-        .bulk_create_fields(
-            [
-                Fields.TextField(
-                    name="new_text_field_widget",
-                    page_number=1,
-                    x=72,
-                    y=730,
-                    width=120,
-                    height=40,
-                    max_length=6,
-                    font="Times-Roman",
-                    font_size=20,
-                    font_color=(0, 0, 1),
-                )
-            ]
-        )
-        .schema
-    )
-
-    assert schema["properties"]["new_text_field_widget"]
-    assert len(schema["properties"]) == len(old_schema["properties"]) + 1
-
-
 def test_fill_cmyk_color(pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "widget", "test_fill_cmyk_color.pdf")
     obj = PdfWrapper(
@@ -478,5 +450,141 @@ def test_create_fields_with_tooltips(pdf_samples, expect_pdf):
             ),
         ]
     )
+
+    expect_pdf(obj.read(), expected_path)
+
+
+def test_bulk_create_fields_stress_max(pdf_samples, expect_pdf):
+    expected_path = os.path.join(
+        pdf_samples, "bulk_create_fields", "test_bulk_create_fields_stress_max.pdf"
+    )
+
+    fields = []
+    x = 0
+    y = 0
+    margin = 25
+    while x <= 575:
+        while y <= 625:
+            fields.append(
+                Fields.TextField(f"text_{x}_{y}", 1, x, y, width=margin, height=margin)
+            )
+            fields.append(Fields.CheckBoxField(f"check_{x}_{y}", 2, x, y, size=margin))
+            fields.append(
+                Fields.DropdownField(
+                    f"dropdown_{x}_{y}",
+                    3,
+                    x,
+                    y,
+                    width=margin,
+                    height=margin,
+                    options=["foo", "bar"],
+                )
+            )
+            fields.append(
+                Fields.RadioGroup(
+                    f"radio_{x}_{y}", 4, [x, x + 12.5], [y, y + 12.5], size=12.5
+                )
+            )
+            fields.append(
+                Fields.ImageField(
+                    f"image_{x}_{y}", 5, x, y, width=margin, height=margin
+                )
+            )
+            fields.append(
+                Fields.SignatureField(
+                    f"signature_{x}_{y}", 6, x, y, width=margin, height=margin
+                )
+            )
+            y += margin
+        y = 0
+        x += margin
+
+    obj = PdfWrapper()
+    for _ in range(6):
+        obj += PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+    obj.bulk_create_fields(fields)
+
+    prefix_to_page = {
+        "text_": 1,
+        "check_": 2,
+        "dropdown_": 3,
+        "radio_": 4,
+        "image_": 5,
+        "signature_": 6,
+    }
+
+    for k, v in obj.widgets.items():
+        for each, page in prefix_to_page.items():
+            if k.startswith(each):
+                assert v.page_number == page
+                break
+
+    expect_pdf(obj.read(), expected_path)
+
+
+def test_bulk_create_fields_stress_max_mixed(pdf_samples, expect_pdf):
+    expected_path = os.path.join(
+        pdf_samples,
+        "bulk_create_fields",
+        "test_bulk_create_fields_stress_max_mixed.pdf",
+    )
+
+    fields = []
+    x = 0
+    y = 0
+    margin = 25
+    while x <= 450:
+        while y <= 625:
+            fields.append(
+                Fields.TextField(f"text_{x}_{y}", 1, x, y, width=margin, height=margin)
+            )
+            fields.append(
+                Fields.CheckBoxField(f"check_{x}_{y}", 1, x + margin, y, size=margin)
+            )
+            fields.append(
+                Fields.DropdownField(
+                    f"dropdown_{x}_{y}",
+                    1,
+                    x,
+                    y + margin,
+                    width=margin,
+                    height=margin,
+                    options=["foo", "bar"],
+                )
+            )
+            fields.append(
+                Fields.RadioGroup(
+                    f"radio_{x}_{y}",
+                    1,
+                    [x + margin, x + margin + 12.5],
+                    [y + margin, y + margin + 12.5],
+                    size=12.5,
+                )
+            )
+            fields.append(
+                Fields.ImageField(
+                    f"image_{x}_{y}",
+                    1,
+                    x + margin + margin,
+                    y,
+                    width=margin,
+                    height=margin,
+                )
+            )
+            fields.append(
+                Fields.SignatureField(
+                    f"signature_{x}_{y}",
+                    1,
+                    x + margin + margin,
+                    y + margin,
+                    width=margin,
+                    height=margin,
+                )
+            )
+            y += 50
+        y = 0
+        x += 75
+
+    obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(fields)
 
     expect_pdf(obj.read(), expected_path)

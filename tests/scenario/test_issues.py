@@ -11,7 +11,6 @@ from pypdf.generic import (
     IndirectObject,
     NameObject,
     NullObject,
-    NumberObject,
     TextStringObject,
 )
 
@@ -20,6 +19,13 @@ from PyPDFForm.lib.constants import TU, Parent, V
 from PyPDFForm.lib.middleware.radio import Radio
 from PyPDFForm.lib.patterns import get_widget_key
 from PyPDFForm.lib.template import get_widgets_by_page
+from tests.support.builders import (
+    drop_page,
+    drop_page_from_copies,
+    hide_target_form,
+    javascript,
+    set_flags,
+)
 
 
 def test_encrypted_edit_pdf_form(issue_pdf_directory, expect_pdf):
@@ -87,22 +93,13 @@ def test_ppf_2100_inline_parent(issue_pdf_directory, assert_catalog_fields):
     assert widget.raw_get(Parent) == reader.root_object["/AcroForm"]["/Fields"][0]
 
 
-def _javascript(script):
-    return DictionaryObject(
-        {
-            NameObject("/S"): NameObject("/JavaScript"),
-            NameObject("/JS"): TextStringObject(script),
-        }
-    )
-
-
 @pytest.mark.parametrize(
     ("inline_actions", "expected_format"),
     [
         (None, "format_copy();"),
         (
             lambda: DictionaryObject(
-                {NameObject("/F"): _javascript("format_inline();")}
+                {NameObject("/F"): javascript("format_inline();")}
             ),
             "format_inline();",
         ),
@@ -130,8 +127,8 @@ def test_ppf_2100_inline_parent_keeps_catalog_entries(
     copy = acroform["/Fields"][0]
     copy.get_object()[NameObject("/AA")] = DictionaryObject(
         {
-            NameObject("/C"): _javascript("calculate();"),
-            NameObject("/F"): _javascript("format_copy();"),
+            NameObject("/C"): javascript("calculate();"),
+            NameObject("/F"): javascript("format_copy();"),
         }
     )
     copy.get_object()[NameObject(TU)] = TextStringObject("tooltip")
@@ -188,51 +185,20 @@ def test_ppf_2100_inline_fields_keep_version(issue_pdf_directory):
     assert PdfWrapper(stream).version == "1.7"
 
 
-def _hide_target_form(issue_pdf_directory, edit=None):
-    # saved by PyPDFForm before PPF-2100: the widgets of "shared", one per page
-    # at the same rect, are inline, /Kids lists their copies in reverse page
-    # order, and a Hide action targets the page 2 copy
-    path = os.path.join(issue_pdf_directory, "PPF-2100-hide-target.pdf")
-    if edit is None:
-        return path
-
-    writer = PdfWriter(clone_from=path)
-    for page in writer.pages:
-        edit(page["/Annots"][0].get_object())
-    with BytesIO() as f:
-        writer.write(f)
-        return f.getvalue()
-
-
-def _set_flags(widget):
-    widget[NameObject("/F")] = NumberObject(4)
-
-
-def _drop_page(widget):
-    widget.pop("/P", None)
-
-
-def _drop_page_from_copies(widget):
-    # the page widgets and both copies are then equal
-    _drop_page(widget)
-    for kid in widget["/Parent"]["/Kids"]:
-        _drop_page(kid.get_object())
-
-
 @pytest.mark.parametrize(
-    "edit", [None, _set_flags, _drop_page], ids=["saved", "edited", "widgets"]
+    "edit", [None, set_flags, drop_page], ids=["saved", "edited", "widgets"]
 )
 def test_ppf_2100_hide_target(issue_pdf_directory, assert_catalog_fields, edit):
     # each page widget reuses the copy whose /P is its page, even if the widget
     # was changed or lost its own /P
-    stream = PdfWrapper(_hide_target_form(issue_pdf_directory, edit)).read()
+    stream = PdfWrapper(hide_target_form(issue_pdf_directory, edit)).read()
 
     assert_catalog_fields(stream, ["shared"])
     reader = PdfReader(BytesIO(stream))
     target = reader.root_object["/OpenAction"].raw_get("/T")
     assert list(reader.pages[1]["/Annots"]) == [target]
     assert target.get_object().raw_get("/P") == reader.pages[1].indirect_reference
-    if edit is _set_flags:
+    if edit is set_flags:
         assert target.get_object()["/F"] == 4
 
 
@@ -241,7 +207,7 @@ def test_ppf_2100_ambiguous_inline_widgets(issue_pdf_directory):
     # both copies, so neither copy is reused and the Hide action keeps its
     # target
     stream = PdfWrapper(
-        _hide_target_form(issue_pdf_directory, _drop_page_from_copies)
+        hide_target_form(issue_pdf_directory, drop_page_from_copies)
     ).read()
 
     reader = PdfReader(BytesIO(stream))
