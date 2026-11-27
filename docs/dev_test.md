@@ -83,7 +83,7 @@ An expected PDF only shows that the output hasn't changed, not that it is correc
 | `assert_valid_appearances(stream)` | Every `/AP` is a dictionary of appearance streams, and a widget with appearance states selects one of them or `/Off`. |
 | `assert_annotations_preserved(before, after, changed)` | Every annotation has the same content on the same page in the same order, except the widgets of the `changed` fields. |
 
-Use them when a change affects one of these properties. Not every PDF passes all of them. For example, filling a text field by default writes an `/AP` that isn't a dictionary.
+Use them when a change affects one of these properties. Not every PDF passes all of them. For example, `sample_template_sejda.pdf` lists fields whose widgets are on no page, so it fails `assert_page_ownership`.
 
 ### Sample PDFs
 

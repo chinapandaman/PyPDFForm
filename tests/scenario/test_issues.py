@@ -374,6 +374,15 @@ def test_xfa_to_regular_form(issue_pdf_directory, expect_pdf):
         }
     )
 
+    # widgets on each page share a short name but keep their own values,
+    # since the key isn't filled
+    barcodes = [
+        annot.get_object()[V]
+        for page in PdfReader(BytesIO(obj.read())).pages
+        for annot in page["/Annots"]
+        if annot.get_object().get("/T") == "PDF417BarCode1[0]"
+    ]
+    assert barcodes == [f"I-140|06/07/24|{page}" for page in range(1, 9)]
     expect_pdf(obj.read())
 
 

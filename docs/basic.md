@@ -70,7 +70,11 @@ This section covers the basic entry points for PyPDFForm's Python API and CLI, a
 
 ## Handling appearance streams
 
-For a PDF viewer to display content in a form field (especially text fields), it needs an "appearance stream." This stream defines how the field's content is rendered. PyPDFForm offers two ways to handle this.
+For a PDF viewer to display content in a form field (especially text fields), it needs an "appearance stream." This stream defines how the field's content is rendered.
+
+By default, when PyPDFForm fills a text field or dropdown, or changes how one looks, such as its font or alignment, it removes the field's old appearance stream, and the PDF viewer draws the field with its new value. A field is filled when its value is in the data or differs from the one in the PDF. Other fields keep their appearance streams.
+
+PyPDFForm offers two other ways to handle appearance streams.
 
 === "Library"
     Appearance stream handling options are set with keyword arguments when instantiating `PdfWrapper`.
@@ -94,11 +98,14 @@ For a PDF viewer to display content in a form field (especially text fields), it
         ```
 
         ???+ warning
-            PyPDFForm's internal appearance stream generation relies on [qpdf](https://github.com/qpdf/qpdf) and shares its limitations. Some known limitations include:
+            PyPDFForm's internal appearance stream generation relies on [qpdf](https://github.com/qpdf/qpdf) and shares its limitations. PyPDFForm leaves these text fields and dropdowns for the PDF viewer to draw:
 
-            * **Limited to ASCII text:** Only ASCII characters are supported.
-            * **Single-line text fields only:** It does not support multi-line text fields.
-            * **No text alignment handling:** Text alignment (left, center, right) is not preserved or applied.
+            * **Unsupported characters:** Text that the field's font can't encode, such as Korean. Depending on the font, only ASCII or Western European text, such as `café`, is supported.
+            * **Multiline and comb text fields.**
+            * **Center or right alignment.**
+            * **Export values:** A dropdown whose selected option has an export value other than its displayed text.
+
+            A field whose width or height changes loses the border and background of its old appearance stream.
 === "CLI"
     Appearance stream handling options are set with global options when running a command.
 
@@ -112,11 +119,14 @@ For a PDF viewer to display content in a form field (especially text fields), it
         ```
 
         ???+ warning
-            PyPDFForm's internal appearance stream generation relies on [qpdf](https://github.com/qpdf/qpdf) and shares its limitations. Some known limitations include:
+            PyPDFForm's internal appearance stream generation relies on [qpdf](https://github.com/qpdf/qpdf) and shares its limitations. PyPDFForm leaves these text fields and dropdowns for the PDF viewer to draw:
 
-            * **Limited to ASCII text:** Only ASCII characters are supported.
-            * **Single-line text fields only:** It does not support multi-line text fields.
-            * **No text alignment handling:** Text alignment (left, center, right) is not preserved or applied.
+            * **Unsupported characters:** Text that the field's font can't encode, such as Korean. Depending on the font, only ASCII or Western European text, such as `café`, is supported.
+            * **Multiline and comb text fields.**
+            * **Center or right alignment.**
+            * **Export values:** A dropdown whose selected option has an export value other than its displayed text.
+
+            A field whose width or height changes loses the border and background of its old appearance stream.
 
 ## Use full name for PDF form fields
 

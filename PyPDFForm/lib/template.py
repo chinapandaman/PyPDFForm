@@ -57,6 +57,7 @@ from .patterns import (
     get_text_value,
     get_widget_key,
     get_widget_type,
+    record_pdf_value,
     update_annotation_name,
 )
 from .utils import get_dictionary
@@ -314,11 +315,12 @@ def _process_widget(
 
         if type(_widget) is Checkbox:
             _widget.value = get_checkbox_value(widget)
-            # the value the PDF holds, which filling doesn't write again
-            _widget.__dict__["_pdf_value"] = _widget.value
 
         if isinstance(_widget, Dropdown):
             _populate_dropdown_properties(widget, _widget)
+
+        # the value the PDF holds, which filling doesn't write again
+        record_pdf_value(_widget)
 
         if isinstance(_widget, Radio):
             _handle_radio_widget(widget, key, _widget, radios)

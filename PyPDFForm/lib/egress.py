@@ -3,8 +3,9 @@
 Prepare PDF output and publish serialized PDFs to filesystem paths.
 
 Preparation helpers manage appearance streams and the /NeedAppearances flag,
-and add the fields of page widget annotations to the AcroForm `/Fields` array
-before `PdfWrapper.read()` returns the final bytes.
+add the fields of page widget annotations to the AcroForm `/Fields` array, and
+remove widget appearances that aren't appearance dictionaries before
+`PdfWrapper.read()` returns the final bytes.
 
 For path output, `write_path()` writes serialized bytes to a sibling temporary
 file and closes it before atomic replacement. It follows symlinks, preserves
@@ -17,23 +18,50 @@ from contextlib import suppress
 from functools import lru_cache
 from io import BytesIO
 from tempfile import NamedTemporaryFile
+from typing import Optional
 from warnings import catch_warnings, filterwarnings
 
 from pikepdf import Pdf
 from pypdf import PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject
+from pypdf.generic import ArrayObject, DictionaryObject, NameObject, StreamObject
 
 from .constants import (
+    AP,
+    COMB,
+    DR,
+    MULTILINE,
     XFA,
     AcroForm,
     Annots,
+    Encoding,
     Fields,
+    Font,
+    MacRomanEncoding,
+    N,
     Parent,
+    Q,
+    Resources,
     Subtype,
+    V,
     Widget,
+    WinAnsiEncoding,
 )
 from .field_tree import share_inline_objects
-from .utils import get_array, get_dictionary
+from .middleware.dropdown import Dropdown
+from .middleware.text import Text
+from .patterns import (
+    check_field_flag,
+    get_selected_option,
+    get_text_field_style,
+    get_widget_type,
+    parse_alignment,
+    resolve_inherited_entry,
+)
+from .utils import get_array, get_dictionary, get_entry
+
+# the Python codecs of the font encodings qpdf draws generated appearances in;
+# it draws in ASCII with a font of any other encoding
+GENERATOR_ENCODINGS = {WinAnsiEncoding: "cp1252", MacRomanEncoding: "mac_roman"}
 
 
 def write_path(dest: str | bytes | os.PathLike, content: bytes) -> None:
@@ -92,7 +120,9 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
     2. Setting the /NeedAppearances flag in the AcroForm dictionary, which asks
        PDF viewers to generate appearance streams for form fields.
     3. Optionally generating appearance streams explicitly using pikepdf if
-       `generate_appearance_streams` is True.
+       `generate_appearance_streams` is True, then removing the ones that
+       `_remove_unsupported_appearances` describes, so PDF viewers draw those
+       fields instead.
 
     The result is cached using lru_cache for performance.
 
@@ -128,7 +158,175 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
                 r.seek(0)
                 result = r.read()
 
+        result = _remove_unsupported_appearances(result)
+
     return result
+
+
+def _remove_unsupported_appearances(pdf: bytes) -> bytes:
+    """
+    Removes generated appearances that don't show what a field shows.
+
+    qpdf, which generates appearance streams for pikepdf, draws a text field
+    or dropdown on a single line, aligned left, with its value (`/V`) encoded
+    as its font's `/Encoding` names, `/WinAnsiEncoding` or
+    `/MacRomanEncoding`, or else as ASCII, writing `?` for a character the
+    encoding doesn't have. So a text field or dropdown loses its appearance
+    when it is centered or right aligned, including by the AcroForm's
+    default, when it is a multiline or comb text field, when its value has
+    such a character, or when it is a dropdown whose selected option, as
+    `get_selected_option` reads it, has another displayed text than its
+    value. PDF viewers then draw
+    it from its value, as after a fill without generated appearances.
+
+    Args:
+        pdf (bytes): The PDF with generated appearance streams.
+
+    Returns:
+        bytes: The PDF without those appearances, or `pdf` when no widget
+            loses one.
+    """
+    writer = PdfWriter(BytesIO(pdf))
+    acroform = get_dictionary(writer.root_object, AcroForm)
+    removed = False
+    for page in writer.pages:
+        for annot in get_array(page, Annots):
+            widget = annot.get_object()
+            if (
+                isinstance(widget, DictionaryObject)
+                and AP in widget
+                and not _can_generator_draw(widget, acroform)
+            ):
+                del widget[AP]
+                removed = True
+
+    if not removed:
+        return pdf
+
+    with BytesIO() as f:
+        writer.write(f)
+        f.seek(0)
+        return f.read()
+
+
+def _can_generator_draw(
+    widget: DictionaryObject, acroform: Optional[DictionaryObject]
+) -> bool:
+    """
+    Checks whether qpdf's appearance of a widget shows what the field shows.
+
+    Args:
+        widget (DictionaryObject): The widget annotation, with the appearance
+            qpdf generated.
+        acroform (Optional[DictionaryObject]): The AcroForm dictionary, or None.
+
+    Returns:
+        bool: False for a text field or dropdown that
+            `_remove_unsupported_appearances` removes the appearance of, and
+            True for any other widget.
+    """
+    _type = get_widget_type(widget)
+    if _type not in (Text, Dropdown):
+        return True
+
+    multiline_or_comb = _type is Text and (
+        check_field_flag(widget, MULTILINE) or check_field_flag(widget, COMB)
+    )
+    aligned = parse_alignment(_resolve_entry(widget, Q, acroform)) in (1, 2)
+    return not (multiline_or_comb or aligned) and _can_generator_draw_value(
+        widget, _type, acroform
+    )
+
+
+def _can_generator_draw_value(
+    widget: DictionaryObject, _type: type, acroform: Optional[DictionaryObject]
+) -> bool:
+    """
+    Checks whether qpdf draws the value of a text field or dropdown as shown.
+
+    Args:
+        widget (DictionaryObject): The widget annotation, with the appearance
+            qpdf generated.
+        _type (type): The widget's middleware type, `Text` or `Dropdown`.
+        acroform (Optional[DictionaryObject]): The AcroForm dictionary, or None.
+
+    Returns:
+        bool: False for a value with a character the font's encoding doesn't
+            have, or a dropdown whose selected option has another displayed
+            text than its value, and True otherwise.
+    """
+    value = _resolve_entry(widget, V, None)
+    if not isinstance(value, str):
+        return True
+    option = get_selected_option(widget) if _type is Dropdown else None
+    if option is not None and option.display != value:
+        return False
+    try:
+        value.encode(_get_generator_encoding(widget, acroform))
+    except UnicodeEncodeError:
+        return False
+
+    return True
+
+
+def _get_generator_encoding(
+    widget: DictionaryObject, acroform: Optional[DictionaryObject]
+) -> str:
+    """
+    Gets the Python codec of the encoding qpdf drew a widget's value in.
+
+    The font is the one the default appearance (`/DA`) names, looked up in
+    the generated appearance's resources and then in the AcroForm's default
+    resources (`/DR`), as qpdf looks it up.
+
+    Args:
+        widget (DictionaryObject): The widget annotation, with the appearance
+            qpdf generated.
+        acroform (Optional[DictionaryObject]): The AcroForm dictionary, or None.
+
+    Returns:
+        str: `cp1252` for `/WinAnsiEncoding`, `mac_roman` for
+            `/MacRomanEncoding`, and `ascii` otherwise.
+    """
+    font_name = get_text_field_style(widget, acroform).font
+    appearance = get_dictionary(widget, AP)
+    stream = get_dictionary(appearance, N) if appearance is not None else None
+    for owner, key in ((stream, Resources), (acroform, DR)):
+        resources = get_dictionary(owner, key) if owner is not None else None
+        fonts = get_dictionary(resources, Font) if resources is not None else None
+        for name, font in (fonts or {}).items():
+            # pypdf decodes escapes in names, which the /DA keeps
+            if NameObject(name).renumber().decode() == font_name:
+                font = font.get_object()
+                encoding = (
+                    get_entry(font, Encoding)
+                    if isinstance(font, DictionaryObject)
+                    else None
+                )
+                return GENERATOR_ENCODINGS.get(str(encoding), "ascii")
+
+    return "ascii"
+
+
+def _resolve_entry(
+    widget: DictionaryObject, key: str, acroform: Optional[DictionaryObject]
+) -> object:
+    """
+    Resolves an inheritable entry, reading a `/Parent` cycle as no entry.
+
+    Args:
+        widget (DictionaryObject): The widget annotation.
+        key (str): The entry to resolve, such as `/Q`.
+        acroform (Optional[DictionaryObject]): The AcroForm dictionary, or None
+            for an entry without a document default.
+
+    Returns:
+        object: The resolved value, or None.
+    """
+    try:
+        return resolve_inherited_entry(widget, key, acroform).value
+    except ValueError:
+        return None
 
 
 def sync_acroform_fields(pdf: bytes) -> bytes:
@@ -146,8 +344,12 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
     parents stored inline are first shared with the field tree by
     `share_inline_objects`, which `PdfWrapper` already applies when it loads a
     PDF. An AcroForm dictionary is created when necessary, and null entries
-    are treated as absent. When no page has a widget annotation, the original
-    PDF stream is returned unchanged to avoid an unnecessary rewrite.
+    are treated as absent. A page widget whose appearance (`/AP`) isn't an
+    appearance dictionary, such as the value string that earlier versions of
+    PyPDFForm wrote or a stream, loses it, so PDF viewers draw the widget
+    instead. When no page has
+    a widget annotation, the original PDF stream is returned unchanged to
+    avoid an unnecessary rewrite.
 
     Args:
         pdf (bytes): The PDF stream whose AcroForm fields should be updated.
@@ -170,6 +372,14 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
                 or widget.get(Subtype) != Widget
             ):
                 continue
+            appearance = widget[AP].get_object() if AP in widget else None
+            # pypdf's streams are dictionaries too
+            if appearance is not None and (
+                not isinstance(appearance, DictionaryObject)
+                or isinstance(appearance, StreamObject)
+            ):
+                # such as the value string that earlier versions wrote
+                del widget[AP]
             field_ref = _get_root_field_reference(annot)
             field_key = _field_reference_key(field_ref)
             if field_key not in seen_fields:

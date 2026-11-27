@@ -29,6 +29,7 @@ from .patterns import (
     get_widget_key,
     get_widget_type,
     is_pushbutton,
+    is_unchanged,
     update_checkbox_value,
     update_dropdown_value,
     update_radio_value,
@@ -107,29 +108,13 @@ def _is_filled_by(widget: WIDGET_TYPES, annot: DictionaryObject) -> bool:
     return _type is type(widget)
 
 
-def _is_unchanged_checkbox(widget: WIDGET_TYPES) -> bool:
-    """Checks whether a widget is a checkbox still at the value the PDF holds.
-
-    Args:
-        widget (WIDGET_TYPES): The widget to check.
-
-    Returns:
-        bool: True if the widget is a checkbox, not a radio group, whose value
-            is the one in `_pdf_value`, which `build_widgets` read and
-            `PdfWrapper.fill` updates after each fill.
-    """
-    return type(widget) is Checkbox and widget.value == widget.__dict__.get(
-        "_pdf_value"
-    )
-
-
 def update_widget(
     annot: DictionaryObject,
     widget: WIDGET_TYPES,
     key: str,
     radio_options: Dict[str, List[DictionaryObject]],
     images_to_draw_page: list,
-    need_appearances: bool,
+    generate_appearance_streams: bool,
     readonly: bool,
     write_value: bool = True,
 ) -> bool:
@@ -142,7 +127,9 @@ def update_widget(
     collects the options of each radio group in order, which `fill` selects
     once every page is visited, and
     prepares images or signatures for later drawing instead of writing image data directly
-    into the annotation.
+    into the annotation. A text field or dropdown it writes loses its
+    appearance unless appearance streams are generated, as
+    `remove_appearance` describes.
 
     Args:
         annot (DictionaryObject): The annotation object representing the widget in the PDF.
@@ -151,10 +138,12 @@ def update_widget(
         radio_options (Dict[str, List[DictionaryObject]]): The options of
             each radio group so far, by key, in the order they are filled.
         images_to_draw_page (list): A list to store image data for the current page.
-        need_appearances (bool): If True, skips updating appearance streams for certain fields.
+        generate_appearance_streams (bool): If True, keeps the appearance of
+            a text field or dropdown it writes, for the generator to draw in.
         readonly (bool): Whether to make the widget read-only to prevent further editing.
-        write_value (bool): False to leave the value unchanged, such as a
-            checkbox's that wasn't supplied. Defaults to True.
+        write_value (bool): False to leave the value unchanged, such as the
+            value of a checkbox, text field, or dropdown that wasn't supplied
+            and is still the one the PDF holds. Defaults to True.
 
     Returns:
         bool: True if an image or signature was prepared for drawing, False otherwise.
@@ -172,9 +161,9 @@ def update_widget(
     elif isinstance(widget, Radio):
         radio_options.setdefault(key, []).append(annot)
     elif isinstance(widget, Dropdown):
-        update_dropdown_value(annot, widget, need_appearances)
+        update_dropdown_value(annot, widget, generate_appearance_streams)
     elif isinstance(widget, Text):
-        update_text_value(annot, widget, need_appearances)
+        update_text_value(annot, widget, generate_appearance_streams)
 
     return any_image_to_draw
 
@@ -208,7 +197,7 @@ def handle_image_drawing(
 def fill(
     template: bytes,
     widgets: Dict[str, WIDGET_TYPES],
-    need_appearances: bool,
+    generate_appearance_streams: bool,
     use_full_widget_name: bool,
     supplied: Set[str],
     readonly: bool = False,
@@ -223,10 +212,10 @@ def fill(
     radio group fills only its own options. Once every page is visited, the
     option at a radio group's index is selected, and the other widgets of its
     field are cleared, including those that the field's `/Kids` doesn't list.
-    A checkbox whose value wasn't supplied, and is still the one the PDF
-    holds, isn't written again, since its key can name other widgets that
-    read differently, such as the widgets of a field with different on
-    states. It can set fields read-only during
+    A checkbox, text field, or dropdown whose value wasn't supplied, and is
+    still the one the PDF holds, isn't written again, as `is_unchanged`
+    describes. A text field or dropdown that is written loses its
+    appearance, unless appearance streams are generated. It can set fields read-only during
     filling, and when images or signatures are present it removes only the widgets
     whose images were prepared, including their field-tree entries, and returns a
     second stream with the image watermarks applied. All other annotations retain
@@ -236,9 +225,9 @@ def fill(
         template (bytes): The PDF template as bytes.
         widgets (Dict[str, WIDGET_TYPES]): A dictionary of widgets to fill, where the keys are the
                                             widget names and the values are the widget objects.
-        need_appearances (bool): If True, skips updating the appearance stream (AP) for
-            text and dropdown fields to maintain compatibility with Adobe Reader's
-            behavior for certain fields.
+        generate_appearance_streams (bool): If True, keeps the appearances of
+            the text fields and dropdowns it writes, for the generator to
+            draw in.
         use_full_widget_name (bool): Whether to use the full widget name when looking up widgets
                                       in the `widgets` dictionary.
         supplied (Set[str]): The keys whose values the caller supplied.
@@ -251,7 +240,7 @@ def fill(
     """
     out = PdfWriter(BytesIO(template))
     write_values = {
-        key: key in supplied or not _is_unchanged_checkbox(widget)
+        key: key in supplied or not is_unchanged(widget)
         for key, widget in widgets.items()
     }
 
@@ -281,7 +270,7 @@ def fill(
                 key,
                 radio_options,
                 images_to_draw[page_num + 1],
-                need_appearances,
+                generate_appearance_streams,
                 readonly,
                 write_values[key],
             )
