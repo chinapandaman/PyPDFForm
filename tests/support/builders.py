@@ -24,6 +24,25 @@ OTHER_DA = "/Helv 5 Tf 0 g"
 OTHER_FLAG = 1 << 22
 
 
+# Saving and looking up fields
+def save(pdf):
+    with BytesIO() as f:
+        pdf.save(f)
+        return f.getvalue()
+
+
+def get_field(pdf, name):
+    # a field of the AcroForm by its name
+    return next(
+        field for field in pdf.Root.AcroForm.Fields if str(field.get("/T")) == name
+    )
+
+
+def pdf_value(value):
+    return String(value) if isinstance(value, str) else value
+
+
+# Versions, catalogs, and actions
 def blank_pdf(version):
     writer = PdfWriter()
     writer.add_blank_page(width=360, height=360)
@@ -60,20 +79,81 @@ def pdf_with_catalog_version(header, catalog_version, squiggly_page=None):
         return f.getvalue()
 
 
-def without_default_appearance(stream, key):
-    # neither the field nor the AcroForm default sets a default appearance
-    writer = PdfWriter(BytesIO(stream))
-    del writer.root_object["/AcroForm"][NameObject(DA)]
-    for annot in writer.pages[0]["/Annots"]:
-        annot = annot.get_object()
-        if annot.get(T) == key:
-            del annot[NameObject(DA)]
+def with_catalog_extras(stream):
+    # adds fields PyPDFForm doesn't list in `widgets`: a field without a widget,
+    # an unsupported push button on page 1, a parent of test_2 and test_3, and a
+    # calculation order
+    with Pdf.open(BytesIO(stream)) as pdf:
+        acroform = pdf.Root.AcroForm
+        page = pdf.pages[0].obj
+        fields = {str(field.T): field for field in acroform.Fields}
+        group = pdf.make_indirect(
+            Dictionary(
+                T=String("group"), Kids=Array([fields["test_2"], fields["test_3"]])
+            )
+        )
+        for name in ("test_2", "test_3"):
+            fields[name].Parent = group
+        button = pdf.make_indirect(
+            Dictionary(
+                Type=Name.Annot,
+                Subtype=Name.Widget,
+                FT=Name.Btn,
+                Ff=1 << 16,
+                T=String("submit_button"),
+                Rect=Array([0, 0, 20, 20]),
+                P=page,
+            )
+        )
+        page.Annots.append(button)
+        hidden = pdf.make_indirect(
+            Dictionary(FT=Name.Tx, T=String("hidden_business_id"), V=String("12345"))
+        )
+        acroform.Fields = Array(
+            [
+                field
+                for name, field in fields.items()
+                if name not in ("test_2", "test_3")
+            ]
+            + [group, button, hidden]
+        )
+        acroform.CO = Array([fields["test"], fields["test_2"], hidden])
 
-    with BytesIO() as f:
-        writer.write(f)
-        return f.getvalue()
+        with BytesIO() as f:
+            pdf.save(f)
+            return f.getvalue()
 
 
+def with_actions(stream, add):
+    # calls add(pdf, fields) on the form from with_catalog_extras, where
+    # fields maps the fully qualified name of each field to it
+    with Pdf.open(BytesIO(with_catalog_extras(stream))) as pdf:
+        fields = {str(field.T): field for field in pdf.Root.AcroForm.Fields}
+        fields.update({f"group.{kid.T}": kid for kid in fields["group"].Kids})
+        add(pdf, fields)
+
+        with BytesIO() as f:
+            pdf.save(f)
+            return f.getvalue()
+
+
+def build_action(spec, test):
+    # spec is (label, following): "reset" names only test, any other label is
+    # the JavaScript of the action, and following is None, a spec, or a list
+    label, following = spec
+    action = (
+        Dictionary(S=Name.ResetForm, Fields=Array([test]))
+        if label == "reset"
+        else Dictionary(S=Name.JavaScript, JS=String(label))
+    )
+    if isinstance(following, list):
+        action.Next = Array([build_action(each, test) for each in following])
+    elif following is not None:
+        action.Next = build_action(following, test)
+    return action
+
+
+# Forms across pages
 def build_cross_page_form(page_action=True):
     pdf = Pdf.new()
     for _ in range(3):
@@ -213,132 +293,47 @@ def build_cross_page_form(page_action=True):
     return result.getvalue()
 
 
-def with_null_entry(stream, name, key):
-    # sets an entry of the field with this name (/T), at any level, to null
+# Default appearances
+def without_default_appearance(stream, key):
+    # neither the field nor the AcroForm default sets a default appearance
     writer = PdfWriter(BytesIO(stream))
-    stack = list(writer.root_object["/AcroForm"]["/Fields"])
-    while stack:
-        field = stack.pop().get_object()
-        if field.get("/T") == name:
-            field[NameObject(key)] = NullObject()
-        stack.extend(field.get("/Kids", []))
+    del writer.root_object["/AcroForm"][NameObject(DA)]
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get(T) == key:
+            del annot[NameObject(DA)]
+
     with BytesIO() as f:
         writer.write(f)
         return f.getvalue()
 
 
-def build_button_group(field_flags, default, on_index, value=None):
-    pdf = Pdf.new()
-    pdf.add_blank_page()
-    page = pdf.pages[0].obj
-    appearance = pdf.make_stream(
-        b"", Type=Name.XObject, Subtype=Name.Form, BBox=[0, 0, 10, 10]
-    )
-    field = pdf.make_indirect(
-        Dictionary(FT=Name.Btn, Ff=field_flags, T="group", DV=default)
-    )
-    if value is not None:
-        field.V = value
-    kids = [
-        pdf.make_indirect(
-            Dictionary(
-                Type=Name.Annot,
-                Subtype=Name.Widget,
-                Rect=[10 + 20 * index, 10, 20 + 20 * index, 20],
-                P=page,
-                Parent=field,
-                AP=Dictionary(N=Dictionary({state: appearance, "/Off": appearance})),
-                AS=Name(state) if index == on_index else Name.Off,
-            )
-        )
-        for index, state in enumerate(("/a", "/b"))
-    ]
-    field.Kids = kids
-    page.Annots = kids
-    pdf.Root.AcroForm = Dictionary(Fields=[field])
-    stream = BytesIO()
-    pdf.save(stream)
-    return stream.getvalue()
-
-
-def with_catalog_extras(stream):
-    # adds fields PyPDFForm doesn't list in `widgets`: a field without a widget,
-    # an unsupported push button on page 1, a parent of test_2 and test_3, and a
-    # calculation order
+def set_default_appearance(stream, name, default_appearance):
+    # sets the /DA of a field whose widget has its name
     with Pdf.open(BytesIO(stream)) as pdf:
-        acroform = pdf.Root.AcroForm
-        page = pdf.pages[0].obj
-        fields = {str(field.T): field for field in acroform.Fields}
-        group = pdf.make_indirect(
-            Dictionary(
-                T=String("group"), Kids=Array([fields["test_2"], fields["test_3"]])
-            )
-        )
-        for name in ("test_2", "test_3"):
-            fields[name].Parent = group
-        button = pdf.make_indirect(
-            Dictionary(
-                Type=Name.Annot,
-                Subtype=Name.Widget,
-                FT=Name.Btn,
-                Ff=1 << 16,
-                T=String("submit_button"),
-                Rect=Array([0, 0, 20, 20]),
-                P=page,
-            )
-        )
-        page.Annots.append(button)
-        hidden = pdf.make_indirect(
-            Dictionary(FT=Name.Tx, T=String("hidden_business_id"), V=String("12345"))
-        )
-        acroform.Fields = Array(
-            [
-                field
-                for name, field in fields.items()
-                if name not in ("test_2", "test_3")
-            ]
-            + [group, button, hidden]
-        )
-        acroform.CO = Array([fields["test"], fields["test_2"], hidden])
+        for field in pdf.Root.AcroForm.Fields:
+            if str(field.get("/T")) == name:
+                field.DA = pdf_value(default_appearance)
 
-        with BytesIO() as f:
-            pdf.save(f)
-            return f.getvalue()
+        return save(pdf)
 
 
-def with_actions(stream, add):
-    # calls add(pdf, fields) on the form from with_catalog_extras, where
-    # fields maps the fully qualified name of each field to it
-    with Pdf.open(BytesIO(with_catalog_extras(stream))) as pdf:
-        fields = {str(field.T): field for field in pdf.Root.AcroForm.Fields}
-        fields.update({f"group.{kid.T}": kid for kid in fields["group"].Kids})
-        add(pdf, fields)
+def with_null_default_appearance(stream, acroform_null):
+    # the field's /DA is null, and the AcroForm's too if acroform_null
+    writer = PdfWriter(BytesIO(stream))
+    if acroform_null:
+        writer.root_object["/AcroForm"][NameObject("/DA")] = NullObject()
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "test":
+            annot[NameObject("/DA")] = NullObject()
 
-        with BytesIO() as f:
-            pdf.save(f)
-            return f.getvalue()
-
-
-def build_action(spec, test):
-    # spec is (label, following): "reset" names only test, any other label is
-    # the JavaScript of the action, and following is None, a spec, or a list
-    label, following = spec
-    action = (
-        Dictionary(S=Name.ResetForm, Fields=Array([test]))
-        if label == "reset"
-        else Dictionary(S=Name.JavaScript, JS=String(label))
-    )
-    if isinstance(following, list):
-        action.Next = Array([build_action(each, test) for each in following])
-    elif following is not None:
-        action.Next = build_action(following, test)
-    return action
+    with BytesIO() as f:
+        writer.write(f)
+        return f.getvalue()
 
 
-def pdf_value(value):
-    return String(value) if isinstance(value, str) else value
-
-
+# Field trees and null entries
 def set_parent_entry(stream, name, entry, value):
     # sets the entry on the parent field of a widget without a name
     with Pdf.open(BytesIO(stream)) as pdf:
@@ -361,6 +356,20 @@ def set_null_entries(stream, entries):
             for key in entries.get(get_widget_key(annot, False), ()):
                 annot[NameObject(key)] = NullObject()
 
+    with BytesIO() as f:
+        writer.write(f)
+        return f.getvalue()
+
+
+def with_null_entry(stream, name, key):
+    # sets an entry of the field with this name (/T), at any level, to null
+    writer = PdfWriter(BytesIO(stream))
+    stack = list(writer.root_object["/AcroForm"]["/Fields"])
+    while stack:
+        field = stack.pop().get_object()
+        if field.get("/T") == name:
+            field[NameObject(key)] = NullObject()
+        stack.extend(field.get("/Kids", []))
     with BytesIO() as f:
         writer.write(f)
         return f.getvalue()
@@ -389,22 +398,6 @@ def group_fields(stream, names, entry, value):
         with BytesIO() as f:
             pdf.save(f)
             return f.getvalue()
-
-
-def save(pdf):
-    with BytesIO() as f:
-        pdf.save(f)
-        return f.getvalue()
-
-
-def set_default_appearance(stream, name, default_appearance):
-    # sets the /DA of a field whose widget has its name
-    with Pdf.open(BytesIO(stream)) as pdf:
-        for field in pdf.Root.AcroForm.Fields:
-            if str(field.get("/T")) == name:
-                field.DA = pdf_value(default_appearance)
-
-        return save(pdf)
 
 
 def nest_fields(stream, values, entry="/DA"):
@@ -490,63 +483,6 @@ def split_widgets(pdf, field, count=1):
     return widgets
 
 
-def with_parent_cycle(stream, name):
-    # the field's /DA is removed, and its parent is its own parent
-    with Pdf.open(BytesIO(stream)) as pdf:
-        for field in pdf.Root.AcroForm.Fields:
-            if str(field.get("/T")) == name:
-                parent = pdf.make_indirect(Dictionary({"/Kids": Array([field])}))
-                parent.Parent = parent
-                field.Parent = parent
-                del field["/DA"]
-
-        return save(pdf)
-
-
-def with_null_default_appearance(stream, acroform_null):
-    # the field's /DA is null, and the AcroForm's too if acroform_null
-    writer = PdfWriter(BytesIO(stream))
-    if acroform_null:
-        writer.root_object["/AcroForm"][NameObject("/DA")] = NullObject()
-    for annot in writer.pages[0]["/Annots"]:
-        annot = annot.get_object()
-        if annot.get("/T") == "test":
-            annot[NameObject("/DA")] = NullObject()
-
-    with BytesIO() as f:
-        writer.write(f)
-        return f.getvalue()
-
-
-def get_field(pdf, name):
-    # a field of the AcroForm by its name
-    return next(
-        field for field in pdf.Root.AcroForm.Fields if str(field.get("/T")) == name
-    )
-
-
-def set_on_state(widget, state="/Custom"):
-    # gives a checkbox widget an on state other than /Yes
-    widget.AP.N = Dictionary({"/Off": widget.AP.N.Off, state: widget.AP.N.Yes})
-
-
-def with_button_parent(stream, shape):
-    # "check_2" gets the /Parent "check", a button field that doesn't list it
-    with Pdf.open(BytesIO(stream)) as pdf:
-        check, check_2 = get_field(pdf, "check"), get_field(pdf, "check_2")
-        check_2.Parent = check
-        if shape == "unnamed":
-            del check_2.T
-        elif shape == "cycle":
-            # "check" also sets the radio flag, lists "check_2" as a kid, and
-            # has "check_2" as its own parent
-            check.Parent = check_2
-            check.Kids = Array([check_2])
-            check.Ff = RADIO
-
-        return save(pdf)
-
-
 def with_fields_above(stream, entries, holder):
     # the checked widget of "check", which keeps its name but has no /FT or /V
     # of its own, becomes a kid of the button field "group", with the entries,
@@ -595,6 +531,63 @@ def below_unnamed_field(stream, entry, value):
         outer.Kids[0] = unnamed
         test.Parent = unnamed
         del test["/T"]
+
+        return save(pdf)
+
+
+def with_null_named_widget(stream):
+    # "test" becomes a field with a value and a tooltip, and two widgets: the
+    # first without a name, and the second with a null one, which ISO 32000-1
+    # treats as absent
+    widget_entries = ("/Type", "/Subtype", "/Rect", "/F", "/P", "/MK")
+    with Pdf.open(BytesIO(stream)) as pdf:
+        field = get_field(pdf, "test")
+        kids = []
+        for name in (None, "null"):
+            widget = pdf.make_indirect(
+                Dictionary({key: field[key] for key in widget_entries if key in field})
+            )
+            widget.Parent = field
+            if name is not None:
+                # replaced with null below, since pikepdf removes null entries
+                widget.T = String(name)
+            kids.append(widget)
+        for key in widget_entries:
+            if key in field:
+                del field[key]
+        field.Kids = Array(kids)
+        field.V = String("value")
+        field.TU = String("tooltip")
+        page = pdf.pages[0]
+        page.Annots = Array(
+            [
+                kids[0] if annot.objgen == field.objgen else annot
+                for annot in page.Annots
+            ]
+            + [kids[1]]
+        )
+        stream = save(pdf)
+
+    writer = PdfWriter(BytesIO(stream))
+    for annot in writer.pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "null":
+            annot[NameObject("/T")] = NullObject()
+    with BytesIO() as f:
+        writer.write(f)
+        return f.getvalue()
+
+
+# Parent cycles
+def with_parent_cycle(stream, name):
+    # the field's /DA is removed, and its parent is its own parent
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for field in pdf.Root.AcroForm.Fields:
+            if str(field.get("/T")) == name:
+                parent = pdf.make_indirect(Dictionary({"/Kids": Array([field])}))
+                parent.Parent = parent
+                field.Parent = parent
+                del field["/DA"]
 
         return save(pdf)
 
@@ -707,47 +700,61 @@ def with_radio_group_in_parent_cycle(stream, group, other):
         return save(pdf)
 
 
-def with_null_named_widget(stream):
-    # "test" becomes a field with a value and a tooltip, and two widgets: the
-    # first without a name, and the second with a null one, which ISO 32000-1
-    # treats as absent
-    widget_entries = ("/Type", "/Subtype", "/Rect", "/F", "/P", "/MK")
-    with Pdf.open(BytesIO(stream)) as pdf:
-        field = get_field(pdf, "test")
-        kids = []
-        for name in (None, "null"):
-            widget = pdf.make_indirect(
-                Dictionary({key: field[key] for key in widget_entries if key in field})
+# Checkboxes and radio groups
+def build_button_group(field_flags, default, on_index, value=None):
+    pdf = Pdf.new()
+    pdf.add_blank_page()
+    page = pdf.pages[0].obj
+    appearance = pdf.make_stream(
+        b"", Type=Name.XObject, Subtype=Name.Form, BBox=[0, 0, 10, 10]
+    )
+    field = pdf.make_indirect(
+        Dictionary(FT=Name.Btn, Ff=field_flags, T="group", DV=default)
+    )
+    if value is not None:
+        field.V = value
+    kids = [
+        pdf.make_indirect(
+            Dictionary(
+                Type=Name.Annot,
+                Subtype=Name.Widget,
+                Rect=[10 + 20 * index, 10, 20 + 20 * index, 20],
+                P=page,
+                Parent=field,
+                AP=Dictionary(N=Dictionary({state: appearance, "/Off": appearance})),
+                AS=Name(state) if index == on_index else Name.Off,
             )
-            widget.Parent = field
-            if name is not None:
-                # replaced with null below, since pikepdf removes null entries
-                widget.T = String(name)
-            kids.append(widget)
-        for key in widget_entries:
-            if key in field:
-                del field[key]
-        field.Kids = Array(kids)
-        field.V = String("value")
-        field.TU = String("tooltip")
-        page = pdf.pages[0]
-        page.Annots = Array(
-            [
-                kids[0] if annot.objgen == field.objgen else annot
-                for annot in page.Annots
-            ]
-            + [kids[1]]
         )
-        stream = save(pdf)
+        for index, state in enumerate(("/a", "/b"))
+    ]
+    field.Kids = kids
+    page.Annots = kids
+    pdf.Root.AcroForm = Dictionary(Fields=[field])
+    stream = BytesIO()
+    pdf.save(stream)
+    return stream.getvalue()
 
-    writer = PdfWriter(BytesIO(stream))
-    for annot in writer.pages[0]["/Annots"]:
-        annot = annot.get_object()
-        if annot.get("/T") == "null":
-            annot[NameObject("/T")] = NullObject()
-    with BytesIO() as f:
-        writer.write(f)
-        return f.getvalue()
+
+def set_on_state(widget, state="/Custom"):
+    # gives a checkbox widget an on state other than /Yes
+    widget.AP.N = Dictionary({"/Off": widget.AP.N.Off, state: widget.AP.N.Yes})
+
+
+def with_button_parent(stream, shape):
+    # "check_2" gets the /Parent "check", a button field that doesn't list it
+    with Pdf.open(BytesIO(stream)) as pdf:
+        check, check_2 = get_field(pdf, "check"), get_field(pdf, "check_2")
+        check_2.Parent = check
+        if shape == "unnamed":
+            del check_2.T
+        elif shape == "cycle":
+            # "check" also sets the radio flag, lists "check_2" as a kid, and
+            # has "check_2" as its own parent
+            check.Parent = check_2
+            check.Kids = Array([check_2])
+            check.Ff = RADIO
+
+        return save(pdf)
 
 
 def checkbox_field(stream, states, value):
@@ -842,6 +849,7 @@ def name_checkbox_like_radio_group(
         return save(pdf)
 
 
+# CLI input files
 def write_invalid_json(tmp_path, content):
     data_path = tmp_path / "invalid.json"
     data_path.write_text(content, encoding="utf-8")
@@ -854,6 +862,7 @@ def write_invalid_yaml(tmp_path, content):
     return str(data_path)
 
 
+# Issue reproductions
 def javascript(script):
     return DictionaryObject(
         {
