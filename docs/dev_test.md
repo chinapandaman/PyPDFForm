@@ -46,15 +46,12 @@ A doc example or scenario test can compare with an expected PDF and also make ot
 
 ```python
 # tests/snapshots/test_prepare.py
-def test_create_text_multiline(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_text_align_multiline.pdf"
-    )
+def test_create_text_multiline(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).bulk_create_fields(
         [Fields.TextField(name="foo", page_number=1, x=100, y=100, multiline=True)]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 # tests/behavior/test_prepare.py
@@ -70,7 +67,7 @@ Test modules contain only tests and their parametrize tables, and don't import e
 
 * `builders.py` builds PDFs for tests, such as nested, inherited, and cyclic field trees, fields with null entries, and forms with actions.
 * `checks.py` reads and checks PDFs. It implements the [shared assertions](#shared-assertions).
-* `samples.py` has the fixtures for sample directories, template streams, and fill data. `tests/conftest.py` loads it for every test.
+* `samples.py` has the fixtures for [sample directories](#sample-pdfs), template streams, and fill data. `tests/conftest.py` loads it for every test.
 * `snapshots.py` implements [`expect_pdf`](#comparing-with-expected-pdfs).
 
 ### Shared assertions
@@ -88,9 +85,18 @@ An expected PDF only shows that the output hasn't changed, not that it is correc
 
 Use them when a change affects one of these properties. Not every PDF passes all of them. For example, filling a text field by default writes an `/AP` that isn't a dictionary.
 
+### Sample PDFs
+
+`pdf_samples` has two directories:
+
+* `input/` has the PDFs that tests read, such as templates. The `pdf_samples` fixture is this directory, for example `os.path.join(pdf_samples, "sample_template.pdf")`.
+* `expected/` has the expected PDFs, each named after the test that owns it: `expected/<directory under tests>/<module>/<test>.pdf`. For example, `tests/snapshots/test_fill.py::test_fill_sejda` owns `expected/snapshots/test_fill/test_fill_sejda.pdf`. A parametrized test adds its parameters, as in `<test>-<parameters>.pdf`. The `expected_pdfs` fixture is this directory.
+
+A test that reads another test's expected PDF, for example to inspect a filled form, joins its path to `expected_pdfs`. Add new inputs to `input/`. Expected PDFs are added by [regenerating](#expected-pdf-environment) them.
+
 ## Expected PDF environment
 
-Most tests compare the PDF they generate with an expected PDF in `pdf_samples`, using the [`expect_pdf`](#comparing-with-expected-pdfs) fixture. The bytes of a PDF can depend on:
+Most tests compare the PDF they generate with an expected PDF in `pdf_samples/expected/`, using the [`expect_pdf`](#comparing-with-expected-pdfs) fixture. The bytes of a PDF can depend on:
 
 * The zlib library Python uses. Expected PDFs are generated with standard zlib. Python builds that use zlib-ng, such as Python 3.14 and later on Windows, compress some streams to different bytes. `expect_pdf` compares the bytes only with standard zlib.
 * The installed versions of PyPDFForm's dependencies, and of the qpdf library pikepdf uses.
@@ -114,24 +120,30 @@ If byte comparisons fail without a code change, check these differences first. A
 A test compares its PDF with an expected PDF using the `expect_pdf` fixture, implemented in `tests/support/snapshots.py`:
 
 ```python
-def test_fill_font_color(sample_template_with_font_colors, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "test_fill_font_color.pdf")
+def test_fill_font_color(sample_template_with_font_colors, expect_pdf):
     obj = PdfWrapper(sample_template_with_font_colors).fill(...)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 ```
 
 On every platform, the fixture checks that both PDFs have the same version, trailer, and objects, comparing each stream after decompressing it. It ignores each stream's `/Length` and the trailer's `/ID`. Python's zlib compresses some of the streams PyPDFForm writes, such as embedded fonts, drawn text and images, and created fields, so the fixture compares the bytes only with standard zlib.
 
-The test owns this expected PDF. Regenerating expected PDFs writes the test's PDF to that path, even when the comparison fails or the expected PDF doesn't exist yet. Each expected PDF has one owner. Other tests compare with it using `same_as`, which never regenerates it:
+The test owns the expected PDF [named after it](#sample-pdfs), here `pdf_samples/expected/snapshots/test_fill/test_fill_font_color.pdf`. Regenerating expected PDFs writes the test's PDF to that path, even when the comparison fails or the expected PDF doesn't exist yet. Each test owns at most one expected PDF, and each expected PDF has one owner. Other tests, and the owner's other outputs, compare with it using `same_as`, which never regenerates it:
 
 ```python
+expected_path = os.path.join(
+    expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_text_check.pdf"
+)
 expect_pdf(actual, same_as=expected_path)
 ```
 
 When the comparison fails, regenerating expected PDFs into another directory writes the other test's PDF as `<expected PDF>.<test>.pdf`, so `make compare-pdf-diffs` shows it next to the expected PDF.
 
+The README's example compares with `docs/pdfs/sample_filled.pdf`, which the documentation links to, so it passes that path: `expect_pdf(filled.read(), expected_path)`. Only an expected PDF outside `pdf_samples` takes a path.
+
 If two tests own the same expected PDF, the run ends with exit status 4 and lists them, because the PDF written last would hide the other. Regenerating in place then leaves that expected PDF as it was, and also leaves `pdf_samples/fixture_environment.json` as it was if it wrote no other expected PDF.
+
+A run of the whole suite also checks that every file in `pdf_samples/expected/` has an owner. If one doesn't, for example because its test was renamed or removed, the run ends with exit status 4 and lists the file. The check runs only when every test passed and none was left out, so it doesn't run with paths other than `tests/`, or with `-k`, `-m`, `--deselect`, `--ignore`, `--lf`, or `--sw`. A test whose expected PDF is missing fails, unless expected PDFs are being regenerated.
 
 A PDF created from a blank page holds the time it was created. Pass `timestamped=True` for such a PDF. Its `/CreationDate` and `/ModDate` are then ignored, with standard zlib only the length of the bytes is compared, and it is regenerated only when the comparison fails.
 
@@ -171,17 +183,15 @@ To generate a test coverage report, run:
 Although each PyPDFForm test is unique, most follow a general paradigm.
 
 === "Library"
-    Most library tests in `tests/snapshots/` can be summarized in three steps:
+    Most library tests in `tests/snapshots/` can be summarized in two steps:
 
-    * Define the expected PDF file.
     * Use PyPDFForm to generate a PDF from the test inputs.
-    * Compare the PDF generated by the test with the expected PDF file.
+    * Compare the PDF generated by the test with the expected PDF file named after the test.
 
-    Consider this example test:
+    Consider this example test in `tests/snapshots/test_fill.py`:
 
     ```python
     def test_fill(pdf_samples, expect_pdf):
-        expected_path = os.path.join(pdf_samples, "sample_filled.pdf")
         obj = PdfWrapper(os.path.join(pdf_samples, "sample_template.pdf")).fill(
             {
                 "test": "test_1",
@@ -193,16 +203,10 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
             },
         )
 
-        expect_pdf(obj.read(), expected_path)
+        expect_pdf(obj.read())
     ```
 
-    The test starts by defining an expected PDF `sample_filled.pdf`:
-
-    ```python
-    expected_path = os.path.join(pdf_samples, "sample_filled.pdf")
-    ```
-
-    The test then fills `sample_template.pdf` with a data dictionary using `PdfWrapper`:
+    The test starts by filling `sample_template.pdf` from `pdf_samples/input/` with a data dictionary using `PdfWrapper`:
 
     ```python
     obj = PdfWrapper(os.path.join(pdf_samples, "sample_template.pdf")).fill(
@@ -217,10 +221,10 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
     )
     ```
 
-    Finally, the test compares the generated PDF with the expected PDF. `expect_pdf` also records the PDF, so that regenerating expected PDFs can write it:
+    Finally, the test compares the generated PDF with its expected PDF, `pdf_samples/expected/snapshots/test_fill/test_fill.pdf`. `expect_pdf` also records the PDF, so that regenerating expected PDFs can write it:
 
     ```python
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
     ```
 
 === "CLI"
@@ -235,8 +239,10 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
 
     ```python
     @pytest.mark.cli_test
-    def test_fill(pdf_samples, tmp_path, expect_pdf):
-        expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
+    def test_fill(pdf_samples, expected_pdfs, tmp_path, expect_pdf):
+        expected_path = os.path.join(
+            expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_text_check.pdf"
+        )
         input_path = os.path.join(tmp_path, "input.yaml")
         output_path = os.path.join(tmp_path, "output.pdf")
         fill_data = {
@@ -281,10 +287,12 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
     runner = CliRunner()
     ```
 
-    The test starts by defining the expected PDF path, the temporary YAML input path, and the output path:
+    The test starts by defining the expected PDF path, the temporary YAML input path, and the output path. The expected PDF belongs to the library test `tests/doc_examples/lib/test_fill.py::test_fill_text_check`:
 
     ```python
-    expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_text_check.pdf"
+    )
     input_path = os.path.join(tmp_path, "input.yaml")
     output_path = os.path.join(tmp_path, "output.pdf")
     ```
@@ -305,7 +313,7 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
         yaml.safe_dump(fill_data, f)
     ```
 
-    Next, the test invokes the `fill` command against `sample_template.pdf` from `pdf_samples`:
+    Next, the test invokes the `fill` command against `sample_template.pdf` from `pdf_samples/input/`:
 
     ```python
     result = runner.invoke(
