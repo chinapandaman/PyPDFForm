@@ -212,7 +212,11 @@ These items change a complete operation or helper. They fit within the current a
 
 ## Group 3 — Coordinated correctness and delivery work
 
-These items touch multiple representations or workflow stages. They should be split into small contributions with shared acceptance criteria, without postponing the urgent repairs until a broad redesign.
+**Completed with documented exceptions on November 27, 2026.** All ten items (E3-01 through E3-10) had landed on `master` by `4dd3ba56`. At that commit, `make test-all` passed all 1,263 tests with 100% configured package statement coverage, and `make linting` passed. The wheel and source distribution matched the commit. The installed wheel passed the library and CLI smoke tests on Python 3.11 and 3.15. [PPF-2156](https://github.com/chinapandaman/PyPDFForm/issues/2156)
+
+- **E3-05 — Button appearances.** Saving preserves certain malformed checkbox and radio button `/AP /N` arrays when converting them to dictionaries would change how the selection is read or filled.
+- **E3-06 — Dropdown choices.** Replacing a dropdown's choices and saving can leave the live wrapper reporting index `1` while reopening the PDF reports `None`. The saved field still holds the old export value. [PPF-2155](https://github.com/chinapandaman/PyPDFForm/issues/2155)
+- **E3-08 — Release checks.** Create Release runs tests and lint on the exact release commit before tagging it. A release created directly in GitHub triggers Deploy, which runs only the distribution checks before publication.
 
 ### E3-01 — Repair selected-page ownership and excluded-content retention
 
