@@ -166,6 +166,9 @@ def pytest_collection_modifyitems(items):
     for item in items:
         if "expect_pdf" in getattr(item, "fixturenames", ()):
             item.add_marker(pytest.mark.snapshot)
+    # pytest-xdist hands out tests in this order, so a slow test that came last
+    # would keep the run waiting after the other workers finish
+    items.sort(key=lambda item: item.get_closest_marker("slow") is None)
 
 
 def pytest_report_header(config):

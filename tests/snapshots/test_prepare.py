@@ -2,6 +2,8 @@
 
 import os
 
+import pytest
+
 from PyPDFForm import Fields, PdfWrapper
 
 
@@ -445,6 +447,7 @@ def test_create_fields_with_tooltips(pdf_samples, expect_pdf):
     expect_pdf(obj.read(), expected_path)
 
 
+@pytest.mark.slow
 def test_bulk_create_fields_stress_max(pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "bulk_create_fields", "test_bulk_create_fields_stress_max.pdf"

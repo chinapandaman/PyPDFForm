@@ -185,6 +185,7 @@ def test_create_radio_complex(template_stream):
     assert obj.schema["properties"]["radio"]["type"] == "integer"
 
 
+@pytest.mark.slow
 def test_bulk_create_fields_stress_max(pdf_samples):
     fields = []
     x = 0
