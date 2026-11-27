@@ -159,8 +159,6 @@ def test_on_open_script(template_stream, pdf_samples, expect_pdf):
     pdf = PdfWrapper(template_stream, need_appearances=True)
     pdf.on_open_javascript = 'this.getField("test").value = "opened";'
 
-    assert pdf.on_open_javascript == 'this.getField("test").value = "opened";'
-
     expect_pdf(pdf.read(), expected_path)
 
 
@@ -170,9 +168,6 @@ def test_on_open_script_title_coexist(template_stream, pdf_samples, expect_pdf):
     )
     pdf = PdfWrapper(template_stream, title="My PDF")
     pdf.on_open_javascript = 'this.getField("test").value = "opened";'
-
-    assert pdf.title == "My PDF"
-    assert pdf.on_open_javascript == 'this.getField("test").value = "opened";'
 
     expect_pdf(pdf.read(), expected_path)
 

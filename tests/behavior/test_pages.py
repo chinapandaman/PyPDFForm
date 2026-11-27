@@ -7,7 +7,7 @@ import pytest
 from pikepdf import Array, Dictionary, Name, Pdf, Stream, String
 from reportlab.pdfgen.canvas import Canvas
 
-from PyPDFForm import Fields, PdfArray, PdfWrapper, RawElements
+from PyPDFForm import BlankPage, Fields, PdfArray, PdfWrapper, RawElements
 from tests.support.builders import build_cross_page_form, with_null_entry
 from tests.support.checks import get_retained_content, get_values
 
@@ -20,6 +20,20 @@ def test_pages_inherit_attributes(template_stream):
 
     for page in obj.pages:
         assert getattr(page, "use_full_widget_name")
+
+
+def test_blank_page():
+    obj = PdfWrapper(BlankPage() * 1)
+
+    assert not obj.widgets
+    assert len(obj.pages) == 1
+
+
+def test_blank_page_custom_size_multiply():
+    obj = PdfWrapper(BlankPage(595.35, 841.995) * 3)
+
+    assert not obj.widgets
+    assert len(obj.pages) == 3
 
 
 def test_pages_exclude_other_page_content(assert_page_ownership):

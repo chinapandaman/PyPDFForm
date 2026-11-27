@@ -23,6 +23,15 @@ from PyPDFForm.lib.patterns import get_widget_key
 from tests.support.checks import assert_annotation_graph, page_contents
 
 
+def test_fill_readonly_then_editable(template_stream, data_dict):
+    obj = PdfWrapper(template_stream).fill(data_dict, readonly=True)
+    obj.widgets["test_2"].readonly = False
+    obj.widgets["check_3"].readonly = False
+
+    assert len(obj.read()) == len(obj.read())
+    assert obj.read() == obj.read()
+
+
 @pytest.mark.parametrize(
     ("filename", "name", "spanning_pages"),
     [

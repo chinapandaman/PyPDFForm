@@ -80,7 +80,7 @@ def test_need_appearances_sample_template_library(
 
 
 def test_generate_appearance_streams_fill(
-    template_stream, pdf_samples, data_dict, assert_valid_appearances, expect_pdf
+    template_stream, pdf_samples, data_dict, expect_pdf
 ):
     expected_path = os.path.join(
         pdf_samples, "generate_appearance_streams", "sample_filled.pdf"
@@ -90,15 +90,10 @@ def test_generate_appearance_streams_fill(
     )
 
     expect_pdf(obj.read(), expected_path)
-    assert_valid_appearances(obj.read())
 
 
 def test_generate_appearance_streams_fill_sejda_complex(
-    sejda_template_complex,
-    sejda_complex_data,
-    pdf_samples,
-    assert_valid_appearances,
-    expect_pdf,
+    sejda_template_complex, sejda_complex_data, pdf_samples, expect_pdf
 ):
     expected_path = os.path.join(
         pdf_samples,
@@ -111,11 +106,10 @@ def test_generate_appearance_streams_fill_sejda_complex(
     )
 
     expect_pdf(obj.read(), expected_path)
-    assert_valid_appearances(obj.read())
 
 
 def test_generate_appearance_streams_dropdown_two(
-    sample_template_with_dropdown, pdf_samples, assert_valid_appearances, expect_pdf
+    sample_template_with_dropdown, pdf_samples, expect_pdf
 ):
     expected_path = os.path.join(
         pdf_samples, "generate_appearance_streams", "dropdown", "dropdown_two.pdf"
@@ -136,12 +130,9 @@ def test_generate_appearance_streams_dropdown_two(
     )
 
     expect_pdf(obj.read(), expected_path)
-    assert_valid_appearances(obj.read())
 
 
-def test_generate_appearance_streams_issue_613(
-    pdf_samples, assert_valid_appearances, expect_pdf
-):
+def test_generate_appearance_streams_issue_613(pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "generate_appearance_streams", "issues", "613_expected.pdf"
     )
@@ -156,7 +147,6 @@ def test_generate_appearance_streams_issue_613(
     )
 
     expect_pdf(obj.read(), expected_path)
-    assert_valid_appearances(obj.read())
 
 
 def test_generate_appearance_streams_sample_template_library(

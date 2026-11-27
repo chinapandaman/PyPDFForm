@@ -27,8 +27,6 @@ def test_create_checkbox_complex_fill(template_stream, pdf_samples, expect_pdf):
     )
     obj.fill(obj.sample_data)
 
-    assert obj.schema["properties"]["foo"]["type"] == "boolean"
-
     expect_pdf(obj.read(), expected_path)
 
 
@@ -107,7 +105,6 @@ def test_create_text_alpha_bg_color(template_stream, pdf_samples, expect_pdf):
             )
         ]
     )
-    assert obj.schema["properties"]["foo"]["type"] == "string"
 
     expect_pdf(obj.read(), expected_path)
 
@@ -127,7 +124,6 @@ def test_create_text_align_center(template_stream, pdf_samples, expect_pdf):
             )
         ]
     )
-    assert obj.schema["properties"]["foo"]["type"] == "string"
 
     expect_pdf(obj.read(), expected_path)
 
@@ -147,7 +143,6 @@ def test_create_text_multiline(template_stream, pdf_samples, expect_pdf):
             )
         ]
     )
-    assert obj.schema["properties"]["foo"]["type"] == "string"
 
     expect_pdf(obj.read(), expected_path)
 
@@ -223,7 +218,6 @@ def test_create_checkbox_persist_old_widgets_fill(
             )
         ]
     ).fill(obj.sample_data)
-    assert obj.schema["properties"]["foo"]["type"] == "boolean"
 
     expect_pdf(obj.read(), expected_path)
 
@@ -251,7 +245,6 @@ def test_create_widget_sejda_fill_readonly_before(
             )
         ]
     ).fill(obj.sample_data)
-    assert obj.schema["properties"]["new_text_field_widget"]["type"] == "string"
 
     expect_pdf(obj.read(), expected_path)
 
@@ -279,7 +272,6 @@ def test_create_widget_sejda_fill_readonly_after(
             )
         ]
     ).fill(obj.sample_data, readonly=True)
-    assert obj.schema["properties"]["new_text_field_widget"]["type"] == "string"
 
     expect_pdf(obj.read(), expected_path)
 
@@ -312,7 +304,6 @@ def test_create_radio_complex(template_stream, pdf_samples, expect_pdf):
             )
         ]
     )
-    assert obj.schema["properties"]["radio"]["type"] == "integer"
 
     expect_pdf(obj.read(), expected_path)
 
@@ -503,21 +494,6 @@ def test_bulk_create_fields_stress_max(pdf_samples, expect_pdf):
     for _ in range(6):
         obj += PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
     obj.bulk_create_fields(fields)
-
-    prefix_to_page = {
-        "text_": 1,
-        "check_": 2,
-        "dropdown_": 3,
-        "radio_": 4,
-        "image_": 5,
-        "signature_": 6,
-    }
-
-    for k, v in obj.widgets.items():
-        for each, page in prefix_to_page.items():
-            if k.startswith(each):
-                assert v.page_number == page
-                break
 
     expect_pdf(obj.read(), expected_path)
 

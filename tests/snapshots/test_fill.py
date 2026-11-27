@@ -13,9 +13,6 @@ def test_fill_readonly_then_editable(
     obj.widgets["test_2"].readonly = False
     obj.widgets["check_3"].readonly = False
 
-    assert len(obj.read()) == len(obj.read())
-    assert obj.read() == obj.read()
-
     expect_pdf(obj.read(), expected_path)
 
 
