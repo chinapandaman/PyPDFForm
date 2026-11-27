@@ -348,6 +348,23 @@ class PdfWrapper:
 
         self.widgets = new_widgets
 
+    @property
+    def _generates_appearances(self) -> bool:
+        """
+        Whether `read()` generates appearance streams.
+
+        It does only when both `need_appearances` and
+        `generate_appearance_streams` are enabled, so filling and property
+        changes keep the appearances that the generator draws in only then.
+
+        Returns:
+            bool: True if appearance streams are generated.
+        """
+        return bool(
+            getattr(self, "need_appearances")
+            and getattr(self, "generate_appearance_streams")
+        )
+
     @contextmanager
     def _restore_on_failure(self) -> Iterator[None]:
         """
@@ -664,12 +681,15 @@ class PdfWrapper:
         2. If `need_appearances` is enabled, it handles appearance streams and the
            `/NeedAppearances` flag, which may include removing XFA and explicitly
            generating appearance streams. Fonts registered while it was disabled
-           first get the font metrics that appearance generation uses.
+           first get the font metrics that appearance generation uses, and
+           appearance streams are generated after step 3, since the generator
+           draws only the fields that the AcroForm lists.
         3. Adds the fields of page widget annotations to the AcroForm `/Fields`
            array, keeping every field already listed, including fields without
            a widget on a page, and removes page widget appearances that aren't
-           dictionaries, such as the value strings earlier versions wrote. The
-           stream is left unchanged when no page has a widget annotation.
+           appearance dictionaries, such as the value strings earlier versions
+           wrote. The stream is left unchanged when no page has a widget
+           annotation.
         4. Writes the wrapper's PDF version into the header after egress
            processing, since PDF writers may emit their own default version.
            The version read from the template or set by `change_version` is
@@ -694,7 +714,10 @@ class PdfWrapper:
 
         These are the appearance handling for `need_appearances`, the update
         of the AcroForm `/Fields` array, and the removal of widget appearances
-        that aren't dictionaries. The wrapper is not changed.
+        that aren't appearance dictionaries. The fields are also listed before
+        appearance streams are generated, since the generator draws only the
+        fields that the AcroForm lists, such as created fields. The wrapper is
+        not changed.
 
         Args:
             stream (bytes): The PDF stream, such as the wrapper's stored stream.
@@ -710,6 +733,8 @@ class PdfWrapper:
                 result = add_font_metrics(
                     result, tuple(self._fonts_without_metrics.items())
                 )
+            if self._generates_appearances:
+                result = sync_acroform_fields(result)
             result = appearance_streams_handler(
                 result, getattr(self, "generate_appearance_streams")
             )  # cached
@@ -828,7 +853,7 @@ class PdfWrapper:
                     self._stream,
                     self.widgets,
                     getattr(self, "use_full_widget_name"),
-                    getattr(self, "generate_appearance_streams"),
+                    self._generates_appearances,
                 )
                 fonts = self._read_fonts(stream, font_widgets)
             except Exception:
@@ -1006,9 +1031,11 @@ class PdfWrapper:
         A checkbox, text field, or dropdown whose value isn't supplied, and is
         still the one the PDF holds, as read or last filled, isn't written
         again, so it keeps its appearance. A text field or dropdown that is
-        written loses its appearance, so PDF viewers draw the new value. With
-        `generate_appearance_streams`, it keeps its appearance instead, which
-        the generator draws the new value in. Filling delegates to the
+        written loses its appearance, so PDF viewers draw the new value. When
+        `read()` generates appearance streams, which needs both
+        `need_appearances` and `generate_appearance_streams`, it keeps its
+        appearance instead, which the generator draws the new value in.
+        Filling delegates to the
         lower-level filler, which draws image/signature values onto the page
         and removes only the consumed widgets. Other annotations and unfilled
         signature/image fields are preserved. After image drawing, the widget cache
@@ -1058,9 +1085,7 @@ class PdfWrapper:
             filled_stream, image_drawn_stream = fill(
                 self._read(),
                 self.widgets,
-                generate_appearance_streams=getattr(
-                    self, "generate_appearance_streams"
-                ),
+                generate_appearance_streams=self._generates_appearances,
                 use_full_widget_name=getattr(self, "use_full_widget_name"),
                 supplied=set(data),
                 readonly=readonly,

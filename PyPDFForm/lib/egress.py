@@ -4,8 +4,8 @@ Prepare PDF output and publish serialized PDFs to filesystem paths.
 
 Preparation helpers manage appearance streams and the /NeedAppearances flag,
 add the fields of page widget annotations to the AcroForm `/Fields` array, and
-remove widget appearances that aren't dictionaries before `PdfWrapper.read()`
-returns the final bytes.
+remove widget appearances that aren't appearance dictionaries before
+`PdfWrapper.read()` returns the final bytes.
 
 For path output, `write_path()` writes serialized bytes to a sibling temporary
 file and closes it before atomic replacement. It follows symlinks, preserves
@@ -23,7 +23,7 @@ from warnings import catch_warnings, filterwarnings
 
 from pikepdf import Pdf
 from pypdf import PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject
+from pypdf.generic import ArrayObject, DictionaryObject, NameObject, StreamObject
 
 from .constants import (
     AP,
@@ -52,7 +52,7 @@ from .middleware.dropdown import Dropdown
 from .middleware.text import Text
 from .patterns import (
     check_field_flag,
-    get_dropdown_choices,
+    get_selected_option,
     get_widget_type,
     parse_alignment,
     resolve_inherited_entry,
@@ -174,8 +174,9 @@ def remove_unsupported_appearances(pdf: bytes) -> bytes:
     encoding doesn't have. So a text field or dropdown loses its appearance
     when it is centered or right aligned, including by the AcroForm's
     default, when it is a multiline or comb text field, when its value has
-    such a character, or when it is a dropdown whose value is the export
-    value of an option with another displayed text. PDF viewers then draw
+    such a character, or when it is a dropdown whose selected option, as
+    `get_selected_option` reads it, has another displayed text than its
+    value. PDF viewers then draw
     it from its value, as after a fill without generated appearances.
 
     Args:
@@ -251,16 +252,14 @@ def _can_generator_draw_value(
 
     Returns:
         bool: False for a value with a character the font's encoding doesn't
-            have, or a dropdown value that is the export value of an option
-            with another displayed text, and True otherwise.
+            have, or a dropdown whose selected option has another displayed
+            text than its value, and True otherwise.
     """
     value = _resolve_entry(widget, V, None)
     if not isinstance(value, str):
         return True
-    if _type is Dropdown and any(
-        isinstance(choice, tuple) and choice[1] == value
-        for choice in get_dropdown_choices(widget)
-    ):
+    option = get_selected_option(widget) if _type is Dropdown else None
+    if option is not None and option.display != value:
         return False
     try:
         value.encode(_get_generator_encoding(widget, acroform))
@@ -345,9 +344,10 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
     parents stored inline are first shared with the field tree by
     `share_inline_objects`, which `PdfWrapper` already applies when it loads a
     PDF. An AcroForm dictionary is created when necessary, and null entries
-    are treated as absent. A page widget whose appearance (`/AP`) isn't a
-    dictionary, such as the value string that earlier versions of PyPDFForm
-    wrote, loses it, so PDF viewers draw the widget instead. When no page has
+    are treated as absent. A page widget whose appearance (`/AP`) isn't an
+    appearance dictionary, such as the value string that earlier versions of
+    PyPDFForm wrote or a stream, loses it, so PDF viewers draw the widget
+    instead. When no page has
     a widget annotation, the original PDF stream is returned unchanged to
     avoid an unnecessary rewrite.
 
@@ -372,8 +372,11 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
                 or widget.get(Subtype) != Widget
             ):
                 continue
-            if AP in widget and not isinstance(
-                widget[AP].get_object(), DictionaryObject
+            appearance = widget[AP].get_object() if AP in widget else None
+            # pypdf's streams are dictionaries too
+            if appearance is not None and (
+                not isinstance(appearance, DictionaryObject)
+                or isinstance(appearance, StreamObject)
             ):
                 # such as the value string that earlier versions wrote
                 del widget[AP]

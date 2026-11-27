@@ -250,23 +250,18 @@ DEFAULT_APPEARANCE_HOOKS = frozenset(
         "update_text_field_font_color",
     }
 )
-# widget property hooks that change a widget's size; a generated appearance
-# would keep the size of the appearance it is drawn in, so it is removed first
-RESIZE_HOOKS = frozenset({"update_field_width", "update_field_height"})
-# widget property hooks that change how a text field or dropdown is drawn, so
-# its appearance (/AP) no longer matches and is removed
-APPEARANCE_HOOKS = (
-    DEFAULT_APPEARANCE_HOOKS
-    | RESIZE_HOOKS
-    | frozenset(
-        {
-            "update_text_field_alignment",
-            "update_text_field_multiline",
-            "update_text_field_comb",
-            "update_text_field_max_length",
-            "update_dropdown_choices",
-        }
-    )
+# widget property hooks that can change how a text field or dropdown is drawn,
+# so its appearance (/AP) no longer matches and is removed when they do
+APPEARANCE_HOOKS = DEFAULT_APPEARANCE_HOOKS | frozenset(
+    {
+        "update_text_field_alignment",
+        "update_text_field_multiline",
+        "update_text_field_comb",
+        "update_text_field_max_length",
+        "update_dropdown_choices",
+        "update_field_width",
+        "update_field_height",
+    }
 )
 # no feature above needs a newer version, so newer documents are never raised
 NEWEST_FEATURE_VERSION = max(

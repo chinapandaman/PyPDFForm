@@ -244,8 +244,37 @@ def test_resize_keeps_checkbox_appearance(template_stream, assert_valid_appearan
 
 
 @pytest.mark.parametrize(
+    "attribute",
+    [
+        "font",
+        "font_size",
+        "font_color",
+        "alignment",
+        "multiline",
+        "comb",
+        "max_length",
+        "width",
+        "height",
+    ],
+)
+def test_restyle_to_same_value_keeps_appearance(pdf_samples, attribute):
+    form = PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf"))
+    widget = form.widgets["test"]
+    setattr(widget, attribute, getattr(widget, attribute))
+
+    # what the appearance draws didn't change
+    assert widget.hooks_to_trigger
+    assert "/AP" in find_widget(form.read(), "test")
+
+
+@pytest.mark.parametrize(
     ("attribute", "value", "decorated"),
-    [(None, None, True), ("font_size", 20, True), ("width", 200, False)],
+    [
+        (None, None, True),
+        ("font_size", 20, True),
+        ("width", 120, True),
+        ("width", 200, False),
+    ],
 )
 def test_restyle_with_generated_appearances(
     template_stream, attribute, value, decorated, assert_valid_appearances

@@ -316,6 +316,28 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         widget.value = index
 
 
+def get_selected_option(annot: DictionaryObject) -> Optional[DropdownOption]:
+    """
+    Gets the option that a dropdown annotation selects.
+
+    The options and the selection are read as `build_widgets` reads them,
+    with `get_dropdown_choices` and `get_dropdown_value`, so `/I` chooses
+    among options with the same value.
+
+    Args:
+        annot (DictionaryObject): The dropdown annotation dictionary.
+
+    Returns:
+        Optional[DropdownOption]: The selected option, or None when no option
+            matches the value.
+    """
+    dropdown = Dropdown("")
+    dropdown.__dict__["choices"] = get_dropdown_choices(annot)
+    get_dropdown_value(annot, dropdown)
+
+    return None if dropdown.value is None else dropdown.options[dropdown.value]
+
+
 def update_text_value(
     annot: DictionaryObject, widget: Text, generate_appearance_streams: bool
 ) -> None:

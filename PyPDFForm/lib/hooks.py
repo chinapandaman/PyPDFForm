@@ -38,7 +38,6 @@ from .constants import (
     MULTILINE,
     READ_ONLY,
     REQUIRED,
-    RESIZE_HOOKS,
     TU,
     AcroForm,
     Action,
@@ -69,7 +68,12 @@ from .middleware.dropdown import Dropdown, DropdownOption
 from .middleware.text import Text
 from .patterns import (
     check_field_flag,
+    get_dropdown_choices,
+    get_field_rect,
     get_field_tooltip,
+    get_text_field_alignment,
+    get_text_field_max_length,
+    get_text_field_style,
     get_widget_field,
     get_widget_key,
     get_widget_type,
@@ -114,9 +118,10 @@ def trigger_widget_hooks(
     appearance or behavior. Hooks that change the default appearance also get
     the AcroForm dictionary, for its default. A text field or dropdown
     annotation whose hooks change how it is drawn, such as its font,
-    alignment, choices, or size, loses its appearance, as `remove_appearance`
-    describes; a position, flag, tooltip, or JavaScript change keeps it.
-    When appearance streams are generated, only a size change removes it.
+    alignment, choices, or size, as `_get_drawn_state` reads it, loses its
+    appearance, as `remove_appearance` describes. A change to the value the
+    PDF already has, or to its position, flags, tooltip, or JavaScript, keeps
+    it. When appearance streams are generated, only a size change removes it.
     Annotations of other types keep theirs, since their appearances hold
     their states. Widget hook queues are left
     unchanged, so the caller can clear them once the modified PDF is returned,
@@ -138,7 +143,6 @@ def trigger_widget_hooks(
     """
     output = PdfWriter(BytesIO(pdf))
     acroform = get_dictionary(output.root_object, AcroForm) or DictionaryObject()
-    stale_hooks = RESIZE_HOOKS if generate_appearance_streams else APPEARANCE_HOOKS
 
     for page in output.pages:
         for annot in page.get(Annots, []):
@@ -149,6 +153,15 @@ def trigger_widget_hooks(
             if widget is None or not widget.hooks_to_trigger:
                 continue
 
+            drawn = get_widget_type(annot) in (Text, Dropdown) and any(
+                hook in APPEARANCE_HOOKS for hook, _ in widget.hooks_to_trigger
+            )
+            before = (
+                _get_drawn_state(annot, acroform, generate_appearance_streams)
+                if drawn
+                else None
+            )
+
             for hook, value in widget.hooks_to_trigger:
                 function = getattr(sys.modules[__name__], hook)
                 if hook in DEFAULT_APPEARANCE_HOOKS:
@@ -156,8 +169,8 @@ def trigger_widget_hooks(
                 else:
                     function(annot, value)
 
-            if get_widget_type(annot) in (Text, Dropdown) and any(
-                hook in stale_hooks for hook, _ in widget.hooks_to_trigger
+            if drawn and before != _get_drawn_state(
+                annot, acroform, generate_appearance_streams
             ):
                 remove_appearance(annot)
 
@@ -165,6 +178,42 @@ def trigger_widget_hooks(
         output.write(f)
         f.seek(0)
         return f.read()
+
+
+def _get_drawn_state(
+    annot: DictionaryObject, acroform: DictionaryObject, size_only: bool
+) -> tuple:
+    """
+    Reads what the appearance of a text field or dropdown draws, besides its value.
+
+    This is its size and, unless only the size is asked for, its font, font
+    size, and font color, alignment, multiline and comb flags, maximum
+    length, and options, read as reopening the PDF reads them, so a hook
+    that sets the value the PDF already has changes none of them.
+
+    Args:
+        annot (DictionaryObject): The widget annotation.
+        acroform (DictionaryObject): The AcroForm dictionary, for its default
+            appearance.
+        size_only (bool): Whether only the size is read, for appearance
+            streams that are generated in the existing appearance.
+
+    Returns:
+        tuple: The entries, to compare before and after hooks are applied.
+    """
+    size = get_field_rect(annot)[2:]
+    if size_only:
+        return size
+
+    return (
+        size,
+        get_text_field_style(annot, acroform),
+        get_text_field_alignment(annot),
+        check_field_flag(annot, MULTILINE),
+        check_field_flag(annot, COMB),
+        get_text_field_max_length(annot),
+        get_dropdown_choices(annot),
+    )
 
 
 def _update_field_flag(annot: DictionaryObject, flag: int, should_set: bool) -> None:

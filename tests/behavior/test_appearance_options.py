@@ -6,7 +6,7 @@ from io import BytesIO
 import pikepdf
 import pytest
 
-from PyPDFForm import Fields, PdfWrapper
+from PyPDFForm import BlankPage, Fields, PdfWrapper
 from tests.support.builders import save, set_default_appearance, with_parent_cycle
 from tests.support.checks import find_widget, get_normal_appearance
 
@@ -60,18 +60,26 @@ def test_generated_text_appearance_fallback(
 
 
 @pytest.mark.parametrize(
-    ("options", "generated"),
-    [(["apple", "grape"], True), ([("apple", "A"), ("grape", "G")], False)],
-    ids=["same-export", "other-export"],
+    ("options", "index", "generated"),
+    [
+        (["apple", "grape"], 1, True),
+        ([("apple", "A"), ("grape", "G")], 1, False),
+        (["same", ("other display", "same")], 0, True),
+        (["same", ("other display", "same")], 1, False),
+    ],
+    ids=["same-export", "other-export", "shared-export-same", "shared-export-other"],
 )
-def test_generated_dropdown_appearance_fallback(template_stream, options, generated):
+def test_generated_dropdown_appearance_fallback(
+    template_stream, options, index, generated
+):
     form = PdfWrapper(template_stream, generate_appearance_streams=True)
     form.bulk_create_fields(
         [Fields.DropdownField(name="new", page_number=1, x=100, y=300, options=options)]
     )
 
-    # the generator would draw the export value
-    output = form.fill({"new": 1}).read()
+    # the generator draws the export value, which is right only when the
+    # selected option shows it
+    output = form.fill({"new": index}).read()
 
     assert ("/AP" in find_widget(output, "new")) is generated
 
@@ -121,6 +129,40 @@ def test_generated_appearance_fallback_with_parent_cycle(
     assert "/AP" in find_widget(output, "test")
 
 
+@pytest.mark.parametrize("width", [None, 200], ids=["created", "resized"])
+def test_generated_appearance_of_created_field(width):
+    form = PdfWrapper(BlankPage(), generate_appearance_streams=True)
+    form.bulk_create_fields(
+        [Fields.TextField(name="new", page_number=1, x=100, y=600, width=120)]
+    )
+    if width is not None:
+        form.widgets["new"].width = width
+
+    # the AcroForm lists the field before the generator draws it
+    output = form.fill({"new": "Hello"}).read()
+
+    assert b"(Hello) Tj" in get_normal_appearance(output, "new")
+    widget = find_widget(output, "new")
+    bbox, rect = widget["/AP"]["/N"]["/BBox"], widget["/Rect"]
+    assert bbox[2] - bbox[0] == rect[2] - rect[0]
+
+
+def test_fill_after_disabling_need_appearances(pdf_samples, assert_valid_appearances):
+    form = PdfWrapper(
+        os.path.join(pdf_samples, "sample_template_filled.pdf"),
+        generate_appearance_streams=True,
+    )
+    form.need_appearances = False
+
+    # appearances aren't generated, so the old ones show the old values
+    form.widgets["test_2"].font_size = 20
+    output = form.fill({"test": "new"}).read()
+
+    assert_valid_appearances(output)
+    for key in ("test", "test_2"):
+        assert "/AP" not in find_widget(output, key)
+
+
 @pytest.mark.parametrize(
     "path",
     [
@@ -147,6 +189,31 @@ def test_output_without_invalid_appearances(
 
     assert_valid_appearances(form.read())
     assert_valid_appearances(form.fill({}).read())
+
+
+@pytest.mark.parametrize(
+    "options",
+    [{}, {"need_appearances": True}],
+    ids=["default", "need-appearances"],
+)
+def test_output_without_stream_as_appearance(
+    pdf_samples, options, assert_valid_appearances
+):
+    # a stream where the appearance dictionary belongs
+    with pikepdf.Pdf.open(
+        os.path.join(pdf_samples, "sample_template_filled.pdf")
+    ) as pdf:
+        for annot in pdf.pages[0].Annots:
+            if annot.get("/T") == "test":
+                annot.AP = annot.AP.N
+        template = save(pdf)
+    with pytest.raises(AssertionError):
+        assert_valid_appearances(template)
+
+    output = PdfWrapper(template, **options).read()
+
+    assert_valid_appearances(output)
+    assert "/AP" not in find_widget(output, "test")
 
 
 def test_generate_appearance_streams_fill(
