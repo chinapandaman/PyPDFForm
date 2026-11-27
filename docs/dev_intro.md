@@ -61,6 +61,8 @@ python scripts/close_staled_issues.py
 
 Before opening a pull request, create an issue. When opening the pull request, follow these guidelines:
 
-* The PR title should match its respective issue: `PPF-<issue number>: <title of the issue>`. The prefix uses the linked issue's number, so it can be set when opening the PR.
+* The PR title should start with `PPF-<issue number>: `. The prefix uses the linked issue's number, so it can be set when opening the PR. After the prefix:
+    * If a single PR resolves the issue, use the issue's title: `PPF-<issue number>: <title of the issue>`.
+    * If the issue is split across several PRs, describe what that PR does, so each PR has its own title: `PPF-<issue number>: <purpose of the PR>`.
 * The PR description should contain a brief explanation of the changes.
 * Once opened, the PR should be linked to its respective issue.
