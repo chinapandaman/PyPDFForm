@@ -13,6 +13,7 @@ checks that:
   the same package files and README.md, LICENSE, and pyproject.toml, byte for
   byte, plus its generated metadata. The only other files it may contain are
   tracked top-level tests/test*.py files, which setuptools adds by default.
+  The tests are in subdirectories of tests/, so there are none.
 - For each requested Python, the wheel installs into new virtual environments
   in a temporary directory outside this checkout, once without extras and
   once with the cli extra. In each, PyPDFForm must import from the
