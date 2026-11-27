@@ -23,6 +23,7 @@ from tests.support.snapshots import (
     ExpectPdf,
     encode_id,
     expected_pdf_path,
+    repo_path,
 )
 
 # sample paths, template streams, and data, shared by every suite
@@ -94,8 +95,7 @@ def _expected_pdf_files():
     for directory, _, names in os.walk(os.path.join(ROOT, EXPECTED_DIR)):
         for name in names:
             if not name.startswith("."):
-                path = os.path.relpath(os.path.join(directory, name), ROOT)
-                files.add(path.replace(os.sep, "/"))
+                files.add(repo_path(ROOT, os.path.join(directory, name)))
 
     return files
 
@@ -120,12 +120,17 @@ class ExpectedPdfOwners:
                 self.skipped.add(value)
 
     def pytest_collectreport(self, report):
-        # a module or package skipped while it was collected has no tests
+        # a module or package skipped while it was collected has no tests, so
+        # it owns every expected PDF in its directory
+        if not report.skipped:
+            return
         path = report.nodeid.split("::")[0].removesuffix(".py")
-        if report.skipped and (path in ("", ".", "tests") or path.startswith("tests/")):
-            under_tests = path.removeprefix("tests").strip("/.")
-            directory = "/".join(filter(None, ("pdf_samples/expected", under_tests)))
-            self.skipped_dirs.add(f"{directory}/")
+        if path in ("", ".", "tests"):
+            self.skipped_dirs.add("pdf_samples/expected/")
+        elif path.startswith("tests/"):
+            self.skipped_dirs.add(
+                f"pdf_samples/expected/{path.removeprefix('tests/')}/"
+            )
 
     def unowned(self, files):
         # the files no test owns or would own, with the owned path each one
@@ -250,8 +255,8 @@ def pytest_collection_modifyitems(config, items):
         if "expect_pdf" in getattr(item, "fixturenames", ()):
             item.add_marker(pytest.mark.snapshot)
             # reported even if the test is skipped before it calls expect_pdf
-            candidate = os.path.relpath(expected_pdf_path(ROOT, item), ROOT)
-            item.user_properties.append((CANDIDATE, candidate.replace(os.sep, "/")))
+            candidate = repo_path(ROOT, expected_pdf_path(ROOT, item))
+            item.user_properties.append((CANDIDATE, candidate))
     # pytest-xdist hands out tests in this order, so a slow test that came last
     # would keep the run waiting after the other workers finish. Regenerating
     # in place keeps the order, in which a test that compares with an expected
@@ -367,8 +372,9 @@ def standard_zlib():
 
 @pytest.fixture
 def expect_pdf(request, standard_zlib):
-    # expect_pdf(stream, path) compares with the expected PDF this test owns,
-    # and expect_pdf(stream, same_as=path) with one that another test owns
+    # expect_pdf(stream) compares with the expected PDF named after this test,
+    # which it owns, and expect_pdf(stream, same_as=path) with one that
+    # another test owns
     expect = ExpectPdf(request.node, ROOT, standard_zlib)
     yield expect
 

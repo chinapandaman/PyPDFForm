@@ -141,9 +141,14 @@ When the comparison fails, regenerating expected PDFs into another directory wri
 
 The README's example compares with `docs/pdfs/sample_filled.pdf`, which the documentation links to, so it passes that path: `expect_pdf(filled.read(), expected_path)`. Only an expected PDF in `docs/` takes a path.
 
-If two tests own the same expected PDF, the run ends with exit status 4 and lists them, because the PDF written last would hide the other. Paths that differ only in case count as the same, since some filesystems ignore case. Regenerating in place then leaves that expected PDF as it was, and also leaves `pdf_samples/fixture_environment.json` as it was if it wrote no other expected PDF.
+If two tests own the same expected PDF, the run ends with exit status 4 and lists them, because the PDF written last would hide the other. Regenerating in place then leaves that expected PDF as it was, and also leaves `pdf_samples/fixture_environment.json` as it was if it wrote no other expected PDF. Paths that differ only in case count as the same, since some filesystems ignore case.
 
-A run of the whole suite also checks that every file in `pdf_samples/expected/` has an owner. If one doesn't, for example because its test was renamed or removed, the run ends with exit status 4 and lists the file. The check runs only when no test failed and none was left out, so it doesn't run with paths other than `tests/`, or with `-k`, `-m`, `--deselect`, `--ignore`, `--lf`, or `--sw`. A skipped test, or a skipped module, still owns the expected PDFs named after it. A file must have exactly its owner's name, including case. For example, a `test_Fill_sejda.pdf` left next to `test_fill_sejda.pdf` is reported. On a filesystem that ignores case, regenerating an expected PDF after renaming its test keeps the file's old case, so rename the file with `git mv`. A test whose expected PDF is missing fails, unless expected PDFs are being regenerated.
+A run of the whole suite also checks that every file in `pdf_samples/expected/` has an owner whose path it matches exactly, including case. If one doesn't, for example because its test was renamed or removed, the run ends with exit status 4 and lists the file.
+
+* The check runs only when no test failed and none was left out. So it doesn't run with paths other than `tests/`, or with `-k`, `-m`, `--deselect`, `--ignore`, `--lf`, or `--sw`.
+* A skipped test, or a module skipped as a whole, still owns the expected PDFs named after it.
+* A `test_Fill_sejda.pdf` left next to `test_fill_sejda.pdf` is reported. On a filesystem that ignores case, regenerating an expected PDF after renaming its test keeps the file's old case, so rename the file with `git mv`.
+* A test whose expected PDF is missing fails, unless expected PDFs are being regenerated.
 
 A PDF created from a blank page holds the time it was created. Pass `timestamped=True` for such a PDF. Its `/CreationDate` and `/ModDate` are then ignored, with standard zlib only the length of the bytes is compared, and it is regenerated only when the comparison fails.
 

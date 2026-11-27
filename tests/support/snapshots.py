@@ -17,6 +17,11 @@ EXPECTED_DIR = os.path.join("pdf_samples", "expected")
 KEPT_CHARACTERS = frozenset("abcdefghijklmnopqrstuvwxyz0123456789_.-")
 
 
+def repo_path(root, path):
+    # the path relative to the repository, with / on every platform
+    return os.path.relpath(path, root).replace(os.sep, "/")
+
+
 def encode_id(value):
     # writes any other character as ~ and its UTF-8 bytes in lowercase hex, so
     # different IDs get different names, also on filesystems that ignore case
@@ -27,7 +32,7 @@ def encode_id(value):
 
 
 def expected_pdf_path(root, node):
-    # pdf_samples/expected/<directory under tests>/<module>/<test>[-<parameters>].pdf
+    # pdf_samples/expected/<directory under tests>/<module>/<test>[-<encoded ID>].pdf
     module = os.path.relpath(str(node.path), os.path.join(root, "tests"))
     name = node.originalname
     callspec = getattr(node, "callspec", None)
@@ -81,8 +86,9 @@ class ExpectPdf:
                 msg = "a test owns one expected PDF; compare other outputs with same_as"
                 raise TypeError(msg)
             self.owned = expected_path
-            owned = os.path.relpath(expected_path, self.root).replace(os.sep, "/")
-            self.node.user_properties.append((OWNED, owned))
+            self.node.user_properties.append(
+                (OWNED, repo_path(self.root, expected_path))
+            )
             # recorded before comparing, so that a failing test is regenerated
             self.outputs[expected_path] = stream
         else:
