@@ -307,6 +307,15 @@ def change_widgets(source, changes):
         return save(pdf)
 
 
+def with_option_states(stream, make_states):
+    # the second widget on the first page gets the normal appearance (/N)
+    # that make_states makes with the PDF, such as an array of states
+    with Pdf.open(BytesIO(stream)) as pdf:
+        pdf.pages[0].Annots[1].AP.N = make_states(pdf)
+
+        return save(pdf)
+
+
 # Default appearances
 def without_default_appearance(stream, key):
     # neither the field nor the AcroForm default sets a default appearance

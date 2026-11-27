@@ -387,7 +387,7 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
             widget = annot.get_object()
             if (
                 not isinstance(widget, DictionaryObject)
-                or widget.get(Subtype) != Widget
+                or get_entry(widget, Subtype) != Widget
             ):
                 continue
             _repair_appearance(writer, widget)
@@ -426,11 +426,13 @@ def _repair_appearance(writer: PdfWriter, widget: DictionaryObject) -> None:
     and so is one whose normal appearance (`/N`) is missing or is neither a
     stream nor a dictionary or array of appearance states. When `/N` is a
     dictionary of states, each state must be a stream and the appearance
-    state (`/AS`) must name one of them or `/Off`. Otherwise, and when `/N` is
-    an array, whose names PyPDFForm reads as states, a checkbox or radio
-    button keeps its states, whose names are its export values, as
+    state (`/AS`) must name one of them or `/Off`. Otherwise, a checkbox or
+    radio button keeps its states, whose names are its export values, as
     `_repair_states` describes, and an `/AS` that names none of them is set to
     the state its value (`/V`) selects, as `_get_state_of_value` describes.
+    The same applies when `/N` is an array, whose names PyPDFForm reads as
+    states, if a dictionary of them reads and fills like it, as
+    `_is_equivalent_array` describes; otherwise, the array is left as it is.
     Any other widget loses its appearance, including a button without an
     `/AS`, which PyPDFForm doesn't read as a checkbox or radio button. The
     rollover (`/R`) and down (`/D`) appearances lose their states that aren't
@@ -464,10 +466,10 @@ def _repair_appearance(writer: PdfWriter, widget: DictionaryObject) -> None:
         if _type not in (Checkbox, Radio):
             del widget[AP]
             return
-        if isinstance(normal, ArrayObject) or not _are_streams(normal):
-            normal = changes[N] = _repair_states(writer, widget, normal)
-        if not _selects_state(widget, normal):
-            widget[NameObject(AS)] = _get_state_of_value(widget, _type, normal)
+        if not isinstance(normal, ArrayObject) or _is_equivalent_array(
+            widget, _type, normal
+        ):
+            _repair_button_states(writer, widget, _type, normal, changes)
 
     for key in (R, D):
         entry = get_entry(appearance, key)
@@ -476,6 +478,68 @@ def _repair_appearance(writer: PdfWriter, widget: DictionaryObject) -> None:
 
     if changes:
         _replace_appearance(widget, cast(DictionaryObject, appearance), changes)
+
+
+def _repair_button_states(
+    writer: PdfWriter,
+    widget: DictionaryObject,
+    _type: type,
+    normal: DictionaryObject | ArrayObject,
+    changes: Dict[str, Optional[DictionaryObject]],
+) -> None:
+    """
+    Repairs the normal appearance states and appearance state of a button.
+
+    Args:
+        writer (PdfWriter): The writer to add empty streams to.
+        widget (DictionaryObject): The checkbox or radio button widget.
+        _type (type): Its middleware type, `Checkbox` or `Radio`.
+        normal (DictionaryObject | ArrayObject): Its normal appearance
+            (`/N`), which doesn't select a valid appearance.
+        changes (Dict[str, Optional[DictionaryObject]]): The changed entries
+            of its appearance dictionary, which gets a new `/N` when one is
+            built.
+    """
+    if isinstance(normal, ArrayObject) or not _are_streams(normal):
+        normal = changes[N] = _repair_states(writer, widget, normal)
+    if not _selects_state(widget, normal):
+        widget[NameObject(AS)] = _get_state_of_value(widget, _type, normal)
+
+
+def _is_equivalent_array(
+    widget: DictionaryObject, _type: type, states: ArrayObject
+) -> bool:
+    """
+    Checks whether a dictionary of an array's states reads and fills like it.
+
+    `get_radio_value`, `update_checkbox_value`, and `update_radio_value`
+    compare and write the array's elements as they are stored, so each must
+    be a name, or a string that spells one, such as `(/b)`, and not an
+    indirect reference. Filling writes the first state other than `/Off`,
+    whose place in a dictionary isn't kept, since qpdf sorts dictionary keys,
+    so there must be at most one. `get_checkbox_value` reads an inherited
+    value only from a dictionary of states, so a checkbox without a value of
+    its own mustn't inherit a name, other than `/Off`, that the array lists.
+
+    Args:
+        widget (DictionaryObject): The checkbox or radio button widget.
+        _type (type): Its middleware type, `Checkbox` or `Radio`.
+        states (ArrayObject): Its normal appearance (`/N`), an array.
+
+    Returns:
+        bool: True when a dictionary of the array's states reads and fills
+            like the array.
+    """
+    if not all(isinstance(each, str) and each.startswith("/") for each in states):
+        return False
+    names = {str(each) for each in states} - {Off}
+    if len(names) > 1:
+        return False
+    if _type is Checkbox and get_entry(widget, V) is None:
+        inherited = _resolve_entry(widget, V, None)
+        return not (isinstance(inherited, NameObject) and inherited in names)
+
+    return True
 
 
 def _replace_appearance(
@@ -578,10 +642,9 @@ def _repair_states(
     Gets the states of a checkbox or radio button's normal appearance as streams.
 
     A dictionary's states keep their streams, and a state that isn't a stream
-    gets an empty one, as `_create_empty_appearance` describes. An array's
-    states are read as `get_radio_value` and `update_checkbox_value` read
-    them: each name in it is a state, as is a string that spells one, such as
-    `(/b)`, and each gets an empty stream. Its other elements are left out.
+    gets an empty one, as `_create_empty_appearance` describes. Each element
+    of an array, a name or a string that spells one, such as `(/b)`, as
+    `_is_equivalent_array` requires, is a state with an empty stream.
 
     Args:
         writer (PdfWriter): The writer to add empty streams to.
@@ -592,11 +655,7 @@ def _repair_states(
         DictionaryObject: A new dictionary of the states, each a stream.
     """
     if isinstance(normal, ArrayObject):
-        states = dict.fromkeys(
-            NameObject(each)
-            for each in (element.get_object() for element in normal)
-            if isinstance(each, str) and each.startswith("/")
-        )
+        states = dict.fromkeys(NameObject(each) for each in normal)
     else:
         states = dict(normal.items())
 

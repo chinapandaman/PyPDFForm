@@ -6,7 +6,7 @@ from io import BytesIO
 import pikepdf
 import pytest
 from pypdf import PdfReader
-from pypdf.generic import StreamObject
+from pypdf.generic import ArrayObject, StreamObject
 
 from PyPDFForm import BlankPage, Fields, PdfWrapper
 from tests.support.builders import (
@@ -15,6 +15,7 @@ from tests.support.builders import (
     checkbox_field,
     save,
     set_default_appearance,
+    with_option_states,
     with_parent_cycle,
 )
 from tests.support.checks import find_widget, get_normal_appearance
@@ -403,12 +404,10 @@ def test_output_rebuilds_radio_states_from_array(
 ):
     # PyPDFForm reads the names in an array /N as states, and a string that
     # spells one counts as that name
-    group = build_button_group(49152, pikepdf.Name.Off, 1, pikepdf.Name("/b"))
-    with pikepdf.Pdf.open(BytesIO(group)) as pdf:
-        pdf.pages[0].Annots[1].AP.N = pikepdf.Array(
-            [pikepdf.Name("/b"), pikepdf.String("/Off"), 3]
-        )
-        template = save(pdf)
+    template = with_option_states(
+        build_button_group(49152, pikepdf.Name.Off, 1, pikepdf.Name("/b")),
+        lambda pdf: pikepdf.Array([pikepdf.Name("/b"), pikepdf.String("/Off")]),
+    )
     with pytest.raises(AssertionError):
         assert_valid_appearances(template)
 
@@ -421,6 +420,75 @@ def test_output_rebuilds_radio_states_from_array(
     assert PdfWrapper(output).data == {"group": 1}
     assert_widgets_match_output(form)
     assert PdfWrapper(PdfWrapper(output).fill({"group": 0}).read()).data == {"group": 0}
+
+
+@pytest.mark.parametrize(
+    "states",
+    [
+        lambda pdf: pikepdf.Array([pdf.make_indirect(pikepdf.Name("/b"))]),
+        lambda pdf: pikepdf.Array(
+            [pikepdf.Name("/c"), pikepdf.Name("/b"), pikepdf.Name.Off]
+        ),
+    ],
+    ids=["indirect-state", "two-states"],
+)
+def test_output_keeps_radio_array_that_reads_otherwise(
+    states, assert_widgets_match_output
+):
+    # the radio reader doesn't resolve an indirect state, and fill writes the
+    # first state, whose place qpdf doesn't keep in a dictionary
+    template = with_option_states(
+        build_button_group(49152, pikepdf.Name.Off, 1, pikepdf.Name("/b")), states
+    )
+
+    form = PdfWrapper(template)
+    output = form.read()
+
+    normal = PdfReader(BytesIO(output)).pages[0]["/Annots"][1].get_object()["/AP"]
+    assert isinstance(normal["/N"], ArrayObject)
+    assert_widgets_match_output(form)
+
+
+def test_output_keeps_checkbox_array_with_inherited_value(
+    template_stream, assert_widgets_match_output
+):
+    # the checkbox reader reads an inherited value only from a dictionary
+    template = change_widgets(
+        BytesIO(checkbox_field(template_stream, ["/Yes"], "/Yes")),
+        {
+            "check": lambda annot: setattr(
+                annot.AP, "N", pikepdf.Array([pikepdf.Name.Off, pikepdf.Name.Yes])
+            )
+        },
+    )
+
+    form = PdfWrapper(template)
+    output = form.read()
+
+    assert isinstance(find_widget(output, "check")["/AP"]["/N"], ArrayObject)
+    assert_widgets_match_output(form)
+
+
+def test_output_repairs_widget_with_indirect_subtype(
+    pdf_samples, assert_valid_appearances
+):
+    # PdfWrapper reads a widget whose /Subtype is an indirect /Widget
+    with pikepdf.Pdf.open(
+        os.path.join(pdf_samples, "sample_template_filled.pdf")
+    ) as pdf:
+        widget = next(
+            each for each in pdf.pages[1].Annots if each.get("/T") == "test_2"
+        )
+        widget.Subtype = pdf.make_indirect(pikepdf.Name.Widget)
+        widget.AP = pikepdf.Dictionary()
+        template = save(pdf)
+
+    form = PdfWrapper(template)
+    output = form.read()
+
+    assert "test_2" in form.widgets
+    assert_valid_appearances(output)
+    assert "/AP" not in find_widget(output, "test_2")
 
 
 def test_output_keeps_states_shared_with_another_widget(
