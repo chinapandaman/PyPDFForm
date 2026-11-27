@@ -551,12 +551,7 @@ def _create_empty_appearance(
             NameObject(Type): NameObject(XObject),
             NameObject(Subtype): NameObject(Form),
             NameObject(BBox): ArrayObject(
-                [
-                    FloatObject(0),
-                    FloatObject(0),
-                    FloatObject(width),
-                    FloatObject(height),
-                ]
+                FloatObject(each) for each in (0, 0, width, height)
             ),
         }
     )
