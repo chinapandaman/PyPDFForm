@@ -294,9 +294,9 @@ def build_cross_page_form(page_action=True):
 
 
 # Appearances
-def change_widgets(source, changes):
+def change_widgets(stream, changes):
     # calls the change for a field's name with each page widget of the field
-    with Pdf.open(source) as pdf:
+    with Pdf.open(BytesIO(stream)) as pdf:
         for page in pdf.pages:
             for annot in page.get("/Annots", []):
                 field = annot if "/T" in annot else annot.get("/Parent", {})

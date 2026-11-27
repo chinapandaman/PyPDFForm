@@ -57,11 +57,10 @@ from .constants import (
     Subtype,
     Type,
     V,
-    Widget,
     WinAnsiEncoding,
     XObject,
 )
-from .field_tree import share_inline_objects
+from .field_tree import is_widget_annotation, share_inline_objects
 from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
 from .middleware.radio import Radio
@@ -385,10 +384,7 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
     for page in writer.pages:
         for annot in get_array(page, Annots):
             widget = annot.get_object()
-            if (
-                not isinstance(widget, DictionaryObject)
-                or get_entry(widget, Subtype) != Widget
-            ):
+            if not is_widget_annotation(widget):
                 continue
             _repair_appearance(writer, widget)
             field_ref = _get_root_field_reference(annot)
@@ -536,10 +532,27 @@ def _is_equivalent_array(
     if len(names) > 1:
         return False
     if _type is Checkbox and get_entry(widget, V) is None:
-        inherited = _resolve_entry(widget, V, None)
-        return not (isinstance(inherited, NameObject) and inherited in names)
+        return _get_inherited_name(widget) not in names
 
     return True
+
+
+def _get_inherited_name(widget: DictionaryObject) -> Optional[NameObject]:
+    """
+    Gets the value a checkbox inherits, as `get_checkbox_value` reads it.
+
+    `get_checkbox_value` reads an inherited value only when it is a name, and
+    a `/Parent` cycle before a value is found reads as no value.
+
+    Args:
+        widget (DictionaryObject): The checkbox widget.
+
+    Returns:
+        Optional[NameObject]: The inherited value when it is a name, or None.
+    """
+    inherited = _resolve_entry(widget, V, None)
+
+    return inherited if isinstance(inherited, NameObject) else None
 
 
 def _replace_appearance(
@@ -655,18 +668,21 @@ def _repair_states(
         DictionaryObject: A new dictionary of the states, each a stream.
     """
     if isinstance(normal, ArrayObject):
-        states = dict.fromkeys(NameObject(each) for each in normal)
-    else:
-        states = dict(normal.items())
+        return DictionaryObject(
+            {
+                NameObject(state): _create_empty_appearance(writer, widget)
+                for state in dict.fromkeys(normal)
+            }
+        )
 
     return DictionaryObject(
         {
             NameObject(state): (
                 value
-                if value is not None and isinstance(value.get_object(), StreamObject)
+                if isinstance(value.get_object(), StreamObject)
                 else _create_empty_appearance(writer, widget)
             )
-            for state, value in states.items()
+            for state, value in normal.items()
         }
     )
 
@@ -699,8 +715,7 @@ def _get_state_of_value(
     else:
         value = get_entry(widget, V)
         if value is None:
-            inherited = _resolve_entry(widget, V, None)
-            value = inherited if isinstance(inherited, NameObject) else None
+            value = _get_inherited_name(widget)
 
     return next(
         (NameObject(state) for state in states if state != Off and state == value),

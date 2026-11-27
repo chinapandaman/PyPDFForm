@@ -243,12 +243,13 @@ def test_output_without_stream_as_appearance(
     ids=["without-normal", "no-state-selected", "state-not-stream"],
 )
 def test_output_removes_invalid_text_appearance(
-    pdf_samples, change, assert_valid_appearances, assert_widgets_match_output
+    template_filled_stream,
+    change,
+    assert_valid_appearances,
+    assert_widgets_match_output,
 ):
     # viewers draw the field from its value instead
-    template = change_widgets(
-        os.path.join(pdf_samples, "sample_template_filled.pdf"), {"test_2": change}
-    )
+    template = change_widgets(template_filled_stream, {"test_2": change})
     with pytest.raises(AssertionError):
         assert_valid_appearances(template)
 
@@ -285,12 +286,10 @@ def test_output_removes_invalid_text_appearance(
     ids=["not-states", "some-states", "no-states-left"],
 )
 def test_output_removes_invalid_rollover_and_down_states(
-    pdf_samples, change, expected, assert_valid_appearances
+    template_filled_stream, change, expected, assert_valid_appearances
 ):
     # viewers draw the normal appearance instead
-    template = change_widgets(
-        os.path.join(pdf_samples, "sample_template_filled.pdf"), {"test_2": change}
-    )
+    template = change_widgets(template_filled_stream, {"test_2": change})
     with pytest.raises(AssertionError):
         assert_valid_appearances(template)
 
@@ -318,7 +317,7 @@ def test_output_removes_invalid_rollover_and_down_states(
     ids=["unknown-state", "string-state", "value-without-state"],
 )
 def test_output_selects_checkbox_state_of_value(
-    pdf_samples,
+    template_filled_stream,
     state,
     value,
     expected,
@@ -326,7 +325,7 @@ def test_output_selects_checkbox_state_of_value(
     assert_widgets_match_output,
 ):
     template = change_widgets(
-        os.path.join(pdf_samples, "sample_template_filled.pdf"),
+        template_filled_stream,
         {
             "check_2": lambda annot: (
                 setattr(annot, "AS", state),
@@ -380,7 +379,7 @@ def test_output_selects_checkbox_state_of_inherited_value(
     # the widgets of "check" inherit its value /B, and name states that
     # their appearances don't have
     template = change_widgets(
-        BytesIO(checkbox_field(template_stream, ["/A", "/B"], "/B")),
+        checkbox_field(template_stream, ["/A", "/B"], "/B"),
         {"check": lambda annot: setattr(annot, "AS", pikepdf.Name("/Missing"))},
     )
     with pytest.raises(AssertionError):
@@ -415,8 +414,8 @@ def test_output_rebuilds_radio_states_from_array(
     output = form.read()
 
     assert_valid_appearances(output)
-    states = PdfReader(BytesIO(output)).pages[0]["/Annots"][1].get_object()["/AP"]
-    assert sorted(states["/N"]) == ["/Off", "/b"]
+    appearance = PdfReader(BytesIO(output)).pages[0]["/Annots"][1].get_object()["/AP"]
+    assert sorted(appearance["/N"]) == ["/Off", "/b"]
     assert PdfWrapper(output).data == {"group": 1}
     assert_widgets_match_output(form)
     assert PdfWrapper(PdfWrapper(output).fill({"group": 0}).read()).data == {"group": 0}
@@ -444,8 +443,8 @@ def test_output_keeps_radio_array_that_reads_otherwise(
     form = PdfWrapper(template)
     output = form.read()
 
-    normal = PdfReader(BytesIO(output)).pages[0]["/Annots"][1].get_object()["/AP"]
-    assert isinstance(normal["/N"], ArrayObject)
+    appearance = PdfReader(BytesIO(output)).pages[0]["/Annots"][1].get_object()["/AP"]
+    assert isinstance(appearance["/N"], ArrayObject)
     assert_widgets_match_output(form)
 
 
@@ -454,7 +453,7 @@ def test_output_keeps_checkbox_array_with_inherited_value(
 ):
     # the checkbox reader reads an inherited value only from a dictionary
     template = change_widgets(
-        BytesIO(checkbox_field(template_stream, ["/Yes"], "/Yes")),
+        checkbox_field(template_stream, ["/Yes"], "/Yes"),
         {
             "check": lambda annot: setattr(
                 annot.AP, "N", pikepdf.Array([pikepdf.Name.Off, pikepdf.Name.Yes])
@@ -470,12 +469,10 @@ def test_output_keeps_checkbox_array_with_inherited_value(
 
 
 def test_output_repairs_widget_with_indirect_subtype(
-    pdf_samples, assert_valid_appearances
+    template_filled_stream, assert_valid_appearances
 ):
     # PdfWrapper reads a widget whose /Subtype is an indirect /Widget
-    with pikepdf.Pdf.open(
-        os.path.join(pdf_samples, "sample_template_filled.pdf")
-    ) as pdf:
+    with pikepdf.Pdf.open(BytesIO(template_filled_stream)) as pdf:
         widget = next(
             each for each in pdf.pages[1].Annots if each.get("/T") == "test_2"
         )
@@ -522,11 +519,9 @@ def test_output_keeps_states_shared_with_another_widget(
     assert_widgets_match_output(form)
 
 
-def test_output_keeps_appearance_shared_with_annotation(pdf_samples):
+def test_output_keeps_appearance_shared_with_annotation(template_filled_stream):
     # a stamp shares the appearance of "test_2", whose /D isn't valid
-    with pikepdf.Pdf.open(
-        os.path.join(pdf_samples, "sample_template_filled.pdf")
-    ) as pdf:
+    with pikepdf.Pdf.open(BytesIO(template_filled_stream)) as pdf:
         page = pdf.pages[1]
         widget = next(each for each in page.Annots if each.get("/T") == "test_2")
         widget.AP = pdf.make_indirect(
@@ -552,11 +547,11 @@ def test_output_keeps_appearance_shared_with_annotation(pdf_samples):
 
 
 def test_output_removes_checkbox_appearance_without_states(
-    pdf_samples, assert_valid_appearances, assert_widgets_match_output
+    template_filled_stream, assert_valid_appearances, assert_widgets_match_output
 ):
     # PyPDFForm reads the checkbox from its value, with or without it
     template = change_widgets(
-        os.path.join(pdf_samples, "sample_template_filled.pdf"),
+        template_filled_stream,
         {"check_2": lambda annot: setattr(annot.AP, "N", pikepdf.String("N"))},
     )
     with pytest.raises(AssertionError):
@@ -572,12 +567,12 @@ def test_output_removes_checkbox_appearance_without_states(
 
 @pytest.mark.parametrize("state", ["/Yes", "/Off"])
 def test_output_replaces_checkbox_state_that_is_not_a_stream(
-    pdf_samples, state, assert_valid_appearances, assert_widgets_match_output
+    template_filled_stream, state, assert_valid_appearances, assert_widgets_match_output
 ):
     # the state keeps its name, the checkbox's export value or /Off, so the
     # output fills as the PDF did
     template = change_widgets(
-        os.path.join(pdf_samples, "sample_template_filled.pdf"),
+        template_filled_stream,
         {"check_2": lambda annot: annot.AP.N.__setitem__(state, pikepdf.String(""))},
     )
     with pytest.raises(AssertionError):
@@ -600,11 +595,11 @@ def test_output_replaces_checkbox_state_that_is_not_a_stream(
 
 
 def test_output_removes_appearance_of_button_without_state(
-    pdf_samples, assert_valid_appearances, assert_widgets_match_output
+    template_filled_stream, assert_valid_appearances, assert_widgets_match_output
 ):
     # PyPDFForm reads no checkbox without an appearance state (/AS)
     template = change_widgets(
-        os.path.join(pdf_samples, "sample_template_filled.pdf"),
+        template_filled_stream,
         {"check_2": lambda annot: delattr(annot, "AS")},
     )
     with pytest.raises(AssertionError):

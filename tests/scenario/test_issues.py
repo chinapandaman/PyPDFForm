@@ -263,12 +263,12 @@ def test_ppf_2128_remove_hidden_button(issue_pdf_directory):
     ids=["default", "need-appearances", "generate-appearance-streams"],
 )
 def test_ppf_2153_malformed_appearance_dictionaries(
-    pdf_samples, options, assert_valid_appearances
+    template_filled_stream, options, assert_valid_appearances
 ):
     # test_2's appearance dictionary has no /N, and check_2's appearance state
     # names a state that its appearance doesn't have
     template = change_widgets(
-        os.path.join(pdf_samples, "sample_template_filled.pdf"),
+        template_filled_stream,
         {
             "test_2": lambda annot: setattr(
                 annot, "AP", pikepdf.Dictionary(D=annot.AP.N)
