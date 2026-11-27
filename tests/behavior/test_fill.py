@@ -20,7 +20,12 @@ from pypdf.generic import (
 
 from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.patterns import get_widget_key
-from tests.support.checks import assert_annotation_graph, page_contents
+from tests.support.checks import (
+    assert_annotation_graph,
+    find_widget,
+    get_normal_appearance,
+    page_contents,
+)
 
 
 def test_fill_readonly_then_editable(template_stream, data_dict):
@@ -263,7 +268,9 @@ def test_dropdown_display_and_export_values(assert_round_trip):
     writer.write(stream)
     reopened = PdfWrapper(stream.getvalue())
     assert reopened.data == {"choice": 1}
-    assert get_field(reopened.fill({}).read())["/I"] == [1]
+    # unchanged, so it isn't written again and keeps its indirect element
+    indices = get_field(reopened.fill({}).read())["/I"]
+    assert [each.get_object() for each in indices] == [1]
 
 
 def test_schema(sample_template_with_dropdown):
@@ -315,6 +322,61 @@ def test_failed_fill_restores_dropdown(
     assert not any(widget.hooks_to_trigger for widget in obj.widgets.values())
     assert obj.read() == original
     assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(
+    "options", [{}, {"need_appearances": True}], ids=["default", "need-appearances"]
+)
+def test_fill_removes_stale_appearances(
+    sample_template_with_dropdown, options, assert_valid_appearances
+):
+    # text fields and a dropdown with values and appearances
+    filled = (
+        PdfWrapper(sample_template_with_dropdown, generate_appearance_streams=True)
+        .fill({"test_1": "one", "test_2": "two", "dropdown_1": 1})
+        .read()
+    )
+
+    output = PdfWrapper(filled, **options).fill({"test_1": "new", "dropdown_1": 0})
+    output = output.read()
+
+    assert_valid_appearances(output)
+    for key in ("test_1", "dropdown_1"):
+        assert "/AP" not in find_widget(output, key)
+    # a field that isn't filled keeps its value and appearance
+    assert get_normal_appearance(output, "test_2") == get_normal_appearance(
+        filled, "test_2"
+    )
+    assert PdfWrapper(output).data["test_2"] == "two"
+
+
+def test_fill_writes_supplied_and_changed_values(sample_template_with_dropdown):
+    filled = (
+        PdfWrapper(sample_template_with_dropdown, generate_appearance_streams=True)
+        .fill({"test_1": "one", "test_2": "two", "dropdown_1": 1})
+        .read()
+    )
+    form = PdfWrapper(filled)
+
+    # supplied with the value the PDF holds, and assigned without filling
+    form.widgets["test_2"].value = "assigned"
+    output = form.fill({"test_1": "one"}).read()
+
+    for key in ("test_1", "test_2"):
+        assert "/AP" not in find_widget(output, key)
+    assert "/AP" in find_widget(output, "dropdown_1")
+    assert PdfWrapper(output).data["test_2"] == "assigned"
+
+    # the PDF now holds these values, so filling again doesn't write them
+    output = form.fill({}).read()
+    assert "/AP" in find_widget(output, "dropdown_1")
+    assert PdfWrapper(output).data == form.data
+
+    # new choices change the option at the index, so it is written again
+    form.widgets["dropdown_1"].choices = ["x", "y", "z"]
+    widget = find_widget(form.fill({}).read(), "dropdown_1")
+    assert widget["/V"] == "y"
+    assert widget["/I"] == [1]
 
 
 def test_fill_preserves_unrelated_annotations(

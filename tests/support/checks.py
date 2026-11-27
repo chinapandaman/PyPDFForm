@@ -430,6 +430,16 @@ def find_widget(stream, name):
     pytest.fail(f"No widget named {name}.")
 
 
+def get_normal_appearance(stream, name):
+    # the data of the normal appearance stream of a field's widget, by its
+    # short name, or None when the widget has no appearance
+    appearance = find_widget(stream, name).get("/AP")
+    if appearance is None:
+        return None
+
+    return appearance.get_object()["/N"].get_object().get_data()
+
+
 def get_nested_entries(stream, entry="/DA"):
     # the entry of each field of nest_fields, or None without one
     reader = PdfReader(BytesIO(stream))

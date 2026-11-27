@@ -62,7 +62,7 @@ from .font import (
     validate_font,
 )
 from .hooks import FontChange, trigger_widget_hooks
-from .middleware.checkbox import Checkbox
+from .patterns import record_pdf_value
 from .template import (
     build_widgets,
     create_annotations,
@@ -999,8 +999,12 @@ class PdfWrapper:
         shares a key with a widget of another type, such as a checkbox and a radio
         group with the same short name, keeps its value; its widgets are still made
         read-only with `readonly=True`. A radio group fills only its own options.
-        A checkbox whose value isn't supplied, and is still the one the PDF holds,
-        as read or last filled, isn't written again. Filling delegates to the
+        A checkbox, text field, or dropdown whose value isn't supplied, and is
+        still the one the PDF holds, as read or last filled, isn't written
+        again, so it keeps its appearance. A text field or dropdown that is
+        written loses its appearance, so PDF viewers draw the new value. With
+        `generate_appearance_streams`, it keeps its appearance instead, which
+        the generator draws the new value in. Filling delegates to the
         lower-level filler, which draws image/signature values onto the page
         and removes only the consumed widgets. Other annotations and unfilled
         signature/image fields are preserved. After image drawing, the widget cache
@@ -1050,7 +1054,9 @@ class PdfWrapper:
             filled_stream, image_drawn_stream = fill(
                 self._read(),
                 self.widgets,
-                need_appearances=getattr(self, "need_appearances"),
+                generate_appearance_streams=getattr(
+                    self, "generate_appearance_streams"
+                ),
                 use_full_widget_name=getattr(self, "use_full_widget_name"),
                 supplied=set(data),
                 readonly=readonly,
@@ -1060,9 +1066,9 @@ class PdfWrapper:
                 image_drawn_stream if image_drawn_stream is not None else filled_stream
             )
             for widget in self.widgets.values():
-                if type(widget) is Checkbox and widget.value is not None:
+                if widget.value is not None:
                     # the PDF now holds it, so the next fill doesn't write it again
-                    widget.__dict__["_pdf_value"] = widget.value
+                    record_pdf_value(widget)
             if image_drawn_stream is not None:
                 self._init_helper()
 
