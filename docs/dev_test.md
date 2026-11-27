@@ -78,7 +78,7 @@ expect_pdf(actual, same_as=expected_path)
 
 When the comparison fails, regenerating expected PDFs into another directory writes the other test's PDF as `<expected PDF>.<test>.pdf`, so `make compare-pdf-diffs` shows it next to the expected PDF.
 
-If two tests own the same expected PDF, the run ends with exit status 4 and lists them, because the PDF written last would hide the other. Regenerating in place then leaves that expected PDF as it was.
+If two tests own the same expected PDF, the run ends with exit status 4 and lists them, because the PDF written last would hide the other. Regenerating in place then leaves that expected PDF as it was, and also leaves `pdf_samples/fixture_environment.json` as it was if it wrote no other expected PDF.
 
 A PDF created from a blank page holds the time it was created. Pass `timestamped=True` for such a PDF. Its `/CreationDate` and `/ModDate` are then ignored, with standard zlib only the length of the bytes is compared, and it is regenerated only when the comparison fails.
 
