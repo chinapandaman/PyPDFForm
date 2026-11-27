@@ -5,7 +5,7 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_coordinate_grid_view(pdf_samples, static_pdfs, request):
+def test_coordinate_grid_view(pdf_samples, static_pdfs, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_coordinate_grid_view.pdf")
 
     grid_view_pdf = PdfWrapper(
@@ -15,14 +15,7 @@ def test_coordinate_grid_view(pdf_samples, static_pdfs, request):
         margin=100,  # optional
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = grid_view_pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(grid_view_pdf.read()) == len(expected)
-        assert grid_view_pdf.read() == expected
+    expect_pdf(grid_view_pdf.read(), expected_path)
 
 
 def test_field_locations_dimensions(static_pdfs):
@@ -35,7 +28,7 @@ def test_field_locations_dimensions(static_pdfs):
     assert isinstance(form.widgets["test"].height, float)
 
 
-def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, request):
+def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_change_field_coordinates_dimensions.pdf"
     )
@@ -47,11 +40,4 @@ def test_change_field_coordinates_dimensions(pdf_samples, static_pdfs, request):
     form.widgets["test"].width = 242.4235
     form.widgets["test"].height = 31.067999999999984
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = form.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(form.read()) == len(expected)
-        assert form.read() == expected
+    expect_pdf(form.read(), expected_path)

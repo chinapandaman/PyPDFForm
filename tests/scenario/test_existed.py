@@ -5,7 +5,7 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_illinois_gun_bill_of_sale(existed_pdf_directory, request):
+def test_illinois_gun_bill_of_sale(existed_pdf_directory, expect_pdf):
     obj = PdfWrapper(
         os.path.join(existed_pdf_directory, "illinois-gun-bill-of-sale.pdf")
     ).fill(
@@ -45,18 +45,10 @@ def test_illinois_gun_bill_of_sale(existed_pdf_directory, request):
     expected_path = os.path.join(
         existed_pdf_directory, "test_illinois_gun_bill_of_sale.pdf"
     )
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_ds82(existed_pdf_directory, request):
+def test_ds82(existed_pdf_directory, expect_pdf):
     obj = PdfWrapper(os.path.join(existed_pdf_directory, "DS82.pdf")).fill(
         {
             "LastName": "Smith",
@@ -67,18 +59,10 @@ def test_ds82(existed_pdf_directory, request):
         existed_pdf_directory,
         "test_ds82.pdf",
     )
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory, request):
+def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory, expect_pdf):
     obj = PdfWrapper(
         os.path.join(
             existed_pdf_directory, "illinois-real-estate-power-of-attorney-form.pdf"
@@ -109,15 +93,7 @@ def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory, requ
         existed_pdf_directory,
         "test_illinois_real_estate_power_of_attorney_form.pdf",
     )
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    with open(
-        expected_path,
-        "rb+",
-    ) as f:
-        expected = f.read()
-        assert len(obj.read()) == len(expected)
-        assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_clear_form_button_not_checkbox(existed_pdf_directory):

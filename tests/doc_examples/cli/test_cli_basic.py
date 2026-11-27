@@ -13,7 +13,9 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_json_file_input_for_fill(pdf_samples, static_pdfs, json_samples, tmp_path):
+def test_json_file_input_for_fill(
+    pdf_samples, static_pdfs, json_samples, tmp_path, expect_pdf
+):
     expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -30,12 +32,10 @@ def test_json_file_input_for_fill(pdf_samples, static_pdfs, json_samples, tmp_pa
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test

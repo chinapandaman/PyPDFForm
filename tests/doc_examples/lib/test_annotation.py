@@ -5,7 +5,7 @@ import os
 from PyPDFForm import Annotations, PdfWrapper
 
 
-def test_text_annotations(static_pdfs, pdf_samples, request):
+def test_text_annotations(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_text_annotations.pdf")
 
     annotations = [
@@ -30,17 +30,10 @@ def test_text_annotations(static_pdfs, pdf_samples, request):
         annotations
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_uri_link_annotations(static_pdfs, pdf_samples, request):
+def test_uri_link_annotations(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_uri_link_annotations.pdf")
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
@@ -56,17 +49,10 @@ def test_uri_link_annotations(static_pdfs, pdf_samples, request):
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_page_link_annotations(static_pdfs, pdf_samples, request):
+def test_page_link_annotations(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_page_link_annotations.pdf")
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
@@ -82,17 +68,10 @@ def test_page_link_annotations(static_pdfs, pdf_samples, request):
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_highlight_annotations(static_pdfs, pdf_samples, request):
+def test_highlight_annotations(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_highlight_annotations.pdf")
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
@@ -103,17 +82,10 @@ def test_highlight_annotations(static_pdfs, pdf_samples, request):
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_underline_annotations(static_pdfs, pdf_samples, request):
+def test_underline_annotations(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_underline_annotations.pdf")
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
@@ -124,17 +96,10 @@ def test_underline_annotations(static_pdfs, pdf_samples, request):
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_squiggly_annotations(static_pdfs, pdf_samples, request):
+def test_squiggly_annotations(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_squiggly_annotations.pdf")
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
@@ -145,17 +110,10 @@ def test_squiggly_annotations(static_pdfs, pdf_samples, request):
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_strikeout_annotations(static_pdfs, pdf_samples, request):
+def test_strikeout_annotations(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_strikeout_annotations.pdf")
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
@@ -166,17 +124,10 @@ def test_strikeout_annotations(static_pdfs, pdf_samples, request):
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)
 
 
-def test_rubber_stamp_annotations(static_pdfs, pdf_samples, request):
+def test_rubber_stamp_annotations(static_pdfs, pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "docs", "test_rubber_stamp_annotations.pdf"
     )
@@ -194,11 +145,4 @@ def test_rubber_stamp_annotations(static_pdfs, pdf_samples, request):
         ]
     )
 
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = pdf.read()
-
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-
-        assert len(pdf.read()) == len(expected)
-        assert pdf.read() == expected
+    expect_pdf(pdf.read(), expected_path)

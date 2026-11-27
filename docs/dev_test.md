@@ -22,11 +22,10 @@ Leave expected PDF sample regeneration and visual regression comparison to the m
 
 ### Shared assertions
 
-An expected PDF only shows that the output hasn't changed, not that it is correct. `tests/conftest.py` has fixtures that check what a PDF contains instead. They don't depend on an expected PDF, except for `assert_same_pdf`, and behave the same on every platform:
+An expected PDF only shows that the output hasn't changed, not that it is correct. `tests/conftest.py` has fixtures that check what a PDF contains instead. They are implemented in `tests/support/checks.py`, don't depend on an expected PDF, and behave the same on every platform:
 
 | Fixture | Checks |
 | --- | --- |
-| `assert_same_pdf(actual, expected)` | The PDF has the same objects as its expected PDF. See [zlib-specific expected PDFs](#zlib-specific-expected-pdfs). |
 | `assert_page_ownership(stream)` | Every page is in the page tree, every annotation belongs to the page that lists it, and every widget of a listed field is on a page. |
 | `assert_catalog_fields(stream, names)` | The AcroForm lists exactly the fields with these fully qualified names, and their widgets are exactly the widgets on the pages, each listed once. Fields without a widget, such as hidden fields, are listed by name only. |
 | `assert_round_trip(pdf, data)` | The wrapper and its reopened output both read these values. |
@@ -38,16 +37,16 @@ Use them when a change affects one of these properties. Not every PDF passes all
 
 ## Expected PDF environment
 
-Most tests compare the PDF they generate with an expected PDF in `pdf_samples`, byte for byte. These bytes can depend on:
+Most tests compare the PDF they generate with an expected PDF in `pdf_samples`, using the [`expect_pdf`](#comparing-with-expected-pdfs) fixture. The bytes of a PDF can depend on:
 
-* The zlib library Python uses. Expected PDFs are generated with standard zlib. Python builds that use zlib-ng, such as Python 3.14 and later on Windows, compress some streams to different bytes. See [zlib-specific expected PDFs](#zlib-specific-expected-pdfs).
+* The zlib library Python uses. Expected PDFs are generated with standard zlib. Python builds that use zlib-ng, such as Python 3.14 and later on Windows, compress some streams to different bytes. `expect_pdf` compares the bytes only with standard zlib.
 * The installed versions of PyPDFForm's dependencies, and of the qpdf library pikepdf uses.
 
 PyPDFForm doesn't pin its dependencies. Any version in its dependency ranges is supported, and with standard zlib the expected PDFs are the same on Linux, macOS, and Windows, for every supported Python version, and for both the newest and lowest dependency versions.
 
 `pdf_samples/fixture_environment.json` records the environment the expected PDFs were last regenerated in. Regenerating them in place, for example with `make generate-new-pdf-samples` or `update` in the development container, rewrites this file, so commit it with the regenerated PDFs. Regenerating in place stops with an error when Python uses zlib-ng.
 
-Regenerating expected PDFs, in place or into another directory, runs one test at a time, because some tests read expected PDFs that other tests write, and some expected PDFs are written by more than one test. It stops with an error when pytest runs with `-n`.
+Regenerating expected PDFs in place runs one test at a time, because some tests read expected PDFs that other tests write. It stops with an error when pytest runs with `-n`. Regenerating them into another directory, as `make compare-pdf-diffs` does, runs in parallel. `make compare-pdf-diffs` fails when tests fail but no regenerated PDF differs from its expected PDF.
 
 Each test run prints the current environment and any differences from the record at the top of its output, for example:
 
@@ -57,26 +56,35 @@ differs from pdf_samples/fixture_environment.json: pypdf 6.22.0 (recorded 6.21.4
 
 If byte comparisons fail without a code change, check these differences first. A newer dependency version that changes the bytes needs regenerated expected PDFs. To reproduce the recorded bytes, install the recorded versions into a separate virtual environment, for example `uv pip install pypdf==6.21.4`.
 
-### zlib-specific expected PDFs
+### Comparing with expected PDFs
 
-Python's zlib compresses some of the streams PyPDFForm writes, such as embedded fonts, drawn text and images, and created fields. A test whose expected PDF has such streams uses the `assert_same_pdf` fixture instead of comparing bytes itself:
+A test compares its PDF with an expected PDF using the `expect_pdf` fixture, implemented in `tests/support/snapshots.py`:
 
 ```python
-def test_fill_font_color(
-    sample_template_with_font_colors, pdf_samples, request, assert_same_pdf
-):
-    ...
+def test_fill_font_color(sample_template_with_font_colors, pdf_samples, expect_pdf):
+    expected_path = os.path.join(pdf_samples, "test_fill_font_color.pdf")
+    obj = PdfWrapper(sample_template_with_font_colors).fill(...)
 
-    expected = f.read()
-
-    assert_same_pdf(obj.read(), expected)
+    expect_pdf(obj.read(), expected_path)
 ```
 
-On every platform, the fixture checks that both PDFs have the same version, trailer, and objects, comparing each stream after decompressing it. It ignores each stream's `/Length` and the trailer's `/ID`. With standard zlib, it also compares the bytes.
+On every platform, the fixture checks that both PDFs have the same version, trailer, and objects, comparing each stream after decompressing it. It ignores each stream's `/Length` and the trailer's `/ID`. Python's zlib compresses some of the streams PyPDFForm writes, such as embedded fonts, drawn text and images, and created fields, so the fixture compares the bytes only with standard zlib.
 
-Use it for a new test that passes with standard zlib but fails its byte comparison with zlib-ng.
+The test owns this expected PDF. Regenerating expected PDFs writes the test's PDF to that path, even when the comparison fails or the expected PDF doesn't exist yet. Each expected PDF has one owner. Other tests compare with it using `same_as`, which never regenerates it:
 
-A PDF created from a blank page holds the time it was created. Pass `timestamped=True` for such a PDF. Its `/CreationDate` and `/ModDate` are then ignored, and with standard zlib only the length of the bytes is compared.
+```python
+expect_pdf(actual, same_as=expected_path)
+```
+
+When the comparison fails, regenerating expected PDFs into another directory writes the other test's PDF as `<expected PDF>.<test>.pdf`, so `make compare-pdf-diffs` shows it next to the expected PDF.
+
+If two tests own the same expected PDF, the run ends with exit status 4 and lists them, because the PDF written last would hide the other. Regenerating in place then leaves that expected PDF as it was, and also leaves `pdf_samples/fixture_environment.json` as it was if it wrote no other expected PDF.
+
+A PDF created from a blank page holds the time it was created. Pass `timestamped=True` for such a PDF. Its `/CreationDate` and `/ModDate` are then ignored, with standard zlib only the length of the bytes is compared, and it is regenerated only when the comparison fails.
+
+The CLI reopens a PDF between commands, so a PDF made by several commands can have its objects numbered differently from the library test's expected PDF. Pass `length_only=True` with `same_as` to compare only the length of the bytes, with standard zlib.
+
+Every test that uses `expect_pdf` gets the `snapshot` marker, so `pytest -m snapshot` runs only the tests that compare with an expected PDF. `make generate-new-pdf-samples` and `make compare-pdf-diffs` run the tests marked `snapshot and not cli_test`.
 
 ### Lowest dependency versions
 
@@ -119,27 +127,20 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
     Consider this example test:
 
     ```python
-    def test_fill(pdf_samples, request):
+    def test_fill(pdf_samples, expect_pdf):
         expected_path = os.path.join(pdf_samples, "sample_filled.pdf")
-        with open(expected_path, "rb+") as f:
-            obj = PdfWrapper(os.path.join(pdf_samples, "sample_template.pdf")).fill(
-                {
-                    "test": "test_1",
-                    "check": True,
-                    "test_2": "test_2",
-                    "check_2": False,
-                    "test_3": "test_3",
-                    "check_3": True,
-                },
-            )
+        obj = PdfWrapper(os.path.join(pdf_samples, "sample_template.pdf")).fill(
+            {
+                "test": "test_1",
+                "check": True,
+                "test_2": "test_2",
+                "check_2": False,
+                "test_3": "test_3",
+                "check_3": True,
+            },
+        )
 
-            request.config.results["expected_path"] = expected_path
-            request.config.results["stream"] = obj.read()
-
-            expected = f.read()
-
-            assert len(obj.read()) == len(expected)
-            assert obj.read() == expected
+        expect_pdf(obj.read(), expected_path)
     ```
 
     The test starts by defining an expected PDF `sample_filled.pdf`:
@@ -163,20 +164,10 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
     )
     ```
 
-    Include these two lines in most tests to make expected PDF regeneration easier:
+    Finally, the test compares the generated PDF with the expected PDF. `expect_pdf` also records the PDF, so that regenerating expected PDFs can write it:
 
     ```python
-    request.config.results["expected_path"] = expected_path
-    request.config.results["stream"] = obj.read()
-    ```
-
-    Finally, the test compares the generated PDF stream with the expected PDF stream:
-
-    ```python
-    expected = f.read()
-
-    assert len(obj.read()) == len(expected)
-    assert obj.read() == expected
+    expect_pdf(obj.read(), expected_path)
     ```
 
 === "CLI"
@@ -191,7 +182,7 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
 
     ```python
     @pytest.mark.cli_test
-    def test_fill(pdf_samples, tmp_path):
+    def test_fill(pdf_samples, tmp_path, expect_pdf):
         expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
         input_path = os.path.join(tmp_path, "input.yaml")
         output_path = os.path.join(tmp_path, "output.pdf")
@@ -220,12 +211,8 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
         )
         assert result.exit_code == 0
 
-        with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-            expected = f1.read()
-            actual = f2.read()
-
-            assert len(expected) == len(actual)
-            assert expected == actual
+        with open(output_path, "rb") as f:
+            expect_pdf(f.read(), same_as=expected_path)
     ```
 
     Mark CLI tests with `@pytest.mark.cli_test`. The `runner` is a `CliRunner` from
@@ -282,13 +269,9 @@ Although each PyPDFForm test is unique, most follow a general paradigm.
     assert result.exit_code == 0
     ```
 
-    Finally, the test compares the PDF written by the command with the expected PDF stream:
+    Finally, the test compares the PDF written by the command with the expected PDF. A library test owns this expected PDF, so the CLI test uses `same_as` and never regenerates it:
 
     ```python
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
-        actual = f2.read()
-
-        assert len(expected) == len(actual)
-        assert expected == actual
+    with open(output_path, "rb") as f:
+        expect_pdf(f.read(), same_as=expected_path)
     ```

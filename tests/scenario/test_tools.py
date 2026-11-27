@@ -5,101 +5,75 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_filling_pdf_escape_pdf_form(tool_pdf_directory, request):
+def test_filling_pdf_escape_pdf_form(tool_pdf_directory, expect_pdf):
     expected_path = os.path.join(
         tool_pdf_directory, "test_filling_pdf_escape_pdf_form.pdf"
     )
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        result = PdfWrapper(os.path.join(tool_pdf_directory, "pdf_escape.pdf")).fill(
-            {
-                "test_1": "test_1",
-                "test_2": "test_2",
-                "test_3": "test_3",
-                "check_1": True,
-                "check_2": True,
-                "check_3": True,
-                "radio_1": 2,
-            }
-        )
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = result.read()
+    result = PdfWrapper(os.path.join(tool_pdf_directory, "pdf_escape.pdf")).fill(
+        {
+            "test_1": "test_1",
+            "test_2": "test_2",
+            "test_3": "test_3",
+            "check_1": True,
+            "check_2": True,
+            "check_3": True,
+            "radio_1": 2,
+        }
+    )
 
-        assert len(result.read()) == len(expected)
-        assert result.read() == expected
+    expect_pdf(result.read(), expected_path)
 
 
-def test_filling_docfly_pdf_form(tool_pdf_directory, request):
+def test_filling_docfly_pdf_form(tool_pdf_directory, expect_pdf):
     expected_path = os.path.join(tool_pdf_directory, "test_filling_docfly_pdf_form.pdf")
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        result = PdfWrapper(os.path.join(tool_pdf_directory, "docfly.pdf")).fill(
-            {
-                "test_1": "test_1",
-                "test_2": "test_2",
-                "test_3": "test_3",
-                "check_1": True,
-                "check_2": True,
-                "check_3": True,
-                "radio_1": 1,
-            }
-        )
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = result.read()
+    result = PdfWrapper(os.path.join(tool_pdf_directory, "docfly.pdf")).fill(
+        {
+            "test_1": "test_1",
+            "test_2": "test_2",
+            "test_3": "test_3",
+            "check_1": True,
+            "check_2": True,
+            "check_3": True,
+            "radio_1": 1,
+        }
+    )
 
-        assert len(result.read()) == len(expected)
-        assert result.read() == expected
+    expect_pdf(result.read(), expected_path)
 
 
-def test_filling_sejda_dropdown_pdf_form(tool_pdf_directory, request):
+def test_filling_sejda_dropdown_pdf_form(tool_pdf_directory, expect_pdf):
     expected_path = os.path.join(
         tool_pdf_directory, "test_filling_sejda_dropdown_pdf_form.pdf"
     )
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        result = PdfWrapper(
-            os.path.join(tool_pdf_directory, "sejda_dropdown.pdf")
-        ).fill({"dropdown_1": 2})
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = result.read()
-        assert len(result.read()) == len(expected)
-        assert result.read() == expected
+    result = PdfWrapper(os.path.join(tool_pdf_directory, "sejda_dropdown.pdf")).fill(
+        {"dropdown_1": 2}
+    )
+    expect_pdf(result.read(), expected_path)
 
 
-def test_filling_soda_pdf_form(tool_pdf_directory, request):
+def test_filling_soda_pdf_form(tool_pdf_directory, expect_pdf):
     expected_path = os.path.join(tool_pdf_directory, "test_filling_soda_pdf_form.pdf")
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        result = PdfWrapper(os.path.join(tool_pdf_directory, "soda.pdf")).fill(
-            {
-                "Text1": "Helvetica 8",
-                "Text2": "Helvetica 12",
-                "Text3": "Helvetica 24",
-                "Text4": "Helvetica 8",
-                "Text5": "Helvetica 12",
-                "Text6": "Helvetica 24",
-                "Text7": "Helvetica 8",
-                "Text8": "Helvetica 12",
-                "Text9": "Helvetica 24",
-            }
-        )
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = result.read()
+    result = PdfWrapper(os.path.join(tool_pdf_directory, "soda.pdf")).fill(
+        {
+            "Text1": "Helvetica 8",
+            "Text2": "Helvetica 12",
+            "Text3": "Helvetica 24",
+            "Text4": "Helvetica 8",
+            "Text5": "Helvetica 12",
+            "Text6": "Helvetica 24",
+            "Text7": "Helvetica 8",
+            "Text8": "Helvetica 12",
+            "Text9": "Helvetica 24",
+        }
+    )
 
-        assert len(result.read()) == len(expected)
-        assert result.read() == expected
+    expect_pdf(result.read(), expected_path)
 
 
-def test_filling_pdfgear_sig(
-    tool_pdf_directory, image_samples, request, assert_same_pdf
-):
+def test_filling_pdfgear_sig(tool_pdf_directory, image_samples, expect_pdf):
     expected_path = os.path.join(tool_pdf_directory, "test_filling_pdfgear_sig.pdf")
-    with open(expected_path, "rb+") as f:
-        expected = f.read()
-        result = PdfWrapper(os.path.join(tool_pdf_directory, "pdfgear.pdf")).fill(
-            {"signature": os.path.join(image_samples, "sample_signature.png")}
-        )
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = result.read()
+    result = PdfWrapper(os.path.join(tool_pdf_directory, "pdfgear.pdf")).fill(
+        {"signature": os.path.join(image_samples, "sample_signature.png")}
+    )
 
-        assert_same_pdf(result.read(), expected)
+    expect_pdf(result.read(), expected_path)

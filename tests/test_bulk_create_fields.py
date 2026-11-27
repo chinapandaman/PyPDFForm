@@ -10,7 +10,7 @@ from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.constants import Annots, Subtype, Widget
 
 
-def test_bulk_create_fields_stress_max(pdf_samples, request, assert_same_pdf):
+def test_bulk_create_fields_stress_max(pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples, "bulk_create_fields", "test_bulk_create_fields_stress_max.pdf"
     )
@@ -55,36 +55,30 @@ def test_bulk_create_fields_stress_max(pdf_samples, request, assert_same_pdf):
         y = 0
         x += margin
 
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper()
-        for _ in range(6):
-            obj += PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
-        obj.bulk_create_fields(fields)
+    obj = PdfWrapper()
+    for _ in range(6):
+        obj += PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
+    obj.bulk_create_fields(fields)
 
-        prefix_to_page = {
-            "text_": 1,
-            "check_": 2,
-            "dropdown_": 3,
-            "radio_": 4,
-            "image_": 5,
-            "signature_": 6,
-        }
+    prefix_to_page = {
+        "text_": 1,
+        "check_": 2,
+        "dropdown_": 3,
+        "radio_": 4,
+        "image_": 5,
+        "signature_": 6,
+    }
 
-        for k, v in obj.widgets.items():
-            for each, page in prefix_to_page.items():
-                if k.startswith(each):
-                    assert v.page_number == page
-                    break
+    for k, v in obj.widgets.items():
+        for each, page in prefix_to_page.items():
+            if k.startswith(each):
+                assert v.page_number == page
+                break
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert_same_pdf(obj.read(), expected)
+    expect_pdf(obj.read(), expected_path)
 
 
-def test_bulk_create_fields_stress_max_mixed(pdf_samples, request, assert_same_pdf):
+def test_bulk_create_fields_stress_max_mixed(pdf_samples, expect_pdf):
     expected_path = os.path.join(
         pdf_samples,
         "bulk_create_fields",
@@ -147,17 +141,9 @@ def test_bulk_create_fields_stress_max_mixed(pdf_samples, request, assert_same_p
         y = 0
         x += 75
 
-    with open(expected_path, "rb+") as f:
-        obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
-            fields
-        )
+    obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(fields)
 
-        request.config.results["expected_path"] = expected_path
-        request.config.results["stream"] = obj.read()
-
-        expected = f.read()
-
-        assert_same_pdf(obj.read(), expected)
+    expect_pdf(obj.read(), expected_path)
 
 
 def test_bulk_create_fields_does_not_duplicate_widgets():

@@ -73,7 +73,7 @@ def test_create_raw_input_methods(static_pdfs, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_draw_text(pdf_samples, static_pdfs, yaml_samples, tmp_path, assert_same_pdf):
+def test_draw_text(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_text.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -91,15 +91,14 @@ def test_draw_text(pdf_samples, static_pdfs, yaml_samples, tmp_path, assert_same
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert_same_pdf(actual, expected)
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_draw_image(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_draw_image(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_image.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -117,16 +116,14 @@ def test_draw_image(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_draw_line(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_draw_line(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_line.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -144,16 +141,14 @@ def test_draw_line(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_draw_rect(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_draw_rect(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_rect.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -171,16 +166,14 @@ def test_draw_rect(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_draw_circle(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_draw_circle(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_circle.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -198,16 +191,14 @@ def test_draw_circle(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
 
 
 @pytest.mark.cli_test
-def test_draw_ellipse(pdf_samples, static_pdfs, yaml_samples, tmp_path):
+def test_draw_ellipse(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
     expected_path = os.path.join(pdf_samples, "docs", "test_draw_ellipse.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -225,9 +216,7 @@ def test_draw_ellipse(pdf_samples, static_pdfs, yaml_samples, tmp_path):
     )
     assert result.exit_code == 0
 
-    with open(expected_path, "rb") as f1, open(output_path, "rb") as f2:
-        expected = f1.read()
+    with open(output_path, "rb") as f2:
         actual = f2.read()
 
-        assert len(expected) == len(actual)
-        assert expected == actual
+        expect_pdf(actual, same_as=expected_path)
