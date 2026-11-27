@@ -2,7 +2,37 @@
 
 import os
 
+import pytest
+
 from PyPDFForm import PdfWrapper
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        ["test_fill.pdf"],
+        ["dropdown", "test_dropdown_one.pdf"],
+        ["dropdown", "test_dropdown_two.pdf"],
+    ],
+)
+@pytest.mark.parametrize(
+    "options",
+    [{}, {"need_appearances": True}],
+    ids=["default", "need-appearances"],
+)
+def test_output_without_invalid_appearances(
+    pdf_samples, path, options, assert_valid_appearances
+):
+    # written by an earlier version, with a value string as /AP
+    with open(os.path.join(pdf_samples, *path), "rb") as f:
+        template = f.read()
+    with pytest.raises(AssertionError):
+        assert_valid_appearances(template)
+
+    form = PdfWrapper(template, **options)
+
+    assert_valid_appearances(form.read())
+    assert_valid_appearances(form.fill({}).read())
 
 
 def test_generate_appearance_streams_fill(

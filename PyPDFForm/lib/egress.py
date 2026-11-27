@@ -3,8 +3,9 @@
 Prepare PDF output and publish serialized PDFs to filesystem paths.
 
 Preparation helpers manage appearance streams and the /NeedAppearances flag,
-and add the fields of page widget annotations to the AcroForm `/Fields` array
-before `PdfWrapper.read()` returns the final bytes.
+add the fields of page widget annotations to the AcroForm `/Fields` array, and
+remove widget appearances that aren't dictionaries before `PdfWrapper.read()`
+returns the final bytes.
 
 For path output, `write_path()` writes serialized bytes to a sibling temporary
 file and closes it before atomic replacement. It follows symlinks, preserves
@@ -24,6 +25,7 @@ from pypdf import PdfWriter
 from pypdf.generic import ArrayObject, DictionaryObject, NameObject
 
 from .constants import (
+    AP,
     XFA,
     AcroForm,
     Annots,
@@ -146,8 +148,11 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
     parents stored inline are first shared with the field tree by
     `share_inline_objects`, which `PdfWrapper` already applies when it loads a
     PDF. An AcroForm dictionary is created when necessary, and null entries
-    are treated as absent. When no page has a widget annotation, the original
-    PDF stream is returned unchanged to avoid an unnecessary rewrite.
+    are treated as absent. A page widget whose appearance (`/AP`) isn't a
+    dictionary, such as the value string that earlier versions of PyPDFForm
+    wrote, loses it, so PDF viewers draw the widget instead. When no page has
+    a widget annotation, the original PDF stream is returned unchanged to
+    avoid an unnecessary rewrite.
 
     Args:
         pdf (bytes): The PDF stream whose AcroForm fields should be updated.
@@ -170,6 +175,11 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
                 or widget.get(Subtype) != Widget
             ):
                 continue
+            if AP in widget and not isinstance(
+                widget[AP].get_object(), DictionaryObject
+            ):
+                # such as the value string that earlier versions wrote
+                del widget[AP]
             field_ref = _get_root_field_reference(annot)
             field_key = _field_reference_key(field_ref)
             if field_key not in seen_fields:
