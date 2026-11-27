@@ -474,7 +474,7 @@ def test_checkbox_value_of_its_field(template_stream, states, value, expected):
     assert obj.data["check"] is expected
 
 
-def test_fill_keeps_checkboxes_not_supplied(template_stream, pdf_samples):
+def test_fill_keeps_checkboxes_not_supplied(template_stream, expected_pdfs):
     # "check" reads True from the field's value, which names its last widget's
     # state, while its first widget is off
     stream = checkbox_field(template_stream, ["/A", "/B"], "/B")
@@ -496,7 +496,9 @@ def test_fill_keeps_checkboxes_not_supplied(template_stream, pdf_samples):
 
     # two checkboxes are named "c1_3[1]"; the later, checked one gives the
     # name its value, and the other stays unchecked
-    path = os.path.join(pdf_samples, "scenario", "issues", "PPF-939_expected_2.pdf")
+    path = os.path.join(
+        expected_pdfs, "scenario", "test_issues", "test_use_full_widget_name_2.pdf"
+    )
     with open(path, "rb") as f:
         sample = f.read()
     filled = PdfWrapper(sample).fill({}).read()

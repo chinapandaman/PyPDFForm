@@ -6,8 +6,6 @@ from PyPDFForm import Fields, PdfWrapper
 
 
 def test_bulk_create_fields(pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_bulk_create_fields.pdf")
-
     fields = [
         Fields.TextField(
             name="new_text_field_1",
@@ -39,12 +37,10 @@ def test_bulk_create_fields(pdf_samples, expect_pdf):
         fields
     )
 
-    expect_pdf(new_form.read(), expected_path)
+    expect_pdf(new_form.read())
 
 
 def test_create_text(pdf_samples, sample_font_stream, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_text.pdf")
-
     new_form = (
         PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
         .register_font(
@@ -77,12 +73,10 @@ def test_create_text(pdf_samples, sample_font_stream, expect_pdf):
         )
     )
 
-    expect_pdf(new_form.read(), expected_path)
+    expect_pdf(new_form.read())
 
 
 def test_create_check(pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_check.pdf")
-
     new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
         [
             Fields.CheckBoxField(
@@ -102,12 +96,10 @@ def test_create_check(pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(new_form.read(), expected_path)
+    expect_pdf(new_form.read())
 
 
 def test_create_radio(pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_radio.pdf")
-
     new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
         [
             Fields.RadioGroup(
@@ -128,12 +120,10 @@ def test_create_radio(pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(new_form.read(), expected_path)
+    expect_pdf(new_form.read())
 
 
 def test_create_dropdown(pdf_samples, sample_font_stream, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_dropdown.pdf")
-
     new_form = (
         PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
         .register_font("your_registered_font", sample_font_stream)
@@ -164,14 +154,10 @@ def test_create_dropdown(pdf_samples, sample_font_stream, expect_pdf):
         )
     )
 
-    expect_pdf(new_form.read(), expected_path)
+    expect_pdf(new_form.read())
 
 
 def test_create_dropdown_with_export_values(pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "docs", "test_create_dropdown_with_export_values.pdf"
-    )
-
     new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
         [
             Fields.DropdownField(
@@ -188,12 +174,10 @@ def test_create_dropdown_with_export_values(pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(new_form.read(), expected_path)
+    expect_pdf(new_form.read())
 
 
 def test_create_sig(pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_sig.pdf")
-
     new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
         [
             Fields.SignatureField(
@@ -209,12 +193,10 @@ def test_create_sig(pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(new_form.read(), expected_path)
+    expect_pdf(new_form.read())
 
 
 def test_create_image(pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_image.pdf")
-
     new_form = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
         [
             Fields.ImageField(
@@ -230,4 +212,4 @@ def test_create_image(pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(new_form.read(), expected_path)
+    expect_pdf(new_form.read())

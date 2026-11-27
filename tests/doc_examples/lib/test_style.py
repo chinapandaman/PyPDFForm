@@ -17,9 +17,7 @@ def test_change_title(static_pdfs):
     assert PdfWrapper(pdf.read()).title == "New PDF"
 
 
-def test_change_text_font(static_pdfs, sample_font_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
-
+def test_change_text_font(static_pdfs, sample_font_stream, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     form.register_font("new_font_name", sample_font_stream)
 
@@ -42,12 +40,10 @@ def test_change_text_font(static_pdfs, sample_font_stream, pdf_samples, expect_p
         },
     )
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_text_font_size(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_size.pdf")
-
+def test_change_text_font_size(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
     # change globally by iterating each text field
@@ -69,12 +65,10 @@ def test_change_text_font_size(static_pdfs, pdf_samples, expect_pdf):
         },
     )
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_text_font_color(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_color.pdf")
-
+def test_change_text_font_color(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
     # change globally by iterating each text field
@@ -96,12 +90,10 @@ def test_change_text_font_color(static_pdfs, pdf_samples, expect_pdf):
         },
     )
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_text_alignment(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_alignment.pdf")
-
+def test_change_text_alignment(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
     # change globally by iterating each text field
@@ -123,12 +115,10 @@ def test_change_text_alignment(static_pdfs, pdf_samples, expect_pdf):
         },
     )
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_text_max_length(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_max_length.pdf")
-
+def test_change_text_max_length(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
     # change globally by iterating each text field
@@ -150,12 +140,10 @@ def test_change_text_max_length(static_pdfs, pdf_samples, expect_pdf):
         },
     )
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_text_comb(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_comb.pdf")
-
+def test_change_text_comb(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
     # change globally by iterating each text field
@@ -179,12 +167,10 @@ def test_change_text_comb(static_pdfs, pdf_samples, expect_pdf):
         },
     )
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_text_multiline(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_multiline.pdf")
-
+def test_change_text_multiline(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
     form.widgets["test"].multiline = True
@@ -200,12 +186,10 @@ def test_change_text_multiline(static_pdfs, pdf_samples, expect_pdf):
         },
     )
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_check_size(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_check_size.pdf")
-
+def test_change_check_size(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
 
     form.widgets["check"].size = 50
@@ -220,28 +204,18 @@ def test_change_check_size(static_pdfs, pdf_samples, expect_pdf):
         },
     )
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_dropdown_choices(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_dropdown_choices.pdf"
-    )
-
+def test_change_dropdown_choices(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
 
     form.widgets["dropdown_1"].choices = ["", "apple", "banana", "cherry", "dates"]
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_dropdown_choices_with_export_values(
-    static_pdfs, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_dropdown_choices_with_export_values.pdf"
-    )
-
+def test_change_dropdown_choices_with_export_values(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
 
     form.widgets["dropdown_1"].choices = [
@@ -252,43 +226,33 @@ def test_change_dropdown_choices_with_export_values(
         ("dates", "dates_export_value"),
     ]
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_dropdown_font(static_pdfs, pdf_samples, sample_font_stream, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_font.pdf")
-
+def test_change_dropdown_font(static_pdfs, sample_font_stream, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
 
     form.register_font("new_font_name", sample_font_stream)
 
     form.widgets["dropdown_1"].font = "new_font_name"
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_dropdown_font_size(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_dropdown_font_size.pdf"
-    )
-
+def test_change_dropdown_font_size(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
 
     form.widgets["dropdown_1"].font_size = 30
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_dropdown_font_color(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_dropdown_font_color.pdf"
-    )
-
+def test_change_dropdown_font_color(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
 
     form.widgets["dropdown_1"].font_color = (1, 0, 0)
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
 def test_update_key(static_pdfs):
@@ -306,9 +270,7 @@ def test_update_key(static_pdfs):
     assert "test_text_2" in form.widgets
 
 
-def test_update_key_index(pdf_samples, static_pdfs, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_update_key_index.pdf")
-
+def test_update_key_index(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "733.pdf")).update_widget_key(
         "Description[0]", "Description[1]", index=1
     )
@@ -316,14 +278,10 @@ def test_update_key_index(pdf_samples, static_pdfs, expect_pdf):
 
     form.fill(form.sample_data)
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_field_editability(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_field_editability.pdf"
-    )
-
+def test_change_field_editability(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template_with_dropdown.pdf"))
 
     form.fill(
@@ -344,24 +302,18 @@ def test_change_field_editability(static_pdfs, pdf_samples, expect_pdf):
     form.widgets["radio_1"].readonly = False  # radio button group
     form.widgets["dropdown_1"].readonly = False  # dropdown
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_change_field_visibility(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_field_visibility.pdf"
-    )
-
+def test_change_field_visibility(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     form.widgets["test"].hidden = True
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())
 
 
-def test_remove_fields(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_remove_fields.pdf")
-
+def test_remove_fields(static_pdfs, expect_pdf):
     form = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     form.remove_fields(["test", "test_2", "check_2"])
 
-    expect_pdf(form.read(), expected_path)
+    expect_pdf(form.read())

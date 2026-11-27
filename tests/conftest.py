@@ -17,7 +17,7 @@ from packaging.utils import canonicalize_name
 from PIL import features
 
 from tests.support import checks
-from tests.support.snapshots import OWNED, ExpectPdf
+from tests.support.snapshots import EXPECTED_DIR, OWNED, ExpectPdf
 
 # sample paths, template streams, and data, shared by every suite
 pytest_plugins = ["tests.support.samples"]
@@ -26,6 +26,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURE_ENVIRONMENT_PATH = os.path.join(ROOT, "pdf_samples", "fixture_environment.json")
 in_place_writes = pytest.StashKey[object]()
 shared_expected_pdfs = pytest.StashKey[dict]()
+unowned_expected_pdfs = pytest.StashKey[list]()
 
 
 def _zlib_info():
@@ -63,6 +64,34 @@ def _regenerating_in_place(config):
     return config.getoption("--regenerate") == "1" and not config.getoption(
         "--regenerate-dir"
     )
+
+
+def _runs_every_test(config):
+    # whether the run selects the whole suite, so that every owner of an
+    # expected PDF reports it
+    option = config.option
+    if option.collectonly or option.setuponly or option.setupplan:
+        return False
+    if option.keyword or option.markexpr or option.deselect:
+        return False
+    if option.ignore or option.ignore_glob:
+        return False
+    if getattr(option, "lf", False) or getattr(option, "stepwise", False):
+        return False
+    suite = {ROOT, os.path.join(ROOT, "tests")}
+    return all(os.path.abspath(arg) in suite for arg in config.args)
+
+
+def _expected_pdf_files():
+    # every file under pdf_samples/expected/, except hidden ones such as .DS_Store
+    files = set()
+    for directory, _, names in os.walk(os.path.join(ROOT, EXPECTED_DIR)):
+        for name in names:
+            if not name.startswith("."):
+                path = os.path.relpath(os.path.join(directory, name), ROOT)
+                files.add(path.replace(os.sep, "/"))
+
+    return files
 
 
 class ExpectedPdfOwners:
@@ -110,6 +139,8 @@ class InPlaceWrites:
                 shutil.copyfile(path, backup)
             self.backups[path] = backup
 
+        # a new test's expected PDF can be the first in its module's directory
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "wb") as f:
             f.write(stream)
         self.restored.discard(path)
@@ -212,6 +243,12 @@ def pytest_sessionfinish(session):
     # a pytest-xdist worker only sees its own tests, and the controller all of them
     if not hasattr(config, "workerinput"):
         owners = config.pluginmanager.get_plugin("expected_pdf_owners").owners
+        # only a passing run of every test has seen every owner
+        if session.exitstatus == pytest.ExitCode.OK and _runs_every_test(config):
+            unowned = sorted(_expected_pdf_files() - set(owners))
+            if unowned:
+                config.stash[unowned_expected_pdfs] = unowned
+                session.exitstatus = pytest.ExitCode.USAGE_ERROR
         shared = {
             path: sorted(nodeids)
             for path, nodeids in sorted(owners.items())
@@ -237,6 +274,15 @@ def pytest_sessionfinish(session):
 
 
 def pytest_terminal_summary(terminalreporter, config):
+    unowned = config.stash.get(unowned_expected_pdfs, [])
+    if unowned:
+        terminalreporter.section("expected PDFs without an owner", red=True)
+        for path in unowned:
+            terminalreporter.line(path)
+        terminalreporter.line(
+            "Each file in pdf_samples/expected/ is named after the test that owns "
+            "it. Rename the file after its test, or remove it."
+        )
     shared = config.stash.get(shared_expected_pdfs, {})
     if shared:
         terminalreporter.section("expected PDFs owned by more than one test", red=True)

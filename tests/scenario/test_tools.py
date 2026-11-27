@@ -6,9 +6,6 @@ from PyPDFForm import PdfWrapper
 
 
 def test_filling_pdf_escape_pdf_form(tool_pdf_directory, expect_pdf):
-    expected_path = os.path.join(
-        tool_pdf_directory, "test_filling_pdf_escape_pdf_form.pdf"
-    )
     result = PdfWrapper(os.path.join(tool_pdf_directory, "pdf_escape.pdf")).fill(
         {
             "test_1": "test_1",
@@ -21,11 +18,10 @@ def test_filling_pdf_escape_pdf_form(tool_pdf_directory, expect_pdf):
         }
     )
 
-    expect_pdf(result.read(), expected_path)
+    expect_pdf(result.read())
 
 
 def test_filling_docfly_pdf_form(tool_pdf_directory, expect_pdf):
-    expected_path = os.path.join(tool_pdf_directory, "test_filling_docfly_pdf_form.pdf")
     result = PdfWrapper(os.path.join(tool_pdf_directory, "docfly.pdf")).fill(
         {
             "test_1": "test_1",
@@ -38,21 +34,17 @@ def test_filling_docfly_pdf_form(tool_pdf_directory, expect_pdf):
         }
     )
 
-    expect_pdf(result.read(), expected_path)
+    expect_pdf(result.read())
 
 
 def test_filling_sejda_dropdown_pdf_form(tool_pdf_directory, expect_pdf):
-    expected_path = os.path.join(
-        tool_pdf_directory, "test_filling_sejda_dropdown_pdf_form.pdf"
-    )
     result = PdfWrapper(os.path.join(tool_pdf_directory, "sejda_dropdown.pdf")).fill(
         {"dropdown_1": 2}
     )
-    expect_pdf(result.read(), expected_path)
+    expect_pdf(result.read())
 
 
 def test_filling_soda_pdf_form(tool_pdf_directory, expect_pdf):
-    expected_path = os.path.join(tool_pdf_directory, "test_filling_soda_pdf_form.pdf")
     result = PdfWrapper(os.path.join(tool_pdf_directory, "soda.pdf")).fill(
         {
             "Text1": "Helvetica 8",
@@ -67,13 +59,12 @@ def test_filling_soda_pdf_form(tool_pdf_directory, expect_pdf):
         }
     )
 
-    expect_pdf(result.read(), expected_path)
+    expect_pdf(result.read())
 
 
 def test_filling_pdfgear_sig(tool_pdf_directory, image_samples, expect_pdf):
-    expected_path = os.path.join(tool_pdf_directory, "test_filling_pdfgear_sig.pdf")
     result = PdfWrapper(os.path.join(tool_pdf_directory, "pdfgear.pdf")).fill(
         {"signature": os.path.join(image_samples, "sample_signature.png")}
     )
 
-    expect_pdf(result.read(), expected_path)
+    expect_pdf(result.read())

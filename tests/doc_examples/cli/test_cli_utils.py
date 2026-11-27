@@ -12,8 +12,10 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_blank_page(pdf_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_blank_page.pdf")
+def test_blank_page(expected_pdfs, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_utils", "test_blank_page.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -34,9 +36,13 @@ def test_blank_page(pdf_samples, tmp_path, expect_pdf):
 
 
 @pytest.mark.cli_test
-def test_blank_page_custom_dimensions(pdf_samples, tmp_path, expect_pdf):
+def test_blank_page_custom_dimensions(expected_pdfs, tmp_path, expect_pdf):
     expected_path = os.path.join(
-        pdf_samples, "docs", "test_blank_page_custom_dimensions.pdf"
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_utils",
+        "test_blank_page_custom_dimensions.pdf",
     )
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -62,8 +68,14 @@ def test_blank_page_custom_dimensions(pdf_samples, tmp_path, expect_pdf):
 
 
 @pytest.mark.cli_test
-def test_blank_page_multiply(pdf_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_blank_page_multiply.pdf")
+def test_blank_page_multiply(expected_pdfs, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_utils",
+        "test_blank_page_multiply.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -79,8 +91,10 @@ def test_blank_page_multiply(pdf_samples, tmp_path, expect_pdf):
 
 
 @pytest.mark.cli_test
-def test_extract_pages(static_pdfs, pdf_samples, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_extract_pages.pdf")
+def test_extract_pages(static_pdfs, expected_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_utils", "test_extract_pages.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     extract_result = runner.invoke(
@@ -119,8 +133,10 @@ def test_extract_pages(static_pdfs, pdf_samples, yaml_samples, tmp_path, expect_
 
 
 @pytest.mark.cli_test
-def test_merge(static_pdfs, pdf_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_merge.pdf")
+def test_merge(static_pdfs, pdf_samples, tmp_path, expected_pdfs, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_utils", "test_merge.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -143,8 +159,10 @@ def test_merge(static_pdfs, pdf_samples, tmp_path, expect_pdf):
 
 
 @pytest.mark.cli_test
-def test_reorg_pages(static_pdfs, pdf_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_reorg_pages.pdf")
+def test_reorg_pages(static_pdfs, pdf_samples, tmp_path, expected_pdfs, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_utils", "test_reorg_pages.pdf"
+    )
     first_page_path = os.path.join(tmp_path, "first_page.pdf")
     remaining_pages_path = os.path.join(tmp_path, "remaining_pages.pdf")
     output_path = os.path.join(tmp_path, "output.pdf")

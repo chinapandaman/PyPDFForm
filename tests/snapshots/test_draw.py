@@ -5,10 +5,7 @@ import os
 from PyPDFForm import PdfWrapper, RawElements
 
 
-def test_draw_multiline_text_on_one_page(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "test_draw_multiline_text_on_one_page.pdf"
-    )
+def test_draw_multiline_text_on_one_page(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).draw(
         [
             RawElements.RawText(
@@ -22,13 +19,10 @@ def test_draw_multiline_text_on_one_page(template_stream, pdf_samples, expect_pd
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_draw_text_on_radio_template(
-    template_with_radiobutton_stream, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(pdf_samples, "test_draw_text_on_radio_template.pdf")
+def test_draw_text_on_radio_template(template_with_radiobutton_stream, expect_pdf):
     obj = PdfWrapper(template_with_radiobutton_stream).draw(
         [
             RawElements.RawText(
@@ -42,11 +36,10 @@ def test_draw_text_on_radio_template(
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_draw_text_on_sejda_template(sejda_template, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "test_draw_text_on_sejda_template.pdf")
+def test_draw_text_on_sejda_template(sejda_template, expect_pdf):
     obj = PdfWrapper(sejda_template).draw(
         [
             RawElements.RawText(
@@ -60,13 +53,12 @@ def test_draw_text_on_sejda_template(sejda_template, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_draw_image_on_radio_template(
-    template_with_radiobutton_stream, image_samples, pdf_samples, expect_pdf
+    template_with_radiobutton_stream, image_samples, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "test_draw_image_on_radio_template.pdf")
     with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
         obj = PdfWrapper(template_with_radiobutton_stream).draw(
             [
@@ -81,13 +73,10 @@ def test_draw_image_on_radio_template(
             ]
         )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_draw_image_on_sejda_template(
-    sejda_template, image_samples, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(pdf_samples, "test_draw_image_on_sejda_template.pdf")
+def test_draw_image_on_sejda_template(sejda_template, image_samples, expect_pdf):
     with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
         obj = PdfWrapper(sejda_template).draw(
             [
@@ -102,13 +91,10 @@ def test_draw_image_on_sejda_template(
             ]
         )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_draw_png_image_on_one_page(
-    template_stream, image_samples, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(pdf_samples, "test_draw_png_image_on_one_page.pdf")
+def test_draw_png_image_on_one_page(template_stream, image_samples, expect_pdf):
     obj = PdfWrapper(template_stream).draw(
         [
             RawElements.RawImage(
@@ -122,15 +108,12 @@ def test_draw_png_image_on_one_page(
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_draw_transparent_png_image_on_one_page(
-    template_stream, image_samples, pdf_samples, expect_pdf
+    template_stream, image_samples, expect_pdf
 ):
-    expected_path = os.path.join(
-        pdf_samples, "test_draw_transparent_png_image_on_one_page.pdf"
-    )
     obj = PdfWrapper(template_stream).draw(
         [
             RawElements.RawImage(
@@ -144,11 +127,10 @@ def test_draw_transparent_png_image_on_one_page(
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_draw_text_and_image(template_stream, image_samples, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "test_draw_text_and_image.pdf")
+def test_draw_text_and_image(template_stream, image_samples, expect_pdf):
     with open(os.path.join(image_samples, "sample_image.jpg"), "rb+") as _f:
         obj = PdfWrapper(template_stream).draw(
             [
@@ -159,4 +141,4 @@ def test_draw_text_and_image(template_stream, image_samples, pdf_samples, expect
             ]
         )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())

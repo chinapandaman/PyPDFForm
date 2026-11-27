@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 
 from PyPDFForm import Fields, PdfWrapper
 from tests.support.checks import assert_same_pdf
@@ -8,6 +9,19 @@ from tests.support.checks import assert_same_pdf
 # the user property naming an expected PDF that a test owns; reports carry it
 # from pytest-xdist workers to the controller, which sees every owner
 OWNED = "expected_pdf"
+# each expected PDF in this directory is named after the test that owns it
+EXPECTED_DIR = os.path.join("pdf_samples", "expected")
+
+
+def expected_pdf_path(root, node):
+    # pdf_samples/expected/<directory under tests>/<module>/<test>[-<parameters>].pdf
+    module = os.path.relpath(str(node.path), os.path.join(root, "tests"))
+    name = node.originalname
+    callspec = getattr(node, "callspec", None)
+    if callspec is not None:
+        name = f"{name}-{callspec.id}"
+    name = re.sub(r"[^\w.-]+", "_", name)
+    return os.path.join(root, EXPECTED_DIR, os.path.splitext(module)[0], f"{name}.pdf")
 
 
 class ExpectPdf:
@@ -19,6 +33,9 @@ class ExpectPdf:
         self.node = node
         self.root = root
         self.standard_zlib = standard_zlib
+        # the expected PDF this test owns unless it passes a path
+        self.path = expected_pdf_path(root, node)
+        self.owned = None
         # the outputs to regenerate, by the path of their expected PDF
         self.outputs = {}
         # the outputs that differ from an expected PDF compared with same_as,
@@ -28,22 +45,34 @@ class ExpectPdf:
     def __call__(
         self, stream, path=None, *, same_as=None, timestamped=False, length_only=False
     ):
-        # path is the expected PDF this test owns and regenerates; same_as is
-        # only compared, for example one that another test owns
+        # the test owns and regenerates the expected PDF named after it, or path,
+        # which only a PDF outside pdf_samples needs; same_as is only compared,
+        # for example one that another test owns
         if length_only and same_as is None:
             msg = "length_only only applies to same_as"
             raise TypeError(msg)
-        if path is not None and same_as is None:
-            expected_path = os.path.abspath(path)
+        if path is not None and same_as is not None:
+            msg = "expect_pdf takes either path or same_as"
+            raise TypeError(msg)
+        if same_as is None:
+            expected_path = self.path if path is None else os.path.abspath(path)
+            samples = os.path.normcase(os.path.join(self.root, "pdf_samples", ""))
+            if path is not None and os.path.normcase(expected_path).startswith(samples):
+                msg = (
+                    "expected PDFs in pdf_samples are named after their test; "
+                    "call expect_pdf without a path"
+                )
+                raise ValueError(msg)
+            if self.owned is not None:
+                msg = "a test owns one expected PDF; compare other outputs with same_as"
+                raise TypeError(msg)
+            self.owned = expected_path
             owned = os.path.relpath(expected_path, self.root).replace(os.sep, "/")
             self.node.user_properties.append((OWNED, owned))
             # recorded before comparing, so that a failing test is regenerated
             self.outputs[expected_path] = stream
-        elif path is None and same_as is not None:
-            expected_path = os.path.abspath(same_as)
         else:
-            msg = "expect_pdf takes either path or same_as"
-            raise TypeError(msg)
+            expected_path = os.path.abspath(same_as)
 
         with open(expected_path, "rb") as f:
             expected = f.read()
@@ -57,11 +86,11 @@ class ExpectPdf:
             else:
                 assert_same_pdf(stream, expected, self.standard_zlib, timestamped)
         except Exception:
-            if path is None:
+            if same_as is not None:
                 self.mismatches[expected_path] = stream
             raise
 
-        if timestamped and path is not None:
+        if timestamped and same_as is None:
             # a timestamped PDF is regenerated only when it changed
             del self.outputs[expected_path]
 
@@ -74,15 +103,6 @@ def run_sample_template_library_test(
     generate_appearance_streams=False,
     need_appearances=False,
 ):
-    subdir = (
-        "generate_appearance_streams"
-        if generate_appearance_streams
-        else "need_appearances"
-    )
-    expected_path = os.path.join(
-        pdf_samples, subdir, "test_sample_template_library.pdf"
-    )
-
     obj = (
         PdfWrapper(
             os.path.join(pdf_samples, "dummy.pdf"),
@@ -160,4 +180,4 @@ def run_sample_template_library_test(
     obj.widgets["new_checkbox_widget"].size = 40
     obj.widgets["new_radio_group"].size = 50
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())

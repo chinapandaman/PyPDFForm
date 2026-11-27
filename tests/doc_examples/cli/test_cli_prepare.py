@@ -12,8 +12,16 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_bulk_create_fields(pdf_samples, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_bulk_create_fields.pdf")
+def test_bulk_create_fields(
+    pdf_samples, yaml_samples, tmp_path, expected_pdfs, expect_pdf
+):
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_prepare",
+        "test_bulk_create_fields.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -81,8 +89,10 @@ def test_create_field_input_methods(pdf_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_create_text(pdf_samples, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_text.pdf")
+def test_create_text(pdf_samples, yaml_samples, tmp_path, expected_pdfs, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_prepare", "test_create_text.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -106,8 +116,10 @@ def test_create_text(pdf_samples, yaml_samples, tmp_path, expect_pdf):
 
 
 @pytest.mark.cli_test
-def test_create_check(pdf_samples, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_check.pdf")
+def test_create_check(pdf_samples, yaml_samples, tmp_path, expected_pdfs, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_prepare", "test_create_check.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -131,8 +143,10 @@ def test_create_check(pdf_samples, yaml_samples, tmp_path, expect_pdf):
 
 
 @pytest.mark.cli_test
-def test_create_radio(pdf_samples, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_radio.pdf")
+def test_create_radio(pdf_samples, yaml_samples, tmp_path, expected_pdfs, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_prepare", "test_create_radio.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -156,8 +170,12 @@ def test_create_radio(pdf_samples, yaml_samples, tmp_path, expect_pdf):
 
 
 @pytest.mark.cli_test
-def test_create_dropdown(pdf_samples, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_dropdown.pdf")
+def test_create_dropdown(
+    pdf_samples, yaml_samples, tmp_path, expected_pdfs, expect_pdf
+):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_prepare", "test_create_dropdown.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -182,10 +200,14 @@ def test_create_dropdown(pdf_samples, yaml_samples, tmp_path, expect_pdf):
 
 @pytest.mark.cli_test
 def test_create_dropdown_with_export_values(
-    pdf_samples, yaml_samples, tmp_path, expect_pdf
+    pdf_samples, yaml_samples, tmp_path, expected_pdfs, expect_pdf
 ):
     expected_path = os.path.join(
-        pdf_samples, "docs", "test_create_dropdown_with_export_values.pdf"
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_prepare",
+        "test_create_dropdown_with_export_values.pdf",
     )
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -210,8 +232,10 @@ def test_create_dropdown_with_export_values(
 
 
 @pytest.mark.cli_test
-def test_create_sig(pdf_samples, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_sig.pdf")
+def test_create_sig(pdf_samples, yaml_samples, tmp_path, expected_pdfs, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_prepare", "test_create_sig.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -235,8 +259,10 @@ def test_create_sig(pdf_samples, yaml_samples, tmp_path, expect_pdf):
 
 
 @pytest.mark.cli_test
-def test_create_image(pdf_samples, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_create_image.pdf")
+def test_create_image(pdf_samples, yaml_samples, tmp_path, expected_pdfs, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_prepare", "test_create_image.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(

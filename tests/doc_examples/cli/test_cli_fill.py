@@ -11,8 +11,10 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_fill_dynamic_options(pdf_samples, static_pdfs, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
+def test_fill_dynamic_options(expected_pdfs, static_pdfs, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_text_check.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -45,8 +47,12 @@ def test_fill_dynamic_options(pdf_samples, static_pdfs, tmp_path, expect_pdf):
 
 
 @pytest.mark.cli_test
-def test_fill_text_check(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
+def test_fill_text_check(
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_text_check.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -69,8 +75,10 @@ def test_fill_text_check(pdf_samples, static_pdfs, yaml_samples, tmp_path, expec
 
 
 @pytest.mark.cli_test
-def test_fill_radio(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_fill_radio.pdf")
+def test_fill_radio(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_radio.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -93,8 +101,10 @@ def test_fill_radio(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
 
 
 @pytest.mark.cli_test
-def test_fill_dropdown(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_fill_dropdown.pdf")
+def test_fill_dropdown(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_dropdown.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -118,9 +128,11 @@ def test_fill_dropdown(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_
 
 @pytest.mark.cli_test
 def test_fill_dropdown_via_str(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_fill_dropdown.pdf")
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_dropdown.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -143,8 +155,10 @@ def test_fill_dropdown_via_str(
 
 
 @pytest.mark.cli_test
-def test_fill_sig(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig.pdf")
+def test_fill_sig(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_sig.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -167,8 +181,10 @@ def test_fill_sig(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
 
 
 @pytest.mark.cli_test
-def test_fill_sig_ratio(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_fill_sig_ratio.pdf")
+def test_fill_sig_ratio(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_sig_ratio.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -191,8 +207,10 @@ def test_fill_sig_ratio(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect
 
 
 @pytest.mark.cli_test
-def test_fill_image(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_fill_image.pdf")
+def test_fill_image(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_image.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -215,8 +233,12 @@ def test_fill_image(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
 
 
 @pytest.mark.cli_test
-def test_fill_image_ratio(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_fill_image_ratio.pdf")
+def test_fill_image_ratio(
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_image_ratio.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(

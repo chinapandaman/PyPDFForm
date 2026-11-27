@@ -13,8 +13,14 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_coordinate_grid_view(pdf_samples, static_pdfs, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_coordinate_grid_view.pdf")
+def test_coordinate_grid_view(expected_pdfs, static_pdfs, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_coordinate",
+        "test_coordinate_grid_view.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -64,10 +70,14 @@ def test_field_locations_dimensions(static_pdfs):
 
 @pytest.mark.cli_test
 def test_change_field_coordinates_dimensions(
-    pdf_samples, static_pdfs, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_field_coordinates_dimensions.pdf"
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_coordinate",
+        "test_change_field_coordinates_dimensions.pdf",
     )
     output_path = os.path.join(tmp_path, "output.pdf")
 

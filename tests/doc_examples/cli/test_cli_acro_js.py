@@ -11,8 +11,10 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_js_adapting(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_js_adapting.pdf")
+def test_js_adapting(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_acro_js", "test_js_adapting.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -36,8 +38,10 @@ def test_js_adapting(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pd
 
 
 @pytest.mark.cli_test
-def test_on_hover(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_on_hover.pdf")
+def test_on_hover(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_acro_js", "test_on_hover.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -61,8 +65,10 @@ def test_on_hover(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
 
 
 @pytest.mark.cli_test
-def test_off_hover(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_off_hover.pdf")
+def test_off_hover(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_acro_js", "test_off_hover.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -86,8 +92,10 @@ def test_off_hover(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf)
 
 
 @pytest.mark.cli_test
-def test_mouse_pressed(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_mouse_pressed.pdf")
+def test_mouse_pressed(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_acro_js", "test_mouse_pressed.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -111,8 +119,10 @@ def test_mouse_pressed(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_
 
 
 @pytest.mark.cli_test
-def test_mouse_released(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_mouse_released.pdf")
+def test_mouse_released(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_acro_js", "test_mouse_released.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -136,8 +146,10 @@ def test_mouse_released(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect
 
 
 @pytest.mark.cli_test
-def test_on_focused(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_on_focused.pdf")
+def test_on_focused(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_acro_js", "test_on_focused.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -161,8 +173,10 @@ def test_on_focused(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
 
 
 @pytest.mark.cli_test
-def test_off_focused(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_off_focused.pdf")
+def test_off_focused(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_acro_js", "test_off_focused.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -186,8 +200,10 @@ def test_off_focused(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pd
 
 
 @pytest.mark.cli_test
-def test_on_open(pdf_samples, static_pdfs, js_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_on_open.pdf")
+def test_on_open(expected_pdfs, static_pdfs, js_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_acro_js", "test_on_open.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(

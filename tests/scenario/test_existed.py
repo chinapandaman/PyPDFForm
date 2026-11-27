@@ -42,10 +42,7 @@ def test_illinois_gun_bill_of_sale(existed_pdf_directory, expect_pdf):
         }
     )
 
-    expected_path = os.path.join(
-        existed_pdf_directory, "test_illinois_gun_bill_of_sale.pdf"
-    )
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_ds82(existed_pdf_directory, expect_pdf):
@@ -55,11 +52,7 @@ def test_ds82(existed_pdf_directory, expect_pdf):
         }
     )
 
-    expected_path = os.path.join(
-        existed_pdf_directory,
-        "test_ds82.pdf",
-    )
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory, expect_pdf):
@@ -89,11 +82,7 @@ def test_illinois_real_estate_power_of_attorney_form(existed_pdf_directory, expe
         }
     )
 
-    expected_path = os.path.join(
-        existed_pdf_directory,
-        "test_illinois_real_estate_power_of_attorney_form.pdf",
-    )
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_clear_form_button_not_checkbox(existed_pdf_directory):

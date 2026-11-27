@@ -31,15 +31,13 @@ from tests.support.builders import (
 def test_encrypted_edit_pdf_form(issue_pdf_directory, expect_pdf):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "437.pdf"))
     obj = obj.fill(obj.sample_data)
-    expected_path = os.path.join(issue_pdf_directory, "437_expected.pdf")
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_fill_image(issue_pdf_directory, image_samples, expect_pdf):
     obj = PdfWrapper(os.path.join(issue_pdf_directory, "560.pdf"))
     obj = obj.fill({"ImageSign": os.path.join(image_samples, "sample_image.jpg")})
-    expected_path = os.path.join(issue_pdf_directory, "560_expected.pdf")
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_ppf_627_schema(issue_pdf_directory):
@@ -53,8 +51,7 @@ def test_ppf_627_fill_1(issue_pdf_directory, expect_pdf):
         {"S1 GF 7": 1}
     )
 
-    expected_path = os.path.join(issue_pdf_directory, "PPF-627-expected-1.pdf")
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_ppf_2100_refill_inline_widget(issue_pdf_directory, assert_catalog_fields):
@@ -302,8 +299,7 @@ def test_use_full_widget_name_1(issue_pdf_directory, expect_pdf):
         }
     )
 
-    expected_path = os.path.join(issue_pdf_directory, "PPF-939_expected_1.pdf")
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_use_full_widget_name_2(issue_pdf_directory, expect_pdf):
@@ -316,8 +312,7 @@ def test_use_full_widget_name_2(issue_pdf_directory, expect_pdf):
         }
     )
 
-    expected_path = os.path.join(issue_pdf_directory, "PPF-939_expected_2.pdf")
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_use_full_widget_name_both(issue_pdf_directory):
@@ -379,8 +374,7 @@ def test_xfa_to_regular_form(issue_pdf_directory, expect_pdf):
         }
     )
 
-    expected_path = os.path.join(issue_pdf_directory, "1087_expected.pdf")
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_full_widget_name(issue_pdf_directory):
@@ -409,8 +403,7 @@ def test_get_dropdown_choices(issue_pdf_directory, expect_pdf):
         }
     )
 
-    expected_path = os.path.join(issue_pdf_directory, "PPF-1213_expected.pdf")
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_sejda_multiline(issue_pdf_directory, expect_pdf):
@@ -426,8 +419,7 @@ def test_sejda_multiline(issue_pdf_directory, expect_pdf):
         readonly=True,
     )
 
-    expected_path = os.path.join(issue_pdf_directory, "PPF-1349_expected.pdf")
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_not_merge_metadata():
@@ -452,7 +444,7 @@ def test_not_merge_metadata():
     assert metadata["/other_key"] == "other_value"
 
 
-def test_dropdown_tutorial(issue_pdf_directory, expect_pdf):
+def test_dropdown_tutorial(expect_pdf):
     obj = PdfWrapper(BlankPage(width=612, height=792) * 3)
     obj.generate_coordinate_grid(margin=100, color=(0, 0, 1))
 
@@ -509,5 +501,4 @@ def test_dropdown_tutorial(issue_pdf_directory, expect_pdf):
         ]
     )
 
-    expected_path = os.path.join(issue_pdf_directory, "PPF-1599_expected.pdf")
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
