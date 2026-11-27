@@ -206,9 +206,10 @@ def _is_widget_annotation(obj: object) -> bool:
         obj (object): A resolved object, such as a page annotation.
 
     Returns:
-        bool: True if `obj` is a dictionary whose `/Subtype` is `/Widget`.
+        bool: True if `obj` is a dictionary whose `/Subtype`, resolved as
+            `get_widget_type` resolves it, is `/Widget`.
     """
-    return isinstance(obj, DictionaryObject) and obj.get(Subtype) == Widget
+    return isinstance(obj, DictionaryObject) and get_entry(obj, Subtype) == Widget
 
 
 def _get_terminal_fields(acroform: DictionaryObject) -> List[DictionaryObject]:

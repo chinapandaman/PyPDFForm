@@ -8,7 +8,12 @@ from pikepdf import Array, Dictionary, Name, ObjectStreamMode, Pdf, String
 from pypdf import PdfReader, PdfWriter
 
 from PyPDFForm import PdfWrapper
-from tests.support.builders import build_action, with_actions, with_catalog_extras
+from tests.support.builders import (
+    build_action,
+    save,
+    with_actions,
+    with_catalog_extras,
+)
 from tests.support.checks import (
     describe_actions,
     describe_catalog,
@@ -676,6 +681,22 @@ def test_remove_fields_resolves_action_types(template_stream, kind):
         else:
             attribute = pdf.Root.StructTreeRoot.K.A
             assert [str(each) for each in attribute.S] == ["/ResetForm"]
+
+
+def test_remove_fields_widget_with_indirect_subtype(
+    template_stream, assert_catalog_fields
+):
+    # PdfWrapper reads a widget whose /Subtype is an indirect /Widget, and
+    # removing its field removes it from the page too
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        for annot in pdf.pages[1].Annots:
+            if annot.get("/T") == "test_2":
+                annot.Subtype = pdf.make_indirect(Name.Widget)
+        stream = save(pdf)
+
+    result = PdfWrapper(stream).remove_fields(["test_2"]).read()
+
+    assert_catalog_fields(result, ["test", "check", "check_2", "test_3", "check_3"])
 
 
 def test_remove_fields_hide_widget_not_in_catalog(template_stream):
