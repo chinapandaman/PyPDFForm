@@ -90,7 +90,7 @@ Use them when a change affects one of these properties. Not every PDF passes all
 `pdf_samples` has two directories:
 
 * `input/` has the PDFs that tests read, such as templates. The `pdf_samples` fixture is this directory, for example `os.path.join(pdf_samples, "sample_template.pdf")`.
-* `expected/` has the expected PDFs, each named after the test that owns it: `expected/<directory under tests>/<module>/<test>.pdf`. For example, `tests/snapshots/test_fill.py::test_fill_sejda` owns `expected/snapshots/test_fill/test_fill_sejda.pdf`. A parametrized test adds its parameters, as in `<test>-<parameters>.pdf`. The `expected_pdfs` fixture is this directory.
+* `expected/` has the expected PDFs, each named after the test that owns it: `expected/<directory under tests>/<module>/<test>.pdf`. For example, `tests/snapshots/test_fill.py::test_fill_sejda` owns `expected/snapshots/test_fill/test_fill_sejda.pdf`. A parametrized test adds its parameter ID, as in `<test>-<ID>.pdf`. The ID keeps lowercase letters, digits, `_`, `.`, and `-`, and writes any other character as `~` and its UTF-8 bytes in hexadecimal, so `ids=["A", "a b"]` gives `<test>-~41.pdf` and `<test>-a~20b.pdf`. That way, different IDs get different files, also on filesystems that ignore case. The `expected_pdfs` fixture is this directory.
 
 A test that reads another test's expected PDF, for example to inspect a filled form, joins its path to `expected_pdfs`. Add new inputs to `input/`. Expected PDFs are added by [regenerating](#expected-pdf-environment) them.
 
@@ -137,13 +137,13 @@ expected_path = os.path.join(
 expect_pdf(actual, same_as=expected_path)
 ```
 
-When the comparison fails, regenerating expected PDFs into another directory writes the other test's PDF as `<expected PDF>.<test>.pdf`, so `make compare-pdf-diffs` shows it next to the expected PDF.
+When the comparison fails, regenerating expected PDFs into another directory writes the other test's PDF as `same_as/<test>/<expected PDF>`, so `make compare-pdf-diffs` shows it next to the expected PDF.
 
-The README's example compares with `docs/pdfs/sample_filled.pdf`, which the documentation links to, so it passes that path: `expect_pdf(filled.read(), expected_path)`. Only an expected PDF outside `pdf_samples` takes a path.
+The README's example compares with `docs/pdfs/sample_filled.pdf`, which the documentation links to, so it passes that path: `expect_pdf(filled.read(), expected_path)`. Only an expected PDF in `docs/` takes a path.
 
-If two tests own the same expected PDF, the run ends with exit status 4 and lists them, because the PDF written last would hide the other. Regenerating in place then leaves that expected PDF as it was, and also leaves `pdf_samples/fixture_environment.json` as it was if it wrote no other expected PDF.
+If two tests own the same expected PDF, the run ends with exit status 4 and lists them, because the PDF written last would hide the other. Paths that differ only in case count as the same, since some filesystems ignore case. Regenerating in place then leaves that expected PDF as it was, and also leaves `pdf_samples/fixture_environment.json` as it was if it wrote no other expected PDF.
 
-A run of the whole suite also checks that every file in `pdf_samples/expected/` has an owner. If one doesn't, for example because its test was renamed or removed, the run ends with exit status 4 and lists the file. The check runs only when every test passed and none was left out, so it doesn't run with paths other than `tests/`, or with `-k`, `-m`, `--deselect`, `--ignore`, `--lf`, or `--sw`. A test whose expected PDF is missing fails, unless expected PDFs are being regenerated.
+A run of the whole suite also checks that every file in `pdf_samples/expected/` has an owner. If one doesn't, for example because its test was renamed or removed, the run ends with exit status 4 and lists the file. The check runs only when no test failed and none was left out, so it doesn't run with paths other than `tests/`, or with `-k`, `-m`, `--deselect`, `--ignore`, `--lf`, or `--sw`. A skipped test, or a skipped module, still owns the expected PDFs named after it. A test whose expected PDF is missing fails, unless expected PDFs are being regenerated.
 
 A PDF created from a blank page holds the time it was created. Pass `timestamped=True` for such a PDF. Its `/CreationDate` and `/ModDate` are then ignored, with standard zlib only the length of the bytes is compared, and it is regenerated only when the comparison fails.
 

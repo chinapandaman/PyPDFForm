@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import re
 
 from PyPDFForm import Fields, PdfWrapper
 from tests.support.checks import assert_same_pdf
@@ -9,8 +8,22 @@ from tests.support.checks import assert_same_pdf
 # the user property naming an expected PDF that a test owns; reports carry it
 # from pytest-xdist workers to the controller, which sees every owner
 OWNED = "expected_pdf"
+# the user property naming the expected PDF a test would own, so that a
+# skipped test's expected PDF still has an owner
+CANDIDATE = "expected_pdf_candidate"
 # each expected PDF in this directory is named after the test that owns it
 EXPECTED_DIR = os.path.join("pdf_samples", "expected")
+# the characters of a parameter ID that a file name keeps as they are
+KEPT_CHARACTERS = frozenset("abcdefghijklmnopqrstuvwxyz0123456789_.-")
+
+
+def encode_id(value):
+    # writes any other character as ~ and its UTF-8 bytes in lowercase hex, so
+    # different IDs get different names, also on filesystems that ignore case
+    return "".join(
+        character if character in KEPT_CHARACTERS else f"~{character.encode().hex()}"
+        for character in value
+    )
 
 
 def expected_pdf_path(root, node):
@@ -19,8 +32,7 @@ def expected_pdf_path(root, node):
     name = node.originalname
     callspec = getattr(node, "callspec", None)
     if callspec is not None:
-        name = f"{name}-{callspec.id}"
-    name = re.sub(r"[^\w.-]+", "_", name)
+        name = f"{name}-{encode_id(callspec.id)}"
     return os.path.join(root, EXPECTED_DIR, os.path.splitext(module)[0], f"{name}.pdf")
 
 
@@ -46,8 +58,8 @@ class ExpectPdf:
         self, stream, path=None, *, same_as=None, timestamped=False, length_only=False
     ):
         # the test owns and regenerates the expected PDF named after it, or path,
-        # which only a PDF outside pdf_samples needs; same_as is only compared,
-        # for example one that another test owns
+        # which only a PDF in docs/ needs; same_as is only compared, for
+        # example one that another test owns
         if length_only and same_as is None:
             msg = "length_only only applies to same_as"
             raise TypeError(msg)
@@ -56,11 +68,13 @@ class ExpectPdf:
             raise TypeError(msg)
         if same_as is None:
             expected_path = self.path if path is None else os.path.abspath(path)
-            samples = os.path.normcase(os.path.join(self.root, "pdf_samples", ""))
-            if path is not None and os.path.normcase(expected_path).startswith(samples):
+            docs = os.path.normcase(os.path.join(self.root, "docs", ""))
+            if path is not None and not os.path.normcase(expected_path).startswith(
+                docs
+            ):
                 msg = (
-                    "expected PDFs in pdf_samples are named after their test; "
-                    "call expect_pdf without a path"
+                    "only an expected PDF in docs/ takes a path; the others are "
+                    "named after their test, so call expect_pdf without one"
                 )
                 raise ValueError(msg)
             if self.owned is not None:

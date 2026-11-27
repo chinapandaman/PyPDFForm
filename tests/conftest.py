@@ -3,7 +3,6 @@
 import json
 import os
 import platform
-import re
 import runpy
 import shutil
 import tempfile
@@ -17,7 +16,14 @@ from packaging.utils import canonicalize_name
 from PIL import features
 
 from tests.support import checks
-from tests.support.snapshots import EXPECTED_DIR, OWNED, ExpectPdf
+from tests.support.snapshots import (
+    CANDIDATE,
+    EXPECTED_DIR,
+    OWNED,
+    ExpectPdf,
+    encode_id,
+    expected_pdf_path,
+)
 
 # sample paths, template streams, and data, shared by every suite
 pytest_plugins = ["tests.support.samples"]
@@ -25,7 +31,7 @@ pytest_plugins = ["tests.support.samples"]
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURE_ENVIRONMENT_PATH = os.path.join(ROOT, "pdf_samples", "fixture_environment.json")
 in_place_writes = pytest.StashKey[object]()
-shared_expected_pdfs = pytest.StashKey[dict]()
+shared_expected_pdfs = pytest.StashKey[list]()
 unowned_expected_pdfs = pytest.StashKey[list]()
 
 
@@ -101,11 +107,50 @@ class ExpectedPdfOwners:
     def __init__(self):
         super().__init__()
         self.owners = {}
+        # the expected PDFs that skipped tests would own, and the directories
+        # of skipped modules and packages
+        self.skipped = set()
+        self.skipped_dirs = set()
 
     def pytest_runtest_logreport(self, report):
         for name, value in report.user_properties:
             if name == OWNED:
                 self.owners.setdefault(value, set()).add(report.nodeid)
+            elif name == CANDIDATE and report.skipped:
+                self.skipped.add(value)
+
+    def pytest_collectreport(self, report):
+        # a module or package skipped while it was collected has no tests
+        path = report.nodeid.split("::")[0].removesuffix(".py")
+        if report.skipped and (path in ("", ".", "tests") or path.startswith("tests/")):
+            under_tests = path.removeprefix("tests").strip("/.")
+            directory = "/".join(filter(None, ("pdf_samples/expected", under_tests)))
+            self.skipped_dirs.add(f"{directory}/")
+
+    def unowned(self, files):
+        # the files no test owns or would own, comparing paths regardless of
+        # case, since some filesystems ignore it
+        owned = {path.casefold() for path in (*self.owners, *self.skipped)}
+        skipped_dirs = tuple(directory.casefold() for directory in self.skipped_dirs)
+        return sorted(
+            path
+            for path in files
+            if path.casefold() not in owned
+            and not path.casefold().startswith(skipped_dirs)
+        )
+
+    def shared(self):
+        # the paths owned by more than one test, grouped regardless of case
+        groups = {}
+        for path, nodeids in self.owners.items():
+            groups.setdefault(path.casefold(), {})[path] = nodeids
+        shared = []
+        for paths in groups.values():
+            nodeids = set().union(*paths.values())
+            if len(nodeids) > 1:
+                shared.append((sorted(paths), sorted(nodeids)))
+
+        return sorted(shared)
 
 
 class InPlaceWrites:
@@ -118,43 +163,47 @@ class InPlaceWrites:
     def __init__(self):
         super().__init__()
         self.backup_dir = tempfile.mkdtemp(prefix="expected_pdf_backups_")
+        # keyed by the path regardless of case, since some filesystems ignore it
         self.owners = {}
-        # the backup of each written expected PDF, or None if it didn't exist
+        # the path each written expected PDF was written to, and its backup,
+        # or None if it didn't exist
         self.backups = {}
         self.restored = set()
 
     @property
     def kept(self):
         # whether any expected PDF this run wrote is still its version
-        return any(path not in self.restored for path in self.backups)
+        return any(key not in self.restored for key in self.backups)
 
     def write(self, path, stream, nodeid):
-        if self.owners.setdefault(path, nodeid) != nodeid:
+        key = path.casefold()
+        if self.owners.setdefault(key, nodeid) != nodeid:
             self.restore(path)
             return
-        if path not in self.backups:
+        if key not in self.backups:
             backup = None
             if os.path.exists(path):
                 backup = os.path.join(self.backup_dir, f"{len(self.backups)}.pdf")
                 shutil.copyfile(path, backup)
-            self.backups[path] = backup
+            self.backups[key] = (path, backup)
 
         # a new test's expected PDF can be the first in its module's directory
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "wb") as f:
             f.write(stream)
-        self.restored.discard(path)
+        self.restored.discard(key)
 
     def restore(self, path):
-        if path not in self.backups:
+        key = path.casefold()
+        if key not in self.backups:
             # not written in this run
             return
-        backup = self.backups[path]
+        written, backup = self.backups[key]
         if backup is not None:
-            shutil.copyfile(backup, path)
-        elif os.path.exists(path):
-            os.remove(path)
-        self.restored.add(path)
+            shutil.copyfile(backup, written)
+        elif os.path.exists(written):
+            os.remove(written)
+        self.restored.add(key)
 
     def close(self):
         shutil.rmtree(self.backup_dir, ignore_errors=True)
@@ -197,6 +246,9 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         if "expect_pdf" in getattr(item, "fixturenames", ()):
             item.add_marker(pytest.mark.snapshot)
+            # reported even if the test is skipped before it calls expect_pdf
+            candidate = os.path.relpath(expected_pdf_path(ROOT, item), ROOT)
+            item.user_properties.append((CANDIDATE, candidate.replace(os.sep, "/")))
     # pytest-xdist hands out tests in this order, so a slow test that came last
     # would keep the run waiting after the other workers finish. Regenerating
     # in place keeps the order, in which a test that compares with an expected
@@ -242,18 +294,14 @@ def pytest_sessionfinish(session):
     config = session.config
     # a pytest-xdist worker only sees its own tests, and the controller all of them
     if not hasattr(config, "workerinput"):
-        owners = config.pluginmanager.get_plugin("expected_pdf_owners").owners
+        owners = config.pluginmanager.get_plugin("expected_pdf_owners")
         # only a passing run of every test has seen every owner
         if session.exitstatus == pytest.ExitCode.OK and _runs_every_test(config):
-            unowned = sorted(_expected_pdf_files() - set(owners))
+            unowned = owners.unowned(_expected_pdf_files())
             if unowned:
                 config.stash[unowned_expected_pdfs] = unowned
                 session.exitstatus = pytest.ExitCode.USAGE_ERROR
-        shared = {
-            path: sorted(nodeids)
-            for path, nodeids in sorted(owners.items())
-            if len(nodeids) > 1
-        }
+        shared = owners.shared()
         if shared:
             # the last writer would win, so regenerated PDFs couldn't be trusted
             config.stash[shared_expected_pdfs] = shared
@@ -262,8 +310,9 @@ def pytest_sessionfinish(session):
     writes = config.stash.get(in_place_writes, None)
     if isinstance(writes, InPlaceWrites):
         # also the PDFs whose second owner didn't write them
-        for path in config.stash.get(shared_expected_pdfs, {}):
-            writes.restore(os.path.abspath(os.path.join(ROOT, path)))
+        for paths, _ in config.stash.get(shared_expected_pdfs, []):
+            for path in paths:
+                writes.restore(os.path.abspath(os.path.join(ROOT, path)))
 
     # record the environment of the latest in-place regeneration, unless every
     # expected PDF it wrote was restored
@@ -283,11 +332,11 @@ def pytest_terminal_summary(terminalreporter, config):
             "Each file in pdf_samples/expected/ is named after the test that owns "
             "it. Rename the file after its test, or remove it."
         )
-    shared = config.stash.get(shared_expected_pdfs, {})
+    shared = config.stash.get(shared_expected_pdfs, [])
     if shared:
         terminalreporter.section("expected PDFs owned by more than one test", red=True)
-        for path, nodeids in shared.items():
-            terminalreporter.line(f"{path}: {', '.join(nodeids)}")
+        for paths, nodeids in shared:
+            terminalreporter.line(f"{', '.join(paths)}: {', '.join(nodeids)}")
         if isinstance(config.stash.get(in_place_writes, None), InPlaceWrites):
             terminalreporter.line(
                 "Regenerating in place left these expected PDFs as they were."
@@ -333,13 +382,16 @@ def expect_pdf(request, standard_zlib):
         _write_artifact(
             os.path.join(regenerate_dir, os.path.relpath(path, ROOT)), stream
         )
-    test_name = re.sub(r"[^\w.-]+", "_", request.node.nodeid)
     for path, stream in expect.mismatches.items():
-        # named <expected PDF>.<test>.pdf, so that a comparison run shows it
-        # without overwriting the version of the test that owns the PDF
+        # under same_as/<test>/, so that a comparison run shows it without
+        # overwriting the version of the test that owns the PDF. Owned outputs
+        # are under pdf_samples/ or docs/.
         _write_artifact(
             os.path.join(
-                regenerate_dir, f"{os.path.relpath(path, ROOT)}.{test_name}.pdf"
+                regenerate_dir,
+                "same_as",
+                encode_id(request.node.nodeid),
+                os.path.relpath(path, ROOT),
             ),
             stream,
         )
