@@ -5,27 +5,24 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_file_path_scripts(template_stream, pdf_samples, js_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "js", "test_file_path_scripts.pdf")
+def test_file_path_scripts(template_stream, js_samples, expect_pdf):
     pdf = PdfWrapper(template_stream)
     pdf.widgets["test"].on_mouse_pressed_javascript = os.path.join(
         js_samples, "test_file_path_scripts.js"
     )
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_file_obj_scripts(template_stream, pdf_samples, js_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "js", "test_file_obj_scripts.pdf")
+def test_file_obj_scripts(template_stream, js_samples, expect_pdf):
     with open(os.path.join(js_samples, "test_file_obj_scripts.js")) as script:
         pdf = PdfWrapper(template_stream)
         pdf.widgets["test"].on_mouse_pressed_javascript = script
 
-        expect_pdf(pdf.read(), expected_path)
+        expect_pdf(pdf.read())
 
 
-def test_text_field_scripts(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "js", "test_text_field_scripts.pdf")
+def test_text_field_scripts(template_stream, expect_pdf):
     pdf = PdfWrapper(template_stream)
     pdf.widgets[
         "test"
@@ -47,11 +44,10 @@ def test_text_field_scripts(template_stream, pdf_samples, expect_pdf):
         "test_2"
     ].on_blurred_javascript = 'this.getField("test_2").value = "defocused";'
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_checkbox_scripts(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "js", "test_checkbox_scripts.pdf")
+def test_checkbox_scripts(template_stream, expect_pdf):
     pdf = PdfWrapper(template_stream)
     pdf.widgets[
         "check"
@@ -73,11 +69,10 @@ def test_checkbox_scripts(template_stream, pdf_samples, expect_pdf):
         "check_2"
     ].on_blurred_javascript = 'this.getField("test_2").value = "defocused";'
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_radio_scripts(template_with_radiobutton_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "js", "test_radio_scripts.pdf")
+def test_radio_scripts(template_with_radiobutton_stream, expect_pdf):
     pdf = PdfWrapper(template_with_radiobutton_stream)
     pdf.widgets[
         "radio_1"
@@ -99,11 +94,10 @@ def test_radio_scripts(template_with_radiobutton_stream, pdf_samples, expect_pdf
         "radio_2"
     ].on_blurred_javascript = 'this.getField("test_2").value = "defocused";'
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_dropdown_scripts(sample_template_with_dropdown, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "js", "test_dropdown_scripts.pdf")
+def test_dropdown_scripts(sample_template_with_dropdown, expect_pdf):
     pdf = PdfWrapper(sample_template_with_dropdown)
     pdf.widgets[
         "dropdown_1"
@@ -125,11 +119,10 @@ def test_dropdown_scripts(sample_template_with_dropdown, pdf_samples, expect_pdf
         "dropdown_1"
     ].on_blurred_javascript = 'this.getField("test_2").value = "defocused";'
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_image_scripts(sample_template_with_image_field, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "js", "test_image_scripts.pdf")
+def test_image_scripts(sample_template_with_image_field, expect_pdf):
     pdf = PdfWrapper(sample_template_with_image_field)
     pdf.widgets[
         "image_1"
@@ -151,22 +144,24 @@ def test_image_scripts(sample_template_with_image_field, pdf_samples, expect_pdf
         "image_1"
     ].on_blurred_javascript = 'this.getField("test_2").value = "defocused";'
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_on_open_script(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "js", "test_on_open_script.pdf")
+def test_on_open_script(template_stream, expect_pdf):
     pdf = PdfWrapper(template_stream, need_appearances=True)
     pdf.on_open_javascript = 'this.getField("test").value = "opened";'
     # reading the script back doesn't change the PDF
     _ = pdf.on_open_javascript
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_on_open_script_title_coexist(template_stream, pdf_samples, expect_pdf):
+def test_on_open_script_title_coexist(template_stream, expected_pdfs, expect_pdf):
     expected_path = os.path.join(
-        pdf_samples, "js", "test_on_open_script_title_coexist.pdf"
+        expected_pdfs,
+        "snapshots",
+        "test_acro_js",
+        "test_on_open_script_title_coexist.pdf",
     )
     pdf = PdfWrapper(template_stream, title="My PDF")
     pdf.on_open_javascript = 'this.getField("test").value = "opened";'
@@ -174,7 +169,7 @@ def test_on_open_script_title_coexist(template_stream, pdf_samples, expect_pdf):
     _ = pdf.title
     _ = pdf.on_open_javascript
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
     pdf2 = PdfWrapper(template_stream)
     pdf2.on_open_javascript = 'this.getField("test").value = "opened";'

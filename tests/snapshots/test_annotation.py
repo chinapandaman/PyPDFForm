@@ -5,8 +5,7 @@ import os
 from PyPDFForm import Annotations, PdfWrapper
 
 
-def test_annotate(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "test_annotate.pdf")
+def test_annotate(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).annotate(
         [
             Annotations.TextAnnotation(1, 100, 100, contents="this is an annotation"),
@@ -42,11 +41,10 @@ def test_annotate(template_stream, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_annotate_no_annotations(pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "test_annotate_no_annotations.pdf")
     obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).annotate(
         [
             Annotations.TextAnnotation(1, 100, 100, contents="this is an annotation"),
@@ -82,11 +80,10 @@ def test_annotate_no_annotations(pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_rubber_stamp_annotation(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "test_rubber_stamp_annotation.pdf")
+def test_rubber_stamp_annotation(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).annotate(
         [
             Annotations.RubberStampAnnotation(
@@ -204,4 +201,4 @@ def test_rubber_stamp_annotation(template_stream, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())

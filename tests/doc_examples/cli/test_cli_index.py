@@ -13,10 +13,12 @@ runner = CliRunner()
 
 
 @pytest.mark.cli_test
-def test_index_snippets(pdf_samples, yaml_samples, tmp_path, monkeypatch, expect_pdf):
+def test_index_snippets(expected_pdfs, yaml_samples, tmp_path, monkeypatch, expect_pdf):
     # Stable ReportLab timestamps prevent variable-length document IDs.
     monkeypatch.setenv("SOURCE_DATE_EPOCH", "946684800")
-    expected_path = os.path.join(pdf_samples, "docs", "test_index_snippets.pdf")
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_index", "test_index_snippets.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     runner.invoke(cli_app, ["create", "blank", "-o", output_path])

@@ -7,10 +7,7 @@ import pytest
 from PyPDFForm import Fields, PdfWrapper
 
 
-def test_create_checkbox_complex_fill(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_complex_fill.pdf"
-    )
+def test_create_checkbox_complex_fill(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).bulk_create_fields(
         [
             Fields.CheckBoxField(
@@ -29,13 +26,10 @@ def test_create_checkbox_complex_fill(template_stream, pdf_samples, expect_pdf):
     )
     obj.fill(obj.sample_data)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_checkbox_check_fill(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_check_fill.pdf"
-    )
+def test_create_checkbox_check_fill(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).bulk_create_fields(
         [
             Fields.CheckBoxField(
@@ -49,13 +43,10 @@ def test_create_checkbox_check_fill(template_stream, pdf_samples, expect_pdf):
     )
     obj.fill(obj.sample_data)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_checkbox_circle_fill(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_circle_fill.pdf"
-    )
+def test_create_checkbox_circle_fill(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).bulk_create_fields(
         [
             Fields.CheckBoxField(
@@ -69,13 +60,10 @@ def test_create_checkbox_circle_fill(template_stream, pdf_samples, expect_pdf):
     )
     obj.fill(obj.sample_data)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_checkbox_cross_fill(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_cross_fill.pdf"
-    )
+def test_create_checkbox_cross_fill(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).bulk_create_fields(
         [
             Fields.CheckBoxField(
@@ -89,13 +77,10 @@ def test_create_checkbox_cross_fill(template_stream, pdf_samples, expect_pdf):
     )
     obj.fill(obj.sample_data)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_text_alpha_bg_color(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_text_alpha_bg_color.pdf"
-    )
+def test_create_text_alpha_bg_color(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).bulk_create_fields(
         [
             Fields.TextField(
@@ -108,13 +93,10 @@ def test_create_text_alpha_bg_color(template_stream, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_text_align_center(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_text_align_center.pdf"
-    )
+def test_create_text_align_center(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).bulk_create_fields(
         [
             Fields.TextField(
@@ -127,13 +109,10 @@ def test_create_text_align_center(template_stream, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_text_multiline(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_text_align_multiline.pdf"
-    )
+def test_create_text_multiline(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).bulk_create_fields(
         [
             Fields.TextField(
@@ -146,15 +125,10 @@ def test_create_text_multiline(template_stream, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_text_complex_filled(
-    template_stream, pdf_samples, sample_font_stream, expect_pdf
-):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_text_complex_filled.pdf"
-    )
+def test_create_text_complex_filled(template_stream, sample_font_stream, expect_pdf):
     obj = (
         PdfWrapper(template_stream)
         .register_font("new_font", sample_font_stream)
@@ -180,11 +154,10 @@ def test_create_text_complex_filled(
     )
     obj.fill(obj.sample_data)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_text_comb(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_text_comb.pdf")
+def test_create_text_comb(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).bulk_create_fields(
         [
             Fields.TextField(
@@ -198,15 +171,10 @@ def test_create_text_comb(template_stream, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_checkbox_persist_old_widgets_fill(
-    template_stream, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_checkbox_persist_old_widgets_fill.pdf"
-    )
+def test_create_checkbox_persist_old_widgets_fill(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream)
     obj.widgets["test"].font_size = 30
     obj.widgets["test"].font_color = (0, 1, 0)
@@ -221,15 +189,10 @@ def test_create_checkbox_persist_old_widgets_fill(
         ]
     ).fill(obj.sample_data)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_widget_sejda_fill_readonly_before(
-    sejda_template, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_widget_sejda_fill_readonly_before.pdf"
-    )
+def test_create_widget_sejda_fill_readonly_before(sejda_template, expect_pdf):
     obj = PdfWrapper(sejda_template)
     obj.fill(obj.sample_data, readonly=True).bulk_create_fields(
         [
@@ -248,15 +211,10 @@ def test_create_widget_sejda_fill_readonly_before(
         ]
     ).fill(obj.sample_data)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_widget_sejda_fill_readonly_after(
-    sejda_template, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_widget_sejda_fill_readonly_after.pdf"
-    )
+def test_create_widget_sejda_fill_readonly_after(sejda_template, expect_pdf):
     obj = PdfWrapper(sejda_template)
     obj.fill(obj.sample_data).bulk_create_fields(
         [
@@ -275,20 +233,18 @@ def test_create_widget_sejda_fill_readonly_after(
         ]
     ).fill(obj.sample_data, readonly=True)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_fill_cmyk_color(pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "widget", "test_fill_cmyk_color.pdf")
     obj = PdfWrapper(
         os.path.join(pdf_samples, "widget", "sample_template_with_cmyk_color.pdf")
     ).fill({"foo": "foo"})
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_create_radio_complex(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "widget", "test_create_radio_complex.pdf")
+def test_create_radio_complex(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).bulk_create_fields(
         [
             Fields.RadioGroup(
@@ -307,13 +263,10 @@ def test_create_radio_complex(template_stream, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_create_required_fields(pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_required_fields.pdf"
-    )
     obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
         [
             Fields.TextField(
@@ -350,13 +303,10 @@ def test_create_required_fields(pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_create_not_required_fields(pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_not_required_fields.pdf"
-    )
     obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
         [
             Fields.TextField(
@@ -393,13 +343,10 @@ def test_create_not_required_fields(pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_create_fields_with_tooltips(pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "widget", "test_create_fields_with_tooltips.pdf"
-    )
     obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(
         [
             Fields.TextField(
@@ -444,15 +391,11 @@ def test_create_fields_with_tooltips(pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 @pytest.mark.slow
 def test_bulk_create_fields_stress_max(pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "bulk_create_fields", "test_bulk_create_fields_stress_max.pdf"
-    )
-
     fields = []
     x = 0
     y = 0
@@ -498,16 +441,10 @@ def test_bulk_create_fields_stress_max(pdf_samples, expect_pdf):
         obj += PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
     obj.bulk_create_fields(fields)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_bulk_create_fields_stress_max_mixed(pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples,
-        "bulk_create_fields",
-        "test_bulk_create_fields_stress_max_mixed.pdf",
-    )
-
     fields = []
     x = 0
     y = 0
@@ -566,4 +503,4 @@ def test_bulk_create_fields_stress_max_mixed(pdf_samples, expect_pdf):
 
     obj = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf")).bulk_create_fields(fields)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())

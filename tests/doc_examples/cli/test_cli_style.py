@@ -79,14 +79,16 @@ def test_change_title(static_pdfs, tmp_path):
 
 @pytest.mark.cli_test
 def test_change_text_font(
-    pdf_samples,
+    expected_pdfs,
     static_pdfs,
     yaml_samples,
     tmp_path,
     assert_annotations_preserved,
     expect_pdf,
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font.pdf")
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_style", "test_change_text_font.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -128,9 +130,15 @@ def test_change_text_font(
 
 @pytest.mark.cli_test
 def test_change_text_font_size(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_size.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_text_font_size.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -173,9 +181,15 @@ def test_change_text_font_size(
 
 @pytest.mark.cli_test
 def test_change_text_font_color(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_font_color.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_text_font_color.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -218,9 +232,15 @@ def test_change_text_font_color(
 
 @pytest.mark.cli_test
 def test_change_text_alignment(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_alignment.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_text_alignment.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -260,9 +280,15 @@ def test_change_text_alignment(
 
 @pytest.mark.cli_test
 def test_change_text_max_length(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_max_length.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_text_max_length.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -301,8 +327,12 @@ def test_change_text_max_length(
 
 
 @pytest.mark.cli_test
-def test_change_text_comb(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_comb.pdf")
+def test_change_text_comb(
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_style", "test_change_text_comb.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -342,9 +372,15 @@ def test_change_text_comb(pdf_samples, static_pdfs, yaml_samples, tmp_path, expe
 
 @pytest.mark.cli_test
 def test_change_text_multiline(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_text_multiline.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_text_multiline.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
     data_yaml = os.path.join(tmp_path, "data.yaml")
     with open(data_yaml, "w", encoding="utf-8") as f:
@@ -397,9 +433,11 @@ def test_change_text_multiline(
 
 @pytest.mark.cli_test
 def test_change_check_size(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_check_size.pdf")
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_style", "test_change_check_size.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
     data_yaml = os.path.join(tmp_path, "data.yaml")
     with open(data_yaml, "w", encoding="utf-8") as f:
@@ -449,10 +487,14 @@ def test_change_check_size(
 
 @pytest.mark.cli_test
 def test_change_dropdown_choices(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_dropdown_choices.pdf"
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_dropdown_choices.pdf",
     )
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -478,10 +520,14 @@ def test_change_dropdown_choices(
 
 @pytest.mark.cli_test
 def test_change_dropdown_choices_with_export_values(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_dropdown_choices_with_export_values.pdf"
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_dropdown_choices_with_export_values.pdf",
     )
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -509,9 +555,15 @@ def test_change_dropdown_choices_with_export_values(
 
 @pytest.mark.cli_test
 def test_change_dropdown_font(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_change_dropdown_font.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_dropdown_font.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -536,10 +588,14 @@ def test_change_dropdown_font(
 
 @pytest.mark.cli_test
 def test_change_dropdown_font_size(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_dropdown_font_size.pdf"
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_dropdown_font_size.pdf",
     )
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -565,10 +621,14 @@ def test_change_dropdown_font_size(
 
 @pytest.mark.cli_test
 def test_change_dropdown_font_color(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_dropdown_font_color.pdf"
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_dropdown_font_color.pdf",
     )
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -649,8 +709,12 @@ def test_update_key(static_pdfs, yaml_samples, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_update_key_index(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_update_key_index.pdf")
+def test_update_key_index(
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_style", "test_update_key_index.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
     sample_data = os.path.join(tmp_path, "sample_data.yaml")
 
@@ -694,10 +758,14 @@ def test_update_key_index(pdf_samples, static_pdfs, yaml_samples, tmp_path, expe
 
 @pytest.mark.cli_test
 def test_change_field_editability(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_field_editability.pdf"
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_field_editability.pdf",
     )
     readonly_path = os.path.join(tmp_path, "readonly.pdf")
     data_yaml = os.path.join(tmp_path, "data.yaml")
@@ -751,10 +819,14 @@ def test_change_field_editability(
 
 @pytest.mark.cli_test
 def test_change_field_visibility(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(
-        pdf_samples, "docs", "test_change_field_visibility.pdf"
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_style",
+        "test_change_field_visibility.pdf",
     )
     output_path = os.path.join(tmp_path, "output.pdf")
 
@@ -779,8 +851,10 @@ def test_change_field_visibility(
 
 
 @pytest.mark.cli_test
-def test_remove_fields(pdf_samples, static_pdfs, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_remove_fields.pdf")
+def test_remove_fields(expected_pdfs, static_pdfs, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_style", "test_remove_fields.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(

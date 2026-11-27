@@ -5,10 +5,7 @@ import os
 from PyPDFForm import PdfWrapper
 
 
-def test_fill_readonly_then_editable(
-    template_stream, pdf_samples, data_dict, expect_pdf
-):
-    expected_path = os.path.join(pdf_samples, "test_fill_readonly_then_editable.pdf")
+def test_fill_readonly_then_editable(template_stream, data_dict, expect_pdf):
     obj = PdfWrapper(template_stream).fill(data_dict, readonly=True)
     obj.widgets["test_2"].readonly = False
     obj.widgets["check_3"].readonly = False
@@ -16,13 +13,12 @@ def test_fill_readonly_then_editable(
     for _ in range(4):
         obj.read()
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_fill_with_customized_widgets(
-    template_stream, pdf_samples, sample_font_stream, data_dict, expect_pdf
+    template_stream, sample_font_stream, data_dict, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "test_fill_with_customized_widgets.pdf")
     obj = PdfWrapper(template_stream).register_font(
         "new_font",
         sample_font_stream,
@@ -35,15 +31,12 @@ def test_fill_with_customized_widgets(
         data_dict,
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_fill_with_customized_widgets_readonly(
-    template_stream, pdf_samples, sample_font_stream, data_dict, expect_pdf
+    template_stream, sample_font_stream, data_dict, expect_pdf
 ):
-    expected_path = os.path.join(
-        pdf_samples, "test_fill_with_customized_widgets_readonly.pdf"
-    )
     obj = PdfWrapper(template_stream).register_font(
         "new_font",
         sample_font_stream,
@@ -57,11 +50,10 @@ def test_fill_with_customized_widgets_readonly(
         readonly=True,
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_fill_with_varied_int_values(template_stream, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "test_fill_with_varied_int_values.pdf")
+def test_fill_with_varied_int_values(template_stream, expect_pdf):
     obj = PdfWrapper(template_stream).fill(
         {
             "test": 100,
@@ -70,13 +62,10 @@ def test_fill_with_varied_int_values(template_stream, pdf_samples, expect_pdf):
         }
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_fill_radiobutton_readonly(
-    template_with_radiobutton_stream, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(pdf_samples, "test_fill_radiobutton_readonly.pdf")
+def test_fill_radiobutton_readonly(template_with_radiobutton_stream, expect_pdf):
     obj = PdfWrapper(template_with_radiobutton_stream).fill(
         {
             "radio_1": 0,
@@ -86,15 +75,12 @@ def test_fill_radiobutton_readonly(
         readonly=True,
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_fill_radiobutton_readonly_then_editable(
-    template_with_radiobutton_stream, pdf_samples, expect_pdf
+    template_with_radiobutton_stream, expect_pdf
 ):
-    expected_path = os.path.join(
-        pdf_samples, "test_fill_radiobutton_readonly_then_editable.pdf"
-    )
     obj = PdfWrapper(template_with_radiobutton_stream).fill(
         {
             "radio_1": 0,
@@ -105,32 +91,25 @@ def test_fill_radiobutton_readonly_then_editable(
     )
     obj.widgets["radio_2"].readonly = False
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_fill_sejda(sejda_template, pdf_samples, sejda_data, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "test_fill_sejda.pdf")
+def test_fill_sejda(sejda_template, sejda_data, expect_pdf):
     obj = PdfWrapper(sejda_template).fill(sejda_data)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_fill_sejda_readonly(sejda_template, pdf_samples, sejda_data, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "test_fill_sejda_readonly.pdf")
+def test_fill_sejda_readonly(sejda_template, sejda_data, expect_pdf):
     obj = PdfWrapper(sejda_template).fill(
         sejda_data,
         readonly=True,
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_fill_sejda_readonly_then_editable(
-    sejda_template, pdf_samples, sejda_data, expect_pdf
-):
-    expected_path = os.path.join(
-        pdf_samples, "test_fill_sejda_readonly_then_editable.pdf"
-    )
+def test_fill_sejda_readonly_then_editable(sejda_template, sejda_data, expect_pdf):
     obj = PdfWrapper(sejda_template).fill(
         sejda_data,
         readonly=True,
@@ -139,13 +118,10 @@ def test_fill_sejda_readonly_then_editable(
     obj.widgets["at_future_date"].readonly = False
     obj.widgets["purchase_option"].readonly = False
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_fill_right_aligned(
-    sample_template_with_right_aligned_text_field, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(pdf_samples, "test_fill_right_aligned.pdf")
+def test_fill_right_aligned(sample_template_with_right_aligned_text_field, expect_pdf):
     obj = PdfWrapper(sample_template_with_right_aligned_text_field).fill(
         {
             "name": "Hans Mustermann",
@@ -154,11 +130,10 @@ def test_fill_right_aligned(
         },
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_fill_font_color(sample_template_with_font_colors, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "test_fill_font_color.pdf")
+def test_fill_font_color(sample_template_with_font_colors, expect_pdf):
     obj = PdfWrapper(sample_template_with_font_colors).fill(
         {
             "red_12": "red",
@@ -168,13 +143,10 @@ def test_fill_font_color(sample_template_with_font_colors, pdf_samples, expect_p
         },
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_fill_complex_fonts(
-    sample_template_with_complex_fonts, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(pdf_samples, "test_fill_complex_fonts.pdf")
+def test_fill_complex_fonts(sample_template_with_complex_fonts, expect_pdf):
     obj = PdfWrapper(sample_template_with_complex_fonts).fill(
         {
             "Courier": "Test",
@@ -192,22 +164,18 @@ def test_fill_complex_fonts(
         },
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_uncheck_checkbox(pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "test_uncheck_checkbox.pdf")
     obj = PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf")).fill(
         {"check": False, "check_2": False, "check_3": False},
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_dropdown_one_readonly(sample_template_with_dropdown, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_one_readonly.pdf"
-    )
+def test_dropdown_one_readonly(sample_template_with_dropdown, expect_pdf):
     obj = PdfWrapper(sample_template_with_dropdown).fill(
         {
             "test_1": "test_1",
@@ -222,11 +190,10 @@ def test_dropdown_one_readonly(sample_template_with_dropdown, pdf_samples, expec
         readonly=True,
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_dropdown_alignment(dropdown_alignment, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "dropdown", "test_dropdown_alignment.pdf")
+def test_dropdown_alignment(dropdown_alignment, expect_pdf):
     obj = PdfWrapper(dropdown_alignment).fill(
         {
             "dropdown_left": 0,
@@ -235,15 +202,10 @@ def test_dropdown_alignment(dropdown_alignment, pdf_samples, expect_pdf):
         },
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_dropdown_alignment_readonly_then_editable(
-    dropdown_alignment, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_alignment_readonly_then_editable.pdf"
-    )
+def test_dropdown_alignment_readonly_then_editable(dropdown_alignment, expect_pdf):
     obj = PdfWrapper(dropdown_alignment).fill(
         {
             "dropdown_left": 0,
@@ -254,13 +216,10 @@ def test_dropdown_alignment_readonly_then_editable(
     )
     obj.widgets["dropdown_center"].readonly = False
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_alignment_sejda.pdf"
-    )
+def test_dropdown_alignment_sejda(dropdown_alignment_sejda, expect_pdf):
     obj = PdfWrapper(dropdown_alignment_sejda).fill(
         {
             "dropdown_left": 0,
@@ -269,15 +228,10 @@ def test_dropdown_alignment_sejda(dropdown_alignment_sejda, pdf_samples, expect_
         },
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_dropdown_alignment_sejda_readonly(
-    dropdown_alignment_sejda, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(
-        pdf_samples, "dropdown", "test_dropdown_alignment_sejda_readonly.pdf"
-    )
+def test_dropdown_alignment_sejda_readonly(dropdown_alignment_sejda, expect_pdf):
     obj = PdfWrapper(dropdown_alignment_sejda).fill(
         {
             "dropdown_left": 0,
@@ -287,17 +241,12 @@ def test_dropdown_alignment_sejda_readonly(
         readonly=True,
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_dropdown_alignment_sejda_readonly_then_editable(
-    dropdown_alignment_sejda, pdf_samples, expect_pdf
+    dropdown_alignment_sejda, expect_pdf
 ):
-    expected_path = os.path.join(
-        pdf_samples,
-        "dropdown",
-        "test_dropdown_alignment_sejda_readonly_then_editable.pdf",
-    )
     obj = PdfWrapper(dropdown_alignment_sejda).fill(
         {
             "dropdown_left": 0,
@@ -308,36 +257,27 @@ def test_dropdown_alignment_sejda_readonly_then_editable(
     )
     obj.widgets["dropdown_center"].readonly = False
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_fill_sejda_complex(
-    sejda_template_complex, sejda_complex_data, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(
-        pdf_samples, "paragraph", "test_fill_sejda_complex.pdf"
-    )
+def test_fill_sejda_complex(sejda_template_complex, sejda_complex_data, expect_pdf):
     obj = PdfWrapper(sejda_template_complex).fill(sejda_complex_data)
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_fill_sejda_complex_readonly(
-    sejda_template_complex, sejda_complex_data, pdf_samples, expect_pdf
+    sejda_template_complex, sejda_complex_data, expect_pdf
 ):
-    expected_path = os.path.join(
-        pdf_samples, "paragraph", "test_fill_sejda_complex_readonly.pdf"
-    )
     obj = PdfWrapper(sejda_template_complex).fill(
         sejda_complex_data,
         readonly=True,
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "paragraph", "test_paragraph_complex.pdf")
+def test_paragraph_complex(sample_template_paragraph_complex, expect_pdf):
     obj = PdfWrapper(sample_template_paragraph_complex).fill(
         {
             "paragraph_font_auto_left": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
@@ -349,32 +289,23 @@ def test_paragraph_complex(sample_template_paragraph_complex, pdf_samples, expec
         }
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_paragraph_max_length(
-    sample_template_with_paragraph_max_length, pdf_samples, expect_pdf
-):
-    expected_path = os.path.join(
-        pdf_samples, "paragraph", "test_paragraph_max_length.pdf"
-    )
+def test_paragraph_max_length(sample_template_with_paragraph_max_length, expect_pdf):
     obj = PdfWrapper(sample_template_with_paragraph_max_length).fill(
         {
             "paragraph": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
         }
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_fill_max_length_text_field_all_chars(
     sample_template_with_max_length_text_field,
-    max_length_expected_directory,
     expect_pdf,
 ):
-    expected_path = os.path.join(
-        max_length_expected_directory, "test_fill_max_length_text_field_all_chars.pdf"
-    )
     obj = PdfWrapper(sample_template_with_max_length_text_field).fill(
         {
             "FirstName": "John",
@@ -385,15 +316,12 @@ def test_fill_max_length_text_field_all_chars(
         }
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_fill_comb_text_field_all_chars(
-    sample_template_with_comb_text_field, max_length_expected_directory, expect_pdf
+    sample_template_with_comb_text_field, expect_pdf
 ):
-    expected_path = os.path.join(
-        max_length_expected_directory, "test_fill_comb_text_field_all_chars.pdf"
-    )
     obj = PdfWrapper(sample_template_with_comb_text_field).fill(
         {
             "FirstName": "John",
@@ -404,16 +332,12 @@ def test_fill_comb_text_field_all_chars(
         }
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_fill_comb_text_field_all_chars_readonly(
-    sample_template_with_comb_text_field, max_length_expected_directory, expect_pdf
+    sample_template_with_comb_text_field, expect_pdf
 ):
-    expected_path = os.path.join(
-        max_length_expected_directory,
-        "test_fill_comb_text_field_all_chars_readonly.pdf",
-    )
     obj = PdfWrapper(sample_template_with_comb_text_field).fill(
         {
             "FirstName": "John",
@@ -425,29 +349,19 @@ def test_fill_comb_text_field_all_chars_readonly(
         readonly=True,
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
-def test_fill_comb_text_field_void(
-    sample_template_with_comb_text_field, max_length_expected_directory, expect_pdf
-):
-    expected_path = os.path.join(
-        max_length_expected_directory, "test_fill_comb_text_field_void.pdf"
-    )
+def test_fill_comb_text_field_void(sample_template_with_comb_text_field, expect_pdf):
     obj = PdfWrapper(sample_template_with_comb_text_field).fill({})
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())
 
 
 def test_fill_comb_text_field_even_chars_right_aligned(
     sample_template_with_comb_text_field_right_aligned,
-    max_length_expected_directory,
     expect_pdf,
 ):
-    expected_path = os.path.join(
-        max_length_expected_directory,
-        "test_fill_comb_text_field_even_chars_right_aligned.pdf",
-    )
     obj = PdfWrapper(sample_template_with_comb_text_field_right_aligned).fill(
         {
             "FirstName": "John",
@@ -458,4 +372,4 @@ def test_fill_comb_text_field_even_chars_right_aligned(
         }
     )
 
-    expect_pdf(obj.read(), expected_path)
+    expect_pdf(obj.read())

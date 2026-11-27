@@ -76,8 +76,16 @@ def test_create_annotation_input_methods(static_pdfs, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_text_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_text_annotations.pdf")
+def test_text_annotations(
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
+):
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_annotation",
+        "test_text_annotations.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -102,9 +110,15 @@ def test_text_annotations(pdf_samples, static_pdfs, yaml_samples, tmp_path, expe
 
 @pytest.mark.cli_test
 def test_uri_link_annotations(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_uri_link_annotations.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_annotation",
+        "test_uri_link_annotations.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -129,9 +143,15 @@ def test_uri_link_annotations(
 
 @pytest.mark.cli_test
 def test_page_link_annotations(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_page_link_annotations.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_annotation",
+        "test_page_link_annotations.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -156,9 +176,15 @@ def test_page_link_annotations(
 
 @pytest.mark.cli_test
 def test_highlight_annotations(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_highlight_annotations.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_annotation",
+        "test_highlight_annotations.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -183,9 +209,15 @@ def test_highlight_annotations(
 
 @pytest.mark.cli_test
 def test_underline_annotations(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_underline_annotations.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_annotation",
+        "test_underline_annotations.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -210,9 +242,15 @@ def test_underline_annotations(
 
 @pytest.mark.cli_test
 def test_squiggly_annotations(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_squiggly_annotations.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_annotation",
+        "test_squiggly_annotations.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -237,9 +275,15 @@ def test_squiggly_annotations(
 
 @pytest.mark.cli_test
 def test_strikeout_annotations(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_strikeout_annotations.pdf")
+    expected_path = os.path.join(
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_annotation",
+        "test_strikeout_annotations.pdf",
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -264,10 +308,14 @@ def test_strikeout_annotations(
 
 @pytest.mark.cli_test
 def test_rubber_stamp_annotations(
-    pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf
 ):
     expected_path = os.path.join(
-        pdf_samples, "docs", "test_rubber_stamp_annotations.pdf"
+        expected_pdfs,
+        "doc_examples",
+        "lib",
+        "test_annotation",
+        "test_rubber_stamp_annotations.pdf",
     )
     output_path = os.path.join(tmp_path, "output.pdf")
 

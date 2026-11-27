@@ -6,10 +6,8 @@ import pytest
 
 
 @pytest.fixture
-def pdf_directory():
-    return os.path.join(
-        os.path.dirname(__file__), "..", "..", "pdf_samples", "scenario"
-    )
+def pdf_directory(pdf_samples):
+    return os.path.join(pdf_samples, "scenario")
 
 
 @pytest.fixture
@@ -28,10 +26,8 @@ def existed_pdf_directory(pdf_directory):
 
 
 @pytest.fixture
-def multi_language_pdf_samples():
-    return os.path.join(
-        os.path.dirname(__file__), "..", "..", "pdf_samples", "multi_language"
-    )
+def multi_language_pdf_samples(pdf_samples):
+    return os.path.join(pdf_samples, "multi_language")
 
 
 @pytest.fixture

@@ -23,7 +23,16 @@ from PyPDFForm.lib.constants import (
 
 @pytest.fixture
 def pdf_samples():
-    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples")
+    # the input PDFs; expected PDFs are in expected_pdfs
+    return os.path.join(os.path.dirname(__file__), "..", "..", "pdf_samples", "input")
+
+
+@pytest.fixture
+def expected_pdfs():
+    # for same_as, and for tests that read another test's expected PDF
+    return os.path.join(
+        os.path.dirname(__file__), "..", "..", "pdf_samples", "expected"
+    )
 
 
 @pytest.fixture
@@ -276,17 +285,6 @@ def sejda_complex_data():
         "text_font_ten_center": "text_font_ten_center",
         "text_font_ten_right": "text_font_ten_right",
     }
-
-
-@pytest.fixture
-def max_length_expected_directory():
-    return os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        "..",
-        "pdf_samples",
-        "max_length_text_field_related",
-    )
 
 
 @pytest.fixture(params=[False, True], ids=["short-names", "full-names"])

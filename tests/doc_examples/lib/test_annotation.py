@@ -5,9 +5,7 @@ import os
 from PyPDFForm import Annotations, PdfWrapper
 
 
-def test_text_annotations(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_text_annotations.pdf")
-
+def test_text_annotations(static_pdfs, expect_pdf):
     annotations = [
         Annotations.TextAnnotation(
             page_number=1,
@@ -30,12 +28,10 @@ def test_text_annotations(static_pdfs, pdf_samples, expect_pdf):
         annotations
     )
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_uri_link_annotations(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_uri_link_annotations.pdf")
-
+def test_uri_link_annotations(static_pdfs, expect_pdf):
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
         [
             Annotations.LinkAnnotation(
@@ -49,12 +45,10 @@ def test_uri_link_annotations(static_pdfs, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_page_link_annotations(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_page_link_annotations.pdf")
-
+def test_page_link_annotations(static_pdfs, expect_pdf):
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
         [
             Annotations.LinkAnnotation(
@@ -68,12 +62,10 @@ def test_page_link_annotations(static_pdfs, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_highlight_annotations(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_highlight_annotations.pdf")
-
+def test_highlight_annotations(static_pdfs, expect_pdf):
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
         [
             Annotations.HighlightAnnotation(
@@ -82,12 +74,10 @@ def test_highlight_annotations(static_pdfs, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_underline_annotations(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_underline_annotations.pdf")
-
+def test_underline_annotations(static_pdfs, expect_pdf):
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
         [
             Annotations.UnderlineAnnotation(
@@ -96,12 +86,10 @@ def test_underline_annotations(static_pdfs, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_squiggly_annotations(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_squiggly_annotations.pdf")
-
+def test_squiggly_annotations(static_pdfs, expect_pdf):
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
         [
             Annotations.SquigglyAnnotation(
@@ -110,12 +98,10 @@ def test_squiggly_annotations(static_pdfs, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_strikeout_annotations(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_strikeout_annotations.pdf")
-
+def test_strikeout_annotations(static_pdfs, expect_pdf):
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
         [
             Annotations.StrikeOutAnnotation(
@@ -124,14 +110,10 @@ def test_strikeout_annotations(static_pdfs, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_rubber_stamp_annotations(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "docs", "test_rubber_stamp_annotations.pdf"
-    )
-
+def test_rubber_stamp_annotations(static_pdfs, expect_pdf):
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).annotate(
         [
             Annotations.RubberStampAnnotation(
@@ -145,4 +127,4 @@ def test_rubber_stamp_annotations(static_pdfs, pdf_samples, expect_pdf):
         ]
     )
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())

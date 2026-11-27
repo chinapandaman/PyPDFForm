@@ -14,9 +14,11 @@ runner = CliRunner()
 
 @pytest.mark.cli_test
 def test_json_file_input_for_fill(
-    pdf_samples, static_pdfs, json_samples, tmp_path, expect_pdf
+    expected_pdfs, static_pdfs, json_samples, tmp_path, expect_pdf
 ):
-    expected_path = os.path.join(pdf_samples, "docs", "test_fill_text_check.pdf")
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_fill", "test_fill_text_check.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(

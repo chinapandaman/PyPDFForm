@@ -136,8 +136,10 @@ def test_radio_values(pdf_samples):
         assert obj.widgets[k].value == v
 
 
-def test_sejda_values(pdf_samples, sejda_data):
-    obj = PdfWrapper(os.path.join(pdf_samples, "test_fill_sejda.pdf"))
+def test_sejda_values(expected_pdfs, sejda_data):
+    obj = PdfWrapper(
+        os.path.join(expected_pdfs, "snapshots", "test_fill", "test_fill_sejda.pdf")
+    )
 
     for k, v in sejda_data.items():
         if v is False:
@@ -158,9 +160,11 @@ def test_dropdown_default_values(pdf_samples):
     assert obj.widgets["dropdown_1"].value == 0
 
 
-def test_sejda_dropdown_values(pdf_samples):
+def test_sejda_dropdown_values(expected_pdfs):
     obj = PdfWrapper(
-        os.path.join(pdf_samples, "dropdown", "test_dropdown_alignment_sejda.pdf")
+        os.path.join(
+            expected_pdfs, "snapshots", "test_fill", "test_dropdown_alignment_sejda.pdf"
+        )
     )
 
     assert obj.widgets["dropdown_left"].value == 0
@@ -181,8 +185,15 @@ def test_addition_operator_3_times_values(template_stream, data_dict):
             assert (v.value or False) == data_dict[k.split("-")[0]]
 
 
-def test_field_readonly(pdf_samples):
-    obj = PdfWrapper(os.path.join(pdf_samples, "test_fill_readonly_then_editable.pdf"))
+def test_field_readonly(expected_pdfs):
+    obj = PdfWrapper(
+        os.path.join(
+            expected_pdfs,
+            "snapshots",
+            "test_fill",
+            "test_fill_readonly_then_editable.pdf",
+        )
+    )
 
     for k, v in obj.widgets.items():
         if k in ["test_2", "check_3"]:
@@ -191,27 +202,37 @@ def test_field_readonly(pdf_samples):
             assert v.readonly
 
 
-def test_field_readonly_sejda(pdf_samples):
-    obj = PdfWrapper(os.path.join(pdf_samples, "test_fill_sejda_readonly.pdf"))
+def test_field_readonly_sejda(expected_pdfs):
+    obj = PdfWrapper(
+        os.path.join(
+            expected_pdfs, "snapshots", "test_fill", "test_fill_sejda_readonly.pdf"
+        )
+    )
 
     for v in obj.widgets.values():
         assert v.readonly
 
 
-def test_field_required(pdf_samples):
+def test_field_required(expected_pdfs):
     obj = PdfWrapper(
-        os.path.join(pdf_samples, "widget", "test_create_required_fields.pdf")
+        os.path.join(
+            expected_pdfs,
+            "snapshots",
+            "test_prepare",
+            "test_create_required_fields.pdf",
+        )
     )
 
     for v in obj.widgets.values():
         assert v.required
 
 
-def test_field_required_sejda(pdf_samples):
+def test_field_required_sejda(expected_pdfs):
     obj = PdfWrapper(
         os.path.join(
-            pdf_samples,
-            "test_widget_attr_trigger",
+            expected_pdfs,
+            "snapshots",
+            "test_style",
             "test_set_text_field_required_sejda.pdf",
         )
     )
@@ -222,8 +243,12 @@ def test_field_required_sejda(pdf_samples):
             assert not v.required
 
 
-def test_field_hidden(pdf_samples):
-    obj = PdfWrapper(os.path.join(pdf_samples, "test_hidden_text_check.pdf"))
+def test_field_hidden(expected_pdfs):
+    obj = PdfWrapper(
+        os.path.join(
+            expected_pdfs, "snapshots", "test_style", "test_hidden_text_check.pdf"
+        )
+    )
 
     assert obj.widgets["test"].hidden
     assert obj.widgets["check_2"].hidden
@@ -232,8 +257,10 @@ def test_field_hidden(pdf_samples):
             assert not v.hidden
 
 
-def test_field_hidden_sejda(pdf_samples):
-    obj = PdfWrapper(os.path.join(pdf_samples, "test_hidden_sejda.pdf"))
+def test_field_hidden_sejda(expected_pdfs):
+    obj = PdfWrapper(
+        os.path.join(expected_pdfs, "snapshots", "test_style", "test_hidden_sejda.pdf")
+    )
 
     assert obj.widgets["buyer_name"].hidden
     assert obj.widgets["purchase_option"].hidden
@@ -243,11 +270,12 @@ def test_field_hidden_sejda(pdf_samples):
             assert not v.hidden
 
 
-def test_text_field_alignment_sejda(pdf_samples):
+def test_text_field_alignment_sejda(expected_pdfs):
     obj = PdfWrapper(
         os.path.join(
-            pdf_samples,
-            "test_widget_attr_trigger",
+            expected_pdfs,
+            "snapshots",
+            "test_style",
             "test_set_text_field_alignment_sejda.pdf",
         )
     )
@@ -255,10 +283,12 @@ def test_text_field_alignment_sejda(pdf_samples):
     assert obj.widgets["buyer_name"].alignment == 2
 
 
-def test_text_field_comb(max_length_expected_directory):
+def test_text_field_comb(expected_pdfs):
     obj = PdfWrapper(
         os.path.join(
-            max_length_expected_directory,
+            expected_pdfs,
+            "snapshots",
+            "test_fill",
             "test_fill_comb_text_field_all_chars.pdf",
         )
     )
@@ -266,11 +296,12 @@ def test_text_field_comb(max_length_expected_directory):
     assert obj.widgets["LastName"].comb
 
 
-def test_text_field_comb_sejda(pdf_samples):
+def test_text_field_comb_sejda(expected_pdfs):
     obj = PdfWrapper(
         os.path.join(
-            pdf_samples,
-            "test_widget_attr_trigger",
+            expected_pdfs,
+            "snapshots",
+            "test_style",
             "test_set_text_field_comb_sejda.pdf",
         )
     )

@@ -6,9 +6,7 @@ import os
 from PyPDFForm import PdfWrapper, RawElements
 
 
-def test_draw_text(static_pdfs, pdf_samples, sample_font_stream, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_text.pdf")
-
+def test_draw_text(static_pdfs, sample_font_stream, expect_pdf):
     texts = [
         RawElements.RawText(
             text="random text",
@@ -36,12 +34,10 @@ def test_draw_text(static_pdfs, pdf_samples, sample_font_stream, expect_pdf):
         .draw(texts)
     )
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_draw_image(static_pdfs, image_samples, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_image.pdf")
-
+def test_draw_image(static_pdfs, image_samples, expect_pdf):
     images = [
         RawElements.RawImage(
             image=os.path.join(image_samples, "sample_image.jpg"),
@@ -65,7 +61,7 @@ def test_draw_image(static_pdfs, image_samples, pdf_samples, expect_pdf):
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(images)
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
     images = [
         RawElements.RawImage(
@@ -126,9 +122,7 @@ def test_draw_image(static_pdfs, image_samples, pdf_samples, expect_pdf):
     assert pdf3.read() == pdf.read()
 
 
-def test_draw_line(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_line.pdf")
-
+def test_draw_line(static_pdfs, expect_pdf):
     lines = [
         RawElements.RawLine(
             page_number=1,
@@ -149,12 +143,10 @@ def test_draw_line(static_pdfs, pdf_samples, expect_pdf):
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(lines)
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_draw_rect(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_rect.pdf")
-
+def test_draw_rect(static_pdfs, expect_pdf):
     rectangles = [
         RawElements.RawRectangle(
             page_number=1,
@@ -176,12 +168,10 @@ def test_draw_rect(static_pdfs, pdf_samples, expect_pdf):
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(rectangles)
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_draw_circle(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_circle.pdf")
-
+def test_draw_circle(static_pdfs, expect_pdf):
     circles = [
         RawElements.RawCircle(
             page_number=1,
@@ -201,12 +191,10 @@ def test_draw_circle(static_pdfs, pdf_samples, expect_pdf):
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(circles)
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())
 
 
-def test_draw_ellipse(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_ellipse.pdf")
-
+def test_draw_ellipse(static_pdfs, expect_pdf):
     ellipses = [
         RawElements.RawEllipse(
             page_number=1,
@@ -228,4 +216,4 @@ def test_draw_ellipse(static_pdfs, pdf_samples, expect_pdf):
 
     pdf = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).draw(ellipses)
 
-    expect_pdf(pdf.read(), expected_path)
+    expect_pdf(pdf.read())

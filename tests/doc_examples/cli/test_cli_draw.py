@@ -73,8 +73,10 @@ def test_create_raw_input_methods(static_pdfs, tmp_path):
 
 
 @pytest.mark.cli_test
-def test_draw_text(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_text.pdf")
+def test_draw_text(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_draw", "test_draw_text.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -98,8 +100,10 @@ def test_draw_text(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf)
 
 
 @pytest.mark.cli_test
-def test_draw_image(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_image.pdf")
+def test_draw_image(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_draw", "test_draw_image.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -123,8 +127,10 @@ def test_draw_image(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf
 
 
 @pytest.mark.cli_test
-def test_draw_line(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_line.pdf")
+def test_draw_line(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_draw", "test_draw_line.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -148,8 +154,10 @@ def test_draw_line(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf)
 
 
 @pytest.mark.cli_test
-def test_draw_rect(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_rect.pdf")
+def test_draw_rect(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_draw", "test_draw_rect.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -173,8 +181,10 @@ def test_draw_rect(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf)
 
 
 @pytest.mark.cli_test
-def test_draw_circle(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_circle.pdf")
+def test_draw_circle(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_draw", "test_draw_circle.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(
@@ -198,8 +208,10 @@ def test_draw_circle(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pd
 
 
 @pytest.mark.cli_test
-def test_draw_ellipse(pdf_samples, static_pdfs, yaml_samples, tmp_path, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_draw_ellipse.pdf")
+def test_draw_ellipse(expected_pdfs, static_pdfs, yaml_samples, tmp_path, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_draw", "test_draw_ellipse.pdf"
+    )
     output_path = os.path.join(tmp_path, "output.pdf")
 
     result = runner.invoke(

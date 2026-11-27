@@ -23,10 +23,14 @@ if [ "$STATUS" -gt 1 ]; then
 fi
 
 # A test that compares with another test's expected PDF writes its differing
-# version as <expected PDF>.<test>.pdf, so it doesn't replace the owner's.
+# version as same_as/<test>/<expected PDF>, so it doesn't replace the owner's.
+# <test> has no slash, and the owners' versions are under pdf_samples/ or docs/.
 expected_pdf() {
   case "$1" in
-    *.pdf.*) echo "${1%%.pdf.*}.pdf" ;;
+    same_as/*)
+      local rest="${1#same_as/}"
+      echo "${rest#*/}"
+      ;;
     *) echo "$1" ;;
   esac
 }

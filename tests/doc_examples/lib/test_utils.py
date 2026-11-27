@@ -5,44 +5,34 @@ import os
 from PyPDFForm import BlankPage, PdfArray, PdfWrapper
 
 
-def test_blank_page(pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_blank_page.pdf")
-
+def test_blank_page(expect_pdf):
     blank_pdf = PdfWrapper(BlankPage())
 
-    expect_pdf(blank_pdf.read(), expected_path, timestamped=True)
+    expect_pdf(blank_pdf.read(), timestamped=True)
 
     assert not blank_pdf.widgets
     assert len(blank_pdf.pages) == 1
 
 
-def test_blank_page_custom_dimensions(pdf_samples, expect_pdf):
-    expected_path = os.path.join(
-        pdf_samples, "docs", "test_blank_page_custom_dimensions.pdf"
-    )
-
+def test_blank_page_custom_dimensions(expect_pdf):
     blank_pdf = PdfWrapper(BlankPage(width=595.35, height=841.995))  # A4 size
 
-    expect_pdf(blank_pdf.read(), expected_path, timestamped=True)
+    expect_pdf(blank_pdf.read(), timestamped=True)
 
     assert not blank_pdf.widgets
     assert len(blank_pdf.pages) == 1
 
 
-def test_blank_page_multiply(pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_blank_page_multiply.pdf")
-
+def test_blank_page_multiply(expect_pdf):
     blank_pdf = PdfWrapper(BlankPage() * 3)  # 3 pages of letter size
 
-    expect_pdf(blank_pdf.read(), expected_path, timestamped=True)
+    expect_pdf(blank_pdf.read(), timestamped=True)
 
     assert not blank_pdf.widgets
     assert len(blank_pdf.pages) == 3
 
 
-def test_extract_pages(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_extract_pages.pdf")
-
+def test_extract_pages(static_pdfs, expect_pdf):
     first_page = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf")).pages[0]
     first_page = PdfWrapper(
         first_page.read()
@@ -54,31 +44,29 @@ def test_extract_pages(static_pdfs, pdf_samples, expect_pdf):
         },
     )
 
-    expect_pdf(first_page.read(), expected_path)
+    expect_pdf(first_page.read())
 
 
 def test_merge(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_merge.pdf")
-
     pdf_one = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
     pdf_two = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     merged = pdf_one + pdf_two
 
-    expect_pdf(merged.read(), expected_path)
+    expect_pdf(merged.read())
 
 
 def test_reorg_pages(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_reorg_pages.pdf")
-
     pdf_one = PdfWrapper(os.path.join(pdf_samples, "dummy.pdf"))
     pdf_two = PdfWrapper(os.path.join(static_pdfs, "sample_template.pdf"))
     merged = pdf_two.pages[0] + pdf_one + pdf_two.pages[1:]
 
-    expect_pdf(merged.read(), expected_path)
+    expect_pdf(merged.read())
 
 
-def test_merge_using_pdf_array(static_pdfs, pdf_samples, expect_pdf):
-    expected_path = os.path.join(pdf_samples, "docs", "test_merge.pdf")
+def test_merge_using_pdf_array(static_pdfs, pdf_samples, expected_pdfs, expect_pdf):
+    expected_path = os.path.join(
+        expected_pdfs, "doc_examples", "lib", "test_utils", "test_merge.pdf"
+    )
 
     pdfs = PdfArray(
         [
