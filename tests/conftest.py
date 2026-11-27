@@ -89,6 +89,12 @@ class InPlaceWrites:
         self.owners = {}
         # the backup of each written expected PDF, or None if it didn't exist
         self.backups = {}
+        self.restored = set()
+
+    @property
+    def kept(self):
+        # whether any expected PDF this run wrote is still its version
+        return any(path not in self.restored for path in self.backups)
 
     def write(self, path, stream, nodeid):
         if self.owners.setdefault(path, nodeid) != nodeid:
@@ -103,6 +109,7 @@ class InPlaceWrites:
 
         with open(path, "wb") as f:
             f.write(stream)
+        self.restored.discard(path)
 
     def restore(self, path):
         if path not in self.backups:
@@ -113,6 +120,7 @@ class InPlaceWrites:
             shutil.copyfile(backup, path)
         elif os.path.exists(path):
             os.remove(path)
+        self.restored.add(path)
 
     def close(self):
         shutil.rmtree(self.backup_dir, ignore_errors=True)
@@ -211,8 +219,9 @@ def pytest_sessionfinish(session):
         for path in config.stash.get(shared_expected_pdfs, {}):
             writes.restore(os.path.abspath(os.path.join(ROOT, path)))
 
-    # record the environment of the latest in-place regeneration
-    if isinstance(writes, InPlaceWrites) and writes.owners:
+    # record the environment of the latest in-place regeneration, unless every
+    # expected PDF it wrote was restored
+    if isinstance(writes, InPlaceWrites) and writes.kept:
         with open(FIXTURE_ENVIRONMENT_PATH, "w", encoding="utf-8", newline="\n") as f:
             json.dump(fixture_environment(), f, indent=2)
             f.write("\n")
