@@ -12,6 +12,7 @@ from PyPDFForm import BlankPage, Fields, PdfWrapper
 from tests.support.builders import (
     build_button_group,
     change_widgets,
+    checkbox_field,
     save,
     set_default_appearance,
     with_parent_cycle,
@@ -343,12 +344,17 @@ def test_output_selects_checkbox_state_of_value(
     assert_widgets_match_output(form)
 
 
+@pytest.mark.parametrize(
+    "value",
+    [pikepdf.Name("/b"), pikepdf.String("/b")],
+    ids=["name", "string"],
+)
 def test_output_selects_radio_state_of_value(
-    assert_valid_appearances, assert_widgets_match_output
+    value, assert_valid_appearances, assert_widgets_match_output
 ):
     # neither option's appearance has the state it names, and the value of
-    # their field names the second option's state
-    group = build_button_group(49152, pikepdf.Name.Off, None, pikepdf.Name("/b"))
+    # their field names the second option's state, as a string too
+    group = build_button_group(49152, pikepdf.Name.Off, None, value)
     with pikepdf.Pdf.open(BytesIO(group)) as pdf:
         for annot in pdf.pages[0].Annots:
             annot.AS = pikepdf.Name("/Missing")
@@ -365,6 +371,116 @@ def test_output_selects_radio_state_of_value(
         for annot in PdfReader(BytesIO(output)).pages[0]["/Annots"]
     ] == ["/Off", "/b"]
     assert_widgets_match_output(form)
+
+
+def test_output_selects_checkbox_state_of_inherited_value(
+    template_stream, assert_valid_appearances, assert_widgets_match_output
+):
+    # the widgets of "check" inherit its value /B, and name states that
+    # their appearances don't have
+    template = change_widgets(
+        BytesIO(checkbox_field(template_stream, ["/A", "/B"], "/B")),
+        {"check": lambda annot: setattr(annot, "AS", pikepdf.Name("/Missing"))},
+    )
+    with pytest.raises(AssertionError):
+        assert_valid_appearances(template)
+
+    form = PdfWrapper(template)
+    output = form.read()
+
+    assert_valid_appearances(output)
+    assert [
+        annot.get_object()["/AS"]
+        for page in PdfReader(BytesIO(output)).pages[:2]
+        for annot in page["/Annots"]
+        if annot.get_object().get("/Parent", {}).get("/T") == "check"
+    ] == ["/Off", "/B"]
+    assert_widgets_match_output(form)
+
+
+def test_output_rebuilds_radio_states_from_array(
+    assert_valid_appearances, assert_widgets_match_output
+):
+    # PyPDFForm reads the names in an array /N as states, and a string that
+    # spells one counts as that name
+    group = build_button_group(49152, pikepdf.Name.Off, 1, pikepdf.Name("/b"))
+    with pikepdf.Pdf.open(BytesIO(group)) as pdf:
+        pdf.pages[0].Annots[1].AP.N = pikepdf.Array(
+            [pikepdf.Name("/b"), pikepdf.String("/Off"), 3]
+        )
+        template = save(pdf)
+    with pytest.raises(AssertionError):
+        assert_valid_appearances(template)
+
+    form = PdfWrapper(template)
+    output = form.read()
+
+    assert_valid_appearances(output)
+    states = PdfReader(BytesIO(output)).pages[0]["/Annots"][1].get_object()["/AP"]
+    assert sorted(states["/N"]) == ["/Off", "/b"]
+    assert PdfWrapper(output).data == {"group": 1}
+    assert_widgets_match_output(form)
+    assert PdfWrapper(PdfWrapper(output).fill({"group": 0}).read()).data == {"group": 0}
+
+
+def test_output_keeps_states_shared_with_another_widget(
+    assert_valid_appearances, assert_widgets_match_output
+):
+    # the second option's /N, where its state /b isn't a stream, is also the
+    # first option's /R, which loses that state
+    group = build_button_group(49152, pikepdf.Name.Off, 1, pikepdf.Name("/b"))
+    with pikepdf.Pdf.open(BytesIO(group)) as pdf:
+        first, second = pdf.pages[0].Annots
+        shared = pdf.make_indirect(
+            pikepdf.Dictionary({"/b": pikepdf.String("b"), "/Off": second.AP.N.Off})
+        )
+        second.AP.N = shared
+        first.AP.R = shared
+        template = save(pdf)
+    with pytest.raises(AssertionError):
+        assert_valid_appearances(template)
+
+    form = PdfWrapper(template)
+    output = form.read()
+
+    assert_valid_appearances(output)
+    first, second = (
+        annot.get_object()["/AP"]
+        for annot in PdfReader(BytesIO(output)).pages[0]["/Annots"]
+    )
+    assert list(first["/R"]) == ["/Off"]
+    assert sorted(second["/N"]) == ["/Off", "/b"]
+    assert PdfWrapper(output).data == {"group": 1}
+    assert_widgets_match_output(form)
+
+
+def test_output_keeps_appearance_shared_with_annotation(pdf_samples):
+    # a stamp shares the appearance of "test_2", whose /D isn't valid
+    with pikepdf.Pdf.open(
+        os.path.join(pdf_samples, "sample_template_filled.pdf")
+    ) as pdf:
+        page = pdf.pages[1]
+        widget = next(each for each in page.Annots if each.get("/T") == "test_2")
+        widget.AP = pdf.make_indirect(
+            pikepdf.Dictionary(N=widget.AP.N, D=pikepdf.String("D"))
+        )
+        page.Annots.append(
+            pdf.make_indirect(
+                pikepdf.Dictionary(
+                    Type=pikepdf.Name.Annot,
+                    Subtype=pikepdf.Name.Stamp,
+                    Rect=[100, 100, 150, 150],
+                    AP=widget.AP,
+                )
+            )
+        )
+        template = save(pdf)
+
+    output = PdfWrapper(template).read()
+
+    assert sorted(find_widget(output, "test_2")["/AP"]) == ["/N"]
+    stamp = PdfReader(BytesIO(output)).pages[1]["/Annots"][-1].get_object()
+    assert sorted(stamp["/AP"]) == ["/D", "/N"]
 
 
 def test_output_removes_checkbox_appearance_without_states(
