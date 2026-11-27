@@ -12,6 +12,9 @@ def test_fill_readonly_then_editable(
     obj = PdfWrapper(template_stream).fill(data_dict, readonly=True)
     obj.widgets["test_2"].readonly = False
     obj.widgets["check_3"].readonly = False
+    # earlier reads don't change what a later one writes
+    for _ in range(4):
+        obj.read()
 
     expect_pdf(obj.read(), expected_path)
 

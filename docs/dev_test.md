@@ -14,7 +14,7 @@ for measuring test coverage. To run the tests, execute:
 
 The tests run in parallel with [pytest-xdist](https://pytest-xdist.readthedocs.io/): `-n auto` starts one worker per CPU. Coverage measures each worker in its own data file, and `coverage combine` merges them before the report. `coverage erase` first removes data left by an earlier run, which would otherwise be merged in. Without `-n`, pytest runs the tests one at a time, which suits running a single test or using a debugger such as `pudb` or `--pdb`.
 
-Runs start the tests marked `@pytest.mark.slow` first, so that a parallel run doesn't wait for a slow test that started last. Mark a test that takes several seconds, such as `test_bulk_create_fields_stress_max`.
+Runs start the tests marked `@pytest.mark.slow` first, so that a parallel run doesn't wait for a slow test that started last. Mark a test that takes several seconds, such as `test_bulk_create_fields_stress_max`. Regenerating expected PDFs in place keeps the order the tests are collected in.
 
 ## Adding tests
 

@@ -161,14 +161,17 @@ def pytest_addoption(parser):
 
 
 @pytest.hookimpl(tryfirst=True)
-def pytest_collection_modifyitems(items):
+def pytest_collection_modifyitems(config, items):
     # before -m selects tests, mark every test that compares with an expected PDF
     for item in items:
         if "expect_pdf" in getattr(item, "fixturenames", ()):
             item.add_marker(pytest.mark.snapshot)
     # pytest-xdist hands out tests in this order, so a slow test that came last
-    # would keep the run waiting after the other workers finish
-    items.sort(key=lambda item: item.get_closest_marker("slow") is None)
+    # would keep the run waiting after the other workers finish. Regenerating
+    # in place keeps the order, in which a test that compares with an expected
+    # PDF another test writes runs after that test.
+    if not _regenerating_in_place(config):
+        items.sort(key=lambda item: item.get_closest_marker("slow") is None)
 
 
 def pytest_report_header(config):

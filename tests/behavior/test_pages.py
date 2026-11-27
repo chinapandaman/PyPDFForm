@@ -24,6 +24,8 @@ def test_pages_inherit_attributes(template_stream):
 
 def test_blank_page():
     obj = PdfWrapper(BlankPage() * 1)
+    # reading the PDF adds no widgets or pages
+    obj.read()
 
     assert not obj.widgets
     assert len(obj.pages) == 1
@@ -31,6 +33,8 @@ def test_blank_page():
 
 def test_blank_page_custom_size_multiply():
     obj = PdfWrapper(BlankPage(595.35, 841.995) * 3)
+    # reading the PDF adds no widgets or pages
+    obj.read()
 
     assert not obj.widgets
     assert len(obj.pages) == 3

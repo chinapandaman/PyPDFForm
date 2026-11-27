@@ -12,6 +12,8 @@ def test_generate_appearance_streams_fill(
         data_dict,
     )
 
+    # a second read of the same wrapper also has valid appearances
+    obj.read()
     assert_valid_appearances(obj.read())
 
 
@@ -22,6 +24,8 @@ def test_generate_appearance_streams_fill_sejda_complex(
         sejda_complex_data,
     )
 
+    # a second read of the same wrapper also has valid appearances
+    obj.read()
     assert_valid_appearances(obj.read())
 
 
@@ -43,6 +47,8 @@ def test_generate_appearance_streams_dropdown_two(
         },
     )
 
+    # a second read of the same wrapper also has valid appearances
+    obj.read()
     assert_valid_appearances(obj.read())
 
 
@@ -57,4 +63,6 @@ def test_generate_appearance_streams_issue_613(pdf_samples, assert_valid_appeara
         },
     )
 
+    # a second read of the same wrapper also has valid appearances
+    obj.read()
     assert_valid_appearances(obj.read())
