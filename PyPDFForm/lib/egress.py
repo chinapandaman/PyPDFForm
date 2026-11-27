@@ -4,8 +4,8 @@ Prepare PDF output and publish serialized PDFs to filesystem paths.
 
 Preparation helpers manage appearance streams and the /NeedAppearances flag,
 add the fields of page widget annotations to the AcroForm `/Fields` array, and
-remove widget appearances that aren't appearance dictionaries before
-`PdfWrapper.read()` returns the final bytes.
+make widget appearances valid before `PdfWrapper.read()` returns the final
+bytes.
 
 For path output, `write_path()` writes serialized bytes to a sibling temporary
 file and closes it before atomic replacement. It follows symlinks, preserves
@@ -23,36 +23,55 @@ from warnings import catch_warnings, filterwarnings
 
 from pikepdf import Pdf
 from pypdf import PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject, StreamObject
+from pypdf.generic import (
+    ArrayObject,
+    DictionaryObject,
+    FloatObject,
+    IndirectObject,
+    NameObject,
+    StreamObject,
+)
 
 from .constants import (
     AP,
+    AS,
     COMB,
     DR,
     MULTILINE,
     XFA,
     AcroForm,
     Annots,
+    BBox,
+    D,
     Encoding,
     Fields,
     Font,
+    Form,
     MacRomanEncoding,
     N,
+    Off,
     Parent,
     Q,
+    R,
     Resources,
     Subtype,
+    Type,
     V,
     Widget,
     WinAnsiEncoding,
+    XObject,
 )
 from .field_tree import share_inline_objects
+from .middleware.checkbox import Checkbox
 from .middleware.dropdown import Dropdown
+from .middleware.radio import Radio
 from .middleware.text import Text
 from .patterns import (
     check_field_flag,
+    get_field_rect,
     get_selected_option,
     get_text_field_style,
+    get_widget_field,
     get_widget_type,
     parse_alignment,
     resolve_inherited_entry,
@@ -344,10 +363,9 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
     parents stored inline are first shared with the field tree by
     `share_inline_objects`, which `PdfWrapper` already applies when it loads a
     PDF. An AcroForm dictionary is created when necessary, and null entries
-    are treated as absent. A page widget whose appearance (`/AP`) isn't an
-    appearance dictionary, such as the value string that earlier versions of
-    PyPDFForm wrote or a stream, loses it, so PDF viewers draw the widget
-    instead. When no page has
+    are treated as absent. The appearance (`/AP`) of every page widget is
+    made valid, as `_repair_appearance` describes, such as by removing the
+    value string that earlier versions of PyPDFForm wrote. When no page has
     a widget annotation, the original PDF stream is returned unchanged to
     avoid an unnecessary rewrite.
 
@@ -372,14 +390,7 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
                 or widget.get(Subtype) != Widget
             ):
                 continue
-            appearance = widget[AP].get_object() if AP in widget else None
-            # pypdf's streams are dictionaries too
-            if appearance is not None and (
-                not isinstance(appearance, DictionaryObject)
-                or isinstance(appearance, StreamObject)
-            ):
-                # such as the value string that earlier versions wrote
-                del widget[AP]
+            _repair_appearance(writer, widget)
             field_ref = _get_root_field_reference(annot)
             field_key = _field_reference_key(field_ref)
             if field_key not in seen_fields:
@@ -404,6 +415,180 @@ def sync_acroform_fields(pdf: bytes) -> bytes:
         writer.write(f)
         f.seek(0)
         return f.read()
+
+
+def _repair_appearance(writer: PdfWriter, widget: DictionaryObject) -> None:
+    """
+    Makes the appearance (`/AP`) of a page widget valid.
+
+    An appearance that isn't an appearance dictionary, such as the value
+    string that earlier versions of PyPDFForm wrote or a stream, is removed,
+    and so is one whose normal appearance (`/N`) is missing or is neither a
+    stream nor a dictionary of appearance states. When `/N` is a dictionary of
+    states, each state must be a stream and the appearance state (`/AS`) must
+    name one of them or `/Off`. Otherwise, a checkbox or radio button keeps
+    its states, whose names are its export values: a state that isn't a
+    stream becomes an empty one, as `_create_empty_appearance` describes, and
+    an `/AS` that names no state is set to the state its value (`/V`) names,
+    as `_get_state_of_value` reads it, or else `/Off`. Any other widget loses
+    its appearance, including a button without an `/AS`, which PyPDFForm
+    doesn't read as a checkbox or radio button. Then, in the rollover (`/R`)
+    and down (`/D`) appearances, as `_remove_invalid_states` describes, states
+    that aren't streams are removed. PDF viewers draw a widget without an
+    appearance from its value, and use the normal appearance in place of a
+    missing rollover or down appearance. The values and properties that
+    PyPDFForm reads don't change.
+
+    Args:
+        writer (PdfWriter): The writer whose page holds the widget.
+        widget (DictionaryObject): The page widget annotation.
+    """
+    if AP not in widget:
+        return
+    appearance = widget[AP].get_object()
+    normal = get_entry(appearance, N) if _is_appearance_dictionary(appearance) else None
+    # pypdf's streams are dictionaries too, so a single appearance passes
+    if not isinstance(normal, DictionaryObject):
+        del widget[AP]
+        return
+    if not isinstance(normal, StreamObject) and not _selects_state(widget, normal):
+        _type = get_widget_type(widget)
+        if _type not in (Checkbox, Radio):
+            del widget[AP]
+            return
+        for state, value in list(normal.items()):
+            if not isinstance(value.get_object(), StreamObject):
+                normal[NameObject(state)] = _create_empty_appearance(writer, widget)
+        if not _selects_state(widget, normal):
+            widget[NameObject(AS)] = _get_state_of_value(widget, _type, normal)
+
+    for key in (R, D):
+        _remove_invalid_states(appearance, key)
+
+
+def _is_appearance_dictionary(obj: object) -> bool:
+    """
+    Checks whether an object is a dictionary and not a stream.
+
+    Args:
+        obj (object): The resolved object.
+
+    Returns:
+        bool: True for a dictionary, and False for a stream, since pypdf's
+            streams are dictionaries too, or any other object.
+    """
+    return isinstance(obj, DictionaryObject) and not isinstance(obj, StreamObject)
+
+
+def _selects_state(widget: DictionaryObject, states: DictionaryObject) -> bool:
+    """
+    Checks whether a widget's appearance state selects a valid appearance.
+
+    Args:
+        widget (DictionaryObject): The widget annotation.
+        states (DictionaryObject): Its normal appearance (`/N`), a dictionary
+            of appearance states.
+
+    Returns:
+        bool: True when every state is a stream and the appearance state
+            (`/AS`) is a name for one of them or `/Off`.
+    """
+    state = get_entry(widget, AS)
+    return (
+        isinstance(state, NameObject)
+        and (state == Off or state in states)
+        and all(isinstance(each.get_object(), StreamObject) for each in states.values())
+    )
+
+
+def _get_state_of_value(
+    widget: DictionaryObject, _type: type, states: DictionaryObject
+) -> NameObject:
+    """
+    Gets the appearance state that a checkbox or radio button's value selects.
+
+    The value (`/V`) is read as `get_checkbox_value` and `get_radio_value`
+    read it: a checkbox's own value or the one it inherits, and the value of
+    the field a radio button belongs to, as `get_widget_field` describes. A
+    `/Parent` cycle before a value is found reads as no value.
+
+    Args:
+        widget (DictionaryObject): The checkbox or radio button widget.
+        _type (type): Its middleware type, `Checkbox` or `Radio`.
+        states (DictionaryObject): Its normal appearance (`/N`), a dictionary
+            of appearance states.
+
+    Returns:
+        NameObject: The state the value names, or `/Off` when it names none of
+            the widget's states.
+    """
+    field = get_widget_field(widget) if _type is Radio else widget
+    value = _resolve_entry(field, V, None)
+
+    return (
+        value if isinstance(value, NameObject) and value in states else NameObject(Off)
+    )
+
+
+def _create_empty_appearance(
+    writer: PdfWriter, widget: DictionaryObject
+) -> IndirectObject:
+    """
+    Creates an appearance stream that draws nothing.
+
+    Args:
+        writer (PdfWriter): The writer to add the stream to.
+        widget (DictionaryObject): The widget annotation the stream is for.
+
+    Returns:
+        IndirectObject: The new form XObject, whose bounding box (`/BBox`) has
+            the width and height of the widget's `/Rect`.
+    """
+    _, _, width, height = get_field_rect(widget)
+    stream = StreamObject()
+    stream.update(
+        {
+            NameObject(Type): NameObject(XObject),
+            NameObject(Subtype): NameObject(Form),
+            NameObject(BBox): ArrayObject(
+                [
+                    FloatObject(0),
+                    FloatObject(0),
+                    FloatObject(width),
+                    FloatObject(height),
+                ]
+            ),
+        }
+    )
+
+    return writer._add_object(stream)  # type: ignore # noqa: SLF001 # # pylint: disable=W0212
+
+
+def _remove_invalid_states(appearance: DictionaryObject, key: str) -> None:
+    """
+    Removes the states of a rollover or down appearance that aren't streams.
+
+    The entry is removed when it is neither a stream nor a dictionary, or when
+    none of its states is left.
+
+    Args:
+        appearance (DictionaryObject): The appearance dictionary (`/AP`).
+        key (str): The entry, `/R` or `/D`.
+    """
+    entry = get_entry(appearance, key)
+    if entry is None or isinstance(entry, StreamObject):
+        return
+    if isinstance(entry, DictionaryObject):
+        invalid = [
+            state
+            for state, value in entry.items()
+            if not isinstance(value.get_object(), StreamObject)
+        ]
+        for state in invalid:
+            del entry[state]
+        if entry or not invalid:
+            return
+    del appearance[key]
 
 
 def _get_root_field_reference(annot):

@@ -686,10 +686,9 @@ class PdfWrapper:
            draws only the fields that the AcroForm lists.
         3. Adds the fields of page widget annotations to the AcroForm `/Fields`
            array, keeping every field already listed, including fields without
-           a widget on a page, and removes page widget appearances that aren't
-           appearance dictionaries, such as the value strings earlier versions
-           wrote. The stream is left unchanged when no page has a widget
-           annotation.
+           a widget on a page, and makes page widget appearances valid, such as
+           by removing the value strings earlier versions wrote. The stream is
+           left unchanged when no page has a widget annotation.
         4. Writes the wrapper's PDF version into the header after egress
            processing, since PDF writers may emit their own default version.
            The version read from the template or set by `change_version` is
@@ -713,8 +712,8 @@ class PdfWrapper:
         Applies the egress steps of `read()` to a PDF stream, except its version.
 
         These are the appearance handling for `need_appearances`, the update
-        of the AcroForm `/Fields` array, and the removal of widget appearances
-        that aren't appearance dictionaries. The fields are also listed before
+        of the AcroForm `/Fields` array, and the repair of widget appearances
+        that aren't valid. The fields are also listed before
         appearance streams are generated, since the generator draws only the
         fields that the AcroForm lists, such as created fields. The wrapper is
         not changed.
