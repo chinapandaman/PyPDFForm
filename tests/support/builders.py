@@ -253,7 +253,7 @@ def build_cross_page_form(page_action=True):
             [10, 130, 20, 140],
             Subtype=Name.Widget,
             Parent=radio,
-            AS=state if selected else Name.Off,
+            AS=Name(state) if selected else Name.Off,
             AP=Dictionary(N=Dictionary({state: appearance(text)})),
         )
         for page, state, text, selected in (
@@ -291,6 +291,29 @@ def build_cross_page_form(page_action=True):
     result = BytesIO()
     pdf.save(result)
     return result.getvalue()
+
+
+# Appearances
+def change_widgets(stream, changes):
+    # calls the change for a field's name with each page widget of the field
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for page in pdf.pages:
+            for annot in page.get("/Annots", []):
+                field = annot if "/T" in annot else annot.get("/Parent", {})
+                change = changes.get(str(field.get("/T")))
+                if change is not None:
+                    change(annot)
+
+        return save(pdf)
+
+
+def with_option_states(stream, make_states):
+    # the second widget on the first page gets the normal appearance (/N)
+    # that make_states makes with the PDF, such as an array of states
+    with Pdf.open(BytesIO(stream)) as pdf:
+        pdf.pages[0].Annots[1].AP.N = make_states(pdf)
+
+        return save(pdf)
 
 
 # Default appearances

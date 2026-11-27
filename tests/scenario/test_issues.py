@@ -3,6 +3,7 @@
 import os
 from io import BytesIO
 
+import pikepdf
 import pytest
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
@@ -20,12 +21,14 @@ from PyPDFForm.lib.middleware.radio import Radio
 from PyPDFForm.lib.patterns import get_widget_key
 from PyPDFForm.lib.template import get_widgets_by_page
 from tests.support.builders import (
+    change_widgets,
     drop_page,
     drop_page_from_copies,
     hide_target_form,
     javascript,
     set_flags,
 )
+from tests.support.checks import find_widget
 
 
 def test_encrypted_edit_pdf_form(issue_pdf_directory, expect_pdf):
@@ -252,6 +255,42 @@ def test_ppf_2128_remove_hidden_button(issue_pdf_directory):
     assert action["/JS"] == script
     # the Hide does nothing, and stays so that the chain keeps its shape
     assert action["/Next"] == {"/S": "/Hide", "/T": []}
+
+
+@pytest.mark.parametrize(
+    "options",
+    [{}, {"need_appearances": True}, {"generate_appearance_streams": True}],
+    ids=["default", "need-appearances", "generate-appearance-streams"],
+)
+def test_ppf_2153_malformed_appearance_dictionaries(
+    template_filled_stream, options, assert_valid_appearances
+):
+    # test_2's appearance dictionary has no /N, and check_2's appearance state
+    # names a state that its appearance doesn't have
+    template = change_widgets(
+        template_filled_stream,
+        {
+            "test_2": lambda annot: setattr(
+                annot, "AP", pikepdf.Dictionary(D=annot.AP.N)
+            ),
+            "check_2": lambda annot: setattr(annot, "AS", pikepdf.Name("/Missing")),
+        },
+    )
+    with pytest.raises(AssertionError):
+        assert_valid_appearances(template)
+
+    for data in (None, {"test": "new"}, {"test_2": "new"}):
+        form = PdfWrapper(template, **options)
+        output = (form.fill(data) if data else form).read()
+
+        assert_valid_appearances(output)
+        # viewers draw test_2 from its value, unless the generator draws it
+        assert ("/AP" in find_widget(output, "test_2")) == (
+            "generate_appearance_streams" in options
+        )
+        # the state that check_2's value names, which PyPDFForm reads
+        assert find_widget(output, "check_2")["/AS"] == "/Yes"
+        assert PdfWrapper(output).data["check_2"] is True
 
 
 def test_get_desc_in_schema(issue_pdf_directory):

@@ -13,7 +13,7 @@ page and the field tree refer to one object.
 from collections.abc import Callable
 from functools import lru_cache
 from io import BytesIO
-from typing import Dict, List, NamedTuple, Optional, cast
+from typing import Dict, List, NamedTuple, Optional, TypeGuard, cast
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
@@ -121,7 +121,7 @@ def remove_widgets_by_keys(
         page_annots = ArrayObject([])
         for reference in annots:
             annot = reference.get_object()
-            if _is_widget_annotation(annot) and (
+            if is_widget_annotation(annot) and (
                 get_widget_key(annot, use_full_widget_name) in key_set
                 or _has_ancestor_in(annot, matched)
             ):
@@ -189,7 +189,7 @@ def get_field_keys(pdf: bytes, use_full_widget_name: bool) -> set:
         annot
         for page in reader.pages
         for annot in (each.get_object() for each in get_array(page, Annots))
-        if _is_widget_annotation(annot)
+        if is_widget_annotation(annot)
     ]
 
     return {
@@ -198,17 +198,21 @@ def get_field_keys(pdf: bytes, use_full_widget_name: bool) -> set:
     }
 
 
-def _is_widget_annotation(obj: object) -> bool:
+def is_widget_annotation(obj: object) -> TypeGuard[DictionaryObject]:
     """
     Checks whether an object is a widget annotation dictionary.
+
+    The field tree and `sync_acroform_fields` both use it, so they treat the
+    same page annotations as widgets.
 
     Args:
         obj (object): A resolved object, such as a page annotation.
 
     Returns:
-        bool: True if `obj` is a dictionary whose `/Subtype` is `/Widget`.
+        bool: True if `obj` is a dictionary whose `/Subtype`, resolved as
+            `get_widget_type` resolves it, is `/Widget`.
     """
-    return isinstance(obj, DictionaryObject) and obj.get(Subtype) == Widget
+    return isinstance(obj, DictionaryObject) and get_entry(obj, Subtype) == Widget
 
 
 def _get_terminal_fields(acroform: DictionaryObject) -> List[DictionaryObject]:
@@ -341,7 +345,7 @@ def _get_field_names(writer: PdfWriter) -> set:
     for page in writer.pages:
         for annot in get_array(page, Annots):
             widget = annot.get_object()
-            if _is_widget_annotation(widget) and (name := _get_full_name(widget)):
+            if is_widget_annotation(widget) and (name := _get_full_name(widget)):
                 result.add(name)
 
     return result
@@ -884,7 +888,7 @@ def _has_inline_fields(reader: PdfReader) -> bool:
     for page in reader.pages:
         for annot in get_array(page, Annots):
             widget = annot.get_object()
-            if _is_widget_annotation(widget) and (
+            if is_widget_annotation(widget) and (
                 not isinstance(annot, IndirectObject) or _has_inline_parent(widget)
             ):
                 return True
@@ -949,7 +953,7 @@ def share_inline_objects(writer: PdfWriter) -> None:
         annots = get_array(page, Annots)
         for index, annot in enumerate(annots):
             widget = annot.get_object()
-            if not _is_widget_annotation(widget):
+            if not is_widget_annotation(widget):
                 continue
             if not isinstance(annot, IndirectObject):
                 annot = _share_inline_widget(
@@ -991,7 +995,7 @@ def _share_inline_widget(
 
     def is_candidate(copy: object) -> bool:
         return (
-            _is_widget_annotation(copy)
+            is_widget_annotation(copy)
             and id(copy) not in on_pages
             and cast(DictionaryObject, copy).get(T) == widget.get(T)
             and _get_rect(cast(DictionaryObject, copy)) == _get_rect(widget)

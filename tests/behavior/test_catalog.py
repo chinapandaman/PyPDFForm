@@ -3,7 +3,7 @@
 from io import BytesIO
 
 import pytest
-from pikepdf import Pdf
+from pikepdf import Dictionary, Name, Pdf
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
     ArrayObject,
@@ -19,7 +19,7 @@ from PyPDFForm.lib import egress
 from PyPDFForm.lib.constants import AcroForm, T
 from PyPDFForm.lib.constants import Fields as FieldsConst
 from PyPDFForm.lib.patterns import get_widget_key
-from tests.support.builders import with_catalog_extras
+from tests.support.builders import save, with_catalog_extras
 from tests.support.checks import describe_catalog
 
 
@@ -84,6 +84,32 @@ def test_sync_acroform_fields_inline_widget(assert_catalog_fields):
     assert_catalog_fields(result, ["inline"])
     assert list(PdfReader(BytesIO(result)).get_fields()) == ["inline"]
     assert list(PdfWrapper(result).widgets) == ["inline"]
+
+
+@pytest.mark.parametrize(
+    "options",
+    [{}, {"need_appearances": True}, {"generate_appearance_streams": True}],
+    ids=["default", "need-appearances", "generate-appearance-streams"],
+)
+def test_sync_acroform_fields_inline_widget_with_indirect_subtype(
+    template_stream, options, assert_catalog_fields
+):
+    # the page lists an inline copy of "test_2" and the catalog the indirect
+    # one, and the /Subtype of both is an indirect /Widget
+    with Pdf.open(BytesIO(template_stream)) as pdf:
+        annots = pdf.pages[1].Annots
+        index = next(
+            index for index, annot in enumerate(annots) if annot.get("/T") == "test_2"
+        )
+        annots[index].Subtype = pdf.make_indirect(Name.Widget)
+        annots[index] = Dictionary(dict(annots[index].items()))
+        stream = save(pdf)
+
+    result = PdfWrapper(stream, **options).read()
+
+    assert_catalog_fields(
+        result, ["test", "check", "test_2", "check_2", "test_3", "check_3"]
+    )
 
 
 def test_sync_acroform_fields_inline_parent(assert_catalog_fields):
