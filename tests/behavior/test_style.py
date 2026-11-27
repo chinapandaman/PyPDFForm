@@ -9,6 +9,7 @@ from pikepdf import Pdf, String
 from PyPDFForm import Fields, PdfWrapper
 from PyPDFForm.lib.middleware.checkbox import Checkbox
 from tests.support.builders import save
+from tests.support.checks import find_widget, get_normal_appearance
 
 
 @pytest.mark.parametrize("field_name", ["test", "check", "radio_1"])
@@ -180,6 +181,103 @@ def test_read_style_of_created_fields(template_stream, assert_widgets_match_outp
     assert (text.font, text.font_size, text.font_color) == ("/Helv", 20, (0, 0, 1))
     assert (dropdown.font_size, dropdown.font_color) == (15, (1, 0, 0))
     assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(
+    ("attribute", "value", "removed"),
+    [
+        ("font", "registered", True),
+        ("font_size", 20, True),
+        ("font_color", (1, 0, 0), True),
+        ("alignment", 1, True),
+        ("multiline", True, True),
+        ("comb", True, True),
+        ("max_length", 5, True),
+        ("width", 100, True),
+        ("height", 30, True),
+        ("x", 50, False),
+        ("y", 50, False),
+        ("tooltip", "tooltip", False),
+        ("readonly", True, False),
+        ("required", True, False),
+        ("hidden", True, False),
+    ],
+)
+def test_restyle_removes_stale_appearance(
+    pdf_samples,
+    sample_font_stream,
+    attribute,
+    value,
+    removed,
+    assert_valid_appearances,
+):
+    form = PdfWrapper(os.path.join(pdf_samples, "sample_template_filled.pdf"))
+    form.register_font("registered", sample_font_stream)
+    original = form.read()
+
+    setattr(form.widgets["test"], attribute, value)
+    output = form.read()
+
+    assert_valid_appearances(output)
+    assert ("/AP" not in find_widget(output, "test")) is removed
+    # the other fields keep theirs
+    assert get_normal_appearance(output, "test_2") == get_normal_appearance(
+        original, "test_2"
+    )
+
+
+def test_change_choices_removes_stale_appearance(sample_template_with_dropdown):
+    form = PdfWrapper(sample_template_with_dropdown)
+    form.widgets["dropdown_1"].choices = ["a", "b"]
+
+    assert "/AP" not in find_widget(form.read(), "dropdown_1")
+
+
+def test_resize_keeps_checkbox_appearance(template_stream, assert_valid_appearances):
+    form = PdfWrapper(template_stream)
+    form.widgets["check"].width = 30
+    output = form.read()
+
+    # it holds the checkbox's states
+    assert_valid_appearances(output)
+    assert "/AP" in find_widget(output, "check")
+
+
+@pytest.mark.parametrize(
+    ("attribute", "value", "decorated"),
+    [(None, None, True), ("font_size", 20, True), ("width", 200, False)],
+)
+def test_restyle_with_generated_appearances(
+    template_stream, attribute, value, decorated, assert_valid_appearances
+):
+    form = PdfWrapper(template_stream, generate_appearance_streams=True)
+    form.bulk_create_fields(
+        [
+            Fields.TextField(
+                name="new",
+                page_number=1,
+                x=100,
+                y=300,
+                width=120,
+                height=30,
+                bg_color=(0.8, 0.9, 1),
+            )
+        ]
+    )
+
+    if attribute is not None:
+        setattr(form.widgets["new"], attribute, value)
+    output = form.fill({"new": "value"}).read()
+
+    # the generator draws in the appearance, keeping its background, unless
+    # the widget's size changed
+    assert_valid_appearances(output)
+    appearance = get_normal_appearance(output, "new")
+    assert b"(value) Tj" in appearance
+    assert (b".8 .9 1 rg" in appearance) is decorated
+    widget = find_widget(output, "new")
+    bbox, rect = widget["/AP"]["/N"]["/BBox"], widget["/Rect"]
+    assert bbox[2] - bbox[0] == rect[2] - rect[0]
 
 
 @pytest.mark.parametrize(

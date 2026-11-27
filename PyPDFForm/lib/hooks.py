@@ -29,6 +29,7 @@ from pypdf.generic import (
 from .adapter import fp_or_f_obj_or_f_content_to_content
 from .constants import (
     AA,
+    APPEARANCE_HOOKS,
     COMB,
     DA,
     DEFAULT_APPEARANCE_HOOKS,
@@ -37,6 +38,7 @@ from .constants import (
     MULTILINE,
     READ_ONLY,
     REQUIRED,
+    RESIZE_HOOKS,
     TU,
     AcroForm,
     Action,
@@ -63,15 +65,18 @@ from .default_appearance import (
     change_font_size,
     read_default_appearance,
 )
-from .middleware.dropdown import DropdownOption
+from .middleware.dropdown import Dropdown, DropdownOption
+from .middleware.text import Text
 from .patterns import (
     check_field_flag,
     get_field_tooltip,
     get_widget_field,
     get_widget_key,
+    get_widget_type,
     parse_alignment,
     parse_field_flags,
     parse_max_length,
+    remove_appearance,
     resolve_inherited_entry,
 )
 from .utils import get_dictionary, get_entry
@@ -97,6 +102,7 @@ def trigger_widget_hooks(
     pdf: bytes,
     widgets: dict,
     use_full_widget_name: bool,
+    generate_appearance_streams: bool = False,
 ) -> bytes:
     """
     Triggers widget hooks to apply dynamic changes to PDF form fields.
@@ -106,7 +112,13 @@ def trigger_widget_hooks(
     it executes those hooks. Hooks are functions defined in this module that
     modify the annotation dictionary, allowing for dynamic changes to the form field's
     appearance or behavior. Hooks that change the default appearance also get
-    the AcroForm dictionary, for its default. Widget hook queues are left
+    the AcroForm dictionary, for its default. A text field or dropdown
+    annotation whose hooks change how it is drawn, such as its font,
+    alignment, choices, or size, loses its appearance, as `remove_appearance`
+    describes; a position, flag, tooltip, or JavaScript change keeps it.
+    When appearance streams are generated, only a size change removes it.
+    Annotations of other types keep theirs, since their appearances hold
+    their states. Widget hook queues are left
     unchanged, so the caller can clear them once the modified PDF is returned,
     or revert them if a hook or writing the PDF raises.
 
@@ -117,12 +129,16 @@ def trigger_widget_hooks(
             and its associated hooks.
         use_full_widget_name (bool): Whether to use the full widget name when
             looking up widgets in the widgets dictionary.
+        generate_appearance_streams (bool): Whether appearance streams are
+            generated, which draw in the appearances of text fields and
+            dropdowns that keep their size. Defaults to False.
 
     Returns:
         bytes: The modified PDF data as bytes, with the widget hooks applied.
     """
     output = PdfWriter(BytesIO(pdf))
     acroform = get_dictionary(output.root_object, AcroForm) or DictionaryObject()
+    stale_hooks = RESIZE_HOOKS if generate_appearance_streams else APPEARANCE_HOOKS
 
     for page in output.pages:
         for annot in page.get(Annots, []):
@@ -139,6 +155,11 @@ def trigger_widget_hooks(
                     function(annot, value, acroform)
                 else:
                     function(annot, value)
+
+            if get_widget_type(annot) in (Text, Dropdown) and any(
+                hook in stale_hooks for hook, _ in widget.hooks_to_trigger
+            ):
+                remove_appearance(annot)
 
     with BytesIO() as f:
         output.write(f)

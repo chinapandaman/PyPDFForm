@@ -825,6 +825,7 @@ class PdfWrapper:
                     self._stream,
                     self.widgets,
                     getattr(self, "use_full_widget_name"),
+                    getattr(self, "generate_appearance_streams"),
                 )
                 fonts = self._read_fonts(stream, font_widgets)
             except Exception:
