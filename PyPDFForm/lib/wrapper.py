@@ -122,7 +122,8 @@ class PdfWrapper:
             Current parameters include:
                 - `use_full_widget_name` (bool): Whether to use the full widget name when filling the form.
                 - `need_appearances` (bool): Whether to set the `NeedAppearances` flag in the PDF's AcroForm dictionary.
-                - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for all form fields using pikepdf.
+                - `generate_appearance_streams` (bool): Whether to explicitly generate appearance streams for form fields using pikepdf,
+                  except for text fields and dropdowns it can't draw, which PDF viewers draw instead.
                 - `title` (str | None): The title stored in the PDF's document
                   metadata. A non-None value replaces the existing title; None
                   preserves it.
