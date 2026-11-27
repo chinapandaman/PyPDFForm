@@ -78,8 +78,10 @@ class ExpectedPdfOwners:
 
 class InPlaceWrites:
     # regenerating in place runs one test at a time, so the first test that
-    # writes an expected PDF owns it; a second owner's PDF isn't written, and
-    # the expected PDF goes back to what it was before the run
+    # writes an expected PDF owns it; a second writer's PDF isn't written, and
+    # the expected PDF goes back to what it was before the run. A second owner
+    # that doesn't write, such as a timestamped one whose comparison passes, is
+    # only found when the session ends, which restores the PDF then.
 
     def __init__(self):
         super().__init__()
@@ -103,6 +105,9 @@ class InPlaceWrites:
             f.write(stream)
 
     def restore(self, path):
+        if path not in self.backups:
+            # not written in this run
+            return
         backup = self.backups[path]
         if backup is not None:
             shutil.copyfile(backup, path)
@@ -200,8 +205,13 @@ def pytest_sessionfinish(session):
             config.stash[shared_expected_pdfs] = shared
             session.exitstatus = pytest.ExitCode.USAGE_ERROR
 
-    # record the environment of the latest in-place regeneration
     writes = config.stash.get(in_place_writes, None)
+    if isinstance(writes, InPlaceWrites):
+        # also the PDFs whose second owner didn't write them
+        for path in config.stash.get(shared_expected_pdfs, {}):
+            writes.restore(os.path.abspath(os.path.join(ROOT, path)))
+
+    # record the environment of the latest in-place regeneration
     if isinstance(writes, InPlaceWrites) and writes.owners:
         with open(FIXTURE_ENVIRONMENT_PATH, "w", encoding="utf-8", newline="\n") as f:
             json.dump(fixture_environment(), f, indent=2)
