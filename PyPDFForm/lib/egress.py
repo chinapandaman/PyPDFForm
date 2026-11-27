@@ -28,7 +28,6 @@ from pypdf.generic import ArrayObject, DictionaryObject, NameObject, StreamObjec
 from .constants import (
     AP,
     COMB,
-    DA,
     DR,
     MULTILINE,
     XFA,
@@ -37,6 +36,7 @@ from .constants import (
     Encoding,
     Fields,
     Font,
+    MacRomanEncoding,
     N,
     Parent,
     Q,
@@ -46,13 +46,13 @@ from .constants import (
     Widget,
     WinAnsiEncoding,
 )
-from .default_appearance import read_default_appearance
 from .field_tree import share_inline_objects
 from .middleware.dropdown import Dropdown
 from .middleware.text import Text
 from .patterns import (
     check_field_flag,
     get_selected_option,
+    get_text_field_style,
     get_widget_type,
     parse_alignment,
     resolve_inherited_entry,
@@ -61,7 +61,7 @@ from .utils import get_array, get_dictionary, get_entry
 
 # the Python codecs of the font encodings qpdf draws generated appearances in;
 # it draws in ASCII with a font of any other encoding
-GENERATOR_ENCODINGS = {WinAnsiEncoding: "cp1252", "/MacRomanEncoding": "mac_roman"}
+GENERATOR_ENCODINGS = {WinAnsiEncoding: "cp1252", MacRomanEncoding: "mac_roman"}
 
 
 def write_path(dest: str | bytes | os.PathLike, content: bytes) -> None:
@@ -121,7 +121,7 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
        PDF viewers to generate appearance streams for form fields.
     3. Optionally generating appearance streams explicitly using pikepdf if
        `generate_appearance_streams` is True, then removing the ones that
-       `remove_unsupported_appearances` describes, so PDF viewers draw those
+       `_remove_unsupported_appearances` describes, so PDF viewers draw those
        fields instead.
 
     The result is cached using lru_cache for performance.
@@ -158,12 +158,12 @@ def appearance_streams_handler(pdf: bytes, generate_appearance_streams: bool) ->
                 r.seek(0)
                 result = r.read()
 
-        result = remove_unsupported_appearances(result)
+        result = _remove_unsupported_appearances(result)
 
     return result
 
 
-def remove_unsupported_appearances(pdf: bytes) -> bytes:
+def _remove_unsupported_appearances(pdf: bytes) -> bytes:
     """
     Removes generated appearances that don't show what a field shows.
 
@@ -222,7 +222,7 @@ def _can_generator_draw(
 
     Returns:
         bool: False for a text field or dropdown that
-            `remove_unsupported_appearances` removes the appearance of, and
+            `_remove_unsupported_appearances` removes the appearance of, and
             True for any other widget.
     """
     _type = get_widget_type(widget)
@@ -288,7 +288,7 @@ def _get_generator_encoding(
         str: `cp1252` for `/WinAnsiEncoding`, `mac_roman` for
             `/MacRomanEncoding`, and `ascii` otherwise.
     """
-    font_name = read_default_appearance(_resolve_entry(widget, DA, acroform)).font
+    font_name = get_text_field_style(widget, acroform).font
     appearance = get_dictionary(widget, AP)
     stream = get_dictionary(appearance, N) if appearance is not None else None
     for owner, key in ((stream, Resources), (acroform, DR)):
