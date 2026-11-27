@@ -2,7 +2,116 @@
 
 import os
 
+import pytest
+from jsonschema import ValidationError, validate
+
 from PyPDFForm import PdfWrapper
+from PyPDFForm.lib.middleware.base import Widget
+
+
+def test_base_schema_definition():
+    assert Widget("foo").schema_definition == {}
+
+
+def test_schema(sample_template_with_comb_text_field):
+    data = {
+        "FirstName": "John",
+        "MiddleName": "Joe",
+        "LastName": "XXXXXXX",
+        "Awesomeness": True,
+        "Gender": 0,
+    }
+    schema = PdfWrapper(sample_template_with_comb_text_field).schema
+
+    assert schema["type"] == "object"
+    properties = schema["properties"]
+    for key, value in data.items():
+        if key == "LastName":
+            assert properties[key]["maxLength"] == 7
+        if isinstance(value, str):
+            assert properties[key]["type"] == "string"
+        elif isinstance(value, bool):
+            assert properties[key]["type"] == "boolean"
+        elif isinstance(value, int):
+            assert properties[key]["type"] == "integer"
+            assert properties[key]["maximum"] == 1
+
+    validate(instance=data, schema=schema)
+
+    data["LastName"] = "XXXXXXXX"
+    try:
+        validate(instance=data, schema=schema)
+        raise AssertionError
+    except ValidationError:
+        pass
+
+    data["LastName"] = "XXXXXXX"
+    data["Gender"] = 1
+    validate(instance=data, schema=schema)
+
+    data["Gender"] = 2
+    try:
+        validate(instance=data, schema=schema)
+        raise AssertionError
+    except ValidationError:
+        pass
+
+
+def test_sample_data(sejda_template_complex):
+    obj = PdfWrapper(sejda_template_complex)
+    try:
+        validate(instance=obj.sample_data, schema=obj.schema)
+    except ValidationError:
+        raise AssertionError from ValidationError
+
+    widget = Widget("foo")
+    try:
+        widget.sample_value()
+        raise AssertionError
+    except NotImplementedError:
+        pass
+
+
+@pytest.mark.parametrize("field_name", ["dropdown_1", "radio_1"])
+@pytest.mark.parametrize("option_count", [0, 1])
+def test_sample_data_choice_boundaries(
+    sample_template_with_dropdown, field_name, option_count
+):
+    form = PdfWrapper(sample_template_with_dropdown)
+    widget = form.widgets[field_name]
+    if field_name == "dropdown_1":
+        choices = widget.choices
+        assert choices is not None
+        widget.choices = choices[:option_count]
+    else:
+        widget.number_of_options = option_count
+    widget.value = None
+
+    sample = form.sample_data
+    if option_count:
+        assert widget.sample_value == 0
+        assert sample[field_name] == 0
+    else:
+        assert widget.sample_value is None
+        assert field_name not in sample
+    validate(sample, form.schema)
+    form.fill(sample)
+    assert widget.value == (0 if option_count else None)
+    if field_name == "dropdown_1":
+        reopened = PdfWrapper(form.read())
+        assert reopened.widgets[field_name].choices == tuple(widget.choices)
+        assert (field_name in reopened.sample_data) == bool(option_count)
+
+
+def test_sample_data_max_boundary(sample_template_with_comb_text_field):
+    obj = PdfWrapper(sample_template_with_comb_text_field)
+    try:
+        validate(instance=obj.sample_data, schema=obj.schema)
+    except ValidationError:
+        raise AssertionError from ValidationError
+
+    assert obj.sample_data["LastName"] == "LastNam"
+    assert obj.sample_data["Gender"] == 1
 
 
 def test_text_check_values(pdf_samples, data_dict):

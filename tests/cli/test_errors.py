@@ -9,28 +9,10 @@ from typer.testing import CliRunner
 
 from PyPDFForm import PdfWrapper
 from PyPDFForm.cli.root import cli_app
+from tests.support.builders import write_invalid_json, write_invalid_yaml
+from tests.support.checks import assert_cli_error
 
 runner = CliRunner()
-
-
-def write_invalid_json(tmp_path, content):
-    data_path = tmp_path / "invalid.json"
-    data_path.write_text(content, encoding="utf-8")
-    return str(data_path)
-
-
-def write_invalid_yaml(tmp_path, content):
-    data_path = tmp_path / "invalid.yaml"
-    data_path.write_text(content, encoding="utf-8")
-    return str(data_path)
-
-
-def assert_cli_error(result, *expected_messages, output_path=None):
-    assert result.exit_code == 2
-    for message in expected_messages:
-        assert message in result.output
-    if output_path is not None:
-        assert not os.path.exists(output_path)
 
 
 @pytest.mark.cli_test

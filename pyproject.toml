@@ -153,4 +153,5 @@ pythonpath = ["."]
 markers = [
     "cli_test",
     "snapshot: compares with an expected PDF; added to every test that uses expect_pdf",
+    "slow: takes several seconds; runs start it first",
 ]

@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
 
+import os
+from collections import Counter
 from io import BytesIO
 
 import pikepdf
 import pytest
+from pikepdf import Array, Dictionary, Name, Pdf, Stream
+from pypdf import PdfReader
 
 from PyPDFForm import PdfWrapper
+from PyPDFForm.lib.constants import DR, AcroForm, Font
 from PyPDFForm.lib.middleware.checkbox import Checkbox
+from PyPDFForm.lib.patterns import get_widget_key
+from tests.support.builders import with_actions
 
 
 def _read_stream(obj):
@@ -287,3 +294,265 @@ def assert_annotations_preserved(before, after, changed=()):
     # every annotation, other than the widgets of the fields with these fully
     # qualified names, has the same content on the same page in the same order
     assert describe_annotations(after, changed) == describe_annotations(before, changed)
+
+
+def without_duplicate_keys(pairs):
+    # a JSON object hook that fails on a key written twice
+    keys = [key for key, _ in pairs]
+    assert len(keys) == len(set(keys)), keys
+    return dict(pairs)
+
+
+def get_link_targets(stream):
+    result = []
+    with Pdf.open(BytesIO(stream)) as pdf:
+        page_numbers = {page.obj.objgen: i + 1 for i, page in enumerate(pdf.pages)}
+        for i, page in enumerate(pdf.pages):
+            for annot in page.get("/Annots", []):
+                if annot.get("/Subtype") != Name.Link:
+                    continue
+                dest = annot.Dest if "/Dest" in annot else annot.A.get("/D")
+                if dest is None:
+                    result.append((i + 1, str(annot.A.URI), []))
+                else:
+                    target = page_numbers.get(getattr(dest[0], "objgen", None))
+                    result.append(
+                        (i + 1, target, [str(each) for each in list(dest)[1:]])
+                    )
+    return result
+
+
+def get_retained_content(stream, markers):
+    found = set()
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for obj in pdf.objects:
+            if isinstance(obj, Stream):
+                data = obj.read_bytes() + obj.stream_dict.unparse(resolved=True)
+            elif isinstance(obj, (Dictionary, Array)):
+                data = obj.unparse(resolved=True)
+            else:
+                continue
+            found.update(marker for marker in markers if marker.encode() in data)
+    return found
+
+
+def get_values(field):
+    return tuple(str(field[key]) if key in field else None for key in ("/V", "/DV"))
+
+
+def get_full_name(field):
+    parts = []
+    while field is not None:
+        if "/T" in field:
+            parts.append(str(field.T))
+        field = field.get("/Parent")
+    return ".".join(reversed(parts))
+
+
+def describe_catalog(stream):
+    # the values of the catalog's fields, by the fully qualified names
+    # assert_catalog_fields lists, the calculation order, and the other
+    # AcroForm entries
+    with Pdf.open(BytesIO(stream)) as pdf:
+        acroform = pdf.Root.get("/AcroForm", Dictionary())
+        values = {}
+        pending = list(acroform.get("/Fields", []))
+        while pending:
+            field = pending.pop()
+            kids = list(field.get("/Kids", []))
+            pending.extend(kid for kid in kids if "/T" in kid)
+            if not kids or any("/T" not in kid for kid in kids):
+                values[get_full_name(field)] = str(field.get("/V", ""))
+
+        return {
+            "fields": values,
+            "calculation_order": [
+                get_full_name(field) for field in acroform.get("/CO", [])
+            ],
+            "entries": sorted(key for key in acroform if key != "/Fields"),
+        }
+
+
+def get_button(pdf):
+    return next(
+        annot for annot in pdf.pages[0].Annots if annot.get("/T") == "submit_button"
+    )
+
+
+def describe_targets(targets):
+    # names as they are, and references as @ followed by their full names
+    return [
+        f"@{get_full_name(each)}" if isinstance(each, Dictionary) else str(each)
+        for each in (targets if isinstance(targets, Array) else [targets])
+    ]
+
+
+def describe_actions(action):
+    # the JavaScript or type of the action and the ones after it, in the
+    # order they are performed, with "again" for one reached a second time
+    result = []
+    seen = set()
+    pending = [] if action is None else [action]
+    while pending:
+        each = pending.pop()
+        if isinstance(each, Array):
+            pending.extend(reversed(list(each)))
+            continue
+        if each.is_indirect and each.objgen in seen:
+            result.append("again")
+            continue
+        seen.add(each.objgen)
+        result.append(str(each.get("/JS", each.get("/N", each.S))))
+        if "/Next" in each:
+            pending.append(each.Next)
+    return result
+
+
+def describe_removal(template_stream, add, read):
+    # the actions read(pdf) finds before removing test, with each action that
+    # names only test shown as the Hide it becomes, and after
+    stream = with_actions(template_stream, add)
+    with Pdf.open(BytesIO(stream)) as pdf:
+        before = describe_actions(read(pdf))
+    with Pdf.open(BytesIO(PdfWrapper(stream).remove_fields(["test"]).read())) as pdf:
+        after = describe_actions(read(pdf))
+    return ["/Hide" if each == "/ResetForm" else each for each in before], after
+
+
+def find_widget(stream, name):
+    # the widget annotation of a field, by its short name
+    for page in PdfReader(BytesIO(stream)).pages:
+        for annot in page.get("/Annots", []):
+            annot = annot.get_object()
+            if get_widget_key(annot, False) == name:
+                return annot
+
+    pytest.fail(f"No widget named {name}.")
+
+
+def get_nested_entries(stream, entry="/DA"):
+    # the entry of each field of nest_fields, or None without one
+    reader = PdfReader(BytesIO(stream))
+    inner = find_widget(stream, "test")["/Parent"].get_object()
+    return {
+        "test": find_widget(stream, "test").get(entry),
+        "test_2": find_widget(stream, "test_2").get(entry),
+        "inner": inner.get(entry),
+        "outer": inner["/Parent"].get_object().get(entry),
+        "/AcroForm": reader.root_object["/AcroForm"].get(entry),
+    }
+
+
+def get_widget_states(stream, name):
+    # the /AS and /V of each widget with the short name, in page order
+    return [
+        [annot.get("/AS"), annot.get("/V")]
+        for page in PdfReader(BytesIO(stream)).pages
+        for annot in (each.get_object() for each in page.get("/Annots", []))
+        if annot.get("/Subtype") == "/Widget" and get_widget_key(annot, False) == name
+    ]
+
+
+def get_field_and_widgets(stream, name):
+    # a field that has widget kids, and its kids, by the field's name
+    reader = PdfReader(BytesIO(stream))
+    field = next(
+        each.get_object()
+        for each in reader.root_object["/AcroForm"]["/Fields"]
+        if each.get_object().get("/T") == name
+    )
+    return field, [kid.get_object() for kid in field["/Kids"]]
+
+
+def get_checkbox_field_states(stream):
+    # the /AS and /V of each widget of the field "check", and the field's /V
+    field = find_widget(stream, "check")["/Parent"].get_object()
+    return get_widget_states(stream, "check") + [field.get("/V")]
+
+
+def get_checkbox_and_radio_states(stream):
+    # the /AS and /V of the checkbox "group", and the /AS of each option and
+    # the /V of the radio group "outer.group"
+    states = {"outer.group": []}
+    for annot in PdfReader(BytesIO(stream)).pages[0]["/Annots"]:
+        annot = annot.get_object()
+        if annot.get("/T") == "group":
+            states["group"] = [annot.get("/AS"), annot.get("/V")]
+        elif annot.get("/Parent", {}).get("/T") == "group":
+            states["outer.group"].append(annot.get("/AS"))
+            states["outer.group /V"] = annot["/Parent"].get("/V")
+
+    return states
+
+
+def assert_annotation_graph(
+    stream, expected_keys, use_full_widget_name, assert_catalog_fields
+):
+    reader = PdfReader(BytesIO(stream))
+    widgets = {}
+    notes = {}
+    subtypes = Counter()
+    popups = []
+    for page in reader.pages:
+        for reference in page["/Annots"]:
+            annotation = reference.get_object()
+            assert annotation["/P"].indirect_reference == page.indirect_reference
+            subtypes[annotation["/Subtype"]] += 1
+            if annotation["/Subtype"] == "/Widget":
+                widgets[get_widget_key(annotation, use_full_widget_name)] = reference
+            elif annotation["/Subtype"] == "/Text":
+                notes[annotation["/Contents"]] = reference
+            elif annotation["/Subtype"] == "/Popup":
+                popups.append(reference)
+            elif annotation["/Subtype"] == "/Link":
+                assert annotation["/Dest"][0] == reader.pages[1].indirect_reference
+
+    assert set(widgets) == expected_keys
+    assert subtypes == {
+        "/Widget": len(expected_keys),
+        "/Text": 3,
+        "/Popup": 1,
+        "/Link": 1,
+        "/Highlight": 1,
+    }
+    assert set(notes) == {"keep note", "keep reply", "second page"}
+    note = notes["keep note"].get_object()
+    assert note["/Popup"].indirect_reference == popups[0]
+    assert note["/Popup"]["/Parent"].indirect_reference == notes["keep note"]
+    assert (
+        notes["keep reply"].get_object()["/IRT"].indirect_reference
+        == notes["keep note"]
+    )
+    # The field tree must reference the same surviving widgets as the pages.
+    assert_catalog_fields(stream, expected_keys)
+    assert (
+        set(PdfWrapper(stream, use_full_widget_name=use_full_widget_name).widgets)
+        == expected_keys
+    )
+    with Pdf.open(BytesIO(stream)) as pdf:
+        assert pdf.check_pdf_syntax() == []
+
+
+def page_contents(pdf):
+    return [
+        contents.get_data()
+        for page in PdfReader(BytesIO(pdf.read())).pages
+        if (contents := page.get_contents()) is not None
+    ]
+
+
+def font_of_widget(reader, key):
+    annotation = next(
+        annot.get_object()
+        for annot in reader.pages[0]["/Annots"]
+        if annot.get_object().get("/T") == key
+    )
+    return reader.root_object[AcroForm][DR][Font][annotation["/DA"].split()[0]]
+
+
+def assert_cli_error(result, *expected_messages, output_path=None):
+    assert result.exit_code == 2
+    for message in expected_messages:
+        assert message in result.output
+    if output_path is not None:
+        assert not os.path.exists(output_path)

@@ -11,9 +11,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fontTools.ttLib import TTFont as FontToolsTTFont
 from fontTools.ttLib import TTLibError
+from pikepdf import Pdf
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject
-from reportlab.pdfbase.pdfmetrics import _fonts
 from reportlab.pdfbase.ttfonts import TTFError, TTFont
 
 from PyPDFForm import Fields, PdfWrapper, RawElements
@@ -24,19 +24,48 @@ from PyPDFForm.lib.constants import (
     AcroForm,
     Font,
     FontDescriptor,
-    MissingWidth,
     Widths,
 )
 from PyPDFForm.lib.font import compute_font_glyph_widths, temporary_font_registration
+from tests.support.checks import font_of_widget
+
+draw_grid_or_none = pytest.mark.parametrize(
+    "operation",
+    [
+        lambda obj: obj.draw([RawElements.RawText("foo", 1, 100, 100)]),
+        lambda obj: obj.generate_coordinate_grid(),
+        lambda obj: obj,
+    ],
+    ids=["draw", "generate_coordinate_grid", "none"],
+)
 
 
-@pytest.fixture
-def font_registry():
-    original = dict(_fonts)
-    yield _fonts
-    # Restore shared state even when a regression assertion fails.
-    _fonts.clear()
-    _fonts.update(original)
+def test_draw_and_coordinate_grid_keep_registered_fonts(
+    template_stream, sample_font_stream
+):
+    obj = PdfWrapper(template_stream).register_font("new_font", sample_font_stream)
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        fonts = set(pdf.Root.AcroForm.DR.Font.keys())
+
+    for _ in range(2):
+        obj.draw([RawElements.RawText("foo", 1, 100, 100, font="new_font")])
+        obj.generate_coordinate_grid()
+    obj.widgets["test"].font = "new_font"
+    obj.fill({"test": "foo"})
+    obj.draw([RawElements.RawText("bar", 2, 100, 100, font="new_font")])
+
+    with Pdf.open(BytesIO(obj.read())) as pdf:
+        dr_fonts = pdf.Root.AcroForm.DR.Font
+        assert set(dr_fonts.keys()) == fonts
+
+        widget = next(each for each in pdf.pages[0].Annots if each.T == "test")
+        assert dr_fonts[str(widget.DA).split()[0]].BaseFont == (
+            "/LiberationSerif-BoldItalic"
+        )
+        assert any(
+            str(font.BaseFont).endswith("LiberationSerif-BoldItalic")
+            for font in pdf.pages[1].Resources.Font.values()
+        )
 
 
 def test_temporary_font_registration_cleans_up_setup_failure(
@@ -121,23 +150,6 @@ def test_repeated_draws_with_duplicate_font_aliases(
                 ref.get_object() for ref in page["/Resources"]["/Font"].values()
             )
         )
-
-
-@pytest.fixture
-def pdf_font_widths_and_missing(static_pdfs, sample_font_stream):
-    path = os.path.join(static_pdfs, "sample_template.pdf")
-    obj = PdfWrapper(path, need_appearances=True)
-    obj.register_font("new_font_name", sample_font_stream)
-
-    writer = PdfWriter(BytesIO(obj.read()))
-    fonts = writer._root_object[AcroForm][DR][Font]  # type: ignore # noqa: SLF001
-    font_obj = fonts[obj._available_fonts["new_font_name"]].get_object()  # type: ignore # noqa: SLF001
-
-    pdf_widths_array = font_obj.get(Widths, [])
-    descriptor_obj = font_obj[FontDescriptor].get_object()
-    missing_width = descriptor_obj.get(MissingWidth, DEFAULT_ASSUMED_GLYPH_WIDTH)
-
-    return pdf_widths_array, missing_width
 
 
 def test_compute_font_glyph_widths_with_valid_font(sample_font_stream):
@@ -310,26 +322,6 @@ def test_register_font_preserves_resource_names(
     )
 
 
-draw_grid_or_none = pytest.mark.parametrize(
-    "operation",
-    [
-        lambda obj: obj.draw([RawElements.RawText("foo", 1, 100, 100)]),
-        lambda obj: obj.generate_coordinate_grid(),
-        lambda obj: obj,
-    ],
-    ids=["draw", "generate_coordinate_grid", "none"],
-)
-
-
-def _font_of_widget(reader, key):
-    annotation = next(
-        annot.get_object()
-        for annot in reader.pages[0]["/Annots"]
-        if annot.get_object().get("/T") == key
-    )
-    return reader.root_object[AcroForm][DR][Font][annotation["/DA"].split()[0]]
-
-
 @draw_grid_or_none
 def test_registered_font_name_keeps_font_after_refresh(
     template_stream, sample_font_stream, operation
@@ -340,7 +332,7 @@ def test_registered_font_name_keeps_font_after_refresh(
     obj.widgets["test"].font = "Arial"
     obj.fill({"test": "foo"})
 
-    font = _font_of_widget(PdfReader(BytesIO(obj.read())), "test")
+    font = font_of_widget(PdfReader(BytesIO(obj.read())), "test")
     assert font["/BaseFont"] == "/LiberationSerif-BoldItalic"
 
 
@@ -364,7 +356,7 @@ def test_font_metrics_added_when_need_appearances_enabled_later(
     )
     expected_fonts = expected.root_object[AcroForm][DR][Font]
     reader = PdfReader(BytesIO(obj.read()))
-    font = _font_of_widget(reader, "test")
+    font = font_of_widget(reader, "test")
     assert set(reader.root_object[AcroForm][DR][Font]) == set(expected_fonts)
     assert set(font) == set(expected_fonts["/F1"])
     assert set(font[FontDescriptor]) == set(expected_fonts["/F1"][FontDescriptor])
@@ -397,7 +389,7 @@ def test_font_metrics_for_font_named_like_builtin_font(
         )
     )
     expected_font = expected.root_object[AcroForm][DR][Font]["/F1"]
-    font = _font_of_widget(PdfReader(BytesIO(obj.read())), "test")
+    font = font_of_widget(PdfReader(BytesIO(obj.read())), "test")
     assert font["/BaseFont"] == "/Helvetica"
     assert font[FontDescriptor]["/FontFile2"].get_data() == helvetica
     assert set(font[FontDescriptor]) == set(expected_font[FontDescriptor])

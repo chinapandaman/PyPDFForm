@@ -14,11 +14,64 @@ for measuring test coverage. To run the tests, execute:
 
 The tests run in parallel with [pytest-xdist](https://pytest-xdist.readthedocs.io/): `-n auto` starts one worker per CPU. Coverage measures each worker in its own data file, and `coverage combine` merges them before the report. `coverage erase` first removes data left by an earlier run, which would otherwise be merged in. Without `-n`, pytest runs the tests one at a time, which suits running a single test or using a debugger such as `pudb` or `--pdb`.
 
+Runs start the tests marked `@pytest.mark.slow` first, so that a parallel run doesn't wait for a slow test that started last. Mark a test that takes several seconds, such as `test_bulk_create_fields_stress_max`. Regenerating expected PDFs in place keeps the order the tests are collected in.
+
 ## Adding tests
 
-Add only the tests needed to cover the changed behavior and maintain 100% coverage. Extend existing test files. If a new test file is absolutely necessary, consult the maintainer before creating it.
+Add only the tests needed to cover the changed behavior and maintain 100% coverage. Follow the [placement rule](#where-tests-go): extend the module it names, or create that module if it doesn't exist yet. Consult the maintainer before creating a new directory.
 
 Leave expected PDF sample regeneration and visual regression comparison to the maintainer unless they explicitly delegate these tasks.
+
+### Where tests go
+
+The tests are in these directories under `tests/`:
+
+| Directory | Tests |
+| --- | --- |
+| `doc_examples/lib/`, `doc_examples/cli/` | The snippets of the User Guide |
+| `scenario/` | Reproductions of issues, and tests of PDFs made by third-party tools or found online |
+| `snapshots/` | Library tests that only compare with an expected PDF |
+| `behavior/` | Other library tests |
+| `behavior/field_tree/` | Library tests of field hierarchies, such as inherited, malformed, and cyclic ones, that aren't tied to one operation |
+| `cli/` | Tests of CLI-only behavior, such as errors and the entry point |
+
+To place a test:
+
+1. A test of a User Guide snippet goes in `doc_examples/lib/` or `doc_examples/cli/`, in the module named after the page.
+2. A test that reproduces an issue, or uses a PDF made by a third-party tool or found online, goes in `scenario/`.
+3. Any other test that compares with an expected PDF goes in `snapshots/`. Other library tests go in `behavior/`, and tests of CLI-only behavior go in `cli/`.
+4. Modules are named after User Guide pages, such as `test_fill.py` and `test_style.py`. A module longer than about 800 lines is split by operation, the way `behavior/` splits the Utils page into `test_pages.py`, `test_merge.py`, and `test_version.py`. Tests of PDF field structure that isn't tied to one operation go in `behavior/field_tree/`.
+
+A doc example or scenario test can compare with an expected PDF and also make other assertions, since it mirrors one snippet or one issue. A library test that needs both is two tests with the same name, one in `snapshots/` that only compares and one in `behavior/` that only asserts:
+
+```python
+# tests/snapshots/test_prepare.py
+def test_create_text_multiline(template_stream, pdf_samples, expect_pdf):
+    expected_path = os.path.join(
+        pdf_samples, "widget", "test_create_text_align_multiline.pdf"
+    )
+    obj = PdfWrapper(template_stream).bulk_create_fields(
+        [Fields.TextField(name="foo", page_number=1, x=100, y=100, multiline=True)]
+    )
+
+    expect_pdf(obj.read(), expected_path)
+
+
+# tests/behavior/test_prepare.py
+def test_create_text_multiline(template_stream):
+    obj = PdfWrapper(template_stream).bulk_create_fields(
+        [Fields.TextField(name="foo", page_number=1, x=100, y=100, multiline=True)]
+    )
+
+    assert obj.schema["properties"]["foo"]["type"] == "string"
+```
+
+Test modules contain only tests and their parametrize tables, and don't import each other. Helpers and fixtures are in `tests/support/`:
+
+* `builders.py` builds PDFs for tests, such as nested, inherited, and cyclic field trees, fields with null entries, and forms with actions.
+* `checks.py` reads and checks PDFs. It implements the [shared assertions](#shared-assertions).
+* `samples.py` has the fixtures for sample directories, template streams, and fill data. `tests/conftest.py` loads it for every test.
+* `snapshots.py` implements [`expect_pdf`](#comparing-with-expected-pdfs).
 
 ### Shared assertions
 
@@ -118,7 +171,7 @@ To generate a test coverage report, run:
 Although each PyPDFForm test is unique, most follow a general paradigm.
 
 === "Library"
-    Most library tests can be summarized in three steps:
+    Most library tests in `tests/snapshots/` can be summarized in three steps:
 
     * Define the expected PDF file.
     * Use PyPDFForm to generate a PDF from the test inputs.

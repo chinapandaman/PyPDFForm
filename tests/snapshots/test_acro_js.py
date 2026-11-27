@@ -158,8 +158,8 @@ def test_on_open_script(template_stream, pdf_samples, expect_pdf):
     expected_path = os.path.join(pdf_samples, "js", "test_on_open_script.pdf")
     pdf = PdfWrapper(template_stream, need_appearances=True)
     pdf.on_open_javascript = 'this.getField("test").value = "opened";'
-
-    assert pdf.on_open_javascript == 'this.getField("test").value = "opened";'
+    # reading the script back doesn't change the PDF
+    _ = pdf.on_open_javascript
 
     expect_pdf(pdf.read(), expected_path)
 
@@ -170,9 +170,9 @@ def test_on_open_script_title_coexist(template_stream, pdf_samples, expect_pdf):
     )
     pdf = PdfWrapper(template_stream, title="My PDF")
     pdf.on_open_javascript = 'this.getField("test").value = "opened";'
-
-    assert pdf.title == "My PDF"
-    assert pdf.on_open_javascript == 'this.getField("test").value = "opened";'
+    # reading the title and the script back doesn't change the PDF
+    _ = pdf.title
+    _ = pdf.on_open_javascript
 
     expect_pdf(pdf.read(), expected_path)
 

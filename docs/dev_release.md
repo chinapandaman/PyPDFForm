@@ -26,7 +26,7 @@ A GitHub release triggers the [Deploy](https://github.com/chinapandaman/PyPDFFor
 Deploy doesn't run the test matrix or Linting, since Create Release ran them on the same commit before creating the release. It runs only the distribution job of Tests, which builds the sdist and wheel once and checks them with `scripts/check_dist.py`:
 
 * The file names, package metadata, installed `__version__`, and release tag name the same version.
-* Both files contain exactly the expected files from the release commit, byte for byte. Apart from package files and metadata, the sdist only contains `README.md`, `LICENSE`, `pyproject.toml`, and top-level `tests/test*.py` files.
+* Both files contain exactly the expected files from the release commit, byte for byte. Apart from package files and metadata, the sdist only contains `README.md`, `LICENSE`, and `pyproject.toml`. setuptools would also add top-level `tests/test*.py` files, but the tests are in subdirectories of `tests/`, so the sdist has none.
 * On the oldest and newest supported Python versions, the wheel is installed into new environments outside the checkout, once without extras and once with the `cli` extra. PyPDFForm must import from the installed wheel rather than the checkout, and a form is created, filled, and reopened. The `pypdfform` command must show installation guidance without the `cli` extra, and create, fill, and inspect a form with it.
 
 Deploy uploads those same files only if the check passes and their SHA-256 checksums match the checked ones. The run summary records the commit and checksums. Deploy Docs runs only after the upload succeeds.
