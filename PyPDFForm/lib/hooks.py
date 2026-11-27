@@ -119,9 +119,12 @@ def trigger_widget_hooks(
     the AcroForm dictionary, for its default. A text field or dropdown
     annotation whose hooks change how it is drawn, such as its font,
     alignment, choices, or size, as `_get_drawn_state` reads it, loses its
-    appearance, as `remove_appearance` describes. A change to the value the
-    PDF already has, or to its position, flags, tooltip, or JavaScript, keeps
-    it. When appearance streams are generated, only a size change removes it.
+    appearance, as `remove_appearance` describes. Each annotation is read
+    before any hook runs and again after all of them, since the widgets of a
+    field share the entries that its hooks change, such as `/Q` on the field.
+    A change to the value the PDF already has, or to its position, flags,
+    tooltip, or JavaScript, keeps it. When appearance streams are generated,
+    only a size change removes it.
     Annotations of other types keep theirs, since their appearances hold
     their states. Widget hook queues are left
     unchanged, so the caller can clear them once the modified PDF is returned,
@@ -144,6 +147,7 @@ def trigger_widget_hooks(
     output = PdfWriter(BytesIO(pdf))
     acroform = get_dictionary(output.root_object, AcroForm) or DictionaryObject()
 
+    targets = []
     for page in output.pages:
         for annot in page.get(Annots, []):
             annot = cast(DictionaryObject, annot.get_object())
@@ -156,23 +160,28 @@ def trigger_widget_hooks(
             drawn = get_widget_type(annot) in (Text, Dropdown) and any(
                 hook in APPEARANCE_HOOKS for hook, _ in widget.hooks_to_trigger
             )
+            # read before any hook runs, since the widgets of a field share
+            # the entries that a hook changes on the field
             before = (
                 _get_drawn_state(annot, acroform, generate_appearance_streams)
                 if drawn
                 else None
             )
+            targets.append((annot, widget, before))
 
-            for hook, value in widget.hooks_to_trigger:
-                function = getattr(sys.modules[__name__], hook)
-                if hook in DEFAULT_APPEARANCE_HOOKS:
-                    function(annot, value, acroform)
-                else:
-                    function(annot, value)
+    for annot, widget, _ in targets:
+        for hook, value in widget.hooks_to_trigger:
+            function = getattr(sys.modules[__name__], hook)
+            if hook in DEFAULT_APPEARANCE_HOOKS:
+                function(annot, value, acroform)
+            else:
+                function(annot, value)
 
-            if drawn and before != _get_drawn_state(
-                annot, acroform, generate_appearance_streams
-            ):
-                remove_appearance(annot)
+    for annot, _, before in targets:
+        if before is not None and before != _get_drawn_state(
+            annot, acroform, generate_appearance_streams
+        ):
+            remove_appearance(annot)
 
     with BytesIO() as f:
         output.write(f)

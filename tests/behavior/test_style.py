@@ -8,7 +8,7 @@ from pikepdf import Pdf, String
 
 from PyPDFForm import Fields, PdfWrapper
 from PyPDFForm.lib.middleware.checkbox import Checkbox
-from tests.support.builders import save
+from tests.support.builders import get_field, save, split_widgets
 from tests.support.checks import find_widget, get_normal_appearance
 
 
@@ -265,6 +265,23 @@ def test_restyle_to_same_value_keeps_appearance(pdf_samples, attribute):
     # what the appearance draws didn't change
     assert widget.hooks_to_trigger
     assert "/AP" in find_widget(form.read(), "test")
+
+
+@pytest.mark.parametrize(("attribute", "value"), [("alignment", 2), ("font_size", 20)])
+def test_restyle_shared_field_removes_every_appearance(pdf_samples, attribute, value):
+    with Pdf.open(os.path.join(pdf_samples, "sample_template_filled.pdf")) as pdf:
+        field = get_field(pdf, "test")
+        widgets = split_widgets(pdf, field, 2)
+        field.Q = 0
+        assert all("/AP" in each for each in widgets)
+        template = save(pdf)
+    form = PdfWrapper(template)
+
+    # the first widget's hooks change /Q or /DA of the field both widgets share
+    setattr(form.widgets["test"], attribute, value)
+
+    with Pdf.open(BytesIO(form.read())) as pdf:
+        assert all("/AP" not in each for each in get_field(pdf, "test").Kids)
 
 
 @pytest.mark.parametrize(
