@@ -128,15 +128,18 @@ class ExpectedPdfOwners:
             self.skipped_dirs.add(f"{directory}/")
 
     def unowned(self, files):
-        # the files no test owns or would own, comparing paths regardless of
-        # case, since some filesystems ignore it
-        owned = {path.casefold() for path in (*self.owners, *self.skipped)}
-        skipped_dirs = tuple(directory.casefold() for directory in self.skipped_dirs)
+        # the files no test owns or would own, with the owned path each one
+        # differs from only in case, if any. Paths must match exactly: a
+        # case-sensitive filesystem can hold a stale file next to the owned
+        # one, and one that ignores case keeps a file's old case when it's
+        # overwritten.
+        owned = {*self.owners, *self.skipped}
+        folded = {path.casefold(): path for path in sorted(owned)}
+        skipped_dirs = tuple(self.skipped_dirs)
         return sorted(
-            path
+            (path, folded.get(path.casefold()))
             for path in files
-            if path.casefold() not in owned
-            and not path.casefold().startswith(skipped_dirs)
+            if path not in owned and not path.startswith(skipped_dirs)
         )
 
     def shared(self):
@@ -326,8 +329,11 @@ def pytest_terminal_summary(terminalreporter, config):
     unowned = config.stash.get(unowned_expected_pdfs, [])
     if unowned:
         terminalreporter.section("expected PDFs without an owner", red=True)
-        for path in unowned:
-            terminalreporter.line(path)
+        for path, owned in unowned:
+            if owned is None:
+                terminalreporter.line(path)
+            else:
+                terminalreporter.line(f"{path} (differs only in case from {owned})")
         terminalreporter.line(
             "Each file in pdf_samples/expected/ is named after the test that owns "
             "it. Rename the file after its test, or remove it."
