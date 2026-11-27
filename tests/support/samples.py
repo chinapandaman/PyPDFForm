@@ -63,7 +63,7 @@ def template_stream(pdf_samples):
 
 @pytest.fixture
 def template_filled_stream(pdf_samples):
-    with open(os.path.join(pdf_samples, "sample_template_filled.pdf"), "rb+") as f:
+    with open(os.path.join(pdf_samples, "sample_template_filled.pdf"), "rb") as f:
         return f.read()
 
 
