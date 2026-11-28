@@ -62,7 +62,7 @@ from .font import (
     validate_font,
 )
 from .hooks import FontChange, trigger_widget_hooks
-from .patterns import record_pdf_value
+from .patterns import is_unchanged, record_pdf_value
 from .template import (
     build_widgets,
     create_annotations,
@@ -824,8 +824,9 @@ class PdfWrapper:
         passed to its hook with the resource name of the registered font or font
         of the PDF with its name, and each changed widget's font is then read back
         from the changed PDF, as reopening it reads it. So is the selection of a
-        dropdown without one whose choices were replaced, since its value can
-        name one of the new choices. The changed PDF and what is read back are
+        dropdown whose choices were replaced and that has none, as the PDF
+        held none, since the PDF's value can name one of the new choices; a
+        None assigned over the PDF's selection is kept. The changed PDF and what is read back are
         committed together, which updates the wrapper's stored stream
         and clears each widget's hook queue. If a hook or reading back
         raises, every widget's queued hooks are discarded and their properties are
@@ -846,10 +847,12 @@ class PdfWrapper:
 
         if widgets_with_hooks:
             font_widgets = self._queue_font_changes(widgets_with_hooks)
+            # a None the PDF holds, not one assigned over its selection
             unselected = {
                 id(widget)
                 for widget in widgets_with_hooks
                 if widget.value is None
+                and is_unchanged(widget)
                 and any(hook == CHOICES_HOOK for hook, _ in widget.hooks_to_trigger)
             }
 

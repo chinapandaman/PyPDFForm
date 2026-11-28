@@ -175,21 +175,30 @@ class Dropdown(Widget):
 
         Replacing the choices moves the selection to the option that
         `follow_selection` finds, or clears it, as `update_dropdown_choices`
-        does in the PDF. The previous value is kept as a committed value, so
-        a failed read restores it with the choices.
+        does in the PDF. The new selection is found before anything changes,
+        so choices that can't be read raise and leave the widget unchanged.
+        The previous value is kept as a committed value, so a failed read
+        restores it with the choices.
 
         Args:
             name (str): The name of the attribute.
             value (Any): The value of the attribute.
         """
-        # the choices are first assigned during construction
-        options = self.options if name == "choices" and name in self.__dict__ else None
+        # the choices are first assigned during construction, and None is
+        # rejected by the base class
+        if name != "choices" or name not in self.__dict__ or value is None:
+            super().__setattr__(name, value)
+            return
+
+        index = self.follow_selection(
+            self.value,
+            self.options,
+            [DropdownOption.from_choice(each) for each in value],
+        )
         super().__setattr__(name, value)
-        if options is not None:
-            index = self.follow_selection(self.value, options, self.options)
-            if index != self.value:
-                self._committed_values.setdefault("_value", self.value)
-                self.__dict__["_value"] = index
+        if index != self.value:
+            self._committed_values.setdefault("_value", self.value)
+            self.__dict__["_value"] = index
 
     @staticmethod
     def follow_selection(
@@ -204,7 +213,8 @@ class Dropdown(Widget):
         selection follows it to its index in the new options. When several new
         options have it, the selection keeps its index if that option is one
         of them, as `get_selected_index` uses `/I`, and otherwise takes the
-        first.
+        first. An index outside `options`, such as after a choices list was
+        changed in place, has no option to follow and is kept.
 
         Args:
             index (int | None): The selected index in `options`, or None.
@@ -212,12 +222,12 @@ class Dropdown(Widget):
             new_options (Sequence[DropdownOption]): The replacement options.
 
         Returns:
-            int | None: The index of the selected option in `new_options`, or
-                None when nothing is selected or no new option has its export
-                value.
+            int | None: The index of the selected option in `new_options`,
+                `index` when nothing is selected or it is outside `options`,
+                or None when no new option has its export value.
         """
-        if index is None:
-            return None
+        if index is None or index >= len(options):
+            return index
 
         export = options[index].export
         matches = [i for i, each in enumerate(new_options) if each.export == export]

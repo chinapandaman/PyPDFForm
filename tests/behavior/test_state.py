@@ -139,6 +139,41 @@ def test_failed_hook_reverts_dropdown_selection(
     assert_widgets_match_output(obj)
 
 
+def test_new_choices_keep_assigned_none(sample_template_with_dropdown):
+    obj = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1})
+    obj.widgets["dropdown_1"].value = None
+    obj.widgets["dropdown_1"].choices = ["bar", "foo"]
+    output = obj.read()
+
+    # assigning without filling changes only the wrapper, and reading doesn't
+    # replace it with the PDF's selection
+    assert obj.data["dropdown_1"] is None
+    assert PdfWrapper(output).data["dropdown_1"] == 0
+
+
+def test_new_choices_after_changing_list_in_place(sample_template_with_dropdown):
+    obj = PdfWrapper(sample_template_with_dropdown)
+    widget = obj.widgets["dropdown_1"]
+    choices = ["a", "b", "c"]
+    widget.choices = choices
+    obj.fill({"dropdown_1": 2}).read()
+
+    # the selected choice is removed from the wrapper's list, so its index has
+    # no option to follow and is kept
+    choices.pop()
+    widget.choices = ["x"]
+    assert widget.choices == ["x"]
+    assert widget.value == 2
+    hooks = list(widget.hooks_to_trigger)
+
+    # choices that can't be read raise before the widget changes
+    with pytest.raises(ValueError, match="too many values to unpack"):
+        widget.choices = [("a", "b", "c")]
+    assert widget.choices == ["x"]
+    assert widget.value == 2
+    assert widget.hooks_to_trigger == hooks
+
+
 @pytest.mark.parametrize(
     "operation",
     [

@@ -309,11 +309,27 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         widget (Dropdown): The Dropdown widget object to update with the retrieved value.
     """
     field = get_widget_field(annot)
-    value = _get_inherited_value(field, V)
+    value = get_field_value(field)
     indices = get_entry(field, I)
     index = widget.get_selected_index(value, indices)
     if index is not None:
         widget.value = index
+
+
+def get_field_value(field: DictionaryObject) -> Any:
+    """
+    Reads the value (V) of a field, its own or inherited from the fields above it.
+
+    A `/Parent` cycle before a value is found reads as no value, as
+    `_get_inherited_value` describes.
+
+    Args:
+        field (DictionaryObject): The field, as `get_widget_field` returns it.
+
+    Returns:
+        Any: The value, or None when no field sets it.
+    """
+    return _get_inherited_value(field, V)
 
 
 def read_dropdown(annot: DictionaryObject) -> Dropdown:

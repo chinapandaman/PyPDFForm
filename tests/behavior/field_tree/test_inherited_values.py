@@ -317,3 +317,54 @@ def test_dropdown_choices_null_malformed_and_cycle(sample_template_with_dropdown
         obj.read()
     assert obj.widgets["dropdown_1"].choices == ()
     assert obj.read() == original
+
+
+@pytest.mark.parametrize("own", [True, False], ids=["own", "inherited"])
+def test_cleared_dropdown_hides_inherited_value(
+    sample_template_with_dropdown, own, assert_widgets_match_output
+):
+    # "dropdown_1" selects "bar", its own value below the "foo" of "outer",
+    # or the value it inherits from "outer"
+    stream = put_under_outer(
+        sample_template_with_dropdown, ("dropdown_1",), {"/V": "foo" if own else "bar"}
+    )
+    if own:
+        with Pdf.open(BytesIO(stream)) as pdf:
+            get_field(pdf, "outer").Kids[0].V = String("bar")
+            stream = save(pdf)
+    obj = PdfWrapper(stream)
+    assert obj.data["dropdown_1"] == 1
+
+    # the new choices don't have "bar", so the selection is cleared, and an
+    # empty value of its own hides the value of "outer"
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    output = obj.read()
+    annot = find_widget(output, "dropdown_1")
+    assert obj.data["dropdown_1"] is PdfWrapper(output).data["dropdown_1"] is None
+    assert annot["/V"] == []
+    assert "/I" not in annot
+    assert annot["/Parent"]["/V"] == ("foo" if own else "bar")
+    assert_widgets_match_output(obj)
+
+
+def test_dropdown_choices_move_shared_selection_once(
+    sample_template_with_dropdown, assert_widgets_match_output
+):
+    # the two widgets of "dropdown_1" share its selection, "foobar" at index 2
+    filled = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 2}).read()
+    with Pdf.open(BytesIO(filled)) as pdf:
+        for widget in split_widgets(pdf, get_field(pdf, "dropdown_1"), count=2):
+            if "/I" in widget:
+                del widget["/I"]
+        stream = save(pdf)
+    obj = PdfWrapper(stream)
+    assert obj.data["dropdown_1"] == 2
+
+    # each widget gets both lists, but the selection moves once: it stays
+    # at index 2, then takes the first "foobar"
+    obj.widgets["dropdown_1"].choices = ["x", "foobar", "foobar"]
+    obj.widgets["dropdown_1"].choices = ["foobar", "foobar"]
+    output = obj.read()
+    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 0
+    assert find_widget(output, "dropdown_1")["/Parent"]["/I"] == [0]
+    assert_widgets_match_output(obj)
