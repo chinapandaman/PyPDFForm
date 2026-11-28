@@ -139,7 +139,7 @@ def test_choice_indices(sample_template_with_dropdown, assert_round_trip):
     widget.value = None
     validate({"dropdown_1": "new option"}, form.schema)
     form.fill({"dropdown_1": "new option"})
-    assert widget.choices == ["new option"]
+    assert widget.choices == ("new option",)
     assert widget.value == 0
 
 

@@ -121,9 +121,9 @@ def trigger_widget_hooks(
     it executes those hooks. Hooks are functions defined in this module that
     modify the annotation dictionary, allowing for dynamic changes to the form field's
     appearance or behavior. Hooks that change the default appearance also get
-    the AcroForm dictionary, for its default. New dropdown choices move the
-    selection of a field only through the first of its widgets that gets
-    them, since its widgets share it. A text field or dropdown
+    the AcroForm dictionary, for its default. A dropdown field whose widgets
+    get new choices moves its selection once, after every hook has run, as
+    `_move_dropdown_selection` describes, since its widgets share it. A text field or dropdown
     annotation whose hooks change how it is drawn, such as its font,
     alignment, choices, or size, as `_get_drawn_state` reads it, loses its
     appearance, as `remove_appearance` describes. Each annotation is read
@@ -176,19 +176,31 @@ def trigger_widget_hooks(
             )
             targets.append((annot, widget, before))
 
-    # the first widget of a field to get new choices moves the selection
-    # that the field's widgets share, so the others don't move it again
-    selecting = {}
+    # the selection of each dropdown field that gets new choices, read
+    # through its last widget, as the wrapper reads it, before options change
+    selections = {}
+    for annot, widget, _ in targets:
+        choices = [
+            value for hook, value in widget.hooks_to_trigger if hook == CHOICES_HOOK
+        ]
+        if choices and get_widget_type(annot) is Dropdown:
+            selections[id(get_widget_field(annot))] = (
+                annot,
+                read_dropdown(annot),
+                choices,
+            )
+
     for annot, widget, _ in targets:
         for hook, value in widget.hooks_to_trigger:
             function = getattr(sys.modules[__name__], hook)
             if hook in DEFAULT_APPEARANCE_HOOKS:
                 function(annot, value, acroform)
-            elif hook == CHOICES_HOOK:
-                owner = selecting.setdefault(id(get_widget_field(annot)), annot)
-                function(annot, value, owner is annot)
             else:
                 function(annot, value)
+
+    # the widgets of a field share its selection, so it moves once
+    for annot, before, choices in selections.values():
+        _move_dropdown_selection(annot, before, choices)
 
     for annot, _, before in targets:
         if before is not None and before != _get_drawn_state(
@@ -629,15 +641,11 @@ def update_check_radio_size(annot: DictionaryObject, val: int | float) -> None:
     annot[NameObject(Rect)] = ArrayObject(new_rect)
 
 
-def update_dropdown_choices(
-    annot: DictionaryObject, val: list, selects: bool = True
-) -> None:
+def update_dropdown_choices(annot: DictionaryObject, val: tuple) -> None:
     """
     Updates the choices in a dropdown field annotation.
 
-    Annotations of other types, such as a text field with the same short
-    name, are left unchanged. This function modifies the Opt entry of the
-    field to change the available
+    This function modifies the Opt entry of the field to change the available
     choices in the dropdown field. The options are resolved from the widget and
     the fields along its `/Parent` chain, as `get_dropdown_choices` reads them,
     and the new options replace the widget's own, and are otherwise written to
@@ -646,63 +654,85 @@ def update_dropdown_choices(
     fields can share, are not changed. String choices
     use the same export and display value. Two-item sequences are written as
     `[export, display]` PDF option arrays from the user-facing
-    `(display, export)` order.
-
-    The selected option, as `read_dropdown` reads it, stays selected if a new
-    option has its export value, as `Dropdown.follow_selection` finds it,
-    and the selection is cleared otherwise. A value that selected no option
-    selects the new option it names, if any, as reopening reads it. The
-    value (V) and selected index (I) of the field the widget belongs to are
-    written as filling writes them when the index changes, the new options
-    would read another selection, or `/I` names another index. A cleared
-    selection removes them, and when the field would then inherit a value
-    from a field above, which other fields can share, it gets an empty array
-    as its own value, which selects nothing. A value that names no option
-    before or after, such as text typed into an editable dropdown, is kept.
+    `(display, export)` order. Annotations of other types, such as a text
+    field with the same short name, are left unchanged. The selection moves
+    once all options are written, as `_move_dropdown_selection` describes.
 
     Args:
         annot (DictionaryObject): The annotation dictionary for the dropdown field.
-        val (list): A list of strings or tuples representing the new choices for the dropdown.
-        selects (bool): False for the other widgets of a field whose
-            selection one of its widgets already moved, which only write the
-            options, so the selection doesn't move again. Defaults to True.
+        val (tuple): The new choices, as strings or `(display, export)` pairs.
 
     Raises:
         ValueError: If the `/Parent` chain has a cycle before any options are
             found.
     """
-    if get_widget_type(annot) is not Dropdown:
-        return
+    if get_widget_type(annot) is Dropdown:
+        resolve_inherited_entry(annot, Opt, None).target[NameObject(Opt)] = ArrayObject(
+            [DropdownOption.from_choice(each).to_pdf() for each in val]
+        )
 
-    target = resolve_inherited_entry(annot, Opt, None).target
-    before = read_dropdown(annot)
-    target[NameObject(Opt)] = ArrayObject(
-        [DropdownOption.from_choice(each).to_pdf() for each in val]
-    )
-    if not selects:
-        return
+
+def _move_dropdown_selection(
+    annot: DictionaryObject, before: Dropdown, choices: list
+) -> None:
+    """
+    Moves the selection of a dropdown field to follow its new choices.
+
+    The selection is read before any options are written, through the last
+    widget of the field, as `build_widgets` reads it, and follows each new
+    list of choices in turn by its export value, as `Dropdown.follow_selection`
+    finds it, as the wrapper's widget does, and it is cleared when a list
+    doesn't have it. A value that selected no option selects the new option
+    it names, if any, as reopening reads it, and one that names no option
+    before or after, such as text typed into an editable dropdown, is kept.
+    The value (V) and selected index (I) of the field are written as filling
+    writes them unless they already name the selected option by its export
+    value, which also replaces a displayed text that earlier versions
+    filled. A cleared selection removes them from the field, as
+    `_remove_field_entry` removes entries.
+
+    Args:
+        annot (DictionaryObject): The last widget of the field.
+        before (Dropdown): The options and selection the widget had, as
+            `read_dropdown` reads them.
+        choices (list): Each list of choices the field got, in order.
+
+    Raises:
+        ValueError: If a field above the field, which other fields can share,
+            still supplies a value after the selection is cleared, or the
+            `/Parent` chain has a cycle before one is found.
+    """
+    index, options = before.value, before.options
+    for each in choices:
+        new = tuple(DropdownOption.from_choice(choice) for choice in each)
+        index = Dropdown.follow_selection(index, options, new)
+        options = new
 
     after = read_dropdown(annot)
-    index = (
-        after.value
-        if before.value is None
-        else Dropdown.follow_selection(before.value, before.options, after.options)
-    )
-
     field = get_widget_field(annot)
+    if before.value is None:
+        index = after.value
+    elif index is None:
+        field.pop(NameObject(I), None)
+        _remove_field_entry(
+            annot, V, lambda widget: resolve_inherited_entry(widget, V, None).value
+        )
+        return
+    if index is None:
+        return
+
+    export = after.options[index].export
     indices = get_entry(field, I)
-    stale = isinstance(indices, list) and [each.get_object() for each in indices] != [
-        index
-    ]
-    if index is not None and (index != before.value or after.value != index or stale):
-        field[NameObject(V)] = TextStringObject(after.options[index].export)
+    if (
+        after.value != index
+        or get_field_value(field) != export
+        or (
+            isinstance(indices, list)
+            and [each.get_object() for each in indices] != [index]
+        )
+    ):
+        field[NameObject(V)] = TextStringObject(export)
         field[NameObject(I)] = ArrayObject([NumberObject(index)])
-    elif index is None and before.value is not None:
-        for key in (V, I):
-            if key in field:
-                del field[key]
-        if get_field_value(field) is not None:
-            field[NameObject(V)] = ArrayObject()
 
 
 def update_field_readonly(annot: DictionaryObject, val: bool) -> None:

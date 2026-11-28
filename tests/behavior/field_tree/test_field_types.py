@@ -8,7 +8,7 @@ from pikepdf import Array, Dictionary, Name, Pdf, String
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject, NullObject
 
-from PyPDFForm import PdfArray, PdfWrapper
+from PyPDFForm import BlankPage, Fields, PdfArray, PdfWrapper
 from PyPDFForm.lib.constants import PUSHBUTTON, RADIO
 from PyPDFForm.lib.middleware.checkbox import Checkbox
 from PyPDFForm.lib.middleware.dropdown import Dropdown
@@ -664,6 +664,51 @@ def test_dropdown_choices_skip_text_field_with_short_name(
     with Pdf.open(BytesIO(output)) as pdf:
         assert "/Opt" not in get_field(pdf, "billing").Kids[0]
     assert PdfWrapper(output).widgets["dropdown_1"].choices == ("foo", ("bar", "b"))
+    assert_widgets_match_output(obj)
+
+
+def test_dropdown_choices_keep_selections_of_fields_with_short_name(
+    assert_widgets_match_output,
+):
+    # "billing.choice" selects Apple, and "shipping.choice", whose widget
+    # comes later and has the key, selects Banana
+    created = (
+        PdfWrapper(BlankPage())
+        .bulk_create_fields(
+            [
+                Fields.DropdownField("billing", 1, 20, 20, options=["Apple", "Banana"]),
+                Fields.DropdownField(
+                    "shipping", 1, 20, 60, options=["Apple", "Banana"]
+                ),
+            ]
+        )
+        .fill({"billing": 0, "shipping": 1})
+        .read()
+    )
+    with Pdf.open(BytesIO(created)) as pdf:
+        fields = []
+        for name in ("billing", "shipping"):
+            field = get_field(pdf, name)
+            field.T = String("choice")
+            parent = pdf.make_indirect(
+                Dictionary({"/T": String(name), "/Kids": Array([field])})
+            )
+            field.Parent = parent
+            fields.append(parent)
+        pdf.Root.AcroForm.Fields = Array(fields)
+        stream = save(pdf)
+
+    def selections(output):
+        return PdfWrapper(output, use_full_widget_name=True).data
+
+    # each field's selection follows the new choices on its own
+    obj = PdfWrapper(stream)
+    obj.widgets["choice"].choices = ["Banana", "Apple"]
+    expected = {"billing.choice": 1, "shipping.choice": 0}
+    assert selections(obj.read()) == expected
+
+    # the PDF holds the key's selection, so filling doesn't write it to both
+    assert selections(obj.fill({}).read()) == expected
     assert_widgets_match_output(obj)
 
 

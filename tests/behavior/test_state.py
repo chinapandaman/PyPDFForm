@@ -151,27 +151,38 @@ def test_new_choices_keep_assigned_none(sample_template_with_dropdown):
     assert PdfWrapper(output).data["dropdown_1"] == 0
 
 
-def test_new_choices_after_changing_list_in_place(sample_template_with_dropdown):
+def test_assigned_choices_are_a_snapshot(
+    sample_template_with_dropdown, assert_widgets_match_output
+):
     obj = PdfWrapper(sample_template_with_dropdown)
     widget = obj.widgets["dropdown_1"]
     choices = ["a", "b", "c"]
     widget.choices = choices
     obj.fill({"dropdown_1": 2}).read()
 
-    # the selected choice is removed from the wrapper's list, so its index has
-    # no option to follow and is kept
+    # removing the selected choice from the assigned list changes nothing,
+    # so new choices without it clear the selection
     choices.pop()
+    assert widget.choices == ("a", "b", "c")
     widget.choices = ["x"]
-    assert widget.choices == ["x"]
-    assert widget.value == 2
-    hooks = list(widget.hooks_to_trigger)
+    output = obj.fill({}).read()
+    assert obj.data["dropdown_1"] is PdfWrapper(output).data["dropdown_1"] is None
+
+    # nor does reordering the list before the choices are written
+    obj = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1})
+    choices = ["bar", "foo"]
+    obj.widgets["dropdown_1"].choices = choices
+    choices.reverse()
+    output = obj.read()
+    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 0
+    assert PdfWrapper(output).widgets["dropdown_1"].choices == ("bar", "foo")
+    assert_widgets_match_output(obj)
 
     # choices that can't be read raise before the widget changes
     with pytest.raises(ValueError, match="too many values to unpack"):
-        widget.choices = [("a", "b", "c")]
-    assert widget.choices == ["x"]
-    assert widget.value == 2
-    assert widget.hooks_to_trigger == hooks
+        obj.widgets["dropdown_1"].choices = [("a", "b", "c")]
+    assert obj.widgets["dropdown_1"].choices == ("bar", "foo")
+    assert not obj.widgets["dropdown_1"].hooks_to_trigger
 
 
 @pytest.mark.parametrize(

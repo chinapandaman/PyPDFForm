@@ -320,7 +320,7 @@ def test_dropdown_choices_null_malformed_and_cycle(sample_template_with_dropdown
 
 
 @pytest.mark.parametrize("own", [True, False], ids=["own", "inherited"])
-def test_cleared_dropdown_hides_inherited_value(
+def test_clearing_dropdown_value_set_above_raises(
     sample_template_with_dropdown, own, assert_widgets_match_output
 ):
     # "dropdown_1" selects "bar", its own value below the "foo" of "outer",
@@ -333,17 +333,21 @@ def test_cleared_dropdown_hides_inherited_value(
             get_field(pdf, "outer").Kids[0].V = String("bar")
             stream = save(pdf)
     obj = PdfWrapper(stream)
+    original = obj.read()
     assert obj.data["dropdown_1"] == 1
 
-    # the new choices don't have "bar", so the selection is cleared, and an
-    # empty value of its own hides the value of "outer"
+    # the new choices don't have "bar", but "outer", which other fields can
+    # share, would still give the field a value
     obj.widgets["dropdown_1"].choices = ["foo", "x"]
-    output = obj.read()
-    annot = find_widget(output, "dropdown_1")
-    assert obj.data["dropdown_1"] is PdfWrapper(output).data["dropdown_1"] is None
-    assert annot["/V"] == []
-    assert "/I" not in annot
-    assert annot["/Parent"]["/V"] == ("foo" if own else "bar")
+    assert obj.data["dropdown_1"] is None
+    with pytest.raises(
+        ValueError, match="Cannot remove /V: a parent field shared with other fields"
+    ):
+        obj.read()
+
+    assert obj.widgets["dropdown_1"].choices == ("foo", "bar", "foobar", " ")
+    assert obj.data["dropdown_1"] == 1
+    assert obj.read() == original
     assert_widgets_match_output(obj)
 
 
@@ -367,4 +371,29 @@ def test_dropdown_choices_move_shared_selection_once(
     output = obj.read()
     assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 0
     assert find_widget(output, "dropdown_1")["/Parent"]["/I"] == [0]
+    assert_widgets_match_output(obj)
+
+
+def test_dropdown_choices_move_selection_of_last_widget(
+    sample_template_with_dropdown, assert_widgets_match_output
+):
+    # the second widget of "dropdown_1", which the wrapper reads, has options
+    # of its own, with the selected "bar" at index 0 instead of 1
+    filled = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1}).read()
+    with Pdf.open(BytesIO(filled)) as pdf:
+        widgets = split_widgets(pdf, get_field(pdf, "dropdown_1"), count=2)
+        for widget in widgets:
+            if "/I" in widget:
+                del widget["/I"]
+        widgets[1].Opt = Array([String("bar"), String("y")])
+        stream = save(pdf)
+    obj = PdfWrapper(stream)
+    assert obj.widgets["dropdown_1"].choices == ("bar", "y")
+    assert obj.data["dropdown_1"] == 0
+
+    # both new options have "bar", so the selection keeps the index the
+    # wrapper has
+    obj.widgets["dropdown_1"].choices = [("B1", "bar"), ("B2", "bar")]
+    output = obj.read()
+    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 0
     assert_widgets_match_output(obj)

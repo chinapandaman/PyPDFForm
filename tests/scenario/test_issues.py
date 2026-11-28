@@ -387,8 +387,18 @@ def test_ppf_2155_unselected_value_names_new_choice(assert_widgets_match_output)
     assert_widgets_match_output(form)
 
 
-def test_ppf_2155_displayed_text_value(assert_widgets_match_output):
-    # earlier versions filled the displayed text, which reads as Banana
+@pytest.mark.parametrize(
+    "choices",
+    [[("Bananas", "b"), "Apple"], [("Banana", "b"), "Cherry"]],
+    ids=["renamed", "other-option-changed"],
+)
+def test_ppf_2155_displayed_text_value(choices, assert_widgets_match_output):
+    # earlier versions filled the displayed text, without /I, which reads as
+    # Banana
+    def set_displayed_text(annot):
+        annot.V = pikepdf.String("Banana")
+        del annot["/I"]
+
     template = change_widgets(
         PdfWrapper(BlankPage())
         .bulk_create_fields(
@@ -399,13 +409,14 @@ def test_ppf_2155_displayed_text_value(assert_widgets_match_output):
             ]
         )
         .read(),
-        {"choice": lambda annot: setattr(annot, "V", pikepdf.String("Banana"))},
+        {"choice": set_displayed_text},
     )
     form = PdfWrapper(template)
     assert form.data["choice"] == 0
 
-    # the new displayed text no longer matches, so the export value is written
-    form.widgets["choice"].choices = [("Bananas", "b"), "Apple"]
+    # new choices remove the appearance, so the export value is written for
+    # viewers, whether or not the displayed text still matches
+    form.widgets["choice"].choices = choices
     output = form.read()
     field = find_widget(output, "choice")
     assert form.data["choice"] == PdfWrapper(output).data["choice"] == 0
