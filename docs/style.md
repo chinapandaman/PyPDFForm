@@ -458,6 +458,8 @@ When `--file` is supplied, it takes precedence over `--field` and the field prop
 
 ## Change dropdown field choices
 
+A selected option stays selected if the new choices have an option with the same export value, even at another position. Otherwise, no option is selected.
+
 === "Library"
     To modify the options available in a dropdown field, assign a new list of strings to the `.choices` attribute of the corresponding field. For example, the following snippet updates the `dropdown_1` field in [this PDF form](pdfs/sample_template_with_dropdown.pdf) with a new set of choices:
 
