@@ -370,20 +370,25 @@ class PdfWrapper:
         """
         Restores the wrapper's state if the enclosed operation raises.
 
-        Queued widget hooks are applied first, so a hook that fails is reverted
-        and raised by `_read` before the operation starts. The fields the
-        operation fills with a value or removes are passed to `_read`, since
-        they don't keep a cleared dropdown selection. The wrapper's
-        attributes, including the PDF stream and widgets, and each widget's
-        attributes are then recorded. If the operation raises, they are restored
-        before the exception propagates, so the wrapper and its PDF output are
-        both unchanged. Widget objects keep their identity.
+        The wrapper's attributes, including the PDF stream and widgets, and
+        each widget's attributes and queued hooks are recorded first. Queued
+        widget hooks are then applied, so a hook that fails is reverted and
+        raised by `_read` before the operation starts, and later reads don't
+        retry it. The fields the operation fills with a value or removes are
+        passed to `_read`, since they don't keep a cleared dropdown
+        selection, so applying the hooks belongs to the operation. If the
+        operation raises, the recorded state is restored, with the hooks
+        queued again, before the exception propagates, so the wrapper and its
+        PDF output are both unchanged. Widget objects keep their identity.
+
+        Args:
+            replaced (Collection[str]): The keys of the fields the operation
+                fills with a value or removes. Defaults to none.
 
         Yields:
             None: Control returns to the enclosed operation.
         """
 
-        self._read(replaced)
         state = {
             name: value.copy() if isinstance(value, (dict, list)) else value
             for name, value in vars(self).items()
@@ -391,6 +396,7 @@ class PdfWrapper:
         widget_states = [
             (widget, widget.save_state()) for widget in self.widgets.values()
         ]
+        self._read(replaced)
 
         try:
             yield
@@ -1128,21 +1134,26 @@ class PdfWrapper:
 
         reject_unsupported_kwargs(self, "fill", kwargs, ["readonly"])
         readonly = kwargs.get("readonly", False)
-        pending = [
-            (self.widgets[key], self.widgets[key].prepare_value(value))
+        pending = {
+            key: self.widgets[key].prepare_value(value)
             for key, value in data.items()
             if key in self.widgets
-        ]
+        }
         for key, widget in self.widgets.items():
             if key not in data:
                 widget.prepare_value(widget.value)
 
-        # a field filled with a value gets a value of its own
-        with self._restore_on_failure(
-            [key for key, value in data.items() if value is not None]
-        ):
-            for widget, update in pending:
-                widget.apply_value(update)
+        # a field with a value, supplied or on its widget, gets a value of its
+        # own; one whose selection new choices clear has it only if it was
+        # assigned since, which differs from the PDF's, so filling writes it
+        written = [
+            key
+            for key, widget in self.widgets.items()
+            if (pending[key].value if key in pending else widget.value) is not None
+        ]
+        with self._restore_on_failure(written):
+            for key, update in pending.items():
+                self.widgets[key].apply_value(update)
 
             filled_stream, image_drawn_stream = fill(
                 self._read(),

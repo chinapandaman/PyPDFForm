@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from io import BytesIO
+from unittest.mock import patch
 
 import pytest
 from pikepdf import Array, Dictionary, Name, Pdf, String
@@ -361,11 +362,62 @@ def test_clearing_dropdown_value_set_above_raises(
     assert find_widget(output, "dropdown_1")["/V"] == "x"
     assert_widgets_match_output(obj)
 
+    # so does a value assigned on the widget, which filling writes
+    obj = PdfWrapper(stream)
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    obj.widgets["dropdown_1"].value = 1
+    output = obj.fill({}).read()
+    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 1
+
     obj = PdfWrapper(stream)
     obj.widgets["dropdown_1"].choices = ["foo", "x"]
     assert (
         "dropdown_1" not in PdfWrapper(obj.remove_fields(["dropdown_1"]).read()).widgets
     )
+
+
+@pytest.mark.parametrize(
+    ("operation", "target"),
+    [
+        (lambda obj: obj.fill({"dropdown_1": 1}), "PyPDFForm.lib.wrapper.fill"),
+        (
+            lambda obj: obj.remove_fields(["dropdown_1"]),
+            "PyPDFForm.lib.wrapper.remove_widgets_by_keys",
+        ),
+    ],
+    ids=["fill", "remove_fields"],
+)
+def test_failed_operation_keeps_dropdown_value_set_above(
+    sample_template_with_dropdown, operation, target, assert_widgets_match_output
+):
+    # "dropdown_1" selects its own "bar" below the "foo" of "outer"
+    stream = put_under_outer(
+        sample_template_with_dropdown, ("dropdown_1",), {"/V": "foo"}
+    )
+    with Pdf.open(BytesIO(stream)) as pdf:
+        get_field(pdf, "outer").Kids[0].V = String("bar")
+        stream = save(pdf)
+    obj = PdfWrapper(stream)
+    original = obj.read()
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    stored = getattr(obj, "_stream")
+
+    # the operation would clear the selection without raising, but fails, so
+    # the PDF is unchanged and the choices are still queued
+    with patch(target, side_effect=RuntimeError), pytest.raises(RuntimeError):
+        operation(obj)
+    assert getattr(obj, "_stream") == stored
+    assert obj.data["dropdown_1"] is None
+    assert [hook for hook, _ in obj.widgets["dropdown_1"].hooks_to_trigger] == [
+        "update_dropdown_choices"
+    ]
+
+    # reading them alone still raises, and restores the selection
+    with pytest.raises(ValueError, match="Cannot remove /V"):
+        obj.read()
+    assert obj.data["dropdown_1"] == 1
+    assert obj.read() == original
+    assert_widgets_match_output(obj)
 
 
 def test_dropdown_choices_move_shared_selection_once(
