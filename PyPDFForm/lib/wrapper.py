@@ -61,7 +61,12 @@ from .font import (
     temporary_font_registration,
     validate_font,
 )
-from .hooks import FontChange, check_cleared_selections, trigger_widget_hooks
+from .hooks import (
+    ClearedSelection,
+    FontChange,
+    check_cleared_selections,
+    trigger_widget_hooks,
+)
 from .patterns import is_unchanged, record_pdf_value
 from .template import (
     build_widgets,
@@ -366,7 +371,9 @@ class PdfWrapper:
         )
 
     @contextmanager
-    def _restore_on_failure(self, defer: bool = False) -> Iterator[list]:
+    def _restore_on_failure(
+        self, defer: bool = False
+    ) -> Iterator[list[ClearedSelection]]:
         """
         Restores the wrapper's state if the enclosed operation raises.
 
@@ -388,8 +395,7 @@ class PdfWrapper:
                 its own or remove it. Defaults to False.
 
         Yields:
-            list: The `ClearedSelection` of each such field, empty without
-                `defer`.
+            list[ClearedSelection]: Each such field, empty without `defer`.
         """
 
         state = {
@@ -399,7 +405,7 @@ class PdfWrapper:
         widget_states = [
             (widget, widget.save_state()) for widget in self.widgets.values()
         ]
-        cleared = []
+        cleared: list[ClearedSelection] = []
         self._read(cleared if defer else None)
 
         try:
@@ -829,27 +835,27 @@ class PdfWrapper:
         except Exception:  # noqa: BLE001 # pylint: disable=W0718
             return stream
 
-    def _read(self, cleared: list | None = None) -> bytes:
+    def _read(self, cleared: list[ClearedSelection] | None = None) -> bytes:
         """
         Reads the PDF stream, triggering widget hooks and updating fonts if necessary.
 
         This internal method executes queued widget hooks. A font being changed is
         passed to its hook with the resource name of the registered font or font
         of the PDF with its name, and each changed widget's font is then read back
-        from the changed PDF, as reopening it reads it. So is the selection of a
-        dropdown whose choices were replaced and that has none, as the PDF
-        held none, since the PDF's value can name one of the new choices; a
-        None assigned over the PDF's selection is kept. The changed PDF and what is read back are
-        committed together, which updates the wrapper's stored stream
-        and clears each widget's hook queue. If a hook or reading back
-        raises, every widget's queued hooks are discarded and their properties are
-        restored to their committed values, so the stream and widgets are
-        unchanged and later reads do not retry the failed updates.
+        from the changed PDF, as reopening it reads it. So is the selection of
+        each dropdown whose choices were replaced, as `_commit_read_back`
+        describes. The changed PDF and what is read back are committed
+        together, which updates the wrapper's stored stream and clears each
+        widget's hook queue. If a hook or reading back raises, every widget's
+        queued hooks are discarded and their properties are restored to their
+        committed values, so the stream and widgets are unchanged and later
+        reads do not retry the failed updates.
 
         Args:
-            cleared (list | None): Where to collect the dropdown fields whose
-                cleared selection still inherits a value, instead of raising,
-                as `trigger_widget_hooks` describes. Defaults to None.
+            cleared (list[ClearedSelection] | None): Where to collect the
+                dropdown fields whose cleared selection still inherits a value,
+                instead of raising, as `trigger_widget_hooks` describes.
+                Defaults to None.
 
         Returns:
             bytes: The raw PDF stream.

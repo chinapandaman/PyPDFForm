@@ -480,6 +480,43 @@ def put_under_outer(stream, names, entries):
         return save(pdf)
 
 
+def with_value_above(stream, names, above, own=None):
+    # makes "outer", with the value "above", the parent of the fields with
+    # these names, which keep the value "own" of their own or inherit "above"
+    stream = put_under_outer(stream, names, {"/V": above})
+    if own is None:
+        return stream
+
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for kid in get_field(pdf, "outer").Kids:
+            kid.V = pdf_value(own)
+
+        return save(pdf)
+
+
+def under_parents(stream, names, short_name, values=None):
+    # the fields with these names get the short name, each below a new parent
+    # field with its old name, which "values" can give a value
+    values = values or {}
+    with Pdf.open(BytesIO(stream)) as pdf:
+        moved = [get_field(pdf, name) for name in names]
+        parents = []
+        for name, field in zip(names, moved, strict=True):
+            field.T = String(short_name)
+            parent = pdf.make_indirect(
+                Dictionary({"/T": String(name), "/Kids": Array([field])})
+            )
+            if name in values:
+                parent.V = pdf_value(values[name])
+            field.Parent = parent
+            parents.append(parent)
+        pdf.Root.AcroForm.Fields = Array(
+            [each for each in pdf.Root.AcroForm.Fields if each not in moved] + parents
+        )
+
+        return save(pdf)
+
+
 def split_widgets(pdf, field, count=1):
     # the widget merged with the field becomes kids without a name, in its
     # place on its page, which take the field's entries from the field

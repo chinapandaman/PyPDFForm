@@ -242,8 +242,8 @@ FEATURE_HOOKS = (
 )
 # the font hook, whose user-facing font names PdfWrapper maps to resource names
 FONT_HOOK = "update_text_field_font"
-# the dropdown choices hook, after which PdfWrapper reads back the selection
-# of a dropdown without one, since its value can name one of the new choices
+# the dropdown choices hook; trigger_widget_hooks moves each field's selection
+# after it, and PdfWrapper reads the selection back
 CHOICES_HOOK = "update_dropdown_choices"
 # widget property hooks that change the default appearance (/DA), which a
 # field can inherit from its ancestors or the AcroForm; they get the AcroForm

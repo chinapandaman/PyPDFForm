@@ -23,6 +23,7 @@ from tests.support.builders import (
     nest_fields,
     save,
     set_on_state,
+    under_parents,
     with_button_parent,
     with_field_cycle,
 )
@@ -685,18 +686,7 @@ def test_dropdown_choices_keep_selections_of_fields_with_short_name(
         .fill({"billing": 0, "shipping": 1})
         .read()
     )
-    with Pdf.open(BytesIO(created)) as pdf:
-        fields = []
-        for name in ("billing", "shipping"):
-            field = get_field(pdf, name)
-            field.T = String("choice")
-            parent = pdf.make_indirect(
-                Dictionary({"/T": String(name), "/Kids": Array([field])})
-            )
-            field.Parent = parent
-            fields.append(parent)
-        pdf.Root.AcroForm.Fields = Array(fields)
-        stream = save(pdf)
+    stream = under_parents(created, ("billing", "shipping"), "choice")
 
     def selections(output):
         return PdfWrapper(output, use_full_widget_name=True).data

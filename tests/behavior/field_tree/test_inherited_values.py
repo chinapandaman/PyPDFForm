@@ -18,8 +18,10 @@ from tests.support.builders import (
     save,
     set_null_entries,
     split_widgets,
+    under_parents,
     with_fields_above,
     with_parent_cycle,
+    with_value_above,
 )
 from tests.support.checks import find_widget, get_nested_entries, get_widget_states
 
@@ -327,13 +329,12 @@ def test_clearing_dropdown_value_set_above_raises(
 ):
     # "dropdown_1" selects "bar", its own value below the "foo" of "outer",
     # or the value it inherits from "outer"
-    stream = put_under_outer(
-        sample_template_with_dropdown, ("dropdown_1",), {"/V": "foo" if own else "bar"}
+    stream = with_value_above(
+        sample_template_with_dropdown,
+        ("dropdown_1",),
+        "foo" if own else "bar",
+        "bar" if own else None,
     )
-    if own:
-        with Pdf.open(BytesIO(stream)) as pdf:
-            get_field(pdf, "outer").Kids[0].V = String("bar")
-            stream = save(pdf)
     obj = PdfWrapper(stream)
     original = obj.read()
     assert obj.data["dropdown_1"] == 1
@@ -352,11 +353,26 @@ def test_clearing_dropdown_value_set_above_raises(
     assert obj.read() == original
     assert_widgets_match_output(obj)
 
-    # filling no value raises too, but filling a value gives the field one of
-    # its own, and removing it leaves nothing to inherit
+    # so does filling no value
     obj.widgets["dropdown_1"].choices = ["foo", "x"]
     with pytest.raises(ValueError, match="Cannot remove /V"):
         obj.fill({"dropdown_1": None})
+
+
+@pytest.mark.parametrize("own", [True, False], ids=["own", "inherited"])
+def test_fill_or_removal_replaces_dropdown_value_set_above(
+    sample_template_with_dropdown, own, assert_widgets_match_output
+):
+    # as above, "dropdown_1" selects "bar" below the "foo" or "bar" of "outer"
+    stream = with_value_above(
+        sample_template_with_dropdown,
+        ("dropdown_1",),
+        "foo" if own else "bar",
+        "bar" if own else None,
+    )
+
+    # filling a value gives the field one of its own
+    obj = PdfWrapper(stream)
     obj.widgets["dropdown_1"].choices = ["foo", "x"]
     output = obj.fill({"dropdown_1": 1}).read()
     assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 1
@@ -373,6 +389,7 @@ def test_clearing_dropdown_value_set_above_raises(
         assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == value
         assert find_widget(output, "dropdown_1")["/V"] == ("foo", "x")[value]
 
+    # and removing it leaves nothing to inherit
     obj = PdfWrapper(stream)
     obj.widgets["dropdown_1"].choices = ["foo", "x"]
     assert (
@@ -398,20 +415,9 @@ def test_fill_keeps_value_set_above_of_field_with_short_name(
         .fill({"billing": 0, "shipping": 2})
         .read()
     )
-    with Pdf.open(BytesIO(created)) as pdf:
-        fields = []
-        for name in ("billing", "shipping"):
-            field = get_field(pdf, name)
-            field.T = String("choice")
-            parent = pdf.make_indirect(
-                Dictionary({"/T": String(name), "/Kids": Array([field])})
-            )
-            if name == "billing":
-                parent.V = String("Banana")
-            field.Parent = parent
-            fields.append(parent)
-        pdf.Root.AcroForm.Fields = Array(fields)
-        stream = save(pdf)
+    stream = under_parents(
+        created, ("billing", "shipping"), "choice", {"billing": "Banana"}
+    )
     obj = PdfWrapper(stream)
     original = obj.read()
 
@@ -433,24 +439,23 @@ def test_fill_keeps_value_set_above_of_field_with_short_name(
 
 @pytest.mark.parametrize("title", ["outer.dropdown_1", "dropdown_1"])
 @pytest.mark.parametrize(
-    "operation",
+    ("value", "operation"),
     [
-        lambda obj: obj.fill({"dropdown_1": 1}),
-        lambda obj: obj.remove_fields(["dropdown_1"]),
-        lambda obj: (setattr(obj.widgets["dropdown_1"], "value", 0), obj.fill({}))[1],
+        (None, lambda obj: obj.fill({"dropdown_1": 1})),
+        (None, lambda obj: obj.remove_fields(["dropdown_1"])),
+        (0, lambda obj: obj.fill({})),
     ],
     ids=["fill", "remove_fields", "assigned"],
 )
 def test_note_with_field_name_doesnt_block_new_choices(
-    sample_template_with_dropdown, title, operation
+    sample_template_with_dropdown, title, value, operation
 ):
     # "dropdown_1" selects its own "bar" below the "foo" of "outer", and a
     # note has its full or short name as its title
-    stream = put_under_outer(
-        sample_template_with_dropdown, ("dropdown_1",), {"/V": "foo"}
+    stream = with_value_above(
+        sample_template_with_dropdown, ("dropdown_1",), "foo", "bar"
     )
     with Pdf.open(BytesIO(stream)) as pdf:
-        get_field(pdf, "outer").Kids[0].V = String("bar")
         note = Dictionary(
             {
                 "/Type": Name.Annot,
@@ -465,6 +470,8 @@ def test_note_with_field_name_doesnt_block_new_choices(
 
     # the note is no widget, so it doesn't count as the field
     obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    if value is not None:
+        obj.widgets["dropdown_1"].value = value
     output = operation(obj).read()
     assert PdfWrapper(output).data == obj.data
 
@@ -480,11 +487,7 @@ def test_cleared_selections_are_checked_in_one_read(sample_template_with_dropdow
         pdf.pages[0].Annots.append(copy)
         pdf.Root.AcroForm.Fields.append(copy)
         stream = save(pdf)
-    stream = put_under_outer(stream, ("dropdown_1", "dropdown_2"), {"/V": "foo"})
-    with Pdf.open(BytesIO(stream)) as pdf:
-        for kid in get_field(pdf, "outer").Kids:
-            kid.V = String("bar")
-        stream = save(pdf)
+    stream = with_value_above(stream, ("dropdown_1", "dropdown_2"), "foo", "bar")
     obj = PdfWrapper(stream)
     for key in ("dropdown_1", "dropdown_2"):
         obj.widgets[key].choices = ["foo", "x"]
@@ -511,12 +514,9 @@ def test_failed_operation_keeps_dropdown_value_set_above(
     sample_template_with_dropdown, operation, target, assert_widgets_match_output
 ):
     # "dropdown_1" selects its own "bar" below the "foo" of "outer"
-    stream = put_under_outer(
-        sample_template_with_dropdown, ("dropdown_1",), {"/V": "foo"}
+    stream = with_value_above(
+        sample_template_with_dropdown, ("dropdown_1",), "foo", "bar"
     )
-    with Pdf.open(BytesIO(stream)) as pdf:
-        get_field(pdf, "outer").Kids[0].V = String("bar")
-        stream = save(pdf)
     obj = PdfWrapper(stream)
     original = obj.read()
     obj.widgets["dropdown_1"].choices = ["foo", "x"]

@@ -130,7 +130,7 @@ class ClearedSelection(NamedTuple):
     error: ValueError
 
 
-def check_cleared_selections(pdf: bytes, cleared: list) -> None:
+def check_cleared_selections(pdf: bytes, cleared: list[ClearedSelection]) -> None:
     """
     Raises for a dropdown field whose cleared selection still inherits a value.
 
@@ -142,8 +142,8 @@ def check_cleared_selections(pdf: bytes, cleared: list) -> None:
 
     Args:
         pdf (bytes): The PDF after the operation that collected `cleared`.
-        cleared (list): The `ClearedSelection` of each field the operation
-            could give a value of its own or remove.
+        cleared (list[ClearedSelection]): Each field the operation could
+            give a value of its own or remove.
 
     Raises:
         ValueError: The error of the first field that still inherits a value.
@@ -171,7 +171,7 @@ def trigger_widget_hooks(
     widgets: dict,
     use_full_widget_name: bool,
     generate_appearance_streams: bool = False,
-    cleared: Optional[list] = None,
+    cleared: Optional[list[ClearedSelection]] = None,
 ) -> bytes:
     """
     Triggers widget hooks to apply dynamic changes to PDF form fields.
@@ -181,9 +181,9 @@ def trigger_widget_hooks(
     it executes those hooks. Hooks are functions defined in this module that
     modify the annotation dictionary, allowing for dynamic changes to the form field's
     appearance or behavior. Hooks that change the default appearance also get
-    the AcroForm dictionary, for its default. A dropdown field whose widgets
-    get new choices moves its selection once, after every hook has run, as
-    `_move_dropdown_selection` describes, since its widgets share it. A text field or dropdown
+    the AcroForm dictionary, for its default. The widgets of a dropdown field
+    share its selection, so it moves once, after every hook has run, as
+    `_move_selections` describes. A text field or dropdown
     annotation whose hooks change how it is drawn, such as its font,
     alignment, choices, or size, as `_get_drawn_state` reads it, loses its
     appearance, as `remove_appearance` describes. Each annotation is read
@@ -207,7 +207,7 @@ def trigger_widget_hooks(
         generate_appearance_streams (bool): Whether appearance streams are
             generated, which draw in the appearances of text fields and
             dropdowns that keep their size. Defaults to False.
-        cleared (Optional[list]): Where to collect a `ClearedSelection` for
+        cleared (Optional[list[ClearedSelection]]): Where to collect one for
             each dropdown field whose cleared selection still inherits a value,
             instead of raising, so the operation reading the PDF can give the
             field a value of its own or remove it. Defaults to None, which
@@ -298,7 +298,9 @@ def _read_selections(targets: list) -> dict:
     return selections
 
 
-def _move_selections(selections: dict, targets: list, cleared: Optional[list]) -> None:
+def _move_selections(
+    selections: dict, targets: list, cleared: Optional[list[ClearedSelection]]
+) -> None:
     """
     Moves the selection of each dropdown field once, as `_move_dropdown_selection` does.
 
@@ -308,8 +310,8 @@ def _move_selections(selections: dict, targets: list, cleared: Optional[list]) -
     Args:
         selections (dict): The fields, as `_read_selections` returns them.
         targets (list): The annotations with queued hooks, in page order.
-        cleared (Optional[list]): Where to collect a `ClearedSelection` for a
-            field whose cleared selection still inherits a value, or None to
+        cleared (Optional[list[ClearedSelection]]): Where to collect one for
+            a field whose cleared selection still inherits a value, or None to
             raise.
 
     Raises:
@@ -832,16 +834,19 @@ def _move_dropdown_selection(
         index = Dropdown.follow_selection(index, options, new)
         options = new
 
-    after = read_dropdown(annot)
     field = get_widget_field(annot)
-    if before.value is None:
-        index = after.value
-    elif index is None:
+    if before.value is not None and index is None:
+        # a new list doesn't have the selected option
         field.pop(NameObject(I), None)
         _remove_field_entry(
             annot, V, lambda widget: resolve_inherited_entry(widget, V, None).value
         )
         return
+
+    after = read_dropdown(annot)
+    if before.value is None:
+        # a value that selected no option selects the new one it names, if any
+        index = after.value
     if index is None:
         return
 
