@@ -709,6 +709,9 @@ def _apply_widget_key_updates(
 
     The update queue is converted into a lookup keyed by old widget name, then
     each annotation is checked against that lookup as pages are traversed.
+    Only annotations that `get_widget_type` reads as widgets, as
+    `build_widgets` does, are renamed or counted, so another annotation with
+    the same `/T`, such as a note, keeps its title.
     Non-radio widgets honor the requested occurrence index, while radio widgets
     update every annotation in the radio group.
 
@@ -727,7 +730,8 @@ def _apply_widget_key_updates(
             annot = cast(DictionaryObject, annot.get_object())
             key = get_widget_key(annot.get_object(), False)
 
-            if key not in updates:
+            # a note with the same /T is no widget, so it isn't an occurrence
+            if key not in updates or get_widget_type(annot) is None:
                 continue
 
             widget = widgets.get(key)
