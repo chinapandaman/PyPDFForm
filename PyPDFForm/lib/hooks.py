@@ -178,7 +178,10 @@ def trigger_widget_hooks(
 
     This function iterates through the annotations on each page of the PDF and,
     if a widget is associated with an annotation and has hooks to trigger,
-    it executes those hooks. Hooks are functions defined in this module that
+    it executes those hooks. Only annotations that `get_widget_type` reads as
+    widgets, as `build_widgets` does, are changed, so another annotation with
+    the same `/T`, such as a note, keeps its entries. Hooks are functions
+    defined in this module that
     modify the annotation dictionary, allowing for dynamic changes to the form field's
     appearance or behavior. Hooks that change the default appearance also get
     the AcroForm dictionary, for its default. The widgets of a dropdown field
@@ -229,7 +232,13 @@ def trigger_widget_hooks(
             if widget is None or not widget.hooks_to_trigger:
                 continue
 
-            drawn = get_widget_type(annot) in (Text, Dropdown) and any(
+            # only the widgets the key gives access to, so not another
+            # annotation with the same /T, such as a note
+            widget_type = get_widget_type(annot)
+            if widget_type is None:
+                continue
+
+            drawn = widget_type in (Text, Dropdown) and any(
                 hook in APPEARANCE_HOOKS for hook, _ in widget.hooks_to_trigger
             )
             # read before any hook runs, since the widgets of a field share
@@ -274,7 +283,7 @@ def _read_selections(targets: list) -> dict:
 
     Args:
         targets (list): The `(annot, key, widget, drawn state)` of each
-            annotation with queued hooks, in page order.
+            widget with queued hooks, in page order.
 
     Returns:
         dict: The `(annot, key, selection, choices)` of each field, by the
@@ -309,7 +318,7 @@ def _move_selections(
 
     Args:
         selections (dict): The fields, as `_read_selections` returns them.
-        targets (list): The annotations with queued hooks, in page order.
+        targets (list): The widgets with queued hooks, in page order.
         cleared (Optional[list[ClearedSelection]]): Where to collect one for
             a field whose cleared selection still inherits a value, or None to
             raise.
@@ -319,11 +328,8 @@ def _move_selections(
             `/Parent` chain has a cycle before one is found, without
             `cleared`.
     """
-    # the widget each key gives access to, the last, as the wrapper reads it,
-    # so not another annotation with the same /T, such as a note
-    read_by_key = {
-        key: annot for annot, key, _, _ in targets if get_widget_type(annot) is not None
-    }
+    # the widget each key gives access to, the last, as the wrapper reads it
+    read_by_key = {key: annot for annot, key, _, _ in targets}
     for annot, key, before, choices in selections.values():
         try:
             _move_dropdown_selection(annot, before, choices)

@@ -27,8 +27,9 @@ from tests.support.builders import (
     hide_target_form,
     javascript,
     set_flags,
+    with_notes,
 )
-from tests.support.checks import find_widget
+from tests.support.checks import describe_annotations, find_widget
 
 
 def test_encrypted_edit_pdf_form(issue_pdf_directory, expect_pdf):
@@ -422,6 +423,108 @@ def test_ppf_2155_displayed_text_value(choices, assert_widgets_match_output):
     assert form.data["choice"] == PdfWrapper(output).data["choice"] == 0
     assert field["/V"] == "b"
     assert field["/I"] == [0]
+    assert_widgets_match_output(form)
+
+
+# each property that queues a hook, with the field it is changed on
+PPF_2159_PROPERTIES = [
+    ("text", "x", 50),
+    ("text", "y", 50),
+    ("text", "width", 150),
+    ("text", "height", 30),
+    ("text", "readonly", True),
+    ("text", "required", True),
+    ("text", "hidden", True),
+    ("text", "tooltip", "tip"),
+    ("text", "on_hovered_over_javascript", "app.alert(1)"),
+    ("text", "on_hovered_off_javascript", "app.alert(1)"),
+    ("text", "on_mouse_pressed_javascript", "app.alert(1)"),
+    ("text", "on_mouse_released_javascript", "app.alert(1)"),
+    ("text", "on_focused_javascript", "app.alert(1)"),
+    ("text", "on_blurred_javascript", "app.alert(1)"),
+    ("text", "font", "registered"),
+    ("text", "font_size", 20),
+    ("text", "font_color", (1, 0, 0)),
+    ("text", "comb", True),
+    ("text", "alignment", 2),
+    ("text", "multiline", True),
+    ("text", "max_length", 5),
+    ("check", "size", 30),
+    ("radio", "size", 30),
+    ("choice", "choices", ["x", "y"]),
+]
+
+
+@pytest.mark.parametrize(
+    ("key", "name", "value"),
+    PPF_2159_PROPERTIES,
+    ids=[f"{key}-{name}" for key, name, _ in PPF_2159_PROPERTIES],
+)
+def test_ppf_2159_property_changes_skip_notes_with_field_name(
+    key,
+    name,
+    value,
+    sample_font_stream,
+    assert_annotations_preserved,
+    assert_widgets_match_output,
+):
+    # each field has a note by an author named like it, whose pop-up reads
+    # the name through its /Parent
+    keys = ["text", "check", "radio", "choice"]
+    template = (
+        PdfWrapper(BlankPage())
+        .bulk_create_fields(
+            [
+                Fields.TextField("text", 1, 20, 20),
+                Fields.CheckBoxField("check", 1, 20, 100),
+                Fields.RadioGroup("radio", 1, [20, 60], [200, 200]),
+                Fields.DropdownField("choice", 1, 20, 300, options=["a", "b"]),
+            ]
+        )
+        .read()
+    )
+    form = PdfWrapper(with_notes(template, keys)).register_font(
+        "registered", sample_font_stream
+    )
+    before = form.read()
+
+    # only the field's widgets change, and a font change doesn't raise for
+    # the note's missing /DA
+    setattr(form.widgets[key], name, value)
+    after = form.read()
+    assert_annotations_preserved(before, after, [key])
+    assert describe_annotations(after, ()) != describe_annotations(before, ())
+    assert_widgets_match_output(form)
+
+
+@pytest.mark.parametrize("first", [False, True], ids=["note-after", "note-before"])
+@pytest.mark.parametrize("key", ["text", "radio"])
+def test_ppf_2159_rename_skips_note_with_field_name(
+    key, first, assert_annotations_preserved, assert_widgets_match_output
+):
+    # the field has a note by an author named like it, listed before or
+    # after the field's widgets, whose pop-up reads the name through its
+    # /Parent
+    template = (
+        PdfWrapper(BlankPage())
+        .bulk_create_fields(
+            [
+                Fields.TextField("text", 1, 20, 20),
+                Fields.RadioGroup("radio", 1, [20, 60], [200, 200]),
+            ]
+        )
+        .read()
+    )
+    form = PdfWrapper(with_notes(template, [key], first))
+    before = form.read()
+
+    # the note isn't the first occurrence of the key, so the field is
+    # renamed, and the note keeps its author
+    form.update_widget_key(key, "renamed").commit_widget_key_updates()
+    after = form.read()
+    assert "renamed" in form.widgets
+    assert key not in form.widgets
+    assert_annotations_preserved(before, after, [key, "renamed"])
     assert_widgets_match_output(form)
 
 

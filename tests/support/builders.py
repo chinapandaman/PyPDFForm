@@ -948,6 +948,37 @@ def hide_target_form(issue_pdf_directory, edit=None):
         return f.getvalue()
 
 
+def with_notes(stream, titles, first=False):
+    # a note on the first page for each title, which is the author shown in
+    # its pop-up, and the pop-up, whose /Parent is the note, so both read the
+    # title as their key; listed before or after the page's other annotations
+    with Pdf.open(BytesIO(stream)) as pdf:
+        notes = []
+        for index, title in enumerate(titles):
+            y = 300 + 30 * index
+            note = pdf.make_indirect(
+                Dictionary(
+                    Type=Name.Annot,
+                    Subtype=Name.Text,
+                    Rect=Array([300, y, 320, y + 20]),
+                    T=String(title),
+                )
+            )
+            note.Popup = pdf.make_indirect(
+                Dictionary(
+                    Type=Name.Annot,
+                    Subtype=Name.Popup,
+                    Rect=Array([320, y, 420, y + 60]),
+                    Parent=note,
+                )
+            )
+            notes += [note, note.Popup]
+        others = list(pdf.pages[0].get("/Annots", []))
+        pdf.pages[0].Annots = Array(notes + others if first else others + notes)
+
+        return save(pdf)
+
+
 def set_flags(widget):
     widget[NameObject("/F")] = NumberObject(4)
 
