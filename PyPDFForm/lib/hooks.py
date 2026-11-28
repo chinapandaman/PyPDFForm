@@ -134,43 +134,36 @@ def check_cleared_selections(pdf: bytes, cleared: list) -> None:
     """
     Raises for a dropdown field whose cleared selection still inherits a value.
 
+    A field still inherits one when a dropdown widget with its full name is
+    on a page and the field has no value (V) of its own; the operation
+    otherwise gave it one or removed it. Other annotations, such as notes
+    with the same `/T`, are not widgets, as for the wrapper. The PDF is
+    read once for all the fields.
+
     Args:
         pdf (bytes): The PDF after the operation that collected `cleared`.
         cleared (list): The `ClearedSelection` of each field the operation
             could give a value of its own or remove.
 
     Raises:
-        ValueError: The field's error, if it still has no value of its own,
-            as `_keeps_inherited_value` checks.
+        ValueError: The error of the first field that still inherits a value.
     """
-    for each in cleared:
-        if _keeps_inherited_value(pdf, each):
-            raise each.error
+    if not cleared:
+        return
 
-
-def _keeps_inherited_value(pdf: bytes, cleared: ClearedSelection) -> bool:
-    """
-    Checks whether a field whose selection was cleared still has no value of its own.
-
-    Args:
-        pdf (bytes): The PDF after the operation.
-        cleared (ClearedSelection): The field.
-
-    Returns:
-        bool: True if a widget with the field's full name is on a page and
-            its field has no value (V) of its own, so it inherits one; False
-            when the operation gave it one or removed it.
-    """
+    inheriting = set()
     for page in PdfReader(BytesIO(pdf)).pages:
         for annot in page.get(Annots, []):
             annot = cast(DictionaryObject, annot.get_object())
             if (
-                get_widget_key(annot, True) == cleared.name
+                get_widget_type(annot) is Dropdown
                 and get_entry(get_widget_field(annot), V) is None
             ):
-                return True
+                inheriting.add(get_widget_key(annot, True))
 
-    return False
+    for each in cleared:
+        if each.name in inheriting:
+            raise each.error
 
 
 def trigger_widget_hooks(
@@ -324,8 +317,11 @@ def _move_selections(selections: dict, targets: list, cleared: Optional[list]) -
             `/Parent` chain has a cycle before one is found, without
             `cleared`.
     """
-    # the annotation each key gives access to, the last, as the wrapper reads it
-    read_by_key = {key: annot for annot, key, _, _ in targets}
+    # the widget each key gives access to, the last, as the wrapper reads it,
+    # so not another annotation with the same /T, such as a note
+    read_by_key = {
+        key: annot for annot, key, _, _ in targets if get_widget_type(annot) is not None
+    }
     for annot, key, before, choices in selections.values():
         try:
             _move_dropdown_selection(annot, before, choices)

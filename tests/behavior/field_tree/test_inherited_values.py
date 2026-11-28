@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import pytest
 from pikepdf import Array, Dictionary, Name, Pdf, String
+from pypdf import PdfReader
 
 from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.constants import RADIO, READ_ONLY
@@ -428,6 +429,71 @@ def test_fill_keeps_value_set_above_of_field_with_short_name(
         "shipping.choice": 2,
     }
     assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize("title", ["outer.dropdown_1", "dropdown_1"])
+@pytest.mark.parametrize(
+    "operation",
+    [
+        lambda obj: obj.fill({"dropdown_1": 1}),
+        lambda obj: obj.remove_fields(["dropdown_1"]),
+        lambda obj: (setattr(obj.widgets["dropdown_1"], "value", 0), obj.fill({}))[1],
+    ],
+    ids=["fill", "remove_fields", "assigned"],
+)
+def test_note_with_field_name_doesnt_block_new_choices(
+    sample_template_with_dropdown, title, operation
+):
+    # "dropdown_1" selects its own "bar" below the "foo" of "outer", and a
+    # note has its full or short name as its title
+    stream = put_under_outer(
+        sample_template_with_dropdown, ("dropdown_1",), {"/V": "foo"}
+    )
+    with Pdf.open(BytesIO(stream)) as pdf:
+        get_field(pdf, "outer").Kids[0].V = String("bar")
+        note = Dictionary(
+            {
+                "/Type": Name.Annot,
+                "/Subtype": Name.Text,
+                "/Rect": Array([300, 300, 320, 320]),
+                "/T": String(title),
+            }
+        )
+        pdf.pages[0].Annots.append(pdf.make_indirect(note))
+        stream = save(pdf)
+    obj = PdfWrapper(stream)
+
+    # the note is no widget, so it doesn't count as the field
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    output = operation(obj).read()
+    assert PdfWrapper(output).data == obj.data
+
+
+def test_cleared_selections_are_checked_in_one_read(sample_template_with_dropdown):
+    # "dropdown_1" and a copy of it, "dropdown_2", select their own "bar"
+    # below the "foo" of "outer"
+    with Pdf.open(BytesIO(sample_template_with_dropdown)) as pdf:
+        field = get_field(pdf, "dropdown_1")
+        copy = pdf.make_indirect(Dictionary(field))
+        copy.T = String("dropdown_2")
+        copy.Rect = Array([300, 300, 400, 320])
+        pdf.pages[0].Annots.append(copy)
+        pdf.Root.AcroForm.Fields.append(copy)
+        stream = save(pdf)
+    stream = put_under_outer(stream, ("dropdown_1", "dropdown_2"), {"/V": "foo"})
+    with Pdf.open(BytesIO(stream)) as pdf:
+        for kid in get_field(pdf, "outer").Kids:
+            kid.V = String("bar")
+        stream = save(pdf)
+    obj = PdfWrapper(stream)
+    for key in ("dropdown_1", "dropdown_2"):
+        obj.widgets[key].choices = ["foo", "x"]
+
+    # the output is read once to check both fields
+    with patch("PyPDFForm.lib.hooks.PdfReader", wraps=PdfReader) as reader:
+        output = obj.fill({"dropdown_1": 1, "dropdown_2": 1}).read()
+    assert reader.call_count == 1
+    assert PdfWrapper(output).data == {**obj.data, "dropdown_1": 1, "dropdown_2": 1}
 
 
 @pytest.mark.parametrize(
