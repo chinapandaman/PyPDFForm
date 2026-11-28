@@ -185,6 +185,39 @@ def test_assigned_choices_are_a_snapshot(
     assert not obj.widgets["dropdown_1"].hooks_to_trigger
 
 
+def test_assigned_choice_pairs_are_a_snapshot(
+    sample_template_with_dropdown, assert_widgets_match_output
+):
+    obj = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1})
+    pairs = [["Bar", "bar"], ["foo", "foo"]]
+    obj.widgets["dropdown_1"].choices = pairs
+
+    # changing an assigned pair changes nothing, and a pair of equal values
+    # is a string, as reading the PDF gives it
+    pairs[0][1] = "x"
+    assert obj.widgets["dropdown_1"].choices == (("Bar", "bar"), "foo")
+    output = obj.read()
+    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 0
+    assert_widgets_match_output(obj)
+
+
+def test_new_choices_record_pdf_selection(sample_template_with_dropdown):
+    obj = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1})
+    widget = obj.widgets["dropdown_1"]
+    # "foo" is assigned without filling, and new choices remove and restore
+    # the saved "bar", which clears the PDF's selection
+    widget.value = 0
+    widget.choices = ["foo"]
+    widget.choices = ["foo", "bar"]
+    output = obj.read()
+    assert widget.value == 0
+    assert PdfWrapper(output).data["dropdown_1"] is None
+
+    # the PDF holds no selection, so filling writes "bar" again
+    widget.value = 1
+    assert PdfWrapper(obj.fill({}).read()).data["dropdown_1"] == 1
+
+
 @pytest.mark.parametrize(
     "operation",
     [

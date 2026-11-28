@@ -366,12 +366,14 @@ class PdfWrapper:
         )
 
     @contextmanager
-    def _restore_on_failure(self) -> Iterator[None]:
+    def _restore_on_failure(self, replaced: Collection[str] = ()) -> Iterator[None]:
         """
         Restores the wrapper's state if the enclosed operation raises.
 
         Queued widget hooks are applied first, so a hook that fails is reverted
-        and raised by `_read` before the operation starts. The wrapper's
+        and raised by `_read` before the operation starts. The fields the
+        operation fills with a value or removes are passed to `_read`, since
+        they don't keep a cleared dropdown selection. The wrapper's
         attributes, including the PDF stream and widgets, and each widget's
         attributes are then recorded. If the operation raises, they are restored
         before the exception propagates, so the wrapper and its PDF output are
@@ -381,7 +383,7 @@ class PdfWrapper:
             None: Control returns to the enclosed operation.
         """
 
-        self._read()
+        self._read(replaced)
         state = {
             name: value.copy() if isinstance(value, (dict, list)) else value
             for name, value in vars(self).items()
@@ -816,7 +818,7 @@ class PdfWrapper:
         except Exception:  # noqa: BLE001 # pylint: disable=W0718
             return stream
 
-    def _read(self) -> bytes:
+    def _read(self, replaced: Collection[str] = ()) -> bytes:
         """
         Reads the PDF stream, triggering widget hooks and updating fonts if necessary.
 
@@ -832,6 +834,12 @@ class PdfWrapper:
         raises, every widget's queued hooks are discarded and their properties are
         restored to their committed values, so the stream and widgets are
         unchanged and later reads do not retry the failed updates.
+
+        Args:
+            replaced (Collection[str]): The keys of the fields that the
+                operation reading the PDF fills with a value or removes,
+                whose cleared dropdown selection may still inherit a value,
+                as `trigger_widget_hooks` describes. Defaults to none.
 
         Returns:
             bytes: The raw PDF stream.
@@ -867,6 +875,7 @@ class PdfWrapper:
                     self.widgets,
                     getattr(self, "use_full_widget_name"),
                     self._generates_appearances,
+                    replaced,
                 )
                 read_back = self._read_back(stream, font_widgets, chosen)
             except Exception:
@@ -967,10 +976,10 @@ class PdfWrapper:
 
         A font replaces the widget's. A dropdown without a selection, as the
         PDF held none, takes the selection read back, which its value can name
-        among the new choices. A dropdown that has the selection read back
-        records it as the PDF's value, as `record_pdf_value` describes, so the
-        next fill doesn't write it again, such as to the other fields with its
-        key, whose selections moved on their own.
+        among the new choices. The selection read back is recorded as the
+        PDF's value, as `record_pdf_value` describes, so the next fill doesn't
+        write a dropdown that has it, such as to the other fields with its
+        key, whose selections moved on their own, and writes one that doesn't.
 
         Args:
             widget (Any): The middleware widget.
@@ -983,8 +992,7 @@ class PdfWrapper:
         if "value" in read:
             if unselected:
                 widget.__dict__["_value"] = read["value"]
-            if widget.value == read["value"]:
-                record_pdf_value(widget)
+            record_pdf_value(widget, read["value"])
 
     def write(self, dest: str | bytes | PathLike | BinaryIO) -> PdfWrapper:
         """
@@ -1129,7 +1137,10 @@ class PdfWrapper:
             if key not in data:
                 widget.prepare_value(widget.value)
 
-        with self._restore_on_failure():
+        # a field filled with a value gets a value of its own
+        with self._restore_on_failure(
+            [key for key, value in data.items() if value is not None]
+        ):
             for widget, update in pending:
                 widget.apply_value(update)
 
@@ -1314,7 +1325,7 @@ class PdfWrapper:
                 a cycle.
         """
 
-        with self._restore_on_failure():
+        with self._restore_on_failure(keys):
             self._stream = remove_widgets_by_keys(
                 self._stream, keys, getattr(self, "use_full_widget_name")
             )

@@ -6,7 +6,7 @@ from io import BytesIO
 import pytest
 from pikepdf import Pdf, String
 
-from PyPDFForm import Fields, PdfWrapper
+from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.middleware.checkbox import Checkbox
 from tests.support.builders import change_widgets, get_field, save, split_widgets
 from tests.support.checks import find_widget, get_normal_appearance
@@ -231,6 +231,27 @@ def test_change_choices_removes_stale_appearance(sample_template_with_dropdown):
     form.widgets["dropdown_1"].choices = ["a", "b"]
 
     assert "/AP" not in find_widget(form.read(), "dropdown_1")
+
+
+def test_cleared_selection_removes_appearance():
+    # a created dropdown keeps the appearance that draws its selection, Apple
+    form = PdfWrapper(
+        PdfWrapper(BlankPage())
+        .bulk_create_fields(
+            [Fields.DropdownField("choice", 1, 20, 20, options=["Apple", "Banana"])]
+        )
+        .read()
+    )
+    assert "/AP" in find_widget(form.read(), "choice")
+
+    # the choices end as they started, but the selection is cleared
+    form.widgets["choice"].choices = ["Pear"]
+    form.widgets["choice"].choices = ["Apple", "Banana"]
+    output = form.read()
+    annot = find_widget(output, "choice")
+    assert form.data["choice"] is PdfWrapper(output).data["choice"] is None
+    assert "/V" not in annot
+    assert "/AP" not in annot
 
 
 @pytest.mark.parametrize(

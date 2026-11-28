@@ -350,6 +350,23 @@ def test_clearing_dropdown_value_set_above_raises(
     assert obj.read() == original
     assert_widgets_match_output(obj)
 
+    # filling no value raises too, but filling a value gives the field one of
+    # its own, and removing it leaves nothing to inherit
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    with pytest.raises(ValueError, match="Cannot remove /V"):
+        obj.fill({"dropdown_1": None})
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    output = obj.fill({"dropdown_1": 1}).read()
+    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 1
+    assert find_widget(output, "dropdown_1")["/V"] == "x"
+    assert_widgets_match_output(obj)
+
+    obj = PdfWrapper(stream)
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    assert (
+        "dropdown_1" not in PdfWrapper(obj.remove_fields(["dropdown_1"]).read()).widgets
+    )
+
 
 def test_dropdown_choices_move_shared_selection_once(
     sample_template_with_dropdown, assert_widgets_match_output

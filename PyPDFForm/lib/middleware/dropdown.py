@@ -196,9 +196,11 @@ class Dropdown(Widget):
         """
         Validates a hooked property value before the widget changes.
 
-        New choices are stored, and passed to their hook, as a tuple, so
-        changing the assigned list afterwards changes neither the widget nor
-        the PDF. Each choice must be a string or a `(display, export)` pair.
+        New choices are stored, and passed to their hook, as a tuple of
+        strings and `(display, export)` tuples, as reading the PDF gives them,
+        so changing the assigned list or its pairs afterwards changes neither
+        the widget nor the PDF. Each choice must be a string or a
+        `(display, export)` pair, which becomes a string when both are equal.
 
         Args:
             name (str): The name of the property.
@@ -212,9 +214,7 @@ class Dropdown(Widget):
             ValueError: Raised when a choice is a sequence of another length.
         """
         if name == "choices" and value is not None:
-            value = tuple(value)
-            for each in value:
-                DropdownOption.from_choice(each)
+            value = tuple(DropdownOption.from_choice(each).choice for each in value)
 
         return super().prepare_property(name, value)
 
