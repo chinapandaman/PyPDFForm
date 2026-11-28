@@ -105,14 +105,17 @@ class Dropdown(Widget):
     assignments select the option whose displayed text or export value matches,
     or are appended as a new choice when none does. Strings matching options that
     differ are rejected. Integer indices must identify an existing option.
+    Replacing the choices keeps the selected option, found by its export value,
+    and clears the selection when no new option has it.
 
     Key attributes:
         font (str): The font of the dropdown field, as the font resource name
             its default appearance uses, such as `/Helv`.
-        choices (List[str | Tuple[str, str]]): The available options. Each is a
+        choices (Tuple[str | Tuple[str, str], ...]): The available options,
+            stored as a tuple whatever sequence is assigned. Each is a
             string when its displayed text and export value are equal, or a
             `(display, export)` tuple when they differ.
-        value (int): The index of the selected choice in the choices list.
+        value (int): The index of the selected choice in the choices.
 
     Methods:
         schema_definition: Returns a schema definition for the dropdown's value.
@@ -149,7 +152,7 @@ class Dropdown(Widget):
                 sizes the text to fit. Defaults to None.
             font_color (tuple): The RGB font color of the dropdown field.
                 Defaults to None.
-            choices (List[str | Tuple[str, str]]): The list of choices for the
+            choices (Tuple[str | Tuple[str, str], ...]): The choices for the
                 dropdown, as strings or `(display, export)` tuples.
         """
         super().__init__(name, value)
@@ -166,6 +169,89 @@ class Dropdown(Widget):
         self.font_size: Optional[float] = None
         self.font_color: Optional[tuple] = None
         self.choices: Optional[tuple | list] = None
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        """
+        Sets an attribute, keeping the selected option when choices are replaced.
+
+        Replacing the choices moves the selection to the option that
+        `follow_selection` finds, or clears it, as `_move_dropdown_selection`
+        does in the PDF. The previous value is kept as a committed value, so
+        a failed read restores it with the choices.
+
+        Args:
+            name (str): The name of the attribute.
+            value (Any): The value of the attribute.
+        """
+        # the choices are first assigned during construction
+        options = self.options if name == "choices" and name in self.__dict__ else None
+        super().__setattr__(name, value)
+        if options is not None:
+            index = self.follow_selection(self.value, options, self.options)
+            if index != self.value:
+                self._committed_values.setdefault("_value", self.value)
+                self.__dict__["_value"] = index
+
+    def prepare_property(self, name: str, value: Any) -> tuple[Any, Any]:
+        """
+        Validates a hooked property value before the widget changes.
+
+        New choices are stored, and passed to their hook, as a tuple of
+        strings and `(display, export)` tuples, as reading the PDF gives them,
+        so changing the assigned list or its pairs afterwards changes neither
+        the widget nor the PDF. Each choice must be a string or a
+        `(display, export)` pair, which becomes a string when both are equal.
+
+        Args:
+            name (str): The name of the property.
+            value (Any): The proposed value of the property.
+
+        Returns:
+            tuple[Any, Any]: The value to store on the widget and the value to
+                pass to the property's hook.
+
+        Raises:
+            ValueError: Raised when a choice is a sequence of another length.
+        """
+        if name == "choices" and value is not None:
+            value = tuple(DropdownOption.from_choice(each).choice for each in value)
+
+        return super().prepare_property(name, value)
+
+    @staticmethod
+    def follow_selection(
+        index: int | None,
+        options: Sequence[DropdownOption],
+        new_options: Sequence[DropdownOption],
+    ) -> int | None:
+        """
+        Finds the selected option among replacement options by its export value.
+
+        A field's `/V` holds the export value of the selected option, so the
+        selection follows it to its index in the new options. When several new
+        options have it, the selection keeps its index if that option is one
+        of them, as `get_selected_index` uses `/I`, and otherwise takes the
+        first.
+
+        Args:
+            index (int | None): The selected index in `options`, or None.
+            options (Sequence[DropdownOption]): The options being replaced.
+            new_options (Sequence[DropdownOption]): The replacement options.
+
+        Returns:
+            int | None: The index of the selected option in `new_options`, or
+                None when nothing is selected or no new option has its export
+                value.
+        """
+        if index is None:
+            return None
+
+        export = options[index].export
+        matches = [i for i, each in enumerate(new_options) if each.export == export]
+        if index in matches:
+            return index
+
+        return matches[0] if matches else None
 
     @property
     def value(self) -> int:

@@ -6,9 +6,9 @@ from io import BytesIO
 import pytest
 from pikepdf import Pdf, String
 
-from PyPDFForm import Fields, PdfWrapper
+from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.middleware.checkbox import Checkbox
-from tests.support.builders import get_field, save, split_widgets
+from tests.support.builders import change_widgets, get_field, save, split_widgets
 from tests.support.checks import find_widget, get_normal_appearance
 
 
@@ -231,6 +231,55 @@ def test_change_choices_removes_stale_appearance(sample_template_with_dropdown):
     form.widgets["dropdown_1"].choices = ["a", "b"]
 
     assert "/AP" not in find_widget(form.read(), "dropdown_1")
+
+
+def test_cleared_selection_removes_appearance():
+    # a created dropdown keeps the appearance that draws its selection, Apple
+    form = PdfWrapper(
+        PdfWrapper(BlankPage())
+        .bulk_create_fields(
+            [Fields.DropdownField("choice", 1, 20, 20, options=["Apple", "Banana"])]
+        )
+        .read()
+    )
+    assert "/AP" in find_widget(form.read(), "choice")
+
+    # the choices end as they started, but the selection is cleared
+    form.widgets["choice"].choices = ["Pear"]
+    form.widgets["choice"].choices = ["Apple", "Banana"]
+    output = form.read()
+    annot = find_widget(output, "choice")
+    assert form.data["choice"] is PdfWrapper(output).data["choice"] is None
+    assert "/V" not in annot
+    assert "/AP" not in annot
+
+
+@pytest.mark.parametrize(
+    ("indices", "expected"), [([2], [1]), (None, None)], ids=["stale", "missing"]
+)
+def test_change_choices_rewrites_stale_index(
+    sample_template_with_dropdown, indices, expected, assert_widgets_match_output
+):
+    # "bar" is selected at index 1, and /I points at index 2 or is missing
+    stream = change_widgets(
+        PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1}).read(),
+        {
+            "dropdown_1": lambda annot: (
+                setattr(annot, "I", indices) if indices else annot.__delitem__("/I")
+            )
+        },
+    )
+    form = PdfWrapper(stream)
+    assert form.data["dropdown_1"] == 1
+
+    # "bar" stays at index 1, so a stale /I is rewritten and a missing one isn't added
+    form.widgets["dropdown_1"].choices = ["foobar", "bar", "foo"]
+    output = form.read()
+    annot = find_widget(output, "dropdown_1")
+    assert form.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 1
+    assert annot["/V"] == "bar"
+    assert annot.get("/I") == expected
+    assert_widgets_match_output(form)
 
 
 def test_resize_keeps_checkbox_appearance(template_stream, assert_valid_appearances):

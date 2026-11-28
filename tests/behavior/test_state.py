@@ -115,6 +115,110 @@ def test_failed_hook_reverts_queued_updates(
 
 
 @pytest.mark.parametrize(
+    ("choices", "index"), [(["bar"], 0), (["x", "y"], None)], ids=["moved", "cleared"]
+)
+def test_failed_hook_reverts_dropdown_selection(
+    sample_template_with_dropdown, choices, index, assert_widgets_match_output
+):
+    obj = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1})
+    original = obj.read()
+    widget = obj.widgets["dropdown_1"]
+    widget.choices = choices
+    assert widget.value == index
+
+    with (
+        patch("PyPDFForm.lib.wrapper.trigger_widget_hooks", side_effect=RuntimeError),
+        pytest.raises(RuntimeError),
+    ):
+        obj.read()
+
+    # the selection is restored with the choices
+    assert widget.choices == ("foo", "bar", "foobar", " ")
+    assert widget.value == 1
+    assert obj.read() == original
+    assert_widgets_match_output(obj)
+
+
+def test_new_choices_keep_assigned_none(sample_template_with_dropdown):
+    obj = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1})
+    obj.widgets["dropdown_1"].value = None
+    obj.widgets["dropdown_1"].choices = ["bar", "foo"]
+    output = obj.read()
+
+    # assigning without filling changes only the wrapper, and reading doesn't
+    # replace it with the PDF's selection
+    assert obj.data["dropdown_1"] is None
+    assert PdfWrapper(output).data["dropdown_1"] == 0
+
+
+def test_assigned_choices_are_a_snapshot(
+    sample_template_with_dropdown, assert_widgets_match_output
+):
+    obj = PdfWrapper(sample_template_with_dropdown)
+    widget = obj.widgets["dropdown_1"]
+    choices = ["a", "b", "c"]
+    widget.choices = choices
+    obj.fill({"dropdown_1": 2}).read()
+
+    # removing the selected choice from the assigned list changes nothing,
+    # so new choices without it clear the selection
+    choices.pop()
+    assert widget.choices == ("a", "b", "c")
+    widget.choices = ["x"]
+    output = obj.fill({}).read()
+    assert obj.data["dropdown_1"] is PdfWrapper(output).data["dropdown_1"] is None
+
+    # nor does reordering the list before the choices are written
+    obj = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1})
+    choices = ["bar", "foo"]
+    obj.widgets["dropdown_1"].choices = choices
+    choices.reverse()
+    output = obj.read()
+    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 0
+    assert PdfWrapper(output).widgets["dropdown_1"].choices == ("bar", "foo")
+    assert_widgets_match_output(obj)
+
+    # choices that can't be read raise before the widget changes
+    with pytest.raises(ValueError, match="too many values to unpack"):
+        obj.widgets["dropdown_1"].choices = [("a", "b", "c")]
+    assert obj.widgets["dropdown_1"].choices == ("bar", "foo")
+    assert not obj.widgets["dropdown_1"].hooks_to_trigger
+
+
+def test_assigned_choice_pairs_are_a_snapshot(
+    sample_template_with_dropdown, assert_widgets_match_output
+):
+    obj = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1})
+    pairs = [["Bar", "bar"], ["foo", "foo"]]
+    obj.widgets["dropdown_1"].choices = pairs
+
+    # changing an assigned pair changes nothing, and a pair of equal values
+    # is a string, as reading the PDF gives it
+    pairs[0][1] = "x"
+    assert obj.widgets["dropdown_1"].choices == (("Bar", "bar"), "foo")
+    output = obj.read()
+    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 0
+    assert_widgets_match_output(obj)
+
+
+def test_new_choices_record_pdf_selection(sample_template_with_dropdown):
+    obj = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1})
+    widget = obj.widgets["dropdown_1"]
+    # "foo" is assigned without filling, and new choices remove and restore
+    # the saved "bar", which clears the PDF's selection
+    widget.value = 0
+    widget.choices = ["foo"]
+    widget.choices = ["foo", "bar"]
+    output = obj.read()
+    assert widget.value == 0
+    assert PdfWrapper(output).data["dropdown_1"] is None
+
+    # the PDF holds no selection, so filling writes "bar" again
+    widget.value = 1
+    assert PdfWrapper(obj.fill({}).read()).data["dropdown_1"] == 1
+
+
+@pytest.mark.parametrize(
     "operation",
     [
         lambda obj: obj.remove_fields(["test_2"]),

@@ -8,9 +8,10 @@ from pikepdf import Array, Dictionary, Name, Pdf, String
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject, NullObject
 
-from PyPDFForm import PdfArray, PdfWrapper
+from PyPDFForm import BlankPage, Fields, PdfArray, PdfWrapper
 from PyPDFForm.lib.constants import PUSHBUTTON, RADIO
 from PyPDFForm.lib.middleware.checkbox import Checkbox
+from PyPDFForm.lib.middleware.dropdown import Dropdown
 from PyPDFForm.lib.middleware.radio import Radio
 from PyPDFForm.lib.middleware.signature import Signature
 from PyPDFForm.lib.middleware.text import Text
@@ -22,6 +23,7 @@ from tests.support.builders import (
     nest_fields,
     save,
     set_on_state,
+    under_parents,
     with_button_parent,
     with_field_cycle,
 )
@@ -630,6 +632,74 @@ def test_fill_checkboxes_with_one_short_name(template_stream, other_state):
 
     # filling the name changes both, as before; "outer.check" is on page 2
     assert get_widget_states(filled, "check") == [["/Off", "/Off"], ["/Off", "/Off"]]
+
+
+def test_dropdown_choices_skip_text_field_with_short_name(
+    sample_template_with_dropdown, assert_widgets_match_output
+):
+    # "test_1" becomes "billing.dropdown_1", a text field with the short name
+    # of the dropdown "dropdown_1", whose widget comes later and has the key
+    with Pdf.open(BytesIO(sample_template_with_dropdown)) as pdf:
+        fields = pdf.Root.AcroForm.Fields
+        text = get_field(pdf, "test_1")
+        text.T = String("dropdown_1")
+        text.V = String("bar")
+        billing = pdf.make_indirect(
+            Dictionary({"/T": String("billing"), "/Kids": Array([text])})
+        )
+        text.Parent = billing
+        pdf.Root.AcroForm.Fields = Array(
+            [field for field in fields if field != text] + [billing]
+        )
+        stream = save(pdf)
+
+    obj = PdfWrapper(stream)
+    assert type(obj.widgets["dropdown_1"]) is Dropdown
+    # "bar" is the displayed text of a new option, which the text field doesn't get
+    obj.widgets["dropdown_1"].choices = ["foo", ("bar", "b")]
+    output = obj.read()
+
+    assert PdfWrapper(output, use_full_widget_name=True).data["billing.dropdown_1"] == (
+        "bar"
+    )
+    with Pdf.open(BytesIO(output)) as pdf:
+        assert "/Opt" not in get_field(pdf, "billing").Kids[0]
+    assert PdfWrapper(output).widgets["dropdown_1"].choices == ("foo", ("bar", "b"))
+    assert_widgets_match_output(obj)
+
+
+def test_dropdown_choices_keep_selections_of_fields_with_short_name(
+    assert_widgets_match_output,
+):
+    # "billing.choice" selects Apple, and "shipping.choice", whose widget
+    # comes later and has the key, selects Banana
+    created = (
+        PdfWrapper(BlankPage())
+        .bulk_create_fields(
+            [
+                Fields.DropdownField("billing", 1, 20, 20, options=["Apple", "Banana"]),
+                Fields.DropdownField(
+                    "shipping", 1, 20, 60, options=["Apple", "Banana"]
+                ),
+            ]
+        )
+        .fill({"billing": 0, "shipping": 1})
+        .read()
+    )
+    stream = under_parents(created, ("billing", "shipping"), "choice")
+
+    def selections(output):
+        return PdfWrapper(output, use_full_widget_name=True).data
+
+    # each field's selection follows the new choices on its own
+    obj = PdfWrapper(stream)
+    obj.widgets["choice"].choices = ["Banana", "Apple"]
+    expected = {"billing.choice": 1, "shipping.choice": 0}
+    assert selections(obj.read()) == expected
+
+    # the PDF holds the key's selection, so filling doesn't write it to both
+    assert selections(obj.fill({}).read()) == expected
+    assert_widgets_match_output(obj)
 
 
 def test_fill_checkbox_with_short_name_of_pushbutton(template_stream):

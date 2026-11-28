@@ -269,7 +269,8 @@ class Widget:
         Discards queued hooks and restores their properties' committed values.
 
         Values are restored without queuing hooks, so the widget again matches
-        the PDF the hooks were not applied to.
+        the PDF the hooks were not applied to. This includes the value of a
+        dropdown whose new choices moved or cleared its selection.
         """
         for name, value in self._committed_values.items():
             self.__dict__[name] = value

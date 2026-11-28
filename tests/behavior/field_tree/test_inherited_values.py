@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from io import BytesIO
+from unittest.mock import patch
 
 import pytest
 from pikepdf import Array, Dictionary, Name, Pdf, String
+from pypdf import PdfReader
 
-from PyPDFForm import PdfWrapper
+from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.constants import RADIO, READ_ONLY
 from PyPDFForm.lib.middleware.checkbox import Checkbox
 from PyPDFForm.lib.middleware.radio import Radio
@@ -16,8 +18,10 @@ from tests.support.builders import (
     save,
     set_null_entries,
     split_widgets,
+    under_parents,
     with_fields_above,
     with_parent_cycle,
+    with_value_above,
 )
 from tests.support.checks import find_widget, get_nested_entries, get_widget_states
 
@@ -317,3 +321,268 @@ def test_dropdown_choices_null_malformed_and_cycle(sample_template_with_dropdown
         obj.read()
     assert obj.widgets["dropdown_1"].choices == ()
     assert obj.read() == original
+
+
+@pytest.mark.parametrize("own", [True, False], ids=["own", "inherited"])
+def test_clearing_dropdown_value_set_above_raises(
+    sample_template_with_dropdown, own, assert_widgets_match_output
+):
+    # "dropdown_1" selects "bar", its own value below the "foo" of "outer",
+    # or the value it inherits from "outer"
+    stream = with_value_above(
+        sample_template_with_dropdown,
+        ("dropdown_1",),
+        "foo" if own else "bar",
+        "bar" if own else None,
+    )
+    obj = PdfWrapper(stream)
+    original = obj.read()
+    assert obj.data["dropdown_1"] == 1
+
+    # the new choices don't have "bar", but "outer", which other fields can
+    # share, would still give the field a value
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    assert obj.data["dropdown_1"] is None
+    with pytest.raises(
+        ValueError, match="Cannot remove /V: a parent field shared with other fields"
+    ):
+        obj.read()
+
+    assert obj.widgets["dropdown_1"].choices == ("foo", "bar", "foobar", " ")
+    assert obj.data["dropdown_1"] == 1
+    assert obj.read() == original
+    assert_widgets_match_output(obj)
+
+    # so does filling no value
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    with pytest.raises(ValueError, match="Cannot remove /V"):
+        obj.fill({"dropdown_1": None})
+
+
+@pytest.mark.parametrize("own", [True, False], ids=["own", "inherited"])
+def test_fill_or_removal_replaces_dropdown_value_set_above(
+    sample_template_with_dropdown, own, assert_widgets_match_output
+):
+    # as above, "dropdown_1" selects "bar" below the "foo" or "bar" of "outer"
+    stream = with_value_above(
+        sample_template_with_dropdown,
+        ("dropdown_1",),
+        "foo" if own else "bar",
+        "bar" if own else None,
+    )
+
+    # filling a value gives the field one of its own
+    obj = PdfWrapper(stream)
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    output = obj.fill({"dropdown_1": 1}).read()
+    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 1
+    assert find_widget(output, "dropdown_1")["/V"] == "x"
+    assert_widgets_match_output(obj)
+
+    # so does a value assigned on the widget, which filling writes, also
+    # when it is the value of "outer"
+    for value in (1, 0):
+        obj = PdfWrapper(stream)
+        obj.widgets["dropdown_1"].choices = ["foo", "x"]
+        obj.widgets["dropdown_1"].value = value
+        output = obj.fill({}).read()
+        assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == value
+        assert find_widget(output, "dropdown_1")["/V"] == ("foo", "x")[value]
+
+    # and removing it leaves nothing to inherit
+    obj = PdfWrapper(stream)
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    assert (
+        "dropdown_1" not in PdfWrapper(obj.remove_fields(["dropdown_1"]).read()).widgets
+    )
+
+
+def test_fill_keeps_value_set_above_of_field_with_short_name(
+    assert_widgets_match_output,
+):
+    # "billing.choice" selects Apple below the "Banana" of "billing", and
+    # "shipping.choice", whose widget comes later and has the key, Pear
+    created = (
+        PdfWrapper(BlankPage())
+        .bulk_create_fields(
+            [
+                Fields.DropdownField(
+                    name, 1, 20, y, options=["Apple", "Banana", "Pear"]
+                )
+                for name, y in (("billing", 20), ("shipping", 60))
+            ]
+        )
+        .fill({"billing": 0, "shipping": 2})
+        .read()
+    )
+    stream = under_parents(
+        created, ("billing", "shipping"), "choice", {"billing": "Banana"}
+    )
+    obj = PdfWrapper(stream)
+    original = obj.read()
+
+    # the new choices clear "billing.choice", which would inherit Banana;
+    # filling doesn't write the key's Pear, which didn't change, so it
+    # raises as reading does, and changes nothing
+    obj.widgets["choice"].choices = ["Banana", "Pear"]
+    with pytest.raises(ValueError, match="Cannot remove /V"):
+        obj.fill({})
+    with pytest.raises(ValueError, match="Cannot remove /V"):
+        obj.read()
+    assert obj.read() == original
+    assert PdfWrapper(original, use_full_widget_name=True).data == {
+        "billing.choice": 0,
+        "shipping.choice": 2,
+    }
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize("title", ["outer.dropdown_1", "dropdown_1"])
+@pytest.mark.parametrize(
+    ("value", "operation"),
+    [
+        (None, lambda obj: obj.fill({"dropdown_1": 1})),
+        (None, lambda obj: obj.remove_fields(["dropdown_1"])),
+        (0, lambda obj: obj.fill({})),
+    ],
+    ids=["fill", "remove_fields", "assigned"],
+)
+def test_note_with_field_name_doesnt_block_new_choices(
+    sample_template_with_dropdown, title, value, operation
+):
+    # "dropdown_1" selects its own "bar" below the "foo" of "outer", and a
+    # note has its full or short name as its title
+    stream = with_value_above(
+        sample_template_with_dropdown, ("dropdown_1",), "foo", "bar"
+    )
+    with Pdf.open(BytesIO(stream)) as pdf:
+        note = Dictionary(
+            {
+                "/Type": Name.Annot,
+                "/Subtype": Name.Text,
+                "/Rect": Array([300, 300, 320, 320]),
+                "/T": String(title),
+            }
+        )
+        pdf.pages[0].Annots.append(pdf.make_indirect(note))
+        stream = save(pdf)
+    obj = PdfWrapper(stream)
+
+    # the note is no widget, so it doesn't count as the field
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    if value is not None:
+        obj.widgets["dropdown_1"].value = value
+    output = operation(obj).read()
+    assert PdfWrapper(output).data == obj.data
+
+
+def test_cleared_selections_are_checked_in_one_read(sample_template_with_dropdown):
+    # "dropdown_1" and a copy of it, "dropdown_2", select their own "bar"
+    # below the "foo" of "outer"
+    with Pdf.open(BytesIO(sample_template_with_dropdown)) as pdf:
+        field = get_field(pdf, "dropdown_1")
+        copy = pdf.make_indirect(Dictionary(field))
+        copy.T = String("dropdown_2")
+        copy.Rect = Array([300, 300, 400, 320])
+        pdf.pages[0].Annots.append(copy)
+        pdf.Root.AcroForm.Fields.append(copy)
+        stream = save(pdf)
+    stream = with_value_above(stream, ("dropdown_1", "dropdown_2"), "foo", "bar")
+    obj = PdfWrapper(stream)
+    for key in ("dropdown_1", "dropdown_2"):
+        obj.widgets[key].choices = ["foo", "x"]
+
+    # the output is read once to check both fields
+    with patch("PyPDFForm.lib.hooks.PdfReader", wraps=PdfReader) as reader:
+        output = obj.fill({"dropdown_1": 1, "dropdown_2": 1}).read()
+    assert reader.call_count == 1
+    assert PdfWrapper(output).data == {**obj.data, "dropdown_1": 1, "dropdown_2": 1}
+
+
+@pytest.mark.parametrize(
+    ("operation", "target"),
+    [
+        (lambda obj: obj.fill({"dropdown_1": 1}), "PyPDFForm.lib.wrapper.fill"),
+        (
+            lambda obj: obj.remove_fields(["dropdown_1"]),
+            "PyPDFForm.lib.wrapper.remove_widgets_by_keys",
+        ),
+    ],
+    ids=["fill", "remove_fields"],
+)
+def test_failed_operation_keeps_dropdown_value_set_above(
+    sample_template_with_dropdown, operation, target, assert_widgets_match_output
+):
+    # "dropdown_1" selects its own "bar" below the "foo" of "outer"
+    stream = with_value_above(
+        sample_template_with_dropdown, ("dropdown_1",), "foo", "bar"
+    )
+    obj = PdfWrapper(stream)
+    original = obj.read()
+    obj.widgets["dropdown_1"].choices = ["foo", "x"]
+    stored = getattr(obj, "_stream")
+
+    # the operation would clear the selection without raising, but fails, so
+    # the PDF is unchanged and the choices are still queued
+    with patch(target, side_effect=RuntimeError), pytest.raises(RuntimeError):
+        operation(obj)
+    assert getattr(obj, "_stream") == stored
+    assert obj.data["dropdown_1"] is None
+    assert [hook for hook, _ in obj.widgets["dropdown_1"].hooks_to_trigger] == [
+        "update_dropdown_choices"
+    ]
+
+    # reading them alone still raises, and restores the selection
+    with pytest.raises(ValueError, match="Cannot remove /V"):
+        obj.read()
+    assert obj.data["dropdown_1"] == 1
+    assert obj.read() == original
+    assert_widgets_match_output(obj)
+
+
+def test_dropdown_choices_move_shared_selection_once(
+    sample_template_with_dropdown, assert_widgets_match_output
+):
+    # the two widgets of "dropdown_1" share its selection, "foobar" at index 2
+    filled = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 2}).read()
+    with Pdf.open(BytesIO(filled)) as pdf:
+        for widget in split_widgets(pdf, get_field(pdf, "dropdown_1"), count=2):
+            if "/I" in widget:
+                del widget["/I"]
+        stream = save(pdf)
+    obj = PdfWrapper(stream)
+    assert obj.data["dropdown_1"] == 2
+
+    # each widget gets both lists, but the selection moves once: it stays
+    # at index 2, then takes the first "foobar"
+    obj.widgets["dropdown_1"].choices = ["x", "foobar", "foobar"]
+    obj.widgets["dropdown_1"].choices = ["foobar", "foobar"]
+    output = obj.read()
+    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 0
+    assert find_widget(output, "dropdown_1")["/Parent"]["/I"] == [0]
+    assert_widgets_match_output(obj)
+
+
+def test_dropdown_choices_move_selection_of_last_widget(
+    sample_template_with_dropdown, assert_widgets_match_output
+):
+    # the second widget of "dropdown_1", which the wrapper reads, has options
+    # of its own, with the selected "bar" at index 0 instead of 1
+    filled = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1}).read()
+    with Pdf.open(BytesIO(filled)) as pdf:
+        widgets = split_widgets(pdf, get_field(pdf, "dropdown_1"), count=2)
+        for widget in widgets:
+            if "/I" in widget:
+                del widget["/I"]
+        widgets[1].Opt = Array([String("bar"), String("y")])
+        stream = save(pdf)
+    obj = PdfWrapper(stream)
+    assert obj.widgets["dropdown_1"].choices == ("bar", "y")
+    assert obj.data["dropdown_1"] == 0
+
+    # both new options have "bar", so the selection keeps the index the
+    # wrapper has
+    obj.widgets["dropdown_1"].choices = [("B1", "bar"), ("B2", "bar")]
+    output = obj.read()
+    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 0
+    assert_widgets_match_output(obj)

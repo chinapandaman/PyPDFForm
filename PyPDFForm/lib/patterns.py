@@ -309,20 +309,53 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         widget (Dropdown): The Dropdown widget object to update with the retrieved value.
     """
     field = get_widget_field(annot)
-    value = _get_inherited_value(field, V)
+    value = get_field_value(field)
     indices = get_entry(field, I)
     index = widget.get_selected_index(value, indices)
     if index is not None:
         widget.value = index
 
 
+def get_field_value(field: DictionaryObject) -> Any:
+    """
+    Reads the value (V) of a field, its own or inherited from the fields above it.
+
+    A `/Parent` cycle before a value is found reads as no value, as
+    `_get_inherited_value` describes.
+
+    Args:
+        field (DictionaryObject): The field, as `get_widget_field` returns it.
+
+    Returns:
+        Any: The value, or None when no field sets it.
+    """
+    return _get_inherited_value(field, V)
+
+
+def read_dropdown(annot: DictionaryObject) -> Dropdown:
+    """
+    Reads the options and the selection of a dropdown annotation.
+
+    They are read as `build_widgets` reads them, with `get_dropdown_choices`
+    and `get_dropdown_value`, so `/I` chooses among options with the same
+    value.
+
+    Args:
+        annot (DictionaryObject): The dropdown annotation dictionary.
+
+    Returns:
+        Dropdown: A dropdown with the annotation's choices and selected index.
+    """
+    dropdown = Dropdown("")
+    dropdown.__dict__["choices"] = get_dropdown_choices(annot)
+    get_dropdown_value(annot, dropdown)
+
+    return dropdown
+
+
 def get_selected_option(annot: DictionaryObject) -> Optional[DropdownOption]:
     """
-    Gets the option that a dropdown annotation selects.
-
-    The options and the selection are read as `build_widgets` reads them,
-    with `get_dropdown_choices` and `get_dropdown_value`, so `/I` chooses
-    among options with the same value.
+    Gets the option that a dropdown annotation selects, as `read_dropdown` reads it.
 
     Args:
         annot (DictionaryObject): The dropdown annotation dictionary.
@@ -331,9 +364,7 @@ def get_selected_option(annot: DictionaryObject) -> Optional[DropdownOption]:
         Optional[DropdownOption]: The selected option, or None when no option
             matches the value.
     """
-    dropdown = Dropdown("")
-    dropdown.__dict__["choices"] = get_dropdown_choices(annot)
-    get_dropdown_value(annot, dropdown)
+    dropdown = read_dropdown(annot)
 
     return None if dropdown.value is None else dropdown.options[dropdown.value]
 
@@ -381,39 +412,45 @@ def remove_appearance(annot: DictionaryObject) -> None:
         del annot[AP]
 
 
-def _get_fill_state(widget: Checkbox | Text | Dropdown) -> Any:
+def _get_fill_state(widget: Checkbox | Text | Dropdown, value: Any) -> Any:
     """
-    Gets what filling writes for a checkbox, text field, or dropdown.
+    Gets what filling writes for a value of a checkbox, text field, or dropdown.
 
-    This is the widget's value, and for a dropdown with a selection also the
-    option at its index, since filling writes that option's export value, so
-    a dropdown whose choices changed at the index is written again.
+    This is the value, and for a dropdown selection also the option at its
+    index, since filling writes that option's export value, so a dropdown
+    whose selected option moved or was renamed by new choices is written
+    again.
 
     Args:
         widget (Checkbox | Text | Dropdown): The widget.
+        value (Any): The value, such as the widget's.
 
     Returns:
-        Any: The value, or for a dropdown with a selection its index and option.
+        Any: The value, or for a dropdown selection its index and option.
     """
-    if isinstance(widget, Dropdown) and widget.value is not None:
-        return widget.value, widget.options[widget.value]
+    if isinstance(widget, Dropdown) and value is not None:
+        return value, widget.options[value]
 
-    return widget.value
+    return value
 
 
-def record_pdf_value(widget: Any) -> None:
+def record_pdf_value(widget: Any, value: Any = ...) -> None:
     """
     Records the value the PDF holds for a checkbox, text field, or dropdown.
 
-    `build_widgets` records the value it reads, and `PdfWrapper.fill` the
-    value it writes, as `_pdf_value`, which `is_unchanged` compares with.
-    Other widgets, including radio groups, record nothing.
+    `build_widgets` records the value it reads, `PdfWrapper.fill` the value
+    it writes, and `PdfWrapper` the selection a dropdown has after new
+    choices, as `_pdf_value`, which `is_unchanged` compares with. Other
+    widgets, including radio groups, record nothing.
 
     Args:
         widget (Any): The middleware widget.
+        value (Any): The value the PDF holds, when it isn't the widget's.
     """
     if type(widget) in (Checkbox, Text, Dropdown):
-        widget.__dict__["_pdf_value"] = _get_fill_state(widget)
+        widget.__dict__["_pdf_value"] = _get_fill_state(
+            widget, widget.value if value is ... else value
+        )
 
 
 def is_unchanged(widget: Any) -> bool:
@@ -435,7 +472,7 @@ def is_unchanged(widget: Any) -> bool:
     """
     return "_pdf_value" in widget.__dict__ and widget.__dict__[
         "_pdf_value"
-    ] == _get_fill_state(widget)
+    ] == _get_fill_state(widget, widget.value)
 
 
 def get_text_value(annot: DictionaryObject, widget: Text) -> None:

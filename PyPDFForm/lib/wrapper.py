@@ -44,7 +44,7 @@ from .adapter import (
     fp_or_f_obj_or_stream_to_stream,
     readable,
 )
-from .constants import FEATURE_HOOKS, FONT_HOOK, JAVASCRIPT_HOOKS
+from .constants import CHOICES_HOOK, FEATURE_HOOKS, FONT_HOOK, JAVASCRIPT_HOOKS
 from .coordinate import generate_coordinate_grid
 from .deprecation import reject_unsupported_kwargs
 from .egress import (
@@ -61,8 +61,13 @@ from .font import (
     temporary_font_registration,
     validate_font,
 )
-from .hooks import FontChange, trigger_widget_hooks
-from .patterns import record_pdf_value
+from .hooks import (
+    ClearedSelection,
+    FontChange,
+    check_cleared_selections,
+    trigger_widget_hooks,
+)
+from .patterns import is_unchanged, record_pdf_value
 from .template import (
     build_widgets,
     create_annotations,
@@ -366,22 +371,33 @@ class PdfWrapper:
         )
 
     @contextmanager
-    def _restore_on_failure(self) -> Iterator[None]:
+    def _restore_on_failure(
+        self, defer: bool = False
+    ) -> Iterator[list[ClearedSelection]]:
         """
         Restores the wrapper's state if the enclosed operation raises.
 
-        Queued widget hooks are applied first, so a hook that fails is reverted
-        and raised by `_read` before the operation starts. The wrapper's
-        attributes, including the PDF stream and widgets, and each widget's
-        attributes are then recorded. If the operation raises, they are restored
-        before the exception propagates, so the wrapper and its PDF output are
-        both unchanged. Widget objects keep their identity.
+        The wrapper's attributes, including the PDF stream and widgets, and
+        each widget's attributes and queued hooks are recorded first. Queued
+        widget hooks are then applied, so a hook that fails is reverted and
+        raised by `_read` before the operation starts, and later reads don't
+        retry it. With `defer`, a dropdown field whose cleared selection
+        still inherits a value doesn't raise there, since the operation can
+        give it a value of its own or remove it; it raises after the
+        operation if the field still inherits one, as `check_cleared_selections`
+        checks, so applying the hooks belongs to the operation. If the
+        operation raises, the recorded state is restored, with the hooks
+        queued again, before the exception propagates, so the wrapper and its
+        PDF output are both unchanged. Widget objects keep their identity.
+
+        Args:
+            defer (bool): Whether the operation can give a field a value of
+                its own or remove it. Defaults to False.
 
         Yields:
-            None: Control returns to the enclosed operation.
+            list[ClearedSelection]: Each such field, empty without `defer`.
         """
 
-        self._read()
         state = {
             name: value.copy() if isinstance(value, (dict, list)) else value
             for name, value in vars(self).items()
@@ -389,9 +405,12 @@ class PdfWrapper:
         widget_states = [
             (widget, widget.save_state()) for widget in self.widgets.values()
         ]
+        cleared: list[ClearedSelection] = []
+        self._read(cleared if defer else None)
 
         try:
-            yield
+            yield cleared
+            check_cleared_selections(self._stream, cleared)
         except Exception:
             self.__dict__.clear()
             self.__dict__.update(state)
@@ -816,26 +835,34 @@ class PdfWrapper:
         except Exception:  # noqa: BLE001 # pylint: disable=W0718
             return stream
 
-    def _read(self) -> bytes:
+    def _read(self, cleared: list[ClearedSelection] | None = None) -> bytes:
         """
         Reads the PDF stream, triggering widget hooks and updating fonts if necessary.
 
         This internal method executes queued widget hooks. A font being changed is
         passed to its hook with the resource name of the registered font or font
         of the PDF with its name, and each changed widget's font is then read back
-        from the changed PDF, as reopening it reads it. The changed PDF and those
-        fonts are committed together, which updates the wrapper's stored stream
-        and clears each widget's hook queue. If a hook or reading the fonts back
-        raises, every widget's queued hooks are discarded and their properties are
-        restored to their committed values, so the stream and widgets are
-        unchanged and later reads do not retry the failed updates.
+        from the changed PDF, as reopening it reads it. So is the selection of
+        each dropdown whose choices were replaced, as `_commit_read_back`
+        describes. The changed PDF and what is read back are committed
+        together, which updates the wrapper's stored stream and clears each
+        widget's hook queue. If a hook or reading back raises, every widget's
+        queued hooks are discarded and their properties are restored to their
+        committed values, so the stream and widgets are unchanged and later
+        reads do not retry the failed updates.
+
+        Args:
+            cleared (list[ClearedSelection] | None): Where to collect the
+                dropdown fields whose cleared selection still inherits a value,
+                instead of raising, as `trigger_widget_hooks` describes.
+                Defaults to None.
 
         Returns:
             bytes: The raw PDF stream.
 
         Raises:
-            Exception: Any error raised while applying a hook or reading the
-                fonts back is re-raised after the queued updates are reverted.
+            Exception: Any error raised while applying a hook or reading
+                back is re-raised after the queued updates are reverted.
         """
 
         widgets_with_hooks = [
@@ -844,8 +871,19 @@ class PdfWrapper:
 
         if widgets_with_hooks:
             font_widgets = self._queue_font_changes(widgets_with_hooks)
+            chosen = {
+                id(widget): widget
+                for widget in widgets_with_hooks
+                if any(hook == CHOICES_HOOK for hook, _ in widget.hooks_to_trigger)
+            }
+            # a None the PDF holds, not one assigned over its selection
+            unselected = {
+                key
+                for key, widget in chosen.items()
+                if widget.value is None and is_unchanged(widget)
+            }
 
-            # the changed PDF and the fonts read back from it are committed
+            # the changed PDF and what is read back from it are committed
             # only when both succeed
             try:
                 stream = trigger_widget_hooks(
@@ -853,8 +891,9 @@ class PdfWrapper:
                     self.widgets,
                     getattr(self, "use_full_widget_name"),
                     self._generates_appearances,
+                    cleared,
                 )
-                fonts = self._read_fonts(stream, font_widgets)
+                read_back = self._read_back(stream, font_widgets, chosen)
             except Exception:
                 for widget in self.widgets.values():
                     widget.revert_property_updates()
@@ -862,8 +901,9 @@ class PdfWrapper:
 
             self._stream = stream
             for widget in self.widgets.values():
-                if id(widget) in fonts:
-                    widget.__dict__["font"] = fonts[id(widget)]
+                self._commit_read_back(
+                    widget, read_back.get(id(widget), {}), id(widget) in unselected
+                )
                 widget.clear_property_updates()
 
         return self._stream
@@ -910,29 +950,65 @@ class PdfWrapper:
 
         return font_widgets
 
-    def _read_fonts(self, stream: bytes, font_widgets: dict) -> dict:
+    def _read_back(self, stream: bytes, font_widgets: dict, chosen: dict) -> dict:
         """
-        Reads the fonts of widgets back from a changed PDF, as reopening it does.
+        Reads fonts and selections of widgets back from a changed PDF, as reopening it does.
 
         Each annotation's font hook decides by its own `/DA`, so the widgets of
         a field can get different fonts, and the key gives access to the last.
+        The selection of a dropdown whose choices were replaced is read the
+        same way.
 
         Args:
-            stream (bytes): The PDF with the font changes applied.
+            stream (bytes): The PDF with the changes applied.
             font_widgets (dict): The widgets whose font was changed, by `id`.
+            chosen (dict): The dropdowns whose choices were replaced, by `id`.
 
         Returns:
-            dict: The font of each of those widgets, by `id`.
+            dict: The `font` or `value` read back for each of those widgets,
+                by `id`.
         """
-        if not font_widgets:
+        if not font_widgets and not chosen:
             return {}
 
         written = build_widgets(stream, getattr(self, "use_full_widget_name"))
-        return {
-            id(widget): getattr(written[key], "font", widget.font)
-            for key, widget in self.widgets.items()
-            if id(widget) in font_widgets and key in written
-        }
+        result = {}
+        for key, widget in self.widgets.items():
+            # a key the PDF no longer has keeps the widget's attributes
+            new = written.get(key, widget)
+            if id(widget) in font_widgets:
+                result.setdefault(id(widget), {})["font"] = getattr(
+                    new, "font", widget.font
+                )
+            if id(widget) in chosen:
+                result.setdefault(id(widget), {})["value"] = new.value
+
+        return result
+
+    @staticmethod
+    def _commit_read_back(widget: Any, read: dict, unselected: bool) -> None:
+        """
+        Gives a widget what `_read_back` read for it.
+
+        A font replaces the widget's. A dropdown without a selection, as the
+        PDF held none, takes the selection read back, which its value can name
+        among the new choices. The selection read back is recorded as the
+        PDF's value, as `record_pdf_value` describes, so the next fill doesn't
+        write a dropdown that has it, such as to the other fields with its
+        key, whose selections moved on their own, and writes one that doesn't.
+
+        Args:
+            widget (Any): The middleware widget.
+            read (dict): The `font` or `value` read back for it.
+            unselected (bool): Whether it is a dropdown whose None the PDF
+                held, as opposed to one assigned over the PDF's selection.
+        """
+        if "font" in read:
+            widget.__dict__["font"] = read["font"]
+        if "value" in read:
+            if unselected:
+                widget.__dict__["_value"] = read["value"]
+            record_pdf_value(widget, read["value"])
 
     def write(self, dest: str | bytes | PathLike | BinaryIO) -> PdfWrapper:
         """
@@ -1068,25 +1144,28 @@ class PdfWrapper:
 
         reject_unsupported_kwargs(self, "fill", kwargs, ["readonly"])
         readonly = kwargs.get("readonly", False)
-        pending = [
-            (self.widgets[key], self.widgets[key].prepare_value(value))
+        pending = {
+            key: self.widgets[key].prepare_value(value)
             for key, value in data.items()
             if key in self.widgets
-        ]
+        }
         for key, widget in self.widgets.items():
             if key not in data:
                 widget.prepare_value(widget.value)
 
-        with self._restore_on_failure():
-            for widget, update in pending:
-                widget.apply_value(update)
+        with self._restore_on_failure(defer=True) as cleared:
+            for key, update in pending.items():
+                self.widgets[key].apply_value(update)
 
+            # the widget's own field lost its selection, so a value the
+            # widget has was assigned since and is written
+            replaced = {each.key for each in cleared if each.read}
             filled_stream, image_drawn_stream = fill(
                 self._read(),
                 self.widgets,
                 generate_appearance_streams=self._generates_appearances,
                 use_full_widget_name=getattr(self, "use_full_widget_name"),
-                supplied=set(data),
+                supplied=set(data) | replaced,
                 readonly=readonly,
             )
 
@@ -1262,7 +1341,7 @@ class PdfWrapper:
                 a cycle.
         """
 
-        with self._restore_on_failure():
+        with self._restore_on_failure(defer=True):
             self._stream = remove_widgets_by_keys(
                 self._stream, keys, getattr(self, "use_full_widget_name")
             )
