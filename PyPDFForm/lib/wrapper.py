@@ -61,7 +61,7 @@ from .font import (
     temporary_font_registration,
     validate_font,
 )
-from .hooks import FontChange, trigger_widget_hooks
+from .hooks import FontChange, check_cleared_selections, trigger_widget_hooks
 from .patterns import is_unchanged, record_pdf_value
 from .template import (
     build_widgets,
@@ -366,7 +366,7 @@ class PdfWrapper:
         )
 
     @contextmanager
-    def _restore_on_failure(self, replaced: Collection[str] = ()) -> Iterator[None]:
+    def _restore_on_failure(self, defer: bool = False) -> Iterator[list]:
         """
         Restores the wrapper's state if the enclosed operation raises.
 
@@ -374,19 +374,22 @@ class PdfWrapper:
         each widget's attributes and queued hooks are recorded first. Queued
         widget hooks are then applied, so a hook that fails is reverted and
         raised by `_read` before the operation starts, and later reads don't
-        retry it. The fields the operation fills with a value or removes are
-        passed to `_read`, since they don't keep a cleared dropdown
-        selection, so applying the hooks belongs to the operation. If the
+        retry it. With `defer`, a dropdown field whose cleared selection
+        still inherits a value doesn't raise there, since the operation can
+        give it a value of its own or remove it; it raises after the
+        operation if the field still inherits one, as `check_cleared_selections`
+        checks, so applying the hooks belongs to the operation. If the
         operation raises, the recorded state is restored, with the hooks
         queued again, before the exception propagates, so the wrapper and its
         PDF output are both unchanged. Widget objects keep their identity.
 
         Args:
-            replaced (Collection[str]): The keys of the fields the operation
-                fills with a value or removes. Defaults to none.
+            defer (bool): Whether the operation can give a field a value of
+                its own or remove it. Defaults to False.
 
         Yields:
-            None: Control returns to the enclosed operation.
+            list: The `ClearedSelection` of each such field, empty without
+                `defer`.
         """
 
         state = {
@@ -396,10 +399,12 @@ class PdfWrapper:
         widget_states = [
             (widget, widget.save_state()) for widget in self.widgets.values()
         ]
-        self._read(replaced)
+        cleared = []
+        self._read(cleared if defer else None)
 
         try:
-            yield
+            yield cleared
+            check_cleared_selections(self._stream, cleared)
         except Exception:
             self.__dict__.clear()
             self.__dict__.update(state)
@@ -824,7 +829,7 @@ class PdfWrapper:
         except Exception:  # noqa: BLE001 # pylint: disable=W0718
             return stream
 
-    def _read(self, replaced: Collection[str] = ()) -> bytes:
+    def _read(self, cleared: list | None = None) -> bytes:
         """
         Reads the PDF stream, triggering widget hooks and updating fonts if necessary.
 
@@ -842,10 +847,9 @@ class PdfWrapper:
         unchanged and later reads do not retry the failed updates.
 
         Args:
-            replaced (Collection[str]): The keys of the fields that the
-                operation reading the PDF fills with a value or removes,
-                whose cleared dropdown selection may still inherit a value,
-                as `trigger_widget_hooks` describes. Defaults to none.
+            cleared (list | None): Where to collect the dropdown fields whose
+                cleared selection still inherits a value, instead of raising,
+                as `trigger_widget_hooks` describes. Defaults to None.
 
         Returns:
             bytes: The raw PDF stream.
@@ -881,7 +885,7 @@ class PdfWrapper:
                     self.widgets,
                     getattr(self, "use_full_widget_name"),
                     self._generates_appearances,
-                    replaced,
+                    cleared,
                 )
                 read_back = self._read_back(stream, font_widgets, chosen)
             except Exception:
@@ -1143,24 +1147,19 @@ class PdfWrapper:
             if key not in data:
                 widget.prepare_value(widget.value)
 
-        # a field with a value, supplied or on its widget, gets a value of its
-        # own; one whose selection new choices clear has it only if it was
-        # assigned since, which differs from the PDF's, so filling writes it
-        written = [
-            key
-            for key, widget in self.widgets.items()
-            if (pending[key].value if key in pending else widget.value) is not None
-        ]
-        with self._restore_on_failure(written):
+        with self._restore_on_failure(defer=True) as cleared:
             for key, update in pending.items():
                 self.widgets[key].apply_value(update)
 
+            # the widget's own field lost its selection, so a value the
+            # widget has was assigned since and is written
+            replaced = {each.key for each in cleared if each.read}
             filled_stream, image_drawn_stream = fill(
                 self._read(),
                 self.widgets,
                 generate_appearance_streams=self._generates_appearances,
                 use_full_widget_name=getattr(self, "use_full_widget_name"),
-                supplied=set(data),
+                supplied=set(data) | replaced,
                 readonly=readonly,
             )
 
@@ -1336,7 +1335,7 @@ class PdfWrapper:
                 a cycle.
         """
 
-        with self._restore_on_failure(keys):
+        with self._restore_on_failure(defer=True):
             self._stream = remove_widgets_by_keys(
                 self._stream, keys, getattr(self, "use_full_widget_name")
             )

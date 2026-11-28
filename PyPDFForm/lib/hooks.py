@@ -11,11 +11,11 @@ and behavior.
 """
 
 import sys
-from collections.abc import Callable, Collection
+from collections.abc import Callable
 from io import BytesIO
 from typing import Any, NamedTuple, Optional, TextIO, cast
 
-from pypdf import PdfWriter
+from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
     ArrayObject,
     ByteStringObject,
@@ -108,12 +108,77 @@ class FontChange(NamedTuple):
     resource: Optional[str]
 
 
+class ClearedSelection(NamedTuple):
+    """
+    A dropdown field whose cleared selection still inherits a value.
+
+    `trigger_widget_hooks` collects one, instead of raising, for an operation
+    that can give the field a value of its own or remove it.
+
+    Attributes:
+        name (str): The field's full name.
+        key (str): The key of the widget the hook ran for.
+        read (bool): Whether the field's widget is the one its key gives
+            access to, as the wrapper reads it.
+        error (ValueError): The error to raise if the field still inherits
+            its value after the operation.
+    """
+
+    name: str
+    key: str
+    read: bool
+    error: ValueError
+
+
+def check_cleared_selections(pdf: bytes, cleared: list) -> None:
+    """
+    Raises for a dropdown field whose cleared selection still inherits a value.
+
+    Args:
+        pdf (bytes): The PDF after the operation that collected `cleared`.
+        cleared (list): The `ClearedSelection` of each field the operation
+            could give a value of its own or remove.
+
+    Raises:
+        ValueError: The field's error, if it still has no value of its own,
+            as `_keeps_inherited_value` checks.
+    """
+    for each in cleared:
+        if _keeps_inherited_value(pdf, each):
+            raise each.error
+
+
+def _keeps_inherited_value(pdf: bytes, cleared: ClearedSelection) -> bool:
+    """
+    Checks whether a field whose selection was cleared still has no value of its own.
+
+    Args:
+        pdf (bytes): The PDF after the operation.
+        cleared (ClearedSelection): The field.
+
+    Returns:
+        bool: True if a widget with the field's full name is on a page and
+            its field has no value (V) of its own, so it inherits one; False
+            when the operation gave it one or removed it.
+    """
+    for page in PdfReader(BytesIO(pdf)).pages:
+        for annot in page.get(Annots, []):
+            annot = cast(DictionaryObject, annot.get_object())
+            if (
+                get_widget_key(annot, True) == cleared.name
+                and get_entry(get_widget_field(annot), V) is None
+            ):
+                return True
+
+    return False
+
+
 def trigger_widget_hooks(
     pdf: bytes,
     widgets: dict,
     use_full_widget_name: bool,
     generate_appearance_streams: bool = False,
-    replaced: Collection[str] = (),
+    cleared: Optional[list] = None,
 ) -> bytes:
     """
     Triggers widget hooks to apply dynamic changes to PDF form fields.
@@ -149,10 +214,11 @@ def trigger_widget_hooks(
         generate_appearance_streams (bool): Whether appearance streams are
             generated, which draw in the appearances of text fields and
             dropdowns that keep their size. Defaults to False.
-        replaced (Collection[str]): The keys of the fields that the operation
-            reading the PDF fills with a value or removes, whose cleared
-            dropdown selection can still inherit a value, as
-            `_move_dropdown_selection` describes. Defaults to none.
+        cleared (Optional[list]): Where to collect a `ClearedSelection` for
+            each dropdown field whose cleared selection still inherits a value,
+            instead of raising, so the operation reading the PDF can give the
+            field a value of its own or remove it. Defaults to None, which
+            raises.
 
     Returns:
         bytes: The modified PDF data as bytes, with the widget hooks applied.
@@ -182,20 +248,7 @@ def trigger_widget_hooks(
             )
             targets.append((annot, key, widget, before))
 
-    # the selection of each dropdown field that gets new choices, read
-    # through its last widget, as the wrapper reads it, before options change
-    selections = {}
-    for annot, key, widget, _ in targets:
-        choices = [
-            value for hook, value in widget.hooks_to_trigger if hook == CHOICES_HOOK
-        ]
-        if choices and get_widget_type(annot) is Dropdown:
-            selections[id(get_widget_field(annot))] = (
-                annot,
-                read_dropdown(annot),
-                choices,
-                key in replaced,
-            )
+    selections = _read_selections(targets)
 
     for annot, _, widget, _ in targets:
         for hook, value in widget.hooks_to_trigger:
@@ -205,9 +258,7 @@ def trigger_widget_hooks(
             else:
                 function(annot, value)
 
-    # the widgets of a field share its selection, so it moves once
-    for annot, before, choices, is_replaced in selections.values():
-        _move_dropdown_selection(annot, before, choices, is_replaced)
+    _move_selections(selections, targets, cleared)
 
     for annot, _, _, before in targets:
         if before is not None and before != _get_drawn_state(
@@ -219,6 +270,73 @@ def trigger_widget_hooks(
         output.write(f)
         f.seek(0)
         return f.read()
+
+
+def _read_selections(targets: list) -> dict:
+    """
+    Reads the selection of each dropdown field whose widgets get new choices.
+
+    The selection is read before any hook runs, through the field's last
+    widget, as the wrapper reads it.
+
+    Args:
+        targets (list): The `(annot, key, widget, drawn state)` of each
+            annotation with queued hooks, in page order.
+
+    Returns:
+        dict: The `(annot, key, selection, choices)` of each field, by the
+            `id` of the field: its last widget, the widget's key, the options
+            and selection as `read_dropdown` reads them, and each list of new
+            choices in order.
+    """
+    selections = {}
+    for annot, key, widget, _ in targets:
+        choices = [
+            value for hook, value in widget.hooks_to_trigger if hook == CHOICES_HOOK
+        ]
+        if choices and get_widget_type(annot) is Dropdown:
+            selections[id(get_widget_field(annot))] = (
+                annot,
+                key,
+                read_dropdown(annot),
+                choices,
+            )
+
+    return selections
+
+
+def _move_selections(selections: dict, targets: list, cleared: Optional[list]) -> None:
+    """
+    Moves the selection of each dropdown field once, as `_move_dropdown_selection` does.
+
+    The widgets of a field share its selection, so it moves once, after every
+    hook has run.
+
+    Args:
+        selections (dict): The fields, as `_read_selections` returns them.
+        targets (list): The annotations with queued hooks, in page order.
+        cleared (Optional[list]): Where to collect a `ClearedSelection` for a
+            field whose cleared selection still inherits a value, or None to
+            raise.
+
+    Raises:
+        ValueError: If a cleared selection still inherits a value, or the
+            `/Parent` chain has a cycle before one is found, without
+            `cleared`.
+    """
+    # the annotation each key gives access to, the last, as the wrapper reads it
+    read_by_key = {key: annot for annot, key, _, _ in targets}
+    for annot, key, before, choices in selections.values():
+        try:
+            _move_dropdown_selection(annot, before, choices)
+        except ValueError as error:
+            if cleared is None:
+                raise
+            cleared.append(
+                ClearedSelection(
+                    get_widget_key(annot, True), key, read_by_key[key] is annot, error
+                )
+            )
 
 
 def _get_drawn_state(
@@ -682,7 +800,7 @@ def update_dropdown_choices(annot: DictionaryObject, val: tuple) -> None:
 
 
 def _move_dropdown_selection(
-    annot: DictionaryObject, before: Dropdown, choices: list, replaced: bool
+    annot: DictionaryObject, before: Dropdown, choices: list
 ) -> None:
     """
     Moves the selection of a dropdown field to follow its new choices.
@@ -699,22 +817,18 @@ def _move_dropdown_selection(
     value, which also replaces a displayed text that earlier versions
     filled. A cleared selection removes them from the field, as
     `_remove_field_entry` removes entries, so it raises when a field above
-    still supplies a value, unless the field is filled with a value of its
-    own or removed right after.
+    still supplies a value, after removing them.
 
     Args:
         annot (DictionaryObject): The last widget of the field.
         before (Dropdown): The options and selection the widget had, as
             `read_dropdown` reads them.
         choices (list): Each list of choices the field got, in order.
-        replaced (bool): Whether the operation reading the PDF fills the
-            field with a value or removes it.
 
     Raises:
         ValueError: If a field above the field, which other fields can share,
             still supplies a value after the selection is cleared, or the
-            `/Parent` chain has a cycle before one is found, and the field
-            isn't replaced.
+            `/Parent` chain has a cycle before one is found.
     """
     index, options = before.value, before.options
     for each in choices:
@@ -728,12 +842,9 @@ def _move_dropdown_selection(
         index = after.value
     elif index is None:
         field.pop(NameObject(I), None)
-        if replaced:
-            field.pop(NameObject(V), None)
-        else:
-            _remove_field_entry(
-                annot, V, lambda widget: resolve_inherited_entry(widget, V, None).value
-            )
+        _remove_field_entry(
+            annot, V, lambda widget: resolve_inherited_entry(widget, V, None).value
+        )
         return
     if index is None:
         return

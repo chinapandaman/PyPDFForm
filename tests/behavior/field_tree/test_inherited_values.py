@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 from pikepdf import Array, Dictionary, Name, Pdf, String
 
-from PyPDFForm import PdfWrapper
+from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.constants import RADIO, READ_ONLY
 from PyPDFForm.lib.middleware.checkbox import Checkbox
 from PyPDFForm.lib.middleware.radio import Radio
@@ -362,18 +362,72 @@ def test_clearing_dropdown_value_set_above_raises(
     assert find_widget(output, "dropdown_1")["/V"] == "x"
     assert_widgets_match_output(obj)
 
-    # so does a value assigned on the widget, which filling writes
-    obj = PdfWrapper(stream)
-    obj.widgets["dropdown_1"].choices = ["foo", "x"]
-    obj.widgets["dropdown_1"].value = 1
-    output = obj.fill({}).read()
-    assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == 1
+    # so does a value assigned on the widget, which filling writes, also
+    # when it is the value of "outer"
+    for value in (1, 0):
+        obj = PdfWrapper(stream)
+        obj.widgets["dropdown_1"].choices = ["foo", "x"]
+        obj.widgets["dropdown_1"].value = value
+        output = obj.fill({}).read()
+        assert obj.data["dropdown_1"] == PdfWrapper(output).data["dropdown_1"] == value
+        assert find_widget(output, "dropdown_1")["/V"] == ("foo", "x")[value]
 
     obj = PdfWrapper(stream)
     obj.widgets["dropdown_1"].choices = ["foo", "x"]
     assert (
         "dropdown_1" not in PdfWrapper(obj.remove_fields(["dropdown_1"]).read()).widgets
     )
+
+
+def test_fill_keeps_value_set_above_of_field_with_short_name(
+    assert_widgets_match_output,
+):
+    # "billing.choice" selects Apple below the "Banana" of "billing", and
+    # "shipping.choice", whose widget comes later and has the key, Pear
+    created = (
+        PdfWrapper(BlankPage())
+        .bulk_create_fields(
+            [
+                Fields.DropdownField(
+                    name, 1, 20, y, options=["Apple", "Banana", "Pear"]
+                )
+                for name, y in (("billing", 20), ("shipping", 60))
+            ]
+        )
+        .fill({"billing": 0, "shipping": 2})
+        .read()
+    )
+    with Pdf.open(BytesIO(created)) as pdf:
+        fields = []
+        for name in ("billing", "shipping"):
+            field = get_field(pdf, name)
+            field.T = String("choice")
+            parent = pdf.make_indirect(
+                Dictionary({"/T": String(name), "/Kids": Array([field])})
+            )
+            if name == "billing":
+                parent.V = String("Banana")
+            field.Parent = parent
+            fields.append(parent)
+        pdf.Root.AcroForm.Fields = Array(fields)
+        stream = save(pdf)
+    obj = PdfWrapper(stream)
+    original = obj.read()
+
+    # the new choices clear "billing.choice", which would inherit Banana;
+    # filling doesn't write the key's Pear, which didn't change, so it
+    # raises as reading does, and changes nothing
+    obj.widgets["choice"].choices = ["Banana", "Pear"]
+    with pytest.raises(ValueError, match="Cannot remove /V"):
+        obj.fill({})
+    with pytest.raises(ValueError, match="Cannot remove /V"):
+        obj.read()
+    assert obj.read() == original
+    assert PdfWrapper(original, use_full_widget_name=True).data == {
+        "billing.choice": 0,
+        "shipping.choice": 2,
+    }
+    assert_widgets_match_output(obj)
 
 
 @pytest.mark.parametrize(
