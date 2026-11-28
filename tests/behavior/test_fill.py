@@ -182,21 +182,16 @@ def test_invalid_choice_indices(
         assert form.read() == stream
 
 
-@pytest.mark.parametrize(("field_name", "count"), [("dropdown_1", 4), ("radio_1", 3)])
 @pytest.mark.parametrize("option_count", [1, 0])
-def test_stale_choice_indices(
-    sample_template_with_dropdown, field_name, count, option_count
-):
+def test_stale_choice_indices(sample_template_with_dropdown, option_count):
+    # new dropdown choices clear a selection they don't have, as
+    # test_ppf_2155_dropdown_selection_follows_new_choices checks, so only a
+    # radio group can keep an index outside its options
     form = PdfWrapper(sample_template_with_dropdown).fill(
-        {field_name: count - 1, "test_1": "original"}
+        {"radio_1": 2, "test_1": "original"}
     )
-    widget = form.widgets[field_name]
-    if field_name == "dropdown_1":
-        choices = widget.choices
-        assert choices is not None
-        widget.choices = choices[:option_count]
-    else:
-        widget.number_of_options = option_count
+    widget = form.widgets["radio_1"]
+    widget.number_of_options = option_count
     form.widgets["test_1"].x = 123
     stream = getattr(form, "_stream")
     original_state = deepcopy(
@@ -204,7 +199,7 @@ def test_stale_choice_indices(
     )
 
     with pytest.raises(ValidationError):
-        validate({field_name: widget.value}, form.schema)
+        validate({"radio_1": widget.value}, form.schema)
     with pytest.raises(ValueError, match="Choice index"):
         form.fill({"test_1": "must not change"}, readonly=True)
 
@@ -212,7 +207,7 @@ def test_stale_choice_indices(
         key: value.__dict__ for key, value in form.widgets.items()
     } == original_state
     assert getattr(form, "_stream") == stream
-    form.fill({field_name: 0 if option_count else None})
+    form.fill({"radio_1": 0 if option_count else None})
     assert widget.value == (0 if option_count else None)
 
 
@@ -372,11 +367,18 @@ def test_fill_writes_supplied_and_changed_values(sample_template_with_dropdown):
     assert "/AP" in find_widget(output, "dropdown_1")
     assert PdfWrapper(output).data == form.data
 
-    # new choices change the option at the index, so it is written again
+    # new choices keep the selected option at its new index
+    form.widgets["dropdown_1"].choices = ["bar", "x"]
+    widget = find_widget(form.fill({}).read(), "dropdown_1")
+    assert widget["/V"] == "bar"
+    assert widget["/I"] == [0]
+
+    # and clear it when they don't have it, so filling writes nothing
     form.widgets["dropdown_1"].choices = ["x", "y", "z"]
     widget = find_widget(form.fill({}).read(), "dropdown_1")
-    assert widget["/V"] == "y"
-    assert widget["/I"] == [1]
+    assert "/V" not in widget
+    assert "/I" not in widget
+    assert form.data["dropdown_1"] is None
 
 
 def test_fill_preserves_unrelated_annotations(

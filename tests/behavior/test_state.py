@@ -115,6 +115,31 @@ def test_failed_hook_reverts_queued_updates(
 
 
 @pytest.mark.parametrize(
+    ("choices", "index"), [(["bar"], 0), (["x", "y"], None)], ids=["moved", "cleared"]
+)
+def test_failed_hook_reverts_dropdown_selection(
+    sample_template_with_dropdown, choices, index, assert_widgets_match_output
+):
+    obj = PdfWrapper(sample_template_with_dropdown).fill({"dropdown_1": 1})
+    original = obj.read()
+    widget = obj.widgets["dropdown_1"]
+    widget.choices = choices
+    assert widget.value == index
+
+    with (
+        patch("PyPDFForm.lib.wrapper.trigger_widget_hooks", side_effect=RuntimeError),
+        pytest.raises(RuntimeError),
+    ):
+        obj.read()
+
+    # the selection is restored with the choices
+    assert widget.choices == ("foo", "bar", "foobar", " ")
+    assert widget.value == 1
+    assert obj.read() == original
+    assert_widgets_match_output(obj)
+
+
+@pytest.mark.parametrize(
     "operation",
     [
         lambda obj: obj.remove_fields(["test_2"]),

@@ -48,6 +48,7 @@ from .constants import (
     F,
     Ff,
     Fo,
+    I,
     JavaScript,
     MaxLen,
     Opt,
@@ -56,6 +57,7 @@ from .constants import (
     S,
     Type,
     U,
+    V,
     X,
 )
 from .default_appearance import (
@@ -80,6 +82,7 @@ from .patterns import (
     parse_alignment,
     parse_field_flags,
     parse_max_length,
+    read_dropdown,
     remove_appearance,
     resolve_inherited_entry,
 )
@@ -631,6 +634,17 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
     `[export, display]` PDF option arrays from the user-facing
     `(display, export)` order.
 
+    The selected option, as `read_dropdown` reads it, stays selected if a new
+    option has its export value, as `Dropdown.follow_selection` finds it,
+    and the selection is cleared otherwise. A value that selected no option
+    selects the new option it names, if any, as reopening reads it. The
+    value (V) and selected index (I) of the field the widget belongs to are
+    written as filling writes them when the index changes or the new options
+    would read another selection. A cleared selection removes them, except a
+    value inherited from a field above, which other fields can share. A
+    value that names no option before or after, such as text typed into an
+    editable dropdown, is kept.
+
     Args:
         annot (DictionaryObject): The annotation dictionary for the dropdown field.
         val (list): A list of strings or tuples representing the new choices for the dropdown.
@@ -639,9 +653,26 @@ def update_dropdown_choices(annot: DictionaryObject, val: list) -> None:
         ValueError: If the `/Parent` chain has a cycle before any options are
             found.
     """
-    resolve_inherited_entry(annot, Opt, None).target[NameObject(Opt)] = ArrayObject(
+    target = resolve_inherited_entry(annot, Opt, None).target
+    before = read_dropdown(annot)
+    target[NameObject(Opt)] = ArrayObject(
         [DropdownOption.from_choice(each).to_pdf() for each in val]
     )
+    after = read_dropdown(annot)
+    index = (
+        after.value
+        if before.value is None
+        else Dropdown.follow_selection(before.value, before.options, after.options)
+    )
+
+    field = get_widget_field(annot)
+    if index is not None and (index != before.value or after.value != index):
+        field[NameObject(V)] = TextStringObject(after.options[index].export)
+        field[NameObject(I)] = ArrayObject([NumberObject(index)])
+    elif index is None and before.value is not None:
+        for key in (V, I):
+            if key in field:
+                del field[key]
 
 
 def update_field_readonly(annot: DictionaryObject, val: bool) -> None:

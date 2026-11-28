@@ -316,13 +316,30 @@ def get_dropdown_value(annot: DictionaryObject, widget: Dropdown) -> None:
         widget.value = index
 
 
+def read_dropdown(annot: DictionaryObject) -> Dropdown:
+    """
+    Reads the options and the selection of a dropdown annotation.
+
+    They are read as `build_widgets` reads them, with `get_dropdown_choices`
+    and `get_dropdown_value`, so `/I` chooses among options with the same
+    value.
+
+    Args:
+        annot (DictionaryObject): The dropdown annotation dictionary.
+
+    Returns:
+        Dropdown: A dropdown with the annotation's choices and selected index.
+    """
+    dropdown = Dropdown("")
+    dropdown.__dict__["choices"] = get_dropdown_choices(annot)
+    get_dropdown_value(annot, dropdown)
+
+    return dropdown
+
+
 def get_selected_option(annot: DictionaryObject) -> Optional[DropdownOption]:
     """
-    Gets the option that a dropdown annotation selects.
-
-    The options and the selection are read as `build_widgets` reads them,
-    with `get_dropdown_choices` and `get_dropdown_value`, so `/I` chooses
-    among options with the same value.
+    Gets the option that a dropdown annotation selects, as `read_dropdown` reads it.
 
     Args:
         annot (DictionaryObject): The dropdown annotation dictionary.
@@ -331,9 +348,7 @@ def get_selected_option(annot: DictionaryObject) -> Optional[DropdownOption]:
         Optional[DropdownOption]: The selected option, or None when no option
             matches the value.
     """
-    dropdown = Dropdown("")
-    dropdown.__dict__["choices"] = get_dropdown_choices(annot)
-    get_dropdown_value(annot, dropdown)
+    dropdown = read_dropdown(annot)
 
     return None if dropdown.value is None else dropdown.options[dropdown.value]
 
@@ -387,7 +402,8 @@ def _get_fill_state(widget: Checkbox | Text | Dropdown) -> Any:
 
     This is the widget's value, and for a dropdown with a selection also the
     option at its index, since filling writes that option's export value, so
-    a dropdown whose choices changed at the index is written again.
+    a dropdown whose selected option moved or was renamed by new choices is
+    written again.
 
     Args:
         widget (Checkbox | Text | Dropdown): The widget.

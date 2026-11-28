@@ -18,7 +18,7 @@ from pypdf.generic import (
 from PyPDFForm import BlankPage, Fields, PdfWrapper
 from PyPDFForm.lib.constants import TU, Parent, V
 from PyPDFForm.lib.middleware.radio import Radio
-from PyPDFForm.lib.patterns import get_widget_key
+from PyPDFForm.lib.patterns import get_widget_key, is_unchanged
 from PyPDFForm.lib.template import get_widgets_by_page
 from tests.support.builders import (
     change_widgets,
@@ -291,6 +291,127 @@ def test_ppf_2153_malformed_appearance_dictionaries(
         # the state that check_2's value names, which PyPDFForm reads
         assert find_widget(output, "check_2")["/AS"] == "/Yes"
         assert PdfWrapper(output).data["check_2"] is True
+
+
+@pytest.mark.parametrize(
+    ("choices", "index"),
+    [
+        (["Cherry", "Pear"], None),
+        (["Banana", "Apple"], 0),
+        (["Cherry", "Apple", "Banana"], 2),
+        (["Banana"], 0),
+        (["Cherry"], None),
+        ([("Bananas", "Banana"), "Apple"], 0),
+        ([("Banana", "x"), "Apple", "Banana"], 2),
+        (["Banana", "Banana"], 1),
+    ],
+    ids=[
+        "replaced",
+        "reordered",
+        "inserted-before",
+        "shortened",
+        "shortened-without",
+        "renamed",
+        "export-over-display",
+        "duplicated",
+    ],
+)
+@pytest.mark.parametrize(
+    "options",
+    [{}, {"need_appearances": True}, {"generate_appearance_streams": True}],
+    ids=["default", "need-appearances", "generate-appearance-streams"],
+)
+def test_ppf_2155_dropdown_selection_follows_new_choices(
+    choices, index, options, assert_widgets_match_output
+):
+    # Banana is selected at index 1
+    form = (
+        PdfWrapper(BlankPage(), **options)
+        .bulk_create_fields(
+            [Fields.DropdownField("choice", 1, 20, 20, options=["Apple", "Banana"])]
+        )
+        .fill({"choice": 1})
+    )
+    form.widgets["choice"].choices = choices
+    assert form.data["choice"] == index
+
+    output = form.read()
+    field = find_widget(output, "choice")
+    exports = [each[0] for each in field["/Opt"]]
+    assert form.data["choice"] == PdfWrapper(output).data["choice"] == index
+    if index is None:
+        assert "/V" not in field
+        assert "/I" not in field
+    else:
+        assert field["/V"] == exports[index] == "Banana"
+        assert field["/I"] == [index]
+    assert_widgets_match_output(form)
+
+    # a later fill selects as before
+    output = form.fill({"choice": 0}).read()
+    assert PdfWrapper(output).data["choice"] == 0
+    assert find_widget(output, "choice")["/V"] == exports[0]
+
+
+def test_ppf_2155_unselected_value_names_new_choice(assert_widgets_match_output):
+    # Cherry is no option, so the dropdown reads as unselected, while /I
+    # still points at Apple
+    template = change_widgets(
+        PdfWrapper(BlankPage())
+        .bulk_create_fields(
+            [Fields.DropdownField("choice", 1, 20, 20, options=["Apple", "Banana"])]
+        )
+        .read(),
+        {"choice": lambda annot: setattr(annot, "V", pikepdf.String("Cherry"))},
+    )
+    form = PdfWrapper(template)
+    assert form.data["choice"] is None
+
+    # reading takes the selection the value names among the new choices
+    form.widgets["choice"].choices = ["Pear", "Cherry"]
+    output = form.read()
+    field = find_widget(output, "choice")
+    assert form.data["choice"] == PdfWrapper(output).data["choice"] == 1
+    assert field["/V"] == "Cherry"
+    assert field["/I"] == [1]
+    assert_widgets_match_output(form)
+    # the PDF holds it, so filling doesn't write it again
+    assert is_unchanged(form.widgets["choice"])
+
+    # a value that names no new option either, such as typed text, is kept
+    form = PdfWrapper(template)
+    form.widgets["choice"].choices = ["Pear", "Plum"]
+    output = form.read()
+    assert form.data["choice"] is PdfWrapper(output).data["choice"] is None
+    assert find_widget(output, "choice")["/V"] == "Cherry"
+    assert_widgets_match_output(form)
+
+
+def test_ppf_2155_displayed_text_value(assert_widgets_match_output):
+    # earlier versions filled the displayed text, which reads as Banana
+    template = change_widgets(
+        PdfWrapper(BlankPage())
+        .bulk_create_fields(
+            [
+                Fields.DropdownField(
+                    "choice", 1, 20, 20, options=[("Banana", "b"), "Apple"]
+                )
+            ]
+        )
+        .read(),
+        {"choice": lambda annot: setattr(annot, "V", pikepdf.String("Banana"))},
+    )
+    form = PdfWrapper(template)
+    assert form.data["choice"] == 0
+
+    # the new displayed text no longer matches, so the export value is written
+    form.widgets["choice"].choices = [("Bananas", "b"), "Apple"]
+    output = form.read()
+    field = find_widget(output, "choice")
+    assert form.data["choice"] == PdfWrapper(output).data["choice"] == 0
+    assert field["/V"] == "b"
+    assert field["/I"] == [0]
+    assert_widgets_match_output(form)
 
 
 def test_get_desc_in_schema(issue_pdf_directory):
